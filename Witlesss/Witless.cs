@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static Witlesss.Logger;
 
 namespace Witlesss
 {
@@ -42,8 +43,8 @@ namespace Witlesss
             if (!SentenceIsAcceptable(sentence)) return false;
             
             List<string> wordlist = new List<string> {Start};
-            wordlist.AddRange((sentence.ToLower() + " ").Replace(". ", $" {Dot} {Start} ").Trim()
-                .Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
+            wordlist.AddRange(sentence.ToLower().Replace(". ", $" {Dot} {Start} ")
+                .Trim().Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
             wordlist.Add(End);
 
             for (var i = 0; i < wordlist.Count - 1; i++)
@@ -149,6 +150,10 @@ namespace Witlesss
                 Save();
             }
         }
-        private void Save() => _fileIO.SaveData(_words);
+        private void Save()
+        {
+            _fileIO.SaveData(_words);
+            Log($"Словарь для чата {Chat} сохранён!");
+        }
     }
 }

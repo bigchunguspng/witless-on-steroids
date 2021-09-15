@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using static Witlesss.Logger;
 
 namespace Witlesss
 {
@@ -46,7 +47,7 @@ namespace Witlesss
                         witless.Interval = value;
                         SaveChatList();
                         await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
-                        Log($@"интервал генерации изменен на {witless.Interval} для чата ""{title}""");
+                        Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
                     }
                     
                     return;
@@ -54,30 +55,21 @@ namespace Witlesss
                 
                 if (witless.ReceiveSentence(text))
                 {
-                    Log($@"получено сообщение ""{text}"" с чата ""{title}"", ID: {chat}");
+                    Log($@"""{title}"": получено сообщение ""{text}""");
                 }
                 
                 witless.Count();
-                //Log($@"""{title}"" - {witless.Counter.ToString()}");
                 
                 if (witless.ReadyToGen())
                 {
-                    try
-                    {
-                        await _client.SendTextMessageAsync(chat, witless.Generate());
-                        Log($@"сгенерировано прикол в чат ""{title}""");
-                    }
-                    catch (Exception exception)
-                    {
-                        Log(exception.Message);
-                        throw;
-                    }
+                    await _client.SendTextMessageAsync(chat, witless.Generate());
+                    Log($@"""{title}"": сгенерировано прикол");
                 }
             }
             else if (CommandFrom(text) == "/start")
             {
                 _sussyBakas.Add(chat, new Witless(chat, 3));
-                Log($@"создано базу для чата ""{title}"", ID: {chat}");
+                Log($@"Создано базу для чата {chat} ({title})");
 
                 SaveChatList();
 
@@ -85,7 +77,7 @@ namespace Witlesss
             }
         }
 
-        private static void Log(string message) => Console.WriteLine(message);
+        
 
         private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
         
@@ -94,7 +86,7 @@ namespace Witlesss
         private static void SaveChatList()
         {
             _fileIO.SaveData(_sussyBakas);
-            Log("список чатов сохранен!");
+            Log("Список чатов сохранен!");
         }
     }
 }

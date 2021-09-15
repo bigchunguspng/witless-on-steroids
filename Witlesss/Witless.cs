@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Witlesss
@@ -13,7 +15,7 @@ namespace Witlesss
         private readonly Dictionary<string, Dictionary<string, int>> _words;
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
-        private int _interval;
+        private int _interval, _saveInt, _saveCount;
 
         [JsonProperty] private long Chat { get; set; }
         [JsonProperty] public int Interval
@@ -39,6 +41,8 @@ namespace Witlesss
             
             _fileIO = new FileIO<Dictionary<string, Dictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             _words = _fileIO.LoadData();
+            
+            WaitOnStartup();
         }
         
         public bool ReceiveSentence(string sentence)
@@ -46,7 +50,8 @@ namespace Witlesss
             if (!SentenceIsAcceptable(sentence)) return false;
             
             List<string> wordlist = new List<string> {Start};
-            wordlist.AddRange(sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Trim().Split().ToList());
+            wordlist.AddRange((sentence.ToLower() + " ").Replace(". ", $" {Dot} {Start} ").Trim()
+                .Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
             wordlist.Add(End);
 
             for (var i = 0; i < wordlist.Count - 1; i++)
@@ -69,6 +74,7 @@ namespace Witlesss
                 }
             }
 
+            TryToSave();
             return true;
         }
 
@@ -85,13 +91,7 @@ namespace Witlesss
             
             return true;
         }
-
-        public void Count()
-        {
-            Counter++;
-            Counter %= Interval;
-        }
-
+        
         public string Generate()
         {
             string result = "";
@@ -105,11 +105,9 @@ namespace Witlesss
 
             result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
             
-            Save();
-            
             return result;
         }
-
+        
         private string PickWord(Dictionary<string, int> dictionary)
         {
             int totalProbability = 0;
@@ -135,7 +133,38 @@ namespace Witlesss
 
             return result;
         }
+        
+        private async void WaitOnStartup()
+        {
+            await Task.Run(() =>
+            {
+                _saveInt = int.MaxValue;
+                int temp = Interval;
+                _interval = int.MaxValue; //ага, в обход сеттера
+                Thread.Sleep(6200);
+                
+                Save();
+                Interval = temp;
+                _saveInt = 5;
+                _saveCount = 0;
+            });
+        }
+        
+        public void Count()
+        {
+            Counter++;
+            Counter %= Interval;
+        }
 
+        private void TryToSave()
+        {
+            _saveCount++;
+            _saveCount %= _saveInt;
+            if (_saveCount == 0)
+            {
+                Save();
+            }
+        }
         private void Save() => _fileIO.SaveData(_words);
     }
 }

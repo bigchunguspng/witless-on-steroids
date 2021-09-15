@@ -24,8 +24,10 @@ namespace Witlesss
             _client = new TelegramBotClient(_token);
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
-            Console.ReadLine();
             
+            Console.ReadLine();
+            foreach (var baka in _sussyBakas) baka.Value.Save();
+
             _client.StopReceiving();
         }
 

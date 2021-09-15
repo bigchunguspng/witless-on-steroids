@@ -150,7 +150,7 @@ namespace Witlesss
                 Save();
             }
         }
-        private void Save()
+        public void Save()
         {
             _fileIO.SaveData(_words);
             Log($"Словарь для чата {Chat} сохранён!", ConsoleColor.Green);

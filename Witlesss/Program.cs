@@ -55,7 +55,7 @@ namespace Witlesss
                 
                 if (witless.ReceiveSentence(text))
                 {
-                    Log($@"""{title}"": получено сообщение ""{text}""");
+                    Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
                 }
                 
                 witless.Count();
@@ -86,7 +86,7 @@ namespace Witlesss
         private static void SaveChatList()
         {
             _fileIO.SaveData(_sussyBakas);
-            Log("Список чатов сохранен!");
+            Log("Список чатов сохранен!", ConsoleColor.Blue);
         }
     }
 }

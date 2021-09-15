@@ -26,9 +26,8 @@ namespace Witlesss
             _client.OnMessage += OnMessageHandler;
             
             Console.ReadLine();
-            foreach (var baka in _sussyBakas) baka.Value.Save();
-
             _client.StopReceiving();
+            foreach (var baka in _sussyBakas) baka.Value.Save();
         }
 
         private static async void OnMessageHandler(object sender, MessageEventArgs e)

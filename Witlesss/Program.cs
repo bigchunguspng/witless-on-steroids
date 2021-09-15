@@ -44,6 +44,7 @@ namespace Witlesss
                     if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
                     {
                         witless.Interval = value;
+                        SaveChatList();
                         await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
                         Log($@"интервал генерации изменен на {witless.Interval} для чата ""{title}""");
                     }
@@ -57,11 +58,11 @@ namespace Witlesss
                 }
                 
                 witless.Count();
-                Log($@"""{title}"" - {witless.Counter.ToString()}");
+                //Log($@"""{title}"" - {witless.Counter.ToString()}");
                 
-                if (witless.Counter == 0)
+                if (witless.ReadyToGen())
                 {
-                    await _client.SendTextMessageAsync(chat, witless.Generate());
+                    await _client.SendTextMessageAsync(chat, witless.Generate()); //todo try catch
                     Log($@"сгенерировано прикол в чат ""{title}""");
                 }
             }
@@ -70,8 +71,7 @@ namespace Witlesss
                 _sussyBakas.Add(chat, new Witless(chat, 3));
                 Log($@"создано базу для чата ""{title}"", ID: {chat}");
 
-                _fileIO.SaveData(_sussyBakas);
-                Log("список чатов сохранен!");
+                SaveChatList();
 
                 await _client.SendTextMessageAsync(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
             }
@@ -82,5 +82,11 @@ namespace Witlesss
         private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
         
         private static bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
+        
+        private static void SaveChatList()
+        {
+            _fileIO.SaveData(_sussyBakas);
+            Log("список чатов сохранен!");
+        }
     }
 }

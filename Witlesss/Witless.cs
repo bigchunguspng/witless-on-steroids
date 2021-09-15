@@ -15,33 +15,21 @@ namespace Witlesss
         private readonly Dictionary<string, Dictionary<string, int>> _words;
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
-        private int _interval;
-
-        private Counter _saving;
+        private Counter _saving, _generation;
 
         [JsonProperty] private long Chat { get; set; }
         [JsonProperty] public int Interval
         {
-            get => _interval;
-            set
-            {
-                if (value < 1)
-                    _interval = 1;
-                else if (value > 62)
-                    _interval = 62;
-                else
-                    _interval = value;
-            }
+            get => _generation.Interval;
+            set => _generation.Interval = value;
         }
-
-        public int Counter { get; private set; }
         
         public Witless(long chat, int interval = 7)
         {
             Chat = chat;
-            Interval = interval;
             
             _saving = new Counter(10);
+            _generation = new Counter(interval);
             
             _fileIO = new FileIO<Dictionary<string, Dictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             _words = _fileIO.LoadData();
@@ -81,7 +69,6 @@ namespace Witlesss
             TryToSave();
             return true;
         }
-
         private bool SentenceIsAcceptable(string sentence)
         {
             if (string.IsNullOrWhiteSpace(sentence))
@@ -111,7 +98,6 @@ namespace Witlesss
             
             return result;
         }
-        
         private string PickWord(Dictionary<string, int> dictionary)
         {
             int totalProbability = 0;
@@ -143,26 +129,22 @@ namespace Witlesss
             await Task.Run(() =>
             {
                 _saving.Stop();
-                int temp = Interval;
-                _interval = int.MaxValue; //ага, в обход сеттера
+                _generation.Stop();
                 Thread.Sleep(6200);
                 
                 Save();
-                Interval = temp;
+                _generation.Resume();
                 _saving.Resume();
             });
         }
         
-        public void Count()
-        {
-            Counter++;
-            Counter %= Interval;
-        }
+        public void Count() => _generation.Count();
+        public bool ReadyToGen() => _generation.Ready();
 
         private void TryToSave()
         {
             _saving.Count();
-            if (_saving.Done())
+            if (_saving.Ready())
             {
                 Save();
             }

@@ -62,8 +62,16 @@ namespace Witlesss
                 
                 if (witless.ReadyToGen())
                 {
-                    await _client.SendTextMessageAsync(chat, witless.Generate()); //todo try catch
-                    Log($@"сгенерировано прикол в чат ""{title}""");
+                    try
+                    {
+                        await _client.SendTextMessageAsync(chat, witless.Generate());
+                        Log($@"сгенерировано прикол в чат ""{title}""");
+                    }
+                    catch (Exception exception)
+                    {
+                        Log(exception.Message);
+                        throw;
+                    }
                 }
             }
             else if (CommandFrom(text) == "/start")

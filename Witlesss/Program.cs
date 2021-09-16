@@ -24,10 +24,8 @@ namespace Witlesss
             _client = new TelegramBotClient(_token);
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
-            
-            Console.ReadLine();
-            _client.StopReceiving();
-            foreach (var baka in _sussyBakas) baka.Value.Save();
+
+            HandleConsoleInput();
         }
 
         private static async void OnMessageHandler(object sender, MessageEventArgs e)
@@ -79,7 +77,16 @@ namespace Witlesss
             }
         }
 
-        
+        private static void HandleConsoleInput()
+        {
+            string input;
+            do
+            {
+                input = Console.ReadLine();
+            } while (input != "s");
+            _client.StopReceiving();
+            foreach (var baka in _sussyBakas) baka.Value.Save();
+        }
 
         private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
         

@@ -13,6 +13,7 @@ namespace Witlesss
         private static TelegramBotClient _client;
         private static Dictionary<long, Witless> _sussyBakas;
         private static FileIO<Dictionary<long, Witless>> _fileIO;
+        private static long _activeChat;
 
         static void Main(string[] args)
         {
@@ -66,7 +67,7 @@ namespace Witlesss
                     Log($@"""{title}"": сгенерировано прикол");
                 }
             }
-            else if (CommandFrom(text) == "/start")
+            else if (text != null && CommandFrom(text) == "/start")
             {
                 _sussyBakas.Add(chat, new Witless(chat));
                 Log($@"Создано базу для чата {chat} ({title})");
@@ -83,6 +84,36 @@ namespace Witlesss
             do
             {
                 input = Console.ReadLine();
+                
+                if (input != null)
+                {
+                    if (input.StartsWith("+") && input.Length > 1)
+                    {
+                        string shit = input.Substring(1);
+                        foreach (var baka in _sussyBakas)
+                        {
+                            if (baka.Key.ToString().EndsWith(shit))
+                            {
+                                _activeChat = baka.Key;
+                                break;
+                            }
+                        }
+                    }
+                    if (WitlessExist(_activeChat) && input.Length > 3)
+                    {
+                        string text = input.Substring(3);
+                        if (input.StartsWith("/a ") )
+                        {
+                            _sussyBakas[_activeChat].ReceiveSentence(text);
+                            Log($@"{_activeChat}: получено сообщение ""{text}""", ConsoleColor.Blue);
+                        }
+                        else if (input.StartsWith("/w "))
+                        {
+                            _client.SendTextMessageAsync(_activeChat, text);
+                            _sussyBakas[_activeChat].ReceiveSentence(input.Substring(3));
+                        }
+                    }
+                }
             } while (input != "s");
             _client.StopReceiving();
             foreach (var baka in _sussyBakas) baka.Value.Save();

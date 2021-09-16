@@ -95,6 +95,7 @@ namespace Witlesss
                             if (baka.Key.ToString().EndsWith(shit))
                             {
                                 _activeChat = baka.Key;
+                                Log($"Выбрано чат {_activeChat}");
                                 break;
                             }
                         }
@@ -105,12 +106,13 @@ namespace Witlesss
                         if (input.StartsWith("/a ") )
                         {
                             _sussyBakas[_activeChat].ReceiveSentence(text);
-                            Log($@"{_activeChat}: получено сообщение ""{text}""", ConsoleColor.Blue);
+                            Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
                         }
                         else if (input.StartsWith("/w "))
                         {
                             _client.SendTextMessageAsync(_activeChat, text);
-                            _sussyBakas[_activeChat].ReceiveSentence(input.Substring(3));
+                            _sussyBakas[_activeChat].ReceiveSentence(text);
+                            Log($@"{_activeChat}: отправлено в чат и добавлено в словарь ""{text}""", ConsoleColor.Yellow);
                         }
                     }
                 }

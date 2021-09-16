@@ -68,7 +68,7 @@ namespace Witlesss
             }
             else if (CommandFrom(text) == "/start")
             {
-                _sussyBakas.Add(chat, new Witless(chat, 3));
+                _sussyBakas.Add(chat, new Witless(chat));
                 Log($@"Создано базу для чата {chat} ({title})");
 
                 SaveChatList();

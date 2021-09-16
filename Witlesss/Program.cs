@@ -57,6 +57,7 @@ namespace Witlesss
                 if (witless.ReceiveSentence(text))
                 {
                     Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
+                    witless.TryToSave();
                 }
                 
                 witless.Count();

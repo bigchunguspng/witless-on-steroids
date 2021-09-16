@@ -66,8 +66,7 @@ namespace Witlesss
                     _words[word].Add(nextWord, 1);
                 }
             }
-
-            TryToSave();
+            
             return true;
         }
         private bool SentenceIsAcceptable(string sentence)
@@ -142,7 +141,7 @@ namespace Witlesss
         public void Count() => _generation.Count();
         public bool ReadyToGen() => _generation.Ready();
 
-        private void TryToSave()
+        public void TryToSave()
         {
             _saving.Count();
             if (_saving.Ready())

@@ -103,22 +103,24 @@ namespace Witlesss
                     if (WitlessExist(_activeChat) && input.Length > 3)
                     {
                         string text = input.Substring(3);
-                        if (input.StartsWith("/a ") )
+                        Witless witless = _sussyBakas[_activeChat];
+                        if (input.StartsWith("/a ") ) //add
                         {
-                            _sussyBakas[_activeChat].ReceiveSentence(text);
+                            witless.ReceiveSentence(text);
                             Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
                         }
-                        else if (input.StartsWith("/w "))
+                        else if (input.StartsWith("/w ")) //write
                         {
                             _client.SendTextMessageAsync(_activeChat, text);
-                            _sussyBakas[_activeChat].ReceiveSentence(text);
+                            witless.ReceiveSentence(text);
                             Log($@"{_activeChat}: отправлено в чат и добавлено в словарь ""{text}""", ConsoleColor.Yellow);
                         }
                     }
+                    if (input == "/s") SaveDics();
                 }
             } while (input != "s");
             _client.StopReceiving();
-            foreach (var baka in _sussyBakas) baka.Value.Save();
+            SaveDics();
         }
 
         private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
@@ -129,6 +131,11 @@ namespace Witlesss
         {
             _fileIO.SaveData(_sussyBakas);
             Log("Список чатов сохранен!", ConsoleColor.Blue);
+        }
+
+        private static void SaveDics()
+        {
+            foreach (KeyValuePair<long, Witless> baka in _sussyBakas) baka.Value.Save();
         }
     }
 }

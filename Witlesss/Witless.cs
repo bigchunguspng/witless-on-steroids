@@ -52,8 +52,7 @@ namespace Witlesss
                 string word = wordlist[i];
                 if (!_words.ContainsKey(word))
                 {
-                    Dictionary<string, int> probOfNextWords = new Dictionary<string, int>();
-                    _words.Add(word, probOfNextWords);
+                    _words.Add(word, new Dictionary<string, int>());
                 }
 
                 string nextWord = wordlist[i + 1];
@@ -109,15 +108,15 @@ namespace Witlesss
             int r = _random.Next(totalProbability);
             string result = End;
 
-            foreach (KeyValuePair<string,int> pair in dictionary)
+            foreach (KeyValuePair<string,int> chance in dictionary)
             {
-                if (pair.Value > r)
+                if (chance.Value > r)
                 {
-                    return pair.Key;
+                    return chance.Key;
                 }
                 else
                 {
-                    r -= pair.Value;
+                    r -= chance.Value;
                 }
             }
 

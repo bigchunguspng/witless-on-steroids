@@ -100,7 +100,7 @@ namespace Witlesss
                             }
                         }
                     }
-                    if (WitlessExist(_activeChat) && input.Length > 3)
+                    else if (WitlessExist(_activeChat) && input.Length > 3)
                     {
                         string text = input.Substring(3);
                         Witless witless = _sussyBakas[_activeChat];
@@ -116,7 +116,7 @@ namespace Witlesss
                             Log($@"{_activeChat}: отправлено в чат и добавлено в словарь ""{text}""", ConsoleColor.Yellow);
                         }
                     }
-                    if (input == "/s") SaveDics();
+                    else if (input == "/s") SaveDics();
                 }
             } while (input != "s");
             _client.StopReceiving();

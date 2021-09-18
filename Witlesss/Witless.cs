@@ -13,7 +13,7 @@ namespace Witlesss
     {
         private const string Start = "_start", End = "_end", Dot = "_dot";
         
-        private readonly Dictionary<string, Dictionary<string, int>> _words;
+        private Dictionary<string, Dictionary<string, int>> _words;
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
         private Counter _saving, _generation;
@@ -33,7 +33,7 @@ namespace Witlesss
             _generation = new Counter(interval);
             
             _fileIO = new FileIO<Dictionary<string, Dictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
-            _words = _fileIO.LoadData();
+            Load();
             
             WaitOnStartup();
         }
@@ -152,6 +152,12 @@ namespace Witlesss
         {
             _fileIO.SaveData(_words);
             Log($"Словарь для чата {Chat} сохранён!", ConsoleColor.Green);
+        }
+
+        public void Load()
+        {
+            _words = _fileIO.LoadData();
+            Log($"Словарь для чата {Chat} загружен!");
         }
     }
 }

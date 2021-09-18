@@ -117,6 +117,7 @@ namespace Witlesss
                         }
                     }
                     else if (input == "/s") SaveDics();
+                    else if (input == "/u") ReloadDics();
                 }
             } while (input != "s");
             _client.StopReceiving();
@@ -136,6 +137,11 @@ namespace Witlesss
         private static void SaveDics()
         {
             foreach (KeyValuePair<long, Witless> baka in _sussyBakas) baka.Value.Save();
+        }
+        
+        private static void ReloadDics()
+        {
+            foreach (KeyValuePair<long,Witless> baka in _sussyBakas) baka.Value.Load();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types.Enums;
 using static Witlesss.Logger;
 
 namespace Witlesss
@@ -34,7 +35,7 @@ namespace Witlesss
             var message = e.Message;
             string text = message.Text;
             long chat = message.Chat.Id;
-            string title = message.Chat.Title;
+            string title = chat < 0 ? message.Chat.Title : message.From.FirstName;
 
             if (WitlessExist(chat))
             {
@@ -51,7 +52,10 @@ namespace Witlesss
                             await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
                             Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
                         }
-                    
+                        else
+                        {
+                            await _client.SendTextMessageAsync(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
+                        }
                         return;
                     }
                     if (CommandFrom(text) == "/chat_id")
@@ -68,7 +72,13 @@ namespace Witlesss
                             FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[value].Words);
                             fusion.Fuse();
                             witless.Save();
+                            await _client.SendTextMessageAsync(chat, $@"словарь беседы ""{title}"" обновлён!");
                         }
+                        else
+                        {
+                            await _client.SendTextMessageAsync(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+                        }
+                        return;
                     }
                 }
                 

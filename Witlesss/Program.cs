@@ -40,17 +40,25 @@ namespace Witlesss
             {
                 var witless = _sussyBakas[chat];
                 
-                if (text != null && CommandFrom(text).StartsWith("/set_frequency"))
+                if (text != null)
                 {
-                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                    if (CommandFrom(text).StartsWith("/set_frequency"))
                     {
-                        witless.Interval = value;
-                        SaveChatList();
-                        await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
-                        Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
-                    }
+                        if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                        {
+                            witless.Interval = value;
+                            SaveChatList();
+                            await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
+                            Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
+                        }
                     
-                    return;
+                        return;
+                    }
+                    if (CommandFrom(text) == "/chat_id")
+                    {
+                        await _client.SendTextMessageAsync(chat, chat.ToString());
+                        return;
+                    }
                 }
                 
                 if (witless.ReceiveSentence(text))

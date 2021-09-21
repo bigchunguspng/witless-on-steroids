@@ -40,7 +40,7 @@ namespace Witlesss
             {
                 var witless = _sussyBakas[chat];
                 
-                if (text != null)
+                if (text != null && text.StartsWith('/'))
                 {
                     if (CommandFrom(text).StartsWith("/set_frequency"))
                     {
@@ -58,6 +58,17 @@ namespace Witlesss
                     {
                         await _client.SendTextMessageAsync(chat, chat.ToString());
                         return;
+                    }
+
+                    if (CommandFrom(text).StartsWith("/fuse"))
+                    {
+                        if (text.Split().Length > 1 && long.TryParse(text.Split()[1], out long value) && value != chat && _sussyBakas.ContainsKey(value))
+                        {
+                            witless.Backup();
+                            FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[value].Words);
+                            fusion.Fuse();
+                            witless.Save();
+                        }
                     }
                 }
                 

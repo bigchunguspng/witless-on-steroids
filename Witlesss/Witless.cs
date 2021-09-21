@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,10 +14,11 @@ namespace Witlesss
     {
         private const string Start = "_start", End = "_end", Dot = "_dot";
         
-        private Dictionary<string, Dictionary<string, int>> _words;
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
         private Counter _saving, _generation;
+        
+        public Dictionary<string, Dictionary<string, int>> Words { get; set; }
 
         [JsonProperty] private long Chat { get; set; }
         [JsonProperty] public int Interval
@@ -50,19 +52,19 @@ namespace Witlesss
             for (var i = 0; i < wordlist.Count - 1; i++)
             {
                 string word = wordlist[i];
-                if (!_words.ContainsKey(word))
+                if (!Words.ContainsKey(word))
                 {
-                    _words.Add(word, new Dictionary<string, int>());
+                    Words.Add(word, new Dictionary<string, int>());
                 }
 
                 string nextWord = wordlist[i + 1];
-                if (_words[word].ContainsKey(nextWord))
+                if (Words[word].ContainsKey(nextWord))
                 {
-                    _words[word][nextWord]++;
+                    Words[word][nextWord]++;
                 }
                 else
                 {
-                    _words[word].Add(nextWord, 1);
+                    Words[word].Add(nextWord, 1);
                 }
             }
             
@@ -90,7 +92,7 @@ namespace Witlesss
             while (currentWord != End)
             {
                 result = result + " " + currentWord;
-                currentWord = PickWord(_words[currentWord]);
+                currentWord = PickWord(Words[currentWord]);
             }
 
             result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
@@ -150,14 +152,22 @@ namespace Witlesss
         }
         public void Save()
         {
-            _fileIO.SaveData(_words);
+            _fileIO.SaveData(Words);
             Log($"Словарь для чата {Chat} сохранён!", ConsoleColor.Green);
         }
 
         public void Load()
         {
-            _words = _fileIO.LoadData();
+            Words = _fileIO.LoadData();
             Log($"Словарь для чата {Chat} загружен!");
+        }
+
+        public void Backup()
+        {
+            Save();
+            Directory.CreateDirectory($@"{Environment.CurrentDirectory}\Backup");
+            FileInfo file = new FileInfo($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
+            file.CopyTo($@"{Environment.CurrentDirectory}\Backup\Telegram-WitlessDB-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss)}.json");
         }
     }
 }

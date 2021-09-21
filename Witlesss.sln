@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Witlesss", "Witlesss\Witlesss.csproj", "{EE94D96B-6E0D-4095-BB6A-C22560E48F85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fusion Collab", "Fusion Collab\Fusion Collab.csproj", "{16294649-B8B4-408E-B29C-3E3C8CEA2A90}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{EE94D96B-6E0D-4095-BB6A-C22560E48F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE94D96B-6E0D-4095-BB6A-C22560E48F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE94D96B-6E0D-4095-BB6A-C22560E48F85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{16294649-B8B4-408E-B29C-3E3C8CEA2A90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16294649-B8B4-408E-B29C-3E3C8CEA2A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16294649-B8B4-408E-B29C-3E3C8CEA2A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16294649-B8B4-408E-B29C-3E3C8CEA2A90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

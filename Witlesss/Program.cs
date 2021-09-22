@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -15,6 +17,7 @@ namespace Witlesss
         private static Dictionary<long, Witless> _sussyBakas;
         private static FileIO<Dictionary<long, Witless>> _fileIO;
         private static long _activeChat;
+        private static Counter _saving;
 
         static void Main(string[] args)
         {
@@ -22,15 +25,17 @@ namespace Witlesss
             
             _fileIO = new FileIO<Dictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
             _sussyBakas = _fileIO.LoadData();
+            _saving = new Counter(5);
 
             _client = new TelegramBotClient(_token);
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
 
+            SaveLoop();
             HandleConsoleInput();
         }
 
-        private static async void OnMessageHandler(object sender, MessageEventArgs e)
+        private static void OnMessageHandler(object sender, MessageEventArgs e)
         {
             var message = e.Message;
             string text = message.Text;
@@ -49,21 +54,20 @@ namespace Witlesss
                         {
                             witless.Interval = value;
                             SaveChatList();
-                            await _client.SendTextMessageAsync(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
+                            SendMessage(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
                             Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
                         }
                         else
                         {
-                            await _client.SendTextMessageAsync(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
+                            SendMessage(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
                         }
                         return;
                     }
                     if (CommandFrom(text) == "/chat_id")
                     {
-                        await _client.SendTextMessageAsync(chat, chat.ToString());
+                        SendMessage(chat, chat.ToString());
                         return;
                     }
-
                     if (CommandFrom(text).StartsWith("/fuse"))
                     {
                         if (text.Split().Length > 1 && long.TryParse(text.Split()[1], out long value) && value != chat && _sussyBakas.ContainsKey(value))
@@ -72,11 +76,11 @@ namespace Witlesss
                             FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[value].Words);
                             fusion.Fuse();
                             witless.Save();
-                            await _client.SendTextMessageAsync(chat, $@"словарь беседы ""{title}"" обновлён!");
+                            SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
                         }
                         else
                         {
-                            await _client.SendTextMessageAsync(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+                            SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
                         }
                         return;
                     }
@@ -85,14 +89,13 @@ namespace Witlesss
                 if (witless.ReceiveSentence(text))
                 {
                     Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
-                    witless.TryToSave();
                 }
                 
                 witless.Count();
                 
                 if (witless.ReadyToGen())
                 {
-                    await _client.SendTextMessageAsync(chat, witless.Generate());
+                    SendMessage(chat, witless.Generate());
                     Log($@"""{title}"": сгенерировано прикол");
                 }
             }
@@ -103,7 +106,7 @@ namespace Witlesss
 
                 SaveChatList();
 
-                await _client.SendTextMessageAsync(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
+                SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
             }
         }
 
@@ -140,7 +143,7 @@ namespace Witlesss
                         }
                         else if (input.StartsWith("/w ")) //write
                         {
-                            _client.SendTextMessageAsync(_activeChat, text);
+                            SendMessage(_activeChat, text);
                             witless.ReceiveSentence(text);
                             Log($@"{_activeChat}: отправлено в чат и добавлено в словарь ""{text}""", ConsoleColor.Yellow);
                         }
@@ -153,6 +156,22 @@ namespace Witlesss
             SaveDics();
         }
 
+        private static async void SendMessage(long chat, string text, ParseMode mode = ParseMode.Default)
+        {
+            try
+            {
+                await _client.SendTextMessageAsync(chat, text, mode, disableNotification: true)
+                    .ContinueWith(task =>
+                    {
+                        Log(chat + ": " + task.Exception?.Message, ConsoleColor.Red);
+                    }, TaskContinuationOptions.OnlyOnFaulted);
+            }
+            catch
+            {
+                // u/stupid
+            }
+        }
+
         private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
         
         private static bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
@@ -161,6 +180,22 @@ namespace Witlesss
         {
             _fileIO.SaveData(_sussyBakas);
             Log("Список чатов сохранен!", ConsoleColor.Blue);
+        }
+
+        private static async void SaveLoop()
+        {
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(60000);
+                    _saving.Count();
+                    if (_saving.Ready())
+                    {
+                        SaveDics();
+                    }
+                }
+            });
         }
 
         private static void SaveDics()

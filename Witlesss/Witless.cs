@@ -16,7 +16,7 @@ namespace Witlesss
         
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
-        private Counter _saving, _generation;
+        private Counter _generation;
         
         public Dictionary<string, Dictionary<string, int>> Words { get; set; }
 
@@ -30,13 +30,9 @@ namespace Witlesss
         public Witless(long chat, int interval = 7)
         {
             Chat = chat;
-            
-            _saving = new Counter(10);
             _generation = new Counter(interval);
-            
             _fileIO = new FileIO<Dictionary<string, Dictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             Load();
-            
             WaitOnStartup();
         }
         
@@ -129,27 +125,17 @@ namespace Witlesss
         {
             await Task.Run(() =>
             {
-                _saving.Stop();
                 _generation.Stop();
-                Thread.Sleep(6200);
+                Thread.Sleep(28000);
                 
                 Save();
                 _generation.Resume();
-                _saving.Resume();
             });
         }
         
         public void Count() => _generation.Count();
         public bool ReadyToGen() => _generation.Ready();
 
-        public void TryToSave()
-        {
-            _saving.Count();
-            if (_saving.Ready())
-            {
-                Save();
-            }
-        }
         public void Save()
         {
             _fileIO.SaveData(Words);

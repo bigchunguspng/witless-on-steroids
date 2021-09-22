@@ -25,7 +25,7 @@ namespace Witlesss
             
             _fileIO = new FileIO<Dictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
             _sussyBakas = _fileIO.LoadData();
-            _saving = new Counter(5);
+            _saving = new Counter(2);
 
             _client = new TelegramBotClient(_token);
             _client.StartReceiving();

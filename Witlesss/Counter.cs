@@ -2,12 +2,9 @@
 {
     public class Counter
     {
-        private int _interval;
-        private int _counter;
-        private int _temp;
-
         private readonly int _min, _max;
-        
+        private int _interval, _actualInterval, _counter;
+
         public Counter(int interval, int min = 1, int max = 62)
         {
             _min = min;
@@ -27,6 +24,8 @@
                     _interval = _max;
                 else
                     _interval = value;
+                
+                _actualInterval = _interval;
             }
         }
 
@@ -34,21 +33,13 @@
         public void Count()
         {
             _counter ++;
-            _counter %= Interval;
+            _counter %= _actualInterval;
         }
 
         public bool Ready() => _counter == 0;
 
-        public void Stop()
-        {
-            _temp = Interval;
-            _interval = int.MaxValue; //ага, в обход сеттера
-        }
+        public void Stop() => _actualInterval = int.MaxValue;
 
-        public void Resume()
-        {
-            Interval = _temp;
-            _counter = 0;
-        }
+        public void Resume() => _actualInterval = Interval;
     }
 }

@@ -75,6 +75,7 @@ namespace Witlesss
                             witless.Backup();
                             FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[value].Words);
                             fusion.Fuse();
+                            witless.HasUnsavedStuff = true;
                             witless.Save();
                             SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
                         }

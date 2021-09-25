@@ -17,7 +17,7 @@ namespace Witlesss
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
         private Counter _generation;
-        private bool _hasUnsavedStuff;
+        public bool HasUnsavedStuff;
         
         public Dictionary<string, Dictionary<string, int>> Words { get; set; }
 
@@ -65,7 +65,7 @@ namespace Witlesss
                 }
             }
 
-            _hasUnsavedStuff = true;
+            HasUnsavedStuff = true;
             return true;
         }
         private bool SentenceIsAcceptable(string sentence)
@@ -140,10 +140,10 @@ namespace Witlesss
 
         public void Save()
         {
-            if (_hasUnsavedStuff)
+            if (HasUnsavedStuff)
             {
                 _fileIO.SaveData(Words);
-                _hasUnsavedStuff = false;
+                HasUnsavedStuff = false;
                 Log($"Словарь для чата {Chat} сохранён!", ConsoleColor.Green);
             }
         }
@@ -151,7 +151,7 @@ namespace Witlesss
         public void Load()
         {
             Words = _fileIO.LoadData();
-            _hasUnsavedStuff = false;
+            HasUnsavedStuff = false;
             Log($"Словарь для чата {Chat} загружен!");
         }
 

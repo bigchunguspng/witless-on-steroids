@@ -96,7 +96,7 @@ namespace Witlesss
                 
                 if (witless.ReadyToGen())
                 {
-                    SendMessage(chat, witless.Generate());
+                    SendMessage(chat, witless.TryToGenerate());
                     Log($@"""{title}"": сгенерировано прикол");
                 }
             }

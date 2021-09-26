@@ -82,7 +82,19 @@ namespace Witlesss
             return true;
         }
         
-        public string Generate()
+        public string TryToGenerate()
+        {
+            try
+            {
+                return Generate();
+            }
+            catch (Exception e)
+            {
+                Log(e.Message, ConsoleColor.Red);
+                return "";
+            }
+        }
+        private string Generate()
         {
             string result = "";
             string currentWord = Start;

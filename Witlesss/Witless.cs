@@ -12,7 +12,7 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private const string Start = "_start", End = "_end", Dot = "_dot";
+        private const string Start = "_start", End = "_end", Dot = "_dot", Link = "[ссылка удалена]";
         
         private readonly Random _random = new Random();
         private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
@@ -45,6 +45,12 @@ namespace Witlesss
             wordlist.AddRange(sentence.ToLower().Replace(". ", $" {Dot} {Start} ")
                 .Trim().Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
             wordlist.Add(End);
+            
+            for (var i = 0; i < wordlist.Count; i++)
+            {
+                if (wordlist[i].Contains(".com") && wordlist[i].Length > 20)
+                    wordlist[i] = Link;
+            }
 
             for (var i = 0; i < wordlist.Count - 1; i++)
             {

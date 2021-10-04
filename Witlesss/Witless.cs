@@ -48,7 +48,7 @@ namespace Witlesss
             
             for (var i = 0; i < wordlist.Count; i++)
             {
-                if (wordlist[i].Contains(".com") && wordlist[i].Length > 20)
+                if (WordIsLink(wordlist[i]))
                     wordlist[i] = Link;
             }
 
@@ -80,14 +80,12 @@ namespace Witlesss
                 return false;
             if (sentence.StartsWith('/'))
                 return false;
-            if (sentence.Contains("https://") || sentence.Contains("http://"))
+            if (sentence.StartsWith("http") && !sentence.Contains(" "))
                 return false;
-            /*if (sentence.Contains("@") && sentence.Contains(".") && !sentence.Contains(" "))
-                return false;*/ // ок оставлю по приколу хд)00)
-            
             return true;
         }
-        
+        private bool WordIsLink(string word) => word.Contains(".com") && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
+
         public string TryToGenerate()
         {
             try

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using static Witlesss.Logger;
 
 namespace Witlesss
@@ -18,6 +19,7 @@ namespace Witlesss
         private static FileIO<Dictionary<long, Witless>> _fileIO;
         private static long _activeChat;
         private static Counter _saving;
+        private static Memes _memes;
 
         static void Main(string[] args)
         {
@@ -26,6 +28,7 @@ namespace Witlesss
             _fileIO = new FileIO<Dictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
             _sussyBakas = _fileIO.LoadData();
             _saving = new Counter(2);
+            _memes = new Memes();
 
             _client = new TelegramBotClient(_token);
             _client.StartReceiving();
@@ -38,7 +41,7 @@ namespace Witlesss
         private static void OnMessageHandler(object sender, MessageEventArgs e)
         {
             var message = e.Message;
-            string text = message.Text;
+            string text = message.Photo == null ? message.Text : message.Caption;
             long chat = message.Chat.Id;
             string title = chat < 0 ? message.Chat.Title : message.From.FirstName;
 
@@ -85,6 +88,23 @@ namespace Witlesss
                         }
                         return;
                     }
+                    if (CommandFrom(text) == "/dg")
+                    {
+                        string fileID;
+                        if (message.ReplyToMessage?.Photo != null)
+                            fileID = message.ReplyToMessage.Photo[^1].FileId;
+                        else if (message.Photo != null)
+                            fileID = message.Photo[^1].FileId;
+                        else // написать как правильно и
+                            return;
+
+                        string path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
+                        DownloadFile(fileID, path).Wait();
+                        using (FileStream stream = File.OpenRead(_memes.MakeDemotivator(path, witless.TryToGenerate(), witless.TryToGenerate())))
+                            _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
+                        Log($@"""{title}"": сгенерировано демотиватор");
+                        return;
+                    }
                 }
                 
                 if (witless.ReceiveSentence(text))
@@ -108,6 +128,22 @@ namespace Witlesss
                 SaveChatList();
 
                 SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
+            }
+        }
+        private static async Task DownloadFile(string fileId, string path)
+        {
+            Directory.CreateDirectory($@"{Environment.CurrentDirectory}\Telegram-Pictures");
+            try
+            {
+                var file = await _client.GetFileAsync(fileId);
+                FileStream stream = new FileStream(path, FileMode.Create);
+                _client.DownloadFileAsync(file.FilePath, stream).Wait();
+                stream.Close();
+                await stream.DisposeAsync();
+            }
+            catch (Exception e)
+            {
+                Log(e.Message, ConsoleColor.Red);
             }
         }
 

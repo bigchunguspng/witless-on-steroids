@@ -61,9 +61,8 @@ namespace Witlesss
                             Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
                         }
                         else
-                        {
                             SendMessage(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
-                        }
+
                         return;
                     }
                     if (CommandFrom(text) == "/chat_id")
@@ -83,9 +82,8 @@ namespace Witlesss
                             SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
                         }
                         else
-                        {
                             SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
-                        }
+
                         return;
                     }
                     if (CommandFrom(text) == "/dg")
@@ -111,10 +109,8 @@ namespace Witlesss
                 }
                 
                 if (witless.ReceiveSentence(text))
-                {
                     Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
-                }
-                
+
                 witless.Count();
                 
                 if (witless.ReadyToGen())
@@ -129,7 +125,6 @@ namespace Witlesss
                 Log($@"Создано базу для чата {chat} ({title})");
 
                 SaveChatList();
-
                 SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
             }
         }
@@ -212,7 +207,7 @@ namespace Witlesss
             }
         }
 
-        private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "");
+        private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "").ToLower();
         
         private static bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
         

@@ -84,7 +84,7 @@ namespace Witlesss
                 return false;
             return true;
         }
-        private bool WordIsLink(string word) => word.Contains(".com") && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
+        private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
 
         public string TryToGenerate()
         {

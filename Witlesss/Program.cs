@@ -91,18 +91,21 @@ namespace Witlesss
                     if (CommandFrom(text) == "/dg")
                     {
                         string fileID;
-                        if (message.ReplyToMessage?.Photo != null)
-                            fileID = message.ReplyToMessage.Photo[^1].FileId;
-                        else if (message.Photo != null)
+                        if (message.Photo != null)
                             fileID = message.Photo[^1].FileId;
-                        else // написать как правильно и
+                        else if (message.ReplyToMessage?.Photo != null)
+                            fileID = message.ReplyToMessage.Photo[^1].FileId;
+                        else
+                        {
+                            SendMessage(chat, "Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото");
                             return;
+                        }
 
                         string path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
                         DownloadFile(fileID, path).Wait();
                         using (FileStream stream = File.OpenRead(_memes.MakeDemotivator(path, witless.TryToGenerate(), witless.TryToGenerate())))
                             _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
-                        Log($@"""{title}"": сгенерировано демотиватор");
+                        Log($@"""{title}"": сгенерировано демотиватор [_]");
                         return;
                     }
                 }

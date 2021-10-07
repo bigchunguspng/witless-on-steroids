@@ -176,7 +176,7 @@ namespace Witlesss
             Save();
             Directory.CreateDirectory($@"{Environment.CurrentDirectory}\Backup");
             FileInfo file = new FileInfo($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
-            file.CopyTo($@"{Environment.CurrentDirectory}\Backup\Telegram-WitlessDB-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss)}.json");
+            file.CopyTo($@"{Environment.CurrentDirectory}\Backup\Telegram-WitlessDB-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static Witlesss.Logger;
+using File = System.IO.File;
 
 namespace Witlesss
 {
@@ -42,9 +43,9 @@ namespace Witlesss
         private static void OnMessageHandler(object sender, MessageEventArgs e)
         {
             var message = e.Message;
-            string text = message.Photo == null ? message.Text : message.Caption;
+            string text = message.Caption ?? message.Text;
             long chat = message.Chat.Id;
-            string title = chat < 0 ? message.Chat.Title : message.From.FirstName;
+            string title = TitleOrUsername(chat, message);
 
             if (WitlessExist(chat))
             {
@@ -54,16 +55,12 @@ namespace Witlesss
                 {
                     if (CommandFrom(text).StartsWith("/set_frequency"))
                     {
-                        if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
-                        {
-                            witless.Interval = value;
-                            SaveChatList();
-                            SendMessage(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
-                            Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
-                        }
-                        else
-                            SendMessage(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
-
+                        ChatSetFrequency(chat, title, witless, text);
+                        return;
+                    }
+                    if (CommandFrom(text) == "/dg")
+                    {
+                        ChatDemotivate(chat, title, witless, message);
                         return;
                     }
                     if (CommandFrom(text) == "/chat_id")
@@ -73,38 +70,7 @@ namespace Witlesss
                     }
                     if (CommandFrom(text).StartsWith("/fuse"))
                     {
-                        if (text.Split().Length > 1 && long.TryParse(text.Split()[1], out long value) && value != chat && _sussyBakas.ContainsKey(value))
-                        {
-                            witless.Backup();
-                            FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[value].Words);
-                            fusion.Fuse();
-                            witless.HasUnsavedStuff = true;
-                            witless.Save();
-                            SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
-                        }
-                        else
-                            SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
-
-                        return;
-                    }
-                    if (CommandFrom(text) == "/dg")
-                    {
-                        string fileID;
-                        if (message.Photo != null)
-                            fileID = message.Photo[^1].FileId;
-                        else if (message.ReplyToMessage?.Photo != null)
-                            fileID = message.ReplyToMessage.Photo[^1].FileId;
-                        else
-                        {
-                            SendMessage(chat, "Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото");
-                            return;
-                        }
-
-                        string path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
-                        DownloadFile(fileID, path).Wait();
-                        using (FileStream stream = File.OpenRead(_memes.MakeDemotivator(path, witless.TryToGenerate(), witless.TryToGenerate())))
-                            _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
-                        Log($@"""{title}"": сгенерировано демотиватор [_]");
+                        ChatFuse(chat, title, witless, text);
                         return;
                     }
                 }
@@ -122,12 +88,64 @@ namespace Witlesss
             }
             else if (text != null && CommandFrom(text) == "/start")
             {
-                if (!_sussyBakas.TryAdd(chat, new Witless(chat))) 
-                    return;
-                SaveChatList();
-                Log($@"Создано базу для чата {chat} ({title})");
-                SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
+                ChatStart(chat, title);
             }
+        }
+        private static string TitleOrUsername(long chat, Message message) => chat < 0 ? message.Chat.Title : message.From.FirstName;
+        private static string CommandFrom(string text) => text.ToLower().Replace("@piece_fap_bot", "");
+
+        private static void ChatStart(long chat, string title)
+        {
+            if (!_sussyBakas.TryAdd(chat, new Witless(chat))) 
+                return;
+            SaveChatList();
+            Log($@"Создано базу для чата {chat} ({title})");
+            SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
+        }
+        private static void ChatSetFrequency(long chat, string title, Witless witless, string text)
+        {
+            if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+            {
+                witless.Interval = value;
+                SaveChatList();
+                SendMessage(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
+                Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
+            }
+            else
+                SendMessage(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
+        }
+        private static void ChatFuse(long chat, string title, Witless witless, string text)
+        {
+            if (text.Split().Length > 1 && long.TryParse(text.Split()[1], out long key) && key != chat && _sussyBakas.ContainsKey(key))
+            {
+                witless.Backup();
+                FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[key].Words);
+                fusion.Fuse();
+                witless.HasUnsavedStuff = true;
+                witless.Save();
+                SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
+            }
+            else
+                SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+        }
+        private static void ChatDemotivate(long chat, string title, Witless witless, Message message)
+        {
+            string fileID;
+            if (message.Photo != null)
+                fileID = message.Photo[^1].FileId;
+            else if (message.ReplyToMessage?.Photo != null)
+                fileID = message.ReplyToMessage.Photo[^1].FileId;
+            else
+            {
+                SendMessage(chat, "Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото");
+                return;
+            }
+
+            string path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
+            DownloadFile(fileID, path).Wait();
+            using (FileStream stream = File.OpenRead(_memes.MakeDemotivator(path, witless.TryToGenerate(), witless.TryToGenerate())))
+                _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
+            Log($@"""{title}"": сгенерировано демотиватор [_]");
         }
         private static async Task DownloadFile(string fileId, string path)
         {
@@ -135,9 +153,8 @@ namespace Witlesss
             try
             {
                 var file = await _client.GetFileAsync(fileId);
-                FileStream stream = new FileStream(path, FileMode.Create);
+                var stream = new FileStream(path, FileMode.Create);
                 _client.DownloadFileAsync(file.FilePath, stream).Wait();
-                stream.Close();
                 await stream.DisposeAsync();
             }
             catch (Exception e)
@@ -158,11 +175,11 @@ namespace Witlesss
                     if (input.StartsWith("+") && input.Length > 1)
                     {
                         string shit = input.Substring(1);
-                        foreach (var baka in _sussyBakas)
+                        foreach (long chat in _sussyBakas.Keys)
                         {
-                            if (baka.Key.ToString().EndsWith(shit))
+                            if (chat.ToString().EndsWith(shit))
                             {
-                                _activeChat = baka.Key;
+                                _activeChat = chat;
                                 Log($"Выбрано чат {_activeChat}");
                                 break;
                             }
@@ -171,7 +188,8 @@ namespace Witlesss
                     else if (WitlessExist(_activeChat) && input.Length > 3)
                     {
                         string text = input.Substring(3);
-                        Witless witless = _sussyBakas[_activeChat];
+                        var witless = _sussyBakas[_activeChat];
+                        
                         if (input.StartsWith("/a ") ) //add
                         {
                             witless.ReceiveSentence(text);
@@ -208,14 +226,12 @@ namespace Witlesss
             }
         }
 
-        private static string CommandFrom(string text) => text.Replace("@piece_fap_bot", "").ToLower();
-        
         private static bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
         
         private static void SaveChatList()
         {
             _fileIO.SaveData(_sussyBakas);
-            Log("Список чатов сохранен!", ConsoleColor.Blue);
+            Log("Список чатов сохранен!", ConsoleColor.Green);
         }
 
         private static async void SaveLoop()
@@ -236,12 +252,12 @@ namespace Witlesss
 
         private static void SaveDics()
         {
-            foreach (KeyValuePair<long, Witless> baka in _sussyBakas) baka.Value.Save();
+            foreach (var witless in _sussyBakas.Values) witless.Save();
         }
         
         private static void ReloadDics()
         {
-            foreach (KeyValuePair<long,Witless> baka in _sussyBakas) baka.Value.Load();
+            foreach (var witless in _sussyBakas.Values) witless.Load();
         }
     }
 }

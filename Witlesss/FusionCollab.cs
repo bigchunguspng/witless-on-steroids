@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using static Witlesss.Logger;
 
@@ -6,9 +7,9 @@ namespace Witlesss
 {
     public class FusionCollab
     {
-        private readonly Dictionary<string, Dictionary<string, int>> _dictionary1, _dictionary2;
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _dictionary1, _dictionary2;
 
-        public FusionCollab(Dictionary<string, Dictionary<string, int>> dictionary1, Dictionary<string, Dictionary<string, int>> dictionary2)
+        public FusionCollab(ConcurrentDictionary<string, ConcurrentDictionary<string, int>> dictionary1, ConcurrentDictionary<string, ConcurrentDictionary<string, int>> dictionary2)
         {
             _dictionary1 = dictionary1;
             _dictionary2 = dictionary2;
@@ -32,14 +33,14 @@ namespace Witlesss
                         else
                         {
                             // add "word2: x" pair
-                            _dictionary1[pair.Key].Add(chance.Key, chance.Value);
+                            _dictionary1[pair.Key].TryAdd(chance.Key, chance.Value);
                         }
                     }
                 }
                 else
                 {
                     // add "word1: {[][][][][]}"
-                    _dictionary1.Add(pair.Key, pair.Value);
+                    _dictionary1.TryAdd(pair.Key, pair.Value);
                 }
             }
             Log("Слияние выполнено", ConsoleColor.Magenta);

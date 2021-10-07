@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,11 +16,11 @@ namespace Witlesss
         private const string Start = "_start", End = "_end", Dot = "_dot", Link = "[ссылка удалена]";
         
         private readonly Random _random = new Random();
-        private readonly FileIO<Dictionary<string, Dictionary<string, int>>> _fileIO;
+        private readonly FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>> _fileIO;
         private Counter _generation;
         public bool HasUnsavedStuff;
         
-        public Dictionary<string, Dictionary<string, int>> Words { get; set; }
+        public ConcurrentDictionary<string, ConcurrentDictionary<string, int>> Words { get; set; }
 
         [JsonProperty] private long Chat { get; set; }
         [JsonProperty] public int Interval
@@ -32,7 +33,7 @@ namespace Witlesss
         {
             Chat = chat;
             _generation = new Counter(interval);
-            _fileIO = new FileIO<Dictionary<string, Dictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
+            _fileIO = new FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             Load();
             WaitOnStartup();
         }
@@ -57,7 +58,7 @@ namespace Witlesss
                 string word = wordlist[i];
                 if (!Words.ContainsKey(word))
                 {
-                    Words.Add(word, new Dictionary<string, int>());
+                    Words.TryAdd(word, new ConcurrentDictionary<string, int>());
                 }
 
                 string nextWord = wordlist[i + 1];
@@ -67,7 +68,7 @@ namespace Witlesss
                 }
                 else
                 {
-                    Words[word].Add(nextWord, 1);
+                    Words[word].TryAdd(nextWord, 1);
                 }
             }
 
@@ -113,7 +114,7 @@ namespace Witlesss
             
             return result;
         }
-        private string PickWord(Dictionary<string, int> dictionary)
+        private string PickWord(ConcurrentDictionary<string, int> dictionary)
         {
             int totalProbability = 0;
             foreach (KeyValuePair<string, int> chance in dictionary)

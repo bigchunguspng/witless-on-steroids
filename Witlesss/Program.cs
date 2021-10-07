@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -15,8 +16,8 @@ namespace Witlesss
     {
         private static string _token;
         private static TelegramBotClient _client;
-        private static Dictionary<long, Witless> _sussyBakas;
-        private static FileIO<Dictionary<long, Witless>> _fileIO;
+        private static ConcurrentDictionary<long, Witless> _sussyBakas;
+        private static FileIO<ConcurrentDictionary<long, Witless>> _fileIO;
         private static long _activeChat;
         private static Counter _saving;
         private static Memes _memes;
@@ -25,7 +26,7 @@ namespace Witlesss
         {
             _token = File.ReadAllText($@"{Environment.CurrentDirectory}\.token");
             
-            _fileIO = new FileIO<Dictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
+            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
             _sussyBakas = _fileIO.LoadData();
             _saving = new Counter(2);
             _memes = new Memes();
@@ -121,10 +122,10 @@ namespace Witlesss
             }
             else if (text != null && CommandFrom(text) == "/start")
             {
-                _sussyBakas.Add(chat, new Witless(chat));
-                Log($@"Создано базу для чата {chat} ({title})");
-
+                if (!_sussyBakas.TryAdd(chat, new Witless(chat))) 
+                    return;
                 SaveChatList();
+                Log($@"Создано базу для чата {chat} ({title})");
                 SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
             }
         }

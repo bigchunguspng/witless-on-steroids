@@ -38,7 +38,7 @@ namespace Witlesss
             WaitOnStartup();
         }
         
-        public bool ReceiveSentence(string sentence)
+        public bool ReceiveSentence(ref string sentence)
         {
             if (!SentenceIsAcceptable(sentence)) return false;
             
@@ -73,6 +73,7 @@ namespace Witlesss
             }
 
             HasUnsavedStuff = true;
+            sentence = string.Join(' ', wordlist.GetRange(1, wordlist.Count - 2)).Replace($" {Dot} {Start} ", ". ");
             return true;
         }
         private bool SentenceIsAcceptable(string sentence)

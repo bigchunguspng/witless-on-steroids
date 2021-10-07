@@ -75,7 +75,7 @@ namespace Witlesss
                     }
                 }
                 
-                if (witless.ReceiveSentence(text))
+                if (witless.ReceiveSentence(ref text))
                     Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
 
                 witless.Count();
@@ -192,14 +192,14 @@ namespace Witlesss
                         
                         if (input.StartsWith("/a ") ) //add
                         {
-                            witless.ReceiveSentence(text);
-                            Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
+                            if (witless.ReceiveSentence(ref text))
+                                Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
                         }
                         else if (input.StartsWith("/w ")) //write
                         {
                             SendMessage(_activeChat, text);
-                            witless.ReceiveSentence(text);
-                            Log($@"{_activeChat}: отправлено в чат и добавлено в словарь ""{text}""", ConsoleColor.Yellow);
+                            bool accepted = witless.ReceiveSentence(ref text);
+                            Log($@"{_activeChat}: отправлено {(accepted ? "и добавлено в словарь " : "")}""{text}""", ConsoleColor.Yellow);
                         }
                     }
                     else if (input == "/s") SaveDics();

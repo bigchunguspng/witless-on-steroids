@@ -58,9 +58,9 @@ namespace Witlesss
                         ChatSetFrequency(chat, title, witless, text);
                         return;
                     }
-                    if (CommandFrom(text) == "/dg")
+                    if (CommandFrom(text).StartsWith("/dg"))
                     {
-                        ChatDemotivate(chat, title, witless, message);
+                        ChatDemotivate(chat, title, witless, message, text);
                         return;
                     }
                     if (CommandFrom(text) == "/chat_id")
@@ -128,7 +128,7 @@ namespace Witlesss
             else
                 SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
         }
-        private static void ChatDemotivate(long chat, string title, Witless witless, Message message)
+        private static void ChatDemotivate(long chat, string title, Witless witless, Message message, string text)
         {
             string fileID;
             if (message.Photo != null)
@@ -141,9 +141,22 @@ namespace Witlesss
                 return;
             }
 
-            string path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
+            string a, b = witless.TryToGenerate();
+            if (text.Contains(' ')) // custom upper text
+            {
+                a = text.Substring(text.IndexOf(' ') + 1);
+                if (a.Contains('\n')) // custom bottom text
+                {
+                    b = a.Substring(a.IndexOf('\n') + 1);
+                    a = a.Remove(a.IndexOf('\n'));
+                }
+            }
+            else
+                a = witless.TryToGenerate();
+
+            var path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
             DownloadFile(fileID, path).Wait();
-            using (FileStream stream = File.OpenRead(_memes.MakeDemotivator(path, witless.TryToGenerate(), witless.TryToGenerate())))
+            using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
                 _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
             Log($@"""{title}"": сгенерировано демотиватор [_]");
         }

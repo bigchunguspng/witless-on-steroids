@@ -43,7 +43,8 @@ namespace Witlesss
             if (!SentenceIsAcceptable(sentence)) return false;
             
             List<string> wordlist = new List<string> {Start};
-            wordlist.AddRange(sentence.ToLower().Replace(". ", $" {Dot} {Start} ")
+            wordlist.AddRange(
+                sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Replace($". {Dot} {Start} ", ".. ")
                 .Trim().Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
             wordlist.Add(End);
             

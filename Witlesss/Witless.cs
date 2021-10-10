@@ -18,16 +18,8 @@ namespace Witlesss
         private readonly Random _random = new Random();
         private readonly FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>> _fileIO;
         private Counter _generation;
-        public bool HasUnsavedStuff;
         
-        public ConcurrentDictionary<string, ConcurrentDictionary<string, int>> Words { get; set; }
-
-        [JsonProperty] private long Chat { get; set; }
-        [JsonProperty] public int Interval
-        {
-            get => _generation.Interval;
-            set => _generation.Interval = value;
-        }
+        public bool HasUnsavedStuff;
         
         public Witless(long chat, int interval = 7)
         {
@@ -37,6 +29,15 @@ namespace Witlesss
             Load();
             WaitOnStartup();
         }
+
+        [JsonProperty] private long Chat { get; set; }
+        [JsonProperty] public int Interval
+        {
+            get => _generation.Interval;
+            set => _generation.Interval = value;
+        }
+        
+        public ConcurrentDictionary<string, ConcurrentDictionary<string, int>> Words { get; set; }
         
         public bool ReceiveSentence(ref string sentence)
         {

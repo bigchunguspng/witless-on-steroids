@@ -31,8 +31,8 @@ namespace Witlesss
             _logos = new Dictionary<Image, Point>();
             LoadLogos($@"{Environment.CurrentDirectory}\Telegram-Water");
 
-            string fontA = "Times New Roman";
-            string fontB = "Roboto Slab Medium";
+            var fontA = "Times New Roman";
+            var fontB = "Roboto Slab Medium";
             _fontA = new Font(fontA, 36);
             _fontB = new Font(fontB, 19);
             _fontColor = new SolidBrush(Color.White);
@@ -56,7 +56,7 @@ namespace Witlesss
             _lowerText = new RectangleF(_imageMargin, _size - _imageMarginB + 84, _imageWidth, 100);
         }
 
-        void LoadLogos(string path)
+        private void LoadLogos(string path)
         {
             Directory.CreateDirectory(path);
             string[] files = Directory.GetFiles(path);

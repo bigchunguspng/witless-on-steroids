@@ -45,7 +45,7 @@ namespace Witlesss
             var message = e.Message;
             string text = message.Caption ?? message.Text;
             long chat = message.Chat.Id;
-            string title = TitleOrUsername(chat, message);
+            string title = TitleOrUsername();
 
             if (WitlessExist(chat))
             {
@@ -53,22 +53,22 @@ namespace Witlesss
                 
                 if (text != null && text.StartsWith('/'))
                 {
-                    if (CommandFrom(text).StartsWith("/set_frequency"))
-                    {
-                        ChatSetFrequency(chat, title, witless, text);
-                        return;
-                    }
-                    if (CommandFrom(text).StartsWith("/dg"))
+                    if (TextAsCommand().StartsWith("/dg"))
                     {
                         ChatDemotivate(chat, title, witless, message, text);
                         return;
                     }
-                    if (CommandFrom(text) == "/chat_id")
+                    if (TextAsCommand().StartsWith("/set_frequency"))
+                    {
+                        ChatSetFrequency(chat, title, witless, text);
+                        return;
+                    }
+                    if (TextAsCommand() == "/chat_id")
                     {
                         SendMessage(chat, chat.ToString());
                         return;
                     }
-                    if (CommandFrom(text).StartsWith("/fuse"))
+                    if (TextAsCommand().StartsWith("/fuse"))
                     {
                         ChatFuse(chat, title, witless, text);
                         return;
@@ -86,14 +86,14 @@ namespace Witlesss
                     Log($@"""{title}"": сгенерировано прикол");
                 }
             }
-            else if (text != null && CommandFrom(text) == "/start")
+            else if (text != null && TextAsCommand() == "/start")
             {
                 ChatStart(chat, title);
             }
-        }
-        private static string TitleOrUsername(long chat, Message message) => chat < 0 ? message.Chat.Title : message.From.FirstName;
-        private static string CommandFrom(string text) => text.ToLower().Replace("@piece_fap_bot", "");
 
+            string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From.FirstName;
+            string TextAsCommand() => text.ToLower().Replace("@piece_fap_bot", "");
+        }
         private static void ChatStart(long chat, string title)
         {
             if (!_sussyBakas.TryAdd(chat, new Witless(chat))) 

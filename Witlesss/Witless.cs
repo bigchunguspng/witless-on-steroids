@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static Witlesss.Logger;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
 {
@@ -16,7 +17,7 @@ namespace Witlesss
         private const string Start = "_start", End = "_end", Dot = "_dot", Link = "[ссылка удалена]";
         
         private readonly Random _random = new Random();
-        private readonly FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>> _fileIO;
+        private readonly FileIO<WitlessDB> _fileIO;
         private Counter _generation;
         
         public bool HasUnsavedStuff;
@@ -25,7 +26,7 @@ namespace Witlesss
         {
             Chat = chat;
             _generation = new Counter(interval);
-            _fileIO = new FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
+            _fileIO = new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             Load();
             WaitOnStartup();
         }
@@ -37,7 +38,7 @@ namespace Witlesss
             set => _generation.Interval = value;
         }
         
-        public ConcurrentDictionary<string, ConcurrentDictionary<string, int>> Words { get; set; }
+        public WitlessDB Words { get; set; }
         
         public bool ReceiveSentence(ref string sentence)
         {

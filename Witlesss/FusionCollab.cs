@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using static Witlesss.Logger;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
 {
     public class FusionCollab
     {
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _dictionary1, _dictionary2;
+        private readonly WitlessDB _dictionary1, _dictionary2;
 
-        public FusionCollab(ConcurrentDictionary<string, ConcurrentDictionary<string, int>> dictionary1, ConcurrentDictionary<string, ConcurrentDictionary<string, int>> dictionary2)
+        public FusionCollab(WitlessDB dictionary1, WitlessDB dictionary2)
         {
             _dictionary1 = dictionary1;
             _dictionary2 = dictionary2;

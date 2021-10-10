@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -10,6 +11,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static Witlesss.Logger;
 using File = System.IO.File;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
 {
@@ -116,14 +118,25 @@ namespace Witlesss
         }
         private static void ChatFuse(long chat, string title, Witless witless, string text)
         {
-            if (text.Split().Length > 1 && long.TryParse(text.Split()[1], out long key) && key != chat && _sussyBakas.ContainsKey(key))
+            string[] a = text.Split();
+            if (a.Length > 1)
             {
-                witless.Backup();
-                FusionCollab fusion = new FusionCollab(witless.Words, _sussyBakas[key].Words);
-                fusion.Fuse();
-                witless.HasUnsavedStuff = true;
-                witless.Save();
-                SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
+                string name = a[1];
+                bool baseExist = BaseAvailable(name);
+                bool chatExist = long.TryParse(name, out long key) && key != chat && WitlessExist(key);
+                if (chatExist || baseExist)
+                {
+                    witless.Backup();
+                    var fusion = new FusionCollab(witless.Words, chatExist ? _sussyBakas[key].Words : FromFile());
+                    fusion.Fuse();
+                    witless.HasUnsavedStuff = true;
+                    witless.Save();
+                    SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
+                }
+                else
+                    SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+
+                WitlessDB FromFile() => new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\Telegram-ExtraDBs\{name}.json").LoadData();
             }
             else
                 SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
@@ -240,6 +253,12 @@ namespace Witlesss
         }
 
         private static bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
+        private static bool BaseAvailable(string name)
+        {
+            var path = $@"{Environment.CurrentDirectory}\Telegram-ExtraDBs";
+            Directory.CreateDirectory(path);
+            return Directory.GetFiles(path).Contains($@"{path}\{name}.json");
+        }
         
         private static void SaveChatList()
         {

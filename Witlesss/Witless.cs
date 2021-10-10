@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -15,8 +14,8 @@ namespace Witlesss
     public class Witless
     {
         private const string Start = "_start", End = "_end", Dot = "_dot", Link = "[ссылка удалена]";
-        
-        private readonly Random _random = new Random();
+
+        private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
         private Counter _generation;
         
@@ -25,6 +24,7 @@ namespace Witlesss
         public Witless(long chat, int interval = 7)
         {
             Chat = chat;
+            _random = new Random();
             _generation = new Counter(interval);
             _fileIO = new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
             Load();
@@ -44,10 +44,8 @@ namespace Witlesss
         {
             if (!SentenceIsAcceptable(sentence)) return false;
             
-            List<string> wordlist = new List<string> {Start};
-            wordlist.AddRange(
-                sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Replace($". {Dot} {Start} ", ".. ")
-                .Trim().Split(new[]{ ' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries).ToList());
+            var wordlist = new List<string> {Start};
+            wordlist.AddRange(WordsOf(sentence));
             wordlist.Add(End);
             
             for (var i = 0; i < wordlist.Count; i++)
@@ -89,6 +87,7 @@ namespace Witlesss
                 return false;
             return true;
         }
+        private string[] WordsOf(string sentence) => sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Replace($". {Dot} {Start} ", ".. ").Trim().Split(new[] {' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries);
         private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
 
         public string TryToGenerate()

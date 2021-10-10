@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using static Witlesss.Logger;
+using static Witlesss.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
@@ -14,7 +15,7 @@ namespace Witlesss
             _dictionary1 = dictionary1;
             _dictionary2 = dictionary2;
 
-            Log("Словари импортировано", ConsoleColor.Magenta);
+            Log(LOG_FUSION_HAVE_DICS, ConsoleColor.Magenta);
         }
         
         public void Fuse()
@@ -43,7 +44,7 @@ namespace Witlesss
                     _dictionary1.TryAdd(pair.Key, pair.Value);
                 }
             }
-            Log("Слияние выполнено", ConsoleColor.Magenta);
+            Log(LOG_FUSE_DONE, ConsoleColor.Magenta);
             
             int ChooseBigger(int a, int b) => a > b ? a : b;
         }

@@ -9,7 +9,9 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using static System.Environment;
 using static Witlesss.Logger;
+using static Witlesss.Strings;
 using File = System.IO.File;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
@@ -26,10 +28,10 @@ namespace Witlesss
 
         public Bot()
         {
-            string token = File.ReadAllText($@"{Environment.CurrentDirectory}\.token");
+            string token = File.ReadAllText($@"{CurrentDirectory}\.token");
             
             _memes = new Memes();
-            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{Environment.CurrentDirectory}\Telegram-ChatsDB.json");
+            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{CurrentDirectory}\{CHATLIST_FILENAME}.json");
             _sussyBakas = _fileIO.LoadData();
             _client = new TelegramBotClient(token);
         }
@@ -103,7 +105,7 @@ namespace Witlesss
             }
 
             string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From.FirstName;
-            string TextAsCommand() => text.ToLower().Replace("@piece_fap_bot", "");
+            string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
         }
         private void ChatStart(long chat, string title)
         {
@@ -111,7 +113,7 @@ namespace Witlesss
                 return;
             SaveChatList();
             Log($@"Создано базу для чата {chat} ({title})");
-            SendMessage(chat, "ВИРУСНАЯ БАЗА ОБНОВЛЕНА!");
+            SendMessage(chat, START_RESPONSE);
         }
         private void ChatSetFrequency(long chat, string title, Witless witless, string text)
         {
@@ -119,11 +121,11 @@ namespace Witlesss
             {
                 witless.Interval = value;
                 SaveChatList();
-                SendMessage(chat, $"я буду писать сюда каждые {witless.Interval} кг сообщений");
+                SendMessage(chat, $"{SET_FREQUENCY_RESPONSE_A} {witless.Interval} {SET_FREQUENCY_RESPONSE_B}");
                 Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
             }
             else
-                SendMessage(chat, "Если че правильно вот так:\n\n/set_frequency@piece_fap_bot 3\n\n(чем меньше значение - тем чаще я буду писать)");
+                SendMessage(chat, SET_FREQUENCY_MANUAL);
         }
         private void ChatFuse(long chat, string title, Witless witless, string text)
         {
@@ -131,8 +133,16 @@ namespace Witlesss
             if (a.Length > 1)
             {
                 string name = a[1];
+                bool passedID = long.TryParse(name, out long key);
+                bool thisChatID = key == chat;
+                if (thisChatID)
+                {
+                    SendMessage(chat, FUSE_FAIL_SELF);
+                    return;
+                }
+
+                bool chatExist = passedID && WitlessExist(key);
                 bool baseExist = BaseAvailable(name);
-                bool chatExist = long.TryParse(name, out long key) && key != chat && WitlessExist(key);
                 if (chatExist || baseExist)
                 {
                     witless.Backup();
@@ -140,15 +150,15 @@ namespace Witlesss
                     fusion.Fuse();
                     witless.HasUnsavedStuff = true;
                     witless.Save();
-                    SendMessage(chat, $@"словарь беседы ""{title}"" обновлён!");
+                    SendMessage(chat, $@"{FUSE_SUCCESS_RESPOND_A} ""{title}"" {FUSE_SUCCESS_RESPOND_B}");
                 }
                 else
-                    SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+                    SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE);
 
-                WitlessDB FromFile() => new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\Telegram-ExtraDBs\{name}.json").LoadData();
+                WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
             }
             else
-                SendMessage(chat, "Если вы хотите объединить словарь <b>этой беседы</b> со словарём <b>другой беседы</b>, где я состою и где есть вы, то для начала скопируйте <b>ID той беседы</b> с помощью команды\n\n/chat_id@piece_fap_bot\n\nи пропишите <b>здесь</b>\n\n/fuse@piece_fap_bot [полученное число]\n\nпример: /fuse@piece_fap_bot -1001541923355\n\nСлияние разово обновит словарь <b>этой беседы</b>", ParseMode.Html);
+                SendMessage(chat, FUSE_MANUAL, ParseMode.Html);
         }
         private void ChatDemotivate(long chat, string title, Witless witless, Message message, string text)
         {
@@ -159,7 +169,7 @@ namespace Witlesss
                 fileID = message.ReplyToMessage.Photo[^1].FileId;
             else
             {
-                SendMessage(chat, "Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото");
+                SendMessage(chat, DG_MANUAL);
                 return;
             }
             SendDemotivator(chat, title, witless, fileID, text);
@@ -179,7 +189,7 @@ namespace Witlesss
             else
                 a = witless.TryToGenerate();
             
-            var path = $@"{Environment.CurrentDirectory}\Telegram-Pictures\{chat}-{fileID.Remove(62)}.jpg";
+            var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.jpg";
             DownloadFile(fileID, path).Wait();
             using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
                 _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
@@ -187,7 +197,7 @@ namespace Witlesss
         }
         private async Task DownloadFile(string fileId, string path)
         {
-            Directory.CreateDirectory($@"{Environment.CurrentDirectory}\Telegram-Pictures");
+            Directory.CreateDirectory($@"{CurrentDirectory}\{PICTURES_FOLDER}");
             try
             {
                 var file = await _client.GetFileAsync(fileId);
@@ -267,7 +277,7 @@ namespace Witlesss
         private bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
         private bool BaseAvailable(string name)
         {
-            var path = $@"{Environment.CurrentDirectory}\Telegram-ExtraDBs";
+            var path = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
             Directory.CreateDirectory(path);
             return Directory.GetFiles(path).Contains($@"{path}\{name}.json");
         }
@@ -275,7 +285,7 @@ namespace Witlesss
         private void SaveChatList()
         {
             _fileIO.SaveData(_sussyBakas);
-            Log("Список чатов сохранен!", ConsoleColor.Green);
+            Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
         }
 
         private async void StartSaveLoop(int minutes)

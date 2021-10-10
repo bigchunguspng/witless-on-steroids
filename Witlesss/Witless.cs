@@ -5,7 +5,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static System.Environment;
 using static Witlesss.Logger;
+using static Witlesss.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
@@ -26,7 +28,7 @@ namespace Witlesss
             Chat = chat;
             _random = new Random();
             _generation = new Counter(interval);
-            _fileIO = new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
+            _fileIO = new FileIO<WitlessDB>($@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json");
             Load();
             WaitOnStartup();
         }
@@ -178,9 +180,9 @@ namespace Witlesss
         public void Backup()
         {
             Save();
-            Directory.CreateDirectory($@"{Environment.CurrentDirectory}\Backup");
-            FileInfo file = new FileInfo($@"{Environment.CurrentDirectory}\Telegram-WitlessDB-{Chat}.json");
-            file.CopyTo($@"{Environment.CurrentDirectory}\Backup\Telegram-WitlessDB-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
+            Directory.CreateDirectory($@"{CurrentDirectory}\{BACKUP_FOLDER}");
+            FileInfo file = new FileInfo($@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json");
+            file.CopyTo($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DB_FILE_PREFIX}-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
         }
     }
 }

@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="START_RESPONSE" xml:space="preserve">
+        <value>ВИРУСНАЯ БАЗА ОБНОВЛЕНА!</value>
+    </data>
+    <data name="BOT_USERNAME" xml:space="preserve">
+        <value>@piece_fap_bot</value>
+    </data>
+    <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
+        <value>Если че правильно вот так:
+
+set_frequency@piece_fap_bot 3
+
+(чем меньше значение - тем чаще я буду писать)</value>
+    </data>
+    <data name="FUSE_MANUAL" xml:space="preserve">
+        <value>Если вы хотите объединить словарь &lt;b&gt;этой беседы&lt;/b&gt; со словарём &lt;b&gt;другой беседы&lt;/b&gt;, где я состою и где есть вы, то для начала скопируйте &lt;b&gt;ID той беседы&lt;/b&gt; с помощью команды
+
+/chat_id@piece_fap_bot
+
+и пропишите &lt;b&gt;здесь&lt;/b&gt;
+
+/fuse@piece_fap_bot [полученное число]
+
+пример: /fuse@piece_fap_bot -1001541923355
+
+Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;</value>
+    </data>
+    <data name="FUSE_FAIL_CHAT" xml:space="preserve">
+        <value>К сожалению, у меня нет словаря этой беседы</value>
+    </data>
+    <data name="FUSE_FAIL_BASE" xml:space="preserve">
+        <value>К сожалению, я не нашёл словаря с таким названием</value>
+    </data>
+    <data name="FUSE_FAIL_SELF" xml:space="preserve">
+        <value>Ты собираешься слить эту беседу... с этой же беседой? Ничего не поменяется, лол</value>
+    </data>
+    <data name="DG_MANUAL" xml:space="preserve">
+        <value>Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото</value>
+    </data>
+    <data name="DEMOTIVATOR_UPPER_FONT" xml:space="preserve">
+        <value>Times New Roman</value>
+    </data>
+    <data name="DEMOTIVATOR_LOWER_FONT" xml:space="preserve">
+        <value>Roboto Slab Medium</value>
+    </data>
+    <data name="LOG_FUSE_DONE" xml:space="preserve">
+        <value>Слияние выполнено</value>
+    </data>
+    <data name="LOG_FUSION_HAVE_DICS" xml:space="preserve">
+        <value>Словари импортировано</value>
+    </data>
+    <data name="PICTURES_FOLDER" xml:space="preserve">
+        <value>Telegram-Pictures</value>
+    </data>
+    <data name="LOG_CHATLIST_SAVED" xml:space="preserve">
+        <value>Список чатов сохранен!</value>
+    </data>
+    <data name="EXTRA_DBS_FOLDER" xml:space="preserve">
+        <value>Telegram-ExtraDBs</value>
+    </data>
+    <data name="SET_FREQUENCY_RESPONSE_A" xml:space="preserve">
+        <value>я буду писать сюда каждые</value>
+    </data>
+    <data name="SET_FREQUENCY_RESPONSE_B" xml:space="preserve">
+        <value>кг сообщений</value>
+    </data>
+    <data name="WATERMARKS_FOLDER" xml:space="preserve">
+        <value>Telegram-Water</value>
+    </data>
+    <data name="BACKUP_FOLDER" xml:space="preserve">
+        <value>Backup</value>
+    </data>
+    <data name="DB_FILE_PREFIX" xml:space="preserve">
+        <value>Telegram-WitlessDB</value>
+    </data>
+    <data name="CHATLIST_FILENAME" xml:space="preserve">
+        <value>Telegram-ChatsDB</value>
+    </data>
+    <data name="FUSE_SUCCESS_RESPOND_A" xml:space="preserve">
+        <value>словарь беседы</value>
+    </data>
+    <data name="FUSE_SUCCESS_RESPOND_B" xml:space="preserve">
+        <value>обновлён!</value>
+    </data>
+</root>

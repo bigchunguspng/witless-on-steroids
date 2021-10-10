@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using static System.Environment;
+using static Witlesss.Strings;
 using Color = System.Drawing.Color;
 using Image = System.Drawing.Image;
 
@@ -29,10 +31,11 @@ namespace Witlesss
         public Memes()
         {
             _logos = new Dictionary<Image, Point>();
-            LoadLogos($@"{Environment.CurrentDirectory}\Telegram-Water");
+            LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
 
-            var fontA = "Times New Roman";
-            var fontB = "Roboto Slab Medium";
+            string fontA = DEMOTIVATOR_UPPER_FONT;
+            string fontB = DEMOTIVATOR_LOWER_FONT;
+            
             _fontA = new Font(fontA, 36);
             _fontB = new Font(fontB, 19);
             _fontColor = new SolidBrush(Color.White);

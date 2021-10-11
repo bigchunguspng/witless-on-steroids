@@ -224,6 +224,39 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Копия словаря сохранена как.
+        /// </summary>
+        internal static string MOVE_DONE_AS {
+            get {
+                return ResourceManager.GetString("MOVE_DONE_AS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Словарь очищен! *пусто*.
+        /// </summary>
+        internal static string MOVE_DONE_CLEARED {
+            get {
+                return ResourceManager.GetString("MOVE_DONE_CLEARED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Если вы хотите очистить словарь беседы, пропишите
+        ///
+        ////move@piece_fap_bot [имя]
+        ///
+        ///Эта команда сохранит &lt;b&gt;копию словаря&lt;/b&gt; под указанным именем и очистит &lt;b&gt;сам словарь&lt;/b&gt;. Зная имя, вы можете в любой момент &lt;b&gt;влить&lt;/b&gt; сохранённую копию в словарь беседы, прописав
+        ///
+        ////fuse@piece_fap_bot [имя].
+        /// </summary>
+        internal static string MOVE_MANUAL {
+            get {
+                return ResourceManager.GetString("MOVE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-Pictures.
         /// </summary>
         internal static string PICTURES_FOLDER {

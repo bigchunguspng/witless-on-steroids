@@ -119,22 +119,31 @@ namespace Witlesss
         }
         private void SaveImage(Image image, ref string path)
         {
+            path = UniquePath(path, DotJpg);
+            image.Save(path, ImageFormat.Jpeg);
+        }
+
+        public static string UniquePath(string path, string extension)
+        {
             while (File.Exists(path))
             {
-                path = path.Replace(DotJpg, "");
-                if (path.EndsWith("D"))
-                    path = path + "_0";
-                else
+                int nameStartIndex = path.LastIndexOf('\\') + 1;
+                string name = path.Substring(nameStartIndex);
+                string directory = path.Remove(nameStartIndex);
+                
+                name = name.Replace(extension, "");
+                int underscoreIndex = name.LastIndexOf('_');
+                if (underscoreIndex > 0 && int.TryParse(name.Substring(underscoreIndex + 1), out int n))
                 {
-                    int index = path.LastIndexOf("_", StringComparison.Ordinal) + 1;
-                    int number = int.Parse(path.Substring(index)) + 1;
-                    
-                    path = path.Remove(index) + number;
+                    int number = n + 1;
+                    name = name.Remove(underscoreIndex + 1) + number;
                 }
+                else
+                    name = name + "_0";
 
-                path = path + DotJpg;
+                path = directory + name + extension;
             }
-            image.Save(path, ImageFormat.Jpeg);
+            return path;
         }
     }
 }

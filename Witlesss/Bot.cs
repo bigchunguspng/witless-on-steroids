@@ -11,6 +11,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
 using static Witlesss.Logger;
+using static Witlesss.Memes;
 using static Witlesss.Strings;
 using File = System.IO.File;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
@@ -78,6 +79,11 @@ namespace Witlesss
                         ChatFuse(chat, title, witless, text);
                         return;
                     }
+                    if (TextAsCommand().StartsWith("/move"))
+                    {
+                        ChatMove(chat, title, witless, text);
+                        return;
+                    }
                 }
                 
                 if (witless.ReceiveSentence(ref text))
@@ -142,7 +148,7 @@ namespace Witlesss
                 }
 
                 bool chatExist = passedID && WitlessExist(key);
-                bool baseExist = BaseAvailable(name);
+                bool baseExist = BaseExists(name);
                 if (chatExist || baseExist)
                 {
                     witless.Backup();
@@ -210,6 +216,30 @@ namespace Witlesss
                 Log(e.Message, ConsoleColor.Red);
             }
         }
+        private void ChatMove(long chat, string title, Witless witless, string text)
+        {
+            string[] a = text.Split();
+            if (a.Length > 1)
+            {
+                string name = a[1];
+                string path = BaseExists(name) ? UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
+                witless.Save();
+                File.Copy(witless.Path, path);
+                
+                witless.Words.Clear();
+                Log($@"""{title}"": словарь беседы очищен!", ConsoleColor.Magenta);
+                witless.HasUnsavedStuff = true;
+                witless.Save();
+                
+                string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
+                SendMessage(chat, $"{MOVE_DONE_AS} \"{result}\"\n\n{MOVE_DONE_CLEARED}");
+                Log($@"""{title}"": словарь сохранён как ""{result}""", ConsoleColor.Magenta);
+            }
+            else
+                SendMessage(chat, MOVE_MANUAL, ParseMode.Html);
+
+            string ExtraDBPath(string name) => $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json";
+        }
 
         private void ProcessConsoleInput()
         {
@@ -275,7 +305,7 @@ namespace Witlesss
         }
 
         private bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
-        private bool BaseAvailable(string name)
+        private bool BaseExists(string name)
         {
             var path = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
             Directory.CreateDirectory(path);

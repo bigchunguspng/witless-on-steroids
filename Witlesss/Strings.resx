@@ -101,4 +101,19 @@ set_frequency@piece_fap_bot 3
     <data name="FUSE_SUCCESS_RESPOND_B" xml:space="preserve">
         <value>обновлён!</value>
     </data>
+    <data name="MOVE_MANUAL" xml:space="preserve">
+        <value>Если вы хотите очистить словарь беседы, пропишите
+
+/move@piece_fap_bot [имя]
+
+Эта команда сохранит &lt;b&gt;копию словаря&lt;/b&gt; под указанным именем и очистит &lt;b&gt;сам словарь&lt;/b&gt;. Зная имя, вы можете в любой момент &lt;b&gt;влить&lt;/b&gt; сохранённую копию в словарь беседы, прописав
+
+/fuse@piece_fap_bot [имя]</value>
+    </data>
+    <data name="MOVE_DONE_AS" xml:space="preserve">
+        <value>Копия словаря сохранена как</value>
+    </data>
+    <data name="MOVE_DONE_CLEARED" xml:space="preserve">
+        <value>Словарь очищен! *пусто*</value>
+    </data>
 </root>

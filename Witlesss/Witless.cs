@@ -28,7 +28,7 @@ namespace Witlesss
             Chat = chat;
             _random = new Random();
             _generation = new Counter(interval);
-            _fileIO = new FileIO<WitlessDB>($@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json");
+            _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             WaitOnStartup();
         }
@@ -41,6 +41,7 @@ namespace Witlesss
         }
         
         public WitlessDB Words { get; set; }
+        public string Path => $@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json";
         
         public bool ReceiveSentence(ref string sentence)
         {
@@ -180,8 +181,8 @@ namespace Witlesss
         public void Backup()
         {
             Save();
+            var file = new FileInfo(Path);
             Directory.CreateDirectory($@"{CurrentDirectory}\{BACKUP_FOLDER}");
-            FileInfo file = new FileInfo($@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json");
             file.CopyTo($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DB_FILE_PREFIX}-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
         }
     }

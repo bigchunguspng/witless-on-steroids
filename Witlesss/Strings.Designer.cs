@@ -179,20 +179,20 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to словарь беседы.
+        ///   Looks up a localized string similar to Cловарь беседы.
         /// </summary>
-        internal static string FUSE_SUCCESS_RESPOND_A {
+        internal static string FUSE_SUCCESS_RESPONSE_A {
             get {
-                return ResourceManager.GetString("FUSE_SUCCESS_RESPOND_A", resourceCulture);
+                return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE_A", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to обновлён!.
         /// </summary>
-        internal static string FUSE_SUCCESS_RESPOND_B {
+        internal static string FUSE_SUCCESS_RESPONSE_B {
             get {
-                return ResourceManager.GetString("FUSE_SUCCESS_RESPOND_B", resourceCulture);
+                return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE_B", resourceCulture);
             }
         }
         
@@ -279,7 +279,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to я буду писать сюда каждые.
+        ///   Looks up a localized string similar to Я буду писать сюда.
         /// </summary>
         internal static string SET_FREQUENCY_RESPONSE_A {
             get {
@@ -288,7 +288,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to кг сообщений.
+        ///   Looks up a localized string similar to Пикчи будут ставать демотиваторами с вероятностью.
         /// </summary>
         internal static string SET_FREQUENCY_RESPONSE_B {
             get {

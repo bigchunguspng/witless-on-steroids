@@ -171,15 +171,27 @@ namespace Witlesss
                     fusion.Fuse();
                     witless.HasUnsavedStuff = true;
                     witless.Save();
-                    SendMessage(chat, $@"{FUSE_SUCCESS_RESPONSE_A} ""{title}"" {FUSE_SUCCESS_RESPONSE_B}");
+                    SendMessage(chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
                 }
                 else
-                    SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE);
+                    SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES(), ParseMode.Html);
 
                 WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
             }
             else
                 SendMessage(chat, FUSE_MANUAL, ParseMode.Html);
+
+            string FUSE_AVAILABLE_BASES()
+            {
+                FileInfo[] files = new DirectoryInfo($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
+                var result = "\n\nДоступные словари:";
+                foreach (var file in files)
+                    result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({file.Length / 1024} КБ)";
+                result = result + "\n\n" + BASE_SIZE();
+                return result;
+            }
+            string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {new FileInfo(witless.Path).Length / 1024} КБ";
+            string BASE_NEW_SIZE() => $"Теперь он весит {new FileInfo(witless.Path).Length / 1024} КБ";
         }
         private void ChatDemotivate(long chat, string title, Witless witless, Message message, string text)
         {

@@ -37,7 +37,7 @@ namespace Witlesss
             string fontB = DEMOTIVATOR_LOWER_FONT;
             
             _fontA = new Font(fontA, 36);
-            _fontB = new Font(fontB, 19);
+            _fontB = new Font(fontB, 18);
             _fontColor = new SolidBrush(Color.White);
             
             _white = new Pen(Color.White, 2);
@@ -91,12 +91,13 @@ namespace Witlesss
             graphics.FillRectangle(Brushes.Black, _background);
             graphics.DrawRectangle(_white, _frame);
             graphics.DrawImage(image, _imageTopLeft);
-            graphics.CompositingMode = CompositingMode.SourceOver;
-            graphics.DrawString(textA, _fontA, _fontColor, _upperText, _format);
-            graphics.DrawString(textB, _fontB, _fontColor, _lowerText, _format);
             
             SetRandomLogo();
             graphics.DrawImage(_logo.Key, _logo.Value);
+            
+            graphics.CompositingMode = CompositingMode.SourceOver;
+            graphics.DrawString(textA, _fontA, _fontColor, _upperText, _format);
+            graphics.DrawString(textB, _fontB, _fontColor, _lowerText, _format);
             
             SaveImage(demotivator, ref pathB);
             return pathB;

@@ -60,7 +60,7 @@ set_frequency@piece_fap_bot 3
         <value>Times New Roman</value>
     </data>
     <data name="DEMOTIVATOR_LOWER_FONT" xml:space="preserve">
-        <value>Roboto Slab Medium</value>
+        <value>Comic Sans MS</value>
     </data>
     <data name="LOG_FUSE_DONE" xml:space="preserve">
         <value>Слияние выполнено</value>

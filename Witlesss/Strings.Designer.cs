@@ -97,7 +97,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Roboto Slab Medium.
+        ///   Looks up a localized string similar to Comic Sans MS.
         /// </summary>
         internal static string DEMOTIVATOR_LOWER_FONT {
             get {

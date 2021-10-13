@@ -12,7 +12,7 @@ using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
 using static Witlesss.Logger;
 using static Witlesss.Memes;
-using static Witlesss.Strings;
+using static Witlesss.Also.Strings;
 using File = System.IO.File;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
@@ -198,6 +198,7 @@ namespace Witlesss
         private void SendDemotivator(long chat, string title, Witless witless, string fileID, string text)
         {
             string a, b = witless.TryToGenerate();
+            b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
             if (text != null && text.Contains(' ')) // custom upper text
             {
                 a = text.Substring(text.IndexOf(' ') + 1);
@@ -213,7 +214,7 @@ namespace Witlesss
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.jpg";
             DownloadFile(fileID, path).Wait();
             using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
-                _client.SendPhotoAsync(chat, new InputOnlineFile(stream)).Wait();
+                SendPhoto(chat, new InputOnlineFile(stream)).Wait();
             Log($@"""{title}"": сгенерировано демотиватор [_]");
         }
         private async Task DownloadFile(string fileId, string path)
@@ -310,12 +311,26 @@ namespace Witlesss
                 await _client.SendTextMessageAsync(chat, text, mode, disableNotification: true)
                     .ContinueWith(task =>
                     {
-                        Log(chat + ": " + task.Exception?.Message, ConsoleColor.Red);
+                        Log(chat + ": Can't send message: " + task.Exception?.Message, ConsoleColor.Red);
                     }, TaskContinuationOptions.OnlyOnFaulted);
             }
             catch
             {
                 // u/stupid
+            }
+        }
+        private async Task SendPhoto(long chat, InputOnlineFile photo)
+        {
+            try
+            {
+                await _client.SendPhotoAsync(chat, photo).ContinueWith(task =>
+                {
+                    Log(chat + ": Can't send photo: " + task.Exception?.Message, ConsoleColor.Red);
+                }, TaskContinuationOptions.OnlyOnFaulted);
+            }
+            catch
+            {
+                // no, i'm not!
             }
         }
 

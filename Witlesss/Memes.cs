@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using static System.Environment;
-using static Witlesss.Strings;
+using static Witlesss.Also.Strings;
 using Color = System.Drawing.Color;
 using Image = System.Drawing.Image;
 

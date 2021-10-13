@@ -5,9 +5,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Witlesss.Also;
 using static System.Environment;
 using static Witlesss.Logger;
-using static Witlesss.Strings;
+using static Witlesss.Also.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
@@ -20,6 +21,7 @@ namespace Witlesss
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
         private Counter _generation;
+        private LetterCase _case;
         
         public bool HasUnsavedStuff;
         
@@ -28,6 +30,7 @@ namespace Witlesss
             Chat = chat;
             _random = new Random();
             _generation = new Counter(interval);
+            _case = new LetterCase();
             _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             WaitOnStartup();
@@ -118,7 +121,7 @@ namespace Witlesss
 
             result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
             
-            return result;
+            return result.InLetterCase(_case);
         }
         private string PickWord(ConcurrentDictionary<string, int> dictionary)
         {

@@ -64,6 +64,22 @@ namespace Witlesss.Also
             }
             return path;
         }
+        
+        public static string SET_FREQUENCY_RESPONSE(int interval)
+        {
+            string a = SET_FREQUENCY_RESPONSE_A;
+            if (interval % 10 > 4 || interval % 10 == 0 || interval > 10 && interval < 15)
+                a = $"{a} каждые {interval} сообщений";
+            else if (interval % 10 > 1)
+                a = $"{a} каждые {interval} сообщения";
+            else if (interval == 1)
+                a = $"{a} после каждого вашего сообщения";
+            else
+                a = $"{a} раз в {interval} сообщение";
+            var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / interval}%";
+            return a + b;
+        }
+        
         public static void ClearExtractedFrames()
         {
             int deleted = 0, failed = 0;

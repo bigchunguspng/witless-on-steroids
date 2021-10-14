@@ -220,7 +220,7 @@ namespace Witlesss
             DownloadFile(fileID, path).Wait();
             
             using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
-                SendPhoto(chat, new InputOnlineFile(stream)).Wait();
+                SendPhoto(chat, new InputOnlineFile(stream));
             Log($@"""{title}"": сгенерировано демотиватор [_]");
         }
         private void SendAnimatedDemotivator(long chat, string title, Witless witless, string fileID, string text)
@@ -231,7 +231,7 @@ namespace Witlesss
             DownloadFile(fileID, path).Wait();
             
             using (var stream = File.OpenRead(_memes.MakeAnimatedDemotivator(path, a, b)))
-                SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4")).Wait();
+                SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"""{title}"": сгенерировано GIF-демотиватор [^]");
         }
         private async Task DownloadFile(string fileId, string path)
@@ -324,45 +324,31 @@ namespace Witlesss
 
         private async void SendMessage(long chat, string text, ParseMode mode = ParseMode.Default)
         {
-            try
-            {
-                await _client.SendTextMessageAsync(chat, text, mode, disableNotification: true)
-                    .ContinueWith(task =>
-                    {
-                        Log(chat + ": Can't send message: " + task.Exception?.Message, ConsoleColor.Red);
-                    }, TaskContinuationOptions.OnlyOnFaulted);
-            }
-            catch
-            {
-                // u/stupid
-            }
+            Task task = _client.SendTextMessageAsync(chat, text, mode, disableNotification: true);
+            await TrySend(task, chat, "message");
         }
-        private async Task SendPhoto(long chat, InputOnlineFile photo)
+        private void SendPhoto(long chat, InputOnlineFile photo)
+        {
+            Task task = _client.SendPhotoAsync(chat, photo);
+            TrySend(task, chat, "photo").Wait();
+        }
+        private void SendAnimation(long chat, InputOnlineFile animation)
+        {
+            Task task = _client.SendAnimationAsync(chat, animation);
+            TrySend(task, chat, "GIF").Wait();
+        }
+        private async Task TrySend(Task task, long chat, string what)
         {
             try
             {
-                await _client.SendPhotoAsync(chat, photo).ContinueWith(task =>
+                await task.ContinueWith(action =>
                 {
-                    Log(chat + ": Can't send photo: " + task.Exception?.Message, ConsoleColor.Red);
+                    Log(chat + $": Can't send {what}: " + action.Exception?.Message, ConsoleColor.Red);
                 }, TaskContinuationOptions.OnlyOnFaulted);
             }
             catch
             {
-                // no, i'm not!
-            }
-        }
-        private async Task SendAnimation(long chat, InputOnlineFile animation)
-        {
-            try
-            {
-                await _client.SendAnimationAsync(chat, animation).ContinueWith(task =>
-                {
-                    Log(chat + ": Can't send GIF: " + task.Exception?.Message, ConsoleColor.Red);
-                }, TaskContinuationOptions.OnlyOnFaulted);
-            }
-            catch
-            {
-                // wuz 9 + 10 ?
+                // 21
             }
         }
 

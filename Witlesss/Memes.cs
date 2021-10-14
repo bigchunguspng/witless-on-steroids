@@ -86,7 +86,7 @@ namespace Witlesss
                 frames = GetAllFrames();
                 foreach (string file in frames)
                     if (file.EndsWith("D.jpg"))
-                        gif.AddFrameAsync(Image.FromFile(file), quality: GifQuality.Bit8).Wait();
+                        gif.AddFrameAsync(Image.FromFile(file)).Wait();
             }
             catch (Exception e)
             {

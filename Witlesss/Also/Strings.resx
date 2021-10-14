@@ -116,4 +116,7 @@ set_frequency@piece_fap_bot 3
     <data name="MOVE_DONE_CLEARED" xml:space="preserve">
         <value>Словарь очищен! *пусто*</value>
     </data>
+    <data name="FFMPEG_PATH" xml:space="preserve">
+        <value>C:\ffmpeg\bin\ffmpeg.exe</value>
+    </data>
 </root>

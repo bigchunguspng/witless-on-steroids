@@ -9,9 +9,10 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.Also;
 using static System.Environment;
+using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
-using static Witlesss.Memes;
 using static Witlesss.Also.Strings;
 using File = System.IO.File;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
@@ -202,32 +203,35 @@ namespace Witlesss
                 fileID = message.ReplyToMessage.Photo[^1].FileId;
             else
             {
-                SendMessage(chat, DG_MANUAL);
+                if (message.ReplyToMessage?.Animation != null)
+                    SendAnimatedDemotivator(chat, title, witless, message.ReplyToMessage.Animation.FileId, text);
+                else
+                    SendMessage(chat, DG_MANUAL);
                 return;
             }
             SendDemotivator(chat, title, witless, fileID, text);
         }
         private void SendDemotivator(long chat, string title, Witless witless, string fileID, string text)
         {
-            string a, b = witless.TryToGenerate();
-            b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
-            if (text != null && text.Contains(' ')) // custom upper text
-            {
-                a = text.Substring(text.IndexOf(' ') + 1);
-                if (a.Contains('\n')) // custom bottom text
-                {
-                    b = a.Substring(a.IndexOf('\n') + 1);
-                    a = a.Remove(a.IndexOf('\n'));
-                }
-            }
-            else
-                a = witless.TryToGenerate();
+            witless.GetDemotivatorText(text, out string a, out string b);
             
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.jpg";
             DownloadFile(fileID, path).Wait();
+            
             using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
                 SendPhoto(chat, new InputOnlineFile(stream)).Wait();
             Log($@"""{title}"": сгенерировано демотиватор [_]");
+        }
+        private void SendAnimatedDemotivator(long chat, string title, Witless witless, string fileID, string text)
+        {
+            witless.GetDemotivatorText(text, out string a, out string b);
+            
+            var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.mp4";
+            DownloadFile(fileID, path).Wait();
+            
+            using (var stream = File.OpenRead(_memes.MakeAnimatedDemotivator(path, a, b)))
+                SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4")).Wait();
+            Log($@"""{title}"": сгенерировано GIF-демотиватор [^]");
         }
         private async Task DownloadFile(string fileId, string path)
         {
@@ -343,6 +347,20 @@ namespace Witlesss
             catch
             {
                 // no, i'm not!
+            }
+        }
+        private async Task SendAnimation(long chat, InputOnlineFile animation)
+        {
+            try
+            {
+                await _client.SendAnimationAsync(chat, animation).ContinueWith(task =>
+                {
+                    Log(chat + ": Can't send GIF: " + task.Exception?.Message, ConsoleColor.Red);
+                }, TaskContinuationOptions.OnlyOnFaulted);
+            }
+            catch
+            {
+                // wuz 9 + 10 ?
             }
         }
 

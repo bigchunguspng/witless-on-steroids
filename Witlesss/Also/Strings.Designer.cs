@@ -9,6 +9,9 @@
 //------------------------------------------------------------------------------
 
 namespace Witlesss.Also {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -126,6 +129,15 @@ namespace Witlesss.Also {
         internal static string EXTRA_DBS_FOLDER {
             get {
                 return ResourceManager.GetString("EXTRA_DBS_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to C:\ffmpeg\bin\ffmpeg.exe.
+        /// </summary>
+        internal static string FFMPEG_PATH {
+            get {
+                return ResourceManager.GetString("FFMPEG_PATH", resourceCulture);
             }
         }
         

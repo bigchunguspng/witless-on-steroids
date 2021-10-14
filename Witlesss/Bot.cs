@@ -213,7 +213,7 @@ namespace Witlesss
         }
         private void SendDemotivator(long chat, string title, Witless witless, string fileID, string text)
         {
-            witless.GetDemotivatorText(text, out string a, out string b);
+            GetDemotivatorText(witless, text, out string a, out string b);
             
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.jpg";
             DownloadFile(fileID, path).Wait();
@@ -224,7 +224,7 @@ namespace Witlesss
         }
         private void SendAnimatedDemotivator(long chat, string title, Witless witless, string fileID, string text)
         {
-            witless.GetDemotivatorText(text, out string a, out string b);
+            GetDemotivatorText(witless, text, out string a, out string b);
             
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.mp4";
             DownloadFile(fileID, path).Wait();

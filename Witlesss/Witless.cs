@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Witlesss.Also;
 using static System.Environment;
+using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Also.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
@@ -121,7 +122,7 @@ namespace Witlesss
 
             result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
             
-            return result.InLetterCase(_case);
+            return TextInLetterCase(result, _case);
         }
         private string PickWord(ConcurrentDictionary<string, int> dictionary)
         {

@@ -5,7 +5,7 @@ namespace Witlesss.Also
 {
     public static class Extension
     {
-        public static string InLetterCase(this string text, LetterCase letterCase)
+        public static string TextInLetterCase(string text, LetterCase letterCase)
         {
             switch (letterCase.Case)
             {
@@ -20,7 +20,7 @@ namespace Witlesss.Also
             }
         }
         
-        public static void GetDemotivatorText(this Witless witless, string text, out string a, out string b)
+        public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {
             b = witless.TryToGenerate();
             b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE

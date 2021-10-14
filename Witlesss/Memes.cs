@@ -20,6 +20,7 @@ namespace Witlesss
         private readonly IMediaToolkitService _service;
         
         private string _animationPath;
+        private string _animationName;
 
         public Memes()
         {
@@ -38,7 +39,7 @@ namespace Witlesss
         {
             _drawer.SetRandomLogo();
             AnimateDemotivator(path, textA, textB).Wait();
-            return $@"{_animationPath}\D.gif";
+            return $@"{_animationPath}\{_animationName}";
         }
 
         private async Task AnimateDemotivator(string path, string textA, string textB)
@@ -60,8 +61,8 @@ namespace Witlesss
             int outFrames = int.Parse(inFrames);
             double k = 1;
 
-            NormalizeFrameRate(50);
             NormalizeLength(50);
+            NormalizeFrameRate(50);
             int frameDelay = 1000 / outFrameRate;
             Log($"Out: FPS: {outFrameRate}, Length: {outFrames}", ConsoleColor.Blue);
             
@@ -80,7 +81,8 @@ namespace Witlesss
             try
             {
                 // Render GIF
-                using var gif = new AnimatedGifCreator($@"{_animationPath}\D.gif", frameDelay);
+                _animationName = $"{inputFileName}-D.gif";
+                using var gif = new AnimatedGifCreator($@"{_animationPath}\{_animationName}", frameDelay);
                 frames = GetAllFrames();
                 foreach (string file in frames)
                     if (file.EndsWith("D.jpg"))
@@ -92,21 +94,19 @@ namespace Witlesss
             }
             
             
-            void NormalizeFrameRate(int max)
-            {
-                if (outFrameRate > max)
-                {
-                    outFrames /= outFrameRate / max;
-                    outFrameRate = max;
-                }
-            }
             void NormalizeLength(int max)
             {
                 if (outFrames > max)
                 {
                     k = outFrames / (double) max;
                     outFrames = max;
+                    //outFrameRate = (int)(outFrameRate * k); // <- this will ++ framerate after --ing length
                 }
+            }
+            void NormalizeFrameRate(int max)
+            {
+                if (outFrameRate > max)
+                    outFrameRate = max;
             }
             string[] GetAllFrames() => Directory.GetFiles(_animationPath);
         }

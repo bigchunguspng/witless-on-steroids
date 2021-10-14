@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using static System.Environment;
 using static Witlesss.Also.LetterCaseMode;
+using static Witlesss.Also.Strings;
+using static Witlesss.Logger;
 
 namespace Witlesss.Also
 {
@@ -59,6 +63,51 @@ namespace Witlesss.Also
                 path = directory + name + extension;
             }
             return path;
+        }
+        public static void ClearExtractedFrames()
+        {
+            int deleted = 0, failed = 0;
+            string path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
+            var directories = Directory.GetDirectories(path);
+            foreach (string directory in directories)
+            {
+                string[] files = Directory.GetFiles(directory);
+                foreach (string file in files)
+                {
+                    if (file.EndsWith(".jpg"))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                            deleted++;
+                        }
+                        catch
+                        {
+                            failed++;
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            File.Move(file, file.Replace($@"{file.Split('\\')[^2]}\",""));
+                        }
+                        catch
+                        {
+                            failed++;
+                        }
+                    }
+                }
+                try
+                {
+                    Directory.Delete(directory);
+                }
+                catch
+                {
+                    failed++;
+                }
+            }
+            Log($"Удалено {deleted} ненужных файлов!{(failed > 0 ? $" {failed} элементов осталось" : "")}", ConsoleColor.Yellow);
         }
     }
 }

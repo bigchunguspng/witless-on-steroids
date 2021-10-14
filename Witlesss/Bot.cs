@@ -9,7 +9,6 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Also;
 using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
@@ -40,6 +39,8 @@ namespace Witlesss
 
         public void Run()
         {
+            ClearExtractedFrames();
+            
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
 
@@ -312,6 +313,7 @@ namespace Witlesss
                             Log($@"{_activeChat}: отправлено {(accepted ? "и добавлено в словарь " : "")}""{text}""", ConsoleColor.Yellow);
                         }
                     }
+                    else if (input == "/r") ClearExtractedFrames();
                     else if (input == "/s") SaveDics();
                     else if (input == "/u") ReloadDics();
                 }

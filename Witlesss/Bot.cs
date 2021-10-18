@@ -181,12 +181,19 @@ namespace Witlesss
                     else
                     {
                         if (message.ReplyToMessage?.Animation != null)
-                            SendAnimatedDemotivator(message.ReplyToMessage.Animation.FileId);
+                            fileID = message.ReplyToMessage.Animation.FileId;
+                        else if (message.ReplyToMessage?.Video != null)
+                            fileID = message.ReplyToMessage.Video.FileId;
+                        else if (message.Video != null)
+                            fileID = message.Video.FileId;
                         else
+                        {
                             SendMessage(chat, DG_MANUAL);
+                            return;
+                        }
+                        SendAnimatedDemotivator(fileID);
                         return;
                     }
-
                     SendDemotivator(fileID);
                 }
 

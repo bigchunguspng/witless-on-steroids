@@ -58,7 +58,7 @@ namespace Witlesss
             Log($"In: FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
 
             string[] fps = inFrameRate.Split('/');
-            int outFrameRate = int.Parse(fps[0]) / int.Parse(fps[1]);
+            int outFrameRate = RetrieveFPS();
             int outFrames = int.Parse(inFrames);
             double k = 1;
 
@@ -93,8 +93,18 @@ namespace Witlesss
             {
                 Log(e.Message, ConsoleColor.Red);
             }
-            
-            
+
+            int RetrieveFPS()
+            {
+                try
+                {
+                    return int.Parse(fps[0]) / int.Parse(fps[1]);
+                }
+                catch
+                {
+                    return 16;
+                }
+            }
             void NormalizeLength(int max)
             {
                 if (outFrames > max)

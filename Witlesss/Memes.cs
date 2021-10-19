@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -86,7 +87,7 @@ namespace Witlesss
                 frames = GetAllFrames();
                 foreach (string file in frames)
                     if (file.EndsWith("D.jpg"))
-                        gif.AddFrameAsync(Image.FromFile(file)).Wait();
+                        gif.AddFrameAsync(_drawer.ResizeImage(Image.FromFile(file), new Size(360, 360))).Wait();
             }
             catch (Exception e)
             {

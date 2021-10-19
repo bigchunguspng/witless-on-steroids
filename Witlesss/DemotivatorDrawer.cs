@@ -86,8 +86,7 @@ namespace Witlesss
             string pathA = path;
             string pathB = path.Replace(DotJpg, "-D" + DotJpg);
 
-            using var image = ResizeImage(Image.FromFile(pathA),
-                new Size(_imageWidth, _size - _imageMargin - _imageMarginB));
+            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageWidth, _size - _imageMargin - _imageMarginB));
             using Image demotivator = new Bitmap(_size, _size);
             using var graphics = Graphics.FromImage(demotivator);
             graphics.CompositingMode = CompositingMode.SourceCopy;
@@ -106,7 +105,7 @@ namespace Witlesss
             return pathB;
         }
 
-        private Image ResizeImage(Image image, Size size) => new Bitmap(image, size);
+        public Image ResizeImage(Image image, Size size) => new Bitmap(image, size);
 
         private void SaveImage(Image image, ref string path)
         {

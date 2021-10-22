@@ -90,6 +90,8 @@ namespace Witlesss
                 return false;
             if (sentence.StartsWith('/'))
                 return false;
+            if (sentence.StartsWith('.'))
+                return false;
             if (sentence.StartsWith("http") && !sentence.Contains(" "))
                 return false;
             return true;

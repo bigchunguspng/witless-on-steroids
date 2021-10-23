@@ -49,6 +49,18 @@ namespace Witlesss
 
         private void OnMessageHandler(object sender, MessageEventArgs e)
         {
+            try
+            {
+                HandleMessage(e);
+            }
+            catch (Exception exception)
+            {
+                Log(e.Message.Chat.Id + ": Can't handle message: " + exception.Message, ConsoleColor.Red);
+            }
+        }
+
+        private void HandleMessage(MessageEventArgs e)
+        {
             var message = e.Message;
             string text = message.Caption ?? message.Text;
             long chat = message.Chat.Id;

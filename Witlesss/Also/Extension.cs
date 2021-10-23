@@ -27,7 +27,7 @@ namespace Witlesss.Also
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {
             b = witless.TryToGenerate();
-            b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
+            if (b.Length > 1) b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
             if (text != null && text.Contains(' ')) // custom upper text
             {
                 a = text.Substring(text.IndexOf(' ') + 1);

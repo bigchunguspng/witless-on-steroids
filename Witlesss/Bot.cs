@@ -31,7 +31,7 @@ namespace Witlesss
             string token = File.ReadAllText($@"{CurrentDirectory}\.token");
             
             _memes = new Memes();
-            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{CurrentDirectory}\{CHATLIST_FILENAME}.json");
+            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
             _sussyBakas = _fileIO.LoadData();
             _client = new TelegramBotClient(token);
         }

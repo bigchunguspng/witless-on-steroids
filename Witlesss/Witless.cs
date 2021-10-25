@@ -45,7 +45,7 @@ namespace Witlesss
         }
         
         public WitlessDB Words { get; set; }
-        public string Path => $@"{CurrentDirectory}\{DB_FILE_PREFIX}-{Chat}.json";
+        public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
         
         public bool ReceiveSentence(ref string sentence)
         {

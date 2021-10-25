@@ -119,4 +119,7 @@ set_frequency@piece_fap_bot 3
     <data name="FFMPEG_PATH" xml:space="preserve">
         <value>C:\ffmpeg\bin\ffmpeg.exe</value>
     </data>
+    <data name="DBS_FOLDER" xml:space="preserve">
+        <value>Telegram-WitlessDBs</value>
+    </data>
 </root>

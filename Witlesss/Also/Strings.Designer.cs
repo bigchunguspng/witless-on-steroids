@@ -61,6 +61,15 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, начиная с него (если оно есть в словаре).
+        /// </summary>
+        internal static string A_MANUAL {
+            get {
+                return ResourceManager.GetString("A_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Backup.
         /// </summary>
         internal static string BACKUP_FOLDER {

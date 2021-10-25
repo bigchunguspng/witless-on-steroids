@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Witlesss.Also;
 using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
@@ -22,7 +21,6 @@ namespace Witlesss
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
         private Counter _generation;
-        private LetterCase _case;
         
         public bool HasUnsavedStuff;
         
@@ -31,7 +29,6 @@ namespace Witlesss
             Chat = chat;
             _random = new Random();
             _generation = new Counter(interval);
-            _case = new LetterCase();
             _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             WaitOnStartup();
@@ -99,11 +96,11 @@ namespace Witlesss
         private string[] WordsOf(string sentence) => sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Replace($". {Dot} {Start} ", ".. ").Trim().Split(new[] {' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries);
         private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
 
-        public string TryToGenerate()
+        public string TryToGenerate(string word = Start)
         {
             try
             {
-                return Generate();
+                return Generate(word);
             }
             catch (Exception e)
             {
@@ -111,10 +108,10 @@ namespace Witlesss
                 return "";
             }
         }
-        private string Generate()
+        private string Generate(string word)
         {
             string result = "";
-            string currentWord = Start;
+            string currentWord = word == Start || Words.ContainsKey(word) ? word : Start;
 
             while (currentWord != End)
             {
@@ -124,7 +121,7 @@ namespace Witlesss
 
             result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
             
-            return TextInLetterCase(result, _case);
+            return TextInRandomLetterCase(result);
         }
         private string PickWord(ConcurrentDictionary<string, int> dictionary)
         {

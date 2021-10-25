@@ -9,9 +9,12 @@ namespace Witlesss.Also
 {
     public static class Extension
     {
-        public static string TextInLetterCase(string text, LetterCase letterCase)
+        private static readonly Random Random = new Random();
+        
+        public static string TextInRandomLetterCase(string text)
         {
-            switch (letterCase.Case)
+            LetterCaseMode c = RandomLetterCase();
+            switch (c)
             {
                 case Lower:
                     return text.ToLower();
@@ -22,6 +25,16 @@ namespace Witlesss.Also
                 default:
                     return text;
             }
+        }
+        private static LetterCaseMode RandomLetterCase()
+        {
+            int n = Random.Next(8);
+            if (n < 5)
+                return Lower;
+            else if (n < 7)
+                return Sentence;
+            else
+                return Upper;
         }
         
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)

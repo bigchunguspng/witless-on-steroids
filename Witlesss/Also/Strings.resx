@@ -122,4 +122,7 @@ set_frequency@piece_fap_bot 3
     <data name="DBS_FOLDER" xml:space="preserve">
         <value>Telegram-WitlessDBs</value>
     </data>
+    <data name="A_MANUAL" xml:space="preserve">
+        <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, начиная с него (если оно есть в словаре)</value>
+    </data>
 </root>

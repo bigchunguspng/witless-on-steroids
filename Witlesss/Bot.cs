@@ -77,6 +77,11 @@ namespace Witlesss
                         ChatDemotivate();
                         return;
                     }
+                    if (TextAsCommand().StartsWith("/a"))
+                    {
+                        ChatGenerateByFirstWord();
+                        return;
+                    }
                     if (TextAsCommand().StartsWith("/set_frequency"))
                     {
                         ChatSetFrequency();
@@ -181,6 +186,20 @@ namespace Witlesss
                         result = result + "\n\n" + BASE_SIZE();
                         return result;
                     }
+                }
+
+                void ChatGenerateByFirstWord()
+                {
+                    if (text.Contains("/a ") && text.Length > 3)
+                    {
+                        string word = text.Split()[^1];
+                        text = text.Substring(3);
+                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerate(word);
+                        SendMessage(chat, TextInRandomLetterCase(text));
+                        Log($@"""{title}"": сгенерировано прикол по слову");
+                    }
+                    else
+                        SendMessage(chat, A_MANUAL);
                 }
 
                 void ChatDemotivate()

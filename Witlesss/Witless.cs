@@ -34,7 +34,7 @@ namespace Witlesss
             WaitOnStartup();
         }
 
-        [JsonProperty] private long Chat { get; set; }
+        [JsonProperty] public long Chat { get; set; }
         [JsonProperty] public int Interval
         {
             get => _generation.Interval;

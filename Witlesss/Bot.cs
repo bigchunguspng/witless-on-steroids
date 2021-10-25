@@ -351,9 +351,10 @@ namespace Witlesss
                             Log($@"{_activeChat}: отправлено {(accepted ? "и добавлено в словарь " : "")}""{text}""", ConsoleColor.Yellow);
                         }
                     }
-                    else if (input == "/r") ClearExtractedFrames();
                     else if (input == "/s") SaveDics();
                     else if (input == "/u") ReloadDics();
+                    else if (input == "/r") ClearExtractedFrames();
+                    else if (input == "/f") FuseAllDics();
                 }
             } while (input != "s");
             _client.StopReceiving();
@@ -419,6 +420,22 @@ namespace Witlesss
                     }
                 }
             });
+        }
+        
+        private void FuseAllDics()
+        {
+            foreach (var witless in _sussyBakas.Values)
+            {
+                var path = $@"{CurrentDirectory}\A\{DB_FILE_PREFIX}-{witless.Chat}.json";
+                if (File.Exists(path))
+                {
+                    witless.Backup();
+                    var fusion = new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData());
+                    fusion.Fuse();
+                    witless.HasUnsavedStuff = true;
+                    witless.Save();
+                }
+            }
         }
 
         private void SaveDics()

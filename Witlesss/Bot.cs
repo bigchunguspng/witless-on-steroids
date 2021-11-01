@@ -230,7 +230,7 @@ namespace Witlesss
 
                 void SendDemotivator(string fileID)
                 {
-                    GetDemotivatorSources(fileID, "jpg", out string a, out string b, out string path);
+                    GetDemotivatorSources(fileID, ".jpg", out string a, out string b, out string path);
                     using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
                         SendPhoto(chat, new InputOnlineFile(stream));
                     Log($@"""{title}"": сгенерировано демотиватор [_]");
@@ -239,7 +239,7 @@ namespace Witlesss
                 void SendAnimatedDemotivator(string fileID)
                 {
                     var time = DateTime.Now;
-                    GetDemotivatorSources(fileID, "mp4", out string a, out string b, out string path);
+                    GetDemotivatorSources(fileID, ".mp4", out string a, out string b, out string path);
                     using (var stream = File.OpenRead(_memes.MakeAnimatedDemotivator(path, a, b)))
                         SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
                     Log($@"""{title}"": сгенерировано GIF-демотиватор [^] за {DateTime.Now - time:s\.fff}");
@@ -248,7 +248,8 @@ namespace Witlesss
                 void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
                 {
                     GetDemotivatorText(witless, text, out textA, out textB);
-                    path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{chat}-{fileID.Remove(62)}.{extension}";
+                    path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{fileID.Remove(62).Remove(2, 44)}{extension}";
+                    path = UniquePath(path, extension);
                     DownloadFile(fileID, path).Wait();
                 }
 

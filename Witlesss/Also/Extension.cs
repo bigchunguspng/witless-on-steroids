@@ -95,9 +95,9 @@ namespace Witlesss.Also
         
         public static void ClearExtractedFrames()
         {
-            int deleted = 0, failed = 0;
-            string path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
-            var directories = Directory.GetDirectories(path);
+            int filesDeleted = 0, dirsDeleted = 0, filesMoved = 0;
+            var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
+            string[] directories = Directory.GetDirectories(path);
             foreach (string directory in directories)
             {
                 string[] files = Directory.GetFiles(directory);
@@ -108,35 +108,39 @@ namespace Witlesss.Also
                         try
                         {
                             File.Delete(file);
-                            deleted++;
+                            filesDeleted++;
                         }
                         catch
                         {
-                            failed++;
+                            //
                         }
                     }
                     else
                     {
                         try
                         {
-                            File.Move(file, file.Replace($@"{file.Split('\\')[^2]}\",""));
+                            string extension = Path.GetExtension(file);
+                            string destination = file.Replace($@"{file.Split('\\')[^2]}\", "");
+                            File.Move(file, UniquePath(destination, extension));
+                            filesMoved++;
                         }
                         catch
                         {
-                            failed++;
+                            //
                         }
                     }
                 }
                 try
                 {
                     Directory.Delete(directory);
+                    dirsDeleted++;
                 }
                 catch
                 {
-                    failed++;
+                    //
                 }
             }
-            Log($"Удалено {deleted} ненужных файлов!{(failed > 0 ? $" {failed} элементов осталось" : "")}", ConsoleColor.Yellow);
+            Log($"Удалено: {filesDeleted} ненужных файлов и {dirsDeleted} пустых папок! {filesMoved} файлов перемещено.", ConsoleColor.Yellow);
         }
     }
 }

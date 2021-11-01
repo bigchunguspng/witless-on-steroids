@@ -3,7 +3,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AnimatedGif;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.Also;
@@ -11,7 +10,6 @@ using static Witlesss.Logger;
 using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Also.Strings;
-using Image = System.Drawing.Image;
 
 namespace Witlesss
 {
@@ -82,12 +80,13 @@ namespace Witlesss
             try
             {
                 // Render GIF
-                _animationName = $"{inputFileName}-D.gif";
-                using var gif = new AnimatedGifCreator($@"{_animationPath}\{_animationName}", frameDelay);
-                frames = GetAllFrames();
-                foreach (string file in frames)
-                    if (file.EndsWith("D.jpg"))
-                        gif.AddFrameAsync(_drawer.ResizeImage(Image.FromFile(file), new Size(360, 360))).Wait();
+                _animationName = $"{inputFileName}-D.mp4";
+                var framesPath = @$"{_animationPath}\F-%04d-D.jpg";
+                var outputPath = $@"{_animationPath}\{_animationName}";
+                
+                var size = new Size(360, 360);
+                var task = new FfTaskRenderAnimation(outFrameRate, size, framesPath, outputPath);
+                _service.ExecuteAsync(task).Wait();
             }
             catch (Exception e)
             {

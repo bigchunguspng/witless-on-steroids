@@ -190,11 +190,11 @@ namespace Witlesss
 
                 void ChatGenerateByFirstWord()
                 {
-                    if (text.Contains("/a ") && text.Length > 3)
+                    if (text.Contains(' '))
                     {
                         string word = text.Split()[^1];
-                        text = text.Substring(3);
-                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerate(word);
+                        text = text.Substring(text.IndexOf(' ') + 1);
+                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerate(word.ToLower());
                         SendMessage(chat, TextInRandomLetterCase(text));
                         Log($@"""{title}"": сгенерировано прикол по слову");
                     }

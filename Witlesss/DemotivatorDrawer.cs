@@ -92,9 +92,8 @@ namespace Witlesss
             graphics.CompositingMode = CompositingMode.SourceCopy;
             graphics.FillRectangle(Brushes.Black, _background);
             graphics.DrawRectangle(_white, _frame);
-            graphics.DrawImage(image, _imageTopLeft);
-            
             graphics.DrawImage(_logo.Key, _logo.Value);
+            graphics.DrawImage(image, _imageTopLeft);
 
             graphics.CompositingMode = CompositingMode.SourceOver;
             graphics.DrawString(textA, _fontA, _fontColor, _upperText, _format);
@@ -105,7 +104,7 @@ namespace Witlesss
             return pathB;
         }
 
-        public Image ResizeImage(Image image, Size size) => new Bitmap(image, size);
+        private Image ResizeImage(Image image, Size size) => new Bitmap(image, size);
 
         private void SaveImage(Image image, ref string path)
         {

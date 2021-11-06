@@ -34,6 +34,14 @@ namespace Witlesss
             return _drawer.DrawDemotivator(path, textA, textB);
         }
 
+        public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
+        {
+            var task = new FfTaskWebpToJpg(path, out string outputPath, extension);
+            _service.ExecuteAsync(task).Wait();
+            
+            return MakeDemotivator(outputPath, textA, textB);
+        }
+
         public string MakeAnimatedDemotivator(string path, string textA, string textB)
         {
             _drawer.SetRandomLogo();

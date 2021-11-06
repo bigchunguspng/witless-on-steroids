@@ -220,7 +220,14 @@ namespace Witlesss
                             fileID = message.Video.FileId;
                         else
                         {
-                            SendMessage(chat, DG_MANUAL);
+                            if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsAnimated == false)
+                                fileID = message.ReplyToMessage.Sticker.FileId;
+                            else
+                            {
+                                SendMessage(chat, DG_MANUAL);
+                                return;
+                            }
+                            SendDemotivatedSticker(fileID);
                             return;
                         }
                         SendAnimatedDemotivator(fileID);
@@ -244,6 +251,15 @@ namespace Witlesss
                     using (var stream = File.OpenRead(_memes.MakeAnimatedDemotivator(path, a, b)))
                         SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
                     Log($@"""{title}"": сгенерировано GIF-демотиватор [^] за {DateTime.Now - time:s\.fff}");
+                }
+                
+                void SendDemotivatedSticker(string fileID)
+                {
+                    GetDemotivatorSources(fileID, ".webp", out string a, out string b, out string path);
+                    string extension = text.Contains("-j") ? ".jpg" : ".png";
+                    using (var stream = File.OpenRead(_memes.MakeStickerDemotivator(path, a, b, extension)))
+                        SendPhoto(chat, new InputOnlineFile(stream));
+                    Log($@"""{title}"": сгенерировано демотиватор [#] из стикера");
                 }
                 
                 void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)

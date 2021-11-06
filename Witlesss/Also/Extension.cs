@@ -92,7 +92,13 @@ namespace Witlesss.Also
             var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / interval}%";
             return a + b;
         }
-        
+
+        public static int AssumedResponseTime(int initialTime, string text)
+        {
+            if (text == null) return initialTime;
+            return Math.Min(text.Length, 120) * 25;
+        }
+
         public static void ClearExtractedFrames()
         {
             int filesDeleted = 0, dirsDeleted = 0, filesMoved = 0;

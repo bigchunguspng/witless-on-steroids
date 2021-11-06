@@ -118,6 +118,7 @@ namespace Witlesss
                     }
                     else
                     {
+                        Thread.Sleep(AssumedResponseTime(150, text));
                         SendMessage(chat, witless.TryToGenerate());
                         Log($@"""{title}"": сгенерировано прикол");
                     }

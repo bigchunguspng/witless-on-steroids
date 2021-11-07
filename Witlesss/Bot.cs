@@ -195,7 +195,7 @@ namespace Witlesss
                     {
                         string word = text.Split()[^1];
                         text = text.Substring(text.IndexOf(' ') + 1);
-                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerate(word.ToLower());
+                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerateFromWord(word.ToLower());
                         SendMessage(chat, TextInRandomLetterCase(text));
                         Log($@"""{title}"": сгенерировано прикол по слову");
                     }

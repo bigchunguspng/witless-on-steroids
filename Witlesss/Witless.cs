@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -107,6 +108,30 @@ namespace Witlesss
                 Log(e.Message, ConsoleColor.Red);
                 return "";
             }
+        }
+        public string TryToGenerateFromWord(string word = Start)
+        {
+            if (!Words.ContainsKey(word))
+            {
+                var words = new List<string>();
+                foreach (string key in Words.Keys)
+                    if (key.StartsWith(word))
+                        words.Add(key);
+                if (words.Count > 0)
+                    return TryToGenerate(words[_random.Next(words.Count)]);
+
+                foreach (string key in Words.Keys)
+                    if (word.StartsWith(key, StringComparison.Ordinal))
+                        words.Add(key);
+                if (words.Count > 0)
+                {
+                    words.Sort(Comparison);
+                    word = words[0];
+                }
+            }
+            return TryToGenerate(string.IsNullOrEmpty(word) ? Start : word);
+
+            int Comparison(string x, string y) => y.Length - x.Length;
         }
         private string Generate(string word)
         {

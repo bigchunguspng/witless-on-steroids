@@ -42,6 +42,7 @@ namespace Witlesss
             
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
+            _client.OnMessageEdited += OnMessageHandler;
 
             StartSaveLoop(2);
             ProcessConsoleInput();

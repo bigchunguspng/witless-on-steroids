@@ -306,7 +306,7 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Я буду писать сюда.
+        ///   Looks up a localized string similar to Я буду отвечать на.
         /// </summary>
         internal static string SET_FREQUENCY_RESPONSE_A {
             get {

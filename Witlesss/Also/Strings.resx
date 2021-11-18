@@ -78,7 +78,7 @@ set_frequency@piece_fap_bot 3
         <value>Telegram-ExtraDBs</value>
     </data>
     <data name="SET_FREQUENCY_RESPONSE_A" xml:space="preserve">
-        <value>Я буду писать сюда</value>
+        <value>Я буду отвечать на</value>
     </data>
     <data name="SET_FREQUENCY_RESPONSE_B" xml:space="preserve">
         <value>Пикчи будут ставать демотиваторами с вероятностью</value>

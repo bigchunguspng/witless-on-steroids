@@ -86,9 +86,9 @@ namespace Witlesss.Also
             else if (interval % 10 > 1)
                 a = $"{a} каждые {interval} сообщения";
             else if (interval == 1)
-                a = $"{a} после каждого вашего сообщения";
+                a = $"{a} каждое ваше сообщение";
             else
-                a = $"{a} раз в {interval} сообщение";
+                a = $"{a} каждое {interval} сообщение";
             var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / interval}%";
             return a + b;
         }

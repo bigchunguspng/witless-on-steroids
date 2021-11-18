@@ -24,6 +24,13 @@ namespace Witlesss
         public Memes()
         {
             _drawer = new DemotivatorDrawer();
+
+            if (!File.Exists(FFMPEG_PATH))
+            {
+                Log(@$"""{FFMPEG_PATH}"" не найден. Поместите его туда или оформите вылет", ConsoleColor.Yellow);
+                Log("Нажмите любую клавишу для продолжения...");
+                Console.ReadKey();
+            }
             _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
         }
 

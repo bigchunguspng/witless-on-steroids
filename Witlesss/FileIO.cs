@@ -13,6 +13,7 @@ namespace Witlesss
         {
             if (!File.Exists(_path))
             {
+                Directory.CreateDirectory(_path.Remove(_path.LastIndexOf('\\')));
                 File.CreateText(_path).Dispose();
                 T result = new T();
                 SaveData(result);

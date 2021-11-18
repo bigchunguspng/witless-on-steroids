@@ -177,14 +177,14 @@ namespace Witlesss
                     else
                         SendMessage(chat, FUSE_MANUAL, ParseMode.Html);
                     
-                    string BASE_NEW_SIZE() => $"Теперь он весит {new FileInfo(witless.Path).Length / 1024} КБ";
-                    string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {new FileInfo(witless.Path).Length / 1024} КБ";
+                    string BASE_NEW_SIZE() => $"Теперь он весит {FileSize(witless.Path)}";
+                    string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(witless.Path)}";
                     string FUSE_AVAILABLE_BASES()
                     {
                         FileInfo[] files = new DirectoryInfo($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
                         var result = "\n\nДоступные словари:";
                         foreach (var file in files)
-                            result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({file.Length / 1024} КБ)";
+                            result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
                         result = result + "\n\n" + BASE_SIZE();
                         return result;
                     }
@@ -287,7 +287,7 @@ namespace Witlesss
                         witless.Save();
 
                         string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
-                        SendMessage(chat, $"{MOVE_DONE_AS} \"{result}\"\n\n{MOVE_DONE_CLEARED}");
+                        SendMessage(chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>", ParseMode.Html);
                         Log($@"""{title}"": словарь сохранён как ""{result}""", ConsoleColor.Magenta);
                     }
                     else

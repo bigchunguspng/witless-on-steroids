@@ -93,6 +93,16 @@ namespace Witlesss.Also
             return a + b;
         }
 
+        public static string FileSize(string path)
+        {
+            long bytes = new FileInfo(path).Length;
+            long kbs = bytes / 1024;
+            if (kbs < 1)
+                return bytes + " байт";
+            else
+                return kbs + " КБ";
+        }
+
         public static int AssumedResponseTime(int initialTime, string text)
         {
             if (text == null) return initialTime;
@@ -103,6 +113,9 @@ namespace Witlesss.Also
         {
             int filesDeleted = 0, dirsDeleted = 0, filesMoved = 0;
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
+            if (!Directory.Exists(path))
+                return;
+            
             string[] directories = Directory.GetDirectories(path);
             foreach (string directory in directories)
             {

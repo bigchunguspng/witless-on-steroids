@@ -103,6 +103,11 @@ namespace Witlesss
                         ChatMove();
                         return;
                     }
+                    if (TextAsCommand() == "/debug")
+                    {
+                        ChatDebugMessage();
+                        return;
+                    }
                 }
                 
                 if (witless.ReceiveSentence(ref text))
@@ -294,6 +299,13 @@ namespace Witlesss
                         SendMessage(chat, MOVE_MANUAL, ParseMode.Html);
 
                     string ExtraDBPath(string name) => $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json";
+                }
+
+                void ChatDebugMessage()
+                {
+                    Message mess = message.ReplyToMessage;
+                    FileIO<Message> m = new FileIO<Message>($@"{CurrentDirectory}\Message-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
+                    m.SaveData(mess);
                 }
 
                 #endregion

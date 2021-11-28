@@ -77,7 +77,26 @@ namespace Witlesss.Also
             }
             return path;
         }
-        
+
+        public static string ExtensionFromID(string id)
+        {
+            string id2 = id.Remove(2);
+            return id2 switch
+            {
+                "BA" => ".mp4",
+                "Cg" => ".mp4",
+                "CQ" => ".mp3",
+                _ => ""
+            };
+        }
+
+        public static string ValidFileName(string text)
+        {
+            char[] chars = Path.GetInvalidFileNameChars();
+            foreach (char c in chars) text = text.Replace(c, '_');
+            return text;
+        }
+
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {
             string a = SET_FREQUENCY_RESPONSE_A;

@@ -97,6 +97,15 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Напиши это вместе с видосом или музлом.
+        /// </summary>
+        internal static string DAMN_MANUAL {
+            get {
+                return ResourceManager.GetString("DAMN_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-WitlessDB.
         /// </summary>
         internal static string DB_FILE_PREFIX {

@@ -70,8 +70,7 @@ namespace Witlesss
             string inFrames = metadata.Metadata.Streams.First().NbFrames;
             Log($"In: FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
 
-            string[] fps = inFrameRate.Split('/');
-            int outFrameRate = RetrieveFPS();
+            int outFrameRate = RetrieveFPS(inFrameRate);
             int outFrames = int.Parse(inFrames);
             double k = 1;
 
@@ -108,17 +107,6 @@ namespace Witlesss
                 Log(e.Message, ConsoleColor.Red);
             }
 
-            int RetrieveFPS()
-            {
-                try
-                {
-                    return int.Parse(fps[0]) / int.Parse(fps[1]);
-                }
-                catch
-                {
-                    return 16;
-                }
-            }
             void NormalizeLength(int max)
             {
                 if (outFrames > max)
@@ -134,6 +122,45 @@ namespace Witlesss
                     outFrameRate = max;
             }
             string[] GetAllFrames() => Directory.GetFiles(_animationPath);
+        }
+
+        public string RemoveBitrate(string path, int bitrate)
+        {
+            if (path.Substring(path.LastIndexOf('.')) == ".mp4")
+                CalculateOutBitrate().Wait();
+            var task = new FfTaskRemoveBitrate(path, out string outputPath, bitrate);
+            _service.ExecuteAsync(task).Wait();
+            return outputPath;
+            
+            async Task CalculateOutBitrate()
+            {
+                if (bitrate == 0)
+                {
+                    var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
+                    var stream = metadata.Metadata.Streams.First();
+                    int height = stream.Height;
+                    int width = stream.Width;
+                    int fps = RetrieveFPS(stream.AvgFrameRate, 30);
+                    int pixelsPerSecond = height * width * fps;
+                    bitrate = pixelsPerSecond / 200000;
+                }
+
+                bitrate = Math.Clamp(bitrate, 1, 40);
+                Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
+            }
+        }
+
+        private int RetrieveFPS(string framerate, int alt = 16)
+        {
+            string[] fps = framerate.Split('/');
+            try
+            {
+                return int.Parse(fps[0]) / int.Parse(fps[1]);
+            }
+            catch
+            {
+                return alt;
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
@@ -81,6 +82,11 @@ namespace Witlesss
                     if (TextAsCommand().StartsWith("/a"))
                     {
                         ChatGenerateByFirstWord();
+                        return;
+                    }
+                    if (TextAsCommand().StartsWith("/damn"))
+                    {
+                        ChatRemoveBitrate();
                         return;
                     }
                     if (TextAsCommand().StartsWith("/set_frequency"))
@@ -276,6 +282,52 @@ namespace Witlesss
                     DownloadFile(fileID, path).Wait();
                 }
 
+                void ChatRemoveBitrate()
+                {
+                    string fileID;
+                    if (message.ReplyToMessage?.Animation != null)
+                        fileID = message.ReplyToMessage.Animation.FileId;
+                    else if (message.Animation != null)
+                        fileID = message.Animation.FileId;
+                    else if (message.ReplyToMessage?.Video != null)
+                        fileID = message.ReplyToMessage.Video.FileId;
+                    else if (message.Video != null)
+                        fileID = message.Video.FileId;
+                    else if (message.ReplyToMessage?.Audio != null)
+                        fileID = message.ReplyToMessage.Audio.FileId;
+                    else if (message.Audio != null)
+                        fileID = message.Audio.FileId;
+                    else
+                    {
+                        SendMessage(chat, DAMN_MANUAL);
+                        return;
+                    }
+
+                    int bitrate = 0;
+                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                        bitrate = value;
+
+                    string shortID = fileID.Remove(62).Remove(2, 44);
+                    string extension = ExtensionFromID(shortID);
+                    var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
+                    path = UniquePath(path, extension);
+                    DownloadFile(fileID, path).Wait();
+                    using (var stream = File.OpenRead(_memes.RemoveBitrate(path, bitrate)))
+                        switch (extension)
+                        {
+                            case ".mp4":
+                                if (shortID.StartsWith("BA")) 
+                                    SendVideo(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+                                else
+                                    SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+                                break;
+                            case ".mp3":
+                                SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(message.From.FirstName)}.mp3"));
+                                break;
+                        }
+                    Log($@"""{title}"": сжато видос [*]");
+                }
+
                 void ChatMove()
                 {
                     string[] a = text.Split();
@@ -406,6 +458,16 @@ namespace Witlesss
         {
             Task task = _client.SendAnimationAsync(chat, animation);
             TrySend(task, chat, "GIF").Wait();
+        }
+        private void SendVideo(long chat, InputOnlineFile video)
+        {
+            Task task = _client.SendVideoAsync(chat, video);
+            TrySend(task, chat, "video").Wait();
+        }
+        private void SendAudio(long chat, InputOnlineFile audio)
+        {
+            Task task = _client.SendAudioAsync(chat, audio);
+            TrySend(task, chat, "audio").Wait();
         }
         private async Task TrySend(Task task, long chat, string what)
         {

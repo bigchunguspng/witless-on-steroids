@@ -126,28 +126,40 @@ namespace Witlesss
 
         public string RemoveBitrate(string path, int bitrate)
         {
-            if (path.Substring(path.LastIndexOf('.')) == ".mp4")
-                CalculateOutBitrate().Wait();
-            var task = new FfTaskRemoveBitrate(path, out string outputPath, bitrate);
-            _service.ExecuteAsync(task).Wait();
-            return outputPath;
-            
-            async Task CalculateOutBitrate()
+            string outputPath;
+            FfTaskRemoveBitrate task;
+            if (GetFileExtension(path) == ".mp4")
             {
-                if (bitrate == 0)
+                Size size = default;
+                CalculateOutBitrate().Wait();
+                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate, size);
+                
+                async Task CalculateOutBitrate()
                 {
                     var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
                     var stream = metadata.Metadata.Streams.First();
                     int height = stream.Height;
                     int width = stream.Width;
-                    int fps = RetrieveFPS(stream.AvgFrameRate, 30);
-                    int pixelsPerSecond = height * width * fps;
-                    bitrate = pixelsPerSecond / 200000;
-                }
+                    if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
+                        size = new Size(NearestEven(width), NearestEven(height));
+                    if (bitrate == 0)
+                    {
+                        int fps = RetrieveFPS(stream.AvgFrameRate, 30);
+                        int pixelsPerSecond = height * width * fps;
+                        bitrate = pixelsPerSecond / 200000;
+                    }
 
-                bitrate = Math.Clamp(bitrate, 1, 40);
-                Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
+                    bitrate = Math.Clamp(bitrate, 1, 40);
+                    Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
+
+                    int NearestEven(int x) => x + x % 2;
+                }
             }
+            else
+                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate);
+
+            _service.ExecuteAsync(task).Wait();
+            return outputPath;
         }
 
         private int RetrieveFPS(string framerate, int alt = 16)

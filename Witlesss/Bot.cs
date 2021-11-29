@@ -226,6 +226,8 @@ namespace Witlesss
                     {
                         if (message.ReplyToMessage?.Animation != null)
                             fileID = message.ReplyToMessage.Animation.FileId;
+                        else if (message.Animation != null)
+                            fileID = message.Animation.FileId;
                         else if (message.ReplyToMessage?.Video != null)
                             fileID = message.ReplyToMessage.Video.FileId;
                         else if (message.Video != null)
@@ -331,7 +333,7 @@ namespace Witlesss
                                 SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(message.From.FirstName)}.mp3"));
                                 break;
                         }
-                    Log($@"""{title}"": сжато видос [*]");
+                    Log($@"""{title}"": что-то сжато [*]");
                 }
 
                 void ChatMove()

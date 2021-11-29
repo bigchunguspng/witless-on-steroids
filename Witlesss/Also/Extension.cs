@@ -77,6 +77,9 @@ namespace Witlesss.Also
             }
             return path;
         }
+        
+        public static string GetFileExtension(string path) => path.Substring(path.LastIndexOf('.'));
+        public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
 
         public static string ExtensionFromID(string id)
         {
@@ -84,8 +87,11 @@ namespace Witlesss.Also
             return id2 switch
             {
                 "BA" => ".mp4",
-                "Cg" => ".mp4",
+                "Cg" => ".mp4", // animation
                 "CQ" => ".mp3",
+                "Aw" => ".mp3", // voice message / ogg
+                "BQ" => ".wav",
+                "Ag" => ".jpg",
                 _ => ""
             };
         }

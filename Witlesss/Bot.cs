@@ -277,42 +277,48 @@ namespace Witlesss
                 void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
                 {
                     GetDemotivatorText(witless, text, out textA, out textB);
-                    path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{fileID.Remove(62).Remove(2, 44)}{extension}";
+                    path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
                     path = UniquePath(path, extension);
                     DownloadFile(fileID, path).Wait();
                 }
 
                 void ChatRemoveBitrate()
                 {
-                    string fileID;
-                    if (message.ReplyToMessage?.Animation != null)
-                        fileID = message.ReplyToMessage.Animation.FileId;
-                    else if (message.Animation != null)
-                        fileID = message.Animation.FileId;
-                    else if (message.ReplyToMessage?.Video != null)
-                        fileID = message.ReplyToMessage.Video.FileId;
-                    else if (message.Video != null)
-                        fileID = message.Video.FileId;
-                    else if (message.ReplyToMessage?.Audio != null)
-                        fileID = message.ReplyToMessage.Audio.FileId;
-                    else if (message.Audio != null)
-                        fileID = message.Audio.FileId;
-                    else
+                    var fileID = "";
+                    Message mess = message.ReplyToMessage ?? message;
+                    for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
                     {
-                        SendMessage(chat, DAMN_MANUAL);
-                        return;
+                        if (mess.Animation != null)
+                            fileID = mess.Animation.FileId;
+                        else if (mess.Video != null)
+                            fileID = mess.Video.FileId;
+                        else if (mess.Audio != null)
+                            fileID = mess.Audio.FileId;
+                        else if (mess.Document != null && mess.Document.MimeType.StartsWith("audio"))
+                            fileID = mess.Document.FileId;
+                        if (fileID.Length > 0)
+                            break;
+                        else if (cycle == 1)
+                        {
+                            SendMessage(chat, DAMN_MANUAL);
+                            return;
+                        }
+                        else mess = message;
                     }
 
-                    int bitrate = 0;
+                    var bitrate = 0;
                     if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
                         bitrate = value;
 
-                    string shortID = fileID.Remove(62).Remove(2, 44);
+                    string shortID = ShortID(fileID);
                     string extension = ExtensionFromID(shortID);
                     var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
                     path = UniquePath(path, extension);
                     DownloadFile(fileID, path).Wait();
-                    using (var stream = File.OpenRead(_memes.RemoveBitrate(path, bitrate)))
+
+                    string result = _memes.RemoveBitrate(path, bitrate);
+                    extension = GetFileExtension(result);
+                    using (var stream = File.OpenRead(result))
                         switch (extension)
                         {
                             case ".mp4":

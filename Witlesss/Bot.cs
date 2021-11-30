@@ -39,7 +39,7 @@ namespace Witlesss
 
         public void Run()
         {
-            ClearExtractedFrames();
+            ClearTempFiles();
             
             _client.StartReceiving();
             _client.OnMessage += OnMessageHandler;
@@ -364,8 +364,12 @@ namespace Witlesss
                 void ChatDebugMessage()
                 {
                     Message mess = message.ReplyToMessage;
-                    FileIO<Message> m = new FileIO<Message>($@"{CurrentDirectory}\Message-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
-                    m.SaveData(mess);
+                    var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
+                    var path = $@"{CurrentDirectory}\{DEBUG_FOLDER}\{name}";
+                    CreatePath(path);
+                    new FileIO<Message>(path).SaveData(mess);
+                    using var stream = File.OpenRead(path);
+                    SendDocument(chat, new InputOnlineFile(stream, name.Replace("--", "-")));
                 }
 
                 #endregion
@@ -445,7 +449,7 @@ namespace Witlesss
                     }
                     else if (input == "/s") SaveDics();
                     else if (input == "/u") ReloadDics();
-                    else if (input == "/r") ClearExtractedFrames();
+                    else if (input == "/r") ClearTempFiles();
                     else if (input == "/f") FuseAllDics();
                 }
             } while (input != "s");
@@ -477,6 +481,11 @@ namespace Witlesss
         {
             Task task = _client.SendAudioAsync(chat, audio);
             TrySend(task, chat, "audio").Wait();
+        }
+        private void SendDocument(long chat, InputOnlineFile document)
+        {
+            Task task = _client.SendDocumentAsync(chat, document);
+            TrySend(task, chat, "document").Wait();
         }
         private async Task TrySend(Task task, long chat, string what)
         {

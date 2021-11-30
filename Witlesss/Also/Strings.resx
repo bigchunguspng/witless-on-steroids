@@ -128,4 +128,7 @@ set_frequency@piece_fap_bot 3
     <data name="DAMN_MANUAL" xml:space="preserve">
         <value>Напиши это вместе с видосом или музлом</value>
     </data>
+    <data name="DEBUG_FOLDER" xml:space="preserve">
+        <value>Telegram-Messages</value>
+    </data>
 </root>

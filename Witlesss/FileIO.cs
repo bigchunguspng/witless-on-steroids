@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
+using static Witlesss.Also.Extension;
 
 namespace Witlesss
 {
@@ -13,7 +14,7 @@ namespace Witlesss
         {
             if (!File.Exists(_path))
             {
-                Directory.CreateDirectory(_path.Remove(_path.LastIndexOf('\\')));
+                CreatePath(_path);
                 File.CreateText(_path).Dispose();
                 T result = new T();
                 SaveData(result);

@@ -141,7 +141,9 @@ namespace Witlesss.Also
             return Math.Min(text.Length, 120) * 25;
         }
 
-        public static void ClearExtractedFrames()
+        public static void CreatePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
+
+        public static void ClearTempFiles()
         {
             int filesDeleted = 0, dirsDeleted = 0, filesMoved = 0;
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
@@ -190,6 +192,15 @@ namespace Witlesss.Also
                 {
                     //
                 }
+            }
+            try
+            {
+                Directory.Delete($@"{CurrentDirectory}\{DEBUG_FOLDER}", true);
+                dirsDeleted++;
+            }
+            catch
+            {
+                //
             }
             Log($"Удалено: {filesDeleted} ненужных файлов и {dirsDeleted} пустых папок! {filesMoved} файлов перемещено.", ConsoleColor.Yellow);
         }

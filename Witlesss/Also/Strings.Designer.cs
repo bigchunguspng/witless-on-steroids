@@ -124,6 +124,15 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Telegram-Messages.
+        /// </summary>
+        internal static string DEBUG_FOLDER {
+            get {
+                return ResourceManager.GetString("DEBUG_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Comic Sans MS.
         /// </summary>
         internal static string DEMOTIVATOR_LOWER_FONT {

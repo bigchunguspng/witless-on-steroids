@@ -316,7 +316,7 @@ namespace Witlesss
                     string extension = ExtensionFromID(shortID);
                     var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
                     path = UniquePath(path, extension);
-                    DownloadFile(fileID, path).Wait();
+                    DownloadFile(fileID, path, chat).Wait();
 
                     string result = _memes.RemoveBitrate(path, bitrate);
                     extension = GetFileExtension(result);
@@ -387,7 +387,7 @@ namespace Witlesss
             string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From.FirstName;
             string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
         }
-        private async Task DownloadFile(string fileId, string path)
+        private async Task DownloadFile(string fileId, string path, long chat = default)
         {
             Directory.CreateDirectory($@"{CurrentDirectory}\{PICTURES_FOLDER}");
             try
@@ -400,6 +400,7 @@ namespace Witlesss
             catch (Exception e)
             {
                 Log(e.Message, ConsoleColor.Red);
+                SendMessage(chat, e.Message == "Bad Request: file is too big" ? FILE_TOO_BIG_RESPONSE() : e.Message);
             }
         }
 

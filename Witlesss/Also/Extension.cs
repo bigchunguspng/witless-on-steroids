@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using static System.Environment;
 using static Witlesss.Also.LetterCaseMode;
 using static Witlesss.Also.Strings;
@@ -116,6 +117,12 @@ namespace Witlesss.Also
                 a = $"{a} каждое {interval} сообщение";
             var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / interval}%";
             return a + b;
+        }
+
+        public static string FILE_TOO_BIG_RESPONSE()
+        {
+            var a = new[] {"пук-среньк...", "не подниму (много весит)", "тяжёлая штука", "ого, какой большой", "сорян, не влезает", ""};
+            return a.ElementAt(Random.Next(a.Length));
         }
 
         public static string FileSize(string path)

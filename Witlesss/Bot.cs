@@ -89,6 +89,11 @@ namespace Witlesss
                         ChatRemoveBitrate();
                         return;
                     }
+                    if (TextAsCommand().StartsWith("/b"))
+                    {
+                        ChatBuhurt();
+                        return;
+                    }
                     if (TextAsCommand().StartsWith("/set_frequency"))
                     {
                         ChatSetFrequency();
@@ -213,6 +218,18 @@ namespace Witlesss
                     }
                     else
                         SendMessage(chat, A_MANUAL);
+                }
+
+                void ChatBuhurt()
+                {
+                    var length = 3;
+                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                        length = Math.Clamp(value, 2, 13);
+                    var lines = new string[length];
+                    for (var i = 0; i < length; i++)
+                        lines[i] = witless.TryToGenerate().ToUpper();
+                    string result = string.Join("\n@\n", lines.Distinct());
+                    SendMessage(chat, result);
                 }
 
                 void ChatDemotivate()

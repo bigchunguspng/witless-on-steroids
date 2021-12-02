@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,36 +12,33 @@ using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Also.Strings;
 using File = System.IO.File;
+using ChatList = System.Collections.Concurrent.ConcurrentDictionary<long, Witlesss.Witless>;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss
 {
-    public class Bot
+    public class Bot : BotCore
     {
         private readonly Random _random = new Random();
-        private readonly TelegramBotClient _client;
-        private readonly ConcurrentDictionary<long, Witless> _sussyBakas;
-        private readonly FileIO<ConcurrentDictionary<long, Witless>> _fileIO;
+        private readonly ChatList _sussyBakas;
+        private readonly FileIO<ChatList> _fileIO;
         private readonly Memes _memes;
         private long _activeChat;
 
         public Bot()
         {
-            string token = File.ReadAllText($@"{CurrentDirectory}\.token");
-            
             _memes = new Memes();
-            _fileIO = new FileIO<ConcurrentDictionary<long, Witless>>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
+            _fileIO = new FileIO<ChatList>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
             _sussyBakas = _fileIO.LoadData();
-            _client = new TelegramBotClient(token);
         }
 
         public void Run()
         {
             ClearTempFiles();
             
-            _client.StartReceiving();
-            _client.OnMessage += OnMessageHandler;
-            _client.OnMessageEdited += OnMessageHandler;
+            Client.StartReceiving();
+            Client.OnMessage += OnMessageHandler;
+            Client.OnMessageEdited += OnMessageHandler;
 
             StartSaveLoop(2);
             ProcessConsoleInput();
@@ -412,22 +407,6 @@ namespace Witlesss
             string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From.FirstName;
             string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
         }
-        private async Task DownloadFile(string fileId, string path, long chat = default)
-        {
-            Directory.CreateDirectory($@"{CurrentDirectory}\{PICTURES_FOLDER}");
-            try
-            {
-                var file = await _client.GetFileAsync(fileId);
-                var stream = new FileStream(path, FileMode.Create);
-                _client.DownloadFileAsync(file.FilePath, stream).Wait();
-                await stream.DisposeAsync();
-            }
-            catch (Exception e)
-            {
-                Log(e.Message, ConsoleColor.Red);
-                SendMessage(chat, e.Message == "Bad Request: file is too big" ? FILE_TOO_BIG_RESPONSE() : e.Message);
-            }
-        }
 
         private void ProcessConsoleInput()
         {
@@ -473,53 +452,8 @@ namespace Witlesss
                     else if (input == "/f") FuseAllDics();
                 }
             } while (input != "s");
-            _client.StopReceiving();
+            Client.StopReceiving();
             SaveDics();
-        }
-
-        private async void SendMessage(long chat, string text, ParseMode mode = ParseMode.Default)
-        {
-            Task task = _client.SendTextMessageAsync(chat, text, mode, disableNotification: true);
-            await TrySend(task, chat, "message");
-        }
-        private void SendPhoto(long chat, InputOnlineFile photo)
-        {
-            Task task = _client.SendPhotoAsync(chat, photo);
-            TrySend(task, chat, "photo").Wait();
-        }
-        private void SendAnimation(long chat, InputOnlineFile animation)
-        {
-            Task task = _client.SendAnimationAsync(chat, animation);
-            TrySend(task, chat, "GIF").Wait();
-        }
-        private void SendVideo(long chat, InputOnlineFile video)
-        {
-            Task task = _client.SendVideoAsync(chat, video);
-            TrySend(task, chat, "video").Wait();
-        }
-        private void SendAudio(long chat, InputOnlineFile audio)
-        {
-            Task task = _client.SendAudioAsync(chat, audio);
-            TrySend(task, chat, "audio").Wait();
-        }
-        private void SendDocument(long chat, InputOnlineFile document)
-        {
-            Task task = _client.SendDocumentAsync(chat, document);
-            TrySend(task, chat, "document").Wait();
-        }
-        private async Task TrySend(Task task, long chat, string what)
-        {
-            try
-            {
-                await task.ContinueWith(action =>
-                {
-                    Log(chat + $": Can't send {what}: " + action.Exception?.Message, ConsoleColor.Red);
-                }, TaskContinuationOptions.OnlyOnFaulted);
-            }
-            catch
-            {
-                // 21
-            }
         }
 
         private bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);

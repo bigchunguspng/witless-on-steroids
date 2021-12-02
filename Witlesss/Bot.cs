@@ -315,6 +315,8 @@ namespace Witlesss
                             fileID = mess.Audio.FileId;
                         else if (mess.Document != null && mess.Document.MimeType.StartsWith("audio"))
                             fileID = mess.Document.FileId;
+                        else if (mess.Voice != null)
+                            fileID = mess.Voice.FileId;
                         if (fileID.Length > 0)
                             break;
                         else if (cycle == 1)

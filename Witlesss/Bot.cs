@@ -145,7 +145,7 @@ namespace Witlesss
 
                 void ChatSetFrequency()
                 {
-                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                    if (HasIntArgument(text, out int value))
                     {
                         witless.Interval = value;
                         SaveChatList();
@@ -179,16 +179,12 @@ namespace Witlesss
                             fusion.Fuse();
                             witless.HasUnsavedStuff = true;
                             witless.Save();
-                            SendMessage(chat,
-                                $"{FUSE_SUCCESS_RESPONSE_A} \"{title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
+                            SendMessage(chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
                         }
                         else
-                            SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES(),
-                                ParseMode.Html);
+                            SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES(), ParseMode.Html);
 
-                        WitlessDB FromFile() =>
-                            new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json")
-                                .LoadData();
+                        WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
                     }
                     else
                         SendMessage(chat, FUSE_MANUAL, ParseMode.Html);
@@ -223,7 +219,7 @@ namespace Witlesss
                 void ChatBuhurt()
                 {
                     var length = 3;
-                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                    if (HasIntArgument(text, out int value))
                         length = Math.Clamp(value, 2, 13);
                     var lines = new string[length];
                     for (var i = 0; i < length; i++)
@@ -328,7 +324,7 @@ namespace Witlesss
                     }
 
                     var bitrate = 0;
-                    if (text.Split().Length > 1 && int.TryParse(text.Split()[1], out int value))
+                    if (HasIntArgument(text, out int value))
                         bitrate = value;
 
                     string shortID = ShortID(fileID);
@@ -454,10 +450,9 @@ namespace Witlesss
                         string text = input.Substring(3).Trim();
                         var witless = _sussyBakas[_activeChat];
                         
-                        if (input.StartsWith("/a ") ) //add
+                        if (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
                         {
-                            if (witless.ReceiveSentence(ref text))
-                                Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
+                            Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
                         }
                         else if (input.StartsWith("/w ")) //write
                         {

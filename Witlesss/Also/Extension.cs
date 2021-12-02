@@ -54,6 +54,13 @@ namespace Witlesss.Also
             else
                 a = witless.TryToGenerate();
         }
+
+        public static bool HasIntArgument(string text, out int value)
+        {
+            value = 0;
+            string[] words = text.Split();
+            return words.Length > 1 && int.TryParse(words[1], out value);
+        }
         
         public static string UniquePath(string path, string extension = "")
         {

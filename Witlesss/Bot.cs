@@ -72,58 +72,64 @@ namespace Witlesss
             {
                 var witless = _sussyBakas[chat];
                 
-                if (text != null && text.StartsWith('/'))
+                if (text != null)
                 {
-                    if (TextAsCommand().StartsWith("/dg"))
+                    if (text.StartsWith('/'))
                     {
-                        ChatDemotivate();
-                        return;
+                        if (TextAsCommand().StartsWith("/dg"))
+                        {
+                            ChatDemotivate();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/a"))
+                        {
+                            ChatGenerateByFirstWord();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/damn"))
+                        {
+                            ChatRemoveBitrate();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/b"))
+                        {
+                            ChatBuhurt();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/set_frequency"))
+                        {
+                            ChatSetFrequency();
+                            return;
+                        }
+                        if (TextAsCommand() == "/chat_id")
+                        {
+                            SendMessage(chat, chat.ToString());
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/fuse"))
+                        {
+                            ChatFuse();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/move"))
+                        {
+                            ChatMove();
+                            return;
+                        }
+                        if (TextAsCommand() == "/debug")
+                        {
+                            ChatDebugMessage();
+                            return;
+                        }
                     }
-                    if (TextAsCommand().StartsWith("/a"))
+                    else
                     {
-                        ChatGenerateByFirstWord();
-                        return;
-                    }
-                    if (TextAsCommand().StartsWith("/damn"))
-                    {
-                        ChatRemoveBitrate();
-                        return;
-                    }
-                    if (TextAsCommand().StartsWith("/b"))
-                    {
-                        ChatBuhurt();
-                        return;
-                    }
-                    if (TextAsCommand().StartsWith("/set_frequency"))
-                    {
-                        ChatSetFrequency();
-                        return;
-                    }
-                    if (TextAsCommand() == "/chat_id")
-                    {
-                        SendMessage(chat, chat.ToString());
-                        return;
-                    }
-                    if (TextAsCommand().StartsWith("/fuse"))
-                    {
-                        ChatFuse();
-                        return;
-                    }
-                    if (TextAsCommand().StartsWith("/move"))
-                    {
-                        ChatMove();
-                        return;
-                    }
-                    if (TextAsCommand() == "/debug")
-                    {
-                        ChatDebugMessage();
-                        return;
+                        var sentence = text.Clone().ToString();
+                        if (witless.ReceiveSentence(ref sentence))
+                            Log($@"""{title}"": получено сообщение ""{sentence}""", ConsoleColor.Blue);
                     }
                 }
                 
-                if (witless.ReceiveSentence(ref text))
-                    Log($@"""{title}"": получено сообщение ""{text}""", ConsoleColor.Blue);
-
                 witless.Count();
                 
                 if (witless.ReadyToGen())

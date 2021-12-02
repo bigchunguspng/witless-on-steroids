@@ -126,6 +126,7 @@ namespace Witlesss
 
         public string RemoveBitrate(string path, int bitrate)
         {
+            bool noArgs = bitrate == 0;
             string outputPath;
             FfTaskRemoveBitrate task;
             if (GetFileExtension(path) == ".mp4")
@@ -142,14 +143,14 @@ namespace Witlesss
                     int width = stream.Width;
                     if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
                         size = new Size(NearestEven(width), NearestEven(height));
-                    if (bitrate == 0)
+                    if (noArgs)
                     {
                         int fps = RetrieveFPS(stream.AvgFrameRate, 30);
                         int pixelsPerSecond = height * width * fps;
                         bitrate = pixelsPerSecond / 200000;
                     }
 
-                    bitrate = Math.Clamp(bitrate, 1, 40);
+                    bitrate = Math.Clamp(bitrate, 1, noArgs ? 40 : 120);
                     Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
 
                     int NearestEven(int x) => x + x % 2;

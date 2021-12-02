@@ -143,14 +143,14 @@ namespace Witlesss
                     int width = stream.Width;
                     if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
                         size = new Size(NearestEven(width), NearestEven(height));
+                    int fps = RetrieveFPS(stream.AvgFrameRate, 30);
                     if (noArgs)
                     {
-                        int fps = RetrieveFPS(stream.AvgFrameRate, 30);
-                        int pixelsPerSecond = height * width * fps;
-                        bitrate = pixelsPerSecond / 200000;
+                        int pixelsPerSecond = (height + width) * fps;
+                        bitrate = pixelsPerSecond / 620;
                     }
 
-                    bitrate = Math.Clamp(bitrate, 1, noArgs ? 40 : 120);
+                    bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
                     Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
 
                     int NearestEven(int x) => x + x % 2;

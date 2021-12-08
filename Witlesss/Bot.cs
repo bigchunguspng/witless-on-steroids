@@ -3,7 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Telegram.Bot.Args;
+using Telegram.Bot;
+using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
@@ -35,30 +36,29 @@ namespace Witlesss
         public void Run()
         {
             ClearTempFiles();
-            
-            Client.StartReceiving();
-            Client.OnMessage += OnMessageHandler;
-            Client.OnMessageEdited += OnMessageHandler;
+
+            var options = new ReceiverOptions() {AllowedUpdates = new[] {UpdateType.Message, UpdateType.EditedMessage}};
+            Client.StartReceiving(new Handler(this), options);
+            Log("стартуем!");
 
             StartSaveLoop(2);
             ProcessConsoleInput();
         }
-
-        private void OnMessageHandler(object sender, MessageEventArgs e)
+        
+        public void TryHandleMessage(Message message)
         {
             try
             {
-                HandleMessage(e);
+                HandleMessage(message);
             }
             catch (Exception exception)
             {
-                Log(e.Message.Chat.Id + ": Can't handle message: " + exception.Message, ConsoleColor.Red);
+                Log(message.Chat.Id + ": Can't handle message: " + exception.Message, ConsoleColor.Red);
             }
         }
 
-        private void HandleMessage(MessageEventArgs e)
+        private void HandleMessage(Message message)
         {
-            var message = e.Message;
             string text = message.Caption ?? message.Text;
             long chat = message.Chat.Id;
             string title = TitleOrUsername();
@@ -183,12 +183,12 @@ namespace Witlesss
                             SendMessage(chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
                         }
                         else
-                            SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES(), ParseMode.Html);
+                            SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
 
                         WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
                     }
                     else
-                        SendMessage(chat, FUSE_MANUAL, ParseMode.Html);
+                        SendMessage(chat, FUSE_MANUAL);
                     
                     string BASE_NEW_SIZE() => $"Теперь он весит {FileSize(witless.Path)}";
                     string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(witless.Path)}";
@@ -368,11 +368,11 @@ namespace Witlesss
                         witless.Save();
 
                         string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
-                        SendMessage(chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>", ParseMode.Html);
+                        SendMessage(chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>");
                         Log($@"""{title}"": словарь сохранён как ""{result}""", ConsoleColor.Magenta);
                     }
                     else
-                        SendMessage(chat, MOVE_MANUAL, ParseMode.Html);
+                        SendMessage(chat, MOVE_MANUAL);
 
                     string ExtraDBPath(string name) => $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json";
                 }
@@ -452,7 +452,6 @@ namespace Witlesss
                     else if (input == "/f") FuseAllDics();
                 }
             } while (input != "s");
-            Client.StopReceiving();
             SaveDics();
         }
 

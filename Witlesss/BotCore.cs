@@ -8,6 +8,7 @@ using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Also.Strings;
+using File = System.IO.File;
 
 namespace Witlesss
 {
@@ -21,9 +22,9 @@ namespace Witlesss
             Client = new TelegramBotClient(token);
         }
 
-        protected async void SendMessage(long chat, string text, ParseMode mode = ParseMode.Default)
+        protected async void SendMessage(long chat, string text)
         {
-            Task task = Client.SendTextMessageAsync(chat, text, mode, disableNotification: true);
+            Task task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
             await TrySend(task, chat, "message");
         }
 
@@ -79,7 +80,7 @@ namespace Witlesss
             {
                 var file = await Client.GetFileAsync(fileId);
                 var stream = new FileStream(path, FileMode.Create);
-                Client.DownloadFileAsync(file.FilePath, stream).Wait();
+                Client.DownloadFileAsync(file.FilePath!, stream).Wait();
                 await stream.DisposeAsync();
             }
             catch (Exception e)

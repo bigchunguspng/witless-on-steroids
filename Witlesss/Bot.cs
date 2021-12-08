@@ -310,7 +310,7 @@ namespace Witlesss
                             fileID = mess.Video.FileId;
                         else if (mess.Audio != null)
                             fileID = mess.Audio.FileId;
-                        else if (mess.Document != null && mess.Document.MimeType.StartsWith("audio"))
+                        else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
                             fileID = mess.Document.FileId;
                         else if (mess.Voice != null)
                             fileID = mess.Voice.FileId;
@@ -346,7 +346,7 @@ namespace Witlesss
                                     SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
                                 break;
                             case ".mp3":
-                                SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(message.From.FirstName)}.mp3"));
+                                SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName())}.mp3"));
                                 break;
                         }
                     Log($@"""{title}"": что-то сжато [*]");
@@ -379,6 +379,9 @@ namespace Witlesss
 
                 void ChatDebugMessage()
                 {
+                    if (message.ReplyToMessage == null)
+                        return;
+                    
                     Message mess = message.ReplyToMessage;
                     var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
                     var path = $@"{CurrentDirectory}\{DEBUG_FOLDER}\{name}";
@@ -404,7 +407,8 @@ namespace Witlesss
                 SendMessage(chat, START_RESPONSE);
             }
 
-            string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From.FirstName;
+            string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From?.FirstName;
+            string SenderName() => message.SenderChat?.Title ?? message.From?.FirstName;
             string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
         }
 

@@ -39,7 +39,6 @@ namespace Witlesss
 
             var options = new ReceiverOptions() {AllowedUpdates = new[] {UpdateType.Message, UpdateType.EditedMessage}};
             Client.StartReceiving(new Handler(this), options);
-            Log("стартуем!");
 
             StartSaveLoop(2);
             ProcessConsoleInput();

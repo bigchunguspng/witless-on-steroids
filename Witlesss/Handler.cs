@@ -5,6 +5,7 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using static Witlesss.Logger;
 
 namespace Witlesss
 {
@@ -23,6 +24,10 @@ namespace Witlesss
             return Task.CompletedTask;
         }
 
-        public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            Log("Telegram API Error...", ConsoleColor.Red);
+            return Task.CompletedTask;
+        }
     }
 }

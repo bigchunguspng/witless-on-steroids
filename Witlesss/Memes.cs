@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,14 +71,14 @@ namespace Witlesss
             string inFrames = metadata.Metadata.Streams.First().NbFrames;
             Log($"In: FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
 
-            int outFrameRate = RetrieveFPS(inFrameRate);
+            double outFrameRate = RetrieveFPS(inFrameRate);
             int outFrames = int.Parse(inFrames);
             double k = 1;
 
             NormalizeLength(50);
             NormalizeFrameRate(50);
-            int frameDelay = 1000 / outFrameRate;
-            Log($"Out: FPS: {outFrameRate}, Length: {outFrames}", ConsoleColor.Blue);
+            double frameDelay = 1000 / outFrameRate;
+            Log($"Out: FPS: {Math.Round(outFrameRate, 3).ToString(CultureInfo.InvariantCulture)}, Length: {outFrames}", ConsoleColor.Blue);
             
             // Extract all frames
             for (var frame = 0; frame < outFrames; frame++)
@@ -143,10 +144,10 @@ namespace Witlesss
                     int width = stream.Width;
                     if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
                         size = new Size(NearestEven(width), NearestEven(height));
-                    int fps = RetrieveFPS(stream.AvgFrameRate, 30);
+                    double fps = RetrieveFPS(stream.AvgFrameRate, 30);
                     if (noArgs)
                     {
-                        int pixelsPerSecond = (height + width) * fps;
+                        var pixelsPerSecond = (int) ((height + width) * fps);
                         bitrate = pixelsPerSecond / 620;
                     }
 
@@ -163,12 +164,12 @@ namespace Witlesss
             return outputPath;
         }
 
-        private int RetrieveFPS(string framerate, int alt = 16)
+        private double RetrieveFPS(string framerate, int alt = 16)
         {
             string[] fps = framerate.Split('/');
             try
             {
-                return int.Parse(fps[0]) / int.Parse(fps[1]);
+                return int.Parse(fps[0]) / (double) int.Parse(fps[1]);
             }
             catch
             {

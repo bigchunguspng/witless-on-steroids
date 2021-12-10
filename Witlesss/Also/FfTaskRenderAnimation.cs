@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Threading.Tasks;
 using MediaToolkit.Core;
 using MediaToolkit.Tasks;
@@ -8,12 +9,12 @@ namespace Witlesss.Also
 {
     public class FfTaskRenderAnimation : FfMpegTaskBase<int>
     {
-        private readonly int _framerate;
+        private readonly double _framerate;
         private readonly Size _size;
         private readonly string _inputFilesPath;
         private readonly string _outputFilePath;
 
-        public FfTaskRenderAnimation(int framerate, Size size, string inputFilesPath, string outputFilePath)
+        public FfTaskRenderAnimation(double framerate, Size size, string inputFilesPath, string outputFilePath)
         {
             _inputFilesPath = inputFilesPath;
             _outputFilePath = outputFilePath;
@@ -24,7 +25,7 @@ namespace Witlesss.Also
         public override IList<string> CreateArguments() => new[]
         {
             "-framerate",
-            _framerate.ToString(),
+            _framerate.ToString(CultureInfo.InvariantCulture),
             "-i",
             _inputFilesPath ?? "",
             "-s",

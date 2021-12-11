@@ -40,6 +40,8 @@ namespace Witlesss
             get => _generation.Interval;
             set => _generation.Interval = value;
         }
+
+        [JsonProperty] public bool DemotivateStickers { get; set; }
         
         public WitlessDB Words { get; set; }
         public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";

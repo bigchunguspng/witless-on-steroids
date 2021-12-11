@@ -30,7 +30,7 @@ namespace Witlesss
             using StreamWriter writer = File.CreateText(_path);
             writer.Write(JsonConvert.SerializeObject(db, new JsonSerializerSettings
             {
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented, DefaultValueHandling = DefaultValueHandling.Ignore
             }));
         }
     }

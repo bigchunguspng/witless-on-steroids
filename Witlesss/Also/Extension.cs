@@ -122,7 +122,7 @@ namespace Witlesss.Also
                 a = $"{a} каждое ваше сообщение";
             else
                 a = $"{a} каждое {interval} сообщение";
-            var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / interval}%";
+            var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / Math.Min(interval, 5)}%";
             return a + b;
         }
 

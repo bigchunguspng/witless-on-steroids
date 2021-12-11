@@ -95,6 +95,11 @@ namespace Witlesss
                             ChatSetFrequency();
                             return;
                         }
+                        if (TextAsCommand().StartsWith("/toggle_stickers"))
+                        {
+                            ChatToggleStickers();
+                            return;
+                        }
                         if (TextAsCommand() == "/chat_id")
                         {
                             SendMessage(chat, chat.ToString());
@@ -128,17 +133,18 @@ namespace Witlesss
                 
                 if (witless.ReadyToGen())
                 {
-                    if (message.Photo != null && _random.Next(witless.Interval) == 0)
-                    {
-                        string fileID = message.Photo[^1].FileId;
-                        SendDemotivator(fileID);
-                    }
+                    if (message.Photo != null && ShouldDemotivate())
+                        SendDemotivator(message.Photo[^1].FileId);
+                    else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsAnimated && ShouldDemotivate())
+                        SendDemotivatedSticker(message.Sticker.FileId);
                     else
                     {
                         Thread.Sleep(AssumedResponseTime(150, text));
                         SendMessage(chat, witless.TryToGenerate());
                         Log($@"""{title}"": сгенерировано прикол");
                     }
+
+                    bool ShouldDemotivate() => _random.Next(Math.Min(witless.Interval, 5)) == 0;
                 }
 
                 #region local memes
@@ -283,7 +289,7 @@ namespace Witlesss
                 void SendDemotivatedSticker(string fileID)
                 {
                     GetDemotivatorSources(fileID, ".webp", out string a, out string b, out string path);
-                    string extension = text.Contains("-j") ? ".jpg" : ".png";
+                    string extension = text == null ? ".png" : text.Contains("-j") ? ".jpg" : ".png";
                     using (var stream = File.OpenRead(_memes.MakeStickerDemotivator(path, a, b, extension)))
                         SendPhoto(chat, new InputOnlineFile(stream));
                     Log($@"""{title}"": сгенерировано демотиватор [#] из стикера");
@@ -388,6 +394,13 @@ namespace Witlesss
                     new FileIO<Message>(path).SaveData(mess);
                     using var stream = File.OpenRead(path);
                     SendDocument(chat, new InputOnlineFile(stream, name.Replace("--", "-")));
+                }
+
+                void ChatToggleStickers()
+                {
+                    witless.DemotivateStickers = !witless.DemotivateStickers;
+                    SaveChatList();
+                    SendMessage(chat, $"Стикеры {(witless.DemotivateStickers ? "" : "<b>НЕ</b> ")}будут демотивироваться в случайном порядке");
                 }
 
                 #endregion

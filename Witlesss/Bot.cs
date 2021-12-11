@@ -431,7 +431,7 @@ namespace Witlesss
             {
                 input = Console.ReadLine();
                 
-                if (input != null)
+                if (input != null && !input.EndsWith("_"))
                 {
                     if (input.StartsWith("+") && input.Length > 1)
                     {

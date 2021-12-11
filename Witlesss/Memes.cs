@@ -169,7 +169,8 @@ namespace Witlesss
             string[] fps = framerate.Split('/');
             try
             {
-                return int.Parse(fps[0]) / (double) int.Parse(fps[1]);
+                double result = int.Parse(fps[0]) / double.Parse(fps[1]);
+                return double.IsNaN(result) ? alt : result;
             }
             catch
             {

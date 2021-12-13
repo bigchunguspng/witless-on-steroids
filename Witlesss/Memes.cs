@@ -125,7 +125,7 @@ namespace Witlesss
             string[] GetAllFrames() => Directory.GetFiles(_animationPath);
         }
 
-        public string RemoveBitrate(string path, int bitrate)
+        public string RemoveBitrate(string path, int bitrate, out int value)
         {
             bool noArgs = bitrate == 0;
             string outputPath;
@@ -140,8 +140,9 @@ namespace Witlesss
                 {
                     var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
                     var stream = metadata.Metadata.Streams.First();
-                    int height = stream.Height;
-                    int width = stream.Width;
+                    int height = FallbackIfZero(stream.Height, 720);
+                    int width = FallbackIfZero(stream.Width, 720);
+                    
                     if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
                         size = new Size(NearestEven(width), NearestEven(height));
                     double fps = RetrieveFPS(stream.AvgFrameRate, 30);
@@ -155,12 +156,14 @@ namespace Witlesss
                     Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
 
                     int NearestEven(int x) => x + x % 2;
+                    int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
                 }
             }
             else
                 task = new FfTaskRemoveBitrate(path, out outputPath, bitrate);
 
             _service.ExecuteAsync(task).Wait();
+            value = bitrate;
             return outputPath;
         }
 

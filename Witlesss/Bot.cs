@@ -339,22 +339,24 @@ namespace Witlesss
                     path = UniquePath(path, extension);
                     DownloadFile(fileID, path, chat).Wait();
 
-                    string result = _memes.RemoveBitrate(path, bitrate);
+                    string result = _memes.RemoveBitrate(path, bitrate, out value);
                     extension = GetFileExtension(result);
                     using (var stream = File.OpenRead(result))
                         switch (extension)
                         {
                             case ".mp4":
                                 if (shortID.StartsWith("BA")) 
-                                    SendVideo(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+                                    SendVideo(chat, new InputOnlineFile(stream, VideoFilename()));
                                 else
-                                    SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+                                    SendAnimation(chat, new InputOnlineFile(stream, VideoFilename()));
                                 break;
                             case ".mp3":
                                 SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName())}.mp3"));
                                 break;
                         }
                     Log($@"""{title}"": что-то сжато [*]");
+                    
+                    string VideoFilename() => $"piece_fap_club-{value}.mp4";
                 }
 
                 void ChatMove()

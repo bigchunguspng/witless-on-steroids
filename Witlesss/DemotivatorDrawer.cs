@@ -56,8 +56,8 @@ namespace Witlesss
             _imageTopLeft = new Point(_imageMargin, _imageMargin);
             _background = new Rectangle(0, 0, _size, _size);
             _frame = new Rectangle(margin, margin, _size - 2 * margin, _size - margin - marginB);
-            _upperText = new RectangleF(_imageMargin, _size - _imageMarginB + 18, _imageWidth, 100);
-            _lowerText = new RectangleF(_imageMargin, _size - _imageMarginB + 84, _imageWidth, 100);
+            _upperText = new RectangleF(0, _size - _imageMarginB + 18, _size, 100);
+            _lowerText = new RectangleF(0, _size - _imageMarginB + 84, _size, 100);
         }
         
         private void LoadLogos(string path)

@@ -122,13 +122,14 @@ namespace Witlesss.Also
                 a = $"{a} каждое ваше сообщение";
             else
                 a = $"{a} каждое {interval} сообщение";
-            var b = $"\n\n{SET_FREQUENCY_RESPONSE_B} {100 / Math.Min(interval, 5)}%";
-            return a + b;
+            return a;
         }
+
+        public static string SET_PROBABILITY_RESPONSE(int p) => $"{SET_FREQUENCY_RESPONSE_B} {p}%";
 
         public static string FILE_TOO_BIG_RESPONSE()
         {
-            var a = new[] {"пук-среньк...", "не подниму (много весит)", "тяжёлая штука", "ого, какой большой", "сорян, не влезает", ""};
+            var a = new[] {"пук-среньк...", "не подниму (много весит)", "тяжёлая штука", "ого, какой большой", "сорян, не влезает"};
             return a.ElementAt(Random.Next(a.Length));
         }
 

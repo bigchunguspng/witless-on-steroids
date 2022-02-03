@@ -1,4 +1,6 @@
-﻿namespace Witlesss
+﻿using System;
+
+namespace Witlesss
 {
     public class Counter
     {
@@ -18,13 +20,7 @@
             get => _interval;
             set
             {
-                if (value < _min)
-                    _interval = _min;
-                else if (value > _max)
-                    _interval = _max;
-                else
-                    _interval = value;
-                
+                _interval = Math.Clamp(value, _min, _max);
                 _actualInterval = _interval;
             }
         }

@@ -21,15 +21,17 @@ namespace Witlesss
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
         private Counter _generation;
+        private int _probability;
         
         public bool HasUnsavedStuff;
         
-        public Witless(long chat, int interval = 7)
+        public Witless(long chat, int interval = 7, int probability = 20)
         {
             Chat = chat;
             _random = new Random();
             _generation = new Counter(interval);
             _fileIO = new FileIO<WitlessDB>(Path);
+            DgProbability = probability;
             Load();
             WaitOnStartup();
         }
@@ -39,6 +41,12 @@ namespace Witlesss
         {
             get => _generation.Interval;
             set => _generation.Interval = value;
+        }
+
+        [JsonProperty] public int DgProbability
+        {
+            get => _probability;
+            set => _probability = Math.Clamp(value, 0, 100);
         }
 
         [JsonProperty] public bool DemotivateStickers { get; set; }

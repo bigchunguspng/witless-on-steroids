@@ -313,7 +313,7 @@ namespace Witlesss.Also {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        ///set_frequency@piece_fap_bot 3
+        ///set@piece_fap_bot 3
         ///
         ///(чем меньше значение - тем чаще я буду писать).
         /// </summary>
@@ -338,6 +338,17 @@ namespace Witlesss.Also {
         internal static string SET_FREQUENCY_RESPONSE_B {
             get {
                 return ResourceManager.GetString("SET_FREQUENCY_RESPONSE_B", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Если че правильно вот так:
+        ///
+        ///set_d@piece_fap_bot 75.
+        /// </summary>
+        internal static string SET_PROBABILITY_MANUAL {
+            get {
+                return ResourceManager.GetString("SET_PROBABILITY_MANUAL", resourceCulture);
             }
         }
         

@@ -90,7 +90,12 @@ namespace Witlesss
                             ChatBuhurt();
                             return;
                         }
-                        if (TextAsCommand().StartsWith("/set_frequency"))
+                        if (TextAsCommand().StartsWith("/set_p"))
+                        {
+                            ChatSetProbability();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/set"))
                         {
                             ChatSetFrequency();
                             return;
@@ -130,22 +135,19 @@ namespace Witlesss
                 }
                 
                 witless.Count();
-                
-                if (witless.ReadyToGen())
-                {
-                    if (message.Photo != null && ShouldDemotivate())
-                        SendDemotivator(message.Photo[^1].FileId);
-                    else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsAnimated && ShouldDemotivate())
-                        SendDemotivatedSticker(message.Sticker.FileId);
-                    else
-                    {
-                        Thread.Sleep(AssumedResponseTime(150, text));
-                        SendMessage(chat, witless.TryToGenerate());
-                        Log($@"""{title}"": сгенерировано прикол");
-                    }
 
-                    bool ShouldDemotivate() => _random.Next(Math.Min(witless.Interval, 5)) == 0;
+                if (message.Photo != null && ShouldDemotivate())
+                    SendDemotivator(message.Photo[^1].FileId);
+                else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsAnimated && ShouldDemotivate())
+                    SendDemotivatedSticker(message.Sticker.FileId);
+                else if (witless.ReadyToGen())
+                {
+                    Thread.Sleep(AssumedResponseTime(150, text));
+                    SendMessage(chat, witless.TryToGenerate());
+                    Log($@"""{title}"": сгенерировано прикол");
                 }
+                
+                bool ShouldDemotivate() => _random.Next(100) < witless.DgProbability;
 
                 #region local memes
 
@@ -160,6 +162,19 @@ namespace Witlesss
                     }
                     else
                         SendMessage(chat, SET_FREQUENCY_MANUAL);
+                }
+
+                void ChatSetProbability()
+                {
+                    if (HasIntArgument(text, out int value))
+                    {
+                        witless.DgProbability = value;
+                        SaveChatList();
+                        SendMessage(chat, SET_PROBABILITY_RESPONSE(witless.DgProbability));
+                        Log($@"""{title}"": вероятность демотивации изменена на {witless.DgProbability}%");
+                    }
+                    else
+                        SendMessage(chat, SET_PROBABILITY_MANUAL);
                 }
 
                 void ChatFuse()

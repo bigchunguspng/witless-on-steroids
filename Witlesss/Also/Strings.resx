@@ -27,7 +27,7 @@
     <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-set_frequency@piece_fap_bot 3
+set@piece_fap_bot 3
 
 (чем меньше значение - тем чаще я буду писать)</value>
     </data>
@@ -130,5 +130,10 @@ set_frequency@piece_fap_bot 3
     </data>
     <data name="DEBUG_FOLDER" xml:space="preserve">
         <value>Telegram-Messages</value>
+    </data>
+    <data name="SET_PROBABILITY_MANUAL" xml:space="preserve">
+        <value>Если че правильно вот так:
+
+set_d@piece_fap_bot 75</value>
     </data>
 </root>

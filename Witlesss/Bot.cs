@@ -370,8 +370,8 @@ namespace Witlesss
                     if (fileID == null) return;
 
                     var speed = 2D;
-                    if (HasDoubleArgument(text, out double value)) // fast: 0.5 - * | slow: * - 2
-                        speed = mode == SpeedMode.Fast ? Math.Max(value, 0.5) : Math.Min(value, 2);
+                    if (HasDoubleArgument(text, out double value))
+                        speed = mode == SpeedMode.Fast ? Math.Clamp(value, 0.5, 94) : Math.Clamp(value, 0.0107, 2);
 
                     string shortID = ShortID(fileID);
                     string extension = ExtensionFromID(shortID);

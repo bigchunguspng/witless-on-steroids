@@ -8,6 +8,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.Also;
 using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
@@ -83,6 +84,16 @@ namespace Witlesss
                         if (TextAsCommand().StartsWith("/damn"))
                         {
                             ChatRemoveBitrate();
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/slow"))
+                        {
+                            ChatChangeSpeed(SpeedMode.Slow);
+                            return;
+                        }
+                        if (TextAsCommand().StartsWith("/fast"))
+                        {
+                            ChatChangeSpeed(SpeedMode.Fast);
                             return;
                         }
                         if (TextAsCommand().StartsWith("/b"))
@@ -320,29 +331,8 @@ namespace Witlesss
 
                 void ChatRemoveBitrate()
                 {
-                    var fileID = "";
-                    Message mess = message.ReplyToMessage ?? message;
-                    for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
-                    {
-                        if (mess.Animation != null)
-                            fileID = mess.Animation.FileId;
-                        else if (mess.Video != null)
-                            fileID = mess.Video.FileId;
-                        else if (mess.Audio != null)
-                            fileID = mess.Audio.FileId;
-                        else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
-                            fileID = mess.Document.FileId;
-                        else if (mess.Voice != null)
-                            fileID = mess.Voice.FileId;
-                        if (fileID.Length > 0)
-                            break;
-                        else if (cycle == 1)
-                        {
-                            SendMessage(chat, DAMN_MANUAL);
-                            return;
-                        }
-                        else mess = message;
-                    }
+                    string fileID = GetVideoOrAudioID();
+                    if (fileID == null) return;
 
                     var bitrate = 0;
                     if (HasIntArgument(text, out int value))
@@ -372,6 +362,70 @@ namespace Witlesss
                     Log($@"""{title}"": что-то сжато [*]");
                     
                     string VideoFilename() => $"piece_fap_club-{value}.mp4";
+                }
+
+                void ChatChangeSpeed(SpeedMode mode)
+                {
+                    string fileID = GetVideoOrAudioID();
+                    if (fileID == null) return;
+
+                    var speed = 2D;
+                    if (HasDoubleArgument(text, out double value)) // fast: 0.5 - * | slow: * - 2
+                        speed = mode == SpeedMode.Fast ? Math.Max(value, 0.5) : Math.Min(value, 2);
+
+                    string shortID = ShortID(fileID);
+                    string extension = ExtensionFromID(shortID);
+                    var type = MediaTypeFromID(shortID);
+                    var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
+                    path = UniquePath(path, extension);
+                    DownloadFile(fileID, path, chat).Wait();
+                    
+                    string result = _memes.ChangeSpeed(path, speed, mode, type);
+                    using (var stream = File.OpenRead(result))
+                        switch (type)
+                        {
+                            case MediaType.Audio:
+                                SendAudio(chat, new InputOnlineFile(stream, Audiofilename()));
+                                break;
+                            case MediaType.Video:
+                                SendAnimation(chat, new InputOnlineFile(stream, VideoFilename()));
+                                break;
+                            case MediaType.AudioVideo:
+                                SendVideo(chat, new InputOnlineFile(stream, VideoFilename()));
+                                break;
+                        }
+                    Log($@"""{title}"": что-то было {(mode == SpeedMode.Fast ? "ускорено" : "замедлено" )} [>>]");
+
+                    string Audiofilename() => message.Audio?.FileName ?? message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName())}.mp3";
+                    string VideoFilename() => $"piece_fap_club-{speed}.mp4";
+                }
+
+                string GetVideoOrAudioID()
+                {
+                    var fileID = "";
+                    Message mess = message.ReplyToMessage ?? message;
+                    for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
+                    {
+                        if (mess.Animation != null)
+                            fileID = mess.Animation.FileId;
+                        else if (mess.Video != null)
+                            fileID = mess.Video.FileId;
+                        else if (mess.Audio != null)
+                            fileID = mess.Audio.FileId;
+                        else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
+                            fileID = mess.Document.FileId;
+                        else if (mess.Voice != null)
+                            fileID = mess.Voice.FileId;
+                        if (fileID.Length > 0)
+                            break;
+                        else if (cycle == 1)
+                        {
+                            SendMessage(chat, DAMN_MANUAL);
+                            return null;
+                        }
+                        else mess = message;
+                    }
+                    return fileID;
                 }
 
                 void ChatMove()

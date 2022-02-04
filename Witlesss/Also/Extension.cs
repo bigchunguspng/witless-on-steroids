@@ -58,8 +58,14 @@ namespace Witlesss.Also
         public static bool HasIntArgument(string text, out int value)
         {
             value = 0;
-            string[] words = text.Split();
+            var words = text.Split();
             return words.Length > 1 && int.TryParse(words[1], out value);
+        }
+        public static bool HasDoubleArgument(string text, out double value)
+        {
+            value = 0;
+            var words = text.Split();
+            return words.Length > 1 && double.TryParse(words[1].Replace('.', ','), out value);
         }
         
         public static string UniquePath(string path, string extension = "")
@@ -101,6 +107,19 @@ namespace Witlesss.Also
                 "BQ" => ".wav",
                 "Ag" => ".jpg",
                 _ => ""
+            };
+        }
+        public static MediaType MediaTypeFromID(string id)
+        {
+            string id2 = id.Remove(2);
+            return id2 switch
+            {
+                "BA" => MediaType.AudioVideo,
+                "Cg" => MediaType.Video,
+                "CQ" => MediaType.Audio,
+                "Aw" => MediaType.Audio,
+                "BQ" => MediaType.Audio,
+                _ => MediaType.Audio // bc who cares?
             };
         }
 
@@ -212,5 +231,18 @@ namespace Witlesss.Also
             }
             Log($"Удалено: {filesDeleted} ненужных файлов и {dirsDeleted} пустых папок! {filesMoved} файлов перемещено.", ConsoleColor.Yellow);
         }
+    }
+
+    public enum SpeedMode
+    {
+        Fast,
+        Slow
+    }
+
+    public enum MediaType
+    {
+        Audio,
+        Video,
+        AudioVideo
     }
 }

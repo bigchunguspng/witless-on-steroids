@@ -180,5 +180,31 @@ namespace Witlesss
                 return alt;
             }
         }
+
+        public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
+        {
+            if (mode == SpeedMode.Slow) speed = 1 / speed;
+            
+            Log($"{speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
+
+            string extension = GetFileExtension(path);
+            string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
+
+            FfMpegTaskBase<int> task = null;
+            switch (type)
+            {
+                case MediaType.Audio:
+                    task = new FfTaskSpeedA(path, output, speed);
+                    break;
+                case MediaType.Video:
+                    task = new FfTaskSpeedV(path, output, speed);
+                    break;
+                case MediaType.AudioVideo:
+                    task = new FfTaskSpeedAV(path, output, speed);
+                    break;
+            }
+            _service.ExecuteAsync(task).Wait();
+            return output;
+        }
     }
 }

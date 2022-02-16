@@ -16,7 +16,7 @@ namespace Witlesss
 {
     public class Memes
     {
-        private readonly DemotivatorDrawer _drawer;
+        private readonly DemotivatorDrawer _drawer720, _drawer1280;
         private readonly IMediaToolkitService _service;
         
         private string _animationPath;
@@ -24,7 +24,8 @@ namespace Witlesss
 
         public Memes()
         {
-            _drawer = new DemotivatorDrawer();
+            _drawer720 = new DemotivatorDrawer();
+            _drawer1280 = new DemotivatorDrawer(1280);
 
             if (!File.Exists(FFMPEG_PATH))
             {
@@ -34,12 +35,26 @@ namespace Witlesss
             }
             _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
         }
+        
+        public DgMode Mode { get; set; }
 
+        private DemotivatorDrawer Drawer()
+        {
+            switch (Mode)
+            {
+                case DgMode.Square:
+                    return _drawer720;
+                case DgMode.Wide:
+                    return _drawer1280;
+                default:
+                    return _drawer720;
+            }
+        }
 
         public string MakeDemotivator(string path, string textA, string textB)
         {
-            _drawer.SetRandomLogo();
-            return _drawer.DrawDemotivator(path, textA, textB);
+            Drawer().SetRandomLogo();
+            return Drawer().DrawDemotivator(path, textA, textB);
         }
 
         public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
@@ -52,7 +67,7 @@ namespace Witlesss
 
         public string MakeAnimatedDemotivator(string path, string textA, string textB)
         {
-            _drawer.SetRandomLogo();
+            Drawer().SetRandomLogo();
             AnimateDemotivator(path, textA, textB).Wait();
             return $@"{_animationPath}\{_animationName}";
         }
@@ -90,7 +105,7 @@ namespace Witlesss
 
             // Demotivate each frame
             string[] frames = GetAllFrames();
-            foreach (string file in frames) _drawer.DrawDemotivator(file, textA, textB);
+            foreach (string file in frames) Drawer().DrawDemotivator(file, textA, textB);
 
             try
             {
@@ -206,5 +221,11 @@ namespace Witlesss
             _service.ExecuteAsync(task).Wait();
             return output;
         }
+    }
+
+    public enum DgMode
+    {
+        Square,
+        Wide
     }
 }

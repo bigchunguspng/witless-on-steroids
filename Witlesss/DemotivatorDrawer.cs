@@ -19,7 +19,7 @@ namespace Witlesss
         private readonly Dictionary<Image, Point> _logos;
         private KeyValuePair<Image, Point> _logo;
 
-        private readonly int _size, _imageMargin, _imageMarginB, _imageWidth;
+        private readonly int _w, _h, _imageMargin, _imageMarginB, _imageWidth;
         private readonly Font _fontA, _fontB;
         private readonly Rectangle _background, _frame;
         private readonly RectangleF _upperText, _lowerText;
@@ -28,7 +28,7 @@ namespace Witlesss
         private readonly StringFormat _format;
         private readonly Point _imageTopLeft;
 
-        public DemotivatorDrawer()
+        public DemotivatorDrawer(int width = 720, int height = 720)
         {
             _logos = new Dictionary<Image, Point>();
             LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
@@ -44,20 +44,21 @@ namespace Witlesss
             _format = new StringFormat(StringFormatFlags.NoWrap)
                 {Alignment = StringAlignment.Center, Trimming = StringTrimming.Word};
 
-            _size = 720;
+            _w = width;
+            _h = height;
             _imageMargin = 50;
             _imageMarginB = 140;
-            _imageWidth = _size - 2 * _imageMargin;
+            _imageWidth = _w - 2 * _imageMargin;
 
             int space = 5;
             int margin = _imageMargin - space;
             int marginB = _imageMarginB - space;
 
             _imageTopLeft = new Point(_imageMargin, _imageMargin);
-            _background = new Rectangle(0, 0, _size, _size);
-            _frame = new Rectangle(margin, margin, _size - 2 * margin, _size - margin - marginB);
-            _upperText = new RectangleF(0, _size - _imageMarginB + 18, _size, 100);
-            _lowerText = new RectangleF(0, _size - _imageMarginB + 84, _size, 100);
+            _background = new Rectangle(0, 0, _w, _h);
+            _frame = new Rectangle(margin, margin, _w - 2 * margin, _h - margin - marginB);
+            _upperText = new RectangleF(0, _h - _imageMarginB + 18, _w, 100);
+            _lowerText = new RectangleF(0, _h - _imageMarginB + 84, _w, 100);
         }
         
         private void LoadLogos(string path)
@@ -86,13 +87,13 @@ namespace Witlesss
             string pathA = path;
             string pathB = path.Replace(DotJpg, "-D" + DotJpg);
 
-            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageWidth, _size - _imageMargin - _imageMarginB));
-            using Image demotivator = new Bitmap(_size, _size);
+            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageWidth, _h - _imageMargin - _imageMarginB));
+            using Image demotivator = new Bitmap(_w, _h);
             using var graphics = Graphics.FromImage(demotivator);
             graphics.CompositingMode = CompositingMode.SourceCopy;
             graphics.FillRectangle(Brushes.Black, _background);
             graphics.DrawRectangle(_white, _frame);
-            graphics.DrawImage(_logo.Key, _logo.Value);
+            if (_w == 720) graphics.DrawImage(_logo.Key, _logo.Value);
             graphics.DrawImage(image, _imageTopLeft);
 
             graphics.CompositingMode = CompositingMode.SourceOver;

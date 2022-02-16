@@ -96,6 +96,11 @@ namespace Witlesss
                             ChatChangeSpeed(SpeedMode.Fast);
                             return;
                         }
+                        if (TextAsCommand().StartsWith("/dv"))
+                        {
+                            ChatDemotivate(DgMode.Wide);
+                            return;
+                        }
                         if (TextAsCommand().StartsWith("/b"))
                         {
                             ChatBuhurt();
@@ -148,9 +153,15 @@ namespace Witlesss
                 witless.Count();
 
                 if (message.Photo != null && ShouldDemotivate())
+                {
+                    _memes.Mode = DgMode.Square;
                     SendDemotivator(message.Photo[^1].FileId);
+                }
                 else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsAnimated && ShouldDemotivate())
+                {
+                    _memes.Mode = DgMode.Square;
                     SendDemotivatedSticker(message.Sticker.FileId);
+                }
                 else if (witless.ReadyToGen())
                 {
                     Thread.Sleep(AssumedResponseTime(150, text));
@@ -260,8 +271,10 @@ namespace Witlesss
                     SendMessage(chat, result);
                 }
 
-                void ChatDemotivate()
+                void ChatDemotivate(DgMode mode = DgMode.Square)
                 {
+                    _memes.Mode = mode;
+                    
                     string fileID;
                     if (message.Photo != null)
                         fileID = message.Photo[^1].FileId;

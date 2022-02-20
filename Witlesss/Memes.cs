@@ -72,6 +72,33 @@ namespace Witlesss
             return $@"{_animationPath}\{_animationName}";
         }
 
+        public string MakeVideoStickerDemotivator(string path, string textA, string textB)
+        {
+            NormalizeSize().Wait();
+            
+            async Task NormalizeSize()
+            {
+                var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
+                var stream = metadata.Metadata.Streams.First();
+                int height = FallbackIfZero(stream.Height, 720);
+                int width = FallbackIfZero(stream.Width, 720);
+
+                if (width % 2 == 1 || height % 2 == 1) // Видеостикеры момент((9
+                {
+                    var size = new Size(NearestEven(width), NearestEven(height));
+                    var task = new FfTaskWebmToMp4(path, out path, ".mp4", size);
+                    _service.ExecuteAsync(task).Wait();
+                }
+                else
+                {
+                    var task = new FfTaskWebpToJpg(path, out path, ".mp4");
+                    _service.ExecuteAsync(task).Wait();
+                }
+            }
+
+            return MakeAnimatedDemotivator(path, textA, textB);
+        }
+        
         private async Task AnimateDemotivator(string path, string textA, string textB)
         {
             string inputFilePath = path;
@@ -169,9 +196,6 @@ namespace Witlesss
 
                     bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
                     Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
-
-                    int NearestEven(int x) => x + x % 2;
-                    int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
                 }
             }
             else
@@ -181,6 +205,9 @@ namespace Witlesss
             value = bitrate;
             return outputPath;
         }
+        
+        private int NearestEven(int x) => x + x % 2;
+        private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
 
         private double RetrieveFPS(string framerate, int alt = 16)
         {

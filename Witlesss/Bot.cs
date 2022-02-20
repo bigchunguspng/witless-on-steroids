@@ -157,7 +157,7 @@ namespace Witlesss
                     _memes.Mode = DgMode.Square;
                     SendDemotivator(message.Photo[^1].FileId);
                 }
-                else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsAnimated && ShouldDemotivate())
+                else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsVideo && !message.Sticker.IsAnimated && ShouldDemotivate())
                 {
                     _memes.Mode = DgMode.Square;
                     SendDemotivatedSticker(message.Sticker.FileId);
@@ -292,14 +292,21 @@ namespace Witlesss
                             fileID = message.Video.FileId;
                         else
                         {
-                            if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsAnimated == false)
+                            if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsVideo)
                                 fileID = message.ReplyToMessage.Sticker.FileId;
                             else
                             {
-                                SendMessage(chat, DG_MANUAL);
+                                if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsAnimated == false)
+                                    fileID = message.ReplyToMessage.Sticker.FileId;
+                                else
+                                {
+                                    SendMessage(chat, DG_MANUAL);
+                                    return;
+                                }
+                                SendDemotivatedSticker(fileID);
                                 return;
                             }
-                            SendDemotivatedSticker(fileID);
+                            SendAnimatedDemotivator(fileID, ".webm");
                             return;
                         }
                         SendAnimatedDemotivator(fileID);
@@ -316,11 +323,14 @@ namespace Witlesss
                     Log($@"""{title}"": сгенерировано демотиватор [_]");
                 }
                 
-                void SendAnimatedDemotivator(string fileID)
+                void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
                 {
                     var time = DateTime.Now;
-                    GetDemotivatorSources(fileID, ".mp4", out string a, out string b, out string path);
-                    using (var stream = File.OpenRead(_memes.MakeAnimatedDemotivator(path, a, b)))
+                    GetDemotivatorSources(fileID, extension, out string a, out string b, out string path);
+                    string output = extension == ".mp4"
+                        ? _memes.MakeAnimatedDemotivator(path, a, b)
+                        : _memes.MakeVideoStickerDemotivator(path, a, b);
+                    using (var stream = File.OpenRead(output))
                         SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
                     Log($@"""{title}"": сгенерировано GIF-демотиватор [^] за {DateTime.Now - time:s\.fff}");
                 }

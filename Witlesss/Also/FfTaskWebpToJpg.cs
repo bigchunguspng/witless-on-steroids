@@ -7,21 +7,21 @@ namespace Witlesss.Also
 {
     public class FfTaskWebpToJpg : FfMpegTaskBase<int>
     {
-        private readonly string _inputFilePath;
-        private readonly string _outputFilePath;
+        protected readonly string InputFilePath;
+        protected readonly string OutputFilePath;
 
         public FfTaskWebpToJpg(string inputFilePath, out string outputFilePath, string extension)
         {
-            _inputFilePath = inputFilePath;
-            _outputFilePath = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + extension;
-            outputFilePath = _outputFilePath;
+            InputFilePath = inputFilePath;
+            OutputFilePath = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + extension;
+            outputFilePath = OutputFilePath;
         }
         
         public override IList<string> CreateArguments() => new[]
         {
             "-i",
-            _inputFilePath ?? "",
-            _outputFilePath ?? ""
+            InputFilePath ?? "",
+            OutputFilePath ?? ""
         };
 
         public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)

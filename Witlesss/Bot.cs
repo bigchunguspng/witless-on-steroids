@@ -53,7 +53,7 @@ namespace Witlesss
             }
             catch (Exception exception)
             {
-                Log(message.Chat.Id + ": Can't handle message: " + exception.Message, ConsoleColor.Red);
+                LogError(TitleOrUsername(message) + " >> CAN'T HANDLE MESSAGE: " + exception.Message);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Witlesss
         {
             string text = message.Caption ?? message.Text;
             long chat = message.Chat.Id;
-            string title = TitleOrUsername();
+            string title = TitleOrUsername(message);
 
             if (WitlessExist(chat))
             {
@@ -146,7 +146,7 @@ namespace Witlesss
                     {
                         var sentence = text.Clone().ToString();
                         if (witless.ReceiveSentence(ref sentence))
-                            Log($@"""{title}"": получено сообщение ""{sentence}""", ConsoleColor.Blue);
+                            Log($"{title} >> {sentence}", ConsoleColor.Blue);
                     }
                 }
                 
@@ -166,7 +166,7 @@ namespace Witlesss
                 {
                     Thread.Sleep(AssumedResponseTime(150, text));
                     SendMessage(chat, witless.TryToGenerate());
-                    Log($@"""{title}"": сгенерировано прикол");
+                    Log($"{title} >> FUNNY");
                 }
                 
                 bool ShouldDemotivate() => _random.Next(100) < witless.DgProbability;
@@ -180,7 +180,7 @@ namespace Witlesss
                         witless.Interval = value;
                         SaveChatList();
                         SendMessage(chat, SET_FREQUENCY_RESPONSE(witless.Interval));
-                        Log($@"""{title}"": интервал генерации изменен на {witless.Interval}");
+                        Log($"{title} >> FUNNY INTERVAL >> {witless.Interval}");
                     }
                     else
                         SendMessage(chat, SET_FREQUENCY_MANUAL);
@@ -193,7 +193,7 @@ namespace Witlesss
                         witless.DgProbability = value;
                         SaveChatList();
                         SendMessage(chat, SET_PROBABILITY_RESPONSE(witless.DgProbability));
-                        Log($@"""{title}"": вероятность демотивации изменена на {witless.DgProbability}%");
+                        Log($"{title} >> DG PROBABILITY >> {witless.DgProbability}%");
                     }
                     else
                         SendMessage(chat, SET_PROBABILITY_MANUAL);
@@ -253,7 +253,7 @@ namespace Witlesss
                         text = text.Substring(text.IndexOf(' ') + 1);
                         text = text.Remove(text.Length - word.Length) + witless.TryToGenerateFromWord(word.ToLower());
                         SendMessage(chat, TextInRandomLetterCase(text));
-                        Log($@"""{title}"": сгенерировано прикол по слову");
+                        Log($"{title} >> FUNNY BY WORD");
                     }
                     else
                         SendMessage(chat, A_MANUAL);
@@ -269,6 +269,7 @@ namespace Witlesss
                         lines[i] = witless.TryToGenerate().ToUpper();
                     string result = string.Join("\n@\n", lines.Distinct());
                     SendMessage(chat, result);
+                    Log($"{title} >> BUGURT #@#");
                 }
 
                 void ChatDemotivate(DgMode mode = DgMode.Square)
@@ -320,7 +321,7 @@ namespace Witlesss
                     GetDemotivatorSources(fileID, ".jpg", out string a, out string b, out string path);
                     using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
                         SendPhoto(chat, new InputOnlineFile(stream));
-                    Log($@"""{title}"": сгенерировано демотиватор [_]");
+                    Log($"{title} >> DEMOTIVATOR [_]");
                 }
                 
                 void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
@@ -332,7 +333,7 @@ namespace Witlesss
                         : _memes.MakeVideoStickerDemotivator(path, a, b);
                     using (var stream = File.OpenRead(output))
                         SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
-                    Log($@"""{title}"": сгенерировано GIF-демотиватор [^] за {DateTime.Now - time:s\.fff}");
+                    Log($@"{title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
                 }
                 
                 void SendDemotivatedSticker(string fileID)
@@ -341,7 +342,7 @@ namespace Witlesss
                     string extension = text == null ? ".png" : text.Contains("-j") ? ".jpg" : ".png";
                     using (var stream = File.OpenRead(_memes.MakeStickerDemotivator(path, a, b, extension)))
                         SendPhoto(chat, new InputOnlineFile(stream));
-                    Log($@"""{title}"": сгенерировано демотиватор [#] из стикера");
+                    Log($"{title} >> DEMOTIVATOR [#] STICKER");
                 }
                 
                 void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
@@ -382,7 +383,7 @@ namespace Witlesss
                                 SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName())}.mp3"));
                                 break;
                         }
-                    Log($@"""{title}"": что-то сжато [*]");
+                    Log($"{title} >> DAMN [*]");
                     
                     string VideoFilename() => $"piece_fap_club-{value}.mp4";
                 }
@@ -417,7 +418,7 @@ namespace Witlesss
                                 SendVideo(chat, new InputOnlineFile(stream, VideoFilename()));
                                 break;
                         }
-                    Log($@"""{title}"": что-то было {(mode == SpeedMode.Fast ? "ускорено" : "замедлено" )} [>>]");
+                    Log($"{title} >> {(mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
 
                     string Audiofilename() => message.Audio?.FileName ?? message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName())}.mp3";
                     string VideoFilename() => $"piece_fap_club-{speed}.mp4";
@@ -460,15 +461,16 @@ namespace Witlesss
                         string path = BaseExists(name) ? UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
                         witless.Save();
                         File.Copy(witless.Path, path);
+                        
+                        string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
+                        Log($@"{title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
 
                         witless.Words.Clear();
-                        Log($@"""{title}"": словарь беседы очищен!", ConsoleColor.Magenta);
+                        Log($"{title} >> DIC CLEARED!", ConsoleColor.Magenta);
                         witless.HasUnsavedStuff = true;
                         witless.Save();
 
-                        string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
                         SendMessage(chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>");
-                        Log($@"""{title}"": словарь сохранён как ""{result}""", ConsoleColor.Magenta);
                     }
                     else
                         SendMessage(chat, MOVE_MANUAL);
@@ -509,11 +511,10 @@ namespace Witlesss
                 if (!_sussyBakas.TryAdd(chat, new Witless(chat)))
                     return;
                 SaveChatList();
-                Log($@"Создано базу для чата {chat} ({title})");
+                Log($"{title} >> DIC CREATED >> {chat}", ConsoleColor.Magenta);
                 SendMessage(chat, START_RESPONSE);
             }
-
-            string TitleOrUsername() => chat < 0 ? message.Chat.Title : message.From?.FirstName;
+            
             string SenderName() => message.SenderChat?.Title ?? message.From?.FirstName;
             string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
         }
@@ -535,7 +536,7 @@ namespace Witlesss
                             if (chat.ToString().EndsWith(shit))
                             {
                                 _activeChat = chat;
-                                Log($"Выбрано чат {_activeChat}");
+                                Log($"{_activeChat} >> ACTIVE CHAT");
                                 break;
                             }
                         }
@@ -547,13 +548,13 @@ namespace Witlesss
                         
                         if (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
                         {
-                            Log($@"{_activeChat}: в словарь добавлено ""{text}""", ConsoleColor.Yellow);
+                            Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
                         }
                         else if (input.StartsWith("/w ")) //write
                         {
                             SendMessage(_activeChat, text);
                             bool accepted = witless.ReceiveSentence(ref text);
-                            Log($@"{_activeChat}: отправлено {(accepted ? "и добавлено в словарь " : "")}""{text}""", ConsoleColor.Yellow);
+                            Log($@"{_activeChat} >> SENT {(accepted ? "AND ADDED TO DIC " : "")}""{text}""", ConsoleColor.Yellow);
                         }
                     }
                     else if (input == "/s") SaveDics();
@@ -565,6 +566,8 @@ namespace Witlesss
             SaveDics();
         }
 
+        private string TitleOrUsername(Message message) => message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName;
+        
         private bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
         private bool BaseExists(string name)
         {

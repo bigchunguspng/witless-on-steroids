@@ -63,16 +63,16 @@ set@piece_fap_bot 3
         <value>Comic Sans MS</value>
     </data>
     <data name="LOG_FUSE_DONE" xml:space="preserve">
-        <value>Слияние выполнено</value>
+        <value>FUSION DONE</value>
     </data>
     <data name="LOG_FUSION_HAVE_DICS" xml:space="preserve">
-        <value>Словари импортировано</value>
+        <value>DICS HERE</value>
     </data>
     <data name="PICTURES_FOLDER" xml:space="preserve">
         <value>Telegram-Pictures</value>
     </data>
     <data name="LOG_CHATLIST_SAVED" xml:space="preserve">
-        <value>Список чатов сохранен!</value>
+        <value>DICS SAVED</value>
     </data>
     <data name="EXTRA_DBS_FOLDER" xml:space="preserve">
         <value>Telegram-ExtraDBs</value>

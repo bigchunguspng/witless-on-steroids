@@ -242,7 +242,7 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Список чатов сохранен!.
+        ///   Looks up a localized string similar to DICS SAVED.
         /// </summary>
         internal static string LOG_CHATLIST_SAVED {
             get {
@@ -251,7 +251,7 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Слияние выполнено.
+        ///   Looks up a localized string similar to FUSION DONE.
         /// </summary>
         internal static string LOG_FUSE_DONE {
             get {
@@ -260,7 +260,7 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Словари импортировано.
+        ///   Looks up a localized string similar to DICS HERE.
         /// </summary>
         internal static string LOG_FUSION_HAVE_DICS {
             get {

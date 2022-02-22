@@ -229,7 +229,7 @@ namespace Witlesss.Also
             {
                 //
             }
-            Log($"Удалено: {filesDeleted} ненужных файлов и {dirsDeleted} пустых папок! {filesMoved} файлов перемещено.", ConsoleColor.Yellow);
+            Log($"DEL >> {filesDeleted} USELESS FILES & {dirsDeleted} EMPTY DIRS! {filesMoved} FILES MOVED.", ConsoleColor.Yellow);
         }
     }
 

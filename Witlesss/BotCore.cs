@@ -25,37 +25,37 @@ namespace Witlesss
         protected async void SendMessage(long chat, string text)
         {
             Task task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
-            await TrySend(task, chat, "message");
+            await TrySend(task, chat, "MESSAGE");
         }
 
         protected void SendPhoto(long chat, InputOnlineFile photo)
         {
             Task task = Client.SendPhotoAsync(chat, photo);
-            TrySend(task, chat, "photo").Wait();
+            TrySend(task, chat, "PHOTO").Wait();
         }
 
         protected void SendAnimation(long chat, InputOnlineFile animation)
         {
             Task task = Client.SendAnimationAsync(chat, animation);
-            TrySend(task, chat, "GIF").Wait();
+            TrySend(task, chat, "ANIMATION").Wait();
         }
 
         protected void SendVideo(long chat, InputOnlineFile video)
         {
             Task task = Client.SendVideoAsync(chat, video);
-            TrySend(task, chat, "video").Wait();
+            TrySend(task, chat, "VIDEO").Wait();
         }
 
         protected void SendAudio(long chat, InputOnlineFile audio)
         {
             Task task = Client.SendAudioAsync(chat, audio);
-            TrySend(task, chat, "audio").Wait();
+            TrySend(task, chat, "AUDIO").Wait();
         }
 
         protected void SendDocument(long chat, InputOnlineFile document)
         {
             Task task = Client.SendDocumentAsync(chat, document);
-            TrySend(task, chat, "document").Wait();
+            TrySend(task, chat, "DOCUMENT").Wait();
         }
 
         private async Task TrySend(Task task, long chat, string what)
@@ -64,7 +64,7 @@ namespace Witlesss
             {
                 await task.ContinueWith(action =>
                 {
-                    Log(chat + $": Can't send {what}: " + action.Exception?.Message, ConsoleColor.Red);
+                    LogError($"{chat} >> CAN'T SEND {what}: " + action.Exception?.Message);
                 }, TaskContinuationOptions.OnlyOnFaulted);
             }
             catch
@@ -85,7 +85,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                Log(e.Message, ConsoleColor.Red);
+                LogError(e.Message);
                 SendMessage(chat, e.Message == "Bad Request: file is too big" ? FILE_TOO_BIG_RESPONSE() : e.Message);
             }
         }

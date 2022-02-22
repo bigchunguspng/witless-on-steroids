@@ -111,7 +111,7 @@ namespace Witlesss
             
             string inFrameRate = metadata.Metadata.Streams.First().AvgFrameRate;
             string inFrames = metadata.Metadata.Streams.First().NbFrames;
-            Log($"In: FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
+            Log($"IN >>> FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
 
             double outFrameRate = RetrieveFPS(inFrameRate);
             int outFrames = int.Parse(inFrames);
@@ -120,7 +120,7 @@ namespace Witlesss
             NormalizeLength(50);
             NormalizeFrameRate(50);
             double frameDelay = 1000 / outFrameRate;
-            Log($"Out: FPS: {Math.Round(outFrameRate, 3).ToString(CultureInfo.InvariantCulture)}, Length: {outFrames}", ConsoleColor.Blue);
+            Log($"OUT >> FPS: {(Math.Round(outFrameRate, 1).ToString(CultureInfo.InvariantCulture) + ",").PadRight(inFrameRate.Length + 1)} Length: {outFrames}", ConsoleColor.Blue);
             
             // Extract all frames
             for (var frame = 0; frame < outFrames; frame++)
@@ -147,7 +147,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                Log(e.Message, ConsoleColor.Red);
+                LogError(e.Message);
             }
 
             void NormalizeLength(int max)
@@ -195,7 +195,7 @@ namespace Witlesss
                     }
 
                     bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
-                    Log($"Damn! -b:v {bitrate}k", ConsoleColor.Blue);
+                    Log($"DAMN >> -b:v {bitrate}k", ConsoleColor.Blue);
                 }
             }
             else
@@ -227,7 +227,7 @@ namespace Witlesss
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;
             
-            Log($"{speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
+            Log($"SPEED >> {speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
 
             string extension = GetFileExtension(path);
             string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;

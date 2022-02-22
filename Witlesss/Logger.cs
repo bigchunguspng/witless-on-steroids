@@ -12,5 +12,7 @@ namespace Witlesss
             Log(message);
             Console.ResetColor();
         }
+
+        public static void LogError(string message) => Log(message, ConsoleColor.Red);
     }
 }

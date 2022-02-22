@@ -114,7 +114,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                Log(e.Message, ConsoleColor.Red);
+                LogError(e.Message);
                 return "";
             }
         }
@@ -204,7 +204,7 @@ namespace Witlesss
             {
                 _fileIO.SaveData(Words);
                 HasUnsavedStuff = false;
-                Log($"Словарь для чата {Chat} сохранён!", ConsoleColor.Green);
+                Log($"DIC  SAVED << {Chat}", ConsoleColor.Green);
             }
         }
 
@@ -212,7 +212,7 @@ namespace Witlesss
         {
             Words = _fileIO.LoadData();
             HasUnsavedStuff = false;
-            Log($"Словарь для чата {Chat} загружен!");
+            Log($"LOADED DIC << {Chat}!");
         }
 
         public void Backup()

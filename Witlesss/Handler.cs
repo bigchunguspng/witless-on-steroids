@@ -26,7 +26,7 @@ namespace Witlesss
 
         public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            Log("Telegram API Error...", ConsoleColor.Red);
+            LogError("Telegram API Error...");
             return Task.CompletedTask;
         }
     }

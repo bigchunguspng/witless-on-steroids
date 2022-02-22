@@ -134,6 +134,6 @@ set@piece_fap_bot 3
     <data name="SET_PROBABILITY_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-set_d@piece_fap_bot 75</value>
+set_p@piece_fap_bot 75</value>
     </data>
 </root>

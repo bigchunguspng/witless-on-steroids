@@ -344,7 +344,7 @@ namespace Witlesss.Also {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        ///set_d@piece_fap_bot 75.
+        ///set_p@piece_fap_bot 75.
         /// </summary>
         internal static string SET_PROBABILITY_MANUAL {
             get {

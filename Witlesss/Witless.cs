@@ -212,7 +212,7 @@ namespace Witlesss
         {
             Words = _fileIO.LoadData();
             HasUnsavedStuff = false;
-            Log($"LOADED DIC << {Chat}!");
+            Log($"LOADED DIC << {Chat}");
         }
 
         public void Backup()

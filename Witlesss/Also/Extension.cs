@@ -14,7 +14,7 @@ namespace Witlesss.Also
         
         public static string TextInRandomLetterCase(string text)
         {
-            LetterCaseMode c = RandomLetterCase();
+            var c = RandomLetterCase();
             switch (c)
             {
                 case Lower:
@@ -125,7 +125,7 @@ namespace Witlesss.Also
 
         public static string ValidFileName(string text)
         {
-            char[] chars = Path.GetInvalidFileNameChars();
+            var chars = Path.GetInvalidFileNameChars();
             foreach (char c in chars) text = text.Replace(c, '_');
             return text;
         }
@@ -177,10 +177,10 @@ namespace Witlesss.Also
             if (!Directory.Exists(path))
                 return;
             
-            string[] directories = Directory.GetDirectories(path);
+            var directories = Directory.GetDirectories(path);
             foreach (string directory in directories)
             {
-                string[] files = Directory.GetFiles(directory);
+                var files = Directory.GetFiles(directory);
                 foreach (string file in files)
                 {
                     if (file.EndsWith(".jpg"))
@@ -244,5 +244,12 @@ namespace Witlesss.Also
         Audio,
         Video,
         AudioVideo
+    }
+    
+    public enum LetterCaseMode
+    {
+        Lower,
+        Upper,
+        Sentence
     }
 }

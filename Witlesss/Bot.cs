@@ -408,7 +408,7 @@ namespace Witlesss
                         switch (type)
                         {
                             case MediaType.Audio:
-                                SendAudio(chat, new InputOnlineFile(stream, Audiofilename()));
+                                SendAudio(chat, new InputOnlineFile(stream, AudioFilename()));
                                 break;
                             case MediaType.Video:
                                 SendAnimation(chat, new InputOnlineFile(stream, VideoFilename()));
@@ -419,7 +419,7 @@ namespace Witlesss
                         }
                     Log($"{title} >> {(mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
 
-                    string Audiofilename() => message.Audio?.FileName ?? message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName())}.mp3";
+                    string AudioFilename() => message.Audio?.FileName ?? message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName())}.mp3";
                     string VideoFilename() => $"piece_fap_club-{speed}.mp4";
                 }
 

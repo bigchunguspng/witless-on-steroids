@@ -21,7 +21,6 @@ namespace Witlesss
 {
     public class Bot : BotCore
     {
-        private readonly Random _random = new Random();
         private readonly ChatList _sussyBakas;
         private readonly FileIO<ChatList> _fileIO;
         private readonly Memes _memes;
@@ -169,7 +168,7 @@ namespace Witlesss
                     Log($"{title} >> FUNNY");
                 }
                 
-                bool ShouldDemotivate() => _random.Next(100) < witless.DgProbability;
+                bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;
 
                 #region local memes
 

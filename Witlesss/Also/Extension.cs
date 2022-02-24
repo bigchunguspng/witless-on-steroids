@@ -10,7 +10,7 @@ namespace Witlesss.Also
 {
     public static class Extension
     {
-        private static readonly Random Random = new Random();
+        public static readonly Random Random = new Random();
         
         public static string TextInRandomLetterCase(string text)
         {

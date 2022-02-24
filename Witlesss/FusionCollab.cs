@@ -29,7 +29,7 @@ namespace Witlesss
                         if (_dictionary1[pair.Key].ContainsKey(chance.Key))
                         {
                             // pick x1 or x2
-                            _dictionary1[pair.Key][chance.Key] = ChooseBigger(_dictionary1[pair.Key][chance.Key], chance.Value);
+                            _dictionary1[pair.Key][chance.Key] = Math.Max(_dictionary1[pair.Key][chance.Key], chance.Value);
                         }
                         else
                         {
@@ -45,8 +45,6 @@ namespace Witlesss
                 }
             }
             Log(LOG_FUSE_DONE, ConsoleColor.Magenta);
-            
-            int ChooseBigger(int a, int b) => a > b ? a : b;
         }
     }
 }

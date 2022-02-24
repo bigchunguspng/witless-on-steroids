@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.Also;
@@ -74,27 +75,8 @@ namespace Witlesss
 
         public string MakeVideoStickerDemotivator(string path, string textA, string textB)
         {
-            NormalizeSize().Wait();
-            
-            async Task NormalizeSize()
-            {
-                var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
-                var stream = metadata.Metadata.Streams.First();
-                int height = FallbackIfZero(stream.Height, 720);
-                int width = FallbackIfZero(stream.Width, 720);
-
-                if (width % 2 == 1 || height % 2 == 1) // Видеостикеры момент((9
-                {
-                    var size = new Size(NearestEven(width), NearestEven(height));
-                    var task = new FfTaskWebmToMp4(path, out path, ".mp4", size);
-                    _service.ExecuteAsync(task).Wait();
-                }
-                else
-                {
-                    var task = new FfTaskWebpToJpg(path, out path, ".mp4");
-                    _service.ExecuteAsync(task).Wait();
-                }
-            }
+            var task = new FfTaskWebmToMp4(path, out path, ".mp4", GetValidSize(path));
+            _service.ExecuteAsync(task).Wait();
 
             return MakeAnimatedDemotivator(path, textA, textB);
         }
@@ -174,29 +156,17 @@ namespace Witlesss
             FfTaskRemoveBitrate task;
             if (GetFileExtension(path) == ".mp4")
             {
-                Size size = default;
-                CalculateOutBitrate().Wait();
-                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate, size);
-                
-                async Task CalculateOutBitrate()
+                var size = GetValidSize(path, out var stream);
+                double fps = RetrieveFPS(stream.AvgFrameRate, 30);
+                if (noArgs)
                 {
-                    var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(path));
-                    var stream = metadata.Metadata.Streams.First();
-                    int height = FallbackIfZero(stream.Height, 720);
-                    int width = FallbackIfZero(stream.Width, 720);
-                    
-                    if (width % 2 == 1 || height % 2 == 1) // РжакаБот момент((9
-                        size = new Size(NearestEven(width), NearestEven(height));
-                    double fps = RetrieveFPS(stream.AvgFrameRate, 30);
-                    if (noArgs)
-                    {
-                        var pixelsPerSecond = (int) ((height + width) * fps);
-                        bitrate = pixelsPerSecond / 620;
-                    }
-
-                    bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
-                    Log($"DAMN >> -b:v {bitrate}k", ConsoleColor.Blue);
+                    var pixelsPerSecond = (int) ((size.Height + size.Width) * fps);
+                    bitrate = pixelsPerSecond / 620;
                 }
+                bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
+                Log($"DAMN >> -b:v {bitrate}k", ConsoleColor.Blue);
+                
+                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate, size);
             }
             else
                 task = new FfTaskRemoveBitrate(path, out outputPath, bitrate);
@@ -205,9 +175,23 @@ namespace Witlesss
             value = bitrate;
             return outputPath;
         }
+
+        private Size GetValidSize(string path, out MediaStream stream)
+        {
+            var metadata = GetMetadata(path).Result;
+            stream = metadata.Metadata.Streams.First();
+            int height = FallbackIfZero(stream.Height, 720);
+            int width = FallbackIfZero(stream.Width, 720);
+
+            if (width % 2 == 1 || height % 2 == 1) // РжакаБот / видеостикеры момент((9
+                return new Size(NearestEven(width), NearestEven(height));
+            return new Size(width, height);
+        }
+        private Size GetValidSize(string path) => GetValidSize(path, out _);
+        private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
         
-        private int NearestEven(int x) => x + x % 2;
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
+        private int NearestEven(int x) => x + x % 2;
 
         private double RetrieveFPS(string framerate, int alt = 16)
         {

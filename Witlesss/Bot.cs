@@ -7,8 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
-using Witlesss.Also;
+using Witlesss.Commands;
 using static System.Environment;
 using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
@@ -21,22 +20,26 @@ namespace Witlesss
 {
     public class Bot : BotCore
     {
-        private readonly ChatList _sussyBakas;
+        public readonly ChatList SussyBakas;
         private readonly FileIO<ChatList> _fileIO;
-        private readonly Memes _memes;
+        public readonly Memes MemeService;
         private long _activeChat;
+
+        private readonly MainJunction _junction;
 
         public Bot()
         {
-            _memes = new Memes();
+            MemeService = new Memes();
             _fileIO = new FileIO<ChatList>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
-            _sussyBakas = _fileIO.LoadData();
+            SussyBakas = _fileIO.LoadData();
+            _junction = new MainJunction();
         }
 
         public void Run()
         {
             ClearTempFiles();
 
+            Command.Bot = this;
             var options = new ReceiverOptions() {AllowedUpdates = new[] {UpdateType.Message, UpdateType.EditedMessage}};
             Client.StartReceiving(new Handler(this), options);
 
@@ -48,474 +51,42 @@ namespace Witlesss
         {
             try
             {
-                HandleMessage(message);
+                _junction.Pass(message);
+                _junction.Run();
             }
             catch (Exception exception)
             {
                 LogError(TitleOrUsername(message) + " >> CAN'T HANDLE MESSAGE: " + exception.Message);
             }
         }
-
-        private void HandleMessage(Message message)
+        
+        
+        public string GetVideoOrAudioID(Message message, long chat)
         {
-            string text = message.Caption ?? message.Text;
-            long chat = message.Chat.Id;
-            string title = TitleOrUsername(message);
-
-            if (WitlessExist(chat))
+            var fileID = "";
+            var mess = message.ReplyToMessage ?? message;
+            for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
             {
-                var witless = _sussyBakas[chat];
-                
-                if (text != null)
+                if (mess.Animation != null)
+                    fileID = mess.Animation.FileId;
+                else if (mess.Video != null)
+                    fileID = mess.Video.FileId;
+                else if (mess.Audio != null)
+                    fileID = mess.Audio.FileId;
+                else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
+                    fileID = mess.Document.FileId;
+                else if (mess.Voice != null)
+                    fileID = mess.Voice.FileId;
+                if (fileID.Length > 0)
+                    break;
+                else if (cycle == 1)
                 {
-                    if (text.StartsWith('/'))
-                    {
-                        if (TextAsCommand().StartsWith("/dg"))
-                        {
-                            ChatDemotivate();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/a"))
-                        {
-                            ChatGenerateByFirstWord();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/damn"))
-                        {
-                            ChatRemoveBitrate();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/slow"))
-                        {
-                            ChatChangeSpeed(SpeedMode.Slow);
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/fast"))
-                        {
-                            ChatChangeSpeed(SpeedMode.Fast);
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/dv"))
-                        {
-                            ChatDemotivate(DgMode.Wide);
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/b"))
-                        {
-                            ChatBuhurt();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/set_p"))
-                        {
-                            ChatSetProbability();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/set"))
-                        {
-                            ChatSetFrequency();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/toggle_stickers"))
-                        {
-                            ChatToggleStickers();
-                            return;
-                        }
-                        if (TextAsCommand() == "/chat_id")
-                        {
-                            SendMessage(chat, chat.ToString());
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/fuse"))
-                        {
-                            ChatFuse();
-                            return;
-                        }
-                        if (TextAsCommand().StartsWith("/move"))
-                        {
-                            ChatMove();
-                            return;
-                        }
-                        if (TextAsCommand() == "/debug")
-                        {
-                            ChatDebugMessage();
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        var sentence = text.Clone().ToString();
-                        if (witless.ReceiveSentence(ref sentence))
-                            Log($"{title} >> {sentence}", ConsoleColor.Blue);
-                    }
+                    SendMessage(chat, DAMN_MANUAL);
+                    return null;
                 }
-                
-                witless.Count();
-
-                if (message.Photo != null && ShouldDemotivate())
-                {
-                    _memes.Mode = DgMode.Square;
-                    SendDemotivator(message.Photo[^1].FileId);
-                }
-                else if (witless.DemotivateStickers && message.Sticker != null && !message.Sticker.IsVideo && !message.Sticker.IsAnimated && ShouldDemotivate())
-                {
-                    _memes.Mode = DgMode.Square;
-                    SendDemotivatedSticker(message.Sticker.FileId);
-                }
-                else if (witless.ReadyToGen())
-                {
-                    Thread.Sleep(AssumedResponseTime(150, text));
-                    SendMessage(chat, witless.TryToGenerate());
-                    Log($"{title} >> FUNNY");
-                }
-                
-                bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;
-
-                #region local memes
-
-                void ChatSetFrequency()
-                {
-                    if (HasIntArgument(text, out int value))
-                    {
-                        witless.Interval = value;
-                        SaveChatList();
-                        SendMessage(chat, SET_FREQUENCY_RESPONSE(witless.Interval));
-                        Log($"{title} >> FUNNY INTERVAL >> {witless.Interval}");
-                    }
-                    else
-                        SendMessage(chat, SET_FREQUENCY_MANUAL);
-                }
-
-                void ChatSetProbability()
-                {
-                    if (HasIntArgument(text, out int value))
-                    {
-                        witless.DgProbability = value;
-                        SaveChatList();
-                        SendMessage(chat, SET_PROBABILITY_RESPONSE(witless.DgProbability));
-                        Log($"{title} >> DG PROBABILITY >> {witless.DgProbability}%");
-                    }
-                    else
-                        SendMessage(chat, SET_PROBABILITY_MANUAL);
-                }
-
-                void ChatFuse()
-                {
-                    string[] a = text.Split();
-                    if (a.Length > 1)
-                    {
-                        string name = a[1];
-                        bool passedID = long.TryParse(name, out long key);
-                        bool thisChatID = key == chat;
-                        if (thisChatID)
-                        {
-                            SendMessage(chat, FUSE_FAIL_SELF);
-                            return;
-                        }
-
-                        bool chatExist = passedID && WitlessExist(key);
-                        bool baseExist = BaseExists(name);
-                        if (chatExist || baseExist)
-                        {
-                            witless.Backup();
-                            var fusion = new FusionCollab(witless.Words, chatExist ? _sussyBakas[key].Words : FromFile());
-                            fusion.Fuse();
-                            witless.HasUnsavedStuff = true;
-                            witless.Save();
-                            SendMessage(chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
-                        }
-                        else
-                            SendMessage(chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
-
-                        WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
-                    }
-                    else
-                        SendMessage(chat, FUSE_MANUAL);
-                    
-                    string BASE_NEW_SIZE() => $"Теперь он весит {FileSize(witless.Path)}";
-                    string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(witless.Path)}";
-                    string FUSE_AVAILABLE_BASES()
-                    {
-                        FileInfo[] files = new DirectoryInfo($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
-                        var result = "\n\nДоступные словари:";
-                        foreach (var file in files)
-                            result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
-                        result = result + "\n\n" + BASE_SIZE();
-                        return result;
-                    }
-                }
-
-                void ChatGenerateByFirstWord()
-                {
-                    if (text.Contains(' '))
-                    {
-                        string word = text.Split()[^1];
-                        text = text.Substring(text.IndexOf(' ') + 1);
-                        text = text.Remove(text.Length - word.Length) + witless.TryToGenerateFromWord(word.ToLower());
-                        SendMessage(chat, TextInRandomLetterCase(text));
-                        Log($"{title} >> FUNNY BY WORD");
-                    }
-                    else
-                        SendMessage(chat, A_MANUAL);
-                }
-
-                void ChatBuhurt()
-                {
-                    var length = 3;
-                    if (HasIntArgument(text, out int value))
-                        length = Math.Clamp(value, 2, 13);
-                    var lines = new string[length];
-                    for (var i = 0; i < length; i++)
-                        lines[i] = witless.TryToGenerate().ToUpper();
-                    string result = string.Join("\n@\n", lines.Distinct());
-                    SendMessage(chat, result);
-                    Log($"{title} >> BUGURT #@#");
-                }
-
-                void ChatDemotivate(DgMode mode = DgMode.Square)
-                {
-                    _memes.Mode = mode;
-                    
-                    string fileID;
-                    if (message.Photo != null)
-                        fileID = message.Photo[^1].FileId;
-                    else if (message.ReplyToMessage?.Photo != null)
-                        fileID = message.ReplyToMessage.Photo[^1].FileId;
-                    else
-                    {
-                        if (message.ReplyToMessage?.Animation != null)
-                            fileID = message.ReplyToMessage.Animation.FileId;
-                        else if (message.Animation != null)
-                            fileID = message.Animation.FileId;
-                        else if (message.ReplyToMessage?.Video != null)
-                            fileID = message.ReplyToMessage.Video.FileId;
-                        else if (message.Video != null)
-                            fileID = message.Video.FileId;
-                        else
-                        {
-                            if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsVideo)
-                                fileID = message.ReplyToMessage.Sticker.FileId;
-                            else
-                            {
-                                if (message.ReplyToMessage?.Sticker != null && message.ReplyToMessage.Sticker.IsAnimated == false)
-                                    fileID = message.ReplyToMessage.Sticker.FileId;
-                                else
-                                {
-                                    SendMessage(chat, DG_MANUAL);
-                                    return;
-                                }
-                                SendDemotivatedSticker(fileID);
-                                return;
-                            }
-                            SendAnimatedDemotivator(fileID, ".webm");
-                            return;
-                        }
-                        SendAnimatedDemotivator(fileID);
-                        return;
-                    }
-                    SendDemotivator(fileID);
-                }
-
-                void SendDemotivator(string fileID)
-                {
-                    GetDemotivatorSources(fileID, ".jpg", out string a, out string b, out string path);
-                    using (var stream = File.OpenRead(_memes.MakeDemotivator(path, a, b)))
-                        SendPhoto(chat, new InputOnlineFile(stream));
-                    Log($"{title} >> DEMOTIVATOR [_]");
-                }
-                
-                void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
-                {
-                    var time = DateTime.Now;
-                    GetDemotivatorSources(fileID, extension, out string a, out string b, out string path);
-                    string output = extension == ".mp4"
-                        ? _memes.MakeAnimatedDemotivator(path, a, b)
-                        : _memes.MakeVideoStickerDemotivator(path, a, b);
-                    using (var stream = File.OpenRead(output))
-                        SendAnimation(chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
-                    Log($@"{title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
-                }
-                
-                void SendDemotivatedSticker(string fileID)
-                {
-                    GetDemotivatorSources(fileID, ".webp", out string a, out string b, out string path);
-                    string extension = text == null ? ".png" : text.Contains("-j") ? ".jpg" : ".png";
-                    using (var stream = File.OpenRead(_memes.MakeStickerDemotivator(path, a, b, extension)))
-                        SendPhoto(chat, new InputOnlineFile(stream));
-                    Log($"{title} >> DEMOTIVATOR [#] STICKER");
-                }
-                
-                void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
-                {
-                    GetDemotivatorText(witless, text, out textA, out textB);
-                    path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
-                    path = UniquePath(path, extension);
-                    DownloadFile(fileID, path).Wait();
-                }
-
-                void ChatRemoveBitrate()
-                {
-                    string fileID = GetVideoOrAudioID();
-                    if (fileID == null) return;
-
-                    var bitrate = 0;
-                    if (HasIntArgument(text, out int value))
-                        bitrate = value;
-
-                    string shortID = ShortID(fileID);
-                    string extension = ExtensionFromID(shortID);
-                    var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
-                    path = UniquePath(path, extension);
-                    DownloadFile(fileID, path, chat).Wait();
-
-                    string result = _memes.RemoveBitrate(path, bitrate, out value);
-                    extension = GetFileExtension(result);
-                    using (var stream = File.OpenRead(result))
-                        switch (extension)
-                        {
-                            case ".mp4":
-                                if (shortID.StartsWith("BA")) 
-                                    SendVideo(chat, new InputOnlineFile(stream, VideoFilename()));
-                                else
-                                    SendAnimation(chat, new InputOnlineFile(stream, VideoFilename()));
-                                break;
-                            case ".mp3":
-                                SendAudio(chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName())}.mp3"));
-                                break;
-                        }
-                    Log($"{title} >> DAMN [*]");
-                    
-                    string VideoFilename() => $"piece_fap_club-{value}.mp4";
-                }
-
-                void ChatChangeSpeed(SpeedMode mode)
-                {
-                    string fileID = GetVideoOrAudioID();
-                    if (fileID == null) return;
-
-                    var speed = 2D;
-                    if (HasDoubleArgument(text, out double value))
-                        speed = mode == SpeedMode.Fast ? Math.Clamp(value, 0.5, 94) : Math.Clamp(value, 0.0107, 2);
-
-                    string shortID = ShortID(fileID);
-                    string extension = ExtensionFromID(shortID);
-                    var type = MediaTypeFromID(shortID);
-                    var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
-                    path = UniquePath(path, extension);
-                    DownloadFile(fileID, path, chat).Wait();
-                    
-                    string result = _memes.ChangeSpeed(path, speed, mode, type);
-                    using (var stream = File.OpenRead(result))
-                        switch (type)
-                        {
-                            case MediaType.Audio:
-                                SendAudio(chat, new InputOnlineFile(stream, AudioFilename()));
-                                break;
-                            case MediaType.Video:
-                                SendAnimation(chat, new InputOnlineFile(stream, VideoFilename()));
-                                break;
-                            case MediaType.AudioVideo:
-                                SendVideo(chat, new InputOnlineFile(stream, VideoFilename()));
-                                break;
-                        }
-                    Log($"{title} >> {(mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
-
-                    string AudioFilename() => message.Audio?.FileName ?? message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName())}.mp3";
-                    string VideoFilename() => $"piece_fap_club-{speed}.mp4";
-                }
-
-                string GetVideoOrAudioID()
-                {
-                    var fileID = "";
-                    Message mess = message.ReplyToMessage ?? message;
-                    for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
-                    {
-                        if (mess.Animation != null)
-                            fileID = mess.Animation.FileId;
-                        else if (mess.Video != null)
-                            fileID = mess.Video.FileId;
-                        else if (mess.Audio != null)
-                            fileID = mess.Audio.FileId;
-                        else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
-                            fileID = mess.Document.FileId;
-                        else if (mess.Voice != null)
-                            fileID = mess.Voice.FileId;
-                        if (fileID.Length > 0)
-                            break;
-                        else if (cycle == 1)
-                        {
-                            SendMessage(chat, DAMN_MANUAL);
-                            return null;
-                        }
-                        else mess = message;
-                    }
-                    return fileID;
-                }
-
-                void ChatMove()
-                {
-                    string[] a = text.Split();
-                    if (a.Length > 1)
-                    {
-                        string name = a[1];
-                        string path = BaseExists(name) ? UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
-                        witless.Save();
-                        File.Copy(witless.Path, path);
-                        
-                        string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
-                        Log($@"{title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
-
-                        witless.Words.Clear();
-                        Log($"{title} >> DIC CLEARED!", ConsoleColor.Magenta);
-                        witless.HasUnsavedStuff = true;
-                        witless.Save();
-
-                        SendMessage(chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>");
-                    }
-                    else
-                        SendMessage(chat, MOVE_MANUAL);
-
-                    string ExtraDBPath(string name) => $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json";
-                }
-
-                void ChatDebugMessage()
-                {
-                    if (message.ReplyToMessage == null)
-                        return;
-                    
-                    Message mess = message.ReplyToMessage;
-                    var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
-                    var path = $@"{CurrentDirectory}\{DEBUG_FOLDER}\{name}";
-                    CreatePath(path);
-                    new FileIO<Message>(path).SaveData(mess);
-                    using var stream = File.OpenRead(path);
-                    SendDocument(chat, new InputOnlineFile(stream, name.Replace("--", "-")));
-                }
-
-                void ChatToggleStickers()
-                {
-                    witless.DemotivateStickers = !witless.DemotivateStickers;
-                    SaveChatList();
-                    SendMessage(chat, $"Стикеры {(witless.DemotivateStickers ? "" : "<b>НЕ</b> ")}будут демотивироваться в случайном порядке");
-                }
-
-                #endregion
+                else mess = message;
             }
-            else if (text != null && TextAsCommand() == "/start")
-            {
-                ChatStart();
-            }
-
-            void ChatStart()
-            {
-                if (!_sussyBakas.TryAdd(chat, new Witless(chat)))
-                    return;
-                SaveChatList();
-                Log($"{title} >> DIC CREATED >> {chat}", ConsoleColor.Magenta);
-                SendMessage(chat, START_RESPONSE);
-            }
-            
-            string SenderName() => message.SenderChat?.Title ?? message.From?.FirstName;
-            string TextAsCommand() => text.ToLower().Replace(BOT_USERNAME, "");
+            return fileID;
         }
 
         private void ProcessConsoleInput()
@@ -530,7 +101,7 @@ namespace Witlesss
                     if (input.StartsWith("+") && input.Length > 1)
                     {
                         string shit = input.Substring(1);
-                        foreach (long chat in _sussyBakas.Keys)
+                        foreach (long chat in SussyBakas.Keys)
                         {
                             if (chat.ToString().EndsWith(shit))
                             {
@@ -543,7 +114,7 @@ namespace Witlesss
                     else if (WitlessExist(_activeChat) && input.Length > 3)
                     {
                         string text = input.Substring(3).Trim();
-                        var witless = _sussyBakas[_activeChat];
+                        var witless = SussyBakas[_activeChat];
                         
                         if (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
                         {
@@ -566,18 +137,19 @@ namespace Witlesss
         }
 
         private string TitleOrUsername(Message message) => message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName;
-        
-        private bool WitlessExist(long chat) => _sussyBakas.ContainsKey(chat);
-        private bool BaseExists(string name)
+
+        public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
+
+        public bool BaseExists(string name)
         {
             var path = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
             Directory.CreateDirectory(path);
             return Directory.GetFiles(path).Contains($@"{path}\{name}.json");
         }
-        
-        private void SaveChatList()
+
+        public void SaveChatList()
         {
-            _fileIO.SaveData(_sussyBakas);
+            _fileIO.SaveData(SussyBakas);
             Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
         }
 
@@ -600,7 +172,7 @@ namespace Witlesss
         
         private void FuseAllDics()
         {
-            foreach (var witless in _sussyBakas.Values)
+            foreach (var witless in SussyBakas.Values)
             {
                 var path = $@"{CurrentDirectory}\A\{DB_FILE_PREFIX}-{witless.Chat}.json";
                 if (File.Exists(path))
@@ -616,12 +188,12 @@ namespace Witlesss
 
         private void SaveDics()
         {
-            foreach (var witless in _sussyBakas.Values) witless.Save();
+            foreach (var witless in SussyBakas.Values) witless.Save();
         }
         
         private void ReloadDics()
         {
-            foreach (var witless in _sussyBakas.Values) witless.Load();
+            foreach (var witless in SussyBakas.Values) witless.Load();
         }
     }
 }

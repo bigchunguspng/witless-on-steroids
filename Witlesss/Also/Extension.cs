@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.Also.LetterCaseMode;
 using static Witlesss.Also.Strings;
 using static Witlesss.Logger;
+using File = System.IO.File;
 
 namespace Witlesss.Also
 {
@@ -37,6 +39,9 @@ namespace Witlesss.Also
             else
                 return Upper;
         }
+
+        public static string TitleOrUsername(Message message) => message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName;
+        public static string SenderName(Message message) => message.SenderChat?.Title ?? message.From?.FirstName;
         
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {

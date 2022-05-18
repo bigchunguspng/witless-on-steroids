@@ -40,9 +40,11 @@ namespace Witlesss.Also
                 return Upper;
         }
 
-        public static string TitleOrUsername(Message message) => message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName;
+        public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName, 32);
         public static string SenderName(Message message) => message.SenderChat?.Title ?? message.From?.FirstName;
         
+        private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
+
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {
             b = witless.TryToGenerate();

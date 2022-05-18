@@ -13,6 +13,7 @@ namespace Witlesss.Commands
         private readonly Fuse _fuse;
         private readonly Move _move;
         private readonly GetChatID _chatID;
+        private readonly ChatInfo _chat;
         private readonly DebugMessage _debug;
         private readonly GenerateByFirstWord _generate;
         private readonly Buhurt _buhurt;
@@ -28,6 +29,7 @@ namespace Witlesss.Commands
             _fuse = new Fuse();
             _move = new Move();
             _chatID = new GetChatID();
+            _chat = new ChatInfo();
             _debug = new DebugMessage();
             _generate = new GenerateByFirstWord();
             _buhurt = new Buhurt();
@@ -94,6 +96,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand() == "/chat_id")
                         {
                             _command = _chatID;
+                        }
+                        else if (TextAsCommand() == "/chat")
+                        {
+                            _command = _chat;
                         }
                         else if (TextAsCommand().StartsWith("/fuse"))
                         {

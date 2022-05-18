@@ -3,6 +3,7 @@ using System.Drawing;
 
 namespace Witlesss.Also
 {
+    // ffmpeg -i "input.webm" -s WxH "output.mp4"
     public class FfTaskWebmToMp4 : FfTaskWebpToJpg
     {
         private readonly Size _size;

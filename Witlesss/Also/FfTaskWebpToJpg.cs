@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MediaToolkit.Core;
-using MediaToolkit.Tasks;
 
 namespace Witlesss.Also
 {
-    public class FfTaskWebpToJpg : FfMpegTaskBase<int>
+    // ffmpeg -i "input.webp" "output.jpg"
+    public class FfTaskWebpToJpg : FfTask
     {
         protected readonly string InputFilePath;
         protected readonly string OutputFilePath;
@@ -23,11 +21,5 @@ namespace Witlesss.Also
             InputFilePath ?? "",
             OutputFilePath ?? ""
         };
-
-        public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
-        {
-            await ffProcess.Task;
-            return 0;
-        }
     }
 }

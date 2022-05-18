@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Threading.Tasks;
-using MediaToolkit.Core;
-using MediaToolkit.Tasks;
 
 namespace Witlesss.Also
 {
-    public class FfTaskRenderAnimation : FfMpegTaskBase<int>
+    // ffmpeg -framerate 30 -i "F-%04d-D.jpg" -s WxH output.mp4
+    public class FfTaskRenderAnimation : FfTask
     {
         private readonly double _framerate;
         private readonly Size _size;
@@ -32,11 +30,5 @@ namespace Witlesss.Also
             $"{_size.Width}x{_size.Height}",
             _outputFilePath ?? ""
         };
-
-        public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
-        {
-            await ffProcess.Task;
-            return 0;
-        }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
-using MediaToolkit.Core;
-using MediaToolkit.Tasks;
 using static Witlesss.Also.Extension;
 
 namespace Witlesss.Also
 {
-    public class FfTaskRemoveBitrate : FfMpegTaskBase<int>
+    // ffmpeg -i "input.mp3" -f mp3          -b:a 1k        output.mp4
+    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k        output.mp4
+    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k -s WxH output.mp4
+    public class FfTaskRemoveBitrate : FfTask
     {
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
@@ -50,11 +50,5 @@ namespace Witlesss.Also
         }
 
         private IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
-
-        public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
-        {
-            await ffProcess.Task;
-            return 0;
-        }
     }
 }

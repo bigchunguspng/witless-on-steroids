@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Threading.Tasks;
-using MediaToolkit.Core;
-using MediaToolkit.Tasks;
 
 namespace Witlesss.Also
 {
     // ffmpeg -i "input.mp4" -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output.mp4
-    public class FfTaskSpeedAV : FfMpegTaskBase<int>
+    public class FfTaskSpeedAV : FfTask
     {
         protected readonly string Input;
         protected readonly string Output;
@@ -30,11 +27,5 @@ namespace Witlesss.Also
             "-map", "[a]",
             Output
         };
-
-        public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
-        {
-            await ffProcess.Task;
-            return 0;
-        }
     }
 }

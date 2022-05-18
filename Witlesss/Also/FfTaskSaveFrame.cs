@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Threading.Tasks;
-using MediaToolkit.Core;
-using MediaToolkit.Tasks;
 
 namespace Witlesss.Also
 {
-    public class FfTaskSaveFrame : FfMpegTaskBase<int>
+    // ffmpeg -nostdin -y -loglevel info -ss 0.066 -i "input.mp4" -vframes 1 "F-0002.jpg"
+    public class FfTaskSaveFrame : FfTask
     {
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
@@ -34,11 +32,5 @@ namespace Witlesss.Also
             "1",
             _outputFilePath ?? ""
         };
-
-        public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
-        {
-            await ffProcess.Task;
-            return 0;
-        }
     }
 }

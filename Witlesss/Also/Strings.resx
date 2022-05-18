@@ -72,7 +72,7 @@ set@piece_fap_bot 3
         <value>Telegram-Pictures</value>
     </data>
     <data name="LOG_CHATLIST_SAVED" xml:space="preserve">
-        <value>DICS SAVED</value>
+        <value>CHATLIST SAVED</value>
     </data>
     <data name="EXTRA_DBS_FOLDER" xml:space="preserve">
         <value>Telegram-ExtraDBs</value>

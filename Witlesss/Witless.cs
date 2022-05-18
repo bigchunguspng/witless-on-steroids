@@ -204,7 +204,7 @@ namespace Witlesss
             {
                 _fileIO.SaveData(Words);
                 HasUnsavedStuff = false;
-                Log($"DIC  SAVED << {Chat}", ConsoleColor.Green);
+                Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
             }
         }
 
@@ -212,7 +212,7 @@ namespace Witlesss
         {
             Words = _fileIO.LoadData();
             HasUnsavedStuff = false;
-            Log($"LOADED DIC << {Chat}");
+            Log($"DIC LOADED << {Chat}");
         }
 
         public void Backup()

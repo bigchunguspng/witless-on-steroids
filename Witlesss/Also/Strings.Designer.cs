@@ -242,7 +242,7 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DICS SAVED.
+        ///   Looks up a localized string similar to CHATLIST SAVED.
         /// </summary>
         internal static string LOG_CHATLIST_SAVED {
             get {

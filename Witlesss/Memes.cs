@@ -93,7 +93,7 @@ namespace Witlesss
             
             string inFrameRate = metadata.Metadata.Streams.First().AvgFrameRate;
             string inFrames = metadata.Metadata.Streams.First().NbFrames;
-            Log($"IN >>> FPS: {inFrameRate}, Length: {inFrames}", ConsoleColor.Blue);
+            Log($"IN >>> FPS: {inFrameRate} Length: {inFrames}", ConsoleColor.Blue);
 
             double outFrameRate = RetrieveFPS(inFrameRate);
             int outFrames = int.Parse(inFrames);
@@ -102,7 +102,7 @@ namespace Witlesss
             NormalizeLength(50);
             NormalizeFrameRate(50);
             double frameDelay = 1000 / outFrameRate;
-            Log($"OUT >> FPS: {(Math.Round(outFrameRate, 1).ToString(CultureInfo.InvariantCulture) + ",").PadRight(inFrameRate.Length + 1)} Length: {outFrames}", ConsoleColor.Blue);
+            Log($"OUT >> FPS: {Math.Round(outFrameRate, 1).ToString(CultureInfo.InvariantCulture).PadRight(inFrameRate.Length)} Length: {outFrames}", ConsoleColor.Blue);
             
             // Extract all frames
             for (var frame = 0; frame < outFrames; frame++)

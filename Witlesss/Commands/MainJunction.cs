@@ -137,12 +137,12 @@ namespace Witlesss.Commands
                 
                 if (Message.Photo != null && ShouldDemotivate())
                 {
-                    Bot.MemeService.Mode = DgMode.Square;
+                    SetUpDemotivateCommand();
                     _demotivate.SendDemotivator(Message.Photo[^1].FileId);
                 }
                 else if (witless.DemotivateStickers && Message.Sticker != null && !Message.Sticker.IsVideo && !Message.Sticker.IsAnimated && ShouldDemotivate())
                 {
-                    Bot.MemeService.Mode = DgMode.Square;
+                    SetUpDemotivateCommand();
                     _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);
                 }
                 else if (witless.ReadyToGen())
@@ -150,6 +150,13 @@ namespace Witlesss.Commands
                     Thread.Sleep(Extension.AssumedResponseTime(150, Text));
                     Bot.SendMessage(Chat, witless.TryToGenerate());
                     Logger.Log($"{Title} >> FUNNY");
+                }
+
+                void SetUpDemotivateCommand()
+                {
+                    Bot.MemeService.Mode = DgMode.Square;
+                    _demotivate.Pass(Message);
+                    _demotivate.Pass(witless);
                 }
                 
                 bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;

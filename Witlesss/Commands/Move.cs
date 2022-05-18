@@ -12,12 +12,7 @@ namespace Witlesss.Commands
             if (a.Length > 1)
             {
                 string name = a[1];
-                string path = Bot.BaseExists(name) ? Extension.UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
-                Baka.Save();
-                File.Copy(Baka.Path, path);
-                        
-                string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
-                Logger.Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
+                string result = MoveDictionary(name);
 
                 Baka.Words.Clear();
                 Logger.Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
@@ -28,8 +23,18 @@ namespace Witlesss.Commands
             }
             else
                 Bot.SendMessage(Chat, Strings.MOVE_MANUAL);
-
-            string ExtraDBPath(string name) => $@"{Environment.CurrentDirectory}\{Strings.EXTRA_DBS_FOLDER}\{name}.json";
         }
+
+        protected string MoveDictionary(string name)
+        {
+            string path = Bot.BaseExists(name) ? Extension.UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
+            Baka.Save();
+            File.Copy(Baka.Path, path);
+                        
+            string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
+            Logger.Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
+            return result;
+        }
+        private string ExtraDBPath(string name) => $@"{Environment.CurrentDirectory}\{Strings.EXTRA_DBS_FOLDER}\{name}.json";
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using Witlesss.Also;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss.Commands
 {
@@ -34,7 +34,7 @@ namespace Witlesss.Commands
                 }
                 else Bot.SendMessage(Chat, passedID ? Strings.FUSE_FAIL_CHAT : Strings.FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
 
-                ConcurrentDictionary<string, ConcurrentDictionary<string, int>> FromFile() => new FileIO<ConcurrentDictionary<string, ConcurrentDictionary<string, int>>>($@"{Environment.CurrentDirectory}\{Strings.EXTRA_DBS_FOLDER}\{name}.json").LoadData();
+                WitlessDB FromFile() => new FileIO<WitlessDB>($@"{Environment.CurrentDirectory}\{Strings.EXTRA_DBS_FOLDER}\{name}.json").LoadData();
             }
             else Bot.SendMessage(Chat, Strings.FUSE_MANUAL);
 

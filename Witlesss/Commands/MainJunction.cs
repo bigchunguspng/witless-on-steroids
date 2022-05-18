@@ -20,6 +20,7 @@ namespace Witlesss.Commands
         private readonly SetFrequency _frequency;
         private readonly SetProbability _probability;
         private readonly ToggleStickers _stickers;
+        private readonly DeleteDictionary _delete;
 
         public MainJunction()
         {
@@ -36,6 +37,7 @@ namespace Witlesss.Commands
             _frequency = new SetFrequency();
             _probability = new SetProbability();
             _stickers = new ToggleStickers();
+            _delete = new DeleteDictionary();
         }
 
         private string TextAsCommand() => Text.ToLower().Replace(Strings.BOT_USERNAME, "");
@@ -112,6 +114,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand() == "/debug")
                         {
                             _command = _debug;
+                        }
+                        else if (TextAsCommand() == "/delete")
+                        {
+                            _command = _delete;
                         }
                         
                         _command.Pass(Message);

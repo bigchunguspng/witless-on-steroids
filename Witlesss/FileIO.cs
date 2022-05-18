@@ -7,12 +7,21 @@ namespace Witlesss
     public class FileIO<T> where T : new()
     {
         private readonly string _path;
+        private readonly JsonSerializerSettings _settings;
 
-        public FileIO(string path) => _path = path;
+        public FileIO(string path)
+        {
+            _path = path;
+            _settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented, 
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
+        }
 
         public T LoadData()
         {
-            if (!File.Exists(_path))
+            if (FileEmptyOrNotExist(_path))
             {
                 CreatePath(_path);
                 File.CreateText(_path).Dispose();
@@ -28,10 +37,7 @@ namespace Witlesss
         public void SaveData(T db)
         {
             using StreamWriter writer = File.CreateText(_path);
-            writer.Write(JsonConvert.SerializeObject(db, new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented, DefaultValueHandling = DefaultValueHandling.Ignore
-            }));
+            writer.Write(JsonConvert.SerializeObject(db, _settings));
         }
     }
 }

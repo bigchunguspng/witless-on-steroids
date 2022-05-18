@@ -159,6 +159,8 @@ namespace Witlesss.Also
             return a.ElementAt(Random.Next(a.Length));
         }
 
+        public static bool FileEmptyOrNotExist(string name) => !File.Exists(name) || new FileInfo(name).Length == 0;
+
         public static string FileSize(string path)
         {
             long bytes = new FileInfo(path).Length;

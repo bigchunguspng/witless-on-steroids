@@ -119,7 +119,8 @@ namespace Witlesss.Commands
                         {
                             _command = _delete;
                         }
-                        
+                        else return;
+
                         _command.Pass(Message);
                         if (_command is WitlessCommand command) command.Pass(witless);
                         _command.Run();

@@ -8,6 +8,7 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Witlesss.Also;
 using Witlesss.Commands;
 using static System.Environment;
 using static Witlesss.Also.Extension;
@@ -116,7 +117,8 @@ namespace Witlesss
                     else if (input == "/c") ClearTempFiles();
                     else if (input == "/k") ClearDics();
                     else if (input == "/e") DeleteBlockers();
-                    else if (input == "/r") DeleteEmpty();
+                    else if (input == "/r") DeleteBySize();
+                    else if (input.StartsWith("/r") && input.Contains(" ") && HasIntArgument(input, out int value)) DeleteBySize(value);
                 }
             } while (input != "s");
             SaveDics();
@@ -209,13 +211,13 @@ namespace Witlesss
             SaveChatList();
         }
 
-        private void DeleteEmpty()
+        private void DeleteBySize(int size = 3)
         {
             var bin = new List<long>();
             foreach (var witless in SussyBakas.Values)
             {
                 long bytes = new FileInfo(witless.Path).Length;
-                if (bytes < 3)
+                if (bytes < size)
                 {
                     witless.Backup();
                     File.Delete(witless.Path);

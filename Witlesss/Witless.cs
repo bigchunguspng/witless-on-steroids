@@ -16,7 +16,7 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private const string Start = "_start", End = "_end", Dot = "_dot", Link = "[ссылка удалена]";
+        private const string Start = "_start", End = "_end", Link = "[ссылка удалена]";
 
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
@@ -88,7 +88,7 @@ namespace Witlesss
             }
 
             HasUnsavedStuff = true;
-            sentence = string.Join(' ', wordlist.GetRange(1, wordlist.Count - 2)).Replace($" {Dot} {Start} ", ". ");
+            sentence = string.Join(' ', wordlist.GetRange(1, wordlist.Count - 2));
             return true;
         }
         private bool SentenceIsAcceptable(string sentence)
@@ -103,7 +103,7 @@ namespace Witlesss
                 return false;
             return true;
         }
-        private string[] WordsOf(string sentence) => sentence.ToLower().Replace(". ", $" {Dot} {Start} ").Replace($". {Dot} {Start} ", ".. ").Trim().Split(new[] {' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+        private string[] WordsOf(string sentence) => sentence.ToLower().Trim().Split(new[] {' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries);
         private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
 
         public string TryToGenerate(string word = Start)
@@ -153,7 +153,7 @@ namespace Witlesss
                 currentWord = PickWord(Words[currentWord]);
             }
 
-            result = result.Replace(Start, "").Replace($" {Dot} ", ".").TrimStart();
+            result = result.Replace(Start, "").TrimStart();
             
             return TextInRandomLetterCase(result);
         }

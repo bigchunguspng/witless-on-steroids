@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,19 +21,16 @@ namespace Witlesss
 {
     public class Bot : BotCore
     {
-        public readonly ChatList SussyBakas;
-        private readonly FileIO<ChatList> _fileIO;
-        public readonly Memes MemeService;
         private long _activeChat;
-
-        private readonly MainJunction _junction;
+        private readonly FileIO<ChatList> _fileIO;
+        public readonly ChatList SussyBakas;
+        public readonly Memes MemeService;
 
         public Bot()
         {
             MemeService = new Memes();
             _fileIO = new FileIO<ChatList>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
             SussyBakas = _fileIO.LoadData();
-            _junction = new MainJunction();
         }
 
         public void Run()
@@ -41,25 +39,11 @@ namespace Witlesss
 
             Command.Bot = this;
             var options = new ReceiverOptions() {AllowedUpdates = new[] {UpdateType.Message, UpdateType.EditedMessage}};
-            Client.StartReceiving(new Handler(this), options);
+            Client.StartReceiving(new Handler(), options);
 
             StartSaveLoop(2);
             ProcessConsoleInput();
         }
-        
-        public void TryHandleMessage(Message message)
-        {
-            try
-            {
-                _junction.Pass(message);
-                _junction.Run();
-            }
-            catch (Exception exception)
-            {
-                LogError(TitleOrUsername(message) + " >> CAN'T HANDLE MESSAGE: " + exception.Message);
-            }
-        }
-        
         
         public string GetVideoOrAudioID(Message message, long chat)
         {
@@ -131,12 +115,12 @@ namespace Witlesss
                     else if (input == "/u") Spam();
                     else if (input == "/c") ClearTempFiles();
                     else if (input == "/k") ClearDics();
+                    else if (input == "/e") DeleteBlockers();
+                    else if (input == "/r") DeleteEmpty();
                 }
             } while (input != "s");
             SaveDics();
         }
-
-        private string TitleOrUsername(Message message) => message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName;
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
 
@@ -201,6 +185,46 @@ namespace Witlesss
                 LogError("SPAM FAILED :( " + e.Message);
                 throw;
             }
+        }
+
+        private void DeleteBlockers()
+        {
+            var bin = new List<long>();
+            foreach (var witless in SussyBakas.Values)
+            {
+                int x = PingChat(witless.Chat);
+                if (x == -1)
+                {
+                    witless.Backup();
+                    File.Delete(witless.Path);
+                    bin.Add(witless.Chat);
+                }
+                else
+                {
+                    Client.DeleteMessageAsync(witless.Chat, x);
+                }
+            }
+
+            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _);
+            SaveChatList();
+        }
+
+        private void DeleteEmpty()
+        {
+            var bin = new List<long>();
+            foreach (var witless in SussyBakas.Values)
+            {
+                long bytes = new FileInfo(witless.Path).Length;
+                if (bytes < 3)
+                {
+                    witless.Backup();
+                    File.Delete(witless.Path);
+                    bin.Add(witless.Chat);
+                }
+            }
+            
+            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _);
+            SaveChatList();
         }
     }
 }

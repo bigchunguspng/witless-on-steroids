@@ -22,54 +22,72 @@ namespace Witlesss
             Client = new TelegramBotClient(token);
         }
 
-        public async void SendMessage(long chat, string text)
+        public void SendMessage(long chat, string text)
         {
-            Task task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
-            await TrySend(task, chat, "MESSAGE");
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
+            TrySend(task, chat, "MESSAGE");
         }
 
         public void SendPhoto(long chat, InputOnlineFile photo)
         {
-            Task task = Client.SendPhotoAsync(chat, photo);
-            TrySend(task, chat, "PHOTO").Wait();
+            var task = Client.SendPhotoAsync(chat, photo);
+            TrySend(task, chat, "PHOTO");
         }
 
         public void SendAnimation(long chat, InputOnlineFile animation)
         {
-            Task task = Client.SendAnimationAsync(chat, animation);
-            TrySend(task, chat, "ANIMATION").Wait();
+            var task = Client.SendAnimationAsync(chat, animation);
+            TrySend(task, chat, "ANIMATION");
         }
 
         public void SendVideo(long chat, InputOnlineFile video)
         {
-            Task task = Client.SendVideoAsync(chat, video);
-            TrySend(task, chat, "VIDEO").Wait();
+            var task = Client.SendVideoAsync(chat, video);
+            TrySend(task, chat, "VIDEO");
         }
 
         public void SendAudio(long chat, InputOnlineFile audio)
         {
-            Task task = Client.SendAudioAsync(chat, audio);
-            TrySend(task, chat, "AUDIO").Wait();
+            var task = Client.SendAudioAsync(chat, audio);
+            TrySend(task, chat, "AUDIO");
         }
 
         public void SendDocument(long chat, InputOnlineFile document)
         {
-            Task task = Client.SendDocumentAsync(chat, document);
-            TrySend(task, chat, "DOCUMENT").Wait();
+            var task = Client.SendDocumentAsync(chat, document);
+            TrySend(task, chat, "DOCUMENT");
         }
 
-        private async Task TrySend(Task task, long chat, string what)
+        private void TrySend(Task task, long chat, string what)
         {
             try
             {
-                await task.ContinueWith(action =>
-                {
-                    LogError($"{chat} >> CAN'T SEND {what}: " + action.Exception?.Message);
-                }, TaskContinuationOptions.OnlyOnFaulted);
+                task.Wait();
+                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
             }
-            catch
+            catch (Exception e)
             {
-                // 21
+                LogError($"{chat} >> CAN'T SEND {what}: " + e.Message);
+            }
+        }
+        
+        protected int PingChat(long chat)
+        {
+            try
+            {
+                var task = Client.SendTextMessageAsync(chat, "мммм...", disableNotification: true);
+
+                task.Wait();
+                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
+
+                return task.Result.MessageId;
+            }
+            catch (Exception e)
+            {
+                LogError($"{chat} >> CAN'T PING: " + e.Message);
+                if (e.Message.Contains("Forbidden") || e.Message.Contains("chat not found") || e.Message.Contains("have no rights to send a message"))
+                    return -1;
+                return -2;
             }
         }
 

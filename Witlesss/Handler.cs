@@ -5,22 +5,24 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Witlesss.Commands;
+using static Witlesss.Also.Extension;
 using static Witlesss.Logger;
 
 namespace Witlesss
 {
     public class Handler : IUpdateHandler
     {
-        private readonly Bot _bot;
+        private readonly MainJunction _fork;
             
-        public Handler(Bot bot) => _bot = bot;
+        public Handler() => _fork = new MainJunction();
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             if (update.Type == UpdateType.Message)
-                _bot.TryHandleMessage(update.Message);
+                TryHandleMessage(update.Message);
             else if (update.Type == UpdateType.EditedMessage)
-                _bot.TryHandleMessage(update.EditedMessage);
+                TryHandleMessage(update.EditedMessage);
             return Task.CompletedTask;
         }
 
@@ -28,6 +30,19 @@ namespace Witlesss
         {
             LogError("Telegram API Error...");
             return Task.CompletedTask;
+        }
+        
+        private void TryHandleMessage(Message message)
+        {
+            try
+            {
+                _fork.Pass(message);
+                _fork.Run();
+            }
+            catch (Exception exception)
+            {
+                LogError(TitleOrUsername(message) + " >> CAN'T HANDLE MESSAGE: " + exception.Message);
+            }
         }
     }
 }

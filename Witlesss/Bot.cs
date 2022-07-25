@@ -128,9 +128,9 @@ namespace Witlesss
                         }
                     }
                     else if (input == "/s") SaveDics();
-                    else if (input == "/u") ReloadDics();
-                    else if (input == "/r") ClearTempFiles();
-                    else if (input == "/f") FuseAllDics();
+                    else if (input == "/u") Spam();
+                    else if (input == "/c") ClearTempFiles();
+                    else if (input == "/k") ClearDics();
                 }
             } while (input != "s");
             SaveDics();
@@ -169,31 +169,38 @@ namespace Witlesss
                 }
             });
         }
-        
-        private void FuseAllDics()
-        {
-            foreach (var witless in SussyBakas.Values)
-            {
-                var path = $@"{CurrentDirectory}\A\{DB_FILE_PREFIX}-{witless.Chat}.json";
-                if (File.Exists(path))
-                {
-                    witless.Backup();
-                    var fusion = new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData());
-                    fusion.Fuse();
-                    witless.HasUnsavedStuff = true;
-                    witless.Save();
-                }
-            }
-        }
 
         private void SaveDics()
         {
             foreach (var witless in SussyBakas.Values) witless.Save();
         }
-        
-        private void ReloadDics()
+
+        private void ClearDics()
         {
-            foreach (var witless in SussyBakas.Values) witless.Load();
+            foreach (var witless in SussyBakas.Values)
+            {
+                witless.Backup();
+                File.Delete(witless.Path);
+                witless.Load();
+            }
+        }
+
+        private void Spam()
+        {
+            try
+            {
+                string message = File.ReadAllText($@"{CurrentDirectory}\.spam");
+                foreach (var witless in SussyBakas.Values)
+                {
+                    SendMessage(witless.Chat, message);
+                    Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
+                }
+            }
+            catch (Exception e)
+            {
+                LogError("SPAM FAILED :( " + e.Message);
+                throw;
+            }
         }
     }
 }

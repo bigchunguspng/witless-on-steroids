@@ -220,7 +220,7 @@ namespace Witlesss
             Save();
             var file = new FileInfo(Path);
             Directory.CreateDirectory($@"{CurrentDirectory}\{BACKUP_FOLDER}");
-            file.CopyTo($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DB_FILE_PREFIX}-{Chat}-{DateTime.Now:dd.MM.yyyy_(HH-mm-ss.ffff)}.json");
+            file.CopyTo($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DB_FILE_PREFIX}-{Chat} {DateTime.Now:dd.MM.yyyy.HH.mm.ss.ffff}.json");
         }
     }
 }

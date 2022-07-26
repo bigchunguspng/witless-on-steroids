@@ -1,10 +1,11 @@
 ﻿using System;
-using System.IO;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
 using static Witlesss.Also.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
+using File = System.IO.File;
 
 namespace Witlesss.Commands
 {
@@ -14,49 +15,28 @@ namespace Witlesss.Commands
 
         public override void Run()
         {
-            string fileID;
-            if (Message.Photo != null)
-                fileID = Message.Photo[^1].FileId;
-            else if (Message.ReplyToMessage?.Photo != null)
-                fileID = Message.ReplyToMessage.Photo[^1].FileId;
-            else
-            {
-                if (Message.ReplyToMessage?.Animation != null)
-                    fileID = Message.ReplyToMessage.Animation.FileId;
-                else if (Message.Animation != null)
-                    fileID = Message.Animation.FileId;
-                else if (Message.ReplyToMessage?.Video != null)
-                    fileID = Message.ReplyToMessage.Video.FileId;
-                else if (Message.Video != null)
-                    fileID = Message.Video.FileId;
-                else
-                {
-                    if (Message.ReplyToMessage?.Sticker != null && Message.ReplyToMessage.Sticker.IsVideo)
-                        fileID = Message.ReplyToMessage.Sticker.FileId;
-                    else
-                    {
-                        if (Message.ReplyToMessage?.Sticker != null &&
-                            Message.ReplyToMessage.Sticker.IsAnimated == false)
-                            fileID = Message.ReplyToMessage.Sticker.FileId;
-                        else
-                        {
-                            Bot.SendMessage(Chat, DG_MANUAL);
-                            return;
-                        }
+            if (!ProcessMessage(Message.ReplyToMessage ?? Message))
+                if (Message.ReplyToMessage == null)
+                    Bot.SendMessage(Chat, DG_MANUAL);
+                else if (!ProcessMessage(Message))
+                    Bot.SendMessage(Chat, DG_MANUAL);
+        }
 
-                        SendDemotivatedSticker(fileID);
-                        return;
-                    }
-
-                    SendAnimatedDemotivator(fileID, ".webm");
-                    return;
-                }
-
-                SendAnimatedDemotivator(fileID);
-                return;
-            }
-
-            SendDemotivator(fileID);
+        private bool ProcessMessage(Message mess)
+        {
+            if      (mess.Photo != null)
+                SendDemotivator(mess.Photo[^1].FileId);
+            else if (mess.Sticker != null && !(mess.Sticker.IsVideo || mess.Sticker.IsAnimated))
+                SendDemotivatedSticker(mess.Sticker.FileId);
+            else if (mess.Animation != null)
+                SendAnimatedDemotivator(mess.Animation.FileId);
+            else if (mess.Sticker != null && mess.Sticker.IsVideo)
+                SendAnimatedDemotivator(mess.Sticker.FileId, ".webm");
+            else if (mess.Video != null)
+                SendAnimatedDemotivator(mess.Video.FileId);
+            else return false;
+            
+            return true;
         }
 
         public void SendDemotivator(string fileID)

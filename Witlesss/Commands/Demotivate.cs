@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Also;
+using static System.Environment;
+using static Witlesss.Also.Strings;
+using static Witlesss.Extension;
+using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -37,7 +40,7 @@ namespace Witlesss.Commands
                             fileID = Message.ReplyToMessage.Sticker.FileId;
                         else
                         {
-                            Bot.SendMessage(Chat, Strings.DG_MANUAL);
+                            Bot.SendMessage(Chat, DG_MANUAL);
                             return;
                         }
 
@@ -61,7 +64,7 @@ namespace Witlesss.Commands
             GetDemotivatorSources(fileID, ".jpg", out string a, out string b, out string path);
             using (var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, a, b)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Logger.Log($"{Title} >> DEMOTIVATOR [_]");
+            Log($"{Title} >> DEMOTIVATOR [_]");
         }
 
         public void SendDemotivatedSticker(string fileID)
@@ -71,7 +74,7 @@ namespace Witlesss.Commands
                 Text.Contains("-j") ? ".jpg" : ".png";
             using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, a, b, extension)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Logger.Log($"{Title} >> DEMOTIVATOR [#] STICKER");
+            Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
 
         private void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
@@ -83,14 +86,14 @@ namespace Witlesss.Commands
                 : Bot.MemeService.MakeVideoStickerDemotivator(path, a, b);
             using (var stream = File.OpenRead(output))
                 Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
-            Logger.Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
+            Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }
 
         private void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
         {
-            Extension.GetDemotivatorText(Baka, Text, out textA, out textB);
-            path = $@"{Environment.CurrentDirectory}\{Strings.PICTURES_FOLDER}\{Extension.ShortID(fileID)}{extension}";
-            path = Extension.UniquePath(path, extension);
+            GetDemotivatorText(Baka, Text, out textA, out textB);
+            path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
+            path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path).Wait();
         }
     }

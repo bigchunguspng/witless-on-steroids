@@ -5,7 +5,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Also.Strings;
 using File = System.IO.File;

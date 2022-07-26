@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Witlesss.Also;
+using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -130,7 +131,7 @@ namespace Witlesss.Commands
                     {
                         var sentence = Text.Clone().ToString();
                         if (witless.ReceiveSentence(ref sentence))
-                            Logger.Log($"{Title} >> {sentence}", ConsoleColor.Blue);
+                            Log($"{Title} >> {sentence}", ConsoleColor.Blue);
                     }
                 }
                 
@@ -150,7 +151,7 @@ namespace Witlesss.Commands
                 {
                     Thread.Sleep(Extension.AssumedResponseTime(150, Text));
                     Bot.SendMessage(Chat, witless.TryToGenerate());
-                    Logger.Log($"{Title} >> FUNNY");
+                    Log($"{Title} >> FUNNY");
                 }
 
                 void SetUpDemotivateCommand()
@@ -172,7 +173,7 @@ namespace Witlesss.Commands
                 if (!Bot.SussyBakas.TryAdd(Chat, new Witless(Chat)))
                     return;
                 Bot.SaveChatList();
-                Logger.Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
+                Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
                 Bot.SendMessage(Chat, Strings.START_RESPONSE);
             }
         }

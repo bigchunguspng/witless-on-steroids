@@ -6,7 +6,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 using static Witlesss.Logger;
 
 namespace Witlesss

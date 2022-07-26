@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 
 namespace Witlesss.Also
 {

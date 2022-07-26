@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
-using static Witlesss.Also.Extension;
+using static Newtonsoft.Json.JsonConvert;
+using static Witlesss.Extension;
 
 namespace Witlesss
 {
@@ -31,13 +32,13 @@ namespace Witlesss
             }
 
             using StreamReader reader = File.OpenText(_path);
-            return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
+            return DeserializeObject<T>(reader.ReadToEnd());
         }
 
         public void SaveData(T db)
         {
             using StreamWriter writer = File.CreateText(_path);
-            writer.Write(JsonConvert.SerializeObject(db, _settings));
+            writer.Write(SerializeObject(db, _settings));
         }
     }
 }

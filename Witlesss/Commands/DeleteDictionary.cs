@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Witlesss.Also;
+using static Witlesss.Extension;
 using static Witlesss.Logger;
 
 namespace Witlesss.Commands
@@ -9,7 +9,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string name = Extension.ValidFileName(Title.Split()[0]);
+            string name = ValidFileName(Title.Split()[0]);
             string result = MoveDictionary(name);
 
             string path = Baka.Path;

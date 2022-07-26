@@ -1,6 +1,4 @@
-﻿using Witlesss.Also;
-
-namespace Witlesss.Commands
+﻿namespace Witlesss.Commands
 {
     public class ChatInfo : WitlessCommand
     {

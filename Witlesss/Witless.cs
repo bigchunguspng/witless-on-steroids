@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static System.Environment;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Also.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;

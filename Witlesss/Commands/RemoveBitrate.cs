@@ -1,7 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Also;
+using static System.Environment;
+using static Witlesss.Also.Strings;
+using static Witlesss.Extension;
+using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -13,17 +15,17 @@ namespace Witlesss.Commands
             if (fileID == null) return;
 
             var bitrate = 0;
-            if (Extension.HasIntArgument(Text, out int value))
+            if (HasIntArgument(Text, out int value))
                 bitrate = value;
 
-            string shortID = Extension.ShortID(fileID);
-            string extension = Extension.ExtensionFromID(shortID);
-            var path = $@"{Environment.CurrentDirectory}\{Strings.PICTURES_FOLDER}\{shortID}{extension}";
-            path = Extension.UniquePath(path, extension);
+            string shortID = ShortID(fileID);
+            string extension = ExtensionFromID(shortID);
+            var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
+            path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path, Chat).Wait();
 
             string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value);
-            extension = Extension.GetFileExtension(result);
+            extension = GetFileExtension(result);
             using (var stream = File.OpenRead(result))
                 switch (extension)
                 {
@@ -34,10 +36,10 @@ namespace Witlesss.Commands
                             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
                         break;
                     case ".mp3":
-                        Bot.SendAudio(Chat, new InputOnlineFile(stream, $"Damn, {Extension.ValidFileName(Extension.SenderName(Message))}.mp3"));
+                        Bot.SendAudio(Chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName(Message))}.mp3"));
                         break;
                 }
-            Logger.Log($"{Title} >> DAMN [*]");
+            Log($"{Title} >> DAMN [*]");
                     
             string VideoFilename() => $"piece_fap_club-{value}.mp4";
         }

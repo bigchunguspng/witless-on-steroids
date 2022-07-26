@@ -6,7 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using static System.Environment;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 using static Witlesss.Also.Strings;
 
 namespace Witlesss

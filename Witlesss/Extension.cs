@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using Telegram.Bot.Types;
 using static System.Environment;
-using static Witlesss.Also.LetterCaseMode;
+using static Witlesss.LetterCaseMode;
 using static Witlesss.Also.Strings;
 using static Witlesss.Logger;
 using File = System.IO.File;
 
-namespace Witlesss.Also
+namespace Witlesss
 {
     public static class Extension
     {

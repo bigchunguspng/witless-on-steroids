@@ -10,7 +10,7 @@ using MediaToolkit.Tasks;
 using Witlesss.Also;
 using static Witlesss.Logger;
 using static System.Environment;
-using static Witlesss.Also.Extension;
+using static Witlesss.Extension;
 using static Witlesss.Also.Strings;
 
 namespace Witlesss

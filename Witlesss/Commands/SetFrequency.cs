@@ -1,4 +1,6 @@
-﻿using Witlesss.Also;
+﻿using static Witlesss.Also.Strings;
+using static Witlesss.Extension;
+using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -6,15 +8,15 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            if (Extension.HasIntArgument(Text, out int value))
+            if (HasIntArgument(Text, out int value))
             {
                 Baka.Interval = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, Extension.SET_FREQUENCY_RESPONSE(Baka.Interval));
-                Logger.Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
+                Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Interval));
+                Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
             }
             else
-                Bot.SendMessage(Chat, Strings.SET_FREQUENCY_MANUAL);
+                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
     }
 }

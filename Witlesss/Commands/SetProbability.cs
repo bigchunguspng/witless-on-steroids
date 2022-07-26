@@ -1,4 +1,6 @@
-﻿using Witlesss.Also;
+﻿using static Witlesss.Also.Strings;
+using static Witlesss.Extension;
+using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -6,15 +8,15 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            if (Extension.HasIntArgument(Text, out int value))
+            if (HasIntArgument(Text, out int value))
             {
                 Baka.DgProbability = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, Extension.SET_PROBABILITY_RESPONSE(Baka.DgProbability));
-                Logger.Log($"{Title} >> DG PROBABILITY >> {Baka.DgProbability}%");
+                Bot.SendMessage(Chat, SET_PROBABILITY_RESPONSE(Baka.DgProbability));
+                Log($"{Title} >> DG PROBABILITY >> {Baka.DgProbability}%");
             }
             else
-                Bot.SendMessage(Chat, Strings.SET_PROBABILITY_MANUAL);
+                Bot.SendMessage(Chat, SET_PROBABILITY_MANUAL);
         }
     }
 }

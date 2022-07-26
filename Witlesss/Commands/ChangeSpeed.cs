@@ -44,7 +44,7 @@ namespace Witlesss.Commands
                 }
             Log($"{Title} >> {(Mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
 
-            string AudioFilename() => Message.Audio?.FileName ?? Message.Document?.FileName ?? $"Lmao, {ValidFileName(SenderName(Message))}.mp3";
+            string AudioFilename() => Message.Audio?.FileName ?? Message.Document?.FileName ?? $"Ohhh, {ValidFileName(SenderName(Message))}.mp3";
             string VideoFilename() => $"piece_fap_club-{speed}.mp4";
         }
     }

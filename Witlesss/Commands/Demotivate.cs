@@ -82,7 +82,7 @@ namespace Witlesss.Commands
             var time = DateTime.Now;
             GetDemotivatorSources(fileID, extension, out string a, out string b, out string path);
             string output = extension == ".mp4"
-                ? Bot.MemeService.MakeAnimatedDemotivator(path, a, b)
+                ? Bot.MemeService.MakeVideoDemotivator(path, a, b)
                 : Bot.MemeService.MakeVideoStickerDemotivator(path, a, b);
             using (var stream = File.OpenRead(output))
                 Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));

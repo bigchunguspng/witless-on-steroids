@@ -20,27 +20,28 @@ namespace Witlesss.Commands
 
             string shortID = ShortID(fileID);
             string extension = ExtensionFromID(shortID);
+            var type = MediaTypeFromID(shortID);
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
             path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path, Chat).Wait();
 
             string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value);
-            extension = GetFileExtension(result);
             using (var stream = File.OpenRead(result))
-                switch (extension)
+                switch (type)
                 {
-                    case ".mp4":
-                        if (shortID.StartsWith("BA")) 
-                            Bot.SendVideo(Chat, new InputOnlineFile(stream, VideoFilename()));
-                        else
-                            Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
+                    case MediaType.Audio:
+                        Bot.SendAudio(Chat, new InputOnlineFile(stream, AudioFilename()));
                         break;
-                    case ".mp3":
-                        Bot.SendAudio(Chat, new InputOnlineFile(stream, $"Damn, {ValidFileName(SenderName(Message))}.mp3"));
+                    case MediaType.Video:
+                        Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
+                        break;
+                    case MediaType.AudioVideo:
+                        Bot.SendVideo(Chat, new InputOnlineFile(stream, VideoFilename()));
                         break;
                 }
             Log($"{Title} >> DAMN [*]");
-                    
+
+            string AudioFilename() => $"Damn, {ValidFileName(SenderName(Message))}.mp3";
             string VideoFilename() => $"piece_fap_club-{value}.mp4";
         }
     }

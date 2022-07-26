@@ -113,6 +113,7 @@ namespace Witlesss
                 "Aw" => ".mp3", // voice message / ogg
                 "BQ" => ".wav",
                 "Ag" => ".jpg",
+                "CA" => ".webm",
                 _ => ""
             };
         }
@@ -126,6 +127,7 @@ namespace Witlesss
                 "CQ" => MediaType.Audio,
                 "Aw" => MediaType.Audio,
                 "BQ" => MediaType.Audio,
+                "CA" => MediaType.Video,
                 _ => MediaType.Audio // bc who cares?
             };
         }

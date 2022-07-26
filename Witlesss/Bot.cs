@@ -51,16 +51,19 @@ namespace Witlesss
             var mess = message.ReplyToMessage ?? message;
             for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
             {
-                if (mess.Animation != null)
-                    fileID = mess.Animation.FileId;
+                if      (mess.Audio != null)
+                    fileID = mess.Audio.FileId;
                 else if (mess.Video != null)
                     fileID = mess.Video.FileId;
-                else if (mess.Audio != null)
-                    fileID = mess.Audio.FileId;
-                else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
-                    fileID = mess.Document.FileId;
+                else if (mess.Animation != null)
+                    fileID = mess.Animation.FileId;
+                else if (mess.Sticker != null && mess.Sticker.IsVideo)
+                    fileID = mess.Sticker.FileId;
                 else if (mess.Voice != null)
                     fileID = mess.Voice.FileId;
+                else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
+                    fileID = mess.Document.FileId;
+                
                 if (fileID.Length > 0)
                     break;
                 else if (cycle == 1)

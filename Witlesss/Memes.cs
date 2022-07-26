@@ -66,7 +66,7 @@ namespace Witlesss
             return MakeDemotivator(outputPath, textA, textB);
         }
 
-        public string MakeAnimatedDemotivator(string path, string textA, string textB)
+        public string MakeVideoDemotivator(string path, string textA, string textB)
         {
             Drawer().SetRandomLogo();
             AnimateDemotivator(path, textA, textB).Wait();
@@ -78,7 +78,7 @@ namespace Witlesss
             var task = new FfTaskWebmToMp4(path, out path, ".mp4", GetValidSize(path));
             _service.ExecuteAsync(task).Wait();
 
-            return MakeAnimatedDemotivator(path, textA, textB);
+            return MakeVideoDemotivator(path, textA, textB);
         }
         
         private async Task AnimateDemotivator(string path, string textA, string textB)
@@ -149,12 +149,42 @@ namespace Witlesss
             string[] GetAllFrames() => Directory.GetFiles(_animationPath);
         }
 
+        public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
+        {
+            if (mode == SpeedMode.Slow) speed = 1 / speed;
+            
+            Log($"SPEED >> {speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
+
+            string extension = GetFileExtension(path);
+            WebmToMp4(ref extension, ref path);
+            string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
+
+            FfMpegTaskBase<int> task = null;
+            switch (type)
+            {
+                case MediaType.Audio:
+                    task = new FfTaskSpeedA(path, output, speed);
+                    break;
+                case MediaType.Video:
+                    task = new FfTaskSpeedV(path, output, speed);
+                    break;
+                case MediaType.AudioVideo:
+                    task = new FfTaskSpeedAV(path, output, speed);
+                    break;
+            }
+            _service.ExecuteAsync(task).Wait();
+            return output;
+        }
+
         public string RemoveBitrate(string path, int bitrate, out int value)
         {
             bool noArgs = bitrate == 0;
             string outputPath;
             FfTaskRemoveBitrate task;
-            if (GetFileExtension(path) == ".mp4")
+            
+            string extension = GetFileExtension(path);
+            WebmToMp4(ref extension, ref path);
+            if (extension == ".mp4")
             {
                 var size = GetValidSize(path, out var stream);
                 double fps = RetrieveFPS(stream.AvgFrameRate, 30);
@@ -207,30 +237,13 @@ namespace Witlesss
             }
         }
 
-        public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
+        private void WebmToMp4(ref string extension, ref string path)
         {
-            if (mode == SpeedMode.Slow) speed = 1 / speed;
-            
-            Log($"SPEED >> {speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
-
-            string extension = GetFileExtension(path);
-            string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
-
-            FfMpegTaskBase<int> task = null;
-            switch (type)
+            if (extension == ".webm")
             {
-                case MediaType.Audio:
-                    task = new FfTaskSpeedA(path, output, speed);
-                    break;
-                case MediaType.Video:
-                    task = new FfTaskSpeedV(path, output, speed);
-                    break;
-                case MediaType.AudioVideo:
-                    task = new FfTaskSpeedAV(path, output, speed);
-                    break;
+                _service.ExecuteAsync(new FfTaskWebmToMp4(path, out path, ".mp4", GetValidSize(path))).Wait();
+                extension = ".mp4";
             }
-            _service.ExecuteAsync(task).Wait();
-            return output;
         }
     }
 

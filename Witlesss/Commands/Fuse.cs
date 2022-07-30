@@ -29,8 +29,7 @@ namespace Witlesss.Commands
                     Baka.Backup();
                     var fusion = new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile());
                     fusion.Fuse();
-                    Baka.HasUnsavedStuff = true;
-                    Baka.Save();
+                    Baka.SaveNoMatterWhat();
                     Bot.SendMessage(Chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{Title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
                 }
                 else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());

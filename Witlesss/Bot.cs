@@ -238,8 +238,7 @@ namespace Witlesss
             foreach (var witless in SussyBakas.Values)
             {
                 NormalizeWitlessDB(witless.Words);
-                witless.HasUnsavedStuff = true;
-                witless.Save();
+                witless.SaveNoMatterWhat();
             }
         }
 

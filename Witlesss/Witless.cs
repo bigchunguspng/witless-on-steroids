@@ -200,12 +200,14 @@ namespace Witlesss
 
         public void Save()
         {
-            if (HasUnsavedStuff)
-            {
-                _fileIO.SaveData(Words);
-                HasUnsavedStuff = false;
-                Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
-            }
+            if (HasUnsavedStuff) SaveNoMatterWhat();
+        }
+
+        public void SaveNoMatterWhat()
+        {
+            _fileIO.SaveData(Words);
+            HasUnsavedStuff = false;
+            Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
 
         public void Load()

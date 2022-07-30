@@ -18,8 +18,7 @@ namespace Witlesss.Commands
 
                 Baka.Words.Clear();
                 Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
-                Baka.HasUnsavedStuff = true;
-                Baka.Save();
+                Baka.SaveNoMatterWhat();
 
                 Bot.SendMessage(Chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>");
             }

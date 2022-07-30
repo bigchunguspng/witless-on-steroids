@@ -122,7 +122,8 @@ namespace Witlesss
                     else if (input == "/e") DeleteBlockers();
                     else if (input == "/r") DeleteBySize();
                     else if (input == "/x") FixDBs();
-                    else if (input.StartsWith("/r") && input.Contains(" ") && HasIntArgument(input, out int value)) DeleteBySize(value);
+                    else if (input.StartsWith("/u") && input.Contains(" ") && HasIntArgument(input, out int x1)) Spam(x1);
+                    else if (input.StartsWith("/r") && input.Contains(" ") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
                 }
             } while (input != "s");
             SaveDics();
@@ -175,15 +176,19 @@ namespace Witlesss
             }
         }
 
-        private void Spam()
+        private void Spam(int size = 2)
         {
             try
             {
                 string message = File.ReadAllText($@"{CurrentDirectory}\.spam");
                 foreach (var witless in SussyBakas.Values)
                 {
-                    SendMessage(witless.Chat, message);
-                    Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
+                    long bytes = new FileInfo(witless.Path).Length;
+                    if (bytes > size)
+                    {
+                        SendMessage(witless.Chat, message);
+                        Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
+                    }
                 }
             }
             catch (Exception e)

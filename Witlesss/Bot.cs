@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -120,6 +121,7 @@ namespace Witlesss
                     else if (input == "/k") ClearDics();
                     else if (input == "/e") DeleteBlockers();
                     else if (input == "/r") DeleteBySize();
+                    else if (input == "/x") FixDBs();
                     else if (input.StartsWith("/r") && input.Contains(" ") && HasIntArgument(input, out int value)) DeleteBySize(value);
                 }
             } while (input != "s");
@@ -229,6 +231,29 @@ namespace Witlesss
             
             foreach (long chat in bin) SussyBakas.TryRemove(chat, out _);
             SaveChatList();
+        }
+
+        private void FixDBs()
+        {
+            foreach (var witless in SussyBakas.Values)
+            {
+                NormalizeWitlessDB(witless.Words);
+                witless.HasUnsavedStuff = true;
+                witless.Save();
+            }
+        }
+
+        private void NormalizeWitlessDB(WitlessDB words)
+        {
+            foreach (var word in words)
+            foreach (string next in word.Value.Keys)
+            {
+                if (!words.ContainsKey(next))
+                {
+                    words.TryAdd(next, new ConcurrentDictionary<string, int>());
+                    words[next].TryAdd(Witless.End, 1);
+                }
+            }
         }
     }
 }

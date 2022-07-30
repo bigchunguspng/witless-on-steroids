@@ -16,7 +16,7 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private const string Start = "_start", End = "_end", Link = "[ссылка удалена]";
+        public const string Start = "_start", End = "_end", Link = "[ссылка удалена]";
 
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;

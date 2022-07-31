@@ -86,47 +86,53 @@ namespace Witlesss
                 
                 if (input != null && !input.EndsWith("_"))
                 {
-                    if (input.StartsWith("+") && input.Length > 1)
+                    if      (input.StartsWith("+")     && input.Length > 1) SetActiveChat();
+                    else if (input.StartsWith("/"))
                     {
-                        string shit = input.Substring(1);
-                        foreach (long chat in SussyBakas.Keys)
-                        {
-                            if (chat.ToString().EndsWith(shit))
-                            {
-                                _activeChat = chat;
-                                Log($"{_activeChat} >> ACTIVE CHAT");
-                                break;
-                            }
-                        }
+                        if  (WitlessExist(_activeChat) && input.Length > 3) BreakFourthWall();
+                        else if (input == "/s") SaveDics();
+                        else if (input == "/u") Spam();
+                        else if (input == "/c") ClearTempFiles();
+                        else if (input == "/k") ClearDics();
+                        else if (input == "/e") DeleteBlockers();
+                        else if (input == "/r") DeleteBySize();
+                        else if (input == "/x") FixDBs();
+                        else if (input.StartsWith("/u") && HasIntArgument(input, out int x1)) Spam(x1);
+                        else if (input.StartsWith("/r") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
                     }
-                    else if (WitlessExist(_activeChat) && input.Length > 3)
-                    {
-                        string text = input.Substring(3).Trim();
-                        var witless = SussyBakas[_activeChat];
-                        
-                        if (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
-                        {
-                            Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
-                        }
-                        else if (input.StartsWith("/w ")) //write
-                        {
-                            SendMessage(_activeChat, text);
-                            bool accepted = witless.ReceiveSentence(ref text);
-                            Log($@"{_activeChat} >> SENT {(accepted ? "AND ADDED TO DIC " : "")}""{text}""", ConsoleColor.Yellow);
-                        }
-                    }
-                    else if (input == "/s") SaveDics();
-                    else if (input == "/u") Spam();
-                    else if (input == "/c") ClearTempFiles();
-                    else if (input == "/k") ClearDics();
-                    else if (input == "/e") DeleteBlockers();
-                    else if (input == "/r") DeleteBySize();
-                    else if (input == "/x") FixDBs();
-                    else if (input.StartsWith("/u") && input.Contains(" ") && HasIntArgument(input, out int x1)) Spam(x1);
-                    else if (input.StartsWith("/r") && input.Contains(" ") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
                 }
             } while (input != "s");
             SaveDics();
+
+            void SetActiveChat()
+            {
+                string shit = input.Substring(1);
+                foreach (long chat in SussyBakas.Keys)
+                {
+                    if (chat.ToString().EndsWith(shit))
+                    {
+                        _activeChat = chat;
+                        Log($"ACTIVE CHAT >> {_activeChat}");
+                        break;
+                    }
+                }
+            }
+            void BreakFourthWall()
+            {
+                string text = input.Substring(3).Trim();
+                var witless = SussyBakas[_activeChat];
+                        
+                if      (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
+                {
+                    Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
+                }
+                else if (input.StartsWith("/w ")) //write
+                {
+                    SendMessage(_activeChat, text);
+                    bool accepted = witless.ReceiveSentence(ref text);
+                    Log($@"{_activeChat} >> SENT {(accepted ? "AND ADDED TO DIC " : "")}""{text}""", ConsoleColor.Yellow);
+                }
+            }
         }
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
@@ -146,19 +152,16 @@ namespace Witlesss
 
         private async void StartSaveLoop(int minutes)
         {
-            var saving = new Counter(minutes);
-            await Task.Run(() =>
+            await Task.Run(SaveLoop);
+            
+            Task SaveLoop()
             {
                 while (true)
                 {
-                    Thread.Sleep(60000);
-                    saving.Count();
-                    if (saving.Ready())
-                    {
-                        SaveDics();
-                    }
+                    Thread.Sleep(60000 * minutes);
+                    SaveDics();
                 }
-            });
+            }
         }
 
         private void SaveDics()

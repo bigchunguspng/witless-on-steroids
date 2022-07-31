@@ -2,7 +2,7 @@
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
             var bot = new Bot();
             bot.Run();

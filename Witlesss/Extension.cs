@@ -114,7 +114,7 @@ namespace Witlesss
                 "BQ" => ".wav",
                 "Ag" => ".jpg",
                 "CA" => ".webm",
-                _ => ""
+                _    => ""
             };
         }
         public static MediaType MediaTypeFromID(string id)
@@ -128,7 +128,7 @@ namespace Witlesss
                 "Aw" => MediaType.Audio,
                 "BQ" => MediaType.Audio,
                 "CA" => MediaType.Video,
-                _ => MediaType.Audio // bc who cares?
+                _    => MediaType.Audio // bc who cares?
             };
         }
 
@@ -158,7 +158,7 @@ namespace Witlesss
         public static string FILE_TOO_BIG_RESPONSE()
         {
             var a = new[] {"пук-среньк...", "не подниму (много весит)", "тяжёлая штука", "ого, какой большой", "сорян, не влезает"};
-            return a.ElementAt(Random.Next(a.Length));
+            return a[Random.Next(a.Length)];
         }
 
         public static bool FileEmptyOrNotExist(string name) => !File.Exists(name) || new FileInfo(name).Length == 0;

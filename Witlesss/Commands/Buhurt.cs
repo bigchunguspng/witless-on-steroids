@@ -11,11 +11,11 @@ namespace Witlesss.Commands
         {
             var length = 3;
             if (HasIntArgument(Text, out int value))
-                length = Math.Clamp(value, 2, 13);
+                length = Math.Clamp(value, 2, 15);
             var lines = new string[length];
             for (var i = 0; i < length; i++)
                 lines[i] = Baka.TryToGenerate().ToUpper();
-            string result = string.Join("\n@\n", lines.Distinct());
+            string result = string.Join("\n@\n", lines.Where(x => !string.IsNullOrEmpty(x))).Replace(" @ ", "\n@\n");
             Bot.SendMessage(Chat, result);
             Log($"{Title} >> BUGURT #@#");
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.LetterCaseMode;

@@ -221,8 +221,9 @@ namespace Witlesss
         {
             Save();
             var file = new FileInfo(Path);
-            Directory.CreateDirectory($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}");
-            file.CopyTo(UniquePath($@"{CurrentDirectory}\{BACKUP_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json", ".json"));
+            var path = $@"{CurrentDirectory}\{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}";
+            Directory.CreateDirectory(path);
+            file.CopyTo(UniquePath($@"{path}\{DB_FILE_PREFIX}-{Chat}.json", ".json"));
         }
     }
 }

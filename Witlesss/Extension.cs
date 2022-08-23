@@ -13,10 +13,10 @@ namespace Witlesss
     {
         public static readonly Random Random = new Random();
         
-        public static string TextInRandomLetterCase(string text)
+        public static string TextInRandomLetterCase(string text) => TextInLetterCase(text, RandomLetterCase());
+        public static string TextInLetterCase(string text, LetterCaseMode mode)
         {
-            var c = RandomLetterCase();
-            switch (c)
+            switch (mode)
             {
                 case Lower:
                     return text.ToLower();

@@ -9,9 +9,17 @@ namespace Witlesss.Commands
             if (Text.Contains(' '))
             {
                 string word = Text.Split()[^1];
+                LetterCaseMode mode;
+                if      (word == word.ToLower())
+                    mode = LetterCaseMode.Lower;
+                else if (word == word.ToUpper())
+                    mode = LetterCaseMode.Upper;
+                else
+                    mode = LetterCaseMode.Sentence;
+
                 Text = Text.Substring(Text.IndexOf(' ') + 1);
                 Text = Text.Remove(Text.Length - word.Length) + Baka.TryToGenerateFromWord(word.ToLower());
-                Bot.SendMessage(Chat, Extension.TextInRandomLetterCase(Text));
+                Bot.SendMessage(Chat, Extension.TextInLetterCase(Text, mode));
                 Logger.Log($"{Title} >> FUNNY BY WORD");
             }
             else

@@ -369,5 +369,14 @@ namespace Witlesss.Also {
                 return ResourceManager.GetString("WATERMARKS_FOLDER", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре).
+        /// </summary>
+        internal static string ZZ_MANUAL {
+            get {
+                return ResourceManager.GetString("ZZ_MANUAL", resourceCulture);
+            }
+        }
     }
 }

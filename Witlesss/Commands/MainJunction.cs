@@ -17,6 +17,7 @@ namespace Witlesss.Commands
         private readonly ChatInfo _chat;
         private readonly DebugMessage _debug;
         private readonly GenerateByFirstWord _generate;
+        private readonly GenerateByLastWord _generateB;
         private readonly Buhurt _buhurt;
         private readonly SetFrequency _frequency;
         private readonly SetProbability _probability;
@@ -34,6 +35,7 @@ namespace Witlesss.Commands
             _chat = new ChatInfo();
             _debug = new DebugMessage();
             _generate = new GenerateByFirstWord();
+            _generateB = new GenerateByLastWord();
             _buhurt = new Buhurt();
             _frequency = new SetFrequency();
             _probability = new SetProbability();
@@ -60,6 +62,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand().StartsWith("/a"))
                         {
                             _command = _generate;
+                        }
+                        else if (TextAsCommand().StartsWith("/zz"))
+                        {
+                            _command = _generateB;
                         }
                         else if (TextAsCommand().StartsWith("/fast"))
                         {

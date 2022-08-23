@@ -136,4 +136,7 @@ set@piece_fap_bot 3
 
 set_p@piece_fap_bot 75</value>
     </data>
+    <data name="ZZ_MANUAL" xml:space="preserve">
+        <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>
+    </data>
 </root>

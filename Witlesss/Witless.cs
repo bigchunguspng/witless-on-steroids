@@ -118,30 +118,58 @@ namespace Witlesss
                 return "";
             }
         }
-        public string TryToGenerateFromWord(string word = Start)
+        public string TryToGenerateBackwards(string word)
+        {
+            try
+            {
+                return GenerateBackwards(word);
+            }
+            catch (Exception e)
+            {
+                LogError(e.Message);
+                return "";
+            }
+        }
+
+        public string GenerateByWord(string word)
+        {
+            word = FindMatch(word, Start);
+            return TryToGenerate(word);
+        }
+        public string GenerateByWordBackwards(string word)
+        {
+            word = FindMatch(word, End);
+            return TryToGenerateBackwards(word);
+        }
+        
+        private string FindMatch(string word, string alt)
         {
             if (!Words.ContainsKey(word))
             {
                 var words = new List<string>();
                 foreach (string key in Words.Keys)
-                    if (key.StartsWith(word))
-                        words.Add(key);
+                {
+                    if (key.StartsWith(word)) words.Add(key);
+                }
                 if (words.Count > 0)
-                    return TryToGenerate(words[_random.Next(words.Count)]);
+                    return words[_random.Next(words.Count)];
 
                 foreach (string key in Words.Keys)
-                    if (word.StartsWith(key, StringComparison.Ordinal))
-                        words.Add(key);
+                {
+                    if (word.StartsWith(key, StringComparison.Ordinal)) words.Add(key);
+                }
                 if (words.Count > 0)
                 {
                     words.Sort(Comparison);
-                    word = words[0];
+                    return words[0];
                 }
+                return alt;
             }
-            return TryToGenerate(string.IsNullOrEmpty(word) ? Start : word);
+            return word;
 
             int Comparison(string x, string y) => y.Length - x.Length;
         }
+        
         private string Generate(string word)
         {
             string result = "";
@@ -157,18 +185,39 @@ namespace Witlesss
             
             return TextInRandomLetterCase(result);
         }
-        private string PickWord(ConcurrentDictionary<string, int> dictionary)
+        private string GenerateBackwards(string word)
         {
-            int totalProbability = 0;
-            foreach (KeyValuePair<string, int> chance in dictionary)
+            string result = "";
+            string currentWord = word == End || Words.ContainsKey(word) ? word : End;
+            
+            while (currentWord != Start)
             {
-                totalProbability += chance.Value;
+                result = currentWord + " " + result;
+                
+                var words = new ConcurrentDictionary<string, int>();
+                foreach (var bunch in Words)
+                {
+                    if (bunch.Value.ContainsKey(currentWord) && !words.TryAdd(bunch.Key, 1)) words[bunch.Key]++;
+                }
+                currentWord = PickWord(words);
             }
             
-            int r = _random.Next(totalProbability);
+            result = result.Replace(End, "").TrimEnd();
+            
+            return TextInRandomLetterCase(result);
+        }
+        private string PickWord(ConcurrentDictionary<string, int> dictionary)
+        {
+            var chanceTotal = 0;
+            foreach (var chance in dictionary)
+            {
+                chanceTotal += chance.Value;
+            }
+            
+            int r = _random.Next(chanceTotal);
             string result = End;
 
-            foreach (KeyValuePair<string,int> chance in dictionary)
+            foreach (var chance in dictionary)
             {
                 if (chance.Value > r)
                 {

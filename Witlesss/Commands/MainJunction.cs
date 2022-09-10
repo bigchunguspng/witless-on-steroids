@@ -45,10 +45,6 @@ namespace Witlesss.Commands
                         {
                             _command = _generate;
                         }
-                        else if (TextAsCommand().StartsWith("/zz"))
-                        {
-                            _command = _generateB;
-                        }
                         else if (TextAsCommand().StartsWith("/fast"))
                         {
                             _command = _speed;
@@ -59,10 +55,6 @@ namespace Witlesss.Commands
                             _command = _speed;
                             _speed.Mode = SpeedMode.Slow;
                         }
-                        else if (TextAsCommand().StartsWith("/damn"))
-                        {
-                            _command = _bitrate;
-                        }
                         else if (TextAsCommand().StartsWith("/cut"))
                         {
                             _command = _cut;
@@ -71,10 +63,18 @@ namespace Witlesss.Commands
                         {
                             _command = _reverse;
                         }
+                        else if (TextAsCommand().StartsWith("/damn"))
+                        {
+                            _command = _bitrate;
+                        }
                         else if (TextAsCommand().StartsWith("/dv"))
                         {
                             _command = _demotivate;
                             _demotivate.SetMode(DgMode.Wide);
+                        }
+                        else if (TextAsCommand().StartsWith("/zz"))
+                        {
+                            _command = _generateB;
                         }
                         else if (TextAsCommand().StartsWith("/b"))
                         {

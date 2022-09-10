@@ -86,6 +86,5 @@ namespace Witlesss.Commands
                     break;
             }
         }
-        
     }
 }

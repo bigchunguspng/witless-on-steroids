@@ -8,44 +8,23 @@ namespace Witlesss.Commands
     public class MainJunction : Command
     {
         private Command _command;
-        private readonly Demotivate _demotivate;
-        private readonly RemoveBitrate _bitrate;
-        private readonly ChangeSpeed _speed;
-        private readonly Reverse _reverse;
-        private readonly Cut _cut;
-        private readonly Fuse _fuse;
-        private readonly Move _move;
-        private readonly GetChatID _chatID;
-        private readonly ChatInfo _chat;
-        private readonly DebugMessage _debug;
-        private readonly GenerateByFirstWord _generate;
-        private readonly GenerateByLastWord _generateB;
-        private readonly Buhurt _buhurt;
-        private readonly SetFrequency _frequency;
-        private readonly SetProbability _probability;
-        private readonly ToggleStickers _stickers;
-        private readonly DeleteDictionary _delete;
-
-        public MainJunction()
-        {
-            _demotivate = new Demotivate();
-            _bitrate = new RemoveBitrate();
-            _speed = new ChangeSpeed();
-            _reverse = new Reverse();
-            _cut = new Cut();
-            _fuse = new Fuse();
-            _move = new Move();
-            _chatID = new GetChatID();
-            _chat = new ChatInfo();
-            _debug = new DebugMessage();
-            _generate = new GenerateByFirstWord();
-            _generateB = new GenerateByLastWord();
-            _buhurt = new Buhurt();
-            _frequency = new SetFrequency();
-            _probability = new SetProbability();
-            _stickers = new ToggleStickers();
-            _delete = new DeleteDictionary();
-        }
+        private readonly Demotivate _demotivate = new Demotivate();
+        private readonly RemoveBitrate _bitrate = new RemoveBitrate();
+        private readonly ChangeSpeed _speed = new ChangeSpeed();
+        private readonly Reverse _reverse = new Reverse();
+        private readonly Cut _cut = new Cut();
+        private readonly Fuse _fuse = new Fuse();
+        private readonly Move _move = new Move();
+        private readonly GetChatID _chatID = new GetChatID();
+        private readonly ChatInfo _chat = new ChatInfo();
+        private readonly DebugMessage _debug = new DebugMessage();
+        private readonly GenerateByFirstWord _generate = new GenerateByFirstWord();
+        private readonly GenerateByLastWord _generateB = new GenerateByLastWord();
+        private readonly Buhurt _buhurt = new Buhurt();
+        private readonly SetFrequency _frequency = new SetFrequency();
+        private readonly SetProbability _probability = new SetProbability();
+        private readonly ToggleStickers _stickers = new ToggleStickers();
+        private readonly DeleteDictionary _delete = new DeleteDictionary();
 
         private string TextAsCommand() => Text.ToLower().Replace(Strings.BOT_USERNAME, "");
         public override void Run()

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.LetterCaseMode;
@@ -43,6 +45,8 @@ namespace Witlesss
         public static string SenderName(Message message) => message.SenderChat?.Title ?? message.From?.FirstName;
         
         private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
+
+        public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
 
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {

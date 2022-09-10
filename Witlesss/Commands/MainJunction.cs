@@ -11,6 +11,7 @@ namespace Witlesss.Commands
         private readonly Demotivate _demotivate;
         private readonly RemoveBitrate _bitrate;
         private readonly ChangeSpeed _speed;
+        private readonly Reverse _reverse;
         private readonly Fuse _fuse;
         private readonly Move _move;
         private readonly GetChatID _chatID;
@@ -29,6 +30,7 @@ namespace Witlesss.Commands
             _demotivate = new Demotivate();
             _bitrate = new RemoveBitrate();
             _speed = new ChangeSpeed();
+            _reverse = new Reverse();
             _fuse = new Fuse();
             _move = new Move();
             _chatID = new GetChatID();
@@ -80,6 +82,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand().StartsWith("/damn"))
                         {
                             _command = _bitrate;
+                        }
+                        else if (TextAsCommand().StartsWith("/reverse"))
+                        {
+                            _command = _reverse;
                         }
                         else if (TextAsCommand().StartsWith("/dv"))
                         {

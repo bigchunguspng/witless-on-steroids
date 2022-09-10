@@ -175,6 +175,16 @@ namespace Witlesss
             _service.ExecuteAsync(task).Wait();
             return output;
         }
+        
+        public string Reverse(string path)
+        {
+            string extension = GetFileExtension(path);
+            WebmToMp4(ref extension, ref path);
+            
+            var task = new FfTaskReverse(path, out string outputPath);
+            _service.ExecuteAsync(task).Wait();
+            return outputPath;
+        }
 
         public string RemoveBitrate(string path, int bitrate, out int value)
         {

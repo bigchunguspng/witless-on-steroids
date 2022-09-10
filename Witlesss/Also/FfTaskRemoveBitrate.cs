@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using static Witlesss.Extension;
 
 namespace Witlesss.Also
@@ -48,7 +47,5 @@ namespace Witlesss.Also
             }
             return RemoveEmpties(result);
         }
-
-        private IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
     }
 }

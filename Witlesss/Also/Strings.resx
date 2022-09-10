@@ -27,7 +27,7 @@
     <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-set@piece_fap_bot 3
+/set@piece_fap_bot 3
 
 (чем меньше значение - тем чаще я буду писать)</value>
     </data>
@@ -134,9 +134,24 @@ set@piece_fap_bot 3
     <data name="SET_PROBABILITY_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-set_p@piece_fap_bot 75</value>
+/set_p@piece_fap_bot 75</value>
     </data>
     <data name="ZZ_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>
+    </data>
+    <data name="CUT_MANUAL" xml:space="preserve">
+        <value>Укажите &lt;b&gt;таймкод начала&lt;/b&gt; фрагмента и его &lt;b&gt;длину&lt;/b&gt;, например:
+
+&lt;b&gt;/cut@piece_fap_bot 0:10 0:15&lt;/b&gt;
+
+вырежет 15-секундный фрагмент, начиная с 10-й секунды видео / аудио
+
+&lt;b&gt;/cut@piece_fap_bot 0:10&lt;/b&gt;
+
+выдаст первые 10 секунд
+
+&lt;b&gt;/cut@piece_fap_bot 0:10 хд&lt;/b&gt;
+
+оставит всё после 10-й секунды</value>
     </data>
 </root>

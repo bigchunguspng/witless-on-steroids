@@ -77,6 +77,24 @@ namespace Witlesss
             var words = text.Split();
             return words.Length > 1 && double.TryParse(words[1].Replace('.', ','), out value);
         }
+
+        public static bool StringIsTimeSpan(string arg, out TimeSpan span)
+        {
+            span = TimeSpan.Zero;
+            arg = arg.TrimStart('-').Replace('.', ',').Replace('ю', ',').Replace('б', ',');
+            if (double.TryParse(arg, out double seconds))
+            {
+                span = TimeSpan.FromSeconds(seconds);
+                return true;
+            }
+            arg = arg.Replace('^', ':').Replace(';', ':').Replace('Ж', ':');
+            if (arg.Contains(':'))
+            {
+                if (TimeSpan.TryParseExact(arg, "m\\:ss", null, out span)) return true;
+            }
+
+            return false;
+        }
         
         public static string UniquePath(string path, string extension = "")
         {

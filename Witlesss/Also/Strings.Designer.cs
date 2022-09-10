@@ -97,6 +97,27 @@ namespace Witlesss.Also {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Укажите &lt;b&gt;таймкод начала&lt;/b&gt; фрагмента и его &lt;b&gt;длину&lt;/b&gt;, например:
+        ///
+        ///&lt;b&gt;/cut@piece_fap_bot 0:10 0:15&lt;/b&gt;
+        ///
+        ///вырежет 15-секундный фрагмент, начиная с 10-й секунды видео / аудио
+        ///
+        ///&lt;b&gt;/cut@piece_fap_bot 0:10&lt;/b&gt;
+        ///
+        ///выдаст первые 10 секунд
+        ///
+        ///&lt;b&gt;/cut@piece_fap_bot 0:10 хд&lt;/b&gt;
+        ///
+        ///оставит всё после 10-й секунды.
+        /// </summary>
+        internal static string CUT_MANUAL {
+            get {
+                return ResourceManager.GetString("CUT_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Напиши это вместе с видосом или музлом.
         /// </summary>
         internal static string DAMN_MANUAL {
@@ -313,7 +334,7 @@ namespace Witlesss.Also {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        ///set@piece_fap_bot 3
+        ////set@piece_fap_bot 3
         ///
         ///(чем меньше значение - тем чаще я буду писать).
         /// </summary>
@@ -344,7 +365,7 @@ namespace Witlesss.Also {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        ///set_p@piece_fap_bot 75.
+        ////set_p@piece_fap_bot 75.
         /// </summary>
         internal static string SET_PROBABILITY_MANUAL {
             get {

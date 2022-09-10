@@ -29,33 +29,6 @@ namespace Witlesss.Commands
             string VideoFilename() => $"piece_fap_club-{value}.mp4";
         }
 
-        protected void Download(string fileID, out string path, out MediaType type)
-        {
-            string shortID = ShortID(fileID);
-            string extension = ExtensionFromID(shortID);
-            type = MediaTypeFromID(shortID);
-            path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
-            path = UniquePath(path, extension);
-            Bot.DownloadFile(fileID, path, Chat).Wait();
-        }
-
-        protected void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
-        {
-            using var stream = File.OpenRead(result);
-            switch (type)
-            {
-                case MediaType.Audio:
-                    Bot.SendAudio(Chat, new InputOnlineFile(stream, audio()));
-                    break;
-                case MediaType.Video:
-                    Bot.SendAnimation(Chat, new InputOnlineFile(stream, video()));
-                    break;
-                case MediaType.AudioVideo:
-                    Bot.SendVideo(Chat, new InputOnlineFile(stream, video()));
-                    break;
-            }
-        }
-        
         protected string GetVideoOrAudioID()
         {
             var fileID = "";
@@ -86,5 +59,33 @@ namespace Witlesss.Commands
             }
             return fileID;
         }
+
+        protected void Download(string fileID, out string path, out MediaType type)
+        {
+            string shortID = ShortID(fileID);
+            string extension = ExtensionFromID(shortID);
+            type = MediaTypeFromID(shortID);
+            path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
+            path = UniquePath(path, extension);
+            Bot.DownloadFile(fileID, path, Chat).Wait();
+        }
+
+        protected void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
+        {
+            using var stream = File.OpenRead(result);
+            switch (type)
+            {
+                case MediaType.Audio:
+                    Bot.SendAudio(Chat, new InputOnlineFile(stream, audio()));
+                    break;
+                case MediaType.Video:
+                    Bot.SendAnimation(Chat, new InputOnlineFile(stream, video()));
+                    break;
+                case MediaType.AudioVideo:
+                    Bot.SendVideo(Chat, new InputOnlineFile(stream, video()));
+                    break;
+            }
+        }
+        
     }
 }

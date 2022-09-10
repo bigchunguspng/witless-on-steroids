@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static System.Environment;
@@ -33,7 +32,7 @@ namespace Witlesss
             _fileIO = new FileIO<WitlessDB>(Path);
             DgProbability = probability;
             Load();
-            WaitOnStartup();
+            PauseGeneration(30);
         }
 
         [JsonProperty] public long Chat { get; set; }
@@ -232,16 +231,12 @@ namespace Witlesss
             return result;
         }
         
-        private async void WaitOnStartup()
+        private async void PauseGeneration(int seconds)
         {
-            await Task.Run(() =>
-            {
-                _generation.Stop();
-                Thread.Sleep(28000);
-                
-                Save();
-                _generation.Resume();
-            });
+            _generation.Stop();
+            await Task.Delay(1000 * seconds);
+            Save();
+            _generation.Resume();
         }
         
         public void Count() => _generation.Count();

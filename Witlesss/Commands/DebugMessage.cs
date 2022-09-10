@@ -1,7 +1,6 @@
 ﻿using System;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Also;
 using File = System.IO.File;
 
 namespace Witlesss.Commands

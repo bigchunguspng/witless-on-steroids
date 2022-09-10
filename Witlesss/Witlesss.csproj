@@ -13,14 +13,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Also\Strings.resx">
+      <EmbeddedResource Update="Strings.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Also\Strings.Designer.cs">
+      <Compile Update="Strings.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Strings.resx</DependentUpon>

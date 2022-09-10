@@ -2,12 +2,12 @@
 using System.Drawing;
 using static Witlesss.Extension;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp3" -f mp3          -b:a 1k        output.mp4
     // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k        output.mp4
     // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k -s WxH output.mp4
-    public class FfTaskRemoveBitrate : FfTask
+    public class F_RemoveBitrate : F_Base
     {
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
@@ -15,7 +15,7 @@ namespace Witlesss.Also
         private readonly bool _video, _otherSize;
         private readonly Size _size;
 
-        public FfTaskRemoveBitrate(string inputFilePath, out string outputFilePath, int bitrate, Size size = default)
+        public F_RemoveBitrate(string inputFilePath, out string outputFilePath, int bitrate, Size size = default)
         {
             _inputFilePath = inputFilePath;
             string extension = GetFileExtension(inputFilePath);

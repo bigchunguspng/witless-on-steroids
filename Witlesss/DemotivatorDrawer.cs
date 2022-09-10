@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using static System.Environment;
 using static Witlesss.Extension;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 
 namespace Witlesss
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 

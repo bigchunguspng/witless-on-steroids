@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -nostdin -y -loglevel info -ss 0.066 -i "input.mp4" -vframes 1 "F-0002.jpg"
-    public class FfTaskSaveFrame : FfTask
+    public class F_SaveFrame : F_Base
     {
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
         private readonly TimeSpan _seekSpan;
 
-        public FfTaskSaveFrame(string inputFilePath, string outputFilePath, TimeSpan seekSpan)
+        public F_SaveFrame(string inputFilePath, string outputFilePath, TimeSpan seekSpan)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;

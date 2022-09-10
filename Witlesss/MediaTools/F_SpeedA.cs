@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp3" -filter:a "atempo=2.0" -vn output.mp3
-    public class FfTaskSpeedA : FfTaskSpeedAV
+    public class F_SpeedA : F_SpeedAV
     {
-        public FfTaskSpeedA(string inputFilePath, string outputFilePath, double speed) : base(inputFilePath, outputFilePath, speed) { }
+        public F_SpeedA(string inputFilePath, string outputFilePath, double speed) : base(inputFilePath, outputFilePath, speed) { }
         
         public override IList<string> CreateArguments() => new[]
         {

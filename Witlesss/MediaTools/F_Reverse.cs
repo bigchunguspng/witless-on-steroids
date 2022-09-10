@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using static Witlesss.Extension;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp4" -vf reverse -af areverse output.mp4
     // ffmpeg -i "input.mp3"             -af areverse output.mp3
-    public class FfTaskReverse : FfTask
+    public class F_Reverse : F_Base
     {
         private readonly string _input;
         private readonly string _output;
         private readonly bool _video;
         
-        public FfTaskReverse(string inputFilePath, out string outputFilePath)
+        public F_Reverse(string inputFilePath, out string outputFilePath)
         {
             _input = inputFilePath;
             string extension = GetFileExtension(inputFilePath);

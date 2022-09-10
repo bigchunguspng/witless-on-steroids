@@ -2,9 +2,9 @@
 using MediaToolkit.Core;
 using MediaToolkit.Tasks;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
-    public abstract class FfTask : FfMpegTaskBase<int>
+    public abstract class F_Base : FfMpegTaskBase<int>
     {
         public override async Task<int> ExecuteCommandAsync(IFfProcess ffProcess)
         {

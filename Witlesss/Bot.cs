@@ -12,7 +12,7 @@ using Witlesss.Commands;
 using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using File = System.IO.File;
 using ChatList = System.Collections.Concurrent.ConcurrentDictionary<long, Witlesss.Witless>;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;

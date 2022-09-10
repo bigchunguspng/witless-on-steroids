@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
-using Witlesss.Also;
+using Witlesss.MediaTools;
 using static Witlesss.Logger;
 using static System.Environment;
 using static Witlesss.Extension;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 
 namespace Witlesss
 {
@@ -60,7 +60,7 @@ namespace Witlesss
 
         public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
         {
-            var task = new FfTaskWebpToJpg(path, out string outputPath, extension);
+            var task = new F_WebpToJpg(path, out string outputPath, extension);
             _service.ExecuteAsync(task).Wait();
             
             return MakeDemotivator(outputPath, textA, textB);
@@ -75,7 +75,7 @@ namespace Witlesss
 
         public string MakeVideoStickerDemotivator(string path, string textA, string textB)
         {
-            var task = new FfTaskWebmToMp4(path, out path, ".mp4", GetValidSize(path));
+            var task = new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path));
             _service.ExecuteAsync(task).Wait();
 
             return MakeVideoDemotivator(path, textA, textB);
@@ -108,7 +108,7 @@ namespace Witlesss
             for (var frame = 0; frame < outFrames; frame++)
             {
                 var output = @$"{_animationPath}\F-{frame:0000}.jpg";
-                var task = new FfTaskSaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame));
+                var task = new F_SaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame));
                 _service.ExecuteAsync(task).Wait();
             }
 
@@ -124,7 +124,7 @@ namespace Witlesss
                 var outputPath = $@"{_animationPath}\{_animationName}";
                 
                 var size = new Size(360, 360);
-                var task = new FfTaskRenderAnimation(outFrameRate, size, framesPath, outputPath);
+                var task = new F_RenderAnimation(outFrameRate, size, framesPath, outputPath);
                 _service.ExecuteAsync(task).Wait();
             }
             catch (Exception e)
@@ -163,13 +163,13 @@ namespace Witlesss
             switch (type)
             {
                 case MediaType.Audio:
-                    task = new FfTaskSpeedA(path, output, speed);
+                    task = new F_SpeedA(path, output, speed);
                     break;
                 case MediaType.Video:
-                    task = new FfTaskSpeedV(path, output, speed);
+                    task = new F_SpeedV(path, output, speed);
                     break;
                 case MediaType.AudioVideo:
-                    task = new FfTaskSpeedAV(path, output, speed);
+                    task = new F_SpeedAV(path, output, speed);
                     break;
             }
             _service.ExecuteAsync(task).Wait();
@@ -181,7 +181,7 @@ namespace Witlesss
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
             
-            var task = new FfTaskReverse(path, out string outputPath);
+            var task = new F_Reverse(path, out string outputPath);
             _service.ExecuteAsync(task).Wait();
             return outputPath;
         }
@@ -191,7 +191,7 @@ namespace Witlesss
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
             
-            var task = new FfTaskCut(path, out string outputPath, start, length);
+            var task = new F_Cut(path, out string outputPath, start, length);
             _service.ExecuteAsync(task).Wait();
             return outputPath;
         }
@@ -200,7 +200,7 @@ namespace Witlesss
         {
             bool noArgs = bitrate == 0;
             string outputPath;
-            FfTaskRemoveBitrate task;
+            F_RemoveBitrate task;
             
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
@@ -216,10 +216,10 @@ namespace Witlesss
                 bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
                 Log($"DAMN >> -b:v {bitrate}k", ConsoleColor.Blue);
                 
-                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate, size);
+                task = new F_RemoveBitrate(path, out outputPath, bitrate, size);
             }
             else
-                task = new FfTaskRemoveBitrate(path, out outputPath, bitrate);
+                task = new F_RemoveBitrate(path, out outputPath, bitrate);
 
             _service.ExecuteAsync(task).Wait();
             value = bitrate;
@@ -261,7 +261,7 @@ namespace Witlesss
         {
             if (extension == ".webm")
             {
-                _service.ExecuteAsync(new FfTaskWebmToMp4(path, out path, ".mp4", GetValidSize(path))).Wait();
+                _service.ExecuteAsync(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path))).Wait();
                 extension = ".mp4";
             }
         }

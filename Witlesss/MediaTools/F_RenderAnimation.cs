@@ -2,17 +2,17 @@
 using System.Drawing;
 using System.Globalization;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -framerate 30 -i "F-%04d-D.jpg" -s WxH output.mp4
-    public class FfTaskRenderAnimation : FfTask
+    public class F_RenderAnimation : F_Base
     {
         private readonly double _framerate;
         private readonly Size _size;
         private readonly string _inputFilesPath;
         private readonly string _outputFilePath;
 
-        public FfTaskRenderAnimation(double framerate, Size size, string inputFilesPath, string outputFilePath)
+        public F_RenderAnimation(double framerate, Size size, string inputFilesPath, string outputFilePath)
         {
             _inputFilesPath = inputFilesPath;
             _outputFilePath = outputFilePath;

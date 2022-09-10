@@ -2,7 +2,7 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 using File = System.IO.File;

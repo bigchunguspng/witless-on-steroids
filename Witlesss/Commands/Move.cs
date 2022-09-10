@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using static System.Environment;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using static Witlesss.Logger;
 
 namespace Witlesss.Commands

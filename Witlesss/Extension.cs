@@ -5,7 +5,7 @@ using System.Linq;
 using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.LetterCaseMode;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using static Witlesss.Logger;
 using File = System.IO.File;
 

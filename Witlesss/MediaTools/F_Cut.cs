@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using static Witlesss.Extension;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp4" -ss 00:00:05 -t 00:00:15 output.mp4
     // ffmpeg -i "input.mp4" -ss 00:00:05             output.mp4
-    public class FfTaskCut : FfTask
+    public class F_Cut : F_Base
     {
         private readonly string _input;
         private readonly string _output;
         private readonly TimeSpan _start;
         private readonly TimeSpan _length;
         
-        public FfTaskCut(string inputFilePath, out string outputFilePath, TimeSpan start, TimeSpan length)
+        public F_Cut(string inputFilePath, out string outputFilePath, TimeSpan start, TimeSpan length)
         {
             _input = inputFilePath;
             string extension = GetFileExtension(inputFilePath);

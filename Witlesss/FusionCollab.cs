@@ -1,6 +1,6 @@
 ﻿using System;
 using static Witlesss.Logger;
-using static Witlesss.Also.Strings;
+using static Witlesss.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
 
 namespace Witlesss

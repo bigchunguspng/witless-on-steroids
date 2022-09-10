@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace Witlesss.Also
+namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.webp" "output.jpg"
-    public class FfTaskWebpToJpg : FfTask
+    public class F_WebpToJpg : F_Base
     {
         protected readonly string InputFilePath;
         protected readonly string OutputFilePath;
 
-        public FfTaskWebpToJpg(string inputFilePath, out string outputFilePath, string extension)
+        public F_WebpToJpg(string inputFilePath, out string outputFilePath, string extension)
         {
             InputFilePath = inputFilePath;
             OutputFilePath = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + extension;

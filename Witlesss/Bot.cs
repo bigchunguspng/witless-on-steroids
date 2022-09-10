@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
 using static System.Environment;
@@ -44,37 +43,6 @@ namespace Witlesss
 
             StartSaveLoop(2);
             ProcessConsoleInput();
-        }
-        
-        public string GetVideoOrAudioID(Message message, long chat)
-        {
-            var fileID = "";
-            var mess = message.ReplyToMessage ?? message;
-            for (int cycle = message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
-            {
-                if      (mess.Audio != null)
-                    fileID = mess.Audio.FileId;
-                else if (mess.Video != null)
-                    fileID = mess.Video.FileId;
-                else if (mess.Animation != null)
-                    fileID = mess.Animation.FileId;
-                else if (mess.Sticker != null && mess.Sticker.IsVideo)
-                    fileID = mess.Sticker.FileId;
-                else if (mess.Voice != null)
-                    fileID = mess.Voice.FileId;
-                else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
-                    fileID = mess.Document.FileId;
-                
-                if (fileID.Length > 0)
-                    break;
-                else if (cycle == 1)
-                {
-                    SendMessage(chat, DAMN_MANUAL);
-                    return null;
-                }
-                else mess = message;
-            }
-            return fileID;
         }
 
         private void ProcessConsoleInput()

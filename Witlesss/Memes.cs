@@ -180,6 +180,8 @@ namespace Witlesss
         {
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
+            
+            if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
 
             F_Base task;
             
@@ -259,7 +261,7 @@ namespace Witlesss
             return new Size(width, height);
         }
         private Size GetValidSize(string path) => GetValidSize(path, out _);
-        public double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);
+        private double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);
         private MediaStream GetMediaStream(string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
         

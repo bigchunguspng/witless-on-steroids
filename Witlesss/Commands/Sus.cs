@@ -27,7 +27,7 @@ namespace Witlesss.Commands
 
             Download(fileID, out string path, out var type);
 
-            if (argless) x.length = TimeSpan.FromSeconds(Bot.MemeService.GetDurationInSeconds(path) / 2D);
+            if (argless) x.length = TimeSpan.MinValue;
 
             string result = Bot.MemeService.Sus(path, x.start, x.length, type);
             SendResult(result, type, VideoFilename, AudioFilename);

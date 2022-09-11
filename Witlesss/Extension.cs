@@ -14,7 +14,13 @@ namespace Witlesss
     public static class Extension
     {
         public static readonly Random Random = new Random();
-        
+
+        public static int AssumedResponseTime(int initialTime, string text)
+        {
+            if (text == null) return initialTime;
+            return Math.Min(text.Length, 120) * 25;
+        }
+
         public static string TextInRandomLetterCase(string text) => TextInLetterCase(text, RandomLetterCase());
         public static string TextInLetterCase(string text, LetterCaseMode mode)
         {
@@ -30,6 +36,7 @@ namespace Witlesss
                     return text;
             }
         }
+
         private static LetterCaseMode RandomLetterCase()
         {
             int n = Random.Next(8);
@@ -41,12 +48,18 @@ namespace Witlesss
                 return Upper;
         }
 
-        public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : message.From?.FirstName, 32);
-        public static string SenderName(Message message) => message.SenderChat?.Title ?? message.From?.FirstName;
-        
-        private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
+        public static string SenderName(Message message) => message.SenderChat?.Title ?? UserFullName(message);
+        public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : UserFullName(message), 32);
 
-        public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
+        public static string ReverseText(string s) => new string(s.Reverse().ToArray());
+
+        private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
+        private static string UserFullName(Message message)
+        {
+            string name = message.From?.FirstName;
+            string last = message.From?.LastName ?? "";
+            return last == "" ? name : name + " " + last;
+        }
 
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {
@@ -95,7 +108,7 @@ namespace Witlesss
 
             return false;
         }
-        
+
         public static string UniquePath(string path, string extension = "")
         {
             while (File.Exists(path) || Directory.Exists(path))
@@ -119,7 +132,13 @@ namespace Witlesss
             }
             return path;
         }
-        
+        public static string ValidFileName(string text)
+        {
+            var chars = Path.GetInvalidFileNameChars();
+            foreach (char c in chars) text = text.Replace(c, '_');
+            return text;
+        }
+
         public static string GetFileExtension(string path) => path.Substring(path.LastIndexOf('.'));
         public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
 
@@ -153,12 +172,7 @@ namespace Witlesss
             };
         }
 
-        public static string ValidFileName(string text)
-        {
-            var chars = Path.GetInvalidFileNameChars();
-            foreach (char c in chars) text = text.Replace(c, '_');
-            return text;
-        }
+        public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
 
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {
@@ -182,8 +196,6 @@ namespace Witlesss
             return a[Random.Next(a.Length)];
         }
 
-        public static bool FileEmptyOrNotExist(string name) => !File.Exists(name) || new FileInfo(name).Length == 0;
-
         public static string FileSize(string path)
         {
             long bytes = new FileInfo(path).Length;
@@ -194,11 +206,7 @@ namespace Witlesss
                 return kbs + " КБ";
         }
 
-        public static int AssumedResponseTime(int initialTime, string text)
-        {
-            if (text == null) return initialTime;
-            return Math.Min(text.Length, 120) * 25;
-        }
+        public static bool FileEmptyOrNotExist(string name) => !File.Exists(name) || new FileInfo(name).Length == 0;
 
         public static void CreatePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
 

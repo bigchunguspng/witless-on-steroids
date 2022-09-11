@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
@@ -41,7 +40,7 @@ namespace Witlesss.Commands
                 string s = ValidFileName(SenderName(Message));
                 if (s.Length < 3) return s;
                 int l = (s.Length + 1) / 2;
-                return s.Remove(l) + new string(s.Remove(l - 1).Reverse().ToArray());
+                return s.Remove(l) + ReverseText(s.Remove(l - 1));
             }
         }
     }

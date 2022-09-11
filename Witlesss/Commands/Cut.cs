@@ -12,25 +12,8 @@ namespace Witlesss.Commands
             string fileID = GetVideoOrAudioID();
             if (fileID == null) return;
 
-            var failed = true;
-            var start  = TimeSpan.Zero;
-            var length = TimeSpan.Zero;
-
-            var s = Text.Split();
-            if (s.Length == 2 && StringIsTimeSpan(s[1], out length))
-            {
-                failed = false;
-            }
-            else if (s.Length > 2 && StringIsTimeSpan(s[1], out start))
-            {
-                if (!StringIsTimeSpan(s[2], out length))
-                {
-                    length = TimeSpan.Zero;
-                }
-                failed = false;
-            }
-            
-            if (failed)
+            var x = GetArgs();
+            if (x.failed)
             {
                 Bot.SendMessage(Chat, CUT_MANUAL);
                 return;
@@ -38,12 +21,28 @@ namespace Witlesss.Commands
             
             Download(fileID, out string path, out var type);
             
-            string result = Bot.MemeService.Cut(path, start, length);
+            string result = Bot.MemeService.Cut(path, x.start, x.length);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> CUT [8K]");
 
             string AudioFilename() => $"((({ValidFileName(SenderName(Message))}))).mp3";
             string VideoFilename() => "cut_fap_club.mp4";
+        }
+
+        protected (bool failed, TimeSpan start, TimeSpan length) GetArgs()
+        {
+            var s = Text.Split();
+            if (s.Length == 2 && StringIsTimeSpan(s[1], out var length))
+                return (false, TimeSpan.Zero, length);    // [++++]-----]
+            else if (s.Length > 2 && StringIsTimeSpan(s[1], out var start))
+            {
+                if (StringIsTimeSpan(s[2], out length))
+                    return (false, start, length);        // [--[++++]--]
+                else
+                    return (false, start, TimeSpan.Zero); // [--[+++++++]
+            }
+            
+            return (true, TimeSpan.Zero, TimeSpan.Zero);  // [----------]
         }
     }
 }

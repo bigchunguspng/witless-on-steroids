@@ -11,6 +11,7 @@ namespace Witlesss.Commands
         private readonly RemoveBitrate _bitrate = new RemoveBitrate();
         private readonly ChangeSpeed _speed = new ChangeSpeed();
         private readonly Reverse _reverse = new Reverse();
+        private readonly Sus _sus = new Sus();
         private readonly Cut _cut = new Cut();
         private readonly Fuse _fuse = new Fuse();
         private readonly Move _move = new Move();
@@ -58,6 +59,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand().StartsWith("/cut"))
                         {
                             _command = _cut;
+                        }
+                        else if (TextAsCommand().StartsWith("/sus"))
+                        {
+                            _command = _sus;
                         }
                         else if (TextAsCommand().StartsWith("/reverse"))
                         {

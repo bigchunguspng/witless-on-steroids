@@ -69,7 +69,7 @@ namespace Witlesss
         public string MakeVideoDemotivator(string path, string textA, string textB)
         {
             Drawer().SetRandomLogo();
-            AnimateDemotivator(path, textA, textB).Wait();
+            AnimateDemotivator(path, textA, textB);
             return $@"{_animationPath}\{_animationName}";
         }
 
@@ -81,7 +81,7 @@ namespace Witlesss
             return MakeVideoDemotivator(path, textA, textB);
         }
         
-        private async Task AnimateDemotivator(string path, string textA, string textB)
+        private void AnimateDemotivator(string path, string textA, string textB)
         {
             string inputFilePath = path;
             string inputFileName = path.Split('\\', '.')[^2];
@@ -89,10 +89,10 @@ namespace Witlesss
             
             Directory.CreateDirectory(_animationPath);
 
-            var metadata = await _service.ExecuteAsync(new FfTaskGetMetadata(inputFilePath));
+            var stream = GetMediaStream(path);
             
-            string inFrameRate = metadata.Metadata.Streams.First().AvgFrameRate;
-            string inFrames = metadata.Metadata.Streams.First().NbFrames;
+            string inFrameRate = stream.AvgFrameRate;
+            string inFrames = stream.NbFrames;
             Log($"IN >>> FPS: {inFrameRate} Length: {inFrames}", ConsoleColor.Blue);
 
             double outFrameRate = RetrieveFPS(inFrameRate);
@@ -176,6 +176,28 @@ namespace Witlesss
             return output;
         }
         
+        public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
+        {
+            string extension = GetFileExtension(path);
+            WebmToMp4(ref extension, ref path);
+
+            F_Base task;
+            
+            if (start != TimeSpan.Zero || length != TimeSpan.Zero)
+            {
+                task = new F_Cut(path, out path, start, length);
+                _service.ExecuteAsync(task).Wait();
+            }
+            
+            task = new F_Reverse(path, out string reversed);
+            _service.ExecuteAsync(task).Wait();
+            
+            task = new F_Concat(path, reversed, out string output, type);
+            _service.ExecuteAsync(task).Wait();
+
+            return output;
+        }
+        
         public string Reverse(string path)
         {
             string extension = GetFileExtension(path);
@@ -228,8 +250,7 @@ namespace Witlesss
 
         private Size GetValidSize(string path, out MediaStream stream)
         {
-            var metadata = GetMetadata(path).Result;
-            stream = metadata.Metadata.Streams.First();
+            stream = GetMediaStream(path);
             int height = FallbackIfZero(stream.Height, 720);
             int width = FallbackIfZero(stream.Width, 720);
 
@@ -238,6 +259,8 @@ namespace Witlesss
             return new Size(width, height);
         }
         private Size GetValidSize(string path) => GetValidSize(path, out _);
+        public double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);
+        private MediaStream GetMediaStream(string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
         
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;

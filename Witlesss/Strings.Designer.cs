@@ -99,17 +99,17 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to Укажите &lt;b&gt;таймкод начала&lt;/b&gt; фрагмента и его &lt;b&gt;длину&lt;/b&gt;, например:
         ///
-        ///&lt;b&gt;/cut@piece_fap_bot 0:10 0:15&lt;/b&gt;
-        ///
-        ///вырежет 15-секундный фрагмент, начиная с 10-й секунды видео / аудио
-        ///
         ///&lt;b&gt;/cut@piece_fap_bot 0:10&lt;/b&gt;
         ///
         ///выдаст первые 10 секунд
         ///
         ///&lt;b&gt;/cut@piece_fap_bot 0:10 хд&lt;/b&gt;
         ///
-        ///оставит всё после 10-й секунды.
+        ///оставит всё, что идёт после 10-й секунды
+        ///
+        ///&lt;b&gt;/cut@piece_fap_bot 0:10 0:15&lt;/b&gt;
+        ///
+        ///вырежет 15-секундный фрагмент, начиная с 10-й секунды.
         /// </summary>
         internal static string CUT_MANUAL {
             get {
@@ -379,6 +379,35 @@ namespace Witlesss {
         internal static string START_RESPONSE {
             get {
                 return ResourceManager.GetString("START_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Вместе с командой можно указать &lt;b&gt;таймкод начала&lt;/b&gt; фрагмента и его &lt;b&gt;длину&lt;/b&gt;, например:
+        ///
+        ///&lt;b&gt;/sus@piece_fap_bot&lt;/b&gt;
+        ///
+        ///зареверсит первую половину
+        ///
+        ///&lt;b&gt;/sus@piece_fap_bot 0&lt;/b&gt;
+        ///
+        ///зареверсит видео целиком
+        ///
+        ///&lt;b&gt;/sus@piece_fap_bot 0:03&lt;/b&gt;
+        ///
+        ///зареверсит первые 3 секунды
+        ///
+        ///&lt;b&gt;/sus@piece_fap_bot 0:15 хд&lt;/b&gt;
+        ///
+        ///зареверсит всё, что идёт после 15-й секунды
+        ///
+        ///&lt;b&gt;/sus@piece_fap_bot 0:10 0:03&lt;/b&gt;
+        ///
+        ///зареверсит 3-секундный фрагмент, начиная с 10-й секунды.
+        /// </summary>
+        internal static string SUS_MANUAL {
+            get {
+                return ResourceManager.GetString("SUS_MANUAL", resourceCulture);
             }
         }
         

@@ -60,10 +60,9 @@ namespace Witlesss
 
         public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
         {
-            var task = new F_WebpToJpg(path, out string outputPath, extension);
-            _service.ExecuteAsync(task).Wait();
+            Execute(new F_WebpToJpg(path, out path, extension));
             
-            return MakeDemotivator(outputPath, textA, textB);
+            return MakeDemotivator(path, textA, textB);
         }
 
         public string MakeVideoDemotivator(string path, string textA, string textB)
@@ -75,8 +74,7 @@ namespace Witlesss
 
         public string MakeVideoStickerDemotivator(string path, string textA, string textB)
         {
-            var task = new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path));
-            _service.ExecuteAsync(task).Wait();
+            Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
 
             return MakeVideoDemotivator(path, textA, textB);
         }
@@ -108,8 +106,7 @@ namespace Witlesss
             for (var frame = 0; frame < outFrames; frame++)
             {
                 var output = @$"{_animationPath}\F-{frame:0000}.jpg";
-                var task = new F_SaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame));
-                _service.ExecuteAsync(task).Wait();
+                Execute(new F_SaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame)));
             }
 
             // Demotivate each frame
@@ -124,8 +121,7 @@ namespace Witlesss
                 var outputPath = $@"{_animationPath}\{_animationName}";
                 
                 var size = new Size(360, 360);
-                var task = new F_RenderAnimation(outFrameRate, size, framesPath, outputPath);
-                _service.ExecuteAsync(task).Wait();
+                Execute(new F_RenderAnimation(outFrameRate, size, framesPath, outputPath));
             }
             catch (Exception e)
             {
@@ -159,7 +155,7 @@ namespace Witlesss
             WebmToMp4(ref extension, ref path);
             string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
 
-            FfMpegTaskBase<int> task = null;
+            F_Base task = null;
             switch (type)
             {
                 case MediaType.Audio:
@@ -172,7 +168,7 @@ namespace Witlesss
                     task = new F_SpeedAV(path, output, speed);
                     break;
             }
-            _service.ExecuteAsync(task).Wait();
+            Execute(task);
             return output;
         }
         
@@ -182,20 +178,14 @@ namespace Witlesss
             WebmToMp4(ref extension, ref path);
             
             if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
-
-            F_Base task;
             
             if (start != TimeSpan.Zero || length != TimeSpan.Zero)
             {
-                task = new F_Cut(path, out path, start, length);
-                _service.ExecuteAsync(task).Wait();
+                Execute(new F_Cut(path, out path, start, length));
             }
             
-            task = new F_Reverse(path, out string reversed);
-            _service.ExecuteAsync(task).Wait();
-            
-            task = new F_Concat(path, reversed, out string output, type);
-            _service.ExecuteAsync(task).Wait();
+            Execute(new F_Reverse(path, out string reversed));
+            Execute(new F_Concat(path, reversed, out string output, type));
 
             return output;
         }
@@ -205,9 +195,8 @@ namespace Witlesss
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
             
-            var task = new F_Reverse(path, out string outputPath);
-            _service.ExecuteAsync(task).Wait();
-            return outputPath;
+            Execute(new F_Reverse(path, out string output));
+            return output;
         }
         
         public string Cut(string path, TimeSpan start, TimeSpan length)
@@ -215,9 +204,8 @@ namespace Witlesss
             string extension = GetFileExtension(path);
             WebmToMp4(ref extension, ref path);
             
-            var task = new F_Cut(path, out string outputPath, start, length);
-            _service.ExecuteAsync(task).Wait();
-            return outputPath;
+            Execute(new F_Cut(path, out string output, start, length));
+            return output;
         }
 
         public string RemoveBitrate(string path, int bitrate, out int value)
@@ -245,7 +233,7 @@ namespace Witlesss
             else
                 task = new F_RemoveBitrate(path, out outputPath, bitrate);
 
-            _service.ExecuteAsync(task).Wait();
+            Execute(task);
             value = bitrate;
             return outputPath;
         }
@@ -264,13 +252,15 @@ namespace Witlesss
         private double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);
         private MediaStream GetMediaStream(string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
+
+        private void Execute(F_Base task) => _service.ExecuteAsync(task).Wait();
         
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
         private int NearestEven(int x) => x + x % 2;
 
         private double RetrieveFPS(string framerate, int alt = 16)
         {
-            string[] fps = framerate.Split('/');
+            var fps = framerate.Split('/');
             try
             {
                 double result = int.Parse(fps[0]) / double.Parse(fps[1]);
@@ -286,7 +276,7 @@ namespace Witlesss
         {
             if (extension == ".webm")
             {
-                _service.ExecuteAsync(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path))).Wait();
+                Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
                 extension = ".mp4";
             }
         }

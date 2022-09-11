@@ -155,20 +155,7 @@ namespace Witlesss
             WebmToMp4(ref extension, ref path);
             string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
 
-            F_Base task = null;
-            switch (type)
-            {
-                case MediaType.Audio:
-                    task = new F_SpeedA(path, output, speed);
-                    break;
-                case MediaType.Video:
-                    task = new F_SpeedV(path, output, speed);
-                    break;
-                case MediaType.AudioVideo:
-                    task = new F_SpeedAV(path, output, speed);
-                    break;
-            }
-            Execute(task);
+            Execute(new F_Speed(path, output, speed, type));
             return output;
         }
         

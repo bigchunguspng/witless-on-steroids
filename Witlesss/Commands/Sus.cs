@@ -39,7 +39,8 @@ namespace Witlesss.Commands
             string WhenTheSenderIsSus()
             {
                 string s = ValidFileName(SenderName(Message));
-                int l = s.Length / 2;
+                if (s.Length < 3) return s;
+                int l = (s.Length + 1) / 2;
                 return s.Remove(l) + new string(s.Remove(l - 1).Reverse().ToArray());
             }
         }

@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
@@ -65,6 +64,7 @@ namespace Witlesss
                         else if (input == "/e") DeleteBlockers();
                         else if (input == "/r") DeleteBySize();
                         else if (input == "/x") FixDBs();
+                        else if (input == "/d") FuseAllDics();
                         else if (input.StartsWith("/u") && HasIntArgument(input, out int x1)) Spam(x1);
                         else if (input.StartsWith("/r") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
                     }
@@ -204,6 +204,21 @@ namespace Witlesss
             SaveChatList();
         }
 
+        private void FuseAllDics()
+        {
+            foreach (var witless in SussyBakas.Values)
+            {
+                var path = $@"{CurrentDirectory}\CopyDB\{DB_FILE_PREFIX}-{witless.Chat}.json";
+                if (File.Exists(path))
+                {
+                    witless.Backup();
+                    var fusion = new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData());
+                    fusion.Fuse();
+                    witless.SaveNoMatterWhat();
+                }
+            }
+        }
+        
         private void FixDBs()
         {
             foreach (var witless in SussyBakas.Values)

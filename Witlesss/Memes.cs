@@ -17,16 +17,12 @@ namespace Witlesss
 {
     public class Memes
     {
-        private readonly DemotivatorDrawer _drawer720, _drawer1280;
+        private readonly DemotivatorDrawer[] _drawers;
         private readonly IMediaToolkitService _service;
-        
-        private string _animationPath;
-        private string _animationName;
 
         public Memes()
         {
-            _drawer720 = new DemotivatorDrawer();
-            _drawer1280 = new DemotivatorDrawer(1280);
+            _drawers = new[] {new DemotivatorDrawer(), new DemotivatorDrawer(1280)};
 
             if (!File.Exists(FFMPEG_PATH))
             {
@@ -36,21 +32,15 @@ namespace Witlesss
             }
             _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
         }
-        
-        public DgMode Mode { get; set; }
 
-        private DemotivatorDrawer Drawer()
+        public DgMode Mode;
+
+        private DemotivatorDrawer Drawer() => Mode switch
         {
-            switch (Mode)
-            {
-                case DgMode.Square:
-                    return _drawer720;
-                case DgMode.Wide:
-                    return _drawer1280;
-                default:
-                    return _drawer720;
-            }
-        }
+            DgMode.Square => _drawers[0],
+            DgMode.Wide =>   _drawers[1],
+            _ =>             _drawers[0]
+        };
 
         public string MakeDemotivator(string path, string textA, string textB)
         {
@@ -68,8 +58,7 @@ namespace Witlesss
         public string MakeVideoDemotivator(string path, string textA, string textB)
         {
             Drawer().SetRandomLogo();
-            AnimateDemotivator(path, textA, textB);
-            return $@"{_animationPath}\{_animationName}";
+            return AnimateDemotivator(path, textA, textB);
         }
 
         public string MakeVideoStickerDemotivator(string path, string textA, string textB)
@@ -79,13 +68,14 @@ namespace Witlesss
             return MakeVideoDemotivator(path, textA, textB);
         }
         
-        private void AnimateDemotivator(string path, string textA, string textB)
+        private string AnimateDemotivator(string path, string textA, string textB)
         {
             string inputFilePath = path;
             string inputFileName = path.Split('\\', '.')[^2];
-            _animationPath = UniquePath($@"{CurrentDirectory}\{PICTURES_FOLDER}\{inputFileName}");
+            string animationPath = UniquePath($@"{CurrentDirectory}\{PICTURES_FOLDER}\{inputFileName}");
+            string animationName = $"{inputFileName}-D.mp4";
             
-            Directory.CreateDirectory(_animationPath);
+            Directory.CreateDirectory(animationPath);
 
             var stream = GetMediaStream(path);
             
@@ -105,28 +95,20 @@ namespace Witlesss
             // Extract all frames
             for (var frame = 0; frame < outFrames; frame++)
             {
-                var output = @$"{_animationPath}\F-{frame:0000}.jpg";
+                var output = @$"{animationPath}\F-{frame:0000}.jpg";
                 Execute(new F_SaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame)));
             }
 
             // Demotivate each frame
-            string[] frames = GetAllFrames();
+            var frames = GetAllFrames();
             foreach (string file in frames) Drawer().DrawDemotivator(file, textA, textB);
 
-            try
-            {
-                // Render GIF
-                _animationName = $"{inputFileName}-D.mp4";
-                var framesPath = @$"{_animationPath}\F-%04d-D.jpg";
-                var outputPath = $@"{_animationPath}\{_animationName}";
-                
-                var size = new Size(360, 360);
-                Execute(new F_RenderAnimation(outFrameRate, size, framesPath, outputPath));
-            }
-            catch (Exception e)
-            {
-                LogError(e.Message);
-            }
+            var framesPath = @$"{animationPath}\F-%04d-D.jpg";
+            var outputPath = $@"{animationPath}\{animationName}";
+
+            Execute(new F_RenderAnimation(outFrameRate, new Size(360, 360), framesPath, outputPath));
+
+            return outputPath;
 
             void NormalizeLength(int max)
             {
@@ -142,7 +124,7 @@ namespace Witlesss
                 if (outFrameRate > max)
                     outFrameRate = max;
             }
-            string[] GetAllFrames() => Directory.GetFiles(_animationPath);
+            string[] GetAllFrames() => Directory.GetFiles(animationPath);
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)

@@ -120,15 +120,10 @@ namespace Witlesss
 
         private async void StartSaveLoop(int minutes)
         {
-            await Task.Run(SaveLoop);
-            
-            Task SaveLoop()
+            while (true)
             {
-                while (true)
-                {
-                    Thread.Sleep(60000 * minutes);
-                    SaveDics();
-                }
+                await Task.Delay(60000 * minutes);
+                SaveDics();
             }
         }
 

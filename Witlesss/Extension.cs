@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Telegram.Bot.Types;
@@ -108,6 +109,8 @@ namespace Witlesss
 
             return false;
         }
+        
+        public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
 
         public static string UniquePath(string path, string extension = "")
         {
@@ -139,6 +142,19 @@ namespace Witlesss
             return text;
         }
 
+        public static void SetOutName(string path, out string output, string suffix)
+        {
+            string extension = GetFileExtension(path);
+            output = GetFileName(path) + suffix + extension;
+        }
+        public static void SetOutName(string path, out string output, string suffix, out bool video)
+        {
+            string extension = GetFileExtension(path);
+            output = GetFileName(path) + suffix + extension;
+            video = extension == ".mp4";
+        }
+
+        public static string GetFileName(string path) => path.Remove(path.LastIndexOf('.'));
         public static string GetFileExtension(string path) => path.Substring(path.LastIndexOf('.'));
         public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
 

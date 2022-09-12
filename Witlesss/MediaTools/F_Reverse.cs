@@ -7,19 +7,17 @@ namespace Witlesss.MediaTools
     // ffmpeg -i "input.mp3"             -af areverse output.mp3
     public class F_Reverse : F_Base
     {
-        private readonly string _input;
-        private readonly string _output;
+        private readonly string _input, _output;
         private readonly bool _video;
         
-        public F_Reverse(string inputFilePath, out string outputFilePath)
+        public F_Reverse(string input, out string output)
         {
-            _input = inputFilePath;
-            string extension = GetFileExtension(inputFilePath);
-            _video = extension == ".mp4";
-            if (!_video) extension = ".mp3";
-            _output = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + "-R" + extension;
-            outputFilePath = _output;
+            SetOutName(input, out output, "-R", out _video);
+            
+            _input = input;
+            _output = output;
         }
+        
 
         public override IList<string> CreateArguments()
         {

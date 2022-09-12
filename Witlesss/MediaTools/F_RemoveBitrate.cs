@@ -9,40 +9,36 @@ namespace Witlesss.MediaTools
     // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k -s WxH output.mp4
     public class F_RemoveBitrate : F_Base
     {
-        private readonly string _inputFilePath;
-        private readonly string _outputFilePath;
-        private readonly string _bitrate;
-        private readonly bool _video, _otherSize;
+        private readonly string _input, _output, _bitrate;
+        private readonly bool _video, _resize;
         private readonly Size _size;
 
-        public F_RemoveBitrate(string inputFilePath, out string outputFilePath, int bitrate, Size size = default)
+        public F_RemoveBitrate(string input, out string output, int bitrate, Size size = default)
         {
-            _inputFilePath = inputFilePath;
-            string extension = GetFileExtension(inputFilePath);
-            _video = extension == ".mp4";
-            if (!_video) extension = ".mp3";
-            _outputFilePath = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + "-L" + extension;
+            SetOutName(input, out output, "-L", out _video);
+            
+            _input = input;
+            _output = output;
             _bitrate = bitrate.ToString();
-            outputFilePath = _outputFilePath;
             if (size != default)
             {
                 _size = size;
-                _otherSize = true;
+                _resize = true;
             }
         }
         
         public override IList<string> CreateArguments()
         {
-            var result = new List<string> {"-i", _inputFilePath, "-f", "mp3", "", "", "", "", "-b:a", "1k", _outputFilePath};
+            var result = new List<string> {"-i", _input, "-f", "mp3", "", "", "-b:a", "1k", "", "", _output};
             if (_video)
             {
                 result[3] = "mp4";
                 result[4] = "-b:v";
                 result[5] = $"{_bitrate}k";
-                if (_otherSize)
+                if (_resize)
                 {
-                    result[6] = "-s";
-                    result[7] = $"{_size.Width}x{_size.Height}";
+                    result[8] = "-s";
+                    result[9] = $"{_size.Width}x{_size.Height}";
                 }
             }
             return RemoveEmpties(result);

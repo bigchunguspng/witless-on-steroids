@@ -1,25 +1,21 @@
 ﻿using System.Collections.Generic;
+using static Witlesss.Extension;
 
 namespace Witlesss.MediaTools
 {
-    // ffmpeg -i "input.webp" "output.jpg"
+    // ffmpeg -i "input.webp" output.jpg
     public class F_WebpToJpg : F_Base
     {
-        protected readonly string InputFilePath;
-        protected readonly string OutputFilePath;
+        protected readonly string Input;
+        protected readonly string Output;
 
-        public F_WebpToJpg(string inputFilePath, out string outputFilePath, string extension)
+        public F_WebpToJpg(string input, out string output, string extension)
         {
-            InputFilePath = inputFilePath;
-            OutputFilePath = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + extension;
-            outputFilePath = OutputFilePath;
+            Input = input;
+            Output = GetFileName(input) + extension;
+            output = Output;
         }
-        
-        public override IList<string> CreateArguments() => new[]
-        {
-            "-i",
-            InputFilePath ?? "",
-            OutputFilePath ?? ""
-        };
+
+        public override IList<string> CreateArguments() => new[] {"-i", Input, Output};
     }
 }

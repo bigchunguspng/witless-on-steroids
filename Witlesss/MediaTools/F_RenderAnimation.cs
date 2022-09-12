@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
+using static Witlesss.Extension;
 
 namespace Witlesss.MediaTools
 {
@@ -14,21 +14,17 @@ namespace Witlesss.MediaTools
 
         public F_RenderAnimation(double framerate, Size size, string inputFilesPath, string outputFilePath)
         {
-            _inputFilesPath = inputFilesPath;
-            _outputFilePath = outputFilePath;
             _framerate = framerate;
             _size = size;
+            _inputFilesPath = inputFilesPath;
+            _outputFilePath = outputFilePath;
         }
         
         public override IList<string> CreateArguments() => new[]
         {
-            "-framerate",
-            _framerate.ToString(CultureInfo.InvariantCulture),
-            "-i",
-            _inputFilesPath ?? "",
-            "-s",
-            $"{_size.Width}x{_size.Height}",
-            _outputFilePath ?? ""
+            "-framerate", FormatDouble(_framerate),
+            "-i", _inputFilesPath,
+            "-s", $"{_size.Width}x{_size.Height}", _outputFilePath
         };
     }
 }

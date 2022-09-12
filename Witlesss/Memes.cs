@@ -133,9 +133,8 @@ namespace Witlesss
             
             Log($"SPEED >> {speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
 
-            string extension = GetFileExtension(path);
-            WebmToMp4(ref extension, ref path);
-            string output = path.Remove(path.LastIndexOf('.')) + "-S" + extension;
+            WebmToMp4(ref path, out _);
+            SetOutName(path, out string output, "-S");
 
             Execute(new F_Speed(path, output, speed, type));
             return output;
@@ -143,8 +142,7 @@ namespace Witlesss
         
         public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
         {
-            string extension = GetFileExtension(path);
-            WebmToMp4(ref extension, ref path);
+            WebmToMp4(ref path, out _);
             
             if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
             
@@ -161,8 +159,7 @@ namespace Witlesss
         
         public string Reverse(string path)
         {
-            string extension = GetFileExtension(path);
-            WebmToMp4(ref extension, ref path);
+            WebmToMp4(ref path, out _);
             
             Execute(new F_Reverse(path, out string output));
             return output;
@@ -170,8 +167,7 @@ namespace Witlesss
         
         public string Cut(string path, TimeSpan start, TimeSpan length)
         {
-            string extension = GetFileExtension(path);
-            WebmToMp4(ref extension, ref path);
+            WebmToMp4(ref path, out _);
             
             Execute(new F_Cut(path, out string output, start, length));
             return output;
@@ -183,8 +179,7 @@ namespace Witlesss
             string outputPath;
             F_RemoveBitrate task;
             
-            string extension = GetFileExtension(path);
-            WebmToMp4(ref extension, ref path);
+            WebmToMp4(ref path, out string extension);
             if (extension == ".mp4")
             {
                 var size = GetValidSize(path, out var stream);
@@ -241,8 +236,9 @@ namespace Witlesss
             }
         }
 
-        private void WebmToMp4(ref string extension, ref string path)
+        private void WebmToMp4(ref string path, out string extension)
         {
+            extension = GetFileExtension(path);
             if (extension == ".webm")
             {
                 Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using static Witlesss.Extension;
 
 namespace Witlesss.MediaTools
 {
@@ -32,8 +32,7 @@ namespace Witlesss.MediaTools
             {MediaType.Video,      "-filter:v"},
             {MediaType.AudioVideo, "-filter_complex"}
         };
-        
-        private string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
+
         private string FilterAudio() => $"atempo={FormatDouble(_speed)}";
         private string FilterVideo() => $"setpts={FormatDouble(1 / _speed)}*PTS";
         private string Filter() => _type switch

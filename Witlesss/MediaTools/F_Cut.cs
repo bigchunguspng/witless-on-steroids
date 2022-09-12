@@ -8,18 +8,15 @@ namespace Witlesss.MediaTools
     // ffmpeg -i "input.mp4" -ss 00:00:05             output.mp4
     public class F_Cut : F_Base
     {
-        private readonly string _input;
-        private readonly string _output;
-        private readonly TimeSpan _start;
-        private readonly TimeSpan _length;
-        
-        public F_Cut(string inputFilePath, out string outputFilePath, TimeSpan start, TimeSpan length)
+        private readonly string   _input, _output;
+        private readonly TimeSpan _start, _length;
+
+        public F_Cut(string input, out string output, TimeSpan start, TimeSpan length)
         {
-            _input = inputFilePath;
-            string extension = GetFileExtension(inputFilePath);
-            _output = inputFilePath.Remove(inputFilePath.LastIndexOf('.')) + "-C" + extension;
-            outputFilePath = _output;
+            SetOutName(input, out output, "-C");
             
+            _input = input;
+            _output = output;
             _start = start;
             _length = length;
         }
@@ -28,8 +25,7 @@ namespace Witlesss.MediaTools
         {
             var result = new List<string>
             {
-                "-i", 
-                _input,
+                "-i", _input,
                 "-ss", $"{_start:c}",
                 "-t", $"{_length:c}",
                 _output

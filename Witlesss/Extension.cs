@@ -222,7 +222,7 @@ namespace Witlesss
                 return kbs + " КБ";
         }
 
-        public static bool FileEmptyOrNotExist(string name) => !File.Exists(name) || new FileInfo(name).Length == 0;
+        public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || new FileInfo(path).Length == 0;
 
         public static void CreatePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
 

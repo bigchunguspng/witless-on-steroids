@@ -10,7 +10,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string[] a = Text.Split();
+            var a = Text.Split();
             if (a.Length > 1)
             {
                 string name = a[1];
@@ -43,7 +43,7 @@ namespace Witlesss.Commands
 
             string FUSE_AVAILABLE_BASES()
             {
-                FileInfo[] files = new DirectoryInfo($@"{Environment.CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
+                var files = new DirectoryInfo($@"{Environment.CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
                 var result = "\n\nДоступные словари:";
                 foreach (var file in files)
                     result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";

@@ -31,13 +31,13 @@ namespace Witlesss
                 return result;
             }
 
-            using StreamReader reader = File.OpenText(_path);
+            using var reader = File.OpenText(_path);
             return DeserializeObject<T>(reader.ReadToEnd());
         }
 
         public void SaveData(T db)
         {
-            using StreamWriter writer = File.CreateText(_path);
+            using var writer = File.CreateText(_path);
             writer.Write(SerializeObject(db, _settings));
         }
     }

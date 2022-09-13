@@ -119,11 +119,7 @@ namespace Witlesss
                     //outFrameRate = (int)(outFrameRate * k); // <- this will ++ framerate after --ing length
                 }
             }
-            void NormalizeFrameRate(int max)
-            {
-                if (outFrameRate > max)
-                    outFrameRate = max;
-            }
+            void NormalizeFrameRate(int max) => outFrameRate = Math.Min(outFrameRate, max);
             string[] GetAllFrames() => Directory.GetFiles(animationPath);
         }
 
@@ -131,12 +127,19 @@ namespace Witlesss
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;
             
-            Log($"SPEED >> {speed.ToString(CultureInfo.InvariantCulture)}", ConsoleColor.Blue);
+            Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
             WebmToMp4(ref path, out _);
             SetOutName(path, out string output, "-S");
 
-            Execute(new F_Speed(path, output, speed, type));
+            if (type != MediaType.Audio)
+            {
+                double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate, 30) * speed;
+                Execute(new F_Speed(path, output, speed, type, Math.Min(fps, 90)));
+            }
+            else
+                Execute(new F_Speed(path, output, speed, type));
+
             return output;
         }
         

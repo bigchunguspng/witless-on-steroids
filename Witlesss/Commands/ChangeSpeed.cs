@@ -23,7 +23,7 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> {(Mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
 
-            string AudioFilename() => Message.Audio?.FileName ?? Message.Document?.FileName ?? $"Ohhh, {ValidFileName(SenderName(Message))}.mp3";
+            string AudioFilename() => MediaFileName($"Are you {Sender().Split()[0]} or something.mp3");
             string VideoFilename() => $"piece_fap_club-{speed}.mp4";
         }
     }

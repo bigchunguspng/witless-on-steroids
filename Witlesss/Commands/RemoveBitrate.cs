@@ -25,9 +25,12 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> DAMN [*]");
 
-            string AudioFilename() => $"Damn, {ValidFileName(SenderName(Message))}.mp3";
+            string AudioFilename() => MediaFileName($"Damn, {Sender()}.mp3");
             string VideoFilename() => $"piece_fap_club-{value}.mp4";
         }
+
+        protected string MediaFileName(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
+        protected string Sender() => ValidFileName(SenderName(Message));
 
         protected string GetVideoOrAudioID()
         {

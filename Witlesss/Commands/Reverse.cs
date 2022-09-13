@@ -1,5 +1,4 @@
-﻿using static Witlesss.Extension;
-using static Witlesss.Logger;
+﻿using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
@@ -16,7 +15,7 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> REVERSED [<<]");
 
-            string AudioFilename() => $"{ReverseText(ValidFileName(SenderName(Message)))}, lol.mp3";
+            string AudioFilename() => MediaFileName($"Kid Named {Sender()}.mp3");
             string VideoFilename() => "piece_fap_club-R.mp4";
         }
     }

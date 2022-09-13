@@ -23,9 +23,9 @@ namespace Witlesss.Commands
             
             string result = Bot.MemeService.Cut(path, x.start, x.length);
             SendResult(result, type, VideoFilename, AudioFilename);
-            Log($"{Title} >> CUT [8K]");
+            Log($"{Title} >> CUT [8K-]");
 
-            string AudioFilename() => $"((({ValidFileName(SenderName(Message))}))).mp3";
+            string AudioFilename() => MediaFileName($"((({Sender()}))).mp3");
             string VideoFilename() => "cut_fap_club.mp4";
         }
 

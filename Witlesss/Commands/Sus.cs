@@ -1,6 +1,5 @@
 ﻿using System;
 using static Witlesss.Strings;
-using static Witlesss.Extension;
 using static Witlesss.Logger;
 
 namespace Witlesss.Commands
@@ -30,17 +29,15 @@ namespace Witlesss.Commands
 
             string result = Bot.MemeService.Sus(path, x.start, x.length, type);
             SendResult(result, type, VideoFilename, AudioFilename);
-            Log($"{Title} >> SUS [>><<]");
+            Log($"{Title} >> SUS [>_<]");
 
-            string AudioFilename() => $"Kid Named {WhenTheSenderIsSus()}.mp3";
+            string AudioFilename() => MediaFileName($"Kid Named {WhenTheSenderIsSus()}.mp3");
             string VideoFilename() => "sus_fap_club.mp4";
 
             string WhenTheSenderIsSus()
             {
-                string s = ValidFileName(SenderName(Message));
-                if (s.Length < 3) return s;
-                int l = (s.Length + 1) / 2;
-                return s.Remove(l) + ReverseText(s.Remove(l - 1));
+                string s = Sender();
+                return s.Length > 2 ? s[..2] + s[0] : s;
             }
         }
     }

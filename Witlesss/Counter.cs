@@ -7,12 +7,10 @@ namespace Witlesss
         private readonly int _min, _max;
         private int _declaredInterval, _actualInterval, _counter;
 
-        public Counter(int interval, int min = 1, int max = 62)
+        public Counter(int min = 1, int max = 62)
         {
             _min = min;
             _max = max;
-            
-            Interval = interval;
         }
 
         public int Interval

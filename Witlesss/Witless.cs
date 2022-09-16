@@ -19,20 +19,19 @@ namespace Witlesss
     {
         public const string START = "_start", END = "_end", LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = " " + LF + " ";
 
-        private readonly Random _random;
+        private readonly Random _random = new Random();
+        private readonly Regex _urls = new Regex(@"\S+(:[\/\\])\S+");
         private readonly FileIO<WitlessDB> _fileIO;
-        private Counter _generation;
+        private readonly Counter _generation = new Counter();
         private int _probability;
-        
-        public bool HasUnsavedStuff;
+        private bool _hasUnsavedStuff;
         
         public Witless(long chat, int interval = 7, int probability = 20)
         {
             Chat = chat;
-            _random = new Random();
-            _generation = new Counter(interval);
-            _fileIO = new FileIO<WitlessDB>(Path);
+            Interval = interval;
             DgProbability = probability;
+            _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             PauseGeneration(30);
         }
@@ -56,15 +55,10 @@ namespace Witlesss
         public bool Eat(string text, out string eaten)
         {
             eaten = null;
-            if (!SentenceIsAcceptable(text)) return false;
             
-            var words = Tokenize(text);
+            if (TextIsUnacceptable(text)) return false;
             
-            if (text.Contains('/') && text.Contains('.'))
-            {
-                for (var i = 0; i < words.Length; i++) if (WordIsLink(words[i])) words[i] = LINK;
-            }
-
+            var words = Tokenize(ReplaceLinks(text));
             int count = TokenCount();
             if (count < 14)
             {
@@ -76,9 +70,11 @@ namespace Witlesss
                 eaten = EatAdvanced(words);
             }
             
-            HasUnsavedStuff = true;
+            _hasUnsavedStuff = true;
             return true;
 
+            bool TextIsUnacceptable(string s) => Regex.IsMatch(s, @"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
+            string ReplaceLinks(string s) => _urls.Replace(s, LINK);
             int TokenCount() => words.Length - words.Count(x => x == LF);
         }
 
@@ -198,20 +194,6 @@ namespace Witlesss
             }
         }
         private string[] Tokenize(string s) => s.ToLower().Replace("\n", LF_Spaced).Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        private bool SentenceIsAcceptable(string sentence)
-        {
-            if (string.IsNullOrWhiteSpace(sentence))
-                return false;
-            if (sentence.StartsWith('/'))
-                return false;
-            if (sentence.StartsWith('.'))
-                return false;
-            if (sentence.StartsWith("http") && !sentence.Contains(" ")) // todo regex
-                return false;
-            return true;
-        }
-        private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7; // todo regex
 
         public string TryToGenerate(string word = START)
         {
@@ -352,20 +334,20 @@ namespace Witlesss
 
         public void Save()
         {
-            if (HasUnsavedStuff) SaveNoMatterWhat();
+            if (_hasUnsavedStuff) SaveNoMatterWhat();
         }
 
         public void SaveNoMatterWhat()
         {
             _fileIO.SaveData(Words);
-            HasUnsavedStuff = false;
+            _hasUnsavedStuff = false;
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
 
         public void Load()
         {
             Words = _fileIO.LoadData();
-            HasUnsavedStuff = false;
+            _hasUnsavedStuff = false;
             Log($"DIC LOADED << {Chat}");
         }
 

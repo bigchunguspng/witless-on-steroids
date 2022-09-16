@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,7 +14,7 @@ using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, Sys
 
 namespace Witlesss
 {
-    [JsonObject(MemberSerialization.OptIn)] [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")] [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
+    [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
         public const string START = "_start", END = "_end", LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = " " + LF + " ";
@@ -116,8 +115,8 @@ namespace Witlesss
 
             if (tokens.Contains(LF))
             {
-                var indexes = tokens.Select((t, i) => new {t, i}).Where(x => x.t == LF).Select(x => x.i);
-                var list = new List<string[]>(indexes.Count() + 1);
+                var indexes = tokens.Select((t, i) => new {t, i}).Where(x => x.t == LF).Select(x => x.i).ToArray();
+                var list = new List<string[]>(indexes.Length + 1);
                 var toks = tokens.ToArray();
                 var a = 0;
                 foreach (int index in indexes)

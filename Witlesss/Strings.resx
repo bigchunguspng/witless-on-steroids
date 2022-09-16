@@ -62,11 +62,8 @@
     <data name="DEMOTIVATOR_LOWER_FONT" xml:space="preserve">
         <value>Comic Sans MS</value>
     </data>
-    <data name="LOG_FUSE_DONE" xml:space="preserve">
+    <data name="LOG_FUSION_DONE" xml:space="preserve">
         <value>FUSION DONE</value>
-    </data>
-    <data name="LOG_FUSION_HAVE_DICS" xml:space="preserve">
-        <value>DICS HERE</value>
     </data>
     <data name="PICTURES_FOLDER" xml:space="preserve">
         <value>Telegram-Pictures</value>
@@ -87,7 +84,7 @@
         <value>Telegram-Water</value>
     </data>
     <data name="BACKUP_FOLDER" xml:space="preserve">
-        <value>Backup</value>
+        <value>Telegram-Backup</value>
     </data>
     <data name="DB_FILE_PREFIX" xml:space="preserve">
         <value>Telegram-WitlessDB</value>
@@ -95,11 +92,9 @@
     <data name="CHATLIST_FILENAME" xml:space="preserve">
         <value>Telegram-ChatsDB</value>
     </data>
-    <data name="FUSE_SUCCESS_RESPONSE_A" xml:space="preserve">
-        <value>Cловарь беседы</value>
-    </data>
-    <data name="FUSE_SUCCESS_RESPONSE_B" xml:space="preserve">
-        <value>обновлён!</value>
+    <data name="FUSE_SUCCESS_RESPONSE" xml:space="preserve">
+        <value>Cловарь беседы "{0}" обновлён!
+Теперь он весит {1}</value>
     </data>
     <data name="MOVE_MANUAL" xml:space="preserve">
         <value>Если вы хотите очистить словарь беседы, пропишите
@@ -110,8 +105,10 @@
 
 /fuse@piece_fap_bot [имя]</value>
     </data>
-    <data name="MOVE_DONE_AS" xml:space="preserve">
-        <value>Копия словаря сохранена как</value>
+    <data name="MOVING_DONE" xml:space="preserve">
+        <value>Словарь очищен! *пусто*
+
+Копия словаря сохранена как &lt;b&gt;"{0}"&lt;/b&gt;</value>
     </data>
     <data name="MOVE_DONE_CLEARED" xml:space="preserve">
         <value>Словарь очищен! *пусто*</value>
@@ -178,9 +175,23 @@
 зареверсит 3-секундный фрагмент, начиная с 10-й секунды</value>
     </data>
     <data name="CH_HISTORY_FOLDER" xml:space="preserve">
-        <value>Telegram-History-DBs</value>
+        <value>Telegram-HistoryDBs</value>
     </data>
     <data name="CH_HISTORY_FILE_PREFIX" xml:space="preserve">
         <value>Chat-History</value>
+    </data>
+    <data name="COPIES_FOLDER" xml:space="preserve">
+        <value>Telegram-CopyDBs</value>
+    </data>
+    <data name="CHAT_INFO" xml:space="preserve">
+        <value>&lt;b&gt;{0}&lt;/b&gt;
+
+Вес словаря: {1}
+Интервал генерации: {2}
+Вероятность демотивации: {3}%
+Демотивация стикеров: {4}</value>
+    </data>
+    <data name="STICKERS_RESPONSE" xml:space="preserve">
+        <value>Стикеры {0}будут демотивироваться в случайном порядке</value>
     </data>
 </root>

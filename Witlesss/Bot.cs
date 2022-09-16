@@ -208,12 +208,12 @@ namespace Witlesss
         {
             foreach (var witless in SussyBakas.Values)
             {
-                var path = $@"{CurrentDirectory}\CopyDB\{DB_FILE_PREFIX}-{witless.Chat}.json";
+                var path = $@"{CurrentDirectory}\{COPIES_FOLDER}\{DB_FILE_PREFIX}-{witless.Chat}.json";
                 if (File.Exists(path))
                 {
                     witless.Backup();
-                    var fusion = new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData());
-                    fusion.Fuse();
+                    new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData()).Fuse();
+                    Log($"{LOG_FUSION_DONE} << {witless.Chat}", ConsoleColor.Magenta);
                     witless.SaveNoMatterWhat();
                 }
             }

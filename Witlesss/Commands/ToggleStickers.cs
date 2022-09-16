@@ -1,4 +1,6 @@
-﻿namespace Witlesss.Commands
+﻿using static Witlesss.Strings;
+
+namespace Witlesss.Commands
 {
     public class ToggleStickers : WitlessCommand
     {
@@ -6,7 +8,7 @@
         {
             Baka.DemotivateStickers = !Baka.DemotivateStickers;
             Bot.SaveChatList();
-            Bot.SendMessage(Chat, $"Стикеры {(Baka.DemotivateStickers ? "" : "<b>НЕ</b> ")}будут демотивироваться в случайном порядке");
+            Bot.SendMessage(Chat, string.Format(STICKERS_RESPONSE, Baka.DemotivateStickers ? "" : "<b>НЕ</b> "));
         }
     }
 }

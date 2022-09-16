@@ -10,7 +10,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string[] a = Text.Split();
+            var a = Text.Split();
             if (a.Length > 1)
             {
                 string name = a[1];
@@ -20,7 +20,7 @@ namespace Witlesss.Commands
                 Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
                 Baka.SaveNoMatterWhat();
 
-                Bot.SendMessage(Chat, $"{MOVE_DONE_CLEARED}\n\n{MOVE_DONE_AS} <b>\"{result}\"</b>");
+                Bot.SendMessage(Chat, string.Format(MOVING_DONE, result));
             }
             else
                 Bot.SendMessage(Chat, MOVE_MANUAL);

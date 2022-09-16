@@ -1,6 +1,4 @@
 ﻿using System;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
@@ -13,8 +11,6 @@ namespace Witlesss
         {
             _dictionary1 = dictionary1;
             _dictionary2 = dictionary2;
-
-            Log(LOG_FUSION_HAVE_DICS, ConsoleColor.Magenta);
         }
         
         public void Fuse()
@@ -43,7 +39,6 @@ namespace Witlesss
                     _dictionary1.TryAdd(word.Key, word.Value);
                 }
             }
-            Log(LOG_FUSE_DONE, ConsoleColor.Magenta);
         }
     }
 }

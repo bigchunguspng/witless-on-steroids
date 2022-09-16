@@ -52,8 +52,6 @@ namespace Witlesss
         public static string SenderName(Message message) => message.SenderChat?.Title ?? UserFullName(message);
         public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : UserFullName(message), 32);
 
-        public static string ReverseText(string s) => new string(s.Reverse().ToArray());
-
         private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
         private static string UserFullName(Message message)
         {
@@ -208,7 +206,7 @@ namespace Witlesss
 
         public static string FILE_TOO_BIG_RESPONSE()
         {
-            var a = new[] {"пук-среньк...", "не подниму (много весит)", "тяжёлая штука", "ого, какой большой", "сорян, не влезает"};
+            var a = new[] {"пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"};
             return a[Random.Next(a.Length)];
         }
 
@@ -228,7 +226,7 @@ namespace Witlesss
 
         public static void ClearTempFiles()
         {
-            int filesDeleted = 0, dirsDeleted = 0, filesMoved = 0;
+            int filesDeleted = 0, dirsDeleted = 0;
             var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
             if (!Directory.Exists(path))
                 return;
@@ -258,7 +256,6 @@ namespace Witlesss
                             string extension = Path.GetExtension(file);
                             string destination = file.Replace($@"{file.Split('\\')[^2]}\", "");
                             File.Move(file, UniquePath(destination, extension));
-                            filesMoved++;
                         }
                         catch
                         {
@@ -285,7 +282,7 @@ namespace Witlesss
             {
                 //
             }
-            Log($"DEL >> {filesDeleted} USELESS FILES & {dirsDeleted} EMPTY DIRS! {filesMoved} FILES MOVED.", ConsoleColor.Yellow);
+            Log($"DEL TEMP >> {filesDeleted} FILES + {dirsDeleted} DIRS!", ConsoleColor.Yellow);
         }
     }
 

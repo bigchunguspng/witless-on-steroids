@@ -1,12 +1,19 @@
-﻿namespace Witlesss.Commands
+﻿using static Witlesss.Extension;
+using static Witlesss.Strings;
+
+namespace Witlesss.Commands
 {
     public class ChatInfo : WitlessCommand
     {
         public override void Run()
         {
-            string info = $"<b>{Title}</b>\n\nВес словаря: {Extension.FileSize(Baka.Path)}" +
-                          $"\nИнтервал генерации: {Baka.Interval}\nВероятность демотивации: {Baka.DgProbability}%" +
-                          $"\nДемотивация стикеров: {(Baka.DemotivateStickers? "ON" : "OFF")}";
+            string info =
+                string.Format(
+                CHAT_INFO, Title,
+                FileSize(Baka.Path),
+                Baka.Interval,
+                Baka.DgProbability,
+                Baka.DemotivateStickers ? "ON" : "OFF");
             Bot.SendMessage(Chat, info);
         }
     }

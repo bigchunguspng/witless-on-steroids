@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
@@ -7,6 +8,7 @@ using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
+using static Witlesss.Logger;
 using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss.Commands
@@ -32,8 +34,7 @@ namespace Witlesss.Commands
                 if (chatExist || baseExist)
                 {
                     Baka.Backup();
-                    var fusion = new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile());
-                    fusion.Fuse();
+                    new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
                     GoodEnding();
                 }
                 else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
@@ -52,7 +53,6 @@ namespace Witlesss.Commands
             }
             else Bot.SendMessage(Chat, FUSE_MANUAL);
 
-            string BASE_NEW_SIZE() => $"Теперь он весит {FileSize(Baka.Path)}";
             string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
 
             string FUSE_AVAILABLE_BASES()
@@ -79,8 +79,9 @@ namespace Witlesss.Commands
 
             void GoodEnding()
             {
+                Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
                 Baka.SaveNoMatterWhat();
-                Bot.SendMessage(Chat, $"{FUSE_SUCCESS_RESPONSE_A} \"{Title}\" {FUSE_SUCCESS_RESPONSE_B}\n{BASE_NEW_SIZE()}");
+                Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path)));
             }
         }
 

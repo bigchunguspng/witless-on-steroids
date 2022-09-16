@@ -70,7 +70,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Backup.
+        ///   Looks up a localized string similar to Telegram-Backup.
         /// </summary>
         internal static string BACKUP_FOLDER {
             get {
@@ -97,11 +97,25 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-History-DBs.
+        ///   Looks up a localized string similar to Telegram-HistoryDBs.
         /// </summary>
         internal static string CH_HISTORY_FOLDER {
             get {
                 return ResourceManager.GetString("CH_HISTORY_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;{0}&lt;/b&gt;
+        ///
+        ///Вес словаря: {1}
+        ///Интервал генерации: {2}
+        ///Вероятность демотивации: {3}%
+        ///Демотивация стикеров: {4}.
+        /// </summary>
+        internal static string CHAT_INFO {
+            get {
+                return ResourceManager.GetString("CHAT_INFO", resourceCulture);
             }
         }
         
@@ -111,6 +125,15 @@ namespace Witlesss {
         internal static string CHATLIST_FILENAME {
             get {
                 return ResourceManager.GetString("CHATLIST_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram-CopyDBs.
+        /// </summary>
+        internal static string COPIES_FOLDER {
+            get {
+                return ResourceManager.GetString("COPIES_FOLDER", resourceCulture);
             }
         }
         
@@ -263,20 +286,12 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cловарь беседы.
+        ///   Looks up a localized string similar to Cловарь беседы &quot;{0}&quot; обновлён!
+        ///Теперь он весит {1}.
         /// </summary>
-        internal static string FUSE_SUCCESS_RESPONSE_A {
+        internal static string FUSE_SUCCESS_RESPONSE {
             get {
-                return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE_A", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to обновлён!.
-        /// </summary>
-        internal static string FUSE_SUCCESS_RESPONSE_B {
-            get {
-                return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE_B", resourceCulture);
+                return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE", resourceCulture);
             }
         }
         
@@ -292,27 +307,9 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to FUSION DONE.
         /// </summary>
-        internal static string LOG_FUSE_DONE {
+        internal static string LOG_FUSION_DONE {
             get {
-                return ResourceManager.GetString("LOG_FUSE_DONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DICS HERE.
-        /// </summary>
-        internal static string LOG_FUSION_HAVE_DICS {
-            get {
-                return ResourceManager.GetString("LOG_FUSION_HAVE_DICS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Копия словаря сохранена как.
-        /// </summary>
-        internal static string MOVE_DONE_AS {
-            get {
-                return ResourceManager.GetString("MOVE_DONE_AS", resourceCulture);
+                return ResourceManager.GetString("LOG_FUSION_DONE", resourceCulture);
             }
         }
         
@@ -337,6 +334,17 @@ namespace Witlesss {
         internal static string MOVE_MANUAL {
             get {
                 return ResourceManager.GetString("MOVE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Словарь очищен! *пусто*
+        ///
+        ///Копия словаря сохранена как &lt;b&gt;&quot;{0}&quot;&lt;/b&gt;.
+        /// </summary>
+        internal static string MOVING_DONE {
+            get {
+                return ResourceManager.GetString("MOVING_DONE", resourceCulture);
             }
         }
         
@@ -397,6 +405,15 @@ namespace Witlesss {
         internal static string START_RESPONSE {
             get {
                 return ResourceManager.GetString("START_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Стикеры {0}будут демотивироваться в случайном порядке.
+        /// </summary>
+        internal static string STICKERS_RESPONSE {
+            get {
+                return ResourceManager.GetString("STICKERS_RESPONSE", resourceCulture);
             }
         }
         

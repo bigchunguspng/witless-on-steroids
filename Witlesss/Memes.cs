@@ -90,7 +90,7 @@ namespace Witlesss
             NormalizeLength(50);
             NormalizeFrameRate(50);
             double frameDelay = 1000 / outFrameRate;
-            Log($"OUT >> FPS: {Math.Round(outFrameRate, 1).ToString(CultureInfo.InvariantCulture).PadRight(inFrameRate.Length)} Length: {outFrames}", ConsoleColor.Blue);
+            Log($"OUT >> FPS: {FormatDouble(Math.Round(outFrameRate, 1)).PadRight(inFrameRate.Length)} Length: {outFrames}", ConsoleColor.Blue);
             
             // Extract all frames
             for (var frame = 0; frame < outFrames; frame++)

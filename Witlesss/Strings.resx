@@ -177,4 +177,10 @@
 
 зареверсит 3-секундный фрагмент, начиная с 10-й секунды</value>
     </data>
+    <data name="CH_HISTORY_FOLDER" xml:space="preserve">
+        <value>Telegram-History-DBs</value>
+    </data>
+    <data name="CH_HISTORY_FILE_PREFIX" xml:space="preserve">
+        <value>Chat-History</value>
+    </data>
 </root>

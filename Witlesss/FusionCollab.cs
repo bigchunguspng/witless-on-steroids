@@ -1,7 +1,7 @@
 ﻿using System;
 using static Witlesss.Logger;
 using static Witlesss.Strings;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {

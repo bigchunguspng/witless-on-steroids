@@ -14,7 +14,7 @@ using static Witlesss.Logger;
 using static Witlesss.Strings;
 using File = System.IO.File;
 using ChatList = System.Collections.Concurrent.ConcurrentDictionary<long, Witlesss.Witless>;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {
@@ -90,14 +90,14 @@ namespace Witlesss
                 string text = input.Substring(3).Trim();
                 var witless = SussyBakas[_activeChat];
                         
-                if      (input.StartsWith("/a ") && witless.ReceiveSentence(ref text)) //add
+                if      (input.StartsWith("/a ") && witless.Eat(text, out text)) //add
                 {
                     Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
                 }
                 else if (input.StartsWith("/w ")) //write
                 {
                     SendMessage(_activeChat, text);
-                    bool accepted = witless.ReceiveSentence(ref text);
+                    bool accepted = witless.Eat(text, out text);
                     Log($@"{_activeChat} >> SENT {(accepted ? "AND ADDED TO DIC " : "")}""{text}""", ConsoleColor.Yellow);
                 }
             }
@@ -235,8 +235,8 @@ namespace Witlesss
             {
                 if (!words.ContainsKey(next))
                 {
-                    words.TryAdd(next, new ConcurrentDictionary<string, int>());
-                    words[next].TryAdd(Witless.End, 1);
+                    words.TryAdd(next, new ConcurrentDictionary<string, float>());
+                    words[next].TryAdd(Witless.END, 1F);
                 }
             }
         }

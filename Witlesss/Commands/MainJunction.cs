@@ -131,8 +131,8 @@ namespace Witlesss.Commands
                     else
                     {
                         var sentence = Text.Clone().ToString();
-                        if (witless.ReceiveSentence(ref sentence))
-                            Log($"{Title} >> {sentence}", ConsoleColor.Blue);
+                        if (witless.Eat(sentence, out string text))
+                            Log($"{Title} >> {text}", ConsoleColor.Blue);
                     }
                 }
                 

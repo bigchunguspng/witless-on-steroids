@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Strings;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, int>>;
+using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn)] [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")] [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
     public class Witless
     {
-        public const string Start = "_start", End = "_end", Link = "[ссылка удалена]";
+        public const string START = "_start", END = "_end", LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = " " + LF + " ";
 
         private readonly Random _random;
         private readonly FileIO<WitlessDB> _fileIO;
@@ -41,55 +44,162 @@ namespace Witlesss
             get => _generation.Interval;
             set => _generation.Interval = value;
         }
-
         [JsonProperty] public int DgProbability
         {
             get => _probability;
             set => _probability = Math.Clamp(value, 0, 100);
         }
-
         [JsonProperty] public bool DemotivateStickers { get; set; }
         
         public WitlessDB Words { get; set; }
         public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
-        
-        public bool ReceiveSentence(ref string sentence)
+
+        public bool Eat(string text, out string eaten)
         {
-            if (!SentenceIsAcceptable(sentence)) return false;
+            eaten = null;
+            if (!SentenceIsAcceptable(text)) return false;
             
-            var wordlist = new List<string> {Start};
-            wordlist.AddRange(WordsOf(sentence));
-            wordlist.Add(End);
+            var words = Tokenize(text);
             
-            for (var i = 0; i < wordlist.Count; i++)
+            if (text.Contains('/') && text.Contains('.'))
             {
-                if (WordIsLink(wordlist[i]))
-                    wordlist[i] = Link;
+                for (var i = 0; i < words.Length; i++) if (WordIsLink(words[i])) words[i] = LINK;
             }
 
-            for (var i = 0; i < wordlist.Count - 1; i++)
+            int count = TokenCount();
+            if (count < 14)
             {
-                string word = wordlist[i];
-                if (!Words.ContainsKey(word))
-                {
-                    Words.TryAdd(word, new ConcurrentDictionary<string, int>());
-                }
-
-                string nextWord = wordlist[i + 1];
-                if (Words[word].ContainsKey(nextWord))
-                {
-                    Words[word][nextWord]++;
-                }
-                else
-                {
-                    Words[word].TryAdd(nextWord, 1);
-                }
+                float weight = MathF.Round(1.4F - 0.1F * count, 1); // 1 => 1.3  |  5 => 0.9  |  13 => 0.1
+                eaten = EatSimple(words, weight);
             }
-
+            if (count > 4)
+            {
+                eaten = EatAdvanced(words);
+            }
+            
             HasUnsavedStuff = true;
-            sentence = string.Join(' ', wordlist.GetRange(1, wordlist.Count - 2));
             return true;
+
+            int TokenCount() => words.Length - words.Count(x => x == LF);
         }
+
+        private string EatAdvanced(string[] words)
+        {
+            words = Advance(words);
+            EatSimple(words);
+            return string.Join(' ', words.Select(x => x.Replace(' ', '_')));
+        }
+        private string EatSimple(string[] words, float weight = 1F)
+        {
+            var list = new List<string>(words.Length + 2) {START};
+            
+            list.AddRange(words);
+            list.Add(END);
+            list.RemoveAll(x => x == LF);
+            
+            for (var i = 0; i < list.Count - 1; i++)
+            {
+                string word = list[i];
+                if (!Words.ContainsKey(word)) Words.TryAdd(word, new ConcurrentDictionary<string, float>());
+
+                string next = list[i + 1];
+                if (Words[word].ContainsKey(next))
+                    Words[word][next] = MathF.Round(Words[word][next] + weight, 1);
+                else
+                    Words[word].TryAdd(next, weight);
+            }
+            return string.Join(' ', list.GetRange(1, list.Count - 2));
+        }
+        private string[] Advance(string[] words)
+        {
+            var tokens = new LinkedList<string>(words);
+
+            if (tokens.Contains(LF))
+            {
+                var indexes = tokens.Select((t, i) => new {t, i}).Where(x => x.t == LF).Select(x => x.i);
+                var list = new List<string[]>(indexes.Count() + 1);
+                var toks = tokens.ToArray();
+                var a = 0;
+                foreach (int index in indexes)
+                {
+                    if (a == index)
+                    {
+                        a++;
+                        continue;
+                    }
+                    list.Add(toks[a..index]);
+                    a = index + 1;
+                }
+                list.Add(toks[a..tokens.Count]);
+                tokens.Clear();
+                for (var i = 0; i < list.Count; i++)
+                {
+                    list[i] = Advance(list[i]);
+                    foreach (string token in list[i])
+                    {
+                        tokens.AddLast(token);
+                    }
+                }
+                return tokens.ToArray();
+            }
+            
+            UniteTokensToRight(1, 3, 20);
+            UniteTokensToRight(2, 2, 20);
+            UniteTokensToLeft (2, 2, 5);
+            UniteTokensToRight(3, 3, 4);
+
+            return tokens.ToArray();
+
+            IEnumerable<string> SmallWordsSkipLast (int length) => tokens.SkipLast(1).Where(x => UnitableToken(x, length)).Reverse();
+            IEnumerable<string> SmallWordsSkipFirst(int length) => tokens.Skip    (1).Where(x => UnitableToken(x, length)).Reverse();
+            
+            bool UnitableToken(string x, int length) => x.Length == length && !ContainsDigit(x);
+            bool ContainsDigit(string x) => Regex.IsMatch(x, @"\S*\d+\S*");
+            bool IsSimpleToken(string x) => !(x.Contains(' ') || ContainsDigit(x));
+
+            void UniteTokensToRight(int length, int min, int max)
+            {
+                var small = SmallWordsSkipLast(length).ToArray();
+                if (small.Length == 0) return;
+                    
+                foreach (string word in small)
+                {
+                    var x = tokens.Last;
+                    tokens.RemoveLast();
+                    var a = tokens.FindLast(word);
+                    tokens.AddLast(x!);
+                    var n = a?.Next;
+                    var l = n?.Value.Length;
+                    if (l >= min && l <= max && IsSimpleToken(n.Value))
+                    {
+                        a!.Value = a.Value + " " + n.Value;
+                        tokens.Remove(n);
+                    }
+                }
+            }
+            void UniteTokensToLeft (int length, int min, int max)
+            {
+                var small = SmallWordsSkipFirst(length).ToArray();
+                if (small.Length == 0) return;
+
+                foreach (string word in small)
+                {
+                    var x = tokens.First;
+                    tokens.RemoveFirst();
+                    var a = tokens.FindLast(word);
+                    tokens.AddFirst(x!);
+                    var p = a?.Previous;
+                    var l = p?.Value.Length;
+                    if (l >= min && l <= max && IsSimpleToken(p.Value))
+                    {
+                        a!.Value = p.Value + " " + a.Value;
+                        tokens.Remove(p);
+                    }
+                }
+            }
+        }
+        private string[] Tokenize(string s) => s.ToLower().Replace("\n", LF_Spaced).Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
         private bool SentenceIsAcceptable(string sentence)
         {
             if (string.IsNullOrWhiteSpace(sentence))
@@ -98,14 +208,13 @@ namespace Witlesss
                 return false;
             if (sentence.StartsWith('.'))
                 return false;
-            if (sentence.StartsWith("http") && !sentence.Contains(" "))
+            if (sentence.StartsWith("http") && !sentence.Contains(" ")) // todo regex
                 return false;
             return true;
         }
-        private string[] WordsOf(string sentence) => sentence.ToLower().Trim().Split(new[] {' ', '\t', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-        private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7;
+        private bool WordIsLink(string word) => (word.Contains(".com") || word.Contains(".ru")) && word.Length > 20 || word.StartsWith("http") && word.Length > 7; // todo regex
 
-        public string TryToGenerate(string word = Start)
+        public string TryToGenerate(string word = START)
         {
             try
             {
@@ -132,12 +241,12 @@ namespace Witlesss
 
         public string GenerateByWord(string word)
         {
-            word = FindMatch(word, Start);
+            word = FindMatch(word, START);
             return TryToGenerate(word);
         }
         public string GenerateByWordBackwards(string word)
         {
-            word = FindMatch(word, End);
+            word = FindMatch(word, END);
             return TryToGenerateBackwards(word);
         }
         
@@ -172,28 +281,28 @@ namespace Witlesss
         private string Generate(string word)
         {
             string result = "";
-            string currentWord = word == Start || Words.ContainsKey(word) ? word : Start;
+            string currentWord = word == START || Words.ContainsKey(word) ? word : START;
 
-            while (currentWord != End)
+            while (currentWord != END)
             {
                 result = result + " " + currentWord;
                 currentWord = PickWord(Words[currentWord]);
             }
 
-            result = result.Replace(Start, "").TrimStart();
+            result = result.Replace(START, "").TrimStart();
             
             return TextInRandomLetterCase(result);
         }
         private string GenerateBackwards(string word)
         {
             string result = "";
-            string currentWord = word == End || Words.ContainsKey(word) ? word : End;
+            string currentWord = word == END || Words.ContainsKey(word) ? word : END;
             
-            while (currentWord != Start)
+            while (currentWord != START)
             {
                 result = currentWord + " " + result;
                 
-                var words = new ConcurrentDictionary<string, int>();
+                var words = new ConcurrentDictionary<string, float>();
                 foreach (var bunch in Words)
                 {
                     if (bunch.Value.ContainsKey(currentWord) && !words.TryAdd(bunch.Key, 1)) words[bunch.Key]++;
@@ -201,20 +310,20 @@ namespace Witlesss
                 currentWord = PickWord(words);
             }
             
-            result = result.Replace(End, "").TrimEnd();
+            result = result.Replace(END, "").TrimEnd();
             
             return TextInRandomLetterCase(result);
         }
-        private string PickWord(ConcurrentDictionary<string, int> dictionary)
+        private string PickWord(ConcurrentDictionary<string, float> dictionary)
         {
-            var chanceTotal = 0;
+            var chanceTotal = 0F;
             foreach (var chance in dictionary)
             {
                 chanceTotal += chance.Value;
             }
             
-            int r = _random.Next(chanceTotal);
-            string result = End;
+            float r = (float)_random.NextDouble() * chanceTotal;
+            string result = END;
 
             foreach (var chance in dictionary)
             {
@@ -239,7 +348,7 @@ namespace Witlesss
             _generation.Resume();
         }
         
-        public void Count() => _generation.Count();
+        public void Count()      => _generation.Count();
         public bool ReadyToGen() => _generation.Ready();
 
         public void Save()

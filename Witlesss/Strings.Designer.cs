@@ -88,6 +88,24 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chat-History.
+        /// </summary>
+        internal static string CH_HISTORY_FILE_PREFIX {
+            get {
+                return ResourceManager.GetString("CH_HISTORY_FILE_PREFIX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram-History-DBs.
+        /// </summary>
+        internal static string CH_HISTORY_FOLDER {
+            get {
+                return ResourceManager.GetString("CH_HISTORY_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-ChatsDB.
         /// </summary>
         internal static string CHATLIST_FILENAME {

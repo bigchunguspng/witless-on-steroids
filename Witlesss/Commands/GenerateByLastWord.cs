@@ -1,20 +1,29 @@
-﻿namespace Witlesss.Commands
+﻿using static Witlesss.Extension;
+using static Witlesss.Logger;
+using static Witlesss.Strings;
+
+namespace Witlesss.Commands
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {
         public override void Run()
         {
-            if (Text.Contains(' '))
+            if (Text.Contains(' ')) // todo fix generation idk
             {
-                string word = Text.Split()[1];
+                var words = Text.Split();
+                string word = words[1];
+                if (words.Length > 2)
+                {
+                    word = string.Join(' ', words[1..3]);
+                }
 
-                Text = Text.Substring(Text.IndexOf(' ') + 1);
+                Text = Text.Substring(words[0].Length + 1);
                 Text = Baka.GenerateByWordBackwards(word.ToLower()) + Text.Substring(word.Length);
-                Bot.SendMessage(Chat, Extension.TextInLetterCase(Text, GetMode(word)));
-                Logger.Log($"{Title} >> FUNNY BY LAST WORD");
+                Bot.SendMessage(Chat, TextInLetterCase(Text, GetMode(word)));
+                Log($"{Title} >> FUNNY BY LAST WORD");
             }
             else
-                Bot.SendMessage(Chat, Strings.ZZ_MANUAL);
+                Bot.SendMessage(Chat, ZZ_MANUAL);
         }
     }
 }

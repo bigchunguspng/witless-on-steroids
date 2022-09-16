@@ -1,28 +1,37 @@
-﻿namespace Witlesss.Commands
+﻿using static Witlesss.Extension;
+using static Witlesss.Logger;
+using static Witlesss.Strings;
+
+namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
         public override void Run()
         {
-            if (Text.Contains(' '))
+            if (Text.Contains(' ')) // todo fix one word output
             {
-                string word = Text.Split()[^1];
-                string start = Text.Split()[1];
+                var words = Text.Split();
+                string word = words[^1];
+                string start = words[1];
+                if (words.Length > 2)
+                {
+                    word = string.Join(' ', words[^2..]);
+                }
 
-                Text = Text.Substring(Text.IndexOf(' ') + 1);
+                Text = Text.Substring(words[0].Length + 1);
                 Text = Text.Remove(Text.Length - word.Length) + Baka.GenerateByWord(word.ToLower());
-                Bot.SendMessage(Chat, Extension.TextInLetterCase(Text, GetMode(start)));
-                Logger.Log($"{Title} >> FUNNY BY WORD");
+                Bot.SendMessage(Chat, TextInLetterCase(Text, GetMode(start)));
+                Log($"{Title} >> FUNNY BY WORD");
             }
             else
-                Bot.SendMessage(Chat, Strings.A_MANUAL);
+                Bot.SendMessage(Chat, A_MANUAL);
         }
 
-        protected LetterCaseMode GetMode(string word)
+        protected LetterCaseMode GetMode(string s)
         {
-            if      (word == word.ToLower())
+            if      (s == s.ToLower())
                 return LetterCaseMode.Lower;
-            else if (word == word.ToUpper() && word.Length > 1)
+            else if (s == s.ToUpper() && s.Length > 1)
                 return LetterCaseMode.Upper;
             else
                 return LetterCaseMode.Sentence;

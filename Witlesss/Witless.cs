@@ -207,34 +207,34 @@ namespace Witlesss
                 return "";
             }
         }
-        public string TryToGenerateBackwards(string word)
-        {
-            try
-            {
-                return GenerateBackwards(word);
-            }
-            catch (Exception e)
-            {
-                LogError(e.Message);
-                return "";
-            }
-        }
 
         public string GenerateByWord(string word)
         {
-            word = FindMatch(word, START);
-            return TryToGenerate(word);
+            string match = FindMatch(word, START, out bool splitted);
+            string result = TryToGenerate(match);
+            if (splitted) result = word.Split()[0] + " " + result;
+            return result;
         }
         public string GenerateByWordBackwards(string word)
         {
-            word = FindMatch(word, END);
-            return TryToGenerateBackwards(word);
+            string match = FindMatch(word, END, out bool splitted);
+            string result = GenerateBackwards(match);
+            if (splitted) result = result + " " + word.Split()[1];
+            return result;
         }
         
-        private string FindMatch(string word, string alt)
+        private string FindMatch(string word, string alt, out bool splitted)
         {
+            splitted = false;
+            
             if (!Words.ContainsKey(word))
             {
+                if (word.Contains(' '))
+                {
+                    word = alt == END? word.Split()[0] : word.Split()[1];
+                    splitted = true;
+                }
+
                 var words = new List<string>();
                 foreach (string key in Words.Keys)
                 {

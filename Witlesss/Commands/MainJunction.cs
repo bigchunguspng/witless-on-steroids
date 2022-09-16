@@ -64,7 +64,7 @@ namespace Witlesss.Commands
                         {
                             _command = _sus;
                         }
-                        else if (TextAsCommand().StartsWith("/reverse"))
+                        else if (TextAsCommand() == "/reverse")
                         {
                             _command = _reverse;
                         }
@@ -93,7 +93,7 @@ namespace Witlesss.Commands
                         {
                             _command = _frequency;
                         }
-                        else if (TextAsCommand().StartsWith("/toggle_stickers"))
+                        else if (TextAsCommand() == "/toggle_stickers")
                         {
                             _command = _stickers;
                         }

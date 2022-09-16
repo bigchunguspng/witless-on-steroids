@@ -50,7 +50,7 @@ namespace Witlesss
             _imageMarginB = 140;
             _imageWidth = _w - 2 * _imageMargin;
 
-            int space = 5;
+            var space = 5;
             int margin = _imageMargin - space;
             int marginB = _imageMarginB - space;
 
@@ -64,11 +64,11 @@ namespace Witlesss
         private void LoadLogos(string path)
         {
             Directory.CreateDirectory(path);
-            string[] files = Directory.GetFiles(path);
+            var files = Directory.GetFiles(path);
             
             foreach (string file in files)
             {
-                string[] coords = file.Split('\\', '.')[^2].Split(' ');
+                var coords = file.Split('\\', '.')[^2].Split(' ');
                 if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
                     _logos.Add(Image.FromFile(file), new Point(x, y));
             }

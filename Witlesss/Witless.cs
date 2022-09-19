@@ -262,12 +262,12 @@ namespace Witlesss
         private string Generate(string word)
         {
             string result = "";
-            string currentWord = word == START || Words.ContainsKey(word) ? word : START;
+            string current = word;
 
-            while (currentWord != END)
+            while (current != END)
             {
-                result = result + " " + currentWord;
-                currentWord = PickWord(Words[currentWord]);
+                result = result + " " + current;
+                current = PickWord(Words[current]);
             }
 
             result = result.Replace(START, "").TrimStart();
@@ -277,18 +277,22 @@ namespace Witlesss
         private string GenerateBackwards(string word)
         {
             string result = "";
-            string currentWord = word == END || Words.ContainsKey(word) ? word : END;
+            string current = word;
             
-            while (currentWord != START)
+            while (current != START)
             {
-                result = currentWord + " " + result;
+                result = current + " " + result;
                 
                 var words = new ConcurrentDictionary<string, float>();
                 foreach (var bunch in Words)
                 {
-                    if (bunch.Value.ContainsKey(currentWord) && !words.TryAdd(bunch.Key, 1)) words[bunch.Key]++;
+                    if (bunch.Value.ContainsKey(current))
+                    {
+                        float x = bunch.Value[current];
+                        if (!words.TryAdd(bunch.Key, x)) words[bunch.Key] += x;
+                    }
                 }
-                currentWord = PickWord(words);
+                current = PickWord(words);
             }
             
             result = result.Replace(END, "").TrimEnd();

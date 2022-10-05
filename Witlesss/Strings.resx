@@ -32,17 +32,39 @@
 (чем меньше значение - тем чаще я буду писать)</value>
     </data>
     <data name="FUSE_MANUAL" xml:space="preserve">
-        <value>Если вы хотите объединить словарь &lt;b&gt;этой беседы&lt;/b&gt; со словарём &lt;b&gt;другой беседы&lt;/b&gt;, где я состою и где есть вы, то для начала скопируйте &lt;b&gt;ID той беседы&lt;/b&gt; с помощью команды
+        <value>&lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнять ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
+
+1. Словарь другой беседы. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
 
 /chat_id@piece_fap_bot
 
-и пропишите &lt;b&gt;здесь&lt;/b&gt;
+скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt;
 
 /fuse@piece_fap_bot [полученное число]
 
-пример: /fuse@piece_fap_bot -1001541923355
+пример: /fuse -1001541923355
 
-Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;</value>
+Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;
+
+2. Словари созданные командой /move. Их список можно посмотреть прописав
+
+&lt;code&gt;/fuse@piece_fap_bot info&lt;/code&gt;
+
+Выбрав нужный просто пропишите
+
+/fuse@piece_fap_bot [имя]
+
+3. История переписки. Более подробно - &lt;a href='https://t.me/piece_fap_club/5000'&gt;тут&lt;/a&gt;
+
+4. История переписки, которую уже скармливали. Для начала пропишите
+
+&lt;code&gt;/fuse@piece_fap_bot his&lt;/code&gt;
+
+чтобы увидеть доступные диапазоны дат, скопируйте один из них и пропишите
+
+/fuse@piece_fap_bot [диапазон дат]
+
+пример: /fuse 30.11.2021 05.35.30 - 27.02.2022 21.50.13</value>
     </data>
     <data name="FUSE_FAIL_CHAT" xml:space="preserve">
         <value>К сожалению, у меня нет словаря этой беседы</value>
@@ -51,7 +73,7 @@
         <value>К сожалению, я не нашёл словаря с таким названием</value>
     </data>
     <data name="FUSE_FAIL_SELF" xml:space="preserve">
-        <value>Ты собираешься слить эту беседу... с этой же беседой? Ничего не поменяется, лол</value>
+        <value>ёкарный бабай)0</value>
     </data>
     <data name="DG_MANUAL" xml:space="preserve">
         <value>Для генерации демотиватора отправь мне эту команду вместе с фото или в ответ на фото</value>
@@ -109,9 +131,6 @@
         <value>Словарь очищен! *пусто*
 
 Копия словаря сохранена как &lt;b&gt;"{0}"&lt;/b&gt;</value>
-    </data>
-    <data name="MOVE_DONE_CLEARED" xml:space="preserve">
-        <value>Словарь очищен! *пусто*</value>
     </data>
     <data name="FFMPEG_PATH" xml:space="preserve">
         <value>C:\ffmpeg\bin\ffmpeg.exe</value>
@@ -193,5 +212,16 @@
     </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
         <value>Стикеры {0}будут демотивироваться в случайном порядке</value>
+    </data>
+    <data name="FUSE_FAIL_DATES" xml:space="preserve">
+        <value>К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
+
+&lt;code&gt;/fuse@piece_fap_club his&lt;/code&gt;
+
+и выберите один из вариантов, или пропишите
+
+&lt;code&gt;/fuse@piece_fap_club his all&lt;/code&gt;
+
+чтобы скормить всё сразу</value>
     </data>
 </root>

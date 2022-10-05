@@ -28,10 +28,11 @@ namespace Witlesss.Commands
 
         protected string MoveDictionary(string name)
         {
-            string path = Bot.BaseExists(name) ? Extension.UniquePath(ExtraDBPath(name), ".json") : ExtraDBPath(name);
+            bool x = name == "info" || name == "his";
+            string path = Extension.UniquePath(ExtraDBPath(name), ".json", x);
             Baka.Save();
             File.Copy(Baka.Path, path);
-                        
+
             string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
             Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
             return result;

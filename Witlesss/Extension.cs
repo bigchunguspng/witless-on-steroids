@@ -110,9 +110,9 @@ namespace Witlesss
         
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
 
-        public static string UniquePath(string path, string extension = "")
+        public static string UniquePath(string path, string extension = "", bool extra = false)
         {
-            while (File.Exists(path) || Directory.Exists(path))
+            while (File.Exists(path) || Directory.Exists(path) || extra)
             {
                 int nameStartIndex = path.LastIndexOf('\\') + 1;
                 string name = path.Substring(nameStartIndex);
@@ -130,6 +130,7 @@ namespace Witlesss
                     name = name + "_0";
 
                 path = directory + name + extension;
+                extra = false;
             }
             return path;
         }

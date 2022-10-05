@@ -18,26 +18,57 @@ namespace Witlesss.Commands
         public override void Run()
         {
             var a = Text.Split();
-            if (a.Length > 1)
+            if (a.Length > 2)
             {
-                string name = a[1];
-                bool passedID = long.TryParse(name, out long key);
-                bool thisChatID = key == Chat;
-                if (thisChatID)
+                string name = Text.Substring(Text.IndexOf(' ') + 1);
+                var path = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}\{Chat}";
+                Directory.CreateDirectory(path);
+                var files = Directory.GetFiles(path);
+                
+                if (name == "his all")
                 {
-                    Bot.SendMessage(Chat, FUSE_FAIL_SELF);
-                    return;
-                }
-
-                bool chatExist = passedID && Bot.WitlessExist(key);
-                bool baseExist = Bot.BaseExists(name);
-                if (chatExist || baseExist)
-                {
-                    Baka.Backup();
-                    new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
+                    foreach (string file in files) EatHistorySimple(file);
                     GoodEnding();
                 }
-                else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
+                else
+                {
+                    var file = $@"{path}\{name}.json";
+                    if (files.Contains(file))
+                    {
+                        EatHistorySimple(file);
+                        GoodEnding();
+                    }
+                    else
+                        Bot.SendMessage(Chat, FUSE_FAIL_DATES);
+                }
+            }
+            else if (a.Length > 1)
+            {
+                string name = a[1];
+                
+                if      (name == "info")
+                    Bot.SendMessage(Chat, FUSE_AVAILABLE_BASES());
+                else if (name == "his")
+                    Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
+                else
+                {
+                    bool passedID = long.TryParse(name, out long key);
+                    if (key == Chat)
+                    {
+                        Bot.SendMessage(Chat, FUSE_FAIL_SELF);
+                        return;
+                    }
+
+                    bool chatExist = passedID && Bot.WitlessExist(key);
+                    bool baseExist = Bot.BaseExists(name);
+                    if (chatExist || baseExist)
+                    {
+                        Baka.Backup();
+                        new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
+                        GoodEnding();
+                    }
+                    else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
+                }
 
                 WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
             }
@@ -58,10 +89,25 @@ namespace Witlesss.Commands
             string FUSE_AVAILABLE_BASES()
             {
                 var files = new DirectoryInfo($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
-                var result = "\n\nДоступные словари:";
+                var result = "\n\nДоступные словари:\n";
                 foreach (var file in files)
                     result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
                 result = result + "\n\n" + BASE_SIZE();
+                return result;
+            }
+            string FUSE_AVAILABLE_DATES()
+            {
+                var path = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}\{Chat}";
+                Directory.CreateDirectory(path);
+                var files = new DirectoryInfo(path).GetFiles();
+                var result = "Доступные диапазоны переписки:\n";
+                if (files.Length == 0)
+                    result = result + "\n\n*пусто*";
+                else foreach (var file in files)
+                    result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
+                if (files.Length > 0)
+                    result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
+
                 return result;
             }
             
@@ -75,13 +121,6 @@ namespace Witlesss.Commands
                 else if (Message.ReplyToMessage != null && IsJsonAttached(Message.ReplyToMessage))
                     fileID = Message.ReplyToMessage.Document?.FileId;
                 return fileID!.Length > 0;
-            }
-
-            void GoodEnding()
-            {
-                Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-                Baka.SaveNoMatterWhat();
-                Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path)));
             }
         }
 
@@ -116,6 +155,19 @@ namespace Witlesss.Commands
             new FileIO<List<string>>(path).SaveData(save);
             
             string FormatDate(object o) => o.ToString()?.Replace(':', '.').Replace('-', '.').Replace('T', ' ');
+        }
+        
+        private void EatHistorySimple(string path)
+        {
+            var list = new FileIO<List<string>>(path).LoadData();
+            foreach (string text in list) Baka.Eat(text, out _);
+        }
+        
+        private void GoodEnding()
+        {
+            Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+            Baka.SaveNoMatterWhat();
+            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path)));
         }
     }
 }

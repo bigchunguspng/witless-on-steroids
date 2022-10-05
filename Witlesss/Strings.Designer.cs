@@ -258,7 +258,24 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ты собираешься слить эту беседу... с этой же беседой? Ничего не поменяется, лол.
+        ///   Looks up a localized string similar to К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
+        ///
+        ///&lt;code&gt;/fuse@piece_fap_club his&lt;/code&gt;
+        ///
+        ///и выберите один из вариантов, или пропишите
+        ///
+        ///&lt;code&gt;/fuse@piece_fap_club his all&lt;/code&gt;
+        ///
+        ///чтобы скормить всё сразу.
+        /// </summary>
+        internal static string FUSE_FAIL_DATES {
+            get {
+                return ResourceManager.GetString("FUSE_FAIL_DATES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ёкарный бабай)0.
         /// </summary>
         internal static string FUSE_FAIL_SELF {
             get {
@@ -267,17 +284,25 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Если вы хотите объединить словарь &lt;b&gt;этой беседы&lt;/b&gt; со словарём &lt;b&gt;другой беседы&lt;/b&gt;, где я состою и где есть вы, то для начала скопируйте &lt;b&gt;ID той беседы&lt;/b&gt; с помощью команды
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнять ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
+        ///
+        ///1. Словарь другой беседы. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
         ///
         ////chat_id@piece_fap_bot
         ///
-        ///и пропишите &lt;b&gt;здесь&lt;/b&gt;
+        ///скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt;
         ///
         ////fuse@piece_fap_bot [полученное число]
         ///
-        ///пример: /fuse@piece_fap_bot -1001541923355
+        ///пример: /fuse -1001541923355
         ///
-        ///Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;.
+        ///Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;
+        ///
+        ///2. Словари созданные командой /move. Их список можно посмотреть прописав
+        ///
+        ///&lt;code&gt;/fuse@piece_fap_bot info&lt;/code&gt;
+        ///
+        ///Выбрав нужный [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FUSE_MANUAL {
             get {
@@ -310,15 +335,6 @@ namespace Witlesss {
         internal static string LOG_FUSION_DONE {
             get {
                 return ResourceManager.GetString("LOG_FUSION_DONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Словарь очищен! *пусто*.
-        /// </summary>
-        internal static string MOVE_DONE_CLEARED {
-            get {
-                return ResourceManager.GetString("MOVE_DONE_CLEARED", resourceCulture);
             }
         }
         

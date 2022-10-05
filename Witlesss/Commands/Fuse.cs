@@ -155,8 +155,8 @@ namespace Witlesss.Commands
             Directory.CreateDirectory(path);
             path = $@"{path}\{date1} - {date2}.json";
             new FileIO<List<string>>(path).SaveData(save);
-            
-            string FormatDate(object o) => o.ToString()?.Replace(':', '.').Replace('-', '.').Replace('T', ' ');
+
+            string FormatDate(object o) => ((DateTime) o).ToString("yyyy'-'MM'-'dd");
         }
         
         private void EatHistorySimple(string path)

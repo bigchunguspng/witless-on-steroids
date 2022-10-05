@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using static System.Environment;
 using static Witlesss.Extension;
@@ -63,14 +62,12 @@ namespace Witlesss
         
         private void LoadLogos(string path)
         {
-            Directory.CreateDirectory(path);
-            var files = Directory.GetFiles(path);
-            
-            foreach (string file in files)
+            var files = GetFiles(path);
+            foreach (var file in files)
             {
-                var coords = file.Split('\\', '.')[^2].Split(' ');
+                var coords = file.Name.Replace(file.Extension, "").Split(' ');
                 if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
-                    _logos.Add(Image.FromFile(file), new Point(x, y));
+                    _logos.Add(Image.FromFile(file.FullName), new Point(x, y));
             }
         }
 

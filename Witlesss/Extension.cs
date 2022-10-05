@@ -225,6 +225,18 @@ namespace Witlesss
 
         public static void CreatePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
 
+        public static FileInfo[] GetFiles(string path)
+        {
+            Directory.CreateDirectory(path);
+            return new DirectoryInfo(path).GetFiles();
+        }
+        
+        public static string[] GetFileNames(string path)
+        {
+            Directory.CreateDirectory(path);
+            return Directory.GetFiles(path);
+        }
+
         public static void ClearTempFiles()
         {
             int filesDeleted = 0, dirsDeleted = 0;

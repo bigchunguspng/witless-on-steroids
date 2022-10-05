@@ -15,15 +15,17 @@ namespace Witlesss.Commands
 {
     public class Fuse : WitlessCommand
     {
+        private readonly string _extras = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
+        private readonly string _history = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}";
+        
         public override void Run()
         {
             var a = Text.Split();
             if (a.Length > 2)
             {
                 string name = Text.Substring(Text.IndexOf(' ') + 1);
-                var path = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}\{Chat}";
-                Directory.CreateDirectory(path);
-                var files = Directory.GetFiles(path);
+                var path = $@"{_history}\{Chat}";
+                var files = GetFileNames(path);
                 
                 if (name == "his all")
                 {
@@ -51,67 +53,18 @@ namespace Witlesss.Commands
                 else if (name == "his")
                     Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
                 else
-                {
-                    bool passedID = long.TryParse(name, out long key);
-                    if (key == Chat)
-                    {
-                        Bot.SendMessage(Chat, FUSE_FAIL_SELF);
-                        return;
-                    }
-
-                    bool chatExist = passedID && Bot.WitlessExist(key);
-                    bool baseExist = Bot.BaseExists(name);
-                    if (chatExist || baseExist)
-                    {
-                        Baka.Backup();
-                        new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
-                        GoodEnding();
-                    }
-                    else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : FUSE_FAIL_BASE + FUSE_AVAILABLE_BASES());
-                }
-
-                WitlessDB FromFile() => new FileIO<WitlessDB>($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json").LoadData();
+                    FuseWitlessDB(name);
             }
             else if (CanFuseHistory(out string fileID))
             {
-                var directory = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}";
-                var path = UniquePath($@"{directory}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json", ".json");
-                Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(_history);
+                string path = UniquePath($@"{_history}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json", ".json");
                 Bot.DownloadFile(fileID, path, Chat).Wait();
                 
                 EatChatHistory(path);
                 GoodEnding();
             }
             else Bot.SendMessage(Chat, FUSE_MANUAL);
-
-            string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
-
-            string FUSE_AVAILABLE_BASES()
-            {
-                var files = new DirectoryInfo($@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}").GetFiles();
-                var result = "\n\nДоступные словари:\n";
-                foreach (var file in files)
-                    result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
-                result = result + "\n\n" + BASE_SIZE();
-                return result;
-            }
-            string FUSE_AVAILABLE_DATES()
-            {
-                var path = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}\{Chat}";
-                Directory.CreateDirectory(path);
-                var files = new DirectoryInfo(path).GetFiles();
-                var result = "Доступные диапазоны переписки:\n";
-                if (files.Length == 0)
-                    result = result + "\n\n*пусто*";
-                else foreach (var file in files)
-                    result = result + $"\n<b>{file.Name.Replace(".json", "")}</b> ({FileSize(file.FullName)})";
-                if (files.Length > 0)
-                    result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
-
-                return result;
-            }
-            
-            bool IsJsonAttached(Message message) => message.Document?.MimeType != null && message.Document?.MimeType == "application/json";
 
             bool CanFuseHistory(out string fileID)
             {
@@ -122,6 +75,55 @@ namespace Witlesss.Commands
                     fileID = Message.ReplyToMessage.Document?.FileId;
                 return fileID!.Length > 0;
             }
+            bool IsJsonAttached(Message message) => message.Document?.MimeType != null && message.Document?.MimeType == "application/json";
+        }
+
+        private string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
+        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFiles(_extras))}\n\n{BASE_SIZE()}";
+        private string FUSE_AVAILABLE_DATES()
+        {
+            var files = GetFiles($@"{_history}\{Chat}");
+            var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
+            if (files.Length > 0)
+                result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
+
+            return result;
+        }
+
+        private string JsonList(FileInfo[] files)
+        {
+            if (files.Length == 0) return "\n*пусто*";
+            
+            var result = "";
+            foreach (var file in files)
+            {
+                result = result + $"\n<code>{file.Name.Replace(".json", "")}</code> ({FileSize(file.FullName)})";
+            }
+            return result;
+        }
+
+        private void FuseWitlessDB(string name)
+        {
+            bool passedID = long.TryParse(name, out long key);
+            if (key == Chat)
+            {
+                Bot.SendMessage(Chat, FUSE_FAIL_SELF);
+                return;
+            }
+
+            bool chatExist = passedID && Bot.WitlessExist(key);
+            bool baseExist = BaseExists();
+            if (chatExist || baseExist)
+            {
+                Baka.Backup();
+                new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
+                GoodEnding();
+            }
+            else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : $"{FUSE_FAIL_BASE}\n\n{FUSE_AVAILABLE_BASES()}");
+
+            string Path() => $@"{_extras}\{name}.json";
+            WitlessDB FromFile() => new FileIO<WitlessDB>(Path()).LoadData();
+            bool BaseExists() => GetFileNames(_extras).Contains(Path());
         }
 
         private void EatChatHistory(string path)
@@ -149,7 +151,7 @@ namespace Witlesss.Commands
             string date1 = FormatDate(((IDictionary<string, object>) list[0] )?["date"]);
             string date2 = FormatDate(((IDictionary<string, object>) list[^1])?["date"]);
 
-            path = $@"{path.Remove(path.LastIndexOf('\\'))}\{Chat}";
+            path = $@"{_history}\{Chat}";
             Directory.CreateDirectory(path);
             path = $@"{path}\{date1} - {date2}.json";
             new FileIO<List<string>>(path).SaveData(save);

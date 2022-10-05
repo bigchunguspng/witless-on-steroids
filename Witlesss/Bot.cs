@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
@@ -104,13 +103,6 @@ namespace Witlesss
         }
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
-
-        public bool BaseExists(string name)
-        {
-            var path = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
-            Directory.CreateDirectory(path);
-            return Directory.GetFiles(path).Contains($@"{path}\{name}.json");
-        }
 
         public void SaveChatList()
         {

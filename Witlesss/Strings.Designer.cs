@@ -286,7 +286,7 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнять ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
         ///
-        ///1. Словарь другой беседы. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
+        ///1. &lt;u&gt;Словарь другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
         ///
         ////chat_id@piece_fap_bot
         ///
@@ -294,15 +294,11 @@ namespace Witlesss {
         ///
         ////fuse@piece_fap_bot [полученное число]
         ///
-        ///пример: /fuse -1001541923355
+        ///Пример: &lt;i&gt;/fuse -1001541923355&lt;/i&gt;
         ///
         ///Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;
         ///
-        ///2. Словари созданные командой /move. Их список можно посмотреть прописав
-        ///
-        ///&lt;code&gt;/fuse@piece_fap_bot info&lt;/code&gt;
-        ///
-        ///Выбрав нужный [rest of string was truncated]&quot;;.
+        ///2. &lt;u&gt;Словари созданные командой&lt;/u&gt; /move. Список таковых можно посмотреть прописав &lt;code&gt;/fuse@piece_fap_bot info&lt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FUSE_MANUAL {
             get {

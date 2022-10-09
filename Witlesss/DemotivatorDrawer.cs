@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
@@ -14,8 +15,6 @@ namespace Witlesss
 {
     public class DemotivatorDrawer
     {
-        private const string DotJpg = ".jpg";
-
         private readonly Random _r = new Random();
         private readonly Dictionary<Image, Point> _logos;
         private KeyValuePair<Image, Point> _logo;
@@ -32,6 +31,7 @@ namespace Witlesss
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
         private static readonly Dictionary<int, EncoderParameter> Qualities = new Dictionary<int, EncoderParameter>();
+        private static readonly Regex Ext = new Regex("(.png)|(.jpg)");
 
         private static long _jpgQuality = 120;
 
@@ -92,7 +92,7 @@ namespace Witlesss
             // 720 x 720
 
             string pathA = path;
-            string pathB = path.Replace(DotJpg, "-D" + DotJpg); // todo replace png too
+            string pathB = Ext.Replace(path, "-D.jpg");
 
             using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageW, _imageH));
             using Image demotivator = new Bitmap(_w, _h);
@@ -117,7 +117,7 @@ namespace Witlesss
 
         private void SaveImage(Image image, ref string path)
         {
-            path = UniquePath(path, DotJpg);
+            path = UniquePath(path, ".jpg");
             image.Save(path, JpgEncoder, EncoderParameters);
         }
 

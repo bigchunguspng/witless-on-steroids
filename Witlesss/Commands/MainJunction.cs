@@ -42,6 +42,7 @@ namespace Witlesss.Commands
                         {
                             _command = _demotivate;
                             _demotivate.SetMode();
+                            _demotivate.PassQuality(witless);
                         }
                         else if (TextAsCommand().StartsWith("/a"))
                         {
@@ -77,6 +78,7 @@ namespace Witlesss.Commands
                         {
                             _command = _demotivate;
                             _demotivate.SetMode(DgMode.Wide);
+                            _demotivate.PassQuality(witless);
                         }
                         else if (TextAsCommand().StartsWith("/zz"))
                         {
@@ -162,9 +164,10 @@ namespace Witlesss.Commands
 
                 void SetUpDemotivateCommand()
                 {
+                    _demotivate.SetMode();
+                    _demotivate.PassQuality(witless);
                     _demotivate.Pass(Message);
                     _demotivate.Pass(witless);
-                    _demotivate.SetMode();
                 }
                 
                 bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;

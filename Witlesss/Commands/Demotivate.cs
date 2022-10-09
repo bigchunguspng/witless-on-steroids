@@ -11,11 +11,8 @@ namespace Witlesss.Commands
 {
     public class Demotivate : WitlessCommand
     {
-        public void SetMode(DgMode mode = DgMode.Square)
-        {
-            Bot.MemeService.Mode = mode;
-            DemotivatorDrawer.PassQuality(Baka.JpgQuality);
-        }
+        public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
+        public void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
 
         public override void Run()
         {

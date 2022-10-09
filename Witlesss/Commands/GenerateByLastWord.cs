@@ -8,7 +8,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            if (Text.Contains(' ')) // todo fix generation idk
+            if (Text.Contains(' '))
             {
                 var words = Text.Split();
                 string word = words[1];

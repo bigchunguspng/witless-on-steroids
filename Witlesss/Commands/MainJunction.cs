@@ -23,6 +23,7 @@ namespace Witlesss.Commands
         private readonly Buhurt _buhurt = new Buhurt();
         private readonly SetFrequency _frequency = new SetFrequency();
         private readonly SetProbability _probability = new SetProbability();
+        private readonly SetQuality _quality = new SetQuality();
         private readonly ToggleStickers _stickers = new ToggleStickers();
         private readonly DeleteDictionary _delete = new DeleteDictionary();
 
@@ -84,6 +85,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand().StartsWith("/b"))
                         {
                             _command = _buhurt;
+                        }
+                        else if (TextAsCommand().StartsWith("/set_jpg"))
+                        {
+                            _command = _quality;
                         }
                         else if (TextAsCommand().StartsWith("/set_p"))
                         {
@@ -157,9 +162,9 @@ namespace Witlesss.Commands
 
                 void SetUpDemotivateCommand()
                 {
-                    Bot.MemeService.Mode = DgMode.Square;
                     _demotivate.Pass(Message);
                     _demotivate.Pass(witless);
+                    _demotivate.SetMode();
                 }
                 
                 bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;

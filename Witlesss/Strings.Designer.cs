@@ -412,6 +412,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Если че правильно вот так:
+        ///
+        ////set_jpg@piece_fap_bot 75.
+        /// </summary>
+        internal static string SET_QUALITY_MANUAL {
+            get {
+                return ResourceManager.GetString("SET_QUALITY_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ВИРУСНАЯ БАЗА ОБНОВЛЕНА!.
         /// </summary>
         internal static string START_RESPONSE {

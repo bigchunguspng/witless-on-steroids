@@ -216,4 +216,9 @@
 
 чтобы скормить всё сразу</value>
     </data>
+    <data name="SET_QUALITY_MANUAL" xml:space="preserve">
+        <value>Если че правильно вот так:
+
+/set_jpg@piece_fap_bot 75</value>
+    </data>
 </root>

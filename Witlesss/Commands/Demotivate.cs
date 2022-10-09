@@ -11,7 +11,11 @@ namespace Witlesss.Commands
 {
     public class Demotivate : WitlessCommand
     {
-        public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
+        public void SetMode(DgMode mode = DgMode.Square)
+        {
+            Bot.MemeService.Mode = mode;
+            DemotivatorDrawer.PassQuality(Baka.JpgQuality);
+        }
 
         public override void Run()
         {
@@ -50,8 +54,7 @@ namespace Witlesss.Commands
         public void SendDemotivatedSticker(string fileID)
         {
             GetDemotivatorSources(fileID, ".webp", out string a, out string b, out string path);
-            string extension = Text == null ? ".png" :
-                Text.Contains("-j") ? ".jpg" : ".png";
+            string extension = Text == null ? ".png" : Text.Contains("-j") ? ".jpg" : ".png";
             using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, a, b, extension)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");

@@ -23,14 +23,15 @@ namespace Witlesss
         private readonly Regex _urls = new Regex(@"\S+(:[\/\\])\S+");
         private readonly FileIO<WitlessDB> _fileIO;
         private readonly Counter _generation = new Counter();
-        private int _probability;
+        private int _probability, _quality;
         private bool _hasUnsavedStuff;
         
-        public Witless(long chat, int interval = 7, int probability = 20)
+        public Witless(long chat, int interval = 7, int probability = 20, int jpg = 75)
         {
             Chat = chat;
             Interval = interval;
             DgProbability = probability;
+            JpgQuality = jpg;
             _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             PauseGeneration(30);
@@ -48,6 +49,11 @@ namespace Witlesss
             set => _probability = Math.Clamp(value, 0, 100);
         }
         [JsonProperty] public bool DemotivateStickers { get; set; }
+        [JsonProperty] public int JpgQuality
+        {
+            get => _quality;
+            set => _quality = Math.Clamp(value, 0, 100);
+        }
         
         public WitlessDB Words { get; set; }
         public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";

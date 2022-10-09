@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using static System.Drawing.Drawing2D.CompositingMode;
+using static System.Drawing.StringAlignment;
+using static System.Drawing.StringTrimming;
 using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Strings;
@@ -18,7 +20,7 @@ namespace Witlesss
         private readonly Dictionary<Image, Point> _logos;
         private KeyValuePair<Image, Point> _logo;
 
-        private readonly int _w, _h, _imageMargin, _imageMarginB, _imageWidth;
+        private readonly int _w, _h, _imageW, _imageH;
         private readonly Font _fontA, _fontB;
         private readonly Rectangle _background, _frame;
         private readonly RectangleF _upperText, _lowerText;
@@ -26,6 +28,12 @@ namespace Witlesss
         private readonly SolidBrush _fontColor;
         private readonly StringFormat _format;
         private readonly Point _imageTopLeft;
+
+        private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
+        private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
+        private static readonly Dictionary<int, EncoderParameter> Qualities = new Dictionary<int, EncoderParameter>();
+
+        private static long _jpgQuality = 120;
 
         public DemotivatorDrawer(int width = 720, int height = 720)
         {
@@ -40,24 +48,26 @@ namespace Witlesss
             _fontColor = new SolidBrush(Color.White);
 
             _white = new Pen(Color.White, 2);
-            _format = new StringFormat(StringFormatFlags.NoWrap)
-                {Alignment = StringAlignment.Center, Trimming = StringTrimming.Word};
+            _format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word};
 
             _w = width;
             _h = height;
-            _imageMargin = 50;
-            _imageMarginB = 140;
-            _imageWidth = _w - 2 * _imageMargin;
+            var imageMarginT = 50;
+            int imageMarginS = width == 1280 ? 144 : 50;
+            var imageMarginB = 140;
+            _imageW = _w - imageMarginS * 2;
+            _imageH = _h - imageMarginT - imageMarginB;
 
             var space = 5;
-            int margin = _imageMargin - space;
-            int marginB = _imageMarginB - space;
+            int marginT = imageMarginT - space;
+            int marginS = imageMarginS - space;
+            int marginB = imageMarginB - space;
 
-            _imageTopLeft = new Point(_imageMargin, _imageMargin);
+            _imageTopLeft = new Point(imageMarginS, imageMarginT);
             _background = new Rectangle(0, 0, _w, _h);
-            _frame = new Rectangle(margin, margin, _w - 2 * margin, _h - margin - marginB);
-            _upperText = new RectangleF(0, _h - _imageMarginB + 18, _w, 100);
-            _lowerText = new RectangleF(0, _h - _imageMarginB + 84, _w, 100);
+            _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
+            _upperText = new RectangleF(0, _h - imageMarginB + 18, _w, 100);
+            _lowerText = new RectangleF(0, _h - imageMarginB + 84, _w, 100);
         }
         
         private void LoadLogos(string path)
@@ -82,18 +92,19 @@ namespace Witlesss
             // 720 x 720
 
             string pathA = path;
-            string pathB = path.Replace(DotJpg, "-D" + DotJpg);
+            string pathB = path.Replace(DotJpg, "-D" + DotJpg); // todo replace png too
 
-            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageWidth, _h - _imageMargin - _imageMarginB));
+            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageW, _imageH));
             using Image demotivator = new Bitmap(_w, _h);
             using var graphics = Graphics.FromImage(demotivator);
-            graphics.CompositingMode = CompositingMode.SourceCopy;
+
+            graphics.CompositingMode = SourceCopy;
             graphics.FillRectangle(Brushes.Black, _background);
             graphics.DrawRectangle(_white, _frame);
             if (_w == 720) graphics.DrawImage(_logo.Key, _logo.Value);
             graphics.DrawImage(image, _imageTopLeft);
 
-            graphics.CompositingMode = CompositingMode.SourceOver;
+            graphics.CompositingMode = SourceOver;
             graphics.DrawString(textA, _fontA, _fontColor, _upperText, _format);
             graphics.DrawString(textB, _fontB, _fontColor, _lowerText, _format);
 
@@ -107,7 +118,17 @@ namespace Witlesss
         private void SaveImage(Image image, ref string path)
         {
             path = UniquePath(path, DotJpg);
-            image.Save(path, ImageFormat.Jpeg);
+            image.Save(path, JpgEncoder, EncoderParameters);
         }
+
+        public static void PassQuality(int value)
+        {
+            if (value == _jpgQuality) return;
+
+            if (!Qualities.ContainsKey(value)) Qualities.Add(value, new EncoderParameter(Encoder.Quality, value));
+            EncoderParameters.Param[0] = Qualities[value];
+        }
+
+        private static ImageCodecInfo GetEncoder() => ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);
     }
 }

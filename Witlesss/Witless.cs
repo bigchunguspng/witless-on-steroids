@@ -210,29 +210,30 @@ namespace Witlesss
 
         public string GenerateByWord(string word)
         {
-            string match = FindMatch(word, START, out bool splitted);
+            string match = FindMatch(word, START, out bool separated);
             string result = TryToGenerate(match);
-            if (splitted) result = word.Split()[0] + " " + result;
+            if (separated) result = word.Split()[0] + " " + result;
             return result;
         }
         public string GenerateByWordBackwards(string word)
         {
-            string match = FindMatch(word, END, out bool splitted);
+            string match = FindMatch(word, END, out bool separated);
             string result = GenerateBackwards(match);
-            if (splitted) result = result + " " + word.Split()[1];
+            if (separated) result = result + " " + word.Split()[1];
             return result;
         }
         
-        private string FindMatch(string word, string alt, out bool splitted)
+        private string FindMatch(string word, string alt, out bool separated)
         {
-            splitted = false;
+            separated = false;
             
             if (!Words.ContainsKey(word))
             {
                 if (word.Contains(' '))
                 {
                     word = alt == END? word.Split()[0] : word.Split()[1];
-                    splitted = true;
+                    separated = true;
+                    if (Words.ContainsKey(word)) return word;
                 }
 
                 var words = new List<string>();
@@ -308,7 +309,6 @@ namespace Witlesss
             }
             
             float r = (float)_random.NextDouble() * chanceTotal;
-            string result = END;
 
             foreach (var chance in dictionary)
             {
@@ -322,7 +322,7 @@ namespace Witlesss
                 }
             }
 
-            return result;
+            return END;
         }
         
         private async void PauseGeneration(int seconds)

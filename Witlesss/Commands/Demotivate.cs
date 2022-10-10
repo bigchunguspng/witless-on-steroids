@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
@@ -11,20 +12,23 @@ namespace Witlesss.Commands
 {
     public class Demotivate : WitlessCommand
     {
+        private readonly Regex _dg = new Regex(@"^\/d[vg]\S* *");
+        
         public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
         public void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
 
         public override void Run()
         {
-            if (!ProcessMessage(Message.ReplyToMessage ?? Message))
-                if (Message.ReplyToMessage == null)
-                    Bot.SendMessage(Chat, DG_MANUAL);
-                else if (!ProcessMessage(Message))
-                    Bot.SendMessage(Chat, DG_MANUAL);
+            var x = Message.ReplyToMessage;
+            if (ProcessMessage(x) || ProcessMessage(Message)) return;
+
+            Bot.SendMessage(Chat, DG_MANUAL);
         }
 
         private bool ProcessMessage(Message mess)
         {
+            if (mess == null) return false;
+            
             if      (mess.Photo != null)
                 SendDemotivator(mess.Photo[^1].FileId);
             else if (mess.Sticker != null && !(mess.Sticker.IsVideo || mess.Sticker.IsAnimated))
@@ -71,10 +75,12 @@ namespace Witlesss.Commands
 
         private void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
         {
-            GetDemotivatorText(Baka, Text, out textA, out textB);
+            GetDemotivatorText(Baka, RemoveDg(Text), out textA, out textB);
             path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
             path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path).Wait();
         }
+
+        private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");
     }
 }

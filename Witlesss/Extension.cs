@@ -64,17 +64,13 @@ namespace Witlesss
         {
             b = witless.TryToGenerate();
             if (b.Length > 1) b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
-            if (text != null && text.Contains(' ')) // custom upper text
-            {
-                a = text.Substring(text.IndexOf(' ') + 1);
-                if (a.Contains('\n')) // custom bottom text
-                {
-                    b = a.Substring(a.IndexOf('\n') + 1);
-                    a = a.Remove(a.IndexOf('\n'));
-                }
-            }
+            if (string.IsNullOrEmpty(text)) a = witless.TryToGenerate();
             else
-                a = witless.TryToGenerate();
+            {
+                var s = text.Split('\n', 2);
+                a = s[0];
+                if (s.Length > 1) b = s[1];
+            }
         }
 
         public static bool HasIntArgument(string text, out int value)

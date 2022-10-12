@@ -24,8 +24,8 @@ namespace Witlesss
         private readonly FileIO<WitlessDB> _fileIO;
         private readonly Counter _generation = new Counter();
         private int _probability, _quality;
-        private bool _hasUnsavedStuff;
-        
+        private bool _hasUnsavedStuff, _admins;
+
         public Witless(long chat, int interval = 7, int probability = 20, int jpg = 75)
         {
             Chat = chat;
@@ -54,7 +54,16 @@ namespace Witlesss
             get => _quality;
             set => _quality = Math.Clamp(value, 0, 100);
         }
-        
+
+        [JsonProperty] public bool AdminsOnly
+        {
+            get => _admins;
+            set
+            {
+                if (Chat < 0) _admins = value;
+            }
+        }
+
         public WitlessDB Words { get; set; }
         public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
 

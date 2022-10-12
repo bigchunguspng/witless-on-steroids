@@ -13,7 +13,9 @@ namespace Witlesss.Commands
                 FileSize(Baka.Path),
                 Baka.Interval,
                 Baka.DgProbability,
-                Baka.DemotivateStickers ? "ON" : "OFF");
+                Baka.JpgQuality,
+                Baka.DemotivateStickers ? "ON" : "OFF",
+                Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             Bot.SendMessage(Chat, info);
         }
     }

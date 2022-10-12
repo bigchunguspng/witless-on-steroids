@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
@@ -104,8 +106,15 @@ namespace Witlesss
             catch (Exception e)
             {
                 LogError(e.Message);
-                SendMessage(chat, e.Message == "Bad Request: file is too big" ? FILE_TOO_BIG_RESPONSE() : e.Message);
+                SendMessage(chat, e.Message == "Bad Request: file is too big" ? Pick(FILE_TOO_BIG_RESPONSE) : e.Message);
             }
+        }
+        
+        public bool UserIsAdmin(User user, long chat)
+        {
+            var admins = Client.GetChatAdministratorsAsync(chat);
+            admins.Wait();
+            return admins.Result.Any(x => x.User.Id == user.Id);
         }
     }
 }

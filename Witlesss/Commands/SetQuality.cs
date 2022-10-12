@@ -4,10 +4,12 @@ using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
-    public class SetQuality : WitlessCommand
+    public class SetQuality : ToggleAdmins
     {
         public override void Run()
         {
+            if (SenderIsSus()) return;
+
             if (HasIntArgument(Text, out int value))
             {
                 Baka.JpgQuality = value;

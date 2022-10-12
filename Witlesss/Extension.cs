@@ -201,11 +201,20 @@ namespace Witlesss
 
         public static string SET_PROBABILITY_RESPONSE(int p) => $"{SET_FREQUENCY_RESPONSE_B} {p}%";
 
-        public static string FILE_TOO_BIG_RESPONSE()
+        public static string Pick(string[] responses) => responses[Random.Next(responses.Length)];
+
+        public static readonly string[] FILE_TOO_BIG_RESPONSE = new string[]
         {
-            var a = new[] {"пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"};
-            return a[Random.Next(a.Length)];
-        }
+            "пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"
+        };
+        public static readonly string[] UNKNOWN_CHAT_RESPONSE = new string[]
+        {
+            "ты кто?", "я тебя не знаю чувак 😤", "сними маску, я тебя не узнаю", "а ты кто 😲", "понасоздают каналов... 😒"
+        };
+        public static readonly string[] NOT_ADMIN_RESPONSE = new string[]
+        {
+            "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
+        };
 
         public static string FileSize(string path)
         {

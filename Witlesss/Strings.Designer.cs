@@ -70,6 +70,15 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Параметры генерации смогут менять {0}.
+        /// </summary>
+        internal static string ADMINS_RESPONSE {
+            get {
+                return ResourceManager.GetString("ADMINS_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-Backup.
         /// </summary>
         internal static string BACKUP_FOLDER {
@@ -111,7 +120,9 @@ namespace Witlesss {
         ///Вес словаря: {1}
         ///Интервал генерации: {2}
         ///Вероятность демотивации: {3}%
-        ///Демотивация стикеров: {4}.
+        ///Качество демотиваторов: {4}%
+        ///Демотивация стикеров: {5}
+        ///Менять настройки могут: {6}.
         /// </summary>
         internal static string CHAT_INFO {
             get {

@@ -9,6 +9,8 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
+            if (SenderIsSus()) return;
+
             string name = ValidFileName(Title.Split()[0]);
             string result = MoveDictionary(name);
 

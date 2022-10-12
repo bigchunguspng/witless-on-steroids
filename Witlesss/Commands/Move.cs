@@ -6,10 +6,12 @@ using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
-    public class Move : WitlessCommand
+    public class Move : ToggleAdmins
     {
         public override void Run()
         {
+            if (SenderIsSus()) return;
+            
             var a = Text.Split();
             if (a.Length > 1)
             {

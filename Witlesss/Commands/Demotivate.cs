@@ -78,7 +78,7 @@ namespace Witlesss.Commands
             GetDemotivatorText(Baka, RemoveDg(Text), out textA, out textB);
             path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
             path = UniquePath(path, extension);
-            Bot.DownloadFile(fileID, path).Wait();
+            Bot.DownloadFile(fileID, path, Chat).Wait();
         }
 
         private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");

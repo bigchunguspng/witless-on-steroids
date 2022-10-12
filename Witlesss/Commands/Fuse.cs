@@ -13,13 +13,15 @@ using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, Sys
 
 namespace Witlesss.Commands
 {
-    public class Fuse : WitlessCommand
+    public class Fuse : ToggleAdmins
     {
         private readonly string _extras = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
         private readonly string _history = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}";
         
         public override void Run()
         {
+            if (SenderIsSus()) return;
+            
             var a = Text.Split();
             if (a.Length > 2)
             {

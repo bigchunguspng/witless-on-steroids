@@ -4,10 +4,12 @@ using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
-    public class SetFrequency : WitlessCommand
+    public class SetFrequency : ToggleAdmins
     {
         public override void Run()
         {
+            if (SenderIsSus()) return;
+
             if (HasIntArgument(Text, out int value))
             {
                 Baka.Interval = value;

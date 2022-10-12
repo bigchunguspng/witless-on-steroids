@@ -25,6 +25,7 @@ namespace Witlesss.Commands
         private readonly SetProbability _probability = new SetProbability();
         private readonly SetQuality _quality = new SetQuality();
         private readonly ToggleStickers _stickers = new ToggleStickers();
+        private readonly ToggleAdmins _admins = new ToggleAdmins();
         private readonly DeleteDictionary _delete = new DeleteDictionary();
 
         private string TextAsCommand() => Text.ToLower().Replace(Strings.BOT_USERNAME, "");
@@ -119,6 +120,10 @@ namespace Witlesss.Commands
                         else if (TextAsCommand().StartsWith("/move"))
                         {
                             _command = _move;
+                        }
+                        else if (TextAsCommand().StartsWith("/toggle_admins"))
+                        {
+                            _command = _admins;
                         }
                         else if (TextAsCommand() == "/debug")
                         {

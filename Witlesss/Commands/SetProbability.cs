@@ -4,10 +4,12 @@ using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {
-    public class SetProbability : WitlessCommand
+    public class SetProbability : ToggleAdmins
     {
         public override void Run()
         {
+            if (SenderIsSus()) return;
+
             if (HasIntArgument(Text, out int value))
             {
                 Baka.DgProbability = value;

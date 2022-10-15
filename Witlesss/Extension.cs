@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using static System.Environment;
 using static Witlesss.LetterCaseMode;
@@ -14,6 +15,8 @@ namespace Witlesss
 {
     public static class Extension
     {
+        private static readonly Regex Column = new Regex("[:;^Жж]"), Comma = new Regex("[.юб]");
+        
         public static readonly Random Random = new Random();
 
         public static int AssumedResponseTime(int initialTime, string text)
@@ -86,22 +89,20 @@ namespace Witlesss
             return words.Length > 1 && double.TryParse(words[1].Replace('.', ','), out value);
         }
 
-        public static bool StringIsTimeSpan(string arg, out TimeSpan span)
+        public static bool TextIsTimeSpan(string arg, out TimeSpan span)
         {
             span = TimeSpan.Zero;
-            arg = arg.TrimStart('-').Replace('.', ',').Replace('ю', ',').Replace('б', ',');
-            if (double.TryParse(arg, out double seconds))
-            {
-                span = TimeSpan.FromSeconds(seconds);
-                return true;
-            }
-            arg = arg.Replace('^', ':').Replace(';', ':').Replace('Ж', ':');
-            if (arg.Contains(':'))
-            {
-                if (TimeSpan.TryParseExact(arg, "m\\:ss", null, out span)) return true;
-            }
+            arg = arg.TrimStart('-');
 
-            return false;
+            if (!Regex.IsMatch(arg, @"^(\d+[:;^Жж])?\d+([,.юб]\d+)?$")) return false;
+            
+            string s = Comma.Replace(Regex.Match(arg, @"\d+([,.юб]\d+)?$").Value, ",");
+            string m = Column.Replace(Regex.Match(arg, @"^\d+[:;^Жж]").Value, "");
+            
+            if (double.TryParse(s, out double seconds)) span  = TimeSpan.FromSeconds(seconds);
+            if (double.TryParse(m, out double minutes)) span += TimeSpan.FromMinutes(minutes);
+
+            return true;
         }
         
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);

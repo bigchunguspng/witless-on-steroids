@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.TimeSpan;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
@@ -32,17 +33,15 @@ namespace Witlesss.Commands
         protected (bool failed, TimeSpan start, TimeSpan length) GetArgs()
         {
             var s = Text.Split();
-            if (s.Length == 2 && StringIsTimeSpan(s[1], out var length))
-                return (false, TimeSpan.Zero, length);    // [++++]-----]
-            else if (s.Length > 2 && StringIsTimeSpan(s[1], out var start))
+            int len = s.Length;
+            if      (len == 2 && TextIsTimeSpan(s[1], out var length)) return (false, Zero, length);       // [++]----]
+            else if (len >= 3 && TextIsTimeSpan(s[1], out var start))
             {
-                if (StringIsTimeSpan(s[2], out length))
-                    return (false, start, length);        // [--[++++]--]
-                else
-                    return (false, start, TimeSpan.Zero); // [--[+++++++]
+                if  (len == 4 && TextIsTimeSpan(s[3], out var end))    return (false, start, end - start); // [-[++]--]
+                else if         (TextIsTimeSpan(s[2], out length))     return (false, start, length);      // [-[++]--]
+                else                                                   return (false, start, Zero);        // [-[+++++]
             }
-            
-            return (true, TimeSpan.Zero, TimeSpan.Zero);  // [----------]
+            else                                                       return (true, Zero, Zero);          // [-------]
         }
     }
 }

@@ -206,6 +206,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!
+        ///
+        ///Если хотите начать заново - пропишите /start@piece_fap_bot.
+        /// </summary>
+        internal static string DEL_SUCCESS_RESPONSE {
+            get {
+                return ResourceManager.GetString("DEL_SUCCESS_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Comic Sans MS.
         /// </summary>
         internal static string DEMOTIVATOR_LOWER_FONT {
@@ -324,6 +335,15 @@ namespace Witlesss {
         internal static string FUSE_SUCCESS_RESPONSE {
             get {
                 return ResourceManager.GetString("FUSE_SUCCESS_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Это команда только для бесед 🤓.
+        /// </summary>
+        internal static string GROUP_CHAT_ONLY_COMAND {
+            get {
+                return ResourceManager.GetString("GROUP_CHAT_ONLY_COMAND", resourceCulture);
             }
         }
         

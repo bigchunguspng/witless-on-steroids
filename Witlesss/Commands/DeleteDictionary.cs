@@ -2,6 +2,7 @@
 using System.IO;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
+using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {
@@ -25,7 +26,7 @@ namespace Witlesss.Commands
             
             File.Delete(path);
             Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
-            Bot.SendMessage(Chat, $"Поздравляю, чат <b>{Title}</b> был удалён из списка чатов, а словарь сохранён как <b>{result}</b>!\n\nЕсли хотите начать заново - пропишите /start@piece_fap_bot");
+            Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result));
         }
     }
 }

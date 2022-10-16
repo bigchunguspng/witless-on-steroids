@@ -14,6 +14,8 @@ namespace Witlesss.Commands
 
             string name = ValidFileName(Title.Split()[0]);
             string result = MoveDictionary(name);
+            
+            if (result == "*") result = "*👊 никак*";
 
             string path = Baka.Path;
 

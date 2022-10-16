@@ -163,9 +163,8 @@ namespace Witlesss
             IEnumerable<string> SmallWordsSkipLast (int length) => tokens.SkipLast(1).Where(x => UnitableToken(x, length)).Reverse();
             IEnumerable<string> SmallWordsSkipFirst(int length) => tokens.Skip    (1).Where(x => UnitableToken(x, length)).Reverse();
             
-            bool UnitableToken(string x, int length) => x.Length == length && !ContainsDigit(x);
-            bool ContainsDigit(string x) => Regex.IsMatch(x, @"\S*\d+\S*");
-            bool IsSimpleToken(string x) => !(x.Contains(' ') || ContainsDigit(x));
+            bool UnitableToken(string x, int length) => x.Length == length;
+            bool IsSimpleToken(string x) => !x.Contains(' ');
 
             void UniteTokensToRight(int length, int min, int max)
             {

@@ -35,7 +35,7 @@ namespace Witlesss
 
         public DgMode Mode;
 
-        private DemotivatorDrawer Drawer() => Mode switch
+        private DemotivatorDrawer Drawer => Mode switch
         {
             DgMode.Square => _drawers[0],
             DgMode.Wide =>   _drawers[1],
@@ -44,8 +44,7 @@ namespace Witlesss
 
         public string MakeDemotivator(string path, string textA, string textB)
         {
-            Drawer().SetRandomLogo();
-            return Drawer().DrawDemotivator(path, textA, textB);
+            return Drawer.DrawDemotivator(path, textA, textB);
         }
 
         public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
@@ -55,12 +54,6 @@ namespace Witlesss
             return MakeDemotivator(path, textA, textB);
         }
 
-        public string MakeVideoDemotivator(string path, string textA, string textB)
-        {
-            Drawer().SetRandomLogo();
-            return AnimateDemotivator(path, textA, textB);
-        }
-
         public string MakeVideoStickerDemotivator(string path, string textA, string textB)
         {
             Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
@@ -68,7 +61,7 @@ namespace Witlesss
             return MakeVideoDemotivator(path, textA, textB);
         }
         
-        private string AnimateDemotivator(string path, string textA, string textB)
+        public string MakeVideoDemotivator(string path, string textA, string textB)
         {
             string inputFilePath = path;
             string inputFileName = path.Split('\\', '.')[^2];
@@ -100,8 +93,9 @@ namespace Witlesss
             }
 
             // Demotivate each frame
+            var demotivator = Drawer.MakeFrame(textA, textB);
             var frames = GetAllFrames();
-            foreach (string file in frames) Drawer().DrawDemotivator(file, textA, textB);
+            foreach (string file in frames) Drawer.PasteImage(demotivator, file);
 
             var framesPath = @$"{animationPath}\F-%04d-D.jpg";
             var outputPath = $@"{animationPath}\{animationName}";

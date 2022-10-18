@@ -201,15 +201,6 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-Messages.
-        /// </summary>
-        internal static string DEBUG_FOLDER {
-            get {
-                return ResourceManager.GetString("DEBUG_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!
         ///
         ///Если хотите начать заново - пропишите /start@piece_fap_bot.
@@ -405,6 +396,15 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ((\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])\ufe0f*|[\d*#]\ufe0f\u20e3)+.
+        /// </summary>
+        internal static string REGEX_EMOJI {
+            get {
+                return ResourceManager.GetString("REGEX_EMOJI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
         ////set@piece_fap_bot 3
@@ -501,6 +501,15 @@ namespace Witlesss {
         internal static string SUS_MANUAL {
             get {
                 return ResourceManager.GetString("SUS_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram-Temp.
+        /// </summary>
+        internal static string TEMP_FOLDER {
+            get {
+                return ResourceManager.GetString("TEMP_FOLDER", resourceCulture);
             }
         }
         

@@ -2,53 +2,49 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
 using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Strings;
+using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace Witlesss
 {
     public class DemotivatorDrawer
     {
-        private readonly Random _r = new Random();
-        private readonly Dictionary<Image, Point> _logos;
-        private KeyValuePair<Image, Point> _logo;
-
         private readonly int _w, _h, _imageW, _imageH;
-        private readonly Font _fontA, _fontB;
-        private readonly Rectangle _background, _frame;
-        private readonly RectangleF _upperText, _lowerText;
+        private readonly Point _imageXY;
         private readonly Pen _white;
-        private readonly SolidBrush _fontColor;
-        private readonly StringFormat _format;
-        private readonly Point _imageTopLeft;
-
+        private readonly Rectangle _frame;
+        private readonly StringFormat[] _formats;
+        private readonly TextParameters _upper, _lower;
+        
+        private static readonly string TEMP = $@"{CurrentDirectory}\{TEMP_FOLDER}";
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
         private static readonly Dictionary<int, EncoderParameter> Qualities = new Dictionary<int, EncoderParameter>();
-        private static readonly Regex Ext = new Regex("(.png)|(.jpg)");
+        private static readonly Dictionary<Image, Point> Logos = new Dictionary<Image, Point>();
+        private static readonly Regex Ext = new Regex("(.png)|(.jpg)"), Emoji = new Regex(REGEX_EMOJI);
+        private static readonly Random R = new Random();
 
         private static long _jpgQuality = 120;
+        private static KeyValuePair<Image, Point> _logo;
 
+        static DemotivatorDrawer() => LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
         public DemotivatorDrawer(int width = 720, int height = 720)
         {
-            _logos = new Dictionary<Image, Point>();
-            LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
-            
-            string fontA = DEMOTIVATOR_UPPER_FONT;
-            string fontB = DEMOTIVATOR_LOWER_FONT;
-
-            _fontA = new Font(fontA, 36);
-            _fontB = new Font(fontB, 18);
-            _fontColor = new SolidBrush(Color.White);
-
             _white = new Pen(Color.White, 2);
-            _format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word};
+            _formats = new[]
+            {
+                new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = None},
+                new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = EllipsisCharacter}
+            };
 
             _w = width;
             _h = height;
@@ -63,64 +59,199 @@ namespace Witlesss
             int marginS = imageMarginS - space;
             int marginB = imageMarginB - space;
 
-            _imageTopLeft = new Point(imageMarginS, imageMarginT);
-            _background = new Rectangle(0, 0, _w, _h);
+            _imageXY = new Point(imageMarginS, imageMarginT);
             _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
-            _upperText = new RectangleF(0, _h - imageMarginB + 18, _w, 100);
-            _lowerText = new RectangleF(0, _h - imageMarginB + 84, _w, 100);
+            
+            _upper = TextParameters.UpperText(_h - imageMarginB + 18, _w);
+            _lower = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
         }
         
-        private void LoadLogos(string path)
+        public string DrawDemotivator(string path, string a, string b)
         {
-            var files = GetFiles(path);
-            foreach (var file in files)
-            {
-                var coords = file.Name.Replace(file.Extension, "").Split(' ');
-                if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
-                    _logos.Add(Image.FromFile(file.FullName), new Point(x, y));
-            }
+            var demotivator = MakeFrame(a, b);
+            return PasteImage(demotivator, path);
         }
 
-        public void SetRandomLogo() => _logo = _logos.ElementAt(_r.Next(_logos.Count));
-
-        public string DrawDemotivator(string path, string textA, string textB)
+        public string MakeFrame(string a, string b)
         {
-            //1280 x 1024 нейродемотиваторы (5:4)
-            // 357 x 372 ржакабот в беседах
-            // 714 x 745 ржакабот в личке
-            // 430 x 430 - telegram max res to be displayed on desktop
-            // 720 x 720
-
-            string pathA = path;
-            string pathB = Ext.Replace(path, "-D.jpg");
-
-            using var image = ResizeImage(Image.FromFile(pathA), new Size(_imageW, _imageH));
             using Image demotivator = new Bitmap(_w, _h);
             using var graphics = Graphics.FromImage(demotivator);
 
             graphics.CompositingMode = SourceCopy;
-            graphics.FillRectangle(Brushes.Black, _background);
+            graphics.Clear(Color.Black);
             graphics.DrawRectangle(_white, _frame);
-            if (_w == 720) graphics.DrawImage(_logo.Key, _logo.Value);
-            graphics.DrawImage(image, _imageTopLeft);
+            if (_w == 720)
+            {
+                SetRandomLogo();
+                graphics.DrawImage(_logo.Key, _logo.Value);
+            }
 
             graphics.CompositingMode = SourceOver;
-            graphics.DrawString(textA, _fontA, _fontColor, _upperText, _format);
-            graphics.DrawString(textB, _fontB, _fontColor, _lowerText, _format);
+            DrawText(a, graphics, DrawTextA, _upper);
+            DrawText(b, graphics, DrawTextB, _lower);
+            
+            return SaveImageTemp(demotivator);
 
-            SaveImage(demotivator, ref pathB);
-
-            return pathB;
+            void DrawTextA(Graphics g) => Draw(g, a, _upper);
+            void DrawTextB(Graphics g) => Draw(g, b, _lower);
+            
+            void Draw(Graphics g, string s, TextParameters p) => g.DrawString(s, p.Font, p.Color, p.Layout, p.Format);
         }
 
-        private Image ResizeImage(Image image, Size size) => new Bitmap(image, size);
+        public string PasteImage(string background, string picture)
+        {
+            using var demotivator = Image.FromFile(background);
+            using var graphics = Graphics.FromImage(demotivator);
+            using var image = Resize(Image.FromFile(picture), new Size(_imageW, _imageH));
+            
+            graphics.CompositingMode = SourceCopy;
+            graphics.DrawImage(image, _imageXY);
+            
+            string output = Ext.Replace(picture, "-D.jpg");
+            
+            return SaveImage(demotivator, output);
+            
+            Image Resize(Image img, Size size) => new Bitmap(img, size);
+        }
 
-        private void SaveImage(Image image, ref string path)
+        private void SetRandomLogo() => _logo = Logos.ElementAt(R.Next(Logos.Count));
+
+        private void DrawText(string text, Graphics g, Action<Graphics> drawSimple, TextParameters p)
+        {
+            var emoji = Regex.Matches(text, REGEX_EMOJI);
+            if (emoji.Count > 0)
+            {
+                DrawTextAndEmoji(g, text, emoji, p);
+            }
+            else
+            {
+                drawSimple(g);
+            }
+        }
+
+        private void DrawTextAndEmoji(Graphics g, string text, IList<Match> matches, TextParameters p, int m = 0)
+        {
+            if (p.Lines > 1 && text.Contains('\n'))
+            {
+                var s = text.Split('\n');
+                var index1 = s[0].Length;
+                var index2 = s[0].Length + 1 + s[1].Length;
+                var matchesA = matches.Where(u => u.Index < index1).ToArray();
+                var matchesB = matches.Where(u => u.Index > index1 && u.Index < index2).ToArray();
+                DrawTextAndEmoji(g, s[1], matchesB, p, 34);
+                text = s[0];
+                matches = matchesA;
+            }
+            
+            var texts = Emoji.Replace(text, "\t").Split('\t');
+            var emoji = GetEmojiPngs(matches);
+
+            using var textArea = new Bitmap(_w, 100);
+            using var graphics = Graphics.FromImage(textArea);
+
+            graphics.CompositingMode = SourceOver;
+
+            var x = 0;
+            for (int i = 0; i < emoji.Count; i++)
+            {
+                DoText(texts[i]);
+
+                foreach (string path in emoji[i])
+                {
+                    if (p.EmojiS + x > _w) break;
+
+                    var image = new Bitmap(Image.FromFile(path), p.EmojiSize);
+                    graphics.DrawImage(image, x, 0);
+                    x += p.EmojiS;
+                }
+            }
+            DoText(texts[^1]);
+
+            void DoText(string s)
+            {
+                var rest = _w - x;
+                var width = (int) Math.Min(graphics.MeasureString(s, p.Font).Width, rest);
+                var format = width < rest ? _formats[0] : _formats[1];
+
+                var layout = new RectangleF(x, 0, width, 100);
+                graphics.DrawString(s, p.Font, p.Color, layout, format);
+                x += width;
+            }
+            
+            var save = SaveImageTemp(textArea);
+            var y = (int) p.Layout.Y + m;
+            var point = new Point((_w - x) / 2, y);
+
+            g.DrawImage(new Bitmap(Image.FromFile(save)), point);
+            
+            // mb static emoji bitmaps cache to prevent file exceptions
+        }
+
+        private List<List<string>> GetEmojiPngs(IList<Match> matches)
+        {
+            var emoji = new List<List<string>>(matches.Count);
+            
+            for (var n = 0; n < matches.Count; n++)
+            {
+                var match = matches[n];
+                var xd = match.Value;
+                var cluster = new List<string>(xd.Length / 2);
+                for (int i = 0; i < xd.Length; i += IsSurrogatePair(xd, i) ? 2 : 1)
+                {
+                    var c = ConvertToUtf32(xd, i).ToString("x4");
+                    cluster.Add(c);
+                }
+
+                emoji.Add(new List<string>(cluster.Count));
+
+                for (int i = 0; i < cluster.Count; i++)
+                {
+                    int j = i;
+                    var name = cluster[i];
+                    string file = null;
+                    bool repeat;
+                    do
+                    {
+                        repeat = false;
+                        
+                        var files = Directory.GetFiles($@"{CurrentDirectory}\Emoji", name + "*.png");
+                        if (files.Length == 1) file = files[0];
+                        else if (files.Length > 1 && cluster.Count > j + 1)
+                        {
+                            file = files[^1];
+                            repeat = true;
+                            j++;
+                            name = name + "-" + cluster[j];
+                        }
+                    } while (repeat);
+
+                    if (file != null)
+                    {
+                        emoji[n].Add(file);
+                        i += file.Substring(file.LastIndexOf('\\')).Count(c => c == '-');
+                    }
+                }
+            }
+
+            return emoji;
+        }
+
+        private string SaveImage(Image image, string path)
         {
             path = UniquePath(path, ".jpg");
             image.Save(path, JpgEncoder, EncoderParameters);
-        }
 
+            return path;
+        }
+        private string SaveImageTemp(Image image)
+        {
+            var path = UniquePath($@"{TEMP}\x");
+            CreatePath(TEMP);
+            image.Save(path);
+
+            return path;
+        }
+        
         public static void PassQuality(int value)
         {
             if (value == _jpgQuality) return;
@@ -130,5 +261,51 @@ namespace Witlesss
         }
 
         private static ImageCodecInfo GetEncoder() => ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);
+        
+        private static void LoadLogos(string path)
+        {
+            var files = GetFiles(path);
+            foreach (var file in files)
+            {
+                var coords = file.Name.Replace(file.Extension, "").Split(' ');
+                if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
+                    Logos.Add(Image.FromFile(file.FullName), new Point(x, y));
+            }
+        }
+    }
+
+    public class TextParameters
+    {
+        public int Lines, EmojiS;
+        public Font Font;
+        public SolidBrush Color;
+        public RectangleF Layout;
+        public StringFormat Format;
+        
+        public Size EmojiSize => new Size(EmojiS, EmojiS);
+
+        public static TextParameters UpperText(int margin, int width)
+        {
+            var result = new TextParameters() {Font = UpperFont, Lines = 1, EmojiS = 54};
+            result.SetCommon(margin, width);
+            return result;
+        }
+        
+        public static TextParameters LowerText(int margin, int width)
+        {
+            var result = new TextParameters() {Font = LowerFont, Lines = 2, EmojiS = 34};
+            result.SetCommon(margin, width);
+            return result;
+        }
+
+        private static Font UpperFont => new Font(DEMOTIVATOR_UPPER_FONT, 36);
+        private static Font LowerFont => new Font(DEMOTIVATOR_LOWER_FONT, 18);
+
+        private void SetCommon(int margin, int width)
+        {
+            Color  = new SolidBrush(System.Drawing.Color.White);
+            Layout = new RectangleF(0, margin, width, 100);
+            Format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word};
+        }
     }
 }

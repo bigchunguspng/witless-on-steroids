@@ -294,7 +294,7 @@ namespace Witlesss
             }
             try
             {
-                Directory.Delete($@"{CurrentDirectory}\{DEBUG_FOLDER}", true);
+                Directory.Delete($@"{CurrentDirectory}\{TEMP_FOLDER}", true);
                 dirsDeleted++;
             }
             catch

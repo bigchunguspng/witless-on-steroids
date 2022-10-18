@@ -136,8 +136,8 @@
     <data name="DAMN_MANUAL" xml:space="preserve">
         <value>Напиши это вместе с видосом или музлом</value>
     </data>
-    <data name="DEBUG_FOLDER" xml:space="preserve">
-        <value>Telegram-Messages</value>
+    <data name="TEMP_FOLDER" xml:space="preserve">
+        <value>Telegram-Temp</value>
     </data>
     <data name="SET_PROBABILITY_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
@@ -237,5 +237,8 @@
         <value>Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!
 
 Если хотите начать заново - пропишите /start@piece_fap_bot</value>
+    </data>
+    <data name="REGEX_EMOJI" xml:space="preserve">
+        <value>((\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])\ufe0f*|[\d*#]\ufe0f\u20e3)+</value>
     </data>
 </root>

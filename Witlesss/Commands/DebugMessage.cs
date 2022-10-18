@@ -14,7 +14,7 @@ namespace Witlesss.Commands
                     
             var mess = Message.ReplyToMessage;
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
-            var path = $@"{CurrentDirectory}\{DEBUG_FOLDER}\{name}";
+            var path = $@"{CurrentDirectory}\{TEMP_FOLDER}\{name}";
             Extension.CreatePath(path);
             new FileIO<Message>(path).SaveData(mess);
             using var stream = File.OpenRead(path);

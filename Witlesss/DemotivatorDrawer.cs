@@ -245,8 +245,8 @@ namespace Witlesss
         }
         private string SaveImageTemp(Image image)
         {
-            var path = UniquePath($@"{TEMP}\x");
             CreatePath(TEMP);
+            var path = UniquePath($@"{TEMP}\x");
             image.Save(path);
 
             return path;

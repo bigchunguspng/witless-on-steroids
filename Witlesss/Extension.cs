@@ -138,51 +138,35 @@ namespace Witlesss
             return text;
         }
 
-        public static void SetOutName(string path, out string output, string suffix)
+        public static string SetOutName(string path, string suffix)
         {
-            string extension = GetFileExtension(path);
-            output = GetFileName(path) + suffix + extension;
+            string extension = Path.GetExtension(path);
+            return RemoveExtension(path) + suffix + extension;
         }
-        public static void SetOutName(string path, out string output, string suffix, out bool video)
+        public static string SetOutName(string path, string suffix, out bool video)
         {
-            string extension = GetFileExtension(path);
-            output = GetFileName(path) + suffix + extension;
+            string extension = Path.GetExtension(path);
             video = extension == ".mp4";
+            return RemoveExtension(path) + suffix + extension;
         }
 
-        public static string GetFileName(string path) => path.Remove(path.LastIndexOf('.'));
-        public static string GetFileExtension(string path) => path.Substring(path.LastIndexOf('.'));
+        private static string RemoveExtension(string path) => path.Remove(path.LastIndexOf('.'));
+
         public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
+        public static string ExtensionFromID(string id) => ExtensionsIDs[id.Remove(2)];
+        public static MediaType MediaTypeFromID(string id) => MediaTypes[id.Remove(2)];
 
-        public static string ExtensionFromID(string id)
+        private static readonly Dictionary<string, string> ExtensionsIDs = new Dictionary<string, string>()
         {
-            string id2 = id.Remove(2);
-            return id2 switch
-            {
-                "BA" => ".mp4",
-                "Cg" => ".mp4", // animation
-                "CQ" => ".mp3",
-                "Aw" => ".mp3", // voice message / ogg
-                "BQ" => ".wav",
-                "Ag" => ".jpg",
-                "CA" => ".webm",
-                _    => ""
-            };
-        }
-        public static MediaType MediaTypeFromID(string id)
+            {"BA", ".mp4"}, {"Cg", ".mp4"}, // Cg - animation
+            {"CQ", ".mp3"}, {"Aw", ".mp3"}, // Aw - voice message / ogg
+            {"BQ", ".wav"}, {"Ag", ".jpg"}, {"CA", ".webm"}
+        };
+        private static readonly Dictionary<string, MediaType> MediaTypes = new Dictionary<string, MediaType>()
         {
-            string id2 = id.Remove(2);
-            return id2 switch
-            {
-                "BA" => MediaType.AudioVideo,
-                "Cg" => MediaType.Video,
-                "CQ" => MediaType.Audio,
-                "Aw" => MediaType.Audio,
-                "BQ" => MediaType.Audio,
-                "CA" => MediaType.Video,
-                _    => MediaType.Audio // bc who cares?
-            };
-        }
+            {"BA", MediaType.AudioVideo}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
+            {"Aw", MediaType.Audio},      {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
+        };
 
         public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
 
@@ -219,7 +203,7 @@ namespace Witlesss
 
         public static string FileSize(string path)
         {
-            long bytes = new FileInfo(path).Length;
+            long bytes = SizeInBytes(path);
             long kbs = bytes / 1024;
             if (kbs < 1)
                 return bytes + " байт";
@@ -227,17 +211,19 @@ namespace Witlesss
                 return kbs + " КБ";
         }
 
-        public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || new FileInfo(path).Length == 0;
+        public static long SizeInBytes(string path) => new FileInfo(path).Length;
 
-        public static void CreatePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
+        public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
 
-        public static FileInfo[] GetFiles(string path)
+        public static void CreateFilePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
+
+        public static FileInfo[] GetFilesInfo(string path)
         {
             Directory.CreateDirectory(path);
             return new DirectoryInfo(path).GetFiles();
         }
         
-        public static string[] GetFileNames(string path)
+        public static string[] GetFiles(string path)
         {
             Directory.CreateDirectory(path);
             return Directory.GetFiles(path);

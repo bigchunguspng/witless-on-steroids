@@ -124,7 +124,7 @@ namespace Witlesss
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
             WebmToMp4(ref path, out _);
-            SetOutName(path, out string output, "-S");
+            var output = SetOutName(path, "-S");
 
             if (type != MediaType.Audio)
             {
@@ -235,7 +235,7 @@ namespace Witlesss
 
         private void WebmToMp4(ref string path, out string extension)
         {
-            extension = GetFileExtension(path);
+            extension = Path.GetExtension(path);
             if (extension == ".webm")
             {
                 Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));

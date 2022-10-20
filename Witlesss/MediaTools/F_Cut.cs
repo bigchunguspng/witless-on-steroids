@@ -13,7 +13,7 @@ namespace Witlesss.MediaTools
 
         public F_Cut(string input, out string output, TimeSpan start, TimeSpan length)
         {
-            SetOutName(input, out output, "-C");
+            output = SetOutName(input, "-C");
             
             _input = input;
             _output = output;

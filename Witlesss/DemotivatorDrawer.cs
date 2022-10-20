@@ -241,7 +241,7 @@ namespace Witlesss
                     if (file != null)
                     {
                         emoji[n].Add(file);
-                        i += file.Substring(file.LastIndexOf('\\')).Count(c => c == '-');
+                        i += Path.GetFileName(file).Count(c => c == '-');
                     }
                 }
             }
@@ -277,7 +277,7 @@ namespace Witlesss
         
         private static void LoadLogos(string path)
         {
-            var files = GetFiles(path);
+            var files = GetFilesInfo(path);
             foreach (var file in files)
             {
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');

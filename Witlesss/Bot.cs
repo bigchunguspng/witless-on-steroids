@@ -141,8 +141,7 @@ namespace Witlesss
                 string message = File.ReadAllText($@"{CurrentDirectory}\.spam");
                 foreach (var witless in SussyBakas.Values)
                 {
-                    long bytes = new FileInfo(witless.Path).Length;
-                    if (bytes > size)
+                    if (SizeInBytes(witless.Path) > size)
                     {
                         SendMessage(witless.Chat, message);
                         Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
@@ -183,8 +182,7 @@ namespace Witlesss
             var bin = new List<long>();
             foreach (var witless in SussyBakas.Values)
             {
-                long bytes = new FileInfo(witless.Path).Length;
-                if (bytes < size)
+                if (SizeInBytes(witless.Path) < size)
                 {
                     witless.Backup();
                     File.Delete(witless.Path);

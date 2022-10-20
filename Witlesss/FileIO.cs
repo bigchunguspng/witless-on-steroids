@@ -24,7 +24,7 @@ namespace Witlesss
         {
             if (FileEmptyOrNotExist(_path))
             {
-                CreatePath(_path);
+                CreateFilePath(_path);
                 File.CreateText(_path).Dispose();
                 T result = new T();
                 SaveData(result);

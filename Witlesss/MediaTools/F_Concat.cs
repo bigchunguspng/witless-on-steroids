@@ -16,7 +16,7 @@ namespace Witlesss.MediaTools
             _input_a = inputA;
             _input_b = inputB;
 
-            SetOutName(_input_a, out output, "-A");
+            output = SetOutName(_input_a, "-A");
 
             _type = type;
             _output = output;

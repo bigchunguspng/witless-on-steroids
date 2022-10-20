@@ -37,14 +37,13 @@ namespace Witlesss.Commands
 
         protected string MoveDictionary(string name)
         {
-            var bytes = new FileInfo(Baka.Path).Length;
-            if (bytes > 2)
+            if (SizeInBytes(Baka.Path) > 2)
             {
                 string path = UniquePath(ExtraDBPath(name), ".json", name == "info" || name == "his");
                 Baka.Save();
                 File.Copy(Baka.Path, path);
                 
-                string result = path.Substring(path.LastIndexOf('\\') + 1).Replace(".json", "");
+                string result = Path.GetFileNameWithoutExtension(path);
                 Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
                 return result;
             }

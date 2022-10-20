@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using static Witlesss.Extension;
+using System.IO;
 
 namespace Witlesss.MediaTools
 {
@@ -12,7 +12,7 @@ namespace Witlesss.MediaTools
         public F_WebpToJpg(string input, out string output, string extension)
         {
             Input = input;
-            Output = GetFileName(input) + extension;
+            Output = Path.ChangeExtension(input, extension);
             output = Output;
         }
 

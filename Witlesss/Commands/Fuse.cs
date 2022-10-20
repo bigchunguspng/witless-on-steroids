@@ -27,7 +27,7 @@ namespace Witlesss.Commands
             {
                 string name = Text.Substring(Text.IndexOf(' ') + 1);
                 var path = $@"{_history}\{Chat}";
-                var files = GetFileNames(path);
+                var files = GetFiles(path);
                 
                 if (name == "his all")
                 {
@@ -81,10 +81,10 @@ namespace Witlesss.Commands
         }
 
         private string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
-        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFiles(_extras))}\n\n{BASE_SIZE()}";
+        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(_extras))}\n\n{BASE_SIZE()}";
         private string FUSE_AVAILABLE_DATES()
         {
-            var files = GetFiles($@"{_history}\{Chat}");
+            var files = GetFilesInfo($@"{_history}\{Chat}");
             var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
             if (files.Length > 0)
                 result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
@@ -125,7 +125,7 @@ namespace Witlesss.Commands
 
             string Path() => $@"{_extras}\{name}.json";
             WitlessDB FromFile() => new FileIO<WitlessDB>(Path()).LoadData();
-            bool BaseExists() => GetFileNames(_extras).Contains(Path());
+            bool BaseExists() => GetFiles(_extras).Contains(Path());
         }
 
         private void EatChatHistory(string path)

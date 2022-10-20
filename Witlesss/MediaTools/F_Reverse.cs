@@ -12,7 +12,7 @@ namespace Witlesss.MediaTools
         
         public F_Reverse(string input, out string output)
         {
-            SetOutName(input, out output, "-R", out _video);
+            output = SetOutName(input, "-R", out _video);
             
             _input = input;
             _output = output;

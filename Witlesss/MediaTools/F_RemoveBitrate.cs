@@ -15,7 +15,7 @@ namespace Witlesss.MediaTools
 
         public F_RemoveBitrate(string input, out string output, int bitrate, Size size = default)
         {
-            SetOutName(input, out output, "-L", out _video);
+            output = SetOutName(input, "-L", out _video);
             
             _input = input;
             _output = output;

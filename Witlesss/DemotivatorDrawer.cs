@@ -20,11 +20,10 @@ namespace Witlesss
     {
         private readonly int _w, _h, _imageW, _imageH;
         private readonly Point _imageXY;
-        private readonly Pen _white;
         private readonly Rectangle _frame;
-        private readonly StringFormat[] _formats;
         private readonly TextParameters _upper, _lower;
         
+        private static readonly Pen White;
         private static readonly string TEMP = $@"{CurrentDirectory}\{TEMP_FOLDER}";
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
@@ -32,25 +31,31 @@ namespace Witlesss
         private static readonly Dictionary<Image, Point> Logos = new Dictionary<Image, Point>();
         private static readonly Regex Ext = new Regex("(.png)|(.jpg)"), Emoji = new Regex(REGEX_EMOJI);
         private static readonly Random R = new Random();
+        private static readonly StringFormat[] Formats;
 
         private static long _jpgQuality = 120;
         private static KeyValuePair<Image, Point> _logo;
 
-        static DemotivatorDrawer() => LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
-        public DemotivatorDrawer(int width = 720, int height = 720)
+        static DemotivatorDrawer()
         {
-            _white = new Pen(Color.White, 2);
-            _formats = new[]
+            White = new Pen(Color.White, 2);
+            Formats = new[]
             {
                 new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = None},
                 new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = EllipsisCharacter}
             };
+            LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
+        }
 
+        public DemotivatorDrawer(int width = 720, int height = 720)
+        {
             _w = width;
             _h = height;
+
             var imageMarginT = 50;
             int imageMarginS = width == 1280 ? 144 : 50;
             var imageMarginB = 140;
+
             _imageW = _w - imageMarginS * 2;
             _imageH = _h - imageMarginT - imageMarginB;
 
@@ -61,9 +66,17 @@ namespace Witlesss
 
             _imageXY = new Point(imageMarginS, imageMarginT);
             _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
-            
-            _upper = TextParameters.UpperText(_h - imageMarginB + 18, _w);
-            _lower = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
+
+            if (width == 1280)
+            {
+                _upper = TextParameters.LargeText(_h - imageMarginB + 28, _w);
+                _lower = TextParameters.LowerText(_h, 0);
+            }
+            else
+            {
+                _upper = TextParameters.UpperText(_h - imageMarginB + 18, _w);
+                _lower = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
+            }
         }
         
         public string DrawDemotivator(string path, string a, string b)
@@ -79,7 +92,7 @@ namespace Witlesss
 
             graphics.CompositingMode = SourceCopy;
             graphics.Clear(Color.Black);
-            graphics.DrawRectangle(_white, _frame);
+            graphics.DrawRectangle(White, _frame);
             if (_w == 720)
             {
                 SetRandomLogo();
@@ -171,7 +184,7 @@ namespace Witlesss
             {
                 var rest = _w - x;
                 var width = (int) Math.Min(graphics.MeasureString(s, p.Font).Width, rest);
-                var format = width < rest ? _formats[0] : _formats[1];
+                var format = width < rest ? Formats[0] : Formats[1];
 
                 var layout = new RectangleF(x, 0, width, 100);
                 graphics.DrawString(s, p.Font, p.Color, layout, format);
@@ -284,28 +297,22 @@ namespace Witlesss
         
         public Size EmojiSize => new Size(EmojiS, EmojiS);
 
-        public static TextParameters UpperText(int margin, int width)
-        {
-            var result = new TextParameters() {Font = UpperFont, Lines = 1, EmojiS = 54};
-            result.SetCommon(margin, width);
-            return result;
-        }
-        
-        public static TextParameters LowerText(int margin, int width)
-        {
-            var result = new TextParameters() {Font = LowerFont, Lines = 2, EmojiS = 34};
-            result.SetCommon(margin, width);
-            return result;
-        }
+        public static TextParameters LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w);
+        public static TextParameters UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w);
+        public static TextParameters LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w);
 
+        private static Font LargeFont => new Font(DEMOTIVATOR_UPPER_FONT, 48);
         private static Font UpperFont => new Font(DEMOTIVATOR_UPPER_FONT, 36);
         private static Font LowerFont => new Font(DEMOTIVATOR_LOWER_FONT, 18);
 
-        private void SetCommon(int margin, int width)
+        private static TextParameters Construct(Font f, int l, int e, int margin, int width) => new TextParameters
         {
-            Color  = new SolidBrush(System.Drawing.Color.White);
-            Layout = new RectangleF(0, margin, width, 100);
-            Format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word};
-        }
+            Font   = f,
+            Lines  = l,
+            EmojiS = e,
+            Color  = new SolidBrush(System.Drawing.Color.White),
+            Layout = new RectangleF(0, margin, width, 100),
+            Format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word}
+        };
     }
 }

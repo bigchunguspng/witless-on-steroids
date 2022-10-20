@@ -33,6 +33,7 @@ namespace Witlesss
         private static readonly Random R = new Random();
         private static readonly StringFormat[] Formats;
 
+        private static int _temp;
         private static long _jpgQuality = 120;
         private static KeyValuePair<Image, Point> _logo;
 
@@ -259,7 +260,7 @@ namespace Witlesss
         private string SaveImageTemp(Image image)
         {
             Directory.CreateDirectory(TEMP);
-            var path = UniquePath($@"{TEMP}\x.png", ".png");
+            var path = UniquePath($@"{TEMP}\x_{_temp++}.png", ".png");
             image.Save(path);
 
             return path;

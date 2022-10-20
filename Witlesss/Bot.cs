@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;

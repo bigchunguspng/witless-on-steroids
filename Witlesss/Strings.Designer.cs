@@ -396,7 +396,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ((\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])\ufe0f*|[\d*#]\ufe0f\u20e3)+.
+        ///   Looks up a localized string similar to ((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+.
         /// </summary>
         internal static string REGEX_EMOJI {
             get {

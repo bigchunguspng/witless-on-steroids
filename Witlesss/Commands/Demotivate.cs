@@ -12,7 +12,7 @@ namespace Witlesss.Commands
 {
     public class Demotivate : WitlessCommand
     {
-        private readonly Regex _dg = new Regex(@"^\/d[vg]\S* *");
+        private readonly Regex _dg = new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
         
         public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
         public void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);

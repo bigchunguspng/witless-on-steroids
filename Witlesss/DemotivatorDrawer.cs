@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -174,9 +175,13 @@ namespace Witlesss
                 {
                     if (p.EmojiS + x > _w) break;
 
-                    var image = new Bitmap(Image.FromFile(path), p.EmojiSize);
-                    graphics.DrawImage(image, x, 0);
-                    x += p.EmojiS;
+                    if (path.EndsWith(".png"))
+                    {
+                        var image = new Bitmap(Image.FromFile(path), p.EmojiSize);
+                        graphics.DrawImage(image, x, 0);
+                        x += p.EmojiS;
+                    }
+                    else DoText(path);
                 }
             }
             DoText(texts[^1]);
@@ -230,19 +235,32 @@ namespace Witlesss
                         
                         var files = Directory.GetFiles($@"{CurrentDirectory}\Emoji", name + "*.png");
                         if (files.Length == 1) file = files[0];
-                        else if (files.Length > 1 && cluster.Count > j + 1)
+                        else if (files.Length > 1)
                         {
                             file = files[^1];
-                            repeat = true;
-                            j++;
-                            name = name + "-" + cluster[j];
+                            if (cluster.Count > j + 1)
+                            {
+                                repeat = true;
+                                j++;
+                                name = name + "-" + cluster[j];
+                            }
                         }
                     } while (repeat);
 
                     if (file != null)
                     {
                         emoji[n].Add(file);
-                        i += Path.GetFileName(file).Count(c => c == '-');
+                        var s = Path.GetFileNameWithoutExtension(file);
+                        var split = s.Split('-');
+                        for (int k = 1; k < split.Length && i + 1 < cluster.Count; k++)
+                        {
+                            if (split[k] == cluster[i + 1]) i++;
+                        }
+                    }
+                    else
+                    {
+                        var character = ConvertFromUtf32(int.Parse(name, NumberStyles.HexNumber));
+                        if (Regex.IsMatch(character, @"[\u231a-\u303d]")) emoji[n].Add(character);
                     }
                 }
             }

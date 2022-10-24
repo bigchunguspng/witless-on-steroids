@@ -19,16 +19,16 @@ namespace Witlesss
 {
     public class DemotivatorDrawer
     {
-        private readonly int _w, _h, _imageW, _imageH;
+        private readonly int _w, _h;
+        private readonly Size _size;
         private readonly Point _imageXY;
         private readonly Rectangle _frame;
-        private readonly TextParameters _upper, _lower;
+        private readonly DrawableText _textA = new DrawableText(), _textB = new DrawableText();
         
         private static readonly Pen White;
         private static readonly string TEMP = $@"{CurrentDirectory}\{TEMP_FOLDER}";
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
-        private static readonly Dictionary<int, EncoderParameter> Qualities = new Dictionary<int, EncoderParameter>();
         private static readonly Dictionary<Image, Point> Logos = new Dictionary<Image, Point>();
         private static readonly Regex Ext = new Regex("(.png)|(.jpg)"), Emoji = new Regex(REGEX_EMOJI);
         private static readonly Random R = new Random();
@@ -36,7 +36,6 @@ namespace Witlesss
 
         private static int _temp;
         private static long _jpgQuality = 120;
-        private static KeyValuePair<Image, Point> _logo;
 
         static DemotivatorDrawer()
         {
@@ -58,8 +57,10 @@ namespace Witlesss
             int imageMarginS = width == 1280 ? 144 : 50;
             var imageMarginB = 140;
 
-            _imageW = _w - imageMarginS * 2;
-            _imageH = _h - imageMarginT - imageMarginB;
+            var imageW = _w - imageMarginS * 2;
+            var imageH = _h - imageMarginT - imageMarginB;
+            
+            _size = new Size(imageW, imageH);
 
             var space = 5;
             int marginT = imageMarginT - space;
@@ -71,13 +72,13 @@ namespace Witlesss
 
             if (width == 1280)
             {
-                _upper = TextParameters.LargeText(_h - imageMarginB + 28, _w);
-                _lower = TextParameters.LowerText(_h, 0);
+                _textA.P = TextParameters.LargeText(_h - imageMarginB + 28, _w);
+                _textB.P = TextParameters.LowerText(_h, 0);
             }
             else
             {
-                _upper = TextParameters.UpperText(_h - imageMarginB + 18, _w);
-                _lower = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
+                _textA.P = TextParameters.UpperText(_h - imageMarginB + 18, _w);
+                _textB.P = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
             }
         }
         
@@ -97,27 +98,26 @@ namespace Witlesss
             graphics.DrawRectangle(White, _frame);
             if (_w == 720)
             {
-                SetRandomLogo();
-                graphics.DrawImage(_logo.Key, _logo.Value);
+                var logo = PickRandomLogo();
+                graphics.DrawImage(logo.Key, logo.Value);
             }
 
             graphics.CompositingMode = SourceOver;
-            DrawText(a, graphics, DrawTextA, _upper);
-            DrawText(b, graphics, DrawTextB, _lower);
+
+            _textA.Pass(graphics, a);
+            _textB.Pass(graphics, b);
+
+            DrawText(_textA);
+            DrawText(_textB);
             
             return SaveImageTemp(demotivator);
-
-            void DrawTextA(Graphics g) => Draw(g, a, _upper);
-            void DrawTextB(Graphics g) => Draw(g, b, _lower);
-            
-            void Draw(Graphics g, string s, TextParameters p) => g.DrawString(s, p.Font, p.Color, p.Layout, p.Format);
         }
 
         public string PasteImage(string background, string picture)
         {
             using var demotivator = Image.FromFile(background);
             using var graphics = Graphics.FromImage(demotivator);
-            using var image = Resize(Image.FromFile(picture), new Size(_imageW, _imageH));
+            using var image = Resize(Image.FromFile(picture), _size);
             
             graphics.CompositingMode = SourceCopy;
             graphics.DrawImage(image, _imageXY);
@@ -129,18 +129,18 @@ namespace Witlesss
             Image Resize(Image img, Size size) => new Bitmap(img, size);
         }
 
-        private void SetRandomLogo() => _logo = Logos.ElementAt(R.Next(Logos.Count));
+        private KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
 
-        private void DrawText(string text, Graphics g, Action<Graphics> drawSimple, TextParameters p)
+        private void DrawText(DrawableText x)
         {
-            var emoji = Regex.Matches(text, REGEX_EMOJI);
+            var emoji = Regex.Matches(x.S, REGEX_EMOJI);
             if (emoji.Count > 0)
             {
-                DrawTextAndEmoji(g, text, emoji, p);
+                DrawTextAndEmoji(x.G, x.S, emoji, x.P);
             }
             else
             {
-                drawSimple(g);
+                x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
             }
         }
 
@@ -202,8 +202,6 @@ namespace Witlesss
             var point = new Point((_w - x) / 2, y);
 
             g.DrawImage(new Bitmap(Image.FromFile(save)), point);
-            
-            // mb static emoji bitmaps cache to prevent file exceptions
         }
 
         private List<List<string>> GetEmojiPngs(IList<Match> matches)
@@ -288,8 +286,7 @@ namespace Witlesss
         {
             if (value == _jpgQuality) return;
 
-            if (!Qualities.ContainsKey(value)) Qualities.Add(value, new EncoderParameter(Encoder.Quality, value));
-            EncoderParameters.Param[0] = Qualities[value];
+            EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
         }
 
         private static ImageCodecInfo GetEncoder() => ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);
@@ -303,6 +300,15 @@ namespace Witlesss
                 if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
                     Logos.Add(Image.FromFile(file.FullName), new Point(x, y));
             }
+        }
+
+        private class DrawableText
+        {
+            public Graphics G;
+            public string S;
+            public TextParameters P;
+
+            public void Pass(Graphics g, string s) { G = g; S = s; }
         }
     }
 

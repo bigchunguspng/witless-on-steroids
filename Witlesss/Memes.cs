@@ -9,7 +9,6 @@ using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.MediaTools;
 using static Witlesss.Logger;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Strings;
 
@@ -63,58 +62,10 @@ namespace Witlesss
         
         public string MakeVideoDemotivator(string path, string textA, string textB)
         {
-            string inputFilePath = path;
-            string inputFileName = path.Split('\\', '.')[^2];
-            string animationPath = UniquePath($@"{CurrentDirectory}\{PICTURES_FOLDER}\{inputFileName}");
-            string animationName = $"{inputFileName}-D.mp4";
-            
-            Directory.CreateDirectory(animationPath);
-
-            var stream = GetMediaStream(path);
-            
-            string inFrameRate = stream.AvgFrameRate;
-            string inFrames = stream.NbFrames;
-            Log($"IN >>> FPS: {inFrameRate} Length: {inFrames}", ConsoleColor.Blue);
-
-            double outFrameRate = RetrieveFPS(inFrameRate);
-            int outFrames = int.Parse(inFrames);
-            double k = 1;
-
-            NormalizeLength(50);
-            NormalizeFrameRate(50);
-            double frameDelay = 1000 / outFrameRate;
-            Log($"OUT >> FPS: {FormatDouble(Math.Round(outFrameRate, 1)).PadRight(inFrameRate.Length)} Length: {outFrames}", ConsoleColor.Blue);
-            
-            // Extract all frames
-            for (var frame = 0; frame < outFrames; frame++)
-            {
-                var output = @$"{animationPath}\F-{frame:0000}.jpg";
-                Execute(new F_SaveFrame(inputFilePath, output, TimeSpan.FromMilliseconds(k * frameDelay * frame)));
-            }
-
-            // Demotivate each frame
             var demotivator = Drawer.MakeFrame(textA, textB);
-            var frames = GetAllFrames();
-            foreach (string file in frames) Drawer.PasteImage(demotivator, file);
+            Execute(new F_Overlay(demotivator, path, out string output, Drawer));
 
-            var framesPath = @$"{animationPath}\F-%04d-D.jpg";
-            var outputPath = $@"{animationPath}\{animationName}";
-
-            Execute(new F_RenderAnimation(outFrameRate, new Size(360, 360), framesPath, outputPath));
-
-            return outputPath;
-
-            void NormalizeLength(int max)
-            {
-                if (outFrames > max)
-                {
-                    k = outFrames / (double) max;
-                    outFrames = max;
-                    //outFrameRate = (int)(outFrameRate * k); // <- this will ++ framerate after --ing length
-                }
-            }
-            void NormalizeFrameRate(int max) => outFrameRate = Math.Min(outFrameRate, max);
-            string[] GetAllFrames() => Directory.GetFiles(animationPath);
+            return output;
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)

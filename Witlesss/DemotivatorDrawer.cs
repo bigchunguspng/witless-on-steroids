@@ -82,6 +82,9 @@ namespace Witlesss
             }
         }
         
+        public Size Size => _size;
+        public Point Pic => _imageXY;
+
         public string DrawDemotivator(string path, string a, string b)
         {
             var demotivator = MakeFrame(a, b);
@@ -113,7 +116,7 @@ namespace Witlesss
             return SaveImageTemp(demotivator);
         }
 
-        public string PasteImage(string background, string picture)
+        private string PasteImage(string background, string picture)
         {
             using var demotivator = Image.FromFile(background);
             using var graphics = Graphics.FromImage(demotivator);

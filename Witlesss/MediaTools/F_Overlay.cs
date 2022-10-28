@@ -11,7 +11,7 @@ namespace Witlesss.MediaTools
 
         public F_Overlay(string image, string video, out string output, DemotivatorDrawer drawer)
         {
-            output = SetOutName(video, "-C");
+            output = SetOutName(video, "-D");
             
             _image = image;
             _video = video;

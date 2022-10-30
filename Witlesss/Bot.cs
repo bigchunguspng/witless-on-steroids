@@ -41,40 +41,43 @@ namespace Witlesss
             Client.StartReceiving(new Handler(), options);
 
             StartSaveLoop(2);
-            ProcessConsoleInput();
+            ProcessConsole();
         }
 
-        private void ProcessConsoleInput()
+        private void ProcessConsole()
         {
             string input;
             do
             {
                 input = Console.ReadLine();
-                
-                if (input != null && !input.EndsWith("_"))
+                try
                 {
-                    if      (input.StartsWith("+") && input.Length > 1) SetActiveChat();
-                    else if (input.StartsWith("/"))
+                    if (input != null && !input.EndsWith("_"))
                     {
-                        if      (input     ==     "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-                        else if (input     ==     "/s" ) SaveDics();
-                        else if (input     ==     "/sd") SyncDics();
-                        else if (input     ==     "/sp") Spam();
-                        else if (input     ==     "/db") DeleteBlockers();
-                        else if (input     ==     "/ds") DeleteBySize();
-                        else if (input     ==     "/cc") ClearTempFiles();
-                        else if (input     ==     "/oo") ClearDics();
-                        else if (input     ==     "/xx") FixDBs();
-                        else if (input.StartsWith("/sp") && HasIntArgument(input, out int x1)) Spam(x1);
-                        else if (input.StartsWith("/ds") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
-                        else if (WitlessExist(_activeChat))
+                        if      (input.StartsWith("+") && input.Length > 1) SetActiveChat();
+                        else if (input.StartsWith("/"))
                         {
                             if (Regex.IsMatch(input, @"^\/[aw] ")) BreakFourthWall();
-                            else if (input ==     "/DB") DeleteBlocker();
-                            else if (input ==     "/Oo") ClearDic(Active);
-                            else if (input ==     "/Xx") FixDB(Active);
+                            else if (input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
+                            else if (input == "/s" ) SaveDics();
+                            else if (input == "/sd") SyncDics();
+                            else if (input == "/sp") Spam();
+                            else if (input == "/db") DeleteBlockers();
+                            else if (input == "/DB") DeleteBlocker();
+                            else if (input == "/ds") DeleteBySize();
+                            else if (input == "/cc") ClearTempFiles();
+                            else if (input == "/oo") ClearDics();
+                            else if (input == "/Oo") ClearDic(Active);
+                            else if (input == "/xx") FixDBs();
+                            else if (input == "/Xx") FixDB(Active);
+                            else if (input.StartsWith("/sp") && HasIntArgument(input, out int x1)) Spam(x1);
+                            else if (input.StartsWith("/ds") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
                         }
                     }
+                }
+                catch
+                {
+                    Log(">:^< u/stupid >:^<", ConsoleColor.Yellow);
                 }
             } while (input != "s");
             SaveDics();
@@ -156,16 +159,12 @@ namespace Witlesss
             catch (Exception e)
             {
                 LogError("SPAM FAILED :( " + e.Message);
-                throw;
             }
         }
 
         private void DeleteBlockers()
         {
-            var bin = new List<long>();
-            foreach (var witless in Bakas) if (DeleteBlocker(witless) == -1) bin.Add(witless.Chat);
-
-            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _); //todo to another method
+            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) SussyBakas.TryRemove(w.Chat, out _);
             SaveChatList();
         }
         private void DeleteBlocker()
@@ -188,17 +187,14 @@ namespace Witlesss
 
         private void DeleteBySize(int size = 3)
         {
-            var bin = new List<long>(); //todo test bins
             foreach (var witless in Bakas)
             {
                 if (SizeInBytes(witless.Path) < size)
                 {
                     witless.Delete();
-                    bin.Add(witless.Chat);
+                    SussyBakas.TryRemove(witless.Chat, out _);
                 }
             }
-            
-            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _);
             SaveChatList();
         }
 

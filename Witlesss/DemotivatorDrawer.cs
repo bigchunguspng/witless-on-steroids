@@ -85,16 +85,13 @@ namespace Witlesss
         public Size Size => _size;
         public Point Pic => _imageXY;
 
-        public string DrawDemotivator(string path, string a, string b)
-        {
-            var demotivator = MakeFrame(a, b);
-            return PasteImage(demotivator, path);
-        }
+        public string DrawDemotivator(string path, string a, string b) => PasteImage(DrawFrame(a, b), path);
 
-        public string MakeFrame(string a, string b)
+        public string MakeFrame(string a, string b) => SaveImageTemp(DrawFrame(a, b));
+        private Image DrawFrame(string a, string b)
         {
-            using Image demotivator = new Bitmap(_w, _h);
-            using var graphics = Graphics.FromImage(demotivator);
+            Image background = new Bitmap(_w, _h);
+            using var graphics = Graphics.FromImage(background);
 
             graphics.CompositingMode = SourceCopy;
             graphics.Clear(Color.Black);
@@ -113,23 +110,20 @@ namespace Witlesss
             DrawText(_textA);
             DrawText(_textB);
             
-            return SaveImageTemp(demotivator);
+            return background;
         }
 
-        private string PasteImage(string background, string picture)
+        private string PasteImage(Image background, string picture)
         {
-            using var demotivator = Image.FromFile(background);
-            using var graphics = Graphics.FromImage(demotivator);
-            using var image = Resize(Image.FromFile(picture), _size);
+            using var graphics = Graphics.FromImage(background);
+            using var image = new Bitmap(Image.FromFile(picture), _size);
             
             graphics.CompositingMode = SourceCopy;
             graphics.DrawImage(image, _imageXY);
             
             string output = Ext.Replace(picture, "-D.jpg");
             
-            return SaveImage(demotivator, output);
-            
-            Image Resize(Image img, Size size) => new Bitmap(img, size);
+            return SaveImage(background, output);
         }
 
         private KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
@@ -189,6 +183,8 @@ namespace Witlesss
             }
             DoText(texts[^1]);
 
+            g.DrawImage(textArea, new Point((_w - x) / 2, (int) p.Layout.Y + m));
+
             void DoText(string s)
             {
                 var rest = _w - x;
@@ -199,12 +195,6 @@ namespace Witlesss
                 graphics.DrawString(s, p.Font, p.Color, layout, format);
                 x += width;
             }
-            
-            var save = SaveImageTemp(textArea);
-            var y = (int) p.Layout.Y + m;
-            var point = new Point((_w - x) / 2, y);
-
-            g.DrawImage(new Bitmap(Image.FromFile(save)), point);
         }
 
         private List<List<string>> GetEmojiPngs(IList<Match> matches)
@@ -273,6 +263,7 @@ namespace Witlesss
         {
             path = UniquePath(path, ".jpg");
             image.Save(path, JpgEncoder, EncoderParameters);
+            image.Dispose();
 
             return path;
         }
@@ -281,6 +272,7 @@ namespace Witlesss
             Directory.CreateDirectory(TEMP);
             var path = UniquePath($@"{TEMP}\x_{_temp++}.png", ".png");
             image.Save(path);
+            image.Dispose();
 
             return path;
         }

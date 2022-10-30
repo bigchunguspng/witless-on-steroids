@@ -62,8 +62,7 @@ namespace Witlesss
         
         public string MakeVideoDemotivator(string path, string textA, string textB)
         {
-            var demotivator = Drawer.MakeFrame(textA, textB);
-            Execute(new F_Overlay(demotivator, path, out string output, Drawer));
+            Execute(new F_Overlay(Drawer.MakeFrame(textA, textB), path, out string output, Drawer));
 
             return output;
         }
@@ -77,13 +76,15 @@ namespace Witlesss
             WebmToMp4(ref path, out _);
             var output = SetOutName(path, "-S");
 
-            if (type != MediaType.Audio)
+            if (type == MediaType.Audio)
+            {
+                Execute(new F_Speed(path, output, speed, type));
+            }
+            else
             {
                 double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate, 30) * speed;
                 Execute(new F_Speed(path, output, speed, type, Math.Min(fps, 90)));
             }
-            else
-                Execute(new F_Speed(path, output, speed, type));
 
             return output;
         }

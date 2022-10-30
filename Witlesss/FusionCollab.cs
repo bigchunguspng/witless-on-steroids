@@ -7,10 +7,12 @@ namespace Witlesss
     {
         private readonly WitlessDB _dictionary1, _dictionary2;
 
-        public FusionCollab(WitlessDB dictionary1, WitlessDB dictionary2)
+        public FusionCollab(Witless witless, WitlessDB dictionary)
         {
-            _dictionary1 = dictionary1;
-            _dictionary2 = dictionary2;
+            witless.Backup();
+
+            _dictionary1 = witless.Words;
+            _dictionary2 = dictionary;
         }
         
         public void Fuse()

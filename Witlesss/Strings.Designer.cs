@@ -140,6 +140,33 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Console Commands:
+        ///
+        ///s   - save and exit
+        ///+55 - select active chat
+        ///
+        ////s  - save dics
+        ////sd - sync dics
+        ////sp - spam (min size)
+        ///
+        ////db - delete blockers
+        ////DB - delete active if blocked
+        ////ds - delete by size (max size)
+        ///
+        ////cc - clear temp files
+        ////oo - clear dics
+        ////Oo - clear active dic
+        ///
+        ////xx - fix DBs
+        ////Xx - fix active chat DB.
+        /// </summary>
+        internal static string CONSOLE_MANUAL {
+            get {
+                return ResourceManager.GetString("CONSOLE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-CopyDBs.
         /// </summary>
         internal static string COPIES_FOLDER {

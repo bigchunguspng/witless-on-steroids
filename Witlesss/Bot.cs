@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MediaToolkit.Util;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
@@ -51,20 +53,27 @@ namespace Witlesss
                 
                 if (input != null && !input.EndsWith("_"))
                 {
-                    if      (input.StartsWith("+")     && input.Length > 1) SetActiveChat();
+                    if      (input.StartsWith("+") && input.Length > 1) SetActiveChat();
                     else if (input.StartsWith("/"))
                     {
-                        if  (WitlessExist(_activeChat) && input.Length > 3) BreakFourthWall();
-                        else if (input == "/s") SaveDics();
-                        else if (input == "/u") Spam();
-                        else if (input == "/c") ClearTempFiles();
-                        else if (input == "/k") ClearDics();
-                        else if (input == "/e") DeleteBlockers();
-                        else if (input == "/r") DeleteBySize();
-                        else if (input == "/x") FixDBs();
-                        else if (input == "/d") FuseAllDics();
-                        else if (input.StartsWith("/u") && HasIntArgument(input, out int x1)) Spam(x1);
-                        else if (input.StartsWith("/r") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
+                        if      (input     ==     "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
+                        else if (input     ==     "/s" ) SaveDics();
+                        else if (input     ==     "/sd") SyncDics();
+                        else if (input     ==     "/sp") Spam();
+                        else if (input     ==     "/db") DeleteBlockers();
+                        else if (input     ==     "/ds") DeleteBySize();
+                        else if (input     ==     "/cc") ClearTempFiles();
+                        else if (input     ==     "/oo") ClearDics();
+                        else if (input     ==     "/xx") FixDBs();
+                        else if (input.StartsWith("/sp") && HasIntArgument(input, out int x1)) Spam(x1);
+                        else if (input.StartsWith("/ds") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
+                        else if (WitlessExist(_activeChat))
+                        {
+                            if (Regex.IsMatch(input, @"^\/[aw] ")) BreakFourthWall();
+                            else if (input ==     "/DB") DeleteBlocker();
+                            else if (input ==     "/Oo") ClearDic(Active);
+                            else if (input ==     "/Xx") FixDB(Active);
+                        }
                     }
                 }
             } while (input != "s");
@@ -85,9 +94,9 @@ namespace Witlesss
             }
             void BreakFourthWall()
             {
-                string text = input.Substring(3).Trim();
-                var witless = SussyBakas[_activeChat];
-                        
+                string text = input.Split(' ', 2)[1];
+                var witless = Active;
+
                 if      (input.StartsWith("/a ") && witless.Eat(text, out text)) //add
                 {
                     Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
@@ -100,6 +109,9 @@ namespace Witlesss
                 }
             }
         }
+
+        private Witless Active => SussyBakas[_activeChat];
+        private ICollection<Witless> Bakas => SussyBakas.Values;
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
 
@@ -118,19 +130,13 @@ namespace Witlesss
             }
         }
 
-        private void SaveDics()
-        {
-            foreach (var witless in SussyBakas.Values) witless.Save();
-        }
+        private void SaveDics () => Bakas.ForEach(witless => witless.Save());
+        private void ClearDics() => Bakas.ForEach(ClearDic);
 
-        private void ClearDics()
+        private void ClearDic(Witless witless)
         {
-            foreach (var witless in SussyBakas.Values)
-            {
-                witless.Backup();
-                File.Delete(witless.Path);
-                witless.Load();
-            }
+            witless.Delete();
+            witless.Load();
         }
 
         private void Spam(int size = 2)
@@ -138,7 +144,7 @@ namespace Witlesss
             try
             {
                 string message = File.ReadAllText($@"{CurrentDirectory}\.spam");
-                foreach (var witless in SussyBakas.Values)
+                foreach (var witless in Bakas)
                 {
                     if (SizeInBytes(witless.Path) > size)
                     {
@@ -157,34 +163,37 @@ namespace Witlesss
         private void DeleteBlockers()
         {
             var bin = new List<long>();
-            foreach (var witless in SussyBakas.Values)
-            {
-                int x = PingChat(witless.Chat);
-                if (x == -1)
-                {
-                    witless.Backup();
-                    File.Delete(witless.Path);
-                    bin.Add(witless.Chat);
-                }
-                else
-                {
-                    Client.DeleteMessageAsync(witless.Chat, x);
-                }
-            }
+            foreach (var witless in Bakas) if (DeleteBlocker(witless) == -1) bin.Add(witless.Chat);
 
-            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _);
+            foreach (long chat in bin) SussyBakas.TryRemove(chat, out _); //todo to another method
             SaveChatList();
+        }
+        private void DeleteBlocker()
+        {
+            if (DeleteBlocker(Active) == -1)
+            {
+                SussyBakas.TryRemove(_activeChat, out _);
+                SaveChatList();
+            }
+        }
+        
+        private int DeleteBlocker(Witless witless)
+        {
+            int x = PingChat(witless.Chat);
+            if (x == -1) witless.Delete();
+            else Client.DeleteMessageAsync(witless.Chat, x);
+
+            return x;
         }
 
         private void DeleteBySize(int size = 3)
         {
-            var bin = new List<long>();
-            foreach (var witless in SussyBakas.Values)
+            var bin = new List<long>(); //todo test bins
+            foreach (var witless in Bakas)
             {
                 if (SizeInBytes(witless.Path) < size)
                 {
-                    witless.Backup();
-                    File.Delete(witless.Path);
+                    witless.Delete();
                     bin.Add(witless.Chat);
                 }
             }
@@ -193,28 +202,25 @@ namespace Witlesss
             SaveChatList();
         }
 
-        private void FuseAllDics()
+        private void SyncDics()
         {
-            foreach (var witless in SussyBakas.Values)
+            foreach (var witless in Bakas)
             {
                 var path = $@"{CurrentDirectory}\{COPIES_FOLDER}\{DB_FILE_PREFIX}-{witless.Chat}.json";
                 if (File.Exists(path))
                 {
-                    witless.Backup();
-                    new FusionCollab(witless.Words, new FileIO<WitlessDB>(path).LoadData()).Fuse();
+                    new FusionCollab(witless, new FileIO<WitlessDB>(path).LoadData()).Fuse();
                     Log($"{LOG_FUSION_DONE} << {witless.Chat}", ConsoleColor.Magenta);
                     witless.SaveNoMatterWhat();
                 }
             }
         }
         
-        private void FixDBs()
+        private void FixDBs() => Bakas.ForEach(FixDB);
+        private void FixDB(Witless witless)
         {
-            foreach (var witless in SussyBakas.Values)
-            {
-                NormalizeWitlessDB(witless.Words);
-                witless.SaveNoMatterWhat();
-            }
+            NormalizeWitlessDB(witless.Words);
+            witless.SaveNoMatterWhat();
         }
 
         private void NormalizeWitlessDB(WitlessDB words)

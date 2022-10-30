@@ -117,8 +117,7 @@ namespace Witlesss.Commands
             bool baseExist = BaseExists();
             if (chatExist || baseExist)
             {
-                Baka.Backup();
-                new FusionCollab(Baka.Words, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
+                new FusionCollab(Baka, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
                 GoodEnding();
             }
             else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : $"{FUSE_FAIL_BASE}\n\n{FUSE_AVAILABLE_BASES()}");

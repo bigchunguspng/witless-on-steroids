@@ -377,5 +377,11 @@ namespace Witlesss
             Directory.CreateDirectory(path);
             file.CopyTo(UniquePath($@"{path}\{DB_FILE_PREFIX}-{Chat}.json", ".json"));
         }
+
+        public void Delete()
+        {
+            Backup();
+            File.Delete(Path);
+        }
     }
 }

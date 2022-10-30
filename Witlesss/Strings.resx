@@ -241,4 +241,25 @@
     <data name="REGEX_EMOJI" xml:space="preserve">
         <value>((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+</value>
     </data>
+    <data name="CONSOLE_MANUAL" xml:space="preserve">
+        <value>Console Commands:
+
+s   - save and exit
++55 - select active chat
+
+/s  - save dics
+/sd - sync dics
+/sp - spam (min size)
+
+/db - delete blockers
+/DB - delete active if blocked
+/ds - delete by size (max size)
+
+/cc - clear temp files
+/oo - clear dics
+/Oo - clear active dic
+
+/xx - fix DBs
+/Xx - fix active chat DB</value>
+    </data>
 </root>

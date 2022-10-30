@@ -10,14 +10,13 @@ namespace Witlesss.Commands
 
         public override void Run()
         {
-            string fileID = GetVideoOrAudioID();
-            if (fileID == null) return;
+            if (NothingToProcess()) return;
 
             var speed = 2D;
             if (HasDoubleArgument(Text, out double value))
                 speed = Mode == SpeedMode.Fast ? Math.Clamp(value, 0.5, 94) : Math.Clamp(value, 0.0107, 2);
 
-            Download(fileID, out string path, out var type);
+            Download(FileID, out string path, out var type);
                     
             string result = Bot.MemeService.ChangeSpeed(path, speed, Mode, type);
             SendResult(result, type, VideoFilename, AudioFilename);

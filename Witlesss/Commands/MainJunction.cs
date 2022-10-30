@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using static Witlesss.Logger;
+using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {
@@ -28,7 +29,14 @@ namespace Witlesss.Commands
         private readonly ToggleAdmins _admins = new ToggleAdmins();
         private readonly DeleteDictionary _delete = new DeleteDictionary();
 
-        private string TextAsCommand() => Text.ToLower().Replace(Strings.BOT_USERNAME, "");
+        private string TextAsCommand() => Text.ToLower().Replace(BOT_USERNAME, "");
+
+        private bool TextMayBeCommand(out string command)
+        {
+            command = TextAsCommand();
+            return Text.StartsWith('/');
+        }
+
         public override void Run()
         {
             if (Bot.WitlessExist(Chat))
@@ -37,114 +45,113 @@ namespace Witlesss.Commands
 
                 if (Text != null)
                 {
-                    if (Text.StartsWith('/'))
+                    if (TextMayBeCommand(out var command))
                     {
-                        if      (TextAsCommand().StartsWith("/dg"))
+                        if      (command.StartsWith("/dg"))
                         {
                             _command = _demotivate;
                             _demotivate.SetMode();
                             _demotivate.PassQuality(witless);
                         }
-                        else if (TextAsCommand().StartsWith("/a"))
-                        {
-                            _command = _generate;
-                        }
-                        else if (TextAsCommand().StartsWith("/fast"))
-                        {
-                            _command = _speed;
-                            _speed.Mode = SpeedMode.Fast;
-                        }
-                        else if (TextAsCommand().StartsWith("/slow"))
-                        {
-                            _command = _speed;
-                            _speed.Mode = SpeedMode.Slow;
-                        }
-                        else if (TextAsCommand().StartsWith("/cut"))
-                        {
-                            _command = _cut;
-                        }
-                        else if (TextAsCommand().StartsWith("/sus"))
-                        {
-                            _command = _sus;
-                        }
-                        else if (TextAsCommand() == "/reverse")
-                        {
-                            _command = _reverse;
-                        }
-                        else if (TextAsCommand().StartsWith("/damn"))
-                        {
-                            _command = _bitrate;
-                        }
-                        else if (TextAsCommand().StartsWith("/dv"))
+                        else if (command.StartsWith("/dv"))
                         {
                             _command = _demotivate;
                             _demotivate.SetMode(DgMode.Wide);
                             _demotivate.PassQuality(witless);
                         }
-                        else if (TextAsCommand().StartsWith("/zz"))
+                        else if (command.StartsWith("/a"))
+                        {
+                            _command = _generate;
+                        }
+                        else if (command.StartsWith("/fast"))
+                        {
+                            _command = _speed;
+                            _speed.Mode = SpeedMode.Fast;
+                        }
+                        else if (command.StartsWith("/slow"))
+                        {
+                            _command = _speed;
+                            _speed.Mode = SpeedMode.Slow;
+                        }
+                        else if (command.StartsWith("/cut"))
+                        {
+                            _command = _cut;
+                        }
+                        else if (command.StartsWith("/sus"))
+                        {
+                            _command = _sus;
+                        }
+                        else if (command == "/reverse")
+                        {
+                            _command = _reverse;
+                        }
+                        else if (command.StartsWith("/damn"))
+                        {
+                            _command = _bitrate;
+                        }
+                        else if (command.StartsWith("/zz"))
                         {
                             _command = _generateB;
                         }
-                        else if (TextAsCommand().StartsWith("/b"))
+                        else if (command.StartsWith("/b"))
                         {
                             _command = _buhurt;
                         }
-                        else if (TextAsCommand().StartsWith("/set_jpg"))
+                        else if (command.StartsWith("/set_jpg"))
                         {
                             _command = _quality;
                         }
-                        else if (TextAsCommand().StartsWith("/set_p"))
+                        else if (command.StartsWith("/set_p"))
                         {
                             _command = _probability;
                         }
-                        else if (TextAsCommand().StartsWith("/set"))
+                        else if (command.StartsWith("/set"))
                         {
                             _command = _frequency;
                         }
-                        else if (TextAsCommand() == "/toggle_stickers")
+                        else if (command == "/toggle_stickers")
                         {
                             _command = _stickers;
                         }
-                        else if (TextAsCommand() == "/chat_id")
+                        else if (command == "/chat_id")
                         {
                             _command = _chatID;
                         }
-                        else if (TextAsCommand() == "/chat")
+                        else if (command == "/chat")
                         {
                             _command = _chat;
                         }
-                        else if (TextAsCommand().StartsWith("/fuse"))
+                        else if (command.StartsWith("/fuse"))
                         {
                             _command = _fuse;
                         }
-                        else if (TextAsCommand().StartsWith("/move"))
+                        else if (command.StartsWith("/move"))
                         {
                             _command = _move;
                         }
-                        else if (TextAsCommand().StartsWith("/toggle_admins"))
+                        else if (command == "/toggle_admins")
                         {
                             _command = _admins;
                         }
-                        else if (TextAsCommand() == "/debug")
+                        else if (command == "/debug")
                         {
                             _command = _debug;
                         }
-                        else if (TextAsCommand() == "/delete")
+                        else if (command == "/delete")
                         {
                             _command = _delete;
                         }
                         else return;
 
                         _command.Pass(Message);
-                        if (_command is WitlessCommand command) command.Pass(witless);
+                        if (_command is WitlessCommand c) c.Pass(witless);
                         _command.Run();
                         return;
                     }
                     else
                     {
                         var sentence = Text.Clone().ToString();
-                        if (witless.Eat(sentence, out string text))
-                            Log($"{Title} >> {text}", ConsoleColor.Blue);
+                        if (witless.Eat(sentence, out string text)) Log($"{Title} >> {text}", ConsoleColor.Blue);
                     }
                 }
                 
@@ -179,16 +186,11 @@ namespace Witlesss.Commands
             }
             else if (Text != null && TextAsCommand() == "/start")
             {
-                ChatStart();
-            }
+                if (!Bot.SussyBakas.TryAdd(Chat, new Witless(Chat))) return;
 
-            void ChatStart()
-            {
-                if (!Bot.SussyBakas.TryAdd(Chat, new Witless(Chat)))
-                    return;
                 Bot.SaveChatList();
                 Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
-                Bot.SendMessage(Chat, Strings.START_RESPONSE);
+                Bot.SendMessage(Chat, START_RESPONSE);
             }
         }
     }

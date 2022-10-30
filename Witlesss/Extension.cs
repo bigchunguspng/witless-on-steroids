@@ -231,63 +231,20 @@ namespace Witlesss
 
         public static void ClearTempFiles()
         {
-            int filesDeleted = 0, dirsDeleted = 0;
-            var path = $@"{CurrentDirectory}\{PICTURES_FOLDER}";
-            if (!Directory.Exists(path))
-                return;
-            
-            var directories = Directory.GetDirectories(path);
-            foreach (string directory in directories)
+            var temp = $@"{CurrentDirectory}\{TEMP_FOLDER}";
+            if (Directory.Exists(temp))
             {
-                var files = Directory.GetFiles(directory);
-                foreach (string file in files)
-                {
-                    if (file.EndsWith(".jpg"))
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                            filesDeleted++;
-                        }
-                        catch
-                        {
-                            //
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            string extension = Path.GetExtension(file);
-                            string destination = file.Replace($@"{file.Split('\\')[^2]}\", "");
-                            File.Move(file, UniquePath(destination, extension));
-                        }
-                        catch
-                        {
-                            //
-                        }
-                    }
-                }
                 try
                 {
-                    Directory.Delete(directory);
-                    dirsDeleted++;
+                    var x = Directory.GetFiles(temp).Length;
+                    Directory.Delete(temp, true);
+                    Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
                 }
-                catch
+                catch (Exception e)
                 {
-                    //
+                    LogError("CAN'T DEL TEMP >> " + e.Message);
                 }
             }
-            try
-            {
-                Directory.Delete($@"{CurrentDirectory}\{TEMP_FOLDER}", true);
-                dirsDeleted++;
-            }
-            catch
-            {
-                //
-            }
-            Log($"DEL TEMP >> {filesDeleted} FILES + {dirsDeleted} DIRS!", ConsoleColor.Yellow);
         }
     }
 

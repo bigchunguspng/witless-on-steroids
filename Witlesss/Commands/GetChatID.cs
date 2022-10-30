@@ -2,9 +2,6 @@
 {
     public class GetChatID : Command
     {
-        public override void Run()
-        {
-            Bot.SendMessage(Chat, Chat.ToString());
-        }
+        public override void Run() => Bot.SendMessage(Chat, Chat.ToString());
     }
 }

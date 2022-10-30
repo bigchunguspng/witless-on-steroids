@@ -1,25 +1,26 @@
 ﻿using System;
-using System.IO;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static System.Environment;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
+using File = System.IO.File;
 
 namespace Witlesss.Commands
 {
     public class RemoveBitrate : Command
     {
+        protected string FileID;
+        
         public override void Run()
         {
-            string fileID = GetVideoOrAudioID();
-            if (fileID == null) return;
+            if (NothingToProcess()) return;
 
             var bitrate = 0;
-            if (HasIntArgument(Text, out int value))
-                bitrate = value;
+            if (HasIntArgument(Text, out int value)) bitrate = value;
 
-            Download(fileID, out string path, out var type);
+            Download(FileID, out string path, out var type);
 
             string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value);
             SendResult(result, type, VideoFilename, AudioFilename);
@@ -32,35 +33,33 @@ namespace Witlesss.Commands
         protected string MediaFileName(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
         protected string Sender() => ValidFileName(SenderName(Message));
 
-        protected string GetVideoOrAudioID()
+        protected bool NothingToProcess()
         {
-            var fileID = "";
-            var mess = Message.ReplyToMessage ?? Message;
-            for (int cycle = Message.ReplyToMessage != null ? 0 : 1; cycle < 2; cycle++)
-            {
-                if      (mess.Audio != null)
-                    fileID = mess.Audio.FileId;
-                else if (mess.Video != null)
-                    fileID = mess.Video.FileId;
-                else if (mess.Animation != null)
-                    fileID = mess.Animation.FileId;
-                else if (mess.Sticker != null && mess.Sticker.IsVideo)
-                    fileID = mess.Sticker.FileId;
-                else if (mess.Voice != null)
-                    fileID = mess.Voice.FileId;
-                else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
-                    fileID = mess.Document.FileId;
-                
-                if (fileID.Length > 0)
-                    break;
-                else if (cycle == 1)
-                {
-                    Bot.SendMessage(Chat, DAMN_MANUAL);
-                    return null;
-                }
-                else mess = Message;
-            }
-            return fileID;
+            if (GetMediaFileID(Message.ReplyToMessage) || GetMediaFileID(Message)) return false;
+            
+            Bot.SendMessage(Chat, DAMN_MANUAL);
+            return true;
+        }
+        
+        private bool GetMediaFileID(Message mess)
+        {
+            if (mess == null) return false;
+
+            if      (mess.Audio != null)
+                FileID = mess.Audio.FileId;
+            else if (mess.Video != null)
+                FileID = mess.Video.FileId;
+            else if (mess.Animation != null)
+                FileID = mess.Animation.FileId;
+            else if (mess.Sticker != null && mess.Sticker.IsVideo)
+                FileID = mess.Sticker.FileId;
+            else if (mess.Voice != null)
+                FileID = mess.Voice.FileId;
+            else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
+                FileID = mess.Document.FileId;
+            else return false;
+
+            return true;
         }
 
         protected void Download(string fileID, out string path, out MediaType type)

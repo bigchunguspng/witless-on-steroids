@@ -35,7 +35,7 @@ namespace Witlesss
         private static readonly StringFormat[] Formats;
 
         private static int _temp;
-        private static long _jpgQuality = 120;
+        private static long _jpegQuality = 120;
 
         static DemotivatorDrawer()
         {
@@ -78,7 +78,7 @@ namespace Witlesss
             else
             {
                 _textA.P = TextParameters.UpperText(_h - imageMarginB + 18, _w);
-                _textB.P = TextParameters.LowerText(_h - imageMarginB + 84, _w); // + 34 for \n
+                _textB.P = TextParameters.LowerText(_h - imageMarginB + 84, _w);
             }
         }
         
@@ -279,9 +279,11 @@ namespace Witlesss
         
         public static void PassQuality(int value)
         {
-            if (value == _jpgQuality) return;
-
-            EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
+            if (_jpegQuality != value)
+            {
+                _jpegQuality = value;
+                EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
+            }
         }
 
         private static ImageCodecInfo GetEncoder() => ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);

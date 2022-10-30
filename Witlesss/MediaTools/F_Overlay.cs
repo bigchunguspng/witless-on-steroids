@@ -24,6 +24,5 @@ namespace Witlesss.MediaTools
             "-i", _image, "-i", _video, "-filter_complex",
             $"[1:v]scale={_d.Size.Width}:{_d.Size.Height}[pic];[0:v][pic]overlay={_d.Pic.X}:{_d.Pic.Y}", _output
         };
-        
     }
 }

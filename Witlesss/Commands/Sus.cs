@@ -8,8 +8,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string fileID = GetVideoOrAudioID();
-            if (fileID == null) return;
+            if (NothingToProcess()) return;
 
             var argless = false;
             var x = GetArgs();
@@ -23,7 +22,7 @@ namespace Witlesss.Commands
                 else argless = true;
             }
 
-            Download(fileID, out string path, out var type);
+            Download(FileID, out string path, out var type);
 
             if (argless) x.length = TimeSpan.MinValue;
 

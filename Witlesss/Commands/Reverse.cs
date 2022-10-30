@@ -6,10 +6,9 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string fileID = GetVideoOrAudioID();
-            if (fileID == null) return;
+            if (NothingToProcess()) return;
             
-            Download(fileID, out string path, out var type);
+            Download(FileID, out string path, out var type);
             
             string result = Bot.MemeService.Reverse(path);
             SendResult(result, type, VideoFilename, AudioFilename);

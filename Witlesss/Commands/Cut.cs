@@ -10,8 +10,7 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            string fileID = GetVideoOrAudioID();
-            if (fileID == null) return;
+            if (NothingToProcess()) return;
 
             var x = GetArgs();
             if (x.failed)
@@ -20,7 +19,7 @@ namespace Witlesss.Commands
                 return;
             }
             
-            Download(fileID, out string path, out var type);
+            Download(FileID, out string path, out var type);
             
             string result = Bot.MemeService.Cut(path, x.start, x.length);
             SendResult(result, type, VideoFilename, AudioFilename);

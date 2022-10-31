@@ -100,15 +100,15 @@ namespace Witlesss
                 string text = input.Split(' ', 2)[1];
                 var witless = Active;
 
-                if      (input.StartsWith("/a ") && witless.Eat(text, out text)) //add
+                if      (input.StartsWith("/a ") && witless.Eat(text, out text)) // add
                 {
-                    Log($@"{_activeChat} >> ADDED TO DIC ""{text}""", ConsoleColor.Yellow);
+                    Log($@"{_activeChat} >> XD << ""{text}""", ConsoleColor.Yellow);
                 }
-                else if (input.StartsWith("/w ")) //write
+                else if (input.StartsWith("/w "))                                // write
                 {
                     SendMessage(_activeChat, text);
-                    bool accepted = witless.Eat(text, out text);
-                    Log($@"{_activeChat} >> SENT {(accepted ? "AND ADDED TO DIC " : "")}""{text}""", ConsoleColor.Yellow);
+                    witless.Eat(text, out _);
+                    Log($@"{_activeChat} >> {text}", ConsoleColor.Yellow);
                 }
             }
         }

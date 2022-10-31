@@ -28,7 +28,7 @@ namespace Witlesss
 
         public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            LogError("Telegram API Error x_x");
+            LogError("Telegram API Error x_x --> " + exception.Message);
             return Task.CompletedTask;
         }
         
@@ -41,7 +41,7 @@ namespace Witlesss
             }
             catch (Exception exception)
             {
-                LogError(TitleOrUsername(message) + " >> CAN'T HANDLE MESSAGE: " + exception.Message);
+                LogError(TitleOrUsername(message) + " >> Can't process message --> " + exception.Message);
             }
         }
     }

@@ -20,44 +20,43 @@ namespace Witlesss
 
         protected BotCore()
         {
-            string token = File.ReadAllText($@"{CurrentDirectory}\.token");
-            Client = new TelegramBotClient(token);
+            Client = new TelegramBotClient(File.ReadAllText($@"{CurrentDirectory}\.token"));
         }
 
         public void SendMessage(long chat, string text)
         {
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true, disableWebPagePreview: true);
-            TrySend(task, chat, "MESSAGE");
+            TrySend(task, chat, "message");
         }
 
         public void SendPhoto(long chat, InputOnlineFile photo)
         {
             var task = Client.SendPhotoAsync(chat, photo);
-            TrySend(task, chat, "PHOTO");
+            TrySend(task, chat, "photo");
         }
 
         public void SendAnimation(long chat, InputOnlineFile animation)
         {
             var task = Client.SendAnimationAsync(chat, animation);
-            TrySend(task, chat, "ANIMATION");
+            TrySend(task, chat, "animation");
         }
 
         public void SendVideo(long chat, InputOnlineFile video)
         {
             var task = Client.SendVideoAsync(chat, video);
-            TrySend(task, chat, "VIDEO");
+            TrySend(task, chat, "video");
         }
 
         public void SendAudio(long chat, InputOnlineFile audio)
         {
             var task = Client.SendAudioAsync(chat, audio);
-            TrySend(task, chat, "AUDIO");
+            TrySend(task, chat, "audio");
         }
 
         public void SendDocument(long chat, InputOnlineFile document)
         {
             var task = Client.SendDocumentAsync(chat, document);
-            TrySend(task, chat, "DOCUMENT");
+            TrySend(task, chat, "document");
         }
 
         private void TrySend(Task task, long chat, string what)
@@ -69,7 +68,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> CAN'T SEND {what}: " + e.Message);
+                LogError($"{chat} >> Can't send the {what} --> " + e.Message);
             }
         }
         
@@ -77,7 +76,7 @@ namespace Witlesss
         {
             try
             {
-                var task = Client.SendTextMessageAsync(chat, "мммм...", disableNotification: true);
+                var task = Client.SendTextMessageAsync(chat, "😏", disableNotification: true);
 
                 task.Wait();
                 if (task.IsFaulted) throw new Exception(task.Exception?.Message);
@@ -86,7 +85,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> CAN'T PING: " + e.Message);
+                LogError($"{chat} >> Can't ping --> " + e.Message);
                 if (e.Message.Contains("Forbidden") || e.Message.Contains("chat not found") || e.Message.Contains("have no rights to send a message"))
                     return -1;
                 return -2;

@@ -29,7 +29,7 @@ namespace Witlesss.MediaTools
                 "-filter_complex", Filters[_type], _output
             };
 
-        private static readonly Dictionary<MediaType, string> Filters = new Dictionary<MediaType, string>()
+        private static readonly Dictionary<MediaType, string> Filters = new()
         {
             {MediaType.Audio,      "[0:0][1:0]concat=n=2:v=0:a=1"},
             {MediaType.Video,      "[0:0][1:0]concat=n=2:v=1:a=0"},

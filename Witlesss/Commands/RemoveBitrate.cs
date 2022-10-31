@@ -51,7 +51,7 @@ namespace Witlesss.Commands
                 FileID = mess.Video.FileId;
             else if (mess.Animation != null)
                 FileID = mess.Animation.FileId;
-            else if (mess.Sticker != null && mess.Sticker.IsVideo)
+            else if (mess.Sticker is { IsVideo: true })
                 FileID = mess.Sticker.FileId;
             else if (mess.Voice != null)
                 FileID = mess.Voice.FileId;

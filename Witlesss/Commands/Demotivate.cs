@@ -12,7 +12,7 @@ namespace Witlesss.Commands
 {
     public class Demotivate : WitlessCommand
     {
-        private readonly Regex _dg = new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
+        private readonly Regex _dg = new(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
         
         public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
         public void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
@@ -35,7 +35,7 @@ namespace Witlesss.Commands
                 SendDemotivatedSticker(mess.Sticker.FileId);
             else if (mess.Animation != null)
                 SendAnimatedDemotivator(mess.Animation.FileId);
-            else if (mess.Sticker != null && mess.Sticker.IsVideo)
+            else if (mess.Sticker is { IsVideo: true })
                 SendAnimatedDemotivator(mess.Sticker.FileId, ".webm");
             else if (mess.Video != null)
                 SendAnimatedDemotivator(mess.Video.FileId);

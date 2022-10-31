@@ -26,7 +26,7 @@ namespace Witlesss
             {
                 CreateFilePath(_path);
                 File.CreateText(_path).Dispose();
-                T result = new T();
+                T result = new();
                 SaveData(result);
                 return result;
             }

@@ -19,12 +19,12 @@ namespace Witlesss
     {
         public const string START = "_start", END = "_end", LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = " " + LF + " ";
 
-        private readonly Random _random = new Random();
-        private readonly Regex _urls = new Regex(@"\S+(:[\/\\])\S+");
-        private readonly FileIO<WitlessDB> _fileIO;
-        private readonly Counter _generation = new Counter();
         private int _probability, _quality;
         private bool _hasUnsavedStuff, _admins;
+        private readonly Random _random = new();
+        private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
+        private readonly FileIO<WitlessDB> _fileIO;
+        private readonly Counter _generation = new();
 
         public Witless(long chat, int interval = 7, int probability = 20, int jpg = 75)
         {
@@ -101,7 +101,7 @@ namespace Witlesss
         }
         private string EatSimple(string[] words, float weight = 1F)
         {
-            var list = new List<string>(words.Length + 2) {START};
+            var list = new List<string>(words.Length + 2) { START };
             
             list.AddRange(words);
             list.Add(END);

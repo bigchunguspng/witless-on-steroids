@@ -23,15 +23,15 @@ namespace Witlesss
         private readonly Size _size;
         private readonly Point _imageXY;
         private readonly Rectangle _frame;
-        private readonly DrawableText _textA = new DrawableText(), _textB = new DrawableText();
+        private readonly DrawableText _textA = new(), _textB = new();
         
         private static readonly Pen White;
         private static readonly string TEMP = $@"{CurrentDirectory}\{TEMP_FOLDER}";
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
-        private static readonly EncoderParameters EncoderParameters = new EncoderParameters(1);
-        private static readonly Dictionary<Image, Point> Logos = new Dictionary<Image, Point>();
-        private static readonly Regex Ext = new Regex("(.png)|(.jpg)"), Emoji = new Regex(REGEX_EMOJI);
-        private static readonly Random R = new Random();
+        private static readonly EncoderParameters EncoderParameters = new(1);
+        private static readonly Dictionary<Image, Point> Logos = new();
+        private static readonly Regex Ext = new("(.png)|(.jpg)"), Emoji = new(REGEX_EMOJI);
+        private static readonly Random R = new();
         private static readonly StringFormat[] Formats;
 
         private static int _temp;
@@ -317,17 +317,17 @@ namespace Witlesss
         public RectangleF Layout;
         public StringFormat Format;
         
-        public Size EmojiSize => new Size(EmojiS, EmojiS);
+        public Size EmojiSize => new(EmojiS, EmojiS);
 
         public static TextParameters LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w);
         public static TextParameters UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w);
         public static TextParameters LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w);
 
-        private static Font LargeFont => new Font(DEMOTIVATOR_UPPER_FONT, 48);
-        private static Font UpperFont => new Font(DEMOTIVATOR_UPPER_FONT, 36);
-        private static Font LowerFont => new Font(DEMOTIVATOR_LOWER_FONT, 18);
+        private static Font LargeFont => new(DEMOTIVATOR_UPPER_FONT, 48);
+        private static Font UpperFont => new(DEMOTIVATOR_UPPER_FONT, 36);
+        private static Font LowerFont => new(DEMOTIVATOR_LOWER_FONT, 18);
 
-        private static TextParameters Construct(Font f, int l, int e, int margin, int width) => new TextParameters
+        private static TextParameters Construct(Font f, int l, int e, int margin, int width) => new()
         {
             Font   = f,
             Lines  = l,

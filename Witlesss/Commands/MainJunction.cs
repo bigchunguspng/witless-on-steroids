@@ -8,26 +8,26 @@ namespace Witlesss.Commands
     public class MainJunction : Command
     {
         private Command _command;
-        private readonly Demotivate _demotivate = new Demotivate();
-        private readonly RemoveBitrate _bitrate = new RemoveBitrate();
-        private readonly ChangeSpeed _speed = new ChangeSpeed();
-        private readonly Reverse _reverse = new Reverse();
-        private readonly Sus _sus = new Sus();
-        private readonly Cut _cut = new Cut();
-        private readonly Fuse _fuse = new Fuse();
-        private readonly Move _move = new Move();
-        private readonly GetChatID _chatID = new GetChatID();
-        private readonly ChatInfo _chat = new ChatInfo();
-        private readonly DebugMessage _debug = new DebugMessage();
-        private readonly GenerateByFirstWord _generate = new GenerateByFirstWord();
-        private readonly GenerateByLastWord _generateB = new GenerateByLastWord();
-        private readonly Buhurt _buhurt = new Buhurt();
-        private readonly SetFrequency _frequency = new SetFrequency();
-        private readonly SetProbability _probability = new SetProbability();
-        private readonly SetQuality _quality = new SetQuality();
-        private readonly ToggleStickers _stickers = new ToggleStickers();
-        private readonly ToggleAdmins _admins = new ToggleAdmins();
-        private readonly DeleteDictionary _delete = new DeleteDictionary();
+        private readonly Demotivate _demotivate = new();
+        private readonly RemoveBitrate _bitrate = new();
+        private readonly ChangeSpeed _speed = new();
+        private readonly Reverse _reverse = new();
+        private readonly Sus _sus = new();
+        private readonly Cut _cut = new();
+        private readonly Fuse _fuse = new();
+        private readonly Move _move = new();
+        private readonly GetChatID _chatID = new();
+        private readonly ChatInfo _chat = new();
+        private readonly DebugMessage _debug = new();
+        private readonly GenerateByFirstWord _generate = new();
+        private readonly GenerateByLastWord _generateB = new();
+        private readonly Buhurt _buhurt = new();
+        private readonly SetFrequency _frequency = new();
+        private readonly SetProbability _probability = new();
+        private readonly SetQuality _quality = new();
+        private readonly ToggleStickers _stickers = new();
+        private readonly ToggleAdmins _admins = new();
+        private readonly DeleteDictionary _delete = new();
 
         private string TextAsCommand() => Text.ToLower().Replace(BOT_USERNAME, "");
 
@@ -162,7 +162,7 @@ namespace Witlesss.Commands
                     SetUpDemotivateCommand();
                     _demotivate.SendDemotivator(Message.Photo[^1].FileId);
                 }
-                else if (witless.DemotivateStickers && Message.Sticker != null && !Message.Sticker.IsVideo && !Message.Sticker.IsAnimated && ShouldDemotivate())
+                else if (witless.DemotivateStickers && Message.Sticker is { IsVideo: false, IsAnimated: false } && ShouldDemotivate())
                 {
                     SetUpDemotivateCommand();
                     _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);

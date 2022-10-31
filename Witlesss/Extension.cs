@@ -15,9 +15,9 @@ namespace Witlesss
 {
     public static class Extension
     {
-        private static readonly Regex Column = new Regex("[:;^Жж]"), Comma = new Regex("[.юб]");
+        private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
         
-        public static readonly Random Random = new Random();
+        public static readonly Random Random = new();
 
         public static int AssumedResponseTime(int initialTime, string text)
         {
@@ -156,13 +156,13 @@ namespace Witlesss
         public static string ExtensionFromID(string id) => ExtensionsIDs[id.Remove(2)];
         public static MediaType MediaTypeFromID(string id) => MediaTypes[id.Remove(2)];
 
-        private static readonly Dictionary<string, string> ExtensionsIDs = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> ExtensionsIDs = new()
         {
             {"BA", ".mp4"}, {"Cg", ".mp4"}, // Cg - animation
             {"CQ", ".mp3"}, {"Aw", ".mp3"}, // Aw - voice message / ogg
             {"BQ", ".wav"}, {"Ag", ".jpg"}, {"CA", ".webm"}
         };
-        private static readonly Dictionary<string, MediaType> MediaTypes = new Dictionary<string, MediaType>()
+        private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {
             {"BA", MediaType.AudioVideo}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
             {"Aw", MediaType.Audio},      {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
@@ -173,7 +173,7 @@ namespace Witlesss
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {
             string a = SET_FREQUENCY_RESPONSE_A;
-            if (interval % 10 > 4 || interval % 10 == 0 || interval > 10 && interval < 15)
+            if (interval % 10 > 4 || interval % 10 == 0 || interval is > 10 and < 15)
                 a = $"{a} каждые {interval} сообщений";
             else if (interval % 10 > 1)
                 a = $"{a} каждые {interval} сообщения";

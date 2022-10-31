@@ -77,7 +77,7 @@ namespace Witlesss.Commands
                     fileID = Message.ReplyToMessage.Document?.FileId;
                 return fileID!.Length > 0;
             }
-            bool IsJsonAttached(Message message) => message.Document?.MimeType != null && message.Document?.MimeType == "application/json";
+            bool IsJsonAttached(Message message) => message.Document?.MimeType is "application/json";
         }
 
         private string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";

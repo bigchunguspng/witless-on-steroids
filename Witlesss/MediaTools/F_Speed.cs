@@ -27,7 +27,7 @@ namespace Witlesss.MediaTools
             "-i", _input, FiltersNames[_type], Filter(), _output
         };
 
-        private static readonly Dictionary<MediaType, string> FiltersNames = new Dictionary<MediaType, string>()
+        private static readonly Dictionary<MediaType, string> FiltersNames = new()
         {
             {MediaType.Audio,      "-filter:a"},
             {MediaType.Video,      "-filter:v"},

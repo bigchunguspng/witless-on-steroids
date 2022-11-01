@@ -5,7 +5,6 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Telegram.Bot.Types;
-using static System.Environment;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
@@ -15,9 +14,6 @@ namespace Witlesss.Commands
 {
     public class Fuse : ToggleAdmins
     {
-        private readonly string _extras = $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}";
-        private readonly string _history = $@"{CurrentDirectory}\{CH_HISTORY_FOLDER}";
-        
         public override void Run()
         {
             if (SenderIsSus()) return;
@@ -26,7 +22,7 @@ namespace Witlesss.Commands
             if (a.Length > 2)
             {
                 string name = Text.Substring(Text.IndexOf(' ') + 1);
-                var path = $@"{_history}\{Chat}";
+                var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
                 var files = GetFiles(path);
                 
                 if (name == "his all")
@@ -59,8 +55,8 @@ namespace Witlesss.Commands
             }
             else if (CanFuseHistory(out string fileID))
             {
-                Directory.CreateDirectory(_history);
-                string path = UniquePath($@"{_history}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json", ".json");
+                Directory.CreateDirectory(CH_HISTORY_FOLDER);
+                string path = UniquePath($@"{CH_HISTORY_FOLDER}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json", ".json");
                 Bot.DownloadFile(fileID, path, Chat).Wait();
                 
                 EatChatHistory(path);
@@ -81,10 +77,10 @@ namespace Witlesss.Commands
         }
 
         private string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
-        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(_extras))}\n\n{BASE_SIZE()}";
+        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(EXTRA_DBS_FOLDER))}\n\n{BASE_SIZE()}";
         private string FUSE_AVAILABLE_DATES()
         {
-            var files = GetFilesInfo($@"{_history}\{Chat}");
+            var files = GetFilesInfo($@"{CH_HISTORY_FOLDER}\{Chat}");
             var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
             if (files.Length > 0)
                 result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
@@ -122,9 +118,9 @@ namespace Witlesss.Commands
             }
             else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : $"{FUSE_FAIL_BASE}\n\n{FUSE_AVAILABLE_BASES()}");
 
-            string Path() => $@"{_extras}\{name}.json";
+            string Path() => $@"{EXTRA_DBS_FOLDER}\{name}.json";
             WitlessDB FromFile() => new FileIO<WitlessDB>(Path()).LoadData();
-            bool BaseExists() => GetFiles(_extras).Contains(Path());
+            bool BaseExists() => GetFiles(EXTRA_DBS_FOLDER).Contains(Path());
         }
 
         private void EatChatHistory(string path)
@@ -152,7 +148,7 @@ namespace Witlesss.Commands
             string date1 = FormatDate(((IDictionary<string, object>) list[0] )?["date"]);
             string date2 = FormatDate(((IDictionary<string, object>) list[^1])?["date"]);
 
-            path = $@"{_history}\{Chat}";
+            path = $@"{CH_HISTORY_FOLDER}\{Chat}";
             Directory.CreateDirectory(path);
             path = $@"{path}\{date1} - {date2}.json";
             new FileIO<List<string>>(path).SaveData(save);

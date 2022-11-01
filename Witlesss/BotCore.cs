@@ -6,7 +6,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Strings;
@@ -16,7 +15,7 @@ namespace Witlesss
 {
     public abstract class BotCore
     {
-        protected readonly TelegramBotClient Client = new(File.ReadAllText($@"{CurrentDirectory}\.token"));
+        protected readonly TelegramBotClient Client = new(File.ReadAllText(".token"));
 
         public void SendMessage(long chat, string text)
         {
@@ -89,7 +88,7 @@ namespace Witlesss
 
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
-            Directory.CreateDirectory($@"{CurrentDirectory}\{PICTURES_FOLDER}");
+            Directory.CreateDirectory(PICTURES_FOLDER);
             try
             {
                 var file = await Client.GetFileAsync(fileId);

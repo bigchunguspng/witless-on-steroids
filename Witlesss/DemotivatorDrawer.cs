@@ -10,7 +10,6 @@ using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Strings;
 using Encoder = System.Drawing.Imaging.Encoder;
@@ -26,7 +25,6 @@ namespace Witlesss
         private readonly DrawableText _textA = new(), _textB = new();
         
         private static readonly Pen White;
-        private static readonly string TEMP = $@"{CurrentDirectory}\{TEMP_FOLDER}";
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new(1);
         private static readonly Dictionary<Image, Point> Logos = new();
@@ -45,7 +43,7 @@ namespace Witlesss
                 new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = None},
                 new StringFormat(StringFormatFlags.NoWrap) {Alignment = Near, Trimming = EllipsisCharacter}
             };
-            LoadLogos($@"{CurrentDirectory}\{WATERMARKS_FOLDER}");
+            LoadLogos(WATERMARKS_FOLDER);
         }
 
         public DemotivatorDrawer(int width = 720, int height = 720)
@@ -224,7 +222,7 @@ namespace Witlesss
                     {
                         repeat = false;
                         
-                        var files = Directory.GetFiles($@"{CurrentDirectory}\Emoji", name + "*.png");
+                        var files = Directory.GetFiles("Emoji", name + "*.png");
                         if (files.Length == 1) file = files[0];
                         else if (files.Length > 1)
                         {
@@ -269,8 +267,8 @@ namespace Witlesss
         }
         private string SaveImageTemp(Image image)
         {
-            Directory.CreateDirectory(TEMP);
-            var path = UniquePath($@"{TEMP}\x_{_temp++}.png", ".png");
+            Directory.CreateDirectory(TEMP_FOLDER);
+            var path = UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png", ".png");
             image.Save(path);
             image.Dispose();
 

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
-using static System.Environment;
 using static Witlesss.LetterCaseMode;
 using static Witlesss.Strings;
 using static Witlesss.Logger;
@@ -216,12 +215,12 @@ namespace Witlesss
 
         public static void ClearTempFiles()
         {
-            var temp = $@"{CurrentDirectory}\{TEMP_FOLDER}";
-            if (!Directory.Exists(temp)) return;
+            var path = TEMP_FOLDER;
+            if (!Directory.Exists(path)) return;
             try
             {
-                var x = Directory.GetFiles(temp).Length;
-                Directory.Delete(temp, true);
+                var x = Directory.GetFiles(path).Length;
+                Directory.Delete(path, true);
                 Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
             }
             catch (Exception e)

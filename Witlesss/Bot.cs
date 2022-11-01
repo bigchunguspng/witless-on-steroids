@@ -8,7 +8,6 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Strings;
@@ -28,7 +27,7 @@ namespace Witlesss
         public Bot()
         {
             MemeService = new Memes();
-            _fileIO = new FileIO<ChatList>($@"{CurrentDirectory}\{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
+            _fileIO = new FileIO<ChatList>($@"{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
             SussyBakas = _fileIO.LoadData();
         }
 
@@ -146,7 +145,7 @@ namespace Witlesss
         {
             try
             {
-                string message = File.ReadAllText($@"{CurrentDirectory}\.spam");
+                string message = File.ReadAllText(".spam");
                 foreach (var witless in Bakas)
                 {
                     if (SizeInBytes(witless.Path) > size)
@@ -202,7 +201,7 @@ namespace Witlesss
         {
             foreach (var witless in Bakas)
             {
-                var path = $@"{CurrentDirectory}\{COPIES_FOLDER}\{DB_FILE_PREFIX}-{witless.Chat}.json";
+                var path = $@"{COPIES_FOLDER}\{DB_FILE_PREFIX}-{witless.Chat}.json";
                 if (File.Exists(path))
                 {
                     new FusionCollab(witless, new FileIO<WitlessDB>(path).LoadData()).Fuse();

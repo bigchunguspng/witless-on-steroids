@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 using static Witlesss.Strings;
@@ -65,7 +64,7 @@ namespace Witlesss
         }
 
         public WitlessDB Words { get; set; }
-        public string Path => $@"{CurrentDirectory}\{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
+        public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
 
         public bool Eat(string text, out string eaten)
         {
@@ -373,7 +372,7 @@ namespace Witlesss
         {
             Save();
             var file = new FileInfo(Path);
-            var path = $@"{CurrentDirectory}\{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}";
+            var path = $@"{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}";
             Directory.CreateDirectory(path);
             file.CopyTo(UniquePath($@"{path}\{DB_FILE_PREFIX}-{Chat}.json", ".json"));
         }

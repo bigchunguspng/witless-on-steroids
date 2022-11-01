@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using static System.Environment;
 using static Witlesss.Extension;
 using static Witlesss.Strings;
 using static Witlesss.Logger;
@@ -49,6 +48,6 @@ namespace Witlesss.Commands
             }
             else return "*"; // can't be in file name
         }
-        private string ExtraDBPath(string name) => $@"{CurrentDirectory}\{EXTRA_DBS_FOLDER}\{name}.json";
+        private string ExtraDBPath(string name) => $@"{EXTRA_DBS_FOLDER}\{name}.json";
     }
 }

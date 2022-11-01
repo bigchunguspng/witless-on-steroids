@@ -1,7 +1,6 @@
 ﻿using System;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using static System.Environment;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
@@ -67,7 +66,7 @@ namespace Witlesss.Commands
             string shortID = ShortID(fileID);
             string extension = ExtensionFromID(shortID);
             type = MediaTypeFromID(shortID);
-            path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{shortID}{extension}";
+            path = $@"{PICTURES_FOLDER}\{shortID}{extension}";
             path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path, Chat).Wait();
         }

@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using static System.Environment;
 using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
@@ -76,7 +75,7 @@ namespace Witlesss.Commands
         private void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
         {
             GetDemotivatorText(Baka, RemoveDg(Text), out textA, out textB);
-            path = $@"{CurrentDirectory}\{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
+            path = $@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
             path = UniquePath(path, extension);
             Bot.DownloadFile(fileID, path, Chat).Wait();
         }

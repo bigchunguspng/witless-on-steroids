@@ -262,4 +262,7 @@ s   - save and exit
 /xx - fix DBs
 /Xx - fix active chat DB</value>
     </data>
+    <data name="EMOJI_FOLDER" xml:space="preserve">
+        <value>Emoji</value>
+    </data>
 </root>

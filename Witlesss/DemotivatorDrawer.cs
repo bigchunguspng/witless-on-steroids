@@ -222,7 +222,7 @@ namespace Witlesss
                     {
                         repeat = false;
                         
-                        var files = Directory.GetFiles("Emoji", name + "*.png");
+                        var files = Directory.GetFiles(EMOJI_FOLDER, name + "*.png");
                         if (files.Length == 1) file = files[0];
                         else if (files.Length > 1)
                         {

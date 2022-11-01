@@ -16,12 +16,7 @@ namespace Witlesss
 {
     public abstract class BotCore
     {
-        protected readonly TelegramBotClient Client;
-
-        protected BotCore()
-        {
-            Client = new TelegramBotClient(File.ReadAllText($@"{CurrentDirectory}\.token"));
-        }
+        protected readonly TelegramBotClient Client = new(File.ReadAllText($@"{CurrentDirectory}\.token"));
 
         public void SendMessage(long chat, string text)
         {

@@ -157,14 +157,14 @@ namespace Witlesss.Commands
                 
                 witless.Count();
                 
-                if (Message.Photo != null && ShouldDemotivate())
+                if (Message.Photo?[^1] is { } p && ShouldDemotivate())
                 {
-                    SetUpDemotivateCommand();
+                    SetUpDemotivateCommand(p.Width, p.Height);
                     _demotivate.SendDemotivator(Message.Photo[^1].FileId);
                 }
-                else if (witless.DemotivateStickers && Message.Sticker is { IsVideo: false, IsAnimated: false } && ShouldDemotivate())
+                else if (witless.DemotivateStickers && Message.Sticker is { IsVideo: false, IsAnimated: false } s && ShouldDemotivate())
                 {
-                    SetUpDemotivateCommand();
+                    SetUpDemotivateCommand(s.Width, s.Height);
                     _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);
                 }
                 else if (witless.ReadyToGen())
@@ -174,9 +174,9 @@ namespace Witlesss.Commands
                     Log($"{Title} >> FUNNY");
                 }
 
-                void SetUpDemotivateCommand()
+                void SetUpDemotivateCommand(int w, int h)
                 {
-                    _demotivate.SetMode();
+                    _demotivate.SelectModeAuto(w, h);
                     _demotivate.PassQuality(witless);
                     _demotivate.Pass(Message);
                     _demotivate.Pass(witless);

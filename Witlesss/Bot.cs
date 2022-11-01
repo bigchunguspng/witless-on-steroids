@@ -84,7 +84,7 @@ namespace Witlesss
 
             void SetActiveChat()
             {
-                string shit = input.Substring(1);
+                string shit = input[1..];
                 foreach (long chat in SussyBakas.Keys)
                 {
                     if (chat.ToString().EndsWith(shit))

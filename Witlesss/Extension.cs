@@ -26,36 +26,25 @@ namespace Witlesss
         }
 
         public static string TextInRandomLetterCase(string text) => TextInLetterCase(text, RandomLetterCase());
-        public static string TextInLetterCase(string text, LetterCaseMode mode)
+        public static string TextInLetterCase(string text, LetterCaseMode mode) => mode switch
         {
-            switch (mode)
-            {
-                case Lower:
-                    return text.ToLower();
-                case Upper:
-                    return text.ToUpper();
-                case Sentence:
-                    return text[0].ToString().ToUpper() + text.Substring(1).ToLower();
-                default:
-                    return text;
-            }
-        }
+            Lower    => text.ToLower(),
+            Upper    => text.ToUpper(),
+            Sentence => char.ToUpper(text[0]) + text[1..].ToLower(),
+            _        => text
+        };
 
-        private static LetterCaseMode RandomLetterCase()
+        private static LetterCaseMode RandomLetterCase() => Random.Next(8) switch
         {
-            int n = Random.Next(8);
-            if (n < 5)
-                return Lower;
-            else if (n < 7)
-                return Sentence;
-            else
-                return Upper;
-        }
+            < 5 => Lower,
+            < 7 => Sentence,
+            _   => Upper
+        };
 
         public static string SenderName(Message message) => message.SenderChat?.Title ?? UserFullName(message);
         public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : UserFullName(message), 32);
 
-        private static string Truncate(string s, int length) => s.Length > length ? s.Substring(0, length - 3) + "..." : s;
+        private static string Truncate(string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
         private static string UserFullName(Message message)
         {
             string name = message.From?.FirstName;
@@ -66,7 +55,7 @@ namespace Witlesss
         public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
         {
             b = witless.TryToGenerate();
-            if (b.Length > 1) b = b[0] + b.Substring(1).ToLower(); // lower text can't be UPPERCASE
+            if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
             if (string.IsNullOrEmpty(text)) a = witless.TryToGenerate();
             else
             {
@@ -111,20 +100,20 @@ namespace Witlesss
         {
             while (File.Exists(path) || Directory.Exists(path) || extra)
             {
-                int nameStartIndex = path.LastIndexOf('\\') + 1;
-                string name = path.Substring(nameStartIndex);
+                int nameStartIndex = path!.LastIndexOf('\\') + 1;
+                string name = path[nameStartIndex..];
                 string directory = path.Remove(nameStartIndex);
                 
                 if (extension != "")
                     name = name.Replace(extension, "");
                 int underscoreIndex = name.LastIndexOf('_');
-                if (underscoreIndex > 0 && int.TryParse(name.Substring(underscoreIndex + 1), out int n))
+                if (underscoreIndex > 0 && int.TryParse(name.AsSpan(underscoreIndex + 1), out int n))
                 {
                     int number = n + 1;
                     name = name.Remove(underscoreIndex + 1) + number;
                 }
                 else
-                    name = name + "_0";
+                    name += "_0";
 
                 path = directory + name + extension;
                 extra = false;
@@ -134,8 +123,7 @@ namespace Witlesss
         public static string ValidFileName(string text)
         {
             var chars = Path.GetInvalidFileNameChars();
-            foreach (char c in chars) text = text.Replace(c, '_');
-            return text;
+            return chars.Aggregate(text, (current, c) => current.Replace(c, '_'));
         }
 
         public static string SetOutName(string path, string suffix)
@@ -205,10 +193,7 @@ namespace Witlesss
         {
             long bytes = SizeInBytes(path);
             long kbs = bytes / 1024;
-            if (kbs < 1)
-                return bytes + " байт";
-            else
-                return kbs + " КБ";
+            return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }
 
         public static long SizeInBytes(string path) => new FileInfo(path).Length;
@@ -232,18 +217,16 @@ namespace Witlesss
         public static void ClearTempFiles()
         {
             var temp = $@"{CurrentDirectory}\{TEMP_FOLDER}";
-            if (Directory.Exists(temp))
+            if (!Directory.Exists(temp)) return;
+            try
             {
-                try
-                {
-                    var x = Directory.GetFiles(temp).Length;
-                    Directory.Delete(temp, true);
-                    Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
-                }
-                catch (Exception e)
-                {
-                    LogError("CAN'T DEL TEMP >> " + e.Message);
-                }
+                var x = Directory.GetFiles(temp).Length;
+                Directory.Delete(temp, true);
+                Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
+            }
+            catch (Exception e)
+            {
+                LogError("CAN'T DEL TEMP >> " + e.Message);
             }
         }
     }

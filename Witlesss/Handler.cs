@@ -19,7 +19,7 @@ namespace Witlesss
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update.Type == UpdateType.Message)
+            if      (update.Type == UpdateType.Message)
                 TryHandleMessage(update.Message);
             else if (update.Type == UpdateType.EditedMessage)
                 TryHandleMessage(update.EditedMessage);

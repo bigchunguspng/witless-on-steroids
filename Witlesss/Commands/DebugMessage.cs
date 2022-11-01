@@ -11,7 +11,7 @@ namespace Witlesss.Commands
         public override void Run()
         {
             if (Message.ReplyToMessage == null) return;
-                    
+
             var mess = Message.ReplyToMessage;
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
             var path = $@"{CurrentDirectory}\{TEMP_FOLDER}\{name}";

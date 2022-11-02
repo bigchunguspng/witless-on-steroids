@@ -162,7 +162,7 @@ namespace Witlesss.Commands
                     SetUpDemotivateCommand(p.Width, p.Height);
                     _demotivate.SendDemotivator(Message.Photo[^1].FileId);
                 }
-                else if (witless.DemotivateStickers && Message.Sticker is { IsVideo: false, IsAnimated: false } s && ShouldDemotivate())
+                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && ShouldDemotivateSticker())
                 {
                     SetUpDemotivateCommand(s.Width, s.Height);
                     _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);
@@ -183,6 +183,7 @@ namespace Witlesss.Commands
                 }
                 
                 bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;
+                bool ShouldDemotivateSticker() => witless.DemotivateStickers && ShouldDemotivate();
             }
             else if (Text != null && TextAsCommand() == "/start")
             {

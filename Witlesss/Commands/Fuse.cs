@@ -14,10 +14,15 @@ namespace Witlesss.Commands
 {
     public class Fuse : ToggleAdmins
     {
+        private long _size;
+        
         public override void Run()
         {
             if (SenderIsSus()) return;
             
+            Baka.Save();
+            _size = SizeInBytes(Baka.Path);
+
             var a = Text.Split();
             if (a.Length > 2)
             {
@@ -166,7 +171,8 @@ namespace Witlesss.Commands
         {
             Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
             Baka.SaveNoMatterWhat();
-            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path)));
+            var difference = FileSize(SizeInBytes(Baka.Path) - _size);
+            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path), difference));
         }
     }
 }

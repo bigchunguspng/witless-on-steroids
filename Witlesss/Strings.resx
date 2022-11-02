@@ -108,7 +108,7 @@
     </data>
     <data name="FUSE_SUCCESS_RESPONSE" xml:space="preserve">
         <value>Cловарь беседы "{0}" обновлён!
-Теперь он весит {1}</value>
+Теперь он весит {1} (+{2})</value>
     </data>
     <data name="MOVE_MANUAL" xml:space="preserve">
         <value>Если вы хотите очистить словарь беседы, пропишите

@@ -360,7 +360,7 @@ namespace Witlesss {
         
         /// <summary>
         ///   Looks up a localized string similar to Cловарь беседы &quot;{0}&quot; обновлён!
-        ///Теперь он весит {1}.
+        ///Теперь он весит {1} (+{2}).
         /// </summary>
         internal static string FUSE_SUCCESS_RESPONSE {
             get {

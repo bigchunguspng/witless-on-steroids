@@ -188,9 +188,9 @@ namespace Witlesss
             "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
         };
 
-        public static string FileSize(string path)
+        public static string FileSize(string path) => FileSize(SizeInBytes(path));
+        public static string FileSize(long  bytes)
         {
-            long bytes = SizeInBytes(path);
             long kbs = bytes / 1024;
             return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }

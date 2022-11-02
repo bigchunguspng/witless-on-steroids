@@ -97,7 +97,7 @@ namespace Witlesss.Commands
                         {
                             _command = _buhurt;
                         }
-                        else if (command.StartsWith("/set_jpg"))
+                        else if (command.StartsWith("/set_q"))
                         {
                             _command = _quality;
                         }

@@ -68,7 +68,7 @@
         <value>ёкарный бабай)0</value>
     </data>
     <data name="DG_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Я могу делать демотиваторы из&lt;/u&gt;:
+        <value>&lt;u&gt;Демотиваторы я делаю из&lt;/u&gt;:
 
 • картинок 📸, стикеров 🎟
 • видео 🎬, гифок🪣 и видео-стикеров🍿
@@ -93,11 +93,11 @@
     <data name="EXTRA_DBS_FOLDER" xml:space="preserve">
         <value>Telegram-ExtraDBs</value>
     </data>
-    <data name="SET_FREQUENCY_RESPONSE_A" xml:space="preserve">
-        <value>Я буду отвечать на</value>
+    <data name="SET_FREQUENCY_RESPONSE" xml:space="preserve">
+        <value>я буду отвечать на</value>
     </data>
-    <data name="SET_FREQUENCY_RESPONSE_B" xml:space="preserve">
-        <value>Пикчи будут ставать демотиваторами с вероятностью</value>
+    <data name="SET_P_RESPONSE" xml:space="preserve">
+        <value>пикчи будут ставать демотиваторами с вероятностью {0}%</value>
     </data>
     <data name="WATERMARKS_FOLDER" xml:space="preserve">
         <value>Telegram-Water</value>
@@ -141,8 +141,8 @@
     <data name="DAMN_MANUAL" xml:space="preserve">
         <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
 
-• видосами 🎬, гифками🪣, видео-стикерами🍿
-• музыкой 🎧, wav-документами🥭, голосовыми🎙
+• видео 🎬, гифками🪣, видео-стикерами🍿
+• музыкой 🎧, wav-файлами🥭, голосовыми🎙
 
 Отправь её вместе с таким файлом 🗞 или в ответ на него✍️</value>
     </data>
@@ -219,7 +219,7 @@
 Менять настройки могут: {6}</value>
     </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
-        <value>Стикеры {0}будут демотивироваться в случайном порядке</value>
+        <value>cтикеры {0}будут демотивироваться в случайном порядке</value>
     </data>
     <data name="FUSE_FAIL_DATES" xml:space="preserve">
         <value>К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
@@ -269,5 +269,8 @@ s   - save and exit
     </data>
     <data name="EMOJI_FOLDER" xml:space="preserve">
         <value>Emoji</value>
+    </data>
+    <data name="SET_Q_RESPONSE" xml:space="preserve">
+        <value>качество демотиваторов будет {0}%</value>
     </data>
 </root>

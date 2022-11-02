@@ -14,7 +14,7 @@ namespace Witlesss.Commands
             {
                 Baka.DgProbability = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, SET_PROBABILITY_RESPONSE(Baka.DgProbability));
+                Bot.SendMessage(Chat, XD(string.Format(SET_P_RESPONSE, Baka.DgProbability)));
                 Log($"{Title} >> DG PROBABILITY >> {Baka.DgProbability}%");
             }
             else

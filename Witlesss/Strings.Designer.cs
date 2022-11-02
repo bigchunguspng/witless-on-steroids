@@ -202,8 +202,8 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
         ///
-        ///• видосами 🎬, гифками🪣, видео-стикерами🍿
-        ///• музыкой 🎧, wav-документами🥭, голосовыми🎙
+        ///• видео 🎬, гифками🪣, видео-стикерами🍿
+        ///• музыкой 🎧, wav-файлами🥭, голосовыми🎙
         ///
         ///Отправь её вместе с таким файлом 🗞 или в ответ на него✍️.
         /// </summary>
@@ -261,7 +261,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Я могу делать демотиваторы из&lt;/u&gt;:
+        ///   Looks up a localized string similar to &lt;u&gt;Демотиваторы я делаю из&lt;/u&gt;:
         ///
         ///• картинок 📸, стикеров 🎟
         ///• видео 🎬, гифок🪣 и видео-стикеров🍿
@@ -463,20 +463,29 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Я буду отвечать на.
+        ///   Looks up a localized string similar to я буду отвечать на.
         /// </summary>
-        internal static string SET_FREQUENCY_RESPONSE_A {
+        internal static string SET_FREQUENCY_RESPONSE {
             get {
-                return ResourceManager.GetString("SET_FREQUENCY_RESPONSE_A", resourceCulture);
+                return ResourceManager.GetString("SET_FREQUENCY_RESPONSE", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Пикчи будут ставать демотиваторами с вероятностью.
+        ///   Looks up a localized string similar to пикчи будут ставать демотиваторами с вероятностью {0}%.
         /// </summary>
-        internal static string SET_FREQUENCY_RESPONSE_B {
+        internal static string SET_P_RESPONSE {
             get {
-                return ResourceManager.GetString("SET_FREQUENCY_RESPONSE_B", resourceCulture);
+                return ResourceManager.GetString("SET_P_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to качество демотиваторов будет {0}%.
+        /// </summary>
+        internal static string SET_Q_RESPONSE {
+            get {
+                return ResourceManager.GetString("SET_Q_RESPONSE", resourceCulture);
             }
         }
         
@@ -501,7 +510,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Стикеры {0}будут демотивироваться в случайном порядке.
+        ///   Looks up a localized string similar to cтикеры {0}будут демотивироваться в случайном порядке.
         /// </summary>
         internal static string STICKERS_RESPONSE {
             get {

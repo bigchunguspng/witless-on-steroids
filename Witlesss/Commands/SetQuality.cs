@@ -1,4 +1,5 @@
-﻿using static Witlesss.Strings;
+﻿using System;
+using static Witlesss.Strings;
 using static Witlesss.Extension;
 using static Witlesss.Logger;
 
@@ -14,7 +15,7 @@ namespace Witlesss.Commands
             {
                 Baka.JpgQuality = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, $"Качество демотиваторов будет {Baka.JpgQuality}%");
+                Bot.SendMessage(Chat, XD(string.Format(SET_Q_RESPONSE, Baka.JpgQuality)));
                 Log($"{Title} >> JPG QUALITY >> {Baka.JpgQuality}%");
             }
             else

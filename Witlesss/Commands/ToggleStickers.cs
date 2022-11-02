@@ -1,4 +1,5 @@
-﻿using static Witlesss.Strings;
+﻿using static Witlesss.Extension;
+using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {
@@ -10,7 +11,7 @@ namespace Witlesss.Commands
             
             Baka.DemotivateStickers = !Baka.DemotivateStickers;
             Bot.SaveChatList();
-            Bot.SendMessage(Chat, string.Format(STICKERS_RESPONSE, Baka.DemotivateStickers ? "" : "<b>НЕ</b> "));
+            Bot.SendMessage(Chat, XD(string.Format(STICKERS_RESPONSE, Baka.DemotivateStickers ? "" : "<b>НЕ</b> ")));
         }
     }
 }

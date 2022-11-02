@@ -149,10 +149,10 @@
     <data name="TEMP_FOLDER" xml:space="preserve">
         <value>Telegram-Temp</value>
     </data>
-    <data name="SET_PROBABILITY_MANUAL" xml:space="preserve">
+    <data name="SET_X_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-/set_p@piece_fap_bot 75</value>
+/set_{0}@piece_fap_bot 75</value>
     </data>
     <data name="ZZ_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>
@@ -232,16 +232,11 @@
 
 чтобы скормить всё сразу</value>
     </data>
-    <data name="SET_QUALITY_MANUAL" xml:space="preserve">
-        <value>Если че правильно вот так:
-
-/set_jpg@piece_fap_bot 75</value>
-    </data>
     <data name="ADMINS_RESPONSE" xml:space="preserve">
         <value>Параметры генерации смогут менять {0}</value>
     </data>
-    <data name="GROUP_CHAT_ONLY_COMAND" xml:space="preserve">
-        <value>Это команда только для бесед 🤓</value>
+    <data name="GROUPS_ONLY_COMAND" xml:space="preserve">
+        <value>Эта команда только для бесед 🤓</value>
     </data>
     <data name="DEL_SUCCESS_RESPONSE" xml:space="preserve">
         <value>Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!

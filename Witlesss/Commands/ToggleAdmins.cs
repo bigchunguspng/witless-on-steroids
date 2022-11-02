@@ -9,7 +9,7 @@ namespace Witlesss.Commands
         {
             if (Chat > 0)
             {
-                Bot.SendMessage(Chat, GROUP_CHAT_ONLY_COMAND);
+                Bot.SendMessage(Chat, GROUPS_ONLY_COMAND);
             }
             else if (SenderIsAdmin())
             {

@@ -18,7 +18,7 @@ namespace Witlesss.Commands
                 Log($"{Title} >> DG PROBABILITY >> {Baka.DgProbability}%");
             }
             else
-                Bot.SendMessage(Chat, SET_PROBABILITY_MANUAL);
+                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "p"));
         }
     }
 }

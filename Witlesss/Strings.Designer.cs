@@ -379,11 +379,11 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Это команда только для бесед 🤓.
+        ///   Looks up a localized string similar to Эта команда только для бесед 🤓.
         /// </summary>
-        internal static string GROUP_CHAT_ONLY_COMAND {
+        internal static string GROUPS_ONLY_COMAND {
             get {
-                return ResourceManager.GetString("GROUP_CHAT_ONLY_COMAND", resourceCulture);
+                return ResourceManager.GetString("GROUPS_ONLY_COMAND", resourceCulture);
             }
         }
         
@@ -483,22 +483,11 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        /// /set_p@piece_fap_bot 75.
+        /// /set_{0}@piece_fap_bot 75.
         /// </summary>
-        internal static string SET_PROBABILITY_MANUAL {
+        internal static string SET_X_MANUAL {
             get {
-                return ResourceManager.GetString("SET_PROBABILITY_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Если че правильно вот так:
-        ///
-        /// /set_jpg@piece_fap_bot 75.
-        /// </summary>
-        internal static string SET_QUALITY_MANUAL {
-            get {
-                return ResourceManager.GetString("SET_QUALITY_MANUAL", resourceCulture);
+                return ResourceManager.GetString("SET_X_MANUAL", resourceCulture);
             }
         }
         

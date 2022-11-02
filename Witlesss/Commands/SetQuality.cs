@@ -18,7 +18,7 @@ namespace Witlesss.Commands
                 Log($"{Title} >> JPG QUALITY >> {Baka.JpgQuality}%");
             }
             else
-                Bot.SendMessage(Chat, SET_QUALITY_MANUAL);
+                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "q"));
         }
     }
 }

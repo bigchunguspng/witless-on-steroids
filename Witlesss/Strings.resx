@@ -273,4 +273,9 @@ s   - save and exit
     <data name="SET_Q_RESPONSE" xml:space="preserve">
         <value>качество демотиваторов будет {0}%</value>
     </data>
+    <data name="WITLESS_ONLY_COMAND" xml:space="preserve">
+        <value>Для использования этой команды нужно прописать
+
+/start@piece_fap_bot</value>
+    </data>
 </root>

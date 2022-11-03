@@ -566,6 +566,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Для использования этой команды нужно прописать
+        ///
+        /// /start@piece_fap_bot.
+        /// </summary>
+        internal static string WITLESS_ONLY_COMAND {
+            get {
+                return ResourceManager.GetString("WITLESS_ONLY_COMAND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре).
         /// </summary>
         internal static string ZZ_MANUAL {

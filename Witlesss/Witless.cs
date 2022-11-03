@@ -346,8 +346,8 @@ namespace Witlesss
             _generation.Resume();
         }
         
-        public void Count()      => _generation.Count();
-        public bool ReadyToGen() => _generation.Ready();
+        public void Count() => _generation.Count();
+        public bool Ready() => _generation.Ready();
 
         public void Save()
         {

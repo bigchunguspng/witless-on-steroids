@@ -6,7 +6,13 @@ namespace Witlesss.Commands
 {
     public class ChangeSpeed : RemoveBitrate
     {
-        public SpeedMode Mode;
+        private SpeedMode Mode;
+
+        public ChangeSpeed SetMode(SpeedMode mode)
+        {
+            Mode = mode;
+            return this;
+        }
 
         public override void Run()
         {

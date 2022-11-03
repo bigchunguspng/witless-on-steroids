@@ -13,9 +13,17 @@ namespace Witlesss.Commands
     {
         private readonly Regex _dg = new(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
         
-        public void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
-        public void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
-        public void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
+        public  void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
+        private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
+        public  void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
+
+        public Demotivate SetUp(Witless witless, DgMode mode)
+        {
+            SetMode(mode);
+            PassQuality(witless);
+
+            return this;
+        }
 
         public override void Run()
         {

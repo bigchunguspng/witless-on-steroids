@@ -89,16 +89,8 @@ namespace Witlesss.Commands
 
         private bool DoSimpleCommands(string command)
         {
-            if      (command.StartsWith("/fast"))
-            {
-                _command = _speed;
-                _speed.Mode = SpeedMode.Fast;
-            }
-            else if (command.StartsWith("/slow"))
-            {
-                _command = _speed;
-                _speed.Mode = SpeedMode.Slow;
-            }
+            if      (command.StartsWith("/fast"  )) _command = _speed.SetMode(SpeedMode.Fast);
+            else if (command.StartsWith("/slow"  )) _command = _speed.SetMode(SpeedMode.Slow);
             else if (command.StartsWith("/cut"   )) _command = _cut;
             else if (command.StartsWith("/sus"   )) _command = _sus;
             else if (command.StartsWith("/damn"  )) _command = _bitrate;
@@ -115,18 +107,8 @@ namespace Witlesss.Commands
 
         private bool DoWitlessCommands(string command, Witless witless)
         {
-            if      (command.StartsWith("/dg"))
-            {
-                _c = _demotivate;
-                _demotivate.SetMode();
-                _demotivate.PassQuality(witless);
-            }
-            else if (command.StartsWith("/dv"))
-            {
-                _c = _demotivate;
-                _demotivate.SetMode(DgMode.Wide);
-                _demotivate.PassQuality(witless);
-            }
+            if      (command.StartsWith("/dg"            )) _c = _demotivate.SetUp(witless, DgMode.Square);
+            else if (command.StartsWith("/dv"            )) _c = _demotivate.SetUp(witless, DgMode.Wide);
             else if (command.StartsWith("/a"             )) _c = _generate;
             else if (command.StartsWith("/zz"            )) _c = _generateB;
             else if (command.StartsWith("/b"             )) _c = _buhurt;

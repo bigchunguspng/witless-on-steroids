@@ -30,11 +30,9 @@ namespace Witlesss.Commands
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
 
-        private string TextAsCommand() => Text.ToLower().Replace(BOT_USERNAME, "");
-
-        private bool TextMayBeCommand(out string command)
+        private bool TextIsCommand(out string command)
         {
-            command = TextAsCommand();
+            command = Text.ToLower().Replace(BOT_USERNAME, "");
             return Text.StartsWith('/');
         }
 
@@ -46,13 +44,15 @@ namespace Witlesss.Commands
 
                 if (Text is not null)
                 {
-                    if (TextMayBeCommand(out var command))
+                    if (TextIsCommand(out var command))
                     {
                         if (DoSimpleCommands(command) || DoWitlessCommands(command, witless)) return;
                     }
-
-                    var text = Text.Clone().ToString();
-                    if (witless.Eat(text, out string eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                    else
+                    {
+                        var text = Text.Clone().ToString();
+                        if (witless.Eat(text, out string eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                    }
                 }
                 
                 witless.Count();
@@ -79,7 +79,7 @@ namespace Witlesss.Commands
                 bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;
                 bool ShouldDemotivateSticker() => witless.DemotivateStickers && ShouldDemotivate();
             }
-            else if (Text is not null && TextMayBeCommand(out var command))
+            else if (Text is not null && TextIsCommand(out var command))
             {
                 if (DoSimpleCommands(command) || DoStartCommand(command)) return;
 

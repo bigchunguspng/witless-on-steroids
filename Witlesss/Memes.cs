@@ -124,41 +124,46 @@ namespace Witlesss
 
         public string RemoveBitrate(string path, int bitrate, out int value)
         {
-            bool noArgs = bitrate == 0;
-            string outputPath;
-            F_RemoveBitrate task;
+            string output;
+            bool empty = bitrate == 0;
             
             WebmToMp4(ref path, out string extension);
             if (extension == ".mp4")
             {
                 var size = GetValidSize(path, out var stream);
-                double fps = RetrieveFPS(stream.AvgFrameRate, 30);
-                if (noArgs)
-                {
-                    var pixelsPerSecond = (int) ((size.Height + size.Width) * fps);
-                    bitrate = pixelsPerSecond / 620;
-                }
-                bitrate = Math.Clamp(bitrate, 1, noArgs ? (int) (40d * (fps / 30d)) : 120);
-                Log($"DAMN >> -b:v {bitrate}k", ConsoleColor.Blue);
-                
-                task = new F_RemoveBitrate(path, out outputPath, bitrate, size);
+                if (empty) bitrate = GetBitrate(stream, size);
+
+                Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
+
+                Execute(new F_RemoveBitrate(path, out output, bitrate, size));
             }
             else
-                task = new F_RemoveBitrate(path, out outputPath, bitrate);
+                Execute(new F_RemoveBitrate(path, out output, bitrate));
 
-            Execute(task);
             value = bitrate;
-            return outputPath;
+            return output;
+
+            string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }
 
+        private int GetBitrate(MediaStream stream, Size size)
+        {
+            if (int.TryParse(stream.BitRate, out int x))
+            {
+                return Math.Clamp((int)(100 * Math.Log10(0.00001 * x + 1)), 1, 150);
+            }
+            else
+            {
+                return (size.Height + size.Width) / 20;
+            }
+        }
         private Size GetValidSize(string path, out MediaStream stream)
         {
             stream = GetMediaStream(path);
             int height = FallbackIfZero(stream.Height, 720);
-            int width = FallbackIfZero(stream.Width, 720);
+            int width =  FallbackIfZero(stream.Width,  720);
 
-            if (width % 2 == 1 || height % 2 == 1) // РжакаБот / видеостикеры момент((9
-                return new Size(NearestEven(width), NearestEven(height));
+            if ((width | height) % 2 == 1) return new Size(ToEven(width), ToEven(height));
             return new Size(width, height);
         }
         private Size GetValidSize(string path) => GetValidSize(path, out _);
@@ -169,7 +174,7 @@ namespace Witlesss
         private void Execute(F_Base task) => _service.ExecuteAsync(task).Wait();
         
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
-        private int NearestEven(int x) => x + x % 2;
+        private int ToEven(int x) => x + x % 2;
 
         private double RetrieveFPS(string framerate, int alt = 16)
         {

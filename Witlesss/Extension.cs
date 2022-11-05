@@ -148,7 +148,7 @@ namespace Witlesss
         };
         private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {
-            {"BA", MediaType.AudioVideo}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
+            {"BA", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
             {"Aw", MediaType.Audio},      {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
         };
 
@@ -242,7 +242,7 @@ namespace Witlesss
     {
         Audio,
         Video,
-        AudioVideo
+        Movie // video with sound
     }
     
     public enum LetterCaseMode

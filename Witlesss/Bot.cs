@@ -108,6 +108,7 @@ namespace Witlesss
 
         private Witless Active => SussyBakas[_activeChat];
         private ICollection<Witless> Bakas => SussyBakas.Values;
+        private void RemoveChat(long id) => SussyBakas.TryRemove(id, out _);
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
 
@@ -157,14 +158,14 @@ namespace Witlesss
 
         private void DeleteBlockers()
         {
-            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) SussyBakas.TryRemove(w.Chat, out _);
+            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) RemoveChat(w.Chat);
             SaveChatList();
         }
         private void DeleteBlocker()
         {
             if (DeleteBlocker(Active) == -1)
             {
-                SussyBakas.TryRemove(_activeChat, out _);
+                RemoveChat(_activeChat);
                 SaveChatList();
             }
         }
@@ -185,7 +186,7 @@ namespace Witlesss
                 if (SizeInBytes(witless.Path) < size)
                 {
                     witless.Delete();
-                    SussyBakas.TryRemove(witless.Chat, out _);
+                    RemoveChat(witless.Chat);
                 }
             }
             SaveChatList();

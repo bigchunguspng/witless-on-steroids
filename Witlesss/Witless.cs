@@ -235,36 +235,24 @@ namespace Witlesss
         private string FindMatch(string word, string alt, out bool separated)
         {
             separated = false;
-            
-            if (!Words.ContainsKey(word))
+
+            if (Words.ContainsKey(word)) return word;
+
+            if (word.Contains(' '))
             {
-                if (word.Contains(' '))
-                {
-                    word = alt == END? word.Split()[0] : word.Split()[1];
-                    separated = true;
-                    if (Words.ContainsKey(word)) return word;
-                }
-
-                var words = new List<string>();
-                foreach (string key in Words.Keys)
-                {
-                    if (key.StartsWith(word)) words.Add(key);
-                }
-                if (words.Count > 0)
-                    return words[_random.Next(words.Count)];
-
-                foreach (string key in Words.Keys)
-                {
-                    if (word.StartsWith(key, StringComparison.Ordinal)) words.Add(key);
-                }
-                if (words.Count > 0)
-                {
-                    words.Sort(Comparison);
-                    return words[0];
-                }
-                return alt;
+                word = alt == END? word.Split()[0] : word.Split()[1];
+                separated = true;
+                if (Words.ContainsKey(word)) return word;
             }
-            return word;
+
+            var words = Words.Keys.Where(key => key.StartsWith(word)).ToList();
+            if (words.Count > 0) return words[_random.Next(words.Count)];
+
+            words     = Words.Keys.Where(key => word.StartsWith(key, StringComparison.Ordinal)).ToList();
+            if (words.Count < 1) return alt;
+
+            words.Sort(Comparison);
+            return words[0];
 
             int Comparison(string x, string y) => y.Length - x.Length;
         }
@@ -311,24 +299,14 @@ namespace Witlesss
         }
         private string PickWord(ConcurrentDictionary<string, float> dictionary)
         {
-            var chanceTotal = 0F;
-            foreach (var chance in dictionary)
-            {
-                chanceTotal += chance.Value;
-            }
-            
+            var chanceTotal = dictionary.Sum(chance => chance.Value);
+
             float r = (float)_random.NextDouble() * chanceTotal;
 
             foreach (var chance in dictionary)
             {
-                if (chance.Value > r)
-                {
-                    return chance.Key;
-                }
-                else
-                {
-                    r -= chance.Value;
-                }
+                if  (chance.Value > r) return chance.Key;
+                r -= chance.Value;
             }
 
             return END;

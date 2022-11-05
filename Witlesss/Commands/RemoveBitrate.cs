@@ -70,18 +70,9 @@ namespace Witlesss.Commands
         protected void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
         {
             using var stream = File.OpenRead(result);
-            switch (type)
-            {
-                case MediaType.Audio:
-                    Bot.SendAudio(Chat, new InputOnlineFile(stream, audio()));
-                    break;
-                case MediaType.Video:
-                    Bot.SendAnimation(Chat, new InputOnlineFile(stream, video()));
-                    break;
-                case MediaType.AudioVideo:
-                    Bot.SendVideo(Chat, new InputOnlineFile(stream, video()));
-                    break;
-            }
+            if      (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, audio()));
+            else if (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, video()));
+            else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, video()));
         }
     }
 }

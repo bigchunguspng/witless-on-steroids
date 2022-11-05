@@ -160,8 +160,7 @@ namespace Witlesss
             int height = FallbackIfZero(stream.Height, 720);
             int width =  FallbackIfZero(stream.Width,  720);
 
-            if ((width | height) % 2 == 1) return new Size(ToEven(width), ToEven(height));
-            return new Size(width, height);
+            return (width | height) % 2 == 1 ? new Size(ToEven(width), ToEven(height)) : new Size(width, height);
         }
         private Size GetValidSize(string path) => GetValidSize(path, out _);
         private double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);

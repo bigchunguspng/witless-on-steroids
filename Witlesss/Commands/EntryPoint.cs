@@ -142,7 +142,7 @@ namespace Witlesss.Commands
         
         private async void WitlessPoop(Witless witless, long chat, string text, string title)
         {
-            await Task.Delay(Extension.AssumedResponseTime(150, text));
+            await Task.Delay(AssumedResponseTime(150, text));
             Bot.SendMessage(chat, witless.TryToGenerate());
             Log($"{title} >> FUNNY");
         }

@@ -28,19 +28,20 @@ namespace Witlesss.MediaTools
 
         private static readonly Dictionary<MediaType, string> FiltersNames = new()
         {
-            {MediaType.Audio,      "-filter:a"},
-            {MediaType.Video,      "-filter:v"},
-            {MediaType.AudioVideo, "-filter_complex"}
+            {MediaType.Audio, "-filter:a"},
+            {MediaType.Video, "-filter:v"},
+            {MediaType.Movie, "-filter_complex"}
         };
 
         private string FilterAudio() => $"atempo={FormatDouble(_speed)}";
         private string FilterVideo() => $"setpts={FormatDouble(1 / _speed)}*PTS,fps={FormatDouble(_fps)}";
+        private string FilterMovie() => $"[0:v]{FilterVideo()};[0:a]{FilterAudio()}";
         private string Filter() => _type switch
         {
-            MediaType.Audio      => FilterAudio(),
-            MediaType.Video      => FilterVideo(),
-            MediaType.AudioVideo => $"[0:v]{FilterVideo()};[0:a]{FilterAudio()}",
-            _                    => throw new ArgumentOutOfRangeException()
+            MediaType.Audio => FilterAudio(),
+            MediaType.Video => FilterVideo(),
+            MediaType.Movie => FilterMovie(),
+            _               => throw new ArgumentOutOfRangeException()
         };
     }
 }

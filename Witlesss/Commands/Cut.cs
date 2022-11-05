@@ -30,14 +30,14 @@ namespace Witlesss.Commands
         {
             var s = Text.Split();
             int len = s.Length;
-            if      (len == 2 && TextIsTimeSpan(s[1], out var length)) return (false, Zero, length);       // [++]----]
-            else if (len >= 3 && TextIsTimeSpan(s[1], out var start))
+            if     (len == 2 && TextIsTimeSpan(s[1], out var length)) return (false, Zero,  length);      // [++]----]
+            if     (len >= 3 && TextIsTimeSpan(s[1], out var start))
             {
-                if  (len == 4 && TextIsTimeSpan(s[3], out var end))    return (false, start, end - start); // [-[++]--]
-                else if         (TextIsTimeSpan(s[2], out length))     return (false, start, length);      // [-[++]--]
-                else                                                   return (false, start, Zero);        // [-[+++++]
+                if (len == 4 && TextIsTimeSpan(s[3], out var end))    return (false, start, end - start); // [-[++]--]
+                if             (TextIsTimeSpan(s[2], out length))     return (false, start, length);      // [-[++]--]
+                else                                                  return (false, start, Zero);        // [-[+++++]
             }
-            else                                                       return (true, Zero, Zero);          // [-------]
+            else                                                      return (true,  Zero,  Zero);        // [-------]
         }
     }
 }

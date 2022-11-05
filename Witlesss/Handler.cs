@@ -16,7 +16,7 @@ namespace Witlesss
 {
     public class Handler : IUpdateHandler
     {
-        private readonly MainJunction _fork = new();
+        private readonly EntryPoint _fork = new();
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {

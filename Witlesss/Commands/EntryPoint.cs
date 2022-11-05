@@ -5,7 +5,7 @@ using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {
-    public class MainJunction : Command
+    public class EntryPoint : Command
     {
         private Command  _command;
         private WitlessCommand _c;

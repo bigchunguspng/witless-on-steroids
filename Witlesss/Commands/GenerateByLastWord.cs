@@ -1,8 +1,4 @@
-﻿using static Witlesss.Extension;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
-
-namespace Witlesss.Commands
+﻿namespace Witlesss.Commands
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {

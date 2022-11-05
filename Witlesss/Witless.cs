@@ -6,10 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {

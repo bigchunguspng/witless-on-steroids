@@ -1,6 +1,4 @@
-﻿using static Witlesss.Logger;
-
-namespace Witlesss.Commands
+﻿namespace Witlesss.Commands
 {
     public class Reverse : RemoveBitrate
     {

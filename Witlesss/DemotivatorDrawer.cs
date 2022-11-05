@@ -10,8 +10,6 @@ using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using static Witlesss.Extension;
-using static Witlesss.Strings;
 using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace Witlesss

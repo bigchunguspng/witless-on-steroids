@@ -8,9 +8,6 @@ using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.MediaTools;
-using static Witlesss.Logger;
-using static Witlesss.Extension;
-using static Witlesss.Strings;
 
 namespace Witlesss
 {

@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
-using static Witlesss.Extension;
 
 namespace Witlesss
 {

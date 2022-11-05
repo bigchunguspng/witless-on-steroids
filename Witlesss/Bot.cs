@@ -8,12 +8,7 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
 using File = System.IO.File;
-using ChatList = System.Collections.Concurrent.ConcurrentDictionary<long, Witlesss.Witless>;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {

@@ -1,8 +1,4 @@
-﻿using static Witlesss.Strings;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
-
-namespace Witlesss.Commands
+﻿namespace Witlesss.Commands
 {
     public class SetFrequency : ToggleAdmins
     {

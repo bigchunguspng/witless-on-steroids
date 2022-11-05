@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {

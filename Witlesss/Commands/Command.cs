@@ -1,6 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using static Witlesss.Extension;
-using ChatList = System.Collections.Concurrent.ConcurrentDictionary<long, Witlesss.Witless>;
 
 namespace Witlesss.Commands
 {

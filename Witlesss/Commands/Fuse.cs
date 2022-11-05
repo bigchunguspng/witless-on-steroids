@@ -5,10 +5,6 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Telegram.Bot.Types;
-using static Witlesss.Strings;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss.Commands
 {

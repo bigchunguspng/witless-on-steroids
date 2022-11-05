@@ -1,5 +1,4 @@
 ﻿using System;
-using WitlessDB = System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Concurrent.ConcurrentDictionary<string, float>>;
 
 namespace Witlesss
 {

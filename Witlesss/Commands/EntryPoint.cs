@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using static Witlesss.Logger;
-using static Witlesss.Strings;
 
 namespace Witlesss.Commands
 {

@@ -1,6 +1,4 @@
 ﻿using System;
-using static Witlesss.Extension;
-using static Witlesss.Logger;
 
 namespace Witlesss.Commands
 {

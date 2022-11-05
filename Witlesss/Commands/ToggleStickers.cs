@@ -1,7 +1,4 @@
-﻿using static Witlesss.Extension;
-using static Witlesss.Strings;
-
-namespace Witlesss.Commands
+﻿namespace Witlesss.Commands
 {
     public class ToggleStickers : ToggleAdmins
     {

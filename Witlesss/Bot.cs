@@ -8,7 +8,6 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
-using File = System.IO.File;
 
 namespace Witlesss
 {

@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using File = System.IO.File;
 
 namespace Witlesss.Commands
 {

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using static Witlesss.LetterCaseMode;
-using File = System.IO.File;
 
 namespace Witlesss
 {

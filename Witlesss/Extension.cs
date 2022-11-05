@@ -149,7 +149,7 @@ namespace Witlesss
         private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {
             {"BA", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
-            {"Aw", MediaType.Audio},      {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
+            {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
         };
 
         public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();

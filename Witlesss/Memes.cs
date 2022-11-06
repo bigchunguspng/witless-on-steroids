@@ -38,30 +38,30 @@ namespace Witlesss
             _ =>             _drawers[0]
         };
 
-        public string MakeDemotivator(string path, string textA, string textB)
+        public string MakeDemotivator(string path, DgText text)
         {
-            return Drawer.DrawDemotivator(path, textA, textB);
+            return Drawer.DrawDemotivator(path, text);
         }
 
-        public string MakeStickerDemotivator(string path, string textA, string textB, string extension)
+        public string MakeStickerDemotivator(string path, DgText text, string extension)
         {
             Execute(new F_WebpToJpg(path, out path, extension));
             
-            return MakeDemotivator(path, textA, textB);
+            return MakeDemotivator(path, text);
         }
 
-        public string MakeVideoStickerDemotivator(string path, string textA, string textB)
+        public string MakeVideoDemotivator(string path, DgText text)
+        {
+            Execute(new F_Overlay(Drawer.MakeFrame(text), path, out string output, Drawer));
+
+            return output;
+        }
+
+        public string MakeVideoStickerDemotivator(string path, DgText text)
         {
             Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
 
-            return MakeVideoDemotivator(path, textA, textB);
-        }
-        
-        public string MakeVideoDemotivator(string path, string textA, string textB)
-        {
-            Execute(new F_Overlay(Drawer.MakeFrame(textA, textB), path, out string output, Drawer));
-
-            return output;
+            return MakeVideoDemotivator(path, text);
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)

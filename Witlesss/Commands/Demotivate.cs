@@ -50,17 +50,17 @@ namespace Witlesss.Commands
 
         public void SendDemotivator(string fileID)
         {
-            GetSources(fileID, ".jpg", out string a, out string b, out string path);
-            using (var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, a, b)))
+            GetSources(fileID, ".jpg", out var text, out var path);
+            using (var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, text)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> DEMOTIVATOR [_]");
         }
 
         public void SendDemotivatedSticker(string fileID)
         {
-            GetSources(fileID, ".webp", out string a, out string b, out string path);
+            GetSources(fileID, ".webp", out var text, out var path);
             string extension = Text == null ? ".png" : Text.Contains("-j") ? ".jpg" : ".png";
-            using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, a, b, extension)))
+            using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, text, extension)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
@@ -68,18 +68,18 @@ namespace Witlesss.Commands
         private void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
         {
             var time = DateTime.Now;
-            GetSources(fileID, extension, out string a, out string b, out string path);
+            GetSources(fileID, extension, out var text, out var path);
             string output = extension == ".mp4"
-                ? Bot.MemeService.MakeVideoDemotivator(path, a, b)
-                : Bot.MemeService.MakeVideoStickerDemotivator(path, a, b);
+                ? Bot.MemeService.MakeVideoDemotivator       (path, text)
+                : Bot.MemeService.MakeVideoStickerDemotivator(path, text);
             using (var stream = File.OpenRead(output))
                 Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }
 
-        private void GetSources(string fileID, string extension, out string textA, out string textB, out string path)
+        private void GetSources(string fileID, string extension, out DgText text, out string path)
         {
-            GetDemotivatorText(Baka, RemoveDg(Text), out textA, out textB);
+            GetDemotivatorText(Baka, RemoveDg(Text), out text);
             path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
             Bot.DownloadFile(fileID, path, Chat).Wait();
         }

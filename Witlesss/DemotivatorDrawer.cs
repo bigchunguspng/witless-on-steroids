@@ -81,10 +81,10 @@ namespace Witlesss
         public Size Size => _size;
         public Point Pic => _imageXY;
 
-        public string DrawDemotivator(string path, string a, string b) => PasteImage(DrawFrame(a, b), path);
+        public string DrawDemotivator(string path, DgText text) => PasteImage(DrawFrame(text), path);
 
-        public string MakeFrame(string a, string b) => SaveImageTemp(DrawFrame(a, b));
-        private Image DrawFrame(string a, string b)
+        public string MakeFrame(DgText text) => SaveImageTemp(DrawFrame(text));
+        private Image DrawFrame(DgText text)
         {
             Image background = new Bitmap(_w, _h);
             using var graphics = Graphics.FromImage(background);
@@ -100,8 +100,8 @@ namespace Witlesss
 
             graphics.CompositingMode = SourceOver;
 
-            _textA.Pass(graphics, a);
-            _textB.Pass(graphics, b);
+            _textA.Pass(graphics, text.A);
+            _textB.Pass(graphics, text.B);
 
             DrawText(_textA);
             DrawText(_textB);

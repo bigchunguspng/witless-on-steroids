@@ -48,9 +48,11 @@ namespace Witlesss
             return last == "" ? name : name + " " + last;
         }
 
-        public static void GetDemotivatorText(Witless witless, string text, out string a, out string b)
+        public record DgText(string A, string B);
+
+        public static void GetDemotivatorText(Witless witless, string text, out DgText dg)
         {
-            b = witless.TryToGenerate();
+            string a, b = witless.TryToGenerate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
             if (string.IsNullOrEmpty(text)) a = witless.TryToGenerate();
             else
@@ -59,6 +61,7 @@ namespace Witlesss
                 a = s[0];
                 if (s.Length > 1) b = s[1];
             }
+            dg = new DgText(a, b);
         }
 
         public static bool HasIntArgument(string text, out int value)

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Witlesss.Commands;
 
 namespace Witlesss
@@ -40,14 +38,7 @@ namespace Witlesss
             {
                 LogError($"{TitleOrUsername(message)} >> Can't process message --> {e.Message}");
 
-                if (e.Message.Contains("ffmpeg"))
-                {
-                    Directory.CreateDirectory(TEMP_FOLDER);
-                    var path = UniquePath($@"{TEMP_FOLDER}\error.txt", ".txt");
-                    File.WriteAllText(path, e.Message);
-                    using var stream = File.OpenRead(path);
-                    Command.Bot.SendDocument(message.Chat.Id, new InputOnlineFile(stream, "произошла ашыпка(9.txt"));
-                }
+                if (e.Message.Contains("ffmpeg")) Command.Bot.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

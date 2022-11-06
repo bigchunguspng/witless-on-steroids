@@ -57,13 +57,6 @@ namespace Witlesss
             return output;
         }
 
-        public string MakeVideoStickerDemotivator(string path, DgText text)
-        {
-            Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
-
-            return MakeVideoDemotivator(path, text);
-        }
-
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;

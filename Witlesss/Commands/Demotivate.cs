@@ -36,11 +36,11 @@ namespace Witlesss.Commands
             if      (mess.Photo != null)
                 SendDemotivator(mess.Photo[^1].FileId);
             else if (mess.Animation != null)
-                SendAnimatedDemotivator(mess.Animation.FileId);
+                SendDemotivatedVideo(mess.Animation.FileId);
             else if (mess.Sticker is { IsVideo: true })
-                SendAnimatedDemotivator(mess.Sticker.FileId, ".webm");
+                SendDemotivatedVideo(mess.Sticker.FileId, ".webm");
             else if (mess.Video != null)
-                SendAnimatedDemotivator(mess.Video.FileId);
+                SendDemotivatedVideo(mess.Video.FileId);
             else if (mess.Sticker is { IsAnimated: false })
                 SendDemotivatedSticker(mess.Sticker.FileId);
             else return false;
@@ -65,14 +65,11 @@ namespace Witlesss.Commands
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
 
-        private void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
+        private void SendDemotivatedVideo(string fileID, string extension = ".mp4")
         {
             var time = DateTime.Now;
             GetSources(fileID, extension, out var text, out var path);
-            string output = extension == ".mp4"
-                ? Bot.MemeService.MakeVideoDemotivator       (path, text)
-                : Bot.MemeService.MakeVideoStickerDemotivator(path, text);
-            using (var stream = File.OpenRead(output))
+            using (var stream = File.OpenRead(Bot.MemeService.MakeVideoDemotivator(path, text)))
                 Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }

@@ -257,7 +257,7 @@ namespace Witlesss
 
         private string SaveImage(Image image, string path)
         {
-            path = UniquePath(path, ".jpg");
+            path = UniquePath(path);
             image.Save(path, JpgEncoder, EncoderParameters);
             image.Dispose();
 
@@ -265,8 +265,7 @@ namespace Witlesss
         }
         private string SaveImageTemp(Image image)
         {
-            Directory.CreateDirectory(TEMP_FOLDER);
-            var path = UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png", ".png");
+            var path = UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png");
             image.Save(path);
             image.Dispose();
 

@@ -64,8 +64,7 @@ namespace Witlesss
         
         public void SendErrorDetails(long chat, Exception e)
         {
-            Directory.CreateDirectory(TEMP_FOLDER);
-            var path = UniquePath($@"{TEMP_FOLDER}\error.txt", ".txt");
+            var path = UniquePath($@"{TEMP_FOLDER}\error.txt");
             File.WriteAllText(path, e.Message);
             using var stream = File.OpenRead(path);
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка(9.txt"));

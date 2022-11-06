@@ -56,8 +56,7 @@ namespace Witlesss.Commands
             }
             else if (CanFuseHistory(out string fileID))
             {
-                Directory.CreateDirectory(CH_HISTORY_FOLDER);
-                string path = UniquePath($@"{CH_HISTORY_FOLDER}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json", ".json");
+                string path = UniquePath($@"{CH_HISTORY_FOLDER}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json");
                 Bot.DownloadFile(fileID, path, Chat).Wait();
                 
                 EatChatHistory(path);

@@ -345,10 +345,8 @@ namespace Witlesss
         public void Backup()
         {
             Save();
-            var file = new FileInfo(Path);
-            var path = $@"{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}";
-            Directory.CreateDirectory(path);
-            file.CopyTo(UniquePath($@"{path}\{DB_FILE_PREFIX}-{Chat}.json", ".json"));
+            var path = $@"{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}\{DB_FILE_PREFIX}-{Chat}.json";
+            new FileInfo(Path).CopyTo(UniquePath(path));
         }
 
         public void Delete()

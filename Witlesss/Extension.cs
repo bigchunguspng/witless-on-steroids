@@ -92,28 +92,32 @@ namespace Witlesss
         
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
 
-        public static string UniquePath(string path, string extension = "", bool extra = false)
+        public static string UniquePath(string path, bool extra = false)
         {
-            while (File.Exists(path) || Directory.Exists(path) || extra)
+            var cd = true;
+            var directory = Path.GetDirectoryName(path);
+            var extension = Path.GetExtension(path);
+
+            while (File.Exists(path) || extra)
             {
-                int nameStartIndex = path!.LastIndexOf('\\') + 1;
-                string name = path[nameStartIndex..];
-                string directory = path.Remove(nameStartIndex);
-                
-                if (extension != "")
-                    name = name.Replace(extension, "");
-                int underscoreIndex = name.LastIndexOf('_');
-                if (underscoreIndex > 0 && int.TryParse(name.AsSpan(underscoreIndex + 1), out int n))
+                cd = false;
+                var name  = Path.GetFileNameWithoutExtension(path);
+
+                int index = name.LastIndexOf('_');
+                if (index > 0 && int.TryParse(name.AsSpan(index).TrimStart('_'), out int number))
                 {
-                    int number = n + 1;
-                    name = name.Remove(underscoreIndex + 1) + number;
+                    index++;
+                    number++;
+                    name = name[..index] + number;
                 }
                 else
                     name += "_0";
 
-                path = directory + name + extension;
+                path = $@"{directory}\{name}{extension}";
                 extra = false;
             }
+            if (cd) Directory.CreateDirectory(directory);
+            
             return path;
         }
         public static string ValidFileName(string text)
@@ -201,7 +205,7 @@ namespace Witlesss
 
         public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
 
-        public static void CreateFilePath(string path) => Directory.CreateDirectory(path.Remove(path.LastIndexOf('\\')));
+        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path));
 
         public static FileInfo[] GetFilesInfo(string path)
         {

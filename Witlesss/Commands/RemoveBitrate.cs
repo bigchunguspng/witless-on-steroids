@@ -50,7 +50,7 @@ namespace Witlesss.Commands
                 FileID = mess.Sticker.FileId;
             else if (mess.Voice != null)
                 FileID = mess.Voice.FileId;
-            else if (mess.Document?.MimeType != null && mess.Document.MimeType.StartsWith("audio"))
+            else if (mess.Document?.MimeType?.StartsWith("audio") == true)
                 FileID = mess.Document.FileId;
             else return false;
 
@@ -62,8 +62,7 @@ namespace Witlesss.Commands
             string shortID = ShortID(fileID);
             string extension = ExtensionFromID(shortID);
             type = MediaTypeFromID(shortID);
-            path = $@"{PICTURES_FOLDER}\{shortID}{extension}";
-            path = UniquePath(path, extension);
+            path = UniquePath($@"{PICTURES_FOLDER}\{shortID}{extension}");
             Bot.DownloadFile(fileID, path, Chat).Wait();
         }
 

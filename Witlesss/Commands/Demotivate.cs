@@ -50,7 +50,7 @@ namespace Witlesss.Commands
 
         public void SendDemotivator(string fileID)
         {
-            GetDemotivatorSources(fileID, ".jpg", out string a, out string b, out string path);
+            GetSources(fileID, ".jpg", out string a, out string b, out string path);
             using (var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, a, b)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> DEMOTIVATOR [_]");
@@ -58,7 +58,7 @@ namespace Witlesss.Commands
 
         public void SendDemotivatedSticker(string fileID)
         {
-            GetDemotivatorSources(fileID, ".webp", out string a, out string b, out string path);
+            GetSources(fileID, ".webp", out string a, out string b, out string path);
             string extension = Text == null ? ".png" : Text.Contains("-j") ? ".jpg" : ".png";
             using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, a, b, extension)))
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
@@ -68,7 +68,7 @@ namespace Witlesss.Commands
         private void SendAnimatedDemotivator(string fileID, string extension = ".mp4")
         {
             var time = DateTime.Now;
-            GetDemotivatorSources(fileID, extension, out string a, out string b, out string path);
+            GetSources(fileID, extension, out string a, out string b, out string path);
             string output = extension == ".mp4"
                 ? Bot.MemeService.MakeVideoDemotivator(path, a, b)
                 : Bot.MemeService.MakeVideoStickerDemotivator(path, a, b);
@@ -77,11 +77,10 @@ namespace Witlesss.Commands
             Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }
 
-        private void GetDemotivatorSources(string fileID, string extension, out string textA, out string textB, out string path)
+        private void GetSources(string fileID, string extension, out string textA, out string textB, out string path)
         {
             GetDemotivatorText(Baka, RemoveDg(Text), out textA, out textB);
-            path = $@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}";
-            path = UniquePath(path, extension);
+            path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
             Bot.DownloadFile(fileID, path, Chat).Wait();
         }
 

@@ -87,38 +87,40 @@ namespace Witlesss.Commands
 
         private bool DoSimpleCommands(string command)
         {
-            if      (command.StartsWith("/fast"  )) _command = _speed.SetMode(SpeedMode.Fast);
-            else if (command.StartsWith("/slow"  )) _command = _speed.SetMode(SpeedMode.Slow);
-            else if (command.StartsWith("/cut"   )) _command = _cut;
-            else if (command.StartsWith("/sus"   )) _command = _sus;
-            else if (command.StartsWith("/damn"  )) _command = _bitrate;
-            else if (command ==         "/reverse") _command = _reverse;
-            else if (command ==         "/chat_id") _command = _chatID;
-            else if (command ==         "/debug"  ) _command = _debug;
+            if      (CommandIs( "/fast"   )) _command = _speed.SetMode(SpeedMode.Fast);
+            else if (CommandIs( "/slow"   )) _command = _speed.SetMode(SpeedMode.Slow);
+            else if (CommandIs( "/cut"    )) _command = _cut;
+            else if (CommandIs( "/sus"    )) _command = _sus;
+            else if (CommandIs( "/damn"   )) _command = _bitrate;
+            else if (command == "/reverse" ) _command = _reverse;
+            else if (command == "/chat_id" ) _command = _chatID;
+            else if (command == "/debug"   ) _command = _debug;
             else return false;
             
             _command.Pass(Message);
             _command.Run();
 
             return true;
+            
+            bool CommandIs(string s) => command.StartsWith(s);
         }
 
         private bool DoWitlessCommands(string command, Witless witless)
         {
-            if      (command.StartsWith("/dg"            )) _c = _demotivate.SetUp(witless, DgMode.Square);
-            else if (command.StartsWith("/dv"            )) _c = _demotivate.SetUp(witless, DgMode.Wide);
-            else if (command.StartsWith("/a"             )) _c = _generate;
-            else if (command.StartsWith("/zz"            )) _c = _generateB;
-            else if (command.StartsWith("/b"             )) _c = _buhurt;
-            else if (command.StartsWith("/set_q"         )) _c = _quality;
-            else if (command.StartsWith("/set_p"         )) _c = _probability;
-            else if (command.StartsWith("/set"           )) _c = _frequency;
-            else if (command.StartsWith("/fuse"          )) _c = _fuse;
-            else if (command.StartsWith("/move"          )) _c = _move;
-            else if (command ==         "/toggle_stickers") _c = _stickers;
-            else if (command ==         "/chat"           ) _c = _chat;
-            else if (command ==         "/toggle_admins"  ) _c = _admins;
-            else if (command ==         "/delete"         ) _c = _delete;
+            if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(witless, DgMode.Square);
+            else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(witless, DgMode.Wide);
+            else if (CommandIs( "/a"         )) _c = _generate;
+            else if (CommandIs( "/zz"        )) _c = _generateB;
+            else if (CommandIs( "/b"         )) _c = _buhurt;
+            else if (CommandIs( "/set_q"     )) _c = _quality;
+            else if (CommandIs( "/set_p"     )) _c = _probability;
+            else if (CommandIs( "/set"       )) _c = _frequency;
+            else if (CommandIs( "/fuse"      )) _c = _fuse;
+            else if (CommandIs( "/move"      )) _c = _move;
+            else if (command == "/s_stickers" ) _c = _stickers;
+            else if (command == "/chat"       ) _c = _chat;
+            else if (command == "/s_admins"   ) _c = _admins;
+            else if (command == "/delete"     ) _c = _delete;
             else return false;
 
             _c.Pass(Message);
@@ -126,6 +128,8 @@ namespace Witlesss.Commands
             _c.Run();
             
             return true;
+
+            bool CommandIs(string s) => command.StartsWith(s);
         }
 
         private bool DoStartCommand(string command)

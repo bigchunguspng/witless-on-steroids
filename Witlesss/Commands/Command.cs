@@ -7,6 +7,7 @@ namespace Witlesss.Commands
         protected Message Message;
         protected string Text, Title;
         protected long Chat;
+        protected bool ChatIsPrivate => Chat > 0;
         
         public static Bot Bot;
 

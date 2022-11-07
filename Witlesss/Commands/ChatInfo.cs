@@ -11,7 +11,7 @@
                 Baka.JpgQuality,
                 Baka.DemotivateStickers ? "ON" : "OFF",
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
-            if (Chat > 0) info = info.Remove(info.LastIndexOf('\n'));
+            if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
             Bot.SendMessage(Chat, info);
         }
     }

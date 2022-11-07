@@ -81,7 +81,7 @@ namespace Witlesss.Commands
             {
                 if (DoSimpleCommands(command) || DoStartCommand(command)) return;
 
-                if (Chat > 0 || Text.Contains(BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                if (ChatIsPrivate || Text.Contains(BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
             }
         }
 

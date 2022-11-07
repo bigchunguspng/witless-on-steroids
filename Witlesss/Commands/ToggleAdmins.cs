@@ -4,7 +4,7 @@
     {
         public override void Run()
         {
-            if (Chat > 0)
+            if (ChatIsPrivate)
             {
                 Bot.SendMessage(Chat, GROUPS_ONLY_COMAND);
             }

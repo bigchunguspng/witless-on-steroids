@@ -17,7 +17,7 @@ namespace Witlesss.Commands
 
             Download(FileID, out string path, out var type);
 
-            string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value);
+            string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value, type);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> DAMN [*]");
 

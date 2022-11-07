@@ -13,7 +13,7 @@ namespace Witlesss
 {
     public class Memes
     {
-        private readonly DemotivatorDrawer[] _drawers;
+        private readonly DemotivatorDrawer[]  _drawers;
         private readonly IMediaToolkitService _service;
 
         public Memes()
@@ -63,7 +63,7 @@ namespace Witlesss
             
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
-            WebmToMp4(ref path, out _);
+            WebmToMp4(ref path);
             var output = SetOutName(path, "-S");
 
             if (type == MediaType.Audio)
@@ -72,7 +72,7 @@ namespace Witlesss
             }
             else
             {
-                double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate, 30) * speed;
+                double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate) * speed;
                 Execute(new F_Speed(path, output, speed, type, Math.Min(fps, 90)));
             }
 
@@ -81,7 +81,7 @@ namespace Witlesss
         
         public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
         {
-            WebmToMp4(ref path, out _);
+            WebmToMp4(ref path);
             
             if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
             
@@ -90,45 +90,46 @@ namespace Witlesss
                 Execute(new F_Cut(path, out path, start, length));
             }
             
-            Execute(new F_Reverse(path, out string reversed));
+            Execute(new F_Reverse(path, out string reversed, type));
             Execute(new F_Concat(path, reversed, out string output, type));
 
             return output;
         }
         
-        public string Reverse(string path)
+        public string Reverse(string path, MediaType type)
         {
-            WebmToMp4(ref path, out _);
+            WebmToMp4(ref path);
             
-            Execute(new F_Reverse(path, out string output));
+            Execute(new F_Reverse(path, out string output, type));
             return output;
         }
         
         public string Cut(string path, TimeSpan start, TimeSpan length)
         {
-            WebmToMp4(ref path, out _);
+            WebmToMp4(ref path);
             
             Execute(new F_Cut(path, out string output, start, length));
             return output;
         }
 
-        public string RemoveBitrate(string path, int bitrate, out int value)
+        public string RemoveBitrate(string path, int bitrate, out int value, MediaType type)
         {
-            string output;
+            var output = SetOutName(path, "-L").Replace(".webm", ".mp4");
             bool empty = bitrate == 0;
-            
-            WebmToMp4(ref path, out string extension);
-            if (extension == ".mp4")
+
+            if (type == MediaType.Audio)
+            {
+                Execute(new F_RemoveBitrate(path, output, bitrate));
+            }
+            else
             {
                 var size = GetValidSize(path, out var stream);
                 if (empty) bitrate = GetBitrate(stream, size);
 
                 Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
 
-                Execute(new F_RemoveBitrate(path, out output, bitrate, size));
+                Execute(new F_RemoveBitrate(path, output, bitrate, size));
             }
-            else
-                Execute(new F_RemoveBitrate(path, out output, bitrate));
 
             value = bitrate;
             return output;
@@ -151,7 +152,7 @@ namespace Witlesss
         {
             stream = GetMediaStream(path);
             int height = FallbackIfZero(stream.Height, 720);
-            int width =  FallbackIfZero(stream.Width,  720);
+            int width  = FallbackIfZero(stream.Width,  720);
 
             return (width | height) % 2 == 1 ? new Size(ToEven(width), ToEven(height)) : new Size(width, height);
         }
@@ -165,7 +166,7 @@ namespace Witlesss
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
         private int ToEven(int x) => x + x % 2;
 
-        private double RetrieveFPS(string framerate, int alt = 16)
+        private double RetrieveFPS(string framerate, int alt = 30)
         {
             var fps = framerate.Split('/');
             try
@@ -179,14 +180,10 @@ namespace Witlesss
             }
         }
 
-        private void WebmToMp4(ref string path, out string extension)
+        private void WebmToMp4(ref string path)
         {
-            extension = Path.GetExtension(path);
-            if (extension == ".webm")
-            {
-                Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
-                extension = ".mp4";
-            }
+            var extension = Path.GetExtension(path);
+            if (extension == ".webm") Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
         }
     }
 

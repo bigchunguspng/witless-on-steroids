@@ -8,7 +8,7 @@
             
             Download(FileID, out string path, out var type);
             
-            string result = Bot.MemeService.Reverse(path);
+            string result = Bot.MemeService.Reverse(path, type);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> REVERSED [<<]");
 

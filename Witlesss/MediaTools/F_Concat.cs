@@ -14,11 +14,8 @@ namespace Witlesss.MediaTools
         {
             _input_a = inputA;
             _input_b = inputB;
-
-            output = SetOutName(_input_a, "-A");
-
             _type = type;
-            _output = output;
+            _output = output = SetOutName(_input_a, "-A");
         }
 
         public override IList<string> CreateArguments() => new []

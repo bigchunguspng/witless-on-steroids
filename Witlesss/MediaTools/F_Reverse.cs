@@ -9,14 +9,12 @@ namespace Witlesss.MediaTools
         private readonly string _input, _output;
         private readonly bool _video;
         
-        public F_Reverse(string input, out string output)
+        public F_Reverse(string input, out string output, MediaType type)
         {
-            output = SetOutName(input, "-R", out _video);
-            
             _input = input;
-            _output = output;
+            _output = output = SetOutName(input, "-R");
+            _video = type > MediaType.Audio;
         }
-        
 
         public override IList<string> CreateArguments()
         {

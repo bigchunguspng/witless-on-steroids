@@ -134,12 +134,6 @@ namespace Witlesss
             string extension = Path.GetExtension(path);
             return RemoveExtension(path) + suffix + extension;
         }
-        public static string SetOutName(string path, string suffix, out bool video)
-        {
-            string extension = Path.GetExtension(path);
-            video = extension == ".mp4";
-            return RemoveExtension(path) + suffix + extension;
-        }
 
         private static string RemoveExtension(string path) => path.Remove(path.LastIndexOf('.'));
 

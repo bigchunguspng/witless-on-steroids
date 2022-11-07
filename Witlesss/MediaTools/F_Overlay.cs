@@ -10,12 +10,10 @@ namespace Witlesss.MediaTools
 
         public F_Overlay(string image, string video, out string output, DemotivatorDrawer drawer)
         {
-            output = SetOutName(video.Replace(".webm", ".mp4"), "-D");
-            
             _image = image;
             _video = video;
-            _output = output;
             _d = drawer;
+            _output = output = SetOutName(video.Replace(".webm", ".mp4"), "-D");
         }
 
         public override IList<string> CreateArguments() => new[]

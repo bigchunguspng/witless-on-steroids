@@ -8,6 +8,7 @@ using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.MediaTools;
+using static Witlesss.DemotivatorDrawer;
 
 namespace Witlesss
 {
@@ -31,12 +32,7 @@ namespace Witlesss
 
         public DgMode Mode;
 
-        private DemotivatorDrawer Drawer => Mode switch
-        {
-            DgMode.Square => _drawers[0],
-            DgMode.Wide =>   _drawers[1],
-            _ =>             _drawers[0]
-        };
+        private DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
         public string MakeDemotivator(string path, DgText text)
         {
@@ -53,6 +49,12 @@ namespace Witlesss
         public string MakeVideoDemotivator(string path, DgText text)
         {
             Execute(new F_Overlay(Drawer.MakeFrame(text), path, out string output, Drawer));
+
+            if (JpegQuality > 50) return output;
+
+            path = output;
+            output = SetOutName(output, "-L");
+            Execute(new F_RemoveBitrate(path, output, 25 + (int)(JpegQuality * 2.5), Drawer.Size));
 
             return output;
         }

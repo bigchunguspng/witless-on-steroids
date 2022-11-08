@@ -22,6 +22,7 @@ namespace Witlesss
         private readonly Rectangle _frame;
         private readonly DrawableText _textA = new(), _textB = new();
         
+        private static int      _temp;
         private static readonly Pen White;
         private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
         private static readonly EncoderParameters EncoderParameters = new(1);
@@ -30,8 +31,7 @@ namespace Witlesss
         private static readonly Random R = new();
         private static readonly StringFormat[] Formats;
 
-        private static int _temp;
-        private static long _jpegQuality = 120;
+        public static long JpegQuality { get; private set; } = 120;
 
         static DemotivatorDrawer()
         {
@@ -274,9 +274,9 @@ namespace Witlesss
         
         public static void PassQuality(int value)
         {
-            if (_jpegQuality != value)
+            if (JpegQuality != value)
             {
-                _jpegQuality = value;
+                JpegQuality = value;
                 EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
             }
         }

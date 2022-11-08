@@ -18,11 +18,8 @@ namespace Witlesss.MediaTools
             _input = input;
             _output = output;
             _bitrate = bitrate;
-            if (size != default)
-            {
-                _size = size;
-                _video = true;
-            }
+            _video = size != default;
+            if (_video) _size = size;
         }
         
         public override IList<string> CreateArguments()

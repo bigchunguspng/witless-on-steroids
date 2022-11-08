@@ -8,10 +8,7 @@ namespace Witlesss.MediaTools
     {
         private readonly Size _size;
         
-        public F_WebmToMp4(string input, out string output, string extension, Size size) : base(input, out output, extension)
-        {
-            _size = size;
-        }
+        public F_WebmToMp4(string input, Size size) : base(input, ".mp4") => _size = size;
 
         public override IList<string> CreateArguments() => new[]
         {

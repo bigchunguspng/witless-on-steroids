@@ -5,15 +5,12 @@ namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp4" -ss 00:00:05 -t 00:00:15 output.mp4
     // ffmpeg -i "input.mp4" -ss 00:00:05             output.mp4
-    public class F_Cut : F_Base
+    public class F_Cut : F_SimpleTask
     {
-        private readonly string   _input, _output;
         private readonly TimeSpan _start, _length;
 
-        public F_Cut(string input, out string output, TimeSpan start, TimeSpan length)
+        public F_Cut(string input, TimeSpan start, TimeSpan length) : base(input, SetOutName(input, "-C"))
         {
-            _input = input;
-            _output = output = SetOutName(input, "-C");
             _start = start;
             _length = length;
         }
@@ -22,10 +19,10 @@ namespace Witlesss.MediaTools
         {
             var result = new List<string>
             {
-                "-i", _input,
+                "-i", Input,
                 "-ss", $"{_start:c}",
                 "-t", $"{_length:c}",
-                _output
+                Output
             };
             if (_length == TimeSpan.Zero)
             {

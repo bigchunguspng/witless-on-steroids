@@ -41,22 +41,16 @@ namespace Witlesss
 
         public string MakeStickerDemotivator(string path, DgText text, string extension)
         {
-            Execute(new F_WebpToJpg(path, out path, extension));
-            
-            return MakeDemotivator(path, text);
+            return MakeDemotivator(Execute(new F_WebpToJpg(path, extension)), text);
         }
 
         public string MakeVideoDemotivator(string path, DgText text)
         {
-            Execute(new F_Overlay(Drawer.MakeFrame(text), path, out string output, Drawer));
+            path = Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer));
 
-            if (JpegQuality > 50) return output;
+            if (JpegQuality > 50) return path;
 
-            path = output;
-            output = SetOutName(output, "-L");
-            Execute(new F_RemoveBitrate(path, output, 25 + (int)(JpegQuality * 2.5), Drawer.Size));
-
-            return output;
+            return Execute(new F_RemoveBitrate(path, 25 + (int)(JpegQuality * 2.5), Drawer.Size));
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
@@ -65,76 +59,57 @@ namespace Witlesss
             
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
-            WebmToMp4(ref path);
-            var output = SetOutName(path, "-S");
+            path = WebmToMp4(path);
 
             if (type == MediaType.Audio)
             {
-                Execute(new F_Speed(path, output, speed, type));
+                return Execute(new F_Speed(path, speed, type));
             }
             else
             {
                 double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate) * speed;
-                Execute(new F_Speed(path, output, speed, type, Math.Min(fps, 90)));
+                return Execute(new F_Speed(path, speed, type, Math.Min(fps, 90)));
             }
-
-            return output;
         }
         
         public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
         {
-            WebmToMp4(ref path);
+            path = WebmToMp4(path);
             
             if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
-            
-            if (start != TimeSpan.Zero || length != TimeSpan.Zero)
-            {
-                Execute(new F_Cut(path, out path, start, length));
-            }
-            
-            Execute(new F_Reverse(path, out string reversed, type));
-            Execute(new F_Concat(path, reversed, out string output, type));
 
-            return output;
+            if ((start + length).Ticks > 0) path = Cut(path, start, length);
+
+            return Execute(new F_Concat(path, Reverse(path, type), type));
         }
         
         public string Reverse(string path, MediaType type)
         {
-            WebmToMp4(ref path);
-            
-            Execute(new F_Reverse(path, out string output, type));
-            return output;
+            return Execute(new F_Reverse(WebmToMp4(path), type));
         }
         
         public string Cut(string path, TimeSpan start, TimeSpan length)
         {
-            WebmToMp4(ref path);
-            
-            Execute(new F_Cut(path, out string output, start, length));
-            return output;
+            return Execute(new F_Cut(WebmToMp4(path), start, length));
         }
 
-        public string RemoveBitrate(string path, int bitrate, out int value, MediaType type)
+        public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
-            var output = SetOutName(path, "-L").Replace(".webm", ".mp4");
-            bool empty = bitrate == 0;
-
             if (type == MediaType.Audio)
             {
-                Execute(new F_RemoveBitrate(path, output, bitrate));
+                return Execute(new F_RemoveBitrate(path));
             }
             else
             {
+                bool empty = bitrate == 0;
+
                 var size = GetValidSize(path, out var stream);
                 if (empty) bitrate = GetBitrate(stream, size);
 
                 Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
 
-                Execute(new F_RemoveBitrate(path, output, bitrate, size));
+                return Execute(new F_RemoveBitrate(path, bitrate, size));
             }
-
-            value = bitrate;
-            return output;
 
             string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }
@@ -163,7 +138,7 @@ namespace Witlesss
         private MediaStream GetMediaStream(string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
 
-        private void Execute(F_Base task) => _service.ExecuteAsync(task).Wait();
+        private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
         
         private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
         private int ToEven(int x) => x + x % 2;
@@ -182,10 +157,9 @@ namespace Witlesss
             }
         }
 
-        private void WebmToMp4(ref string path)
+        private string WebmToMp4(string path)
         {
-            var extension = Path.GetExtension(path);
-            if (extension == ".webm") Execute(new F_WebmToMp4(path, out path, ".mp4", GetValidSize(path)));
+            return Path.GetExtension(path) == ".webm" ? Execute(new F_WebmToMp4(path, GetValidSize(path))) : path;
         }
     }
 

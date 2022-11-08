@@ -31,11 +31,7 @@ namespace Witlesss.Commands
             string AudioFilename() => MediaFileName($"Kid Named {WhenTheSenderIsSus()}.mp3");
             string VideoFilename() => "sus_fap_club.mp4";
 
-            string WhenTheSenderIsSus()
-            {
-                string s = Sender();
-                return s.Length > 2 ? s[..2] + s[0] : s;
-            }
+            string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
         }
     }
 }

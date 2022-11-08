@@ -22,7 +22,7 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> CUT [8K-]");
 
-            string AudioFilename() => MediaFileName($"((({Sender()}))).mp3");
+            string AudioFilename() => MediaFileName($"((({Sender}))).mp3");
             string VideoFilename() => "cut_fap_club.mp4";
         }
 

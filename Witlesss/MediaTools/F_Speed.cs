@@ -6,24 +6,21 @@ namespace Witlesss.MediaTools
     // ffmpeg -i "input.mp4" -filter_complex "[0:v]setpts=0.5*PTS,fps=60;[0:a]atempo=2.0" output.mp4
     // ffmpeg -i "input.mp4" -filter:v       "setpts=0.5*PTS,fps=60"                      output.mp4
     // ffmpeg -i "input.mp3" -filter:a       "atempo=2.0"                                 output.mp3
-    public class F_Speed : F_Base
+    public class F_Speed : F_SimpleTask
     {
-        private readonly string _input, _output;
         private readonly double _speed, _fps;
         private readonly MediaType _type;
 
-        public F_Speed(string input, string output, double speed, MediaType type, double fps) : this(input, output, speed, type) => _fps = fps;
-        public F_Speed(string input, string output, double speed, MediaType type)
+        public F_Speed(string input, double speed, MediaType type, double fps) : this(input, speed, type) => _fps = fps;
+        public F_Speed(string input, double speed, MediaType type) : base(input, SetOutName(input, "-S"))
         {
-            _input = input;
-            _output = output;
             _speed = speed;
             _type = type;
         }
 
         public override IList<string> CreateArguments() => new[]
         {
-            "-i", _input, FiltersNames[_type], Filter(), _output
+            "-i", Input, FiltersNames[_type], Filter(), Output
         };
 
         private static readonly Dictionary<MediaType, string> FiltersNames = new()

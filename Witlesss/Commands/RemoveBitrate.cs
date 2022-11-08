@@ -17,16 +17,17 @@ namespace Witlesss.Commands
 
             Download(FileID, out string path, out var type);
 
-            string result = Bot.MemeService.RemoveBitrate(path, bitrate, out value, type);
+            string result = Bot.MemeService.RemoveBitrate(path, ref bitrate, type);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> DAMN [*]");
 
-            string AudioFilename() => MediaFileName($"Damn, {Sender()}.mp3");
-            string VideoFilename() => $"piece_fap_club-{value}.mp4";
+            string AudioFilename() => MediaFileName($"Damn, {Sender}.mp3");
+            string VideoFilename() => $"piece_fap_club-{bitrate}.mp4";
         }
 
         protected string MediaFileName(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
-        protected string Sender() => ValidFileName(SenderName(Message));
+
+        protected string Sender => ValidFileName(SenderName(Message));
 
         protected bool NothingToProcess()
         {

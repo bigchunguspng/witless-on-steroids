@@ -9,6 +9,7 @@ using Witlesss.MediaTools;
 using static System.Globalization.CultureInfo;
 using static Witlesss.DemotivatorDrawer;
 using MD = System.Threading.Tasks.Task<MediaToolkit.Tasks.GetMetadataResult>;
+using TS = System.TimeSpan;
 
 namespace Witlesss
 {
@@ -50,7 +51,7 @@ namespace Witlesss
 
             if (JpegQuality > 50) return path;
 
-            return Execute(new F_RemoveBitrate(path, 25 + (int)(JpegQuality * 2.5)));
+            return Execute(new F_Bitrate(path, 25 + (int)(JpegQuality * 2.5)));
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
@@ -68,20 +69,20 @@ namespace Witlesss
                 return Execute(new F_Speed(path, speed, type));
         }
         
-        public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
+        public string Sus(string path, TS start, TS length, MediaType type)
         {
             if (Path.GetExtension(path) == ".webm") path = Execute(new F_ToMP4(path, GetValidSize(path)));
 
-            if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
+            if (length < TS.Zero) length = TS.FromSeconds(GetDurationInSeconds(path) / 2D);
 
             if ((start + length).Ticks > 0) path = Cut(path, start, length);
 
             return Execute(new F_Concat(path, Reverse(path, type), type));
         }
         
-        public string Reverse(string path, MediaType type)              => Execute(new F_Reverse(path, type));
+        public string Reverse(string path, MediaType type)  => Execute(new F_Reverse(path, type));
 
-        public string Cut(string path, TimeSpan start, TimeSpan length) => Execute(new F_Cut(path, start, length));
+        public string Cut(string path, TS start, TS length) => Execute(new F_Cut(path, start, length));
 
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
@@ -94,10 +95,10 @@ namespace Witlesss
 
                 Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
 
-                return Execute(new F_RemoveBitrate(path, bitrate, type));
+                return Execute(new F_Bitrate(path, bitrate, type));
             }
             else
-                return Execute(new F_RemoveBitrate(path));
+                return Execute(new F_Bitrate(path));
 
             string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }

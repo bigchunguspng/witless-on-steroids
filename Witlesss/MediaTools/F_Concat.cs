@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using static Witlesss.MediaType;
 
 namespace Witlesss.MediaTools
 {
@@ -16,9 +17,9 @@ namespace Witlesss.MediaTools
 
         private static readonly Dictionary<MediaType, string> Filters = new()
         {
-            {MediaType.Audio, "[0:0][1:0]concat=n=2:v=0:a=1"},
-            {MediaType.Video, "[0:0][1:0]concat=n=2:v=1:a=0"},
-            {MediaType.Movie, "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1"}
+            { Audio, "[0:0][1:0]concat=n=2:v=0:a=1"           },
+            { Video, "[0:0][1:0]concat=n=2:v=1:a=0"           },
+            { Movie, "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1" }
         };
     }
 }

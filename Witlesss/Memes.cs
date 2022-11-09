@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.MediaTools;
+using static System.Globalization.CultureInfo;
 using static Witlesss.DemotivatorDrawer;
+using MD = System.Threading.Tasks.Task<MediaToolkit.Tasks.GetMetadataResult>;
 
 namespace Witlesss
 {
     public class Memes
     {
         private readonly DemotivatorDrawer[]  _drawers;
-        private readonly IMediaToolkitService _service;
+        private static   IMediaToolkitService _service;
 
         public Memes()
         {
             _drawers = new[] {new DemotivatorDrawer(), new DemotivatorDrawer(1280)};
 
-            if (!File.Exists(FFMPEG_PATH))
+            while (!File.Exists(FFMPEG_PATH))
             {
-                Log(@$"""{FFMPEG_PATH}"" не найден. Поместите его туда или оформите вылет", ConsoleColor.Yellow);
-                Log("Нажмите любую клавишу для продолжения...");
+                Log(@$"""{FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
+                Log("Press any key to continue...");
                 Console.ReadKey();
             }
             _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
@@ -41,7 +41,7 @@ namespace Witlesss
 
         public string MakeStickerDemotivator(string path, DgText text, string extension)
         {
-            return MakeDemotivator(Execute(new F_WebpToJpg(path, extension)), text);
+            return MakeDemotivator(Execute(new F_ToJPG(path, extension)), text);
         }
 
         public string MakeVideoDemotivator(string path, DgText text)
@@ -50,7 +50,7 @@ namespace Witlesss
 
             if (JpegQuality > 50) return path;
 
-            return Execute(new F_RemoveBitrate(path, 25 + (int)(JpegQuality * 2.5), Drawer.Size));
+            return Execute(new F_RemoveBitrate(path, 25 + (int)(JpegQuality * 2.5)));
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
@@ -59,23 +59,19 @@ namespace Witlesss
             
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
-            path = WebmToMp4(path);
-
-            if (type == MediaType.Audio)
+            if (type > MediaType.Audio)
             {
-                return Execute(new F_Speed(path, speed, type));
-            }
-            else
-            {
-                double fps = RetrieveFPS(GetMediaStream(path).AvgFrameRate) * speed;
+                double fps = RetrieveFPS(GetMedia(path).AvgFrameRate) * speed;
                 return Execute(new F_Speed(path, speed, type, Math.Min(fps, 90)));
             }
+            else
+                return Execute(new F_Speed(path, speed, type));
         }
         
         public string Sus(string path, TimeSpan start, TimeSpan length, MediaType type)
         {
-            path = WebmToMp4(path);
-            
+            if (Path.GetExtension(path) == ".webm") path = Execute(new F_ToMP4(path, GetValidSize(path)));
+
             if (length < TimeSpan.Zero) length = TimeSpan.FromSeconds(GetDurationInSeconds(path) / 2D);
 
             if ((start + length).Ticks > 0) path = Cut(path, start, length);
@@ -83,23 +79,13 @@ namespace Witlesss
             return Execute(new F_Concat(path, Reverse(path, type), type));
         }
         
-        public string Reverse(string path, MediaType type)
-        {
-            return Execute(new F_Reverse(WebmToMp4(path), type));
-        }
-        
-        public string Cut(string path, TimeSpan start, TimeSpan length)
-        {
-            return Execute(new F_Cut(WebmToMp4(path), start, length));
-        }
+        public string Reverse(string path, MediaType type)              => Execute(new F_Reverse(path, type));
+
+        public string Cut(string path, TimeSpan start, TimeSpan length) => Execute(new F_Cut(path, start, length));
 
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
-            if (type == MediaType.Audio)
-            {
-                return Execute(new F_RemoveBitrate(path));
-            }
-            else
+            if (type > MediaType.Audio)
             {
                 bool empty = bitrate == 0;
 
@@ -108,8 +94,10 @@ namespace Witlesss
 
                 Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
 
-                return Execute(new F_RemoveBitrate(path, bitrate, size));
+                return Execute(new F_RemoveBitrate(path, bitrate, type));
             }
+            else
+                return Execute(new F_RemoveBitrate(path));
 
             string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }
@@ -125,23 +113,23 @@ namespace Witlesss
                 return (size.Height + size.Width) / 20;
             }
         }
-        private Size GetValidSize(string path, out MediaStream stream)
+        private static Size    GetValidSize(string path, out MediaStream stream)
         {
-            stream = GetMediaStream(path);
-            int height = FallbackIfZero(stream.Height, 720);
-            int width  = FallbackIfZero(stream.Width,  720);
+            stream = GetMedia(path);
+            int height = NotZero(stream.Height);
+            int width  = NotZero(stream.Width);
 
             return (width | height) % 2 == 1 ? new Size(ToEven(width), ToEven(height)) : new Size(width, height);
         }
-        private Size GetValidSize(string path) => GetValidSize(path, out _);
-        private double GetDurationInSeconds(string path) => double.Parse(GetMediaStream(path).Duration, CultureInfo.InvariantCulture);
-        private MediaStream GetMediaStream(string path) => GetMetadata(path).Result.Metadata.Streams.First();
-        private async Task<GetMetadataResult> GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
+        private static Size    GetValidSize(string path) => GetValidSize(path, out _);
+        private double GetDurationInSeconds(string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
+        private static MediaStream GetMedia(string path) => GetMetadata(path).Result.Metadata.Streams.First();
+        private static async MD GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
 
         private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
         
-        private int FallbackIfZero(int x, int alt) => x == 0 ? alt : x;
-        private int ToEven(int x) => x + x % 2;
+        private static int NotZero(int x, int alt = 720) => x == 0 ? alt : x;
+        private static int ToEven (int x) => x + x % 2;
 
         private double RetrieveFPS(string framerate, int alt = 30)
         {
@@ -157,15 +145,14 @@ namespace Witlesss
             }
         }
 
-        private string WebmToMp4(string path)
+        public static bool ToMP4(string input, ref string output, out Size size)
         {
-            return Path.GetExtension(path) == ".webm" ? Execute(new F_WebmToMp4(path, GetValidSize(path))) : path;
+            var w = Path.GetExtension(input) == ".webm";
+            if (w) output = Path.ChangeExtension(output, ".mp4");
+            size = w ? GetValidSize(input) : Size.Empty;
+            return w;
         }
     }
 
-    public enum DgMode
-    {
-        Square,
-        Wide
-    }
+    public enum DgMode { Square, Wide }
 }

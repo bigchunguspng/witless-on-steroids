@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Witlesss.MediaType;
+using Type = Witlesss.MediaType;
 
 namespace Witlesss.MediaTools
 {
@@ -9,36 +11,33 @@ namespace Witlesss.MediaTools
     public class F_Speed : F_SimpleTask
     {
         private readonly double _speed, _fps;
-        private readonly MediaType _type;
 
-        public F_Speed(string input, double speed, MediaType type, double fps) : this(input, speed, type) => _fps = fps;
-        public F_Speed(string input, double speed, MediaType type) : base(input, SetOutName(input, "-S"))
+        public F_Speed(string input, double speed, Type type, double fps = 0) : base(input, SetOutName(input, "-S"))
         {
             _speed = speed;
-            _type = type;
+            _fps = fps;
+
+            AddInput(input);
+            AddOptions(FiltersNames[type], Filter(type));
+            AddSizeFix(type);
         }
 
-        public override IList<string> CreateArguments() => new[]
+        private static readonly Dictionary<Type, string> FiltersNames = new()
         {
-            "-i", Input, FiltersNames[_type], Filter(), Output
-        };
-
-        private static readonly Dictionary<MediaType, string> FiltersNames = new()
-        {
-            {MediaType.Audio, "-filter:a"},
-            {MediaType.Video, "-filter:v"},
-            {MediaType.Movie, "-filter_complex"}
+            { Audio, "-filter:a"       },
+            { Video, "-filter:v"       },
+            { Movie, "-filter_complex" }
         };
 
         private string FilterAudio() => $"atempo={FormatDouble(_speed)}";
         private string FilterVideo() => $"setpts={FormatDouble(1 / _speed)}*PTS,fps={FormatDouble(_fps)}";
         private string FilterMovie() => $"[0:v]{FilterVideo()};[0:a]{FilterAudio()}";
-        private string Filter() => _type switch
+        private string Filter(Type type) => type switch
         {
-            MediaType.Audio => FilterAudio(),
-            MediaType.Video => FilterVideo(),
-            MediaType.Movie => FilterMovie(),
-            _               => throw new ArgumentOutOfRangeException()
+            Audio => FilterAudio(),
+            Video => FilterVideo(),
+            Movie => FilterMovie(),
+            _     => throw new ArgumentOutOfRangeException()
         };
     }
 }

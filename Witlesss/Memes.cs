@@ -15,13 +15,13 @@ namespace Witlesss
 {
     public class Memes
     {
-        private readonly DemotivatorDrawer[]  _drawers;
+        private readonly DemotivatorDrawer [] _drawers;
         private readonly IMediaToolkitService _service;
         public  static   Size StickerSize = Size.Empty;
 
         public Memes()
         {
-            _drawers = new[] {new DemotivatorDrawer(), new DemotivatorDrawer(1280)};
+            _drawers = new[] { new DemotivatorDrawer(), new DemotivatorDrawer(1280) };
 
             while (!File.Exists(FFMPEG_PATH))
             {
@@ -107,14 +107,10 @@ namespace Witlesss
 
         private int       GetBitrate (Size   size,     MediaStream stream)
         {
-            if (int.TryParse(stream.BitRate, out int x))
-            {
-                return Math.Clamp((int)(100 * Math.Log10(0.00001 * x + 1)), 1, 150);
-            }
-            else
-            {
-                return (size.Height + size.Width) / 20;
-            }
+            return int.TryParse(stream.BitRate, out int x) ? ReducedBitrate() : BitrateFromSize();
+            
+            int ReducedBitrate () => Math.Clamp((int)(100 * Math.Log10(0.00001 * x + 1)), 1, 150);
+            int BitrateFromSize() => (size.Height + size.Width) / 20;
         }
         private Size    GetVideoSize (string path, out MediaStream stream)
         {

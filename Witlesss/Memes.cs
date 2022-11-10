@@ -72,10 +72,8 @@ namespace Witlesss
         
         public string Sus(string path, TS start, TS length, MediaType type)
         {
-            if (IsWEBM(path) && SizeIsInvalid(StickerSize))
-            {
-                path = Execute(new F_ToMP4(path, CorrectedSize(StickerSize)));
-            }
+            var b = IsWEBM(path) && SizeIsInvalid(StickerSize);
+            if (b) path = Execute(new F_ToMP4(path, CorrectedSize(StickerSize)));
 
             if (length < TS.Zero) length = TS.FromSeconds(GetDuration(path) / 2D);
 

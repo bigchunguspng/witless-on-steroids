@@ -2,9 +2,8 @@
 
 namespace Witlesss.MediaTools
 {
-    // ffmpeg -i "input.mp3" -f mp3          -b:a 1k        output.mp3
-    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k        output.mp4
-    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k -s WxH output.mp4
+    // ffmpeg -i "input.mp3" -f mp3          -b:a 1k output.mp3
+    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k -b:a 1k output.mp4
     public class F_Bitrate : F_Base
     {
         public F_Bitrate(string input, int bitrate = 0, MediaType type = Audio) : base(SetOutName(input, "-L"))

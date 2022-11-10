@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Witlesss.MediaTools
 {
@@ -13,7 +12,7 @@ namespace Witlesss.MediaTools
             AddInput(input);
             AddOptions("-ss", $"{start:c}");
             AddWhen(b, "-t", $"{length:c}");
-            AddSizeFix(input, MediaTypeFromID(Path.GetFileName(input)));
+            AddSizeFix(input);
         }
     }
 }

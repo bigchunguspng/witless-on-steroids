@@ -16,7 +16,8 @@ namespace Witlesss
     public class Memes
     {
         private readonly DemotivatorDrawer[]  _drawers;
-        private static   IMediaToolkitService _service;
+        private readonly IMediaToolkitService _service;
+        public  static   Size StickerSize = Size.Empty;
 
         public Memes()
         {
@@ -71,9 +72,12 @@ namespace Witlesss
         
         public string Sus(string path, TS start, TS length, MediaType type)
         {
-            if (Path.GetExtension(path) == ".webm") path = Execute(new F_ToMP4(path, GetValidSize(path)));
+            if (IsWEBM(path) && SizeIsInvalid(StickerSize))
+            {
+                path = Execute(new F_ToMP4(path, CorrectedSize(StickerSize)));
+            }
 
-            if (length < TS.Zero) length = TS.FromSeconds(GetDurationInSeconds(path) / 2D);
+            if (length < TS.Zero) length = TS.FromSeconds(GetDuration(path) / 2D);
 
             if ((start + length).Ticks > 0) path = Cut(path, start, length);
 
@@ -90,8 +94,8 @@ namespace Witlesss
             {
                 bool empty = bitrate == 0;
 
-                var size = GetValidSize(path, out var stream);
-                if (empty) bitrate = GetBitrate(stream, size);
+                var size = GetVideoSize(path, out var stream);
+                if (empty) bitrate = GetBitrate(size, stream);
 
                 Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
 
@@ -103,7 +107,7 @@ namespace Witlesss
             string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }
 
-        private int GetBitrate(MediaStream stream, Size size)
+        private int       GetBitrate (Size   size,     MediaStream stream)
         {
             if (int.TryParse(stream.BitRate, out int x))
             {
@@ -114,23 +118,24 @@ namespace Witlesss
                 return (size.Height + size.Width) / 20;
             }
         }
-        private static Size    GetValidSize(string path, out MediaStream stream)
+        private Size    GetVideoSize (string path, out MediaStream stream)
         {
             stream = GetMedia(path);
-            int height = NotZero(stream.Height);
-            int width  = NotZero(stream.Width);
-
-            return (width | height) % 2 == 1 ? new Size(ToEven(width), ToEven(height)) : new Size(width, height);
+            return new Size(NotZero(stream.Width), NotZero(stream.Height));
         }
-        private static Size    GetValidSize(string path) => GetValidSize(path, out _);
-        private double GetDurationInSeconds(string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
-        private static MediaStream GetMedia(string path) => GetMetadata(path).Result.Metadata.Streams.First();
-        private static async MD GetMetadata(string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
+        private double   GetDuration (string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
+        private MediaStream GetMedia (string path) => GetMetadata(path).Result.Metadata.Streams.First();
+        private async MD GetMetadata (string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
 
         private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
         
         private static int NotZero(int x, int alt = 720) => x == 0 ? alt : x;
         private static int ToEven (int x) => x + x % 2;
+
+        public static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
+        public static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;
+        public static Size CorrectedSize(Size s) => new(ToEven(s.Width), ToEven(s.Height));
+
 
         private double RetrieveFPS(string framerate, int alt = 30)
         {
@@ -144,14 +149,6 @@ namespace Witlesss
             {
                 return alt;
             }
-        }
-
-        public static bool ToMP4(string input, ref string output, out Size size)
-        {
-            var w = Path.GetExtension(input) == ".webm";
-            if (w) output = Path.ChangeExtension(output, ".mp4");
-            size = w ? GetValidSize(input) : Size.Empty;
-            return w;
         }
     }
 

@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
 using MediaToolkit.Core;
 using MediaToolkit.Tasks;
 using MediaToolkit.Util;
+using static Witlesss.MediaType;
+using static Witlesss.Memes;
 
 namespace Witlesss.MediaTools
 {
@@ -35,9 +38,14 @@ namespace Witlesss.MediaTools
         protected void AddInput   (string input) => AddOptions("-i", input);
         protected void AddSize    (Size s)       => AddOptions("-s", $"{s.Width}x{s.Height}");
         protected void AddWhen    (bool b, params string[] args) { if (b) AddOptions(args); }
-        protected void AddSizeFix (string input, MediaType type)
+        protected void AddSizeFix (string input, MediaType type) { if (type == Video) AddSizeFix(input); }
+        protected void AddSizeFix (string input)
         {
-            if (type == MediaType.Video && Memes.ToMP4(input, ref Output, out var s)) AddSize(s);
+            if (IsWEBM(input))
+            {
+                Output = Path.ChangeExtension(Output, ".mp4");
+                if (SizeIsInvalid(StickerSize)) AddSize(CorrectedSize(StickerSize));
+            }
         }
     }
 }

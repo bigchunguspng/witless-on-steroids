@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -48,7 +49,10 @@ namespace Witlesss.Commands
             else if (mess.Animation != null)
                 FileID = mess.Animation.FileId;
             else if (mess.Sticker is { IsVideo: true })
+            {
                 FileID = mess.Sticker.FileId;
+                Memes.StickerSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+            }
             else if (mess.Voice != null)
                 FileID = mess.Voice.FileId;
             else if (mess.Document?.MimeType?.StartsWith("audio") == true)

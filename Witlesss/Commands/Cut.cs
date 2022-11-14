@@ -18,7 +18,7 @@ namespace Witlesss.Commands
             
             Download(FileID, out string path, out var type);
             
-            string result = Bot.MemeService.Cut(path, x.start, x.length);
+            string result = Bot.MemeService.Cut(path, new CutSpan(x.start, x.length), type);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> CUT [8K-]");
 

@@ -70,21 +70,21 @@ namespace Witlesss
                 return Execute(new F_Speed(path, speed, type));
         }
         
-        public string Sus(string path, TS start, TS length, MediaType type)
+        public string Sus(string path, CutSpan s, MediaType type)
         {
             var b = IsWEBM(path) && SizeIsInvalid(StickerSize);
             if (b) path = Execute(new F_ToMP4(path, CorrectedSize(StickerSize)));
 
-            if (length < TS.Zero) length = TS.FromSeconds(GetDuration(path) / 2D);
+            if (s.Length < TS.Zero) s = s with { Length = TS.FromSeconds(GetDuration(path) / 2D) };
 
-            if ((start + length).Ticks > 0) path = Cut(path, start, length);
+            if ((s.Start + s.Length).Ticks > 0) path = Cut(path, s, type);
 
             return Execute(new F_Concat(path, Reverse(path, type), type));
         }
         
-        public string Reverse(string path, MediaType type)  => Execute(new F_Reverse(path, type));
+        public string Reverse(string path, MediaType type)        => Execute(new F_Reverse(path, type));
 
-        public string Cut(string path, TS start, TS length) => Execute(new F_Cut(path, start, length));
+        public string Cut(string path, CutSpan s, MediaType type) => Execute(new F_Cut (path, s, type));
 
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
@@ -100,7 +100,7 @@ namespace Witlesss
                 return Execute(new F_Bitrate(path, bitrate, type));
             }
             else
-                return Execute(new F_Bitrate(path));
+                return Execute(new F_Bitrate(path,    type: type));
 
             string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }

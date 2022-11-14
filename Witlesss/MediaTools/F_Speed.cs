@@ -6,7 +6,7 @@ namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp4" -filter_complex "[0:v]setpts=0.5*PTS,fps=60;[0:a]atempo=2.0" output.mp4
     // ffmpeg -i "input.mp4" -filter:v       "setpts=0.5*PTS,fps=60"                      output.mp4
-    // ffmpeg -i "input.mp3" -filter:a       "atempo=2.0"                                 output.mp3
+    // ffmpeg -i "input.mp3" -filter:a       "atempo=2.0"                             -vn output.mp3
     public class F_Speed : F_Base
     {
         private readonly double _speed, _fps;
@@ -18,7 +18,8 @@ namespace Witlesss.MediaTools
 
             AddInput(input);
             AddOptions(FiltersNames[type], Filter(type));
-            AddSizeFix(input, type);
+            AddSizeFix(type, input);
+            AddSongFix(type);
         }
 
         private static readonly Dictionary<MediaType, string> FiltersNames = new()

@@ -50,6 +50,8 @@ namespace Witlesss
 
         public record DgText(string A, string B);
 
+        public record CutSpan(TimeSpan Start, TimeSpan Length);
+
         public static void GetDemotivatorText(Witless witless, string text, out DgText dg)
         {
             string a, b = witless.TryToGenerate();
@@ -152,8 +154,6 @@ namespace Witlesss
             {"BA", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
             {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}
         };
-
-        public static IList<string> RemoveEmpties(IList<string> list) => list.Where(s => !string.IsNullOrEmpty(s)).ToList();
 
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {

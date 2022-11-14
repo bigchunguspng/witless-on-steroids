@@ -38,10 +38,10 @@ namespace Witlesss.MediaTools
         protected void AddInput   (string input) => AddOptions("-i", input);
         protected void AddSize    (Size s)       => AddOptions("-s", $"{s.Width}x{s.Height}");
         protected void AddWhen    (bool b, params string[] args) { if (b) AddOptions(args); }
-        protected void AddSizeFix (string input, MediaType type) { if (type == Video) AddSizeFix(input); }
-        protected void AddSizeFix (string input)
+        protected void AddSongFix (MediaType type) => AddWhen(type == Audio, "-vn");
+        protected void AddSizeFix (MediaType type, string input)
         {
-            if (IsWEBM(input))
+            if (type == Video && IsWEBM(input))
             {
                 Output = Path.ChangeExtension(Output, ".mp4");
                 if (SizeIsInvalid(StickerSize)) AddSize(CorrectedSize(StickerSize));

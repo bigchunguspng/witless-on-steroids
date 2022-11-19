@@ -52,7 +52,7 @@ namespace Witlesss
 
             if (JpegQuality > 50) return path;
 
-            return Execute(new F_Bitrate(path, 25 + (int)(JpegQuality * 2.5)));
+            return Execute(new F_Bitrate(path, 51 - (int)(JpegQuality * 0.42)));
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
@@ -92,40 +92,22 @@ namespace Witlesss
         {
             if (type > MediaType.Audio)
             {
-                bool empty = bitrate == 0;
+                Log($"DAMN >> {bitrate}", ConsoleColor.Blue);
 
-                var size = GetVideoSize(path, out var stream);
-                if (empty) bitrate = GetBitrate(size, stream);
-
-                Log($"DAMN >> {B(stream)}k --> {bitrate}k", ConsoleColor.Blue);
+                bitrate += 30;
 
                 return Execute(new F_Bitrate(path, bitrate, type));
             }
             else
                 return Execute(new F_Bitrate(path,    type: type));
-
-            string B(MediaStream stream) => int.TryParse(stream.BitRate, out int x) ? (x / 1000).ToString() : "~ ";
         }
 
-        private int       GetBitrate (Size   size,     MediaStream stream)
-        {
-            return int.TryParse(stream.BitRate, out int x) ? ReducedBitrate() : BitrateFromSize();
-            
-            int ReducedBitrate () => Math.Clamp((int)(100 * Math.Log10(0.00001 * x + 1)), 1, 150);
-            int BitrateFromSize() => (size.Height + size.Width) / 20;
-        }
-        private Size    GetVideoSize (string path, out MediaStream stream)
-        {
-            stream = GetMedia(path);
-            return new Size(NotZero(stream.Width), NotZero(stream.Height));
-        }
         private double   GetDuration (string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
         private MediaStream GetMedia (string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async MD GetMetadata (string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
 
         private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
-        
-        private static int NotZero(int x, int alt = 720) => x == 0 ? alt : x;
+
         private static int ToEven (int x) => x + x % 2;
 
         public static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";

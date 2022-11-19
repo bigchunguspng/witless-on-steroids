@@ -35,11 +35,11 @@ namespace Witlesss.Commands
             
             if      (mess.Photo != null)
                 SendDemotivator(mess.Photo[^1].FileId);
-            else if (mess.Animation != null)
+            else if (mess.Animation is { Duration: < 21 })
                 SendDemotivatedVideo(mess.Animation.FileId);
             else if (mess.Sticker is { IsVideo: true })
                 SendDemotivatedVideo(mess.Sticker.FileId, ".webm");
-            else if (mess.Video != null)
+            else if (mess.Video is { Duration: < 21 })
                 SendDemotivatedVideo(mess.Video.FileId);
             else if (mess.Sticker is { IsAnimated: false })
                 SendDemotivatedSticker(mess.Sticker.FileId);

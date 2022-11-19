@@ -48,11 +48,9 @@ namespace Witlesss
 
         public string MakeVideoDemotivator(string path, DgText text)
         {
-            path = Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer));
+            var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
 
-            if (JpegQuality > 50) return path;
-
-            return Execute(new F_Bitrate(path, 51 - (int)(JpegQuality * 0.42)));
+            return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer, quality));
         }
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)

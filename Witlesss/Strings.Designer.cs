@@ -379,6 +379,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
+        ///
+        ///• видео 🎬, гифками🪣, видео-стикерами🍿.
+        /// </summary>
+        internal static string G_MANUAL {
+            get {
+                return ResourceManager.GetString("G_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Эта команда только для бесед 🤓.
         /// </summary>
         internal static string GROUPS_ONLY_COMAND {

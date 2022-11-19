@@ -86,6 +86,8 @@ namespace Witlesss
 
         public string Cut(string path, CutSpan s, MediaType type) => Execute(new F_Cut (path, s, type));
 
+        public string RemoveAudio(string path) => Execute(new F_ToAnimation(path, StickerSize));
+
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
             if (type > MediaType.Audio)

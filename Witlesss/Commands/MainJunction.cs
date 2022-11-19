@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Commands
 {
-    public class EntryPoint : Command
+    public class MainJunction : Command
     {
         private Command  _command;
         private WitlessCommand _c;
         private readonly Demotivate _demotivate = new();
         private readonly RemoveBitrate _bitrate = new();
+        private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
         private readonly Reverse _reverse = new();
         private readonly Sus _sus = new();
@@ -94,6 +95,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/damn"   )) _command = _bitrate;
             else if (command == "/reverse" ) _command = _reverse;
             else if (command == "/chat_id" ) _command = _chatID;
+            else if (command == "/g"       ) _command = _audio;
             else if (command == "/debug"   ) _command = _debug;
             else return false;
             

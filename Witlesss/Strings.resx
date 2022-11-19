@@ -278,4 +278,9 @@ s   - save and exit
 
 /start@piece_fap_bot</value>
     </data>
+    <data name="G_MANUAL" xml:space="preserve">
+        <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
+
+• видео 🎬, гифками🪣, видео-стикерами🍿</value>
+    </data>
 </root>

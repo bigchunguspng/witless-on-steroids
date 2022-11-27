@@ -53,7 +53,7 @@ namespace Witlesss
             return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer, quality));
         }
 
-        public string Stickerize(string path) => Execute(new F_ToMP4(path, NormalizeSize(SourceSize), ".webp"));
+        public string Stickerize(string path) => Execute(new F_Resize(path, NormalizeSize(SourceSize), ".webp"));
 
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
         {
@@ -73,7 +73,7 @@ namespace Witlesss
         public string Sus(string path, CutSpan s, MediaType type)
         {
             var b = IsWEBM(path) && SizeIsInvalid(SourceSize);
-            if (b) path = Execute(new F_ToMP4(path, CorrectedSize(SourceSize)));
+            if (b) path = Execute(new F_Resize(path, CorrectedSize(SourceSize)));
 
             if (s.Length < TS.Zero) s = s with { Length = TS.FromSeconds(GetDuration(path) / 2D) };
 

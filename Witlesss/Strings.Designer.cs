@@ -521,6 +521,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
+        ///
+        ///• картинками 📸 и стикерами 🎟.
+        /// </summary>
+        internal static string STICK_MANUAL {
+            get {
+                return ResourceManager.GetString("STICK_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to cтикеры {0}будут демотивироваться в случайном порядке.
         /// </summary>
         internal static string STICKERS_RESPONSE {

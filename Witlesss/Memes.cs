@@ -17,7 +17,7 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers;
         private readonly IMediaToolkitService _service;
-        public  static   Size StickerSize = Size.Empty;
+        public  static   Size SourceSize  = Size.Empty;
 
         public Memes()
         {
@@ -53,6 +53,8 @@ namespace Witlesss
             return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer, quality));
         }
 
+        public string Stickerize(string path) => Execute(new F_ToMP4(path, NormalizeSize(SourceSize), ".webp"));
+
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;
@@ -70,8 +72,8 @@ namespace Witlesss
         
         public string Sus(string path, CutSpan s, MediaType type)
         {
-            var b = IsWEBM(path) && SizeIsInvalid(StickerSize);
-            if (b) path = Execute(new F_ToMP4(path, CorrectedSize(StickerSize)));
+            var b = IsWEBM(path) && SizeIsInvalid(SourceSize);
+            if (b) path = Execute(new F_ToMP4(path, CorrectedSize(SourceSize)));
 
             if (s.Length < TS.Zero) s = s with { Length = TS.FromSeconds(GetDuration(path) / 2D) };
 
@@ -84,7 +86,7 @@ namespace Witlesss
 
         public string Cut(string path, CutSpan s, MediaType type) => Execute(new F_Cut (path, s, type));
 
-        public string RemoveAudio(string path) => Execute(new F_ToAnimation(path, StickerSize));
+        public string RemoveAudio(string path) => Execute(new F_ToAnimation(path, FitSize(SourceSize)));
 
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
@@ -108,10 +110,26 @@ namespace Witlesss
 
         private static int ToEven (int x) => x + x % 2;
 
-        public static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
-        public static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;
-        public static Size CorrectedSize(Size s) => new(ToEven(s.Width), ToEven(s.Height));
-
+        public  static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
+        public  static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;
+        public  static Size CorrectedSize(Size s) => new(ToEven(s.Width), ToEven(s.Height));
+        private static Size NormalizeSize(Size s, int limit = 512)
+        {
+            double lim = limit;
+            if (s.Width > s.Height)
+            {
+                return new Size(limit, (int)(s.Height / (s.Width / lim)));
+            }
+            else
+            {
+                return new Size((int)(s.Width / (s.Height / lim)), limit);
+            }
+        }
+        private static Size FitSize      (Size s, int max = 1280)
+        {
+            if (s.Width > max || s.Height > max) return NormalizeSize(s, max);
+            else return s;
+        }
 
         private double RetrieveFPS(string framerate, int alt = 30)
         {

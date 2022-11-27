@@ -34,17 +34,17 @@ public class RemoveAudio : RemoveBitrate
         if      (mess.Video != null)
         {
             FileID = mess.Video.FileId;
-            Memes.StickerSize = new Size(mess.Video.Width, mess.Video.Height);
+            Memes.SourceSize = new Size(mess.Video.Width, mess.Video.Height);
         }
         else if (mess.Animation != null)
         {
             FileID = mess.Animation.FileId;
-            Memes.StickerSize = new Size(mess.Animation.Width, mess.Animation.Height);
+            Memes.SourceSize = new Size(mess.Animation.Width, mess.Animation.Height);
         }
         else if (mess.Sticker is { IsVideo: true })
         {
             FileID = mess.Sticker.FileId;
-            Memes.StickerSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+            Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
         }
         else return false;
 

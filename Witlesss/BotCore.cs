@@ -48,6 +48,12 @@ namespace Witlesss
             var task = Client.SendDocumentAsync(chat, document);
             TrySend(task, chat, "document");
         }
+        
+        public void SendSticker(long chat, InputOnlineFile sticker)
+        {
+            var task = Client.SendStickerAsync(chat, sticker);
+            TrySend(task, chat, "sticker");
+        }
 
         private void TrySend(Task task, long chat, string what)
         {

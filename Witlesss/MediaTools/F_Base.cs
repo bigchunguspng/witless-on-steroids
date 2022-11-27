@@ -44,7 +44,7 @@ namespace Witlesss.MediaTools
             if (type == Video && IsWEBM(input))
             {
                 Output = Path.ChangeExtension(Output, ".mp4");
-                if (SizeIsInvalid(StickerSize)) AddSize(CorrectedSize(StickerSize));
+                if (SizeIsInvalid(SourceSize)) AddSize(CorrectedSize(SourceSize));
             }
         }
     }

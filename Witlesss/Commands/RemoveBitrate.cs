@@ -51,7 +51,7 @@ namespace Witlesss.Commands
             else if (mess.Sticker is { IsVideo: true })
             {
                 FileID = mess.Sticker.FileId;
-                Memes.StickerSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+                Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
             }
             else if (mess.Voice != null)
                 FileID = mess.Voice.FileId;

@@ -75,7 +75,7 @@ namespace Witlesss
                 float weight = MathF.Round(1.4F - 0.1F * count, 1); // 1 => 1.3  |  5 => 0.9  |  13 => 0.1
                 eaten = EatSimple(words, weight);
             }
-            if (count > 4)
+            if (count > 1)
             {
                 eaten = EatAdvanced(words);
             }

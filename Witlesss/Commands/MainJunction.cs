@@ -125,7 +125,7 @@ namespace Witlesss.Commands
             else if (command == "/chat"       ) _c = _chat;
             else if (command == "/s_admins"   ) _c = _admins;
             else if (command == "/delete"     ) _c = _delete;
-            // else return false;   <-- this will mess with other bots commands
+            else return true;
 
             _c.Pass(Message);
             _c.Pass(witless);

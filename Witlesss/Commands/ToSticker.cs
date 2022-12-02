@@ -35,6 +35,11 @@ public class ToSticker : Command
             _id = mess.Photo[^1].FileId;
             Memes.SourceSize = new Size(mess.Photo[^1].Width, mess.Photo[^1].Height);
         }
+        else if (mess.Document is { MimeType: "image/png" or "image/jpeg", Thumb: { } })
+        {
+            _id = mess.Document.FileId;
+            Memes.SourceSize = new Size(mess.Document.Thumb.Width, mess.Document.Thumb.Height);
+        }
         else if (mess.Sticker is { IsVideo: false, IsAnimated: false })
         {
             _id = mess.Sticker.FileId;

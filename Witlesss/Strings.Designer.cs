@@ -523,7 +523,8 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
         ///
-        ///• картинками 📸 и стикерами 🎟.
+        ///• картинками 📸 и стикерами 🎟
+        ///• картинками 📸 без сжатия.
         /// </summary>
         internal static string STICK_MANUAL {
             get {

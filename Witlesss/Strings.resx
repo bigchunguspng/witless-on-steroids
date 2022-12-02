@@ -286,6 +286,7 @@ s   - save and exit
     <data name="STICK_MANUAL" xml:space="preserve">
         <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
 
-• картинками 📸 и стикерами 🎟</value>
+• картинками 📸 и стикерами 🎟
+• картинками 📸 без сжатия</value>
     </data>
 </root>

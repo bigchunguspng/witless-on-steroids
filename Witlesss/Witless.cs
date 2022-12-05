@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static System.StringComparison;
 
 namespace Witlesss
 {
@@ -16,10 +17,10 @@ namespace Witlesss
 
         private int _probability, _quality;
         private bool _hasUnsavedStuff, _admins;
-        private readonly Random _random = new();
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
         private readonly FileIO<WitlessDB> _fileIO;
         private readonly Counter _generation = new();
+        private static readonly Random Random = new();
 
         public Witless(long chat, int interval = 7, int probability = 20, int jpg = 75)
         {
@@ -245,16 +246,18 @@ namespace Witlesss
                 if (Words.ContainsKey(word)) return word;
             }
 
-            var words = Words.Keys.Where(key => key.StartsWith(word)).ToList();
-            if (words.Count > 0) return words[_random.Next(words.Count)];
+            var words = Words.Keys.Where(KeyHasWord).ToList();
+            if (words.Count > 0) return words[Random.Next(words.Count)];
 
-            words     = Words.Keys.Where(key => word.StartsWith(key, StringComparison.Ordinal)).ToList();
+            words     = Words.Keys.Where(WordHasKey).ToList();
             if (words.Count < 1) return alt;
 
             words.Sort(Comparison);
             return words[0];
 
-            int Comparison(string x, string y) => y.Length - x.Length;
+            int  Comparison(string x, string y) => y.Length - x.Length;
+            bool WordHasKey(string x) => alt == END ? word.EndsWith(x, Ordinal) : word.StartsWith(x, Ordinal);
+            bool KeyHasWord(string x) => alt == END ? x.EndsWith(word, Ordinal) : x.StartsWith(word, Ordinal);
         }
         
         private string Generate(string word)
@@ -297,11 +300,9 @@ namespace Witlesss
             
             return TextInRandomLetterCase(result);
         }
-        private string PickWord(ConcurrentDictionary<string, float> dictionary)
+        public static string PickWord(ConcurrentDictionary<string, float> dictionary)
         {
-            var chanceTotal = dictionary.Sum(chance => chance.Value);
-
-            float r = (float)_random.NextDouble() * chanceTotal;
+            float r = (float) Random.NextDouble() * dictionary.Sum(chance => chance.Value);
 
             foreach (var chance in dictionary)
             {

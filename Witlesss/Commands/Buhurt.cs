@@ -1,21 +1,49 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Witlesss.Commands
 {
     public class Buhurt : WitlessCommand
     {
+        private readonly WitlessDB _baguette = new FileIO<WitlessDB>("BT.json").LoadData();
+
         public override void Run()
         {
-            var length = 3;
+            var length = 16;
             if (HasIntArgument(Text, out int value))
-                length = Math.Clamp(value, 2, 15);
-            var lines = new string[length];
-            for (var i = 0; i < length; i++)
-                lines[i] = Baka.TryToGenerate().ToUpper();
-            string result = string.Join("\n@\n", lines.Where(x => !string.IsNullOrEmpty(x))).Replace(" @ ", "\n@\n");
+                length = System.Math.Clamp(value, 2, 16);
+            
+            var lines = new List<string>(length);
+            var words = _baguette[Witless.START];
+            var word = Witless.PickWord(words);
+
+            AddTextLine();
+
+            words = _baguette["_mid"];
+            for (int i = 1; i < length; i++)
+            {
+                word = Witless.PickWord(words);
+                if (word == Witless.END) break;
+                AddTextLine();
+            }
+
+            string result = string.Join("\n@\n", lines.Where(x => x != "")).Replace(" @ ", "\n@\n").ToUpper();
             Bot.SendMessage(Chat, result);
             Log($"{Title} >> BUGURT #@#");
+
+            void AddTextLine() => lines.Add(Baka.GenerateByWord(PullWord(word)).Trim('@').TrimStart());
+        }
+
+        private string PullWord(string word)
+        {
+            string[] xs;
+
+            if      (word.StartsWith("..")) xs = Baka.Words.Keys.Where(x => x.EndsWith(word[2..] )).ToArray();
+            else if (word.EndsWith  ("..")) xs = Baka.Words.Keys.Where(x => x.EndsWith(word[..^2])).ToArray();
+            else if (word.Contains  (' ') ) return word.Split()[0] + ' ' + Baka.GenerateByWord(PullWord(word.Split()[1]));
+            else
+                return Baka.Words.ContainsKey(word) ? word : Witless.START;
+            return xs.Length > 0 ? xs.ElementAt(Random.Next(xs.Length)) : Witless.START;
         }
     }
 }

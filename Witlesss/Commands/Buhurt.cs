@@ -9,7 +9,7 @@ namespace Witlesss.Commands
 
         public override void Run()
         {
-            var length = 16;
+            var length = 3;
             if (HasIntArgument(Text, out int value))
                 length = System.Math.Clamp(value, 2, 16);
             

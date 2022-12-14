@@ -54,7 +54,7 @@ namespace Witlesss.Commands
             var path = GetSource(fileID, ".jpg");
             if (Text != null)
             {
-                var match = Regex.Match(Text, @"\d");
+                var match = Regex.Match(Text.Split()[0], @"\d");
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }
             for (int i = 0; i < repeats; i++)

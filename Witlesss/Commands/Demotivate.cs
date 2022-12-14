@@ -52,9 +52,9 @@ namespace Witlesss.Commands
         {
             var repeats = 1;
             var path = GetSource(fileID, ".jpg");
-            if (Text != null)
+            if (Text != null && !Text.Contains(' '))
             {
-                var match = Regex.Match(Text.Split()[0], @"\d");
+                var match = Regex.Match(Text, @"\d");
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }
             for (int i = 0; i < repeats; i++)

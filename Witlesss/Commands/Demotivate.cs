@@ -50,36 +50,49 @@ namespace Witlesss.Commands
 
         public void SendDemotivator(string fileID)
         {
-            GetSources(fileID, ".jpg", out var text, out var path);
-            using (var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, text)))
+            var repeats = 1;
+            var path = GetSource(fileID, ".jpg");
+            if (Text != null)
+            {
+                var match = Regex.Match(Text, @"\d");
+                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
+            }
+            for (int i = 0; i < repeats; i++)
+            {
+                using var stream = File.OpenRead(Bot.MemeService.MakeDemotivator(path, Texts()));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Log($"{Title} >> DEMOTIVATOR [_]");
+            }
+            Log($"{Title} >> DEMOTIVATOR [{(repeats == 1 ? "_" : repeats)}]");
         }
 
         public void SendDemotivatedSticker(string fileID)
         {
-            GetSources(fileID, ".webp", out var text, out var path);
-            string extension = Text == null ? ".png" : Text.Contains("-j") ? ".jpg" : ".png";
-            using (var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, text, extension)))
-                Bot.SendPhoto(Chat, new InputOnlineFile(stream));
+            var path = GetSource(fileID, ".webp");
+            var extension = ".png";
+            if (Text != null && Text.Contains('x')) 
+                extension = ".jpg";
+            using var stream = File.OpenRead(Bot.MemeService.MakeStickerDemotivator(path, Texts(), extension));
+            Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
 
         private void SendDemotivatedVideo(string fileID, string extension = ".mp4")
         {
             var time = DateTime.Now;
-            GetSources(fileID, extension, out var text, out var path);
-            using (var stream = File.OpenRead(Bot.MemeService.MakeVideoDemotivator(path, text)))
-                Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+            var path = GetSource(fileID, extension);
+            using var stream = File.OpenRead(Bot.MemeService.MakeVideoDemotivator(path, Texts()));
+            Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }
 
-        private void GetSources(string fileID, string extension, out DgText text, out string path)
+        private string GetSource(string fileID, string extension)
         {
-            GetDemotivatorText(Baka, RemoveDg(Text), out text);
-            path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
+            var path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
             Bot.DownloadFile(fileID, path, Chat).Wait();
+            return path;
         }
+        
+        private DgText Texts() => GetDemotivatorText(Baka, RemoveDg(Text));
 
         private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");
     }

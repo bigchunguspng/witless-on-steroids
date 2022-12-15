@@ -33,17 +33,19 @@ namespace Witlesss.Commands
 
         protected string MoveDictionary(string name)
         {
+            Baka.Save();
+
             if (SizeInBytes(Baka.Path) > 2)
             {
-                string path = UniquePath($@"{EXTRA_DBS_FOLDER}\{name}.json", name == "info" || name == "his");
-                Baka.Save();
+                string path = UniquePath($@"{EXTRA_DBS_FOLDER}\{name}.json", name is "info" or "his");
+
                 File.Copy(Baka.Path, path);
                 
                 string result = Path.GetFileNameWithoutExtension(path);
                 Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
                 return result;
             }
-            else return "*"; // can't be in file name
+            return "*"; // can't be in file name
         }
     }
 }

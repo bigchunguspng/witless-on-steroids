@@ -145,7 +145,7 @@ namespace Witlesss
             var date = BannedChats[chat];
             var o = DateTime.Now > date;
             if (o) UnbanChat(chat);
-            else SendMessage(chat, $"🤓 НЕДОСТУПНО ДО {date:dd.MM.yyyy HH:mm}");
+            else SendMessage(chat, $"🤓 НЕДОСТУПНО ДО {date.ToUniversalTime():dd.MM.yyyy 'UTC' HH:mm}");
             return o;
         }
         private void BanChat(long chat, int hours = 16)

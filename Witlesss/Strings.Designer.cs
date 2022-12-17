@@ -160,7 +160,7 @@ namespace Witlesss {
         /// /Xx - fix active chat DB
         ///
         /// /l  - activate last chat
-        /// /b  - ban active chat (days)
+        /// /b  - ban active chat (hours)
         /// /ub - unban active chat.
         /// </summary>
         internal static string CONSOLE_MANUAL {

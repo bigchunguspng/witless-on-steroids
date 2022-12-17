@@ -268,7 +268,7 @@ s   - save and exit
 /Xx - fix active chat DB
 
 /l  - activate last chat
-/b  - ban active chat (days)
+/b  - ban active chat (hours)
 /ub - unban active chat</value>
     </data>
     <data name="EMOJI_FOLDER" xml:space="preserve">

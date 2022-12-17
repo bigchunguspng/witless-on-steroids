@@ -145,12 +145,12 @@ namespace Witlesss
             var date = BannedChats[chat];
             var o = DateTime.Now > date;
             if (o) UnbanChat(chat);
-            else SendMessage(chat, $"🤓 BLOCKED TIL {date.Date:dd.MM.yyyy}");
+            else SendMessage(chat, $"🤓 НЕДОСТУПНО ДО {date.Date:dd.MM.yyyy HH:mm}");
             return o;
         }
-        private void BanChat(long chat, int days = 1)
+        private void BanChat(long chat, int hours = 16)
         {
-            BannedChats.TryAdd(chat, DateTime.Now + TimeSpan.FromDays(days));
+            BannedChats.TryAdd(chat, DateTime.Now + TimeSpan.FromHours(hours));
             SussyBakas[chat].Banned = true;
             SaveBanList();
             Log($"{chat} >> BANNED", ConsoleColor.Magenta);

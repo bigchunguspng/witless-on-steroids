@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using Witlesss.Commands;
 
 namespace Witlesss
 {
     public class Handler : IUpdateHandler
     {
-        private readonly MainJunction _fork = new();
+        private readonly Bot _bot;
+        
+        public Handler(Bot bot) => _bot = bot;
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
@@ -31,14 +32,14 @@ namespace Witlesss
         {
             try
             {
-                _fork.Pass(message);
-                _fork.Run();
+                _bot.Fork.Pass(message);
+                _bot.Fork.Run();
             }
             catch (Exception e)
             {
                 LogError($"{TitleOrUsername(message)} >> Can't process message --> {e.Message}");
 
-                if (e.Message.Contains("ffmpeg")) Command.Bot.SendErrorDetails(message.Chat.Id, e);
+                if (e.Message.Contains("ffmpeg")) _bot.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

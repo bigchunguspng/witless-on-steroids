@@ -157,7 +157,11 @@ namespace Witlesss {
         /// /Oo - clear active dic
         ///
         /// /xx - fix DBs
-        /// /Xx - fix active chat DB.
+        /// /Xx - fix active chat DB
+        ///
+        /// /l  - activate last chat
+        /// /b  - ban active chat (days)
+        /// /ub - unban active chat.
         /// </summary>
         internal static string CONSOLE_MANUAL {
             get {

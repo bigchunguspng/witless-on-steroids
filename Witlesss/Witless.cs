@@ -62,6 +62,7 @@ namespace Witlesss
 
         public WitlessDB Words { get; set; }
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
+        public bool Banned { get; set; }
 
         public bool Eat(string text, out string eaten)
         {

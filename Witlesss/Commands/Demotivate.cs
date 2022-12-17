@@ -35,11 +35,11 @@ namespace Witlesss.Commands
             
             if      (mess.Photo != null)
                 SendDemotivator(mess.Photo[^1].FileId);
-            else if (mess.Animation is { Duration: < 21 })
+            else if (mess.Animation is { })
                 SendDemotivatedVideo(mess.Animation.FileId);
             else if (mess.Sticker is { IsVideo: true })
                 SendDemotivatedVideo(mess.Sticker.FileId, ".webm");
-            else if (mess.Video is { Duration: < 21 })
+            else if (mess.Video is { })
                 SendDemotivatedVideo(mess.Video.FileId);
             else if (mess.Sticker is { IsAnimated: false })
                 SendDemotivatedSticker(mess.Sticker.FileId);
@@ -78,6 +78,8 @@ namespace Witlesss.Commands
 
         private void SendDemotivatedVideo(string fileID, string extension = ".mp4")
         {
+            if (Bot.ChatIsBanned(Baka)) return;
+            
             var time = DateTime.Now;
             var path = GetSource(fileID, extension);
             using var stream = File.OpenRead(Bot.MemeService.MakeVideoDemotivator(path, Texts()));

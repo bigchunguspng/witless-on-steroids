@@ -30,6 +30,9 @@ namespace Witlesss.Commands
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
 
+        public long   LastChat      => Chat;
+        public string LastChatTitle => Title;
+
         private bool TextIsCommand(out string command)
         {
             command = Text.ToLower().Replace(BOT_USERNAME, "");
@@ -67,7 +70,7 @@ namespace Witlesss.Commands
                     SetUpDemotivateCommand(s.Width, s.Height);
                     _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);
                 }
-                else if (witless.Ready()) WitlessPoop(witless, Chat, Text, Title);
+                else if (witless.Ready() && !witless.Banned) WitlessPoop(witless, Chat, Text, Title);
 
                 void SetUpDemotivateCommand(int w, int h)
                 {
@@ -99,7 +102,8 @@ namespace Witlesss.Commands
             else if (command == "/sex"     ) _command = _sticker;
             else if (command == "/g"       ) _command = _audio;
             else if (command == "/debug"   ) _command = _debug;
-            else return false;
+            else                             return false;
+            if      (Bot.ChatIsBanned(Chat)) return false;
             
             _command.Pass(Message);
             _command.Run();
@@ -144,6 +148,7 @@ namespace Witlesss.Commands
                 Bot.SaveChatList();
                 Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
                 Bot.SendMessage(Chat, START_RESPONSE);
+                Bot.PullBanStatus(Chat);
             }
             return success;
         }

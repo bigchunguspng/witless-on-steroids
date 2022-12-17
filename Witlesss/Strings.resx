@@ -265,7 +265,11 @@ s   - save and exit
 /Oo - clear active dic
 
 /xx - fix DBs
-/Xx - fix active chat DB</value>
+/Xx - fix active chat DB
+
+/l  - activate last chat
+/b  - ban active chat (days)
+/ub - unban active chat</value>
     </data>
     <data name="EMOJI_FOLDER" xml:space="preserve">
         <value>Emoji</value>

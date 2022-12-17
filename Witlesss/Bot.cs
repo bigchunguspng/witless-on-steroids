@@ -8,21 +8,27 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
+using BanList = System.Collections.Generic.Dictionary<long, System.DateTime>;
 
 namespace Witlesss
 {
     public class Bot : BotCore
     {
-        private long _activeChat;
-        private readonly FileIO<ChatList> _fileIO;
+        private long _active;
+        private readonly FileIO<ChatList> _chatsIO;
+        private readonly FileIO<BanList> _bansIO;
         public readonly ChatList SussyBakas;
-        public readonly Memes MemeService;
+        private readonly BanList BannedChats;
+        public readonly MainJunction Fork = new();
+        public readonly Memes MemeService = new();
 
         public Bot()
         {
-            MemeService = new Memes();
-            _fileIO = new FileIO<ChatList>($@"{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
-            SussyBakas = _fileIO.LoadData();
+            _bansIO = new FileIO<BanList>($@"{DBS_FOLDER}\bans.json");
+            BannedChats = _bansIO.LoadData();
+            _chatsIO = new FileIO<ChatList>($@"{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
+            SussyBakas = _chatsIO.LoadData();
+            foreach (var chat in BannedChats.Keys) SussyBakas[chat].Banned = true;
         }
 
         public void Run()
@@ -31,7 +37,7 @@ namespace Witlesss
 
             Command.Bot = this;
             var options = new ReceiverOptions() {AllowedUpdates = new[] {UpdateType.Message, UpdateType.EditedMessage}};
-            Client.StartReceiving(new Handler(), options);
+            Client.StartReceiving(new Handler(this), options);
 
             StartSaveLoop(2);
             ProcessConsole();
@@ -48,24 +54,7 @@ namespace Witlesss
                     if (input != null && !input.EndsWith("_"))
                     {
                         if      (input.StartsWith("+") && input.Length > 1) SetActiveChat();
-                        else if (input.StartsWith("/"))
-                        {
-                            if (Regex.IsMatch(input, @"^\/[aw] ")) BreakFourthWall();
-                            else if (input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-                            else if (input == "/s" ) SaveDics();
-                            else if (input == "/sd") SyncDics();
-                            else if (input == "/sp") Spam();
-                            else if (input == "/db") DeleteBlockers();
-                            else if (input == "/DB") DeleteBlocker();
-                            else if (input == "/ds") DeleteBySize();
-                            else if (input == "/cc") ClearTempFiles();
-                            else if (input == "/oo") ClearDics();
-                            else if (input == "/Oo") ClearDic(Active);
-                            else if (input == "/xx") FixDBs();
-                            else if (input == "/Xx") FixDB(Active);
-                            else if (input.StartsWith("/sp") && HasIntArgument(input, out int x1)) Spam(x1);
-                            else if (input.StartsWith("/ds") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
-                        }
+                        else if (input.StartsWith("/")) DoConsoleCommands();
                     }
                 }
                 catch
@@ -75,6 +64,28 @@ namespace Witlesss
             } while (input != "s");
             SaveDics();
 
+            void DoConsoleCommands()
+            {
+                if (Regex.IsMatch(input, @"^\/[aw] ")) BreakFourthWall();
+                else if (input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
+                else if (input == "/s" ) SaveDics();
+                else if (input == "/sd") SyncDics();
+                else if (input == "/sp") Spam();
+                else if (input == "/db") DeleteBlockers();
+                else if (input == "/DB") DeleteBlocker();
+                else if (input == "/ds") DeleteBySize();
+                else if (input == "/cc") ClearTempFiles();
+                else if (input == "/oo") ClearDics();
+                else if (input == "/Oo") ClearDic(Active);
+                else if (input == "/xx") FixDBs();
+                else if (input == "/Xx") FixDB(Active);
+                else if (input == "/l" ) ActivateLastChat();
+                else if (input == "/b" ) BanChat(Active.Chat);
+                else if (input == "/ub") UnbanChat(Active.Chat);
+                else if (input.StartsWith("/sp") && HasIntArgument(input, out int x1)) Spam(x1);
+                else if (input.StartsWith("/ds") && HasIntArgument(input, out int x2)) DeleteBySize(x2);
+                else if (input.StartsWith("/b" ) && HasIntArgument(input, out int x3)) BanChat(Active.Chat, x3);
+            }
             void SetActiveChat()
             {
                 string shit = input[1..];
@@ -82,8 +93,8 @@ namespace Witlesss
                 {
                     if (chat.ToString().EndsWith(shit))
                     {
-                        _activeChat = chat;
-                        Log($"ACTIVE CHAT >> {_activeChat}");
+                        _active = chat;
+                        Log($"ACTIVE CHAT >> {_active}");
                         break;
                     }
                 }
@@ -95,28 +106,74 @@ namespace Witlesss
 
                 if      (input.StartsWith("/a ") && witless.Eat(text, out text)) // add
                 {
-                    Log($@"{_activeChat} >> XD << ""{text}""", ConsoleColor.Yellow);
+                    Log($@"{_active} >> XD << ""{text}""", ConsoleColor.Yellow);
                 }
                 else if (input.StartsWith("/w "))                                // write
                 {
-                    SendMessage(_activeChat, text);
+                    SendMessage(_active, text);
                     witless.Eat(text, out _);
-                    Log($@"{_activeChat} >> {text}", ConsoleColor.Yellow);
+                    Log($@"{_active} >> {text}", ConsoleColor.Yellow);
                 }
             }
         }
 
-        private Witless Active => SussyBakas[_activeChat];
+        private Witless Active => SussyBakas[_active];
         private ICollection<Witless> Bakas => SussyBakas.Values;
         private void RemoveChat(long id) => SussyBakas.TryRemove(id, out _);
+
+        private void ActivateLastChat()
+        {
+            _active = Fork.LastChat;
+            Log($"ACTIVE CHAT >> {_active} ({Fork.LastChatTitle})");
+        }
 
         public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
 
         public void SaveChatList()
         {
-            _fileIO.SaveData(SussyBakas);
+            _chatsIO.SaveData(SussyBakas);
             Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
         }
+
+        public void PullBanStatus(long chat) => SussyBakas[chat].Banned = BannedChats.ContainsKey(chat);
+        public bool ChatIsBanned(Witless witless)
+        {
+            var banned = witless.Banned;
+            if (banned && BanIsOver(witless.Chat)) return false;
+            
+            return banned;
+        }
+        public bool ChatIsBanned(long chat)
+        {
+            var banned = BannedChats.ContainsKey(chat);
+            if (banned && BanIsOver(chat)) return false;
+
+            return banned;
+        }
+
+        private bool BanIsOver(long chat)
+        {
+            var date = BannedChats[chat];
+            var o = DateTime.Now > date;
+            if (o) UnbanChat(chat);
+            else SendMessage(chat, $"🤓 BLOCKED TIL {date.Date:dd.MM.yyyy}");
+            return o;
+        }
+        private void BanChat(long chat, int days = 1)
+        {
+            BannedChats.TryAdd(chat, DateTime.Now + TimeSpan.FromDays(days));
+            SussyBakas[chat].Banned = true;
+            SaveBanList();
+            Log($"{chat} >> BANNED", ConsoleColor.Magenta);
+        }
+        private void UnbanChat(long chat)
+        {
+            BannedChats.Remove(chat);
+            SussyBakas[chat].Banned = false;
+            SaveBanList();
+            Log($"{chat} >> UNBANNED", ConsoleColor.Magenta);
+        }
+        private void SaveBanList() => _bansIO.SaveData(BannedChats);
 
         private async void StartSaveLoop(int minutes)
         {
@@ -165,7 +222,7 @@ namespace Witlesss
         {
             if (DeleteBlocker(Active) == -1)
             {
-                RemoveChat(_activeChat);
+                RemoveChat(_active);
                 SaveChatList();
             }
         }

@@ -83,7 +83,7 @@ namespace Witlesss.Commands
             var files = GetFilesInfo($@"{CH_HISTORY_FOLDER}\{Chat}");
             var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
             if (files.Length > 0)
-                result = result + "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
+                result += "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
 
             return result;
         }
@@ -95,7 +95,7 @@ namespace Witlesss.Commands
             var result = "";
             foreach (var file in files)
             {
-                result = result + $"\n<code>{file.Name.Replace(".json", "")}</code> ({FileSize(file.FullName)})";
+                result += $"\n<code>{file.Name.Replace(".json", "")}</code> ({FileSize(file.FullName)})";
             }
             return result;
         }

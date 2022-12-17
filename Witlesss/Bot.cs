@@ -136,21 +136,10 @@ namespace Witlesss
         }
 
         public void PullBanStatus(long chat) => SussyBakas[chat].Banned = BannedChats.ContainsKey(chat);
-        public bool ChatIsBanned(Witless witless)
-        {
-            var banned = witless.Banned;
-            if (banned && BanIsOver(witless.Chat)) return false;
-            
-            return banned;
-        }
-        public bool ChatIsBanned(long chat)
-        {
-            var banned = BannedChats.ContainsKey(chat);
-            if (banned && BanIsOver(chat)) return false;
+        public bool ChatIsBanned (Witless w) => CheckBanStatus(w.Banned, w.Chat);
+        public bool ChatIsBanned (long chat) => CheckBanStatus(BannedChats.ContainsKey(chat), chat);
 
-            return banned;
-        }
-
+        private bool CheckBanStatus(bool banned, long chat) => banned && !BanIsOver(chat);
         private bool BanIsOver(long chat)
         {
             var date = BannedChats[chat];

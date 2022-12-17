@@ -157,10 +157,10 @@ namespace Witlesss
         }
         private void UnbanChat(long chat)
         {
-            BannedChats.Remove(chat);
+            var s = BannedChats.Remove(chat);
             SussyBakas[chat].Banned = false;
             SaveBanList();
-            Log($"{chat} >> UNBANNED", ConsoleColor.Magenta);
+            Log($"{chat} >> {(s ? "UNBANNED" : "NOT BANNED")}", ConsoleColor.Magenta);
         }
         private void SaveBanList() => _bansIO.SaveData(BannedChats);
 

@@ -127,8 +127,8 @@ namespace Witlesss
         }
         private static Size FitSize      (Size s, int max = 1280)
         {
-            if (s.Width > max || s.Height > max) return NormalizeSize(s, max);
-            else return s;
+            if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
+            return CorrectedSize(s);
         }
 
         private double RetrieveFPS(string framerate, int alt = 30)

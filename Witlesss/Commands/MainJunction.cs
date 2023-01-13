@@ -7,6 +7,7 @@ namespace Witlesss.Commands
     {
         private Command  _command;
         private WitlessCommand _c;
+        private readonly MakeMeme _meme = new();
         private readonly Demotivate _demotivate = new();
         private readonly RemoveBitrate _bitrate = new();
         private readonly RemoveAudio _audio = new();
@@ -117,6 +118,7 @@ namespace Witlesss.Commands
         {
             if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(witless, DgMode.Square);
             else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(witless, DgMode.Wide);
+            else if (CommandIs( "/meme"      )) _c = _meme;
             else if (CommandIs( "/a"         )) _c = _generate;
             else if (CommandIs( "/zz"        )) _c = _generateB;
             else if (CommandIs( "/b"         )) _c = _buhurt;

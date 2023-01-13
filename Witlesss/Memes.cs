@@ -16,12 +16,14 @@ namespace Witlesss
     public class Memes
     {
         private readonly DemotivatorDrawer [] _drawers;
+        private readonly MemeGenerator        _imgflip;
         private readonly IMediaToolkitService _service;
         public  static   Size SourceSize  = Size.Empty;
 
         public Memes()
         {
             _drawers = new[] { new DemotivatorDrawer(), new DemotivatorDrawer(1280) };
+            _imgflip = new MemeGenerator();
 
             while (!File.Exists(FFMPEG_PATH))
             {
@@ -51,6 +53,16 @@ namespace Witlesss
             var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
 
             return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer, quality));
+        }
+
+        public string MakeMeme(string path, DgText text)
+        {
+            return _imgflip.MakeImpactMeme(path, text);
+        }
+
+        public string MakeMemeFromSticker(string path, DgText text, string extension)
+        {
+            return MakeMeme(Execute(new F_ToJPG(path, extension)), text);
         }
 
         public string Stickerize(string path) => Execute(new F_Resize(path, NormalizeSize(SourceSize), ".webp"));

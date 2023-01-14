@@ -20,7 +20,7 @@ namespace Witlesss.Commands
             if (HasDoubleArgument(Text, out double value))
                 speed = Mode == SpeedMode.Fast ? Math.Clamp(value, 0.5, 94) : Math.Clamp(value, 0.0107, 2);
 
-            Download(FileID, out string path, out var type);
+            Bot.Download(FileID, Chat, out string path, out var type);
                     
             string result = Bot.MemeService.ChangeSpeed(path, speed, Mode, type);
             SendResult(result, type, VideoFilename, AudioFilename);

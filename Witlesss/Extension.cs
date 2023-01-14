@@ -52,20 +52,6 @@ namespace Witlesss
 
         public record CutSpan(TimeSpan Start, TimeSpan Length);
 
-        public static DgText GetDemotivatorText(Witless witless, string text)
-        {
-            string a, b = witless.TryToGenerate();
-            if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
-            if (string.IsNullOrEmpty(text)) a = witless.TryToGenerate();
-            else
-            {
-                var s = text.Split('\n', 2);
-                a = s[0];
-                if (s.Length > 1) b = s[1];
-            }
-            return new DgText(a, b);
-        }
-
         public static bool HasIntArgument(string text, out int value)
         {
             value = 0;

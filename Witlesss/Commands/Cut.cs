@@ -16,7 +16,7 @@ namespace Witlesss.Commands
                 return;
             }
             
-            Download(FileID, out string path, out var type);
+            Bot.Download(FileID, Chat, out string path, out var type);
             
             string result = Bot.MemeService.Cut(path, new CutSpan(x.start, x.length), type);
             SendResult(result, type, VideoFilename, AudioFilename);

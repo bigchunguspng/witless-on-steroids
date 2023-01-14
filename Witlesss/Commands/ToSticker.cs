@@ -11,8 +11,7 @@ public class ToSticker : Command
     {
         if (NoPicture()) return;
 
-        var path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(_id)}{ExtensionFromID(_id)}");
-        Bot.DownloadFile(_id, path, Chat).Wait();
+        Bot.Download(_id, Chat, out string path);
         
         Bot.SendSticker(Chat, new InputOnlineFile(File.OpenRead(Bot.MemeService.Stickerize(path))));
         Log($"{Title} >> STICK [!]");

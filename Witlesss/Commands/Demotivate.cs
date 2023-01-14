@@ -38,7 +38,7 @@ namespace Witlesss.Commands
             else if (mess.Animation is { })
                 SendDemotivatedVideo(mess.Animation.FileId);
             else if (mess.Sticker is { IsVideo: true })
-                SendDemotivatedVideo(mess.Sticker.FileId, ".webm");
+                SendDemotivatedVideo(mess.Sticker.FileId);
             else if (mess.Video is { })
                 SendDemotivatedVideo(mess.Video.FileId);
             else if (mess.Sticker is { IsAnimated: false })
@@ -51,7 +51,7 @@ namespace Witlesss.Commands
         public void SendDemotivator(string fileID)
         {
             var repeats = 1;
-            var path = GetSource(fileID, ".jpg");
+            Bot.Download(fileID, Chat, out string path);
             if (Text != null && Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*"))
             {
                 var match = Regex.Match(Text, @"\d");
@@ -67,7 +67,7 @@ namespace Witlesss.Commands
 
         public void SendDemotivatedSticker(string fileID)
         {
-            var path = GetSource(fileID, ".webp");
+            Bot.Download(fileID, Chat, out string path);
             var extension = ".png";
             if (Text != null && Text.Contains('x')) 
                 extension = ".jpg";
@@ -76,26 +76,33 @@ namespace Witlesss.Commands
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
 
-        private void SendDemotivatedVideo(string fileID, string extension = ".mp4")
+        private void SendDemotivatedVideo(string fileID)
         {
             if (Bot.ChatIsBanned(Baka)) return;
             
             var time = DateTime.Now;
-            var path = GetSource(fileID, extension);
+            Bot.Download(fileID, Chat, out string path);
             using var stream = File.OpenRead(Bot.MemeService.MakeVideoDemotivator(path, Texts()));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> DEMOTIVATOR [^] VID >> TIME: {DateTime.Now - time:s\.fff}");
         }
 
-        private string GetSource(string fileID, string extension)
-        {
-            var path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
-            Bot.DownloadFile(fileID, path, Chat).Wait();
-            return path;
-        }
-        
-        private DgText Texts() => GetDemotivatorText(Baka, RemoveDg(Text));
+        private DgText Texts() => GetDemotivatorText(RemoveDg(Text));
 
         private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");
+
+        private DgText GetDemotivatorText(string text)
+        {
+            string a, b = Baka.TryToGenerate();
+            if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
+            if (string.IsNullOrEmpty(text)) a = Baka.TryToGenerate();
+            else
+            {
+                var s = text.Split('\n', 2);
+                a = s[0];
+                if (s.Length > 1) b = s[1];
+            }
+            return new DgText(a, b);
+        }
     }
 }

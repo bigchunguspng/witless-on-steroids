@@ -16,7 +16,7 @@ namespace Witlesss.Commands
             var value = 15;
             if (HasIntArgument(Text, out int b)) value = Math.Clamp(b, 0, 21);
 
-            Download(FileID, out string path, out var type);
+            Bot.Download(FileID, Chat, out string path, out var type);
 
             string result = Bot.MemeService.RemoveBitrate(path, ref value, type);
             SendResult(result, type, VideoFilename, AudioFilename);
@@ -60,15 +60,6 @@ namespace Witlesss.Commands
             else return false;
 
             return true;
-        }
-
-        protected void Download(string fileID, out string path, out MediaType type)
-        {
-            string shortID = ShortID(fileID);
-            string extension = ExtensionFromID(shortID);
-            type = MediaTypeFromID(shortID);
-            path = UniquePath($@"{PICTURES_FOLDER}\{shortID}{extension}");
-            Bot.DownloadFile(fileID, path, Chat).Wait();
         }
 
         protected void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)

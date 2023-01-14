@@ -1,10 +1,10 @@
 ﻿using System;
-
-namespace Witlesss;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
+
+namespace Witlesss;
 
 public class MemeGenerator
 {

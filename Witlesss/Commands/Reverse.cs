@@ -6,7 +6,7 @@
         {
             if (NothingToProcess()) return;
             
-            Download(FileID, out string path, out var type);
+            Bot.Download(FileID, Chat, out string path, out var type);
             
             string result = Bot.MemeService.Reverse(path, type);
             SendResult(result, type, VideoFilename, AudioFilename);

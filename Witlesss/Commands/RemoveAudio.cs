@@ -10,7 +10,7 @@ public class RemoveAudio : RemoveBitrate
     {
         if (NoVideo()) return;
 
-        Download(FileID, out string path, out _);
+        Bot.Download(FileID, Chat, out string path);
 
         using var stream = File.OpenRead(Bot.MemeService.RemoveAudio(path));
         Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));

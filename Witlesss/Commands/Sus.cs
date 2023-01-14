@@ -20,7 +20,7 @@ namespace Witlesss.Commands
                 else argless = true;
             }
 
-            Download(FileID, out string path, out var type);
+            Bot.Download(FileID, Chat, out string path, out var type);
 
             if (argless) x.length = TimeSpan.MinValue;
 

@@ -6,7 +6,7 @@ namespace Witlesss.Commands;
 
 public class MakeMeme : WitlessCommand
 {
-    private readonly Regex _dg = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
+    private readonly Regex _meme = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
     
     public override void Run()
     {
@@ -37,7 +37,7 @@ public class MakeMeme : WitlessCommand
 
     private void SendMeme(string fileID)
     {
-        var path = GetSource(fileID, ".jpg");
+        Bot.Download(fileID, Chat, out string path);
         
         using var stream = File.OpenRead(Bot.MemeService.MakeMeme(path, Texts()));
         Bot.SendPhoto(Chat, new InputOnlineFile(stream));
@@ -46,7 +46,8 @@ public class MakeMeme : WitlessCommand
 
     private void SendMemeFromSticker(string fileID)
     {
-        var path = GetSource(fileID, ".webp");
+        Bot.Download(fileID, Chat, out string path);
+        
         var extension = ".png";
         if (Text != null && Text.Contains('x'))
             extension = ".jpg";
@@ -54,15 +55,37 @@ public class MakeMeme : WitlessCommand
         Bot.SendPhoto(Chat, new InputOnlineFile(stream));
         Log($"{Title} >> MEME [$] STICKER");
     }
+
+    private DgText Texts() => GetMemeText(RemoveCommand(Text));
     
-    private string GetSource(string fileID, string extension)
+    private string RemoveCommand(string text) => text == null ? null : _meme.Replace(text, "");
+
+    private DgText GetMemeText(string text)
     {
-        var path = UniquePath($@"{PICTURES_FOLDER}\{ShortID(fileID)}{extension}");
-        Bot.DownloadFile(fileID, path, Chat).Wait();
-        return path;
+        string a, b;
+        if (string.IsNullOrEmpty(text))
+        {
+            (a, b) = (Baka.TryToGenerate(), Baka.TryToGenerate());
+                
+            var c = Random.Next(10);
+            if (c == 0) a = "";
+            if (a.Length > 25) b = "";
+        }
+        else
+        {
+            if (text.Contains('\n'))
+            {
+                var s = text.Split('\n', 2);
+                (a, b) = (s[0], s[1]);
+            }
+            else
+            {
+                a = text;
+                b = AddBottomText() ? Baka.TryToGenerate() : "";
+            }
+        }
+        return new DgText(a, b);
     }
     
-    private DgText Texts() => GetDemotivatorText(Baka, RemoveDg(Text));
-    
-    private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");
+    private bool AddBottomText() => Text != null && Text.Split()[0].Contains('s');
 }

@@ -32,7 +32,7 @@ namespace Witlesss.Commands
 
         protected bool NothingToProcess()
         {
-            if (GetMediaFileID(Message.ReplyToMessage) || GetMediaFileID(Message)) return false;
+            if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
             
             Bot.SendMessage(Chat, DAMN_MANUAL);
             return true;

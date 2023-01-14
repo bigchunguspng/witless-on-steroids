@@ -11,7 +11,7 @@ public class MakeMeme : WitlessCommand
     public override void Run()
     {
         var x = Message.ReplyToMessage;
-        if (ProcessMessage(x) || ProcessMessage(Message)) return;
+        if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
         Bot.SendMessage(Chat, MEME_MANUAL);
     }

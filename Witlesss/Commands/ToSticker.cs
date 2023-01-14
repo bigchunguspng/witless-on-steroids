@@ -19,7 +19,7 @@ public class ToSticker : Command
     
     private bool NoPicture()
     {
-        if (GetPicID(Message.ReplyToMessage) || GetPicID(Message)) return false;
+        if (GetPicID(Message) || GetPicID(Message.ReplyToMessage)) return false;
 
         Bot.SendMessage(Chat, STICK_MANUAL);
         return true;

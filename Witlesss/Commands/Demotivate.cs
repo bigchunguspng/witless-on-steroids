@@ -24,7 +24,7 @@ namespace Witlesss.Commands
         public override void Run()
         {
             var x = Message.ReplyToMessage;
-            if (ProcessMessage(x) || ProcessMessage(Message)) return;
+            if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
             Bot.SendMessage(Chat, DG_MANUAL);
         }

@@ -21,7 +21,7 @@ public class RemoveAudio : RemoveBitrate
 
     private bool NoVideo()
     {
-        if (GetMediaFileID(Message.ReplyToMessage) || GetMediaFileID(Message)) return false;
+        if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
 
         Bot.SendMessage(Chat, G_MANUAL);
         return true;

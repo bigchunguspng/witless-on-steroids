@@ -421,6 +421,17 @@ namespace Witlesss {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;u&gt;Мемы я делаю из&lt;/u&gt;:
+        ///
+        ///• картинок 📸 и стикеров 🎟.
+        /// </summary>
+        internal static string MEME_MANUAL {
+            get {
+                return ResourceManager.GetString("MEME_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Если вы хотите очистить словарь беседы, пропишите
         ///
         /// /move@piece_fap_bot [имя]

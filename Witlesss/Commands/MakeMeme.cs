@@ -13,7 +13,7 @@ public class MakeMeme : WitlessCommand
         var x = Message.ReplyToMessage;
         if (ProcessMessage(x) || ProcessMessage(Message)) return;
 
-        Bot.SendMessage(Chat, DG_MANUAL);
+        Bot.SendMessage(Chat, MEME_MANUAL);
     }
     
     private bool ProcessMessage(Message mess)

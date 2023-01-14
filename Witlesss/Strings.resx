@@ -293,4 +293,9 @@ s   - save and exit
 • картинками 📸 и стикерами 🎟
 • картинками 📸 без сжатия</value>
     </data>
+    <data name="MEME_MANUAL" xml:space="preserve">
+        <value>&lt;u&gt;Мемы я делаю из&lt;/u&gt;:
+
+• картинок 📸 и стикеров 🎟</value>
+    </data>
 </root>

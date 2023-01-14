@@ -26,7 +26,7 @@ public class MemeGenerator
         
         var w = image.Width;
         var h = image.Height;
-        var s = (int)Math.Min(w, 1.5 * h) / 12;
+        var s = Math.Max((int)Math.Min(w, 1.5 * h) / 12, 12);
         var mB = h / 3 * 2;
 
         AddText(text.A, s, graphics, _upper, new Rectangle(_m, _m, w - 2 * _m, h / 3 - _m));

@@ -69,7 +69,11 @@ public class MakeMeme : WitlessCommand
                 
             var c = Random.Next(10);
             if (c == 0) a = "";
-            if (a.Length > 25) b = "";
+            if (a.Length > 25)
+            {
+                if (c > 5) (a, b) = ("", a);
+                else b = "";
+            }
         }
         else
         {

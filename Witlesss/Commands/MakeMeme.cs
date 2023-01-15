@@ -53,7 +53,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
         
         using var stream = File.OpenRead(Bot.MemeService.MakeMeme(path, Texts()));
         Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-        Log($"{Title} >> MEME [$]");
+        Log($"{Title} >> MEME [M]");
     }
 
     public void ProcessSticker(string fileID)
@@ -65,7 +65,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
             extension = ".jpg";
         using var stream = File.OpenRead(Bot.MemeService.MakeMemeFromSticker(path, Texts(), extension));
         Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-        Log($"{Title} >> MEME [$] STICKER");
+        Log($"{Title} >> MEME [M] STICKER");
     }
 
     private DgText Texts() => GetMemeText(RemoveCommand(Text));

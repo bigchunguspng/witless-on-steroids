@@ -97,7 +97,7 @@
         <value>я буду отвечать на</value>
     </data>
     <data name="SET_P_RESPONSE" xml:space="preserve">
-        <value>пикчи будут ставать демотиваторами с вероятностью {0}%</value>
+        <value>пикчи будут ставать мемами с вероятностью {0}%</value>
     </data>
     <data name="WATERMARKS_FOLDER" xml:space="preserve">
         <value>Telegram-Water</value>
@@ -220,7 +220,7 @@
 Менять настройки могут: {7}</value>
     </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
-        <value>cтикеры {0}будут демотивироваться в случайном порядке</value>
+        <value>cтикеры {0}будут ставать мемами в случайном порядке</value>
     </data>
     <data name="FUSE_FAIL_DATES" xml:space="preserve">
         <value>К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
@@ -276,7 +276,7 @@ s   - save and exit
         <value>Emoji</value>
     </data>
     <data name="SET_Q_RESPONSE" xml:space="preserve">
-        <value>качество демотиваторов будет {0}%</value>
+        <value>качество картинок будет {0}%</value>
     </data>
     <data name="WITLESS_ONLY_COMAND" xml:space="preserve">
         <value>Для использования этой команды нужно прописать

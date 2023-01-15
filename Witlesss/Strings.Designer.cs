@@ -522,7 +522,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to пикчи будут ставать демотиваторами с вероятностью {0}%.
+        ///   Looks up a localized string similar to пикчи будут ставать мемами с вероятностью {0}%.
         /// </summary>
         internal static string SET_P_RESPONSE {
             get {
@@ -531,7 +531,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to качество демотиваторов будет {0}%.
+        ///   Looks up a localized string similar to качество картинок будет {0}%.
         /// </summary>
         internal static string SET_Q_RESPONSE {
             get {
@@ -572,7 +572,7 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to cтикеры {0}будут демотивироваться в случайном порядке.
+        ///   Looks up a localized string similar to cтикеры {0}будут ставать мемами в случайном порядке.
         /// </summary>
         internal static string STICKERS_RESPONSE {
             get {

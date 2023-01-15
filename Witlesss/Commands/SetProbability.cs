@@ -8,10 +8,10 @@
 
             if (HasIntArgument(Text, out int value))
             {
-                Baka.DgProbability = value;
+                Baka.MemeChance = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, XD(string.Format(SET_P_RESPONSE, Baka.DgProbability)));
-                Log($"{Title} >> DG PROBABILITY >> {Baka.DgProbability}%");
+                Bot.SendMessage(Chat, XD(string.Format(SET_P_RESPONSE, Baka.MemeChance)));
+                Log($"{Title} >> MEME CHANCE >> {Baka.MemeChance}%");
             }
             else
                 Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "p"));

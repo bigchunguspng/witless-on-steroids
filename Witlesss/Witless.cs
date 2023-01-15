@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Witlesss.Commands;
 using static System.StringComparison;
 
 namespace Witlesss
@@ -16,7 +15,7 @@ namespace Witlesss
     {
         public const string START = "_start", END = "_end", LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = " " + LF + " ";
 
-        private int _probability, _quality;
+        private int _chance, _quality;
         private bool _hasUnsavedStuff, _admins;
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
         private readonly FileIO<WitlessDB> _fileIO;
@@ -27,8 +26,8 @@ namespace Witlesss
         {
             Chat = chat;
             Interval = interval;
-            DgProbability = probability;
-            JpgQuality = jpg;
+            MemeChance = probability;
+            MemeQuality = jpg;
             _fileIO = new FileIO<WitlessDB>(Path);
             Load();
             PauseGeneration(30);
@@ -40,27 +39,23 @@ namespace Witlesss
             get => _generation.Interval;
             set => _generation.Interval = value;
         }
-        [JsonProperty] public int DgProbability
+        [JsonProperty] public int MemeChance
         {
-            get => _probability;
-            set => _probability = Math.Clamp(value, 0, 100);
+            get => _chance;
+            set => _chance = Math.Clamp(value, 0, 100);
         }
-        [JsonProperty] public bool DemotivateStickers { get; set; }
-        [JsonProperty] public int JpgQuality
+        [JsonProperty] public int MemeQuality
         {
             get => _quality;
             set => _quality = Math.Clamp(value, 0, 100);
         }
-
+        [JsonProperty] public MemeType MemeType { get; set; }
+        [JsonProperty] public bool MemeStickers { get; set; }
         [JsonProperty] public bool AdminsOnly
         {
             get => _admins;
-            set
-            {
-                if (Chat < 0) _admins = value;
-            }
+            set { if (Chat < 0) _admins = value; }
         }
-        [JsonProperty] public MemeType MemesType { get; set; }
 
         public WitlessDB Words { get; set; }
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";

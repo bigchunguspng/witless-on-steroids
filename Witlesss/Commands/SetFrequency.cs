@@ -21,12 +21,12 @@ namespace Witlesss.Commands
                 var w = Text.Split()[1];
                 if      (Regex.IsMatch(w, @"^[MmМм]"))
                 {
-                    Baka.MemesType = MemeType.Meme;
+                    Baka.MemeType = MemeType.Meme;
                     x = true;
                 }
                 else if (Regex.IsMatch(w, @"^[DdДд]"))
                 {
-                    Baka.MemesType = MemeType.Dg;
+                    Baka.MemeType = MemeType.Dg;
                     x = true;
                 }
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
@@ -35,12 +35,12 @@ namespace Witlesss.Commands
                 {
                     Bot.SaveChatList();
                     Bot.SendMessage(Chat, XD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
-                    Log($"{Title} >> MEMES TYPE >> {(Baka.MemesType == MemeType.Dg ? "D" : "M")}");
+                    Log($"{Title} >> MEMES TYPE >> {(Baka.MemeType == MemeType.Dg ? "D" : "M")}");
                 }
             }
             else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
 
-        private string MEMES_TYPE() => Baka.MemesType == MemeType.Dg ? "демотивоторы" : "мемы";
+        private string MEMES_TYPE() => Baka.MemeType == MemeType.Dg ? "демотивоторы" : "мемы";
     }
 }

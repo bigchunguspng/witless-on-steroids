@@ -79,10 +79,10 @@ namespace Witlesss.Commands
                 else if (witless.Ready() && !witless.Banned) WitlessPoop(witless, Chat, Text, Title);
 
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(Message, witless, w, h);
-                ImageProcessor SelectMemeMaker() => _mematics[witless.MemesType];
+                ImageProcessor SelectMemeMaker() => _mematics[witless.MemeType];
                 
-                bool HaveToMeme() => Extension.Random.Next(100) < witless.DgProbability;
-                bool HaveToMemeSticker() => witless.DemotivateStickers && HaveToMeme();
+                bool HaveToMeme() => Extension.Random.Next(100) < witless.MemeChance;
+                bool HaveToMemeSticker() => witless.MemeStickers && HaveToMeme();
             }
             else if (Text is not null && TextIsCommand(out var command))
             {

@@ -18,7 +18,7 @@ public static class JpegCoder
         EncoderParameters = new EncoderParameters(count: 1);
     }
 
-    public static void PassQuality(Witless witless) => PassQuality(witless.JpgQuality);
+    public static void PassQuality(Witless witless) => PassQuality(witless.MemeQuality);
     public static void PassQuality(int value)
     {
         if (JpegQuality == value) return;

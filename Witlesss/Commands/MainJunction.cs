@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Witlesss.Commands
@@ -30,9 +31,15 @@ namespace Witlesss.Commands
         private readonly ToggleStickers _stickers = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
+        private readonly Dictionary<MemeType, ImageProcessor> _mematics;
 
         public long   LastChat      => Chat;
         public string LastChatTitle => Title;
+
+        public MainJunction() => _mematics = new Dictionary<MemeType, ImageProcessor>()
+        {
+            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }
+        };
 
         private bool TextIsCommand(out string command)
         {
@@ -61,27 +68,21 @@ namespace Witlesss.Commands
                 
                 witless.Count();
                 
-                if (Message.Photo?[^1] is { } p && ShouldDemotivate())
+                if (Message.Photo?[^1] is { } p && HaveToMeme())
                 {
-                    SetUpDemotivateCommand(p.Width, p.Height);
-                    _demotivate.SendDemotivator(Message.Photo[^1].FileId);
+                    GetMemeMaker(p.Width, p.Height).ProcessPhoto(p.FileId);
                 }
-                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && ShouldDemotivateSticker())
+                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
                 {
-                    SetUpDemotivateCommand(s.Width, s.Height);
-                    _demotivate.SendDemotivatedSticker(Message.Sticker.FileId);
+                    GetMemeMaker(s.Width, s.Height).ProcessSticker(s.FileId);
                 }
                 else if (witless.Ready() && !witless.Banned) WitlessPoop(witless, Chat, Text, Title);
 
-                void SetUpDemotivateCommand(int w, int h)
-                {
-                    _demotivate.SelectModeAuto(w, h);
-                    _demotivate.PassQuality(witless);
-                    _demotivate.Pass(Message);
-                    _demotivate.Pass(witless);
-                }
-                bool ShouldDemotivate() => Extension.Random.Next(100) < witless.DgProbability;
-                bool ShouldDemotivateSticker() => witless.DemotivateStickers && ShouldDemotivate();
+                ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(Message, witless, w, h);
+                ImageProcessor SelectMemeMaker() => _mematics[witless.MemesType];
+                
+                bool HaveToMeme() => Extension.Random.Next(100) < witless.DgProbability;
+                bool HaveToMemeSticker() => witless.DemotivateStickers && HaveToMeme();
             }
             else if (Text is not null && TextIsCommand(out var command))
             {

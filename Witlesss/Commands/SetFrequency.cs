@@ -1,4 +1,6 @@
-﻿namespace Witlesss.Commands
+﻿using System.Text.RegularExpressions;
+
+namespace Witlesss.Commands
 {
     public class SetFrequency : ToggleAdmins
     {
@@ -13,8 +15,32 @@
                 Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Interval));
                 Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
             }
-            else
-                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
+            else if (Text.Contains(' '))
+            {
+                var x = false;
+                var w = Text.Split()[1];
+                if      (Regex.IsMatch(w, @"^[MmМм]"))
+                {
+                    Baka.MemesType = MemeType.Meme;
+                    x = true;
+                }
+                else if (Regex.IsMatch(w, @"^[DdДд]"))
+                {
+                    Baka.MemesType = MemeType.Dg;
+                    x = true;
+                }
+                else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
+
+                if (x)
+                {
+                    Bot.SaveChatList();
+                    Bot.SendMessage(Chat, XD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
+                    Log($"{Title} >> MEMES TYPE >> {(Baka.MemesType == MemeType.Dg ? "D" : "M")}");
+                }
+            }
+            else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
+
+        private string MEMES_TYPE() => Baka.MemesType == MemeType.Dg ? "демотивоторы" : "мемы";
     }
 }

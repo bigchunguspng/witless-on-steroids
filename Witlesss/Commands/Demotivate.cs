@@ -5,13 +5,23 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands
 {
-    public class Demotivate : WitlessCommand
+    public class Demotivate : WitlessCommand, ImageProcessor
     {
         private readonly Regex _dg = new(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
         
-        public  void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
+        public ImageProcessor SetUp(Message message, Witless witless, int w, int h)
+        {
+            Pass(message);
+            Pass(witless);
+            SelectModeAuto(w, h);
+            PassQuality(witless);
+            
+            return this;
+        }
+
+        private void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
         private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
-        public  void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
+        private void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
 
         public Demotivate SetUp(Witless witless, DgMode mode)
         {
@@ -34,21 +44,21 @@ namespace Witlesss.Commands
             if (mess == null) return false;
             
             if      (mess.Photo != null)
-                SendDemotivator(mess.Photo[^1].FileId);
+                ProcessPhoto(mess.Photo[^1].FileId);
             else if (mess.Animation is { })
-                SendDemotivatedVideo(mess.Animation.FileId);
+                ProcessVideo(mess.Animation.FileId);
             else if (mess.Sticker is { IsVideo: true })
-                SendDemotivatedVideo(mess.Sticker.FileId);
+                ProcessVideo(mess.Sticker.FileId);
             else if (mess.Video is { })
-                SendDemotivatedVideo(mess.Video.FileId);
+                ProcessVideo(mess.Video.FileId);
             else if (mess.Sticker is { IsAnimated: false })
-                SendDemotivatedSticker(mess.Sticker.FileId);
+                ProcessSticker(mess.Sticker.FileId);
             else return false;
             
             return true;
         }
 
-        public void SendDemotivator(string fileID)
+        public void ProcessPhoto(string fileID)
         {
             var repeats = 1;
             Bot.Download(fileID, Chat, out string path);
@@ -65,7 +75,7 @@ namespace Witlesss.Commands
             Log($"{Title} >> DEMOTIVATOR [{(repeats == 1 ? "_" : repeats)}]");
         }
 
-        public void SendDemotivatedSticker(string fileID)
+        public void ProcessSticker(string fileID)
         {
             Bot.Download(fileID, Chat, out string path);
             var extension = ".png";
@@ -76,7 +86,7 @@ namespace Witlesss.Commands
             Log($"{Title} >> DEMOTIVATOR [#] STICKER");
         }
 
-        private void SendDemotivatedVideo(string fileID)
+        private void ProcessVideo(string fileID)
         {
             if (Bot.ChatIsBanned(Baka)) return;
             

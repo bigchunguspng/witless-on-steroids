@@ -4,9 +4,17 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands;
 
-public class MakeMeme : WitlessCommand
+public class MakeMeme : WitlessCommand, ImageProcessor
 {
     private readonly Regex _meme = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
+
+    public ImageProcessor SetUp(Message message, Witless witless, int w, int h)
+    {
+        Pass(message);
+        Pass(witless);
+        
+        return this;
+    }
     
     public override void Run()
     {
@@ -21,21 +29,21 @@ public class MakeMeme : WitlessCommand
         if (mess == null) return false;
             
         if      (mess.Photo != null)
-            SendMeme(mess.Photo[^1].FileId);
+            ProcessPhoto(mess.Photo[^1].FileId);
         /*else if (mess.Animation is { })
-            SendDemotivatedVideo(mess.Animation.FileId);
+            ProcessVideo(mess.Animation.FileId);
         else if (mess.Sticker is { IsVideo: true })
-            SendDemotivatedVideo(mess.Sticker.FileId, ".webm");     // да я копипащу код вопросы?
+            ProcessVideo(mess.Sticker.FileId, ".webm");     // да я копипащу код вопросы?
         else if (mess.Video is { })
-            SendDemotivatedVideo(mess.Video.FileId);*/
+            ProcessVideo(mess.Video.FileId);*/
         else if (mess.Sticker is { IsAnimated: false, IsVideo: false })
-            SendMemeFromSticker(mess.Sticker.FileId);
+            ProcessSticker(mess.Sticker.FileId);
         else return false;
             
         return true;
     }
 
-    private void SendMeme(string fileID)
+    public void ProcessPhoto(string fileID)
     {
         Bot.Download(fileID, Chat, out string path);
         
@@ -44,7 +52,7 @@ public class MakeMeme : WitlessCommand
         Log($"{Title} >> MEME [$]");
     }
 
-    private void SendMemeFromSticker(string fileID)
+    public void ProcessSticker(string fileID)
     {
         Bot.Download(fileID, Chat, out string path);
         
@@ -92,4 +100,16 @@ public class MakeMeme : WitlessCommand
     }
     
     private bool AddBottomText() => Text != null && Text.Split()[0].Contains('s');
+}
+
+public interface ImageProcessor
+{
+    ImageProcessor SetUp(Message message, Witless witless, int w, int h);
+    void ProcessPhoto(string fileID);
+    void ProcessSticker(string fileID);
+}
+
+public enum MemeType
+{
+    Dg, Meme
 }

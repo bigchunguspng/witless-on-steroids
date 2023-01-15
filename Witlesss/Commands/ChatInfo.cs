@@ -10,6 +10,7 @@
                 Baka.DgProbability,
                 Baka.JpgQuality,
                 Baka.DemotivateStickers ? "ON" : "OFF",
+                Baka.MemesType == MemeType.Dg ? "демотиваторами" : "мемами",
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
             Bot.SendMessage(Chat, info);

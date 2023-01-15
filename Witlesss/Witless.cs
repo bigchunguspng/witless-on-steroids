@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Witlesss.Commands;
 using static System.StringComparison;
 
 namespace Witlesss
@@ -59,6 +60,7 @@ namespace Witlesss
                 if (Chat < 0) _admins = value;
             }
         }
+        [JsonProperty] public MemeType MemesType { get; set; }
 
         public WitlessDB Words { get; set; }
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";

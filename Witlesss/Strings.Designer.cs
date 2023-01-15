@@ -118,10 +118,11 @@ namespace Witlesss {
         ///
         ///Вес словаря: {1}
         ///Интервал генерации: {2}
-        ///Вероятность демотивации: {3}%
-        ///Качество демотиваторов: {4}%
-        ///Демотивация стикеров: {5}
-        ///Менять настройки могут: {6}.
+        ///Мемами стают: {3}% пикч
+        ///Качество картинок: {4}%
+        ///Мемы из стикеров: {5}
+        ///Пикчи стают: {6}
+        ///Менять настройки могут: {7}.
         /// </summary>
         internal static string CHAT_INFO {
             get {
@@ -494,6 +495,29 @@ namespace Witlesss {
         internal static string SET_FREQUENCY_RESPONSE {
             get {
                 return ResourceManager.GetString("SET_FREQUENCY_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Выбрать тип авто-мемов:
+        ///
+        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
+        ///
+        ///(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы).
+        /// </summary>
+        internal static string SET_MEMES_MANUAL {
+            get {
+                return ResourceManager.GetString("SET_MEMES_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Картинки будут превращаться в {0}.
+        /// </summary>
+        internal static string SET_MEMES_RESPONSE {
+            get {
+                return ResourceManager.GetString("SET_MEMES_RESPONSE", resourceCulture);
             }
         }
         

@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
+using static Witlesss.JpegCoder;
 
 namespace Witlesss;
 
@@ -61,15 +62,6 @@ public class MemeGenerator
             _outline.Dispose();
         }
         g.FillPath(_white, path);
-    }
-    
-    private string SaveImage(Image image, string path)
-    {
-        path = UniquePath(path);
-        image.Save(path);
-        image.Dispose();
-
-        return path;
     }
 
     private Image CropFix(Image image)

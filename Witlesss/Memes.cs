@@ -7,7 +7,7 @@ using MediaToolkit.Services;
 using MediaToolkit.Tasks;
 using Witlesss.MediaTools;
 using static System.Globalization.CultureInfo;
-using static Witlesss.DemotivatorDrawer;
+using static Witlesss.JpegCoder;
 using MD = System.Threading.Tasks.Task<MediaToolkit.Tasks.GetMetadataResult>;
 using TS = System.TimeSpan;
 

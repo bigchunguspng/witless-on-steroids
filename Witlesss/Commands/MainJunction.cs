@@ -117,8 +117,8 @@ namespace Witlesss.Commands
 
         private bool DoWitlessCommands(string command, Witless witless)
         {
-            if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(witless, DgMode.Square);
-            else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(witless, DgMode.Wide);
+            if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(DgMode.Square);
+            else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(DgMode.Wide);
             else if (CommandIs( "/meme"      )) _c = _meme;
             else if (CommandIs( "/a"         )) _c = _generate;
             else if (CommandIs( "/zz"        )) _c = _generateB;

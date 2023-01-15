@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using static Witlesss.JpegCoder;
 
 namespace Witlesss.Commands
 {
@@ -21,18 +22,18 @@ namespace Witlesss.Commands
 
         private void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
         private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
-        private void PassQuality(Witless witless) => DemotivatorDrawer.PassQuality(witless.JpgQuality);
 
-        public Demotivate SetUp(Witless witless, DgMode mode)
+        public Demotivate SetUp(DgMode mode)
         {
             SetMode(mode);
-            PassQuality(witless);
 
             return this;
         }
 
         public override void Run()
         {
+            PassQuality(Baka);
+            
             var x = Message.ReplyToMessage;
             if (ProcessMessage(Message) || ProcessMessage(x)) return;
 

@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using static Witlesss.JpegCoder;
 
 namespace Witlesss.Commands;
 
@@ -12,12 +13,15 @@ public class MakeMeme : WitlessCommand, ImageProcessor
     {
         Pass(message);
         Pass(witless);
+        PassQuality(witless);
         
         return this;
     }
     
     public override void Run()
     {
+        PassQuality(Baka);
+        
         var x = Message.ReplyToMessage;
         if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
@@ -105,11 +109,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
 public interface ImageProcessor
 {
     ImageProcessor SetUp(Message message, Witless witless, int w, int h);
-    void ProcessPhoto(string fileID);
+    
+    void ProcessPhoto  (string fileID);
     void ProcessSticker(string fileID);
-}
-
-public enum MemeType
-{
-    Dg, Meme
 }

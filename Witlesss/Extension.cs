@@ -231,6 +231,12 @@ namespace Witlesss
         Video,
         Movie // video with sound
     }
+
+    public enum MemeType
+    {
+        Dg,
+        Meme
+    }
     
     public enum LetterCaseMode
     {

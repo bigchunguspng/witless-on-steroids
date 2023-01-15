@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using Encoder = System.Drawing.Imaging.Encoder;
+using static Witlesss.JpegCoder;
 
 namespace Witlesss
 {
@@ -22,16 +21,11 @@ namespace Witlesss
         private readonly Rectangle _frame;
         private readonly DrawableText _textA = new(), _textB = new();
         
-        private static int      _temp;
         private static readonly Pen White;
-        private static readonly ImageCodecInfo JpgEncoder = GetEncoder();
-        private static readonly EncoderParameters EncoderParameters = new(1);
         private static readonly Dictionary<Image, Point> Logos = new();
         private static readonly Regex Ext = new("(.png)|(.jpg)"), Emoji = new(REGEX_EMOJI);
         private static readonly Random R = new();
         private static readonly StringFormat[] Formats;
-
-        public static long JpegQuality { get; private set; } = 120;
 
         static DemotivatorDrawer()
         {
@@ -255,34 +249,6 @@ namespace Witlesss
             return emoji;
         }
 
-        private string SaveImage(Image image, string path)
-        {
-            path = UniquePath(path);
-            image.Save(path, JpgEncoder, EncoderParameters);
-            image.Dispose();
-
-            return path;
-        }
-        private string SaveImageTemp(Image image)
-        {
-            var path = UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png");
-            image.Save(path);
-            image.Dispose();
-
-            return path;
-        }
-        
-        public static void PassQuality(int value)
-        {
-            if (JpegQuality != value)
-            {
-                JpegQuality = value;
-                EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
-            }
-        }
-
-        private static ImageCodecInfo GetEncoder() => ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);
-        
         private static void LoadLogos(string path)
         {
             var files = GetFilesInfo(path);

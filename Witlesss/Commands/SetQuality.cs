@@ -14,7 +14,7 @@
                 Log($"{Title} >> JPG QUALITY >> {Baka.MemeQuality}%");
             }
             else
-                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "q"));
+                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "quality"));
         }
     }
 }

@@ -542,7 +542,7 @@ namespace Witlesss {
         /// <summary>
         ///   Looks up a localized string similar to Если че правильно вот так:
         ///
-        /// /set_{0}@piece_fap_bot 75.
+        /// /{0}@piece_fap_bot 75.
         /// </summary>
         internal static string SET_X_MANUAL {
             get {

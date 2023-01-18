@@ -123,8 +123,8 @@ namespace Witlesss.Commands
             else if (CommandIs( "/a"         )) _c = _generate;
             else if (CommandIs( "/zz"        )) _c = _generateB;
             else if (CommandIs( "/b"         )) _c = _buhurt;
-            else if (CommandIs( "/set_q"     )) _c = _quality;
-            else if (CommandIs( "/set_p"     )) _c = _probability;
+            else if (CommandIs( "/quality"   )) _c = _quality;
+            else if (CommandIs( "/pics"      )) _c = _probability;
             else if (CommandIs( "/set"       )) _c = _frequency;
             else if (CommandIs( "/fuse"      )) _c = _fuse;
             else if (CommandIs( "/move"      )) _c = _move;

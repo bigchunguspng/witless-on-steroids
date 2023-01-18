@@ -14,7 +14,7 @@
                 Log($"{Title} >> MEME CHANCE >> {Baka.MemeChance}%");
             }
             else
-                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "p"));
+                Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "pics"));
         }
     }
 }

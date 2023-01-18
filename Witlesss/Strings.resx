@@ -152,7 +152,7 @@
     <data name="SET_X_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
 
-/set_{0}@piece_fap_bot 75</value>
+/{0}@piece_fap_bot 75</value>
     </data>
     <data name="ZZ_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>

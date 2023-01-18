@@ -1,17 +1,17 @@
-﻿using System.Drawing;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using static Witlesss.Memes;
 
 namespace Witlesss.Commands;
 
 public class ToSticker : Command
 {
-    private string _id;
+    private string _fileID;
     public override void Run()
     {
         if (NoPicture()) return;
 
-        Bot.Download(_id, Chat, out string path);
+        Bot.Download(_fileID, Chat, out string path);
         
         Bot.SendSticker(Chat, new InputOnlineFile(File.OpenRead(Bot.MemeService.Stickerize(path))));
         Log($"{Title} >> STICK [!]");
@@ -29,20 +29,20 @@ public class ToSticker : Command
     {
         if (mess == null) return false;
         
-        if (mess.Photo != null)
+        if (mess.Photo is { } p)
         {
-            _id = mess.Photo[^1].FileId;
-            Memes.SourceSize = new Size(mess.Photo[^1].Width, mess.Photo[^1].Height);
+            _fileID = p[^1].FileId;
+            PassSize (p[^1]);
         }
-        else if (mess.Document is { MimeType: "image/png" or "image/jpeg", Thumb: { } })
+        else if (mess.Document is { MimeType: "image/png" or "image/jpeg", Thumb: { } } d)
         {
-            _id = mess.Document.FileId;
-            Memes.SourceSize = new Size(mess.Document.Thumb.Width, mess.Document.Thumb.Height);
+            _fileID = d.FileId;
+            PassSize (d.Thumb);
         }
-        else if (mess.Sticker is { IsVideo: false, IsAnimated: false })
+        else if (mess.Sticker is { IsVideo: false, IsAnimated: false } s)
         {
-            _id = mess.Sticker.FileId;
-            Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+            _fileID = s.FileId;
+            PassSize (s);
         }
         else return false;
 

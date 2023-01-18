@@ -5,6 +5,7 @@ using System.Linq;
 using MediaToolkit.Model;
 using MediaToolkit.Services;
 using MediaToolkit.Tasks;
+using Telegram.Bot.Types;
 using Witlesss.MediaTools;
 using static System.Globalization.CultureInfo;
 using static Witlesss.JpegCoder;
@@ -19,6 +20,11 @@ namespace Witlesss
         private readonly MemeGenerator        _imgflip;
         private readonly IMediaToolkitService _service;
         public  static   Size SourceSize  = Size.Empty;
+
+        public static void PassSize(Video     v) => SourceSize = new Size(v.Width, v.Height);
+        public static void PassSize(Sticker   s) => SourceSize = new Size(s.Width, s.Height);
+        public static void PassSize(Animation a) => SourceSize = new Size(a.Width, a.Height);
+        public static void PassSize(PhotoSize p) => SourceSize = new Size(p.Width, p.Height);
 
         public Memes()
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -42,21 +41,21 @@ namespace Witlesss.Commands
         {
             if (mess == null) return false;
 
-            if      (mess.Audio != null)
-                FileID = mess.Audio.FileId;
-            else if (mess.Video != null)
-                FileID = mess.Video.FileId;
-            else if (mess.Animation != null)
-                FileID = mess.Animation.FileId;
-            else if (mess.Sticker is { IsVideo: true })
+            if      (mess.Audio is { } a)
+                FileID = a.FileId;
+            else if (mess.Video is { } v)
+                FileID = v.FileId;
+            else if (mess.Animation is { } g)
+                FileID = g.FileId;
+            else if (mess.Sticker is { IsVideo: true } s)
             {
-                FileID = mess.Sticker.FileId;
-                Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+                FileID = s.FileId;
+                Memes.PassSize(s);
             }
-            else if (mess.Voice != null)
-                FileID = mess.Voice.FileId;
-            else if (mess.Document?.MimeType?.StartsWith("audio") == true)
-                FileID = mess.Document.FileId;
+            else if (mess.Voice is { } c)
+                FileID = c.FileId;
+            else if (mess.Document is { MimeType: "audio/x-wav"} d)
+                FileID = d.FileId;
             else return false;
 
             return true;

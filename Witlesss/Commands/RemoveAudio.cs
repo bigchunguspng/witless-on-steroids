@@ -31,20 +31,20 @@ public class RemoveAudio : RemoveBitrate
     {
         if (mess == null) return false;
 
-        if      (mess.Video != null)
+        if      (mess.Video is { } v)
         {
-            FileID = mess.Video.FileId;
-            Memes.SourceSize = new Size(mess.Video.Width, mess.Video.Height);
+            FileID = v.FileId;
+            Memes.PassSize(v);
         }
-        else if (mess.Animation != null)
+        else if (mess.Animation is { } a)
         {
-            FileID = mess.Animation.FileId;
-            Memes.SourceSize = new Size(mess.Animation.Width, mess.Animation.Height);
+            FileID = a.FileId;
+            Memes.PassSize(a);
         }
-        else if (mess.Sticker is { IsVideo: true })
+        else if (mess.Sticker is { IsVideo: true } s)
         {
-            FileID = mess.Sticker.FileId;
-            Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+            FileID = s.FileId;
+            Memes.PassSize(s);
         }
         else return false;
 

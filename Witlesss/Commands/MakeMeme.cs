@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Drawing;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static Witlesss.JpegCoder;
+using static Witlesss.Memes;
 
 namespace Witlesss.Commands;
 
@@ -34,25 +34,29 @@ public class MakeMeme : WitlessCommand, ImageProcessor
     {
         if (mess == null) return false;
             
-        if      (mess.Photo != null)
-            ProcessPhoto(mess.Photo[^1].FileId);
-        else if (mess.Animation is { })
+        if      (mess.Photo is { } p)
         {
-            Memes.SourceSize = new Size(mess.Animation.Width, mess.Animation.Height);
-            ProcessVideo(mess.Animation.FileId);
+            ProcessPhoto(p[^1].FileId);
         }
-        else if (mess.Sticker is { IsVideo: true })
+        else if (mess.Animation is { } a)
         {
-            Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
-            ProcessVideo(mess.Sticker.FileId);
+            PassSize(a);
+            ProcessVideo(a.FileId);
         }
-        else if (mess.Video is { })
+        else if (mess.Sticker is { IsVideo: true } s)
         {
-            Memes.SourceSize = new Size(mess.Video.Width, mess.Video.Height);
-            ProcessVideo(mess.Video.FileId);
+            PassSize(s);
+            ProcessVideo(s.FileId);
         }
-        else if (mess.Sticker is { IsAnimated: false})
-            ProcessSticker(mess.Sticker.FileId);
+        else if (mess.Video is { } v)
+        {
+            PassSize(v);
+            ProcessVideo(v.FileId);
+        }
+        else if (mess.Sticker is { IsAnimated: false} ss)
+        {
+            ProcessSticker(ss.FileId);
+        }
         else return false;
             
         return true;

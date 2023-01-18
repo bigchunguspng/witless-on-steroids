@@ -52,7 +52,7 @@ namespace Witlesss
         {
             var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
 
-            return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer, quality));
+            return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer.Size, Drawer.Pic, quality));
         }
 
         public string MakeMeme(string path, DgText text)
@@ -63,6 +63,15 @@ namespace Witlesss
         public string MakeMemeFromSticker(string path, DgText text, string extension)
         {
             return MakeMeme(Execute(new F_ToJPG(path, extension)), text);
+        }
+
+        public string MakeVideoMeme(string path, DgText text)
+        {
+            var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
+
+            _imgflip.SetUp(SourceSize);
+
+            return Execute(new F_Overlay(path, _imgflip.BakeCaption(text), SourceSize, Point.Empty, quality));
         }
 
         public string Stickerize(string path) => Execute(new F_Resize(path, NormalizeSize(SourceSize), ".webp"));

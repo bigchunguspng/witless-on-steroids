@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Drawing;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static Witlesss.JpegCoder;
@@ -34,13 +36,22 @@ public class MakeMeme : WitlessCommand, ImageProcessor
             
         if      (mess.Photo != null)
             ProcessPhoto(mess.Photo[^1].FileId);
-        /*else if (mess.Animation is { })
+        else if (mess.Animation is { })
+        {
+            Memes.SourceSize = new Size(mess.Animation.Width, mess.Animation.Height);
             ProcessVideo(mess.Animation.FileId);
+        }
         else if (mess.Sticker is { IsVideo: true })
-            ProcessVideo(mess.Sticker.FileId, ".webm");     // да я копипащу код вопросы?
+        {
+            Memes.SourceSize = new Size(mess.Sticker.Width, mess.Sticker.Height);
+            ProcessVideo(mess.Sticker.FileId);
+        }
         else if (mess.Video is { })
-            ProcessVideo(mess.Video.FileId);*/
-        else if (mess.Sticker is { IsAnimated: false, IsVideo: false })
+        {
+            Memes.SourceSize = new Size(mess.Video.Width, mess.Video.Height);
+            ProcessVideo(mess.Video.FileId);
+        }
+        else if (mess.Sticker is { IsAnimated: false})
             ProcessSticker(mess.Sticker.FileId);
         else return false;
             
@@ -68,6 +79,17 @@ public class MakeMeme : WitlessCommand, ImageProcessor
         Log($"{Title} >> MEME [M] STICKER");
     }
 
+    private void ProcessVideo(string fileID)
+    {
+        if (Bot.ChatIsBanned(Baka)) return;
+            
+        var time = DateTime.Now;
+        Bot.Download(fileID, Chat, out string path);
+        using var stream = File.OpenRead(Bot.MemeService.MakeVideoMeme(path, Texts()));
+        Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
+        Log($@"{Title} >> MEME [M] VID >> TIME: {DateTime.Now - time:s\.fff}");
+    }
+
     private DgText Texts() => GetMemeText(RemoveCommand(Text));
     
     private string RemoveCommand(string text) => text == null ? null : _meme.Replace(text, "");
@@ -79,7 +101,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
         {
             (a, b) = (Baka.TryToGenerate(), Baka.TryToGenerate());
                 
-            var c = Random.Next(10);
+            var c = Extension.Random.Next(10);
             if (c == 0) a = "";
             if (a.Length > 25)
             {

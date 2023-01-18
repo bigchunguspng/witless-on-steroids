@@ -77,6 +77,9 @@ namespace Witlesss
 
             _imgflip.SetUp(SourceSize);
 
+            var b = IsWEBM(path) && SizeIsInvalid(SourceSize);
+            if (b) path = Execute(new F_Resize(path, CorrectedSize(SourceSize)));
+
             return Execute(new F_Overlay(path, _imgflip.BakeCaption(text), SourceSize, Point.Empty, quality));
         }
 

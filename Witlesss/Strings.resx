@@ -67,14 +67,6 @@
     <data name="FUSE_FAIL_SELF" xml:space="preserve">
         <value>ёкарный бабай)0</value>
     </data>
-    <data name="DG_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Демотиваторы я делаю из&lt;/u&gt;:
-
-• картинок 📸, стикеров 🎟
-• видео 🎬, гифок🪣 и видео-стикеров🍿
-
-Напиши это вместе с таким файлом 🗞 или в ответ на него✍️</value>
-    </data>
     <data name="DEMOTIVATOR_UPPER_FONT" xml:space="preserve">
         <value>Times New Roman</value>
     </data>
@@ -295,9 +287,12 @@ s   - save and exit
 • картинками 📸 без сжатия</value>
     </data>
     <data name="MEME_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Мемы я делаю из&lt;/u&gt;:
+        <value>&lt;u&gt;{0} я делаю из&lt;/u&gt;:
 
-• картинок 📸 и стикеров 🎟</value>
+• картинок 📸, стикеров 🎟
+• видео 🎬, гифок🪣 и видео-стикеров🍿
+
+Напиши это вместе с таким файлом 🗞 или в ответ на него✍️</value>
     </data>
     <data name="SET_MEMES_MANUAL" xml:space="preserve">
         <value>Выбрать тип авто-мемов:

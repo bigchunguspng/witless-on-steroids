@@ -27,7 +27,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
         var x = Message.ReplyToMessage;
         if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
-        Bot.SendMessage(Chat, MEME_MANUAL);
+        Bot.SendMessage(Chat, string.Format(MEME_MANUAL, "Мемы"));
     }
     
     private bool ProcessMessage(Message mess)

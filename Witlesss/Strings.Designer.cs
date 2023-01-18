@@ -266,20 +266,6 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Демотиваторы я делаю из&lt;/u&gt;:
-        ///
-        ///• картинок 📸, стикеров 🎟
-        ///• видео 🎬, гифок🪣 и видео-стикеров🍿
-        ///
-        ///Напиши это вместе с таким файлом 🗞 или в ответ на него✍️.
-        /// </summary>
-        internal static string DG_MANUAL {
-            get {
-                return ResourceManager.GetString("DG_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Emoji.
         /// </summary>
         internal static string EMOJI_FOLDER {
@@ -422,9 +408,12 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Мемы я делаю из&lt;/u&gt;:
+        ///   Looks up a localized string similar to &lt;u&gt;{0} я делаю из&lt;/u&gt;:
         ///
-        ///• картинок 📸 и стикеров 🎟.
+        ///• картинок 📸, стикеров 🎟
+        ///• видео 🎬, гифок🪣 и видео-стикеров🍿
+        ///
+        ///Напиши это вместе с таким файлом 🗞 или в ответ на него✍️.
         /// </summary>
         internal static string MEME_MANUAL {
             get {

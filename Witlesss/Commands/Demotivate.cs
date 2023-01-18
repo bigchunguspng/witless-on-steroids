@@ -37,7 +37,7 @@ namespace Witlesss.Commands
             var x = Message.ReplyToMessage;
             if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
-            Bot.SendMessage(Chat, DG_MANUAL);
+            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, "Демотиваторы"));
         }
 
         private bool ProcessMessage(Message mess)

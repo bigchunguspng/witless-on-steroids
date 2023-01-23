@@ -184,6 +184,8 @@ namespace Witlesss
             return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }
 
+        public static string FixErrorMessage(string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
+
         public static long SizeInBytes(string path) => new FileInfo(path).Length;
 
         public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;

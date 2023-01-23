@@ -64,11 +64,19 @@ public class MakeMeme : WitlessCommand, ImageProcessor
 
     public void ProcessPhoto(string fileID)
     {
+        var repeats = 1;
         Bot.Download(fileID, Chat, out string path);
-        
-        using var stream = File.OpenRead(Bot.MemeService.MakeMeme(path, Texts()));
-        Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-        Log($"{Title} >> MEME [M]");
+        if (Text != null && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*"))
+        {
+            var match = Regex.Match(Text, @"\d");
+            if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
+        }
+        for (int i = 0; i < repeats; i++)
+        {
+            using var stream = File.OpenRead(Bot.MemeService.MakeMeme(path, Texts()));
+            Bot.SendPhoto(Chat, new InputOnlineFile(stream));
+        }
+        Log($"{Title} >> MEME [{(repeats == 1 ? "M" : repeats)}]");
     }
 
     public void ProcessSticker(string fileID)

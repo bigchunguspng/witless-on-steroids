@@ -11,7 +11,8 @@ namespace Witlesss.Commands
     public class Fuse : ToggleAdmins
     {
         private long _size;
-        
+        private int   _max;
+
         public override void Run()
         {
             if (SenderIsSus()) return;
@@ -25,8 +26,10 @@ namespace Witlesss.Commands
                 string name = Text.Substring(Text.IndexOf(' ') + 1);
                 var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
                 var files = GetFiles(path);
+
+                GetMaxWordsPerLine();
                 
-                if (name == "his all")
+                if (name.StartsWith("his all"))
                 {
                     foreach (string file in files) EatHistorySimple(file);
                     GoodEnding();
@@ -159,7 +162,16 @@ namespace Witlesss.Commands
         private void EatHistorySimple(string path)
         {
             var list = new FileIO<List<string>>(path).LoadData();
-            foreach (string text in list) Baka.Eat(text, out _);
+            foreach (string text in list)
+            {
+                if (text.Count(c => c == ' ') >= _max) continue;
+                Baka.Eat(text, out _);
+            }
+        }
+        private void GetMaxWordsPerLine()
+        {
+            bool valuePassed = int.TryParse(Text.Substring(Text.LastIndexOf(' ') + 1), out _max);
+            if (!valuePassed) _max = int.MaxValue;
         }
         
         private void GoodEnding()

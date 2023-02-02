@@ -90,7 +90,7 @@ namespace Witlesss
             catch (Exception e)
             {
                 LogError($"{chat} >> Can't ping --> " + e.Message);
-                if (e.Message.Contains("Forbidden") || e.Message.Contains("chat not found") || e.Message.Contains("have no rights to send a message"))
+                if (e.Message.Contains("Forbidden") || e.Message.Contains("chat not found") || e.Message.Contains("rights to send"))
                     return -1;
                 return -2;
             }

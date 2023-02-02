@@ -145,7 +145,7 @@ namespace Witlesss.Commands
 
         private bool DoStartCommand(string command)
         {
-            var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, new Witless(Chat));
+            var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, Witless.Default(Chat));
             if (success)
             {
                 Bot.SaveChatList();

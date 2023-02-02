@@ -19,7 +19,7 @@ namespace Witlesss
         private bool _hasUnsavedStuff, _admins;
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
         private readonly FileIO<WitlessDB> _fileIO;
-        private readonly Counter _generation = new();
+        private readonly Counter _generation = new(), _saves = new();
         private static readonly Random Random = new();
 
         public Witless(long chat, int interval = 7, int probability = 20, int jpg = 75)
@@ -29,8 +29,14 @@ namespace Witlesss
             MemeChance = probability;
             MemeQuality = jpg;
             _fileIO = new FileIO<WitlessDB>(Path);
-            Load();
-            PauseGeneration(30);
+            _saves.Interval = 10; // * 2 = minutes
+        }
+
+        public static Witless Default(long chat)
+        {
+            var witless = new Witless(chat);
+            witless.Load();
+            return witless;
         }
 
         [JsonProperty] public long Chat { get; set; }
@@ -60,6 +66,7 @@ namespace Witlesss
         public WitlessDB Words { get; set; }
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
         public bool Banned { get; set; }
+        public bool Loaded { get; set; }
 
         public bool Eat(string text, out string eaten)
         {
@@ -322,6 +329,19 @@ namespace Witlesss
         public void Count() => _generation.Count();
         public bool Ready() => _generation.Ready();
 
+        public void SaveAndCount()
+        {
+            if (_hasUnsavedStuff)
+            {
+                SaveNoMatterWhat();
+                _saves.Reset();
+            }
+            else if (Loaded)
+            {
+                _saves.Count();
+                if (_saves.Ready()) Unload();
+            }
+        }
         public void Save()
         {
             if (_hasUnsavedStuff) SaveNoMatterWhat();
@@ -337,8 +357,17 @@ namespace Witlesss
         public void Load()
         {
             Words = _fileIO.LoadData();
+            Loaded = true;
+            _saves.Reset();
             _hasUnsavedStuff = false;
-            Log($"DIC LOADED << {Chat}");
+            Log($"DIC LOADED >> {Chat}", ConsoleColor.Magenta);
+        }
+
+        public void Unload()
+        {
+            Words = null;
+            Loaded = false;
+            Log($"DIC UNLOAD << {Chat}", ConsoleColor.Yellow);
         }
 
         public void Backup()

@@ -34,5 +34,7 @@ namespace Witlesss
         public void Stop()   => _actual = int.MaxValue;
 
         public void Resume() => _actual = _declared;
+
+        public void Reset() => _counter = 0;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MediaToolkit.Util;
@@ -29,6 +31,8 @@ namespace Witlesss
             _chatsIO = new FileIO<ChatList>($@"{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
             SussyBakas = _chatsIO.LoadData();
             foreach (var chat in BannedChats.Keys) SussyBakas[chat].Banned = true;
+
+            LoadSomeBakas();
         }
 
         public void Run()
@@ -68,7 +72,7 @@ namespace Witlesss
             {
                 if (Regex.IsMatch(input, @"^\/[aw] ")) BreakFourthWall();
                 else if (input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-                else if (input == "/s" ) SaveDics();
+                else if (input == "/s" ) SaveBakas();
                 else if (input == "/sd") SyncDics();
                 else if (input == "/sp") Spam();
                 else if (input == "/db") DeleteBlockers();
@@ -117,6 +121,16 @@ namespace Witlesss
             }
         }
 
+        private void LoadSomeBakas()
+        {
+            var directory = new DirectoryInfo(DBS_FOLDER);
+            var selected = directory
+                .GetFiles(DB_FILE_PREFIX + "*.json")
+                .Where(x => DateTime.Now - x.LastWriteTime < TimeSpan.FromHours(12) && x.Length < 4_000_000)
+                .Select(x => long.Parse(x.Name.Replace(DB_FILE_PREFIX + "-", "").Replace(".json", "")));
+            foreach (var chat in selected) WitlessExist(chat); // <-- this loads the dictionary;
+        }
+
         private Witless Active => SussyBakas[_active];
         private ICollection<Witless> Bakas => SussyBakas.Values;
         private void RemoveChat(long id) => SussyBakas.TryRemove(id, out _);
@@ -127,7 +141,13 @@ namespace Witlesss
             Log($"ACTIVE CHAT >> {_active} ({Fork.LastChatTitle})");
         }
 
-        public bool WitlessExist(long chat) => SussyBakas.ContainsKey(chat);
+        public bool WitlessExist(long chat)
+        {
+            var exist  =  SussyBakas.ContainsKey(chat);
+            if (exist && !SussyBakas[chat].Loaded) SussyBakas[chat].Load();
+
+            return exist;
+        }
 
         public void SaveChatList()
         {
@@ -169,10 +189,11 @@ namespace Witlesss
             while (true)
             {
                 await Task.Delay(60000 * minutes);
-                SaveDics();
+                SaveBakas();
             }
         }
 
+        private void SaveBakas() => Bakas.ForEach(witless => witless.SaveAndCount());
         private void SaveDics () => Bakas.ForEach(witless => witless.Save());
         private void ClearDics() => Bakas.ForEach(ClearDic);
 

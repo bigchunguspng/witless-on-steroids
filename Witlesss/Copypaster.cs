@@ -9,7 +9,6 @@ namespace Witlesss
     public class Copypaster
     {
         public  const string   START = "_start",      END = "_end";
-        private const string S_START = $"{START} ", S_END = $" {END}";
         private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
 
@@ -215,7 +214,7 @@ namespace Witlesss
                 current = PickWord(Words[current]);
             }
 
-            return TextInRandomLetterCase(result.Replace(S_START, ""));
+            return TextInRandomLetterCase(result.Replace(START, "").TrimStart());
         }
         private string GenerateBackwards(string word)
         {
@@ -228,7 +227,7 @@ namespace Witlesss
                 current = PickWord(GetWordsBefore(current));
             }
 
-            return TextInRandomLetterCase(result.Replace(S_END, ""));
+            return TextInRandomLetterCase(result.Replace(END, "").TrimEnd());
         }
 
         private WordChart GetWordsBefore(string word)

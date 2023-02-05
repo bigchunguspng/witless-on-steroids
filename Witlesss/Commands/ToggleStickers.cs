@@ -6,9 +6,9 @@
         {
             if (SenderIsSus()) return;
             
-            Baka.MemeStickers = !Baka.MemeStickers;
+            Baka.Meme.Stickers = !Baka.Meme.Stickers;
             Bot.SaveChatList();
-            Bot.SendMessage(Chat, XD(string.Format(STICKERS_RESPONSE, Baka.MemeStickers ? "" : "<b>НЕ</b> ")));
+            Bot.SendMessage(Chat, XD(string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ")));
         }
     }
 }

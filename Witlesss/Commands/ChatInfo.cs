@@ -7,10 +7,10 @@
             string info = string.Format(CHAT_INFO, Title,
                 FileSize(Baka.Path),
                 Baka.Interval,
-                Baka.MemeChance,
-                Baka.MemeQuality,
-                Baka.MemeStickers ? "ON" : "OFF",
-                Baka.MemeType == MemeType.Dg ? "демотиваторами" : "мемами",
+                Baka.Meme.Chance,
+                Baka.Meme.Quality,
+                Baka.Meme.Stickers ? "ON" : "OFF",
+                Baka.Meme.Type == MemeType.Dg ? "демотиваторами" : "мемами",
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
             Bot.SendMessage(Chat, info);

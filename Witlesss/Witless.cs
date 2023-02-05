@@ -7,21 +7,14 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private int _quality, _chance;
         private bool _admins;
 
-        private FileIO<WitlessDB> FileIO { get; }
-
-        private Counter Generation { get; } = new();
-        private Counter Saves      { get; } = new();
-
-        public Witless(long chat, int interval = 7, int pics = 20, int jpg = 75)
+        public Witless(long chat, int interval = 7)
         {
             Chat = chat;
             Interval = interval;
-            MemeChance = pics;
-            MemeQuality = jpg;
-
+            
+            Meme   = new MemeSettings();
             Baka   = new Copypaster(this);
             FileIO = new FileIO<WitlessDB>(Path);
 
@@ -42,30 +35,25 @@ namespace Witlesss
             get => Generation.Interval;
             set => Generation.Interval = value;
         }
-        [JsonProperty] public int MemeChance
-        {
-            get => _chance;
-            set => _chance = Math.Clamp(value, 0, 100);
-        }
-        [JsonProperty] public int MemeQuality
-        {
-            get => _quality;
-            set => _quality = Math.Clamp(value, 0, 100);
-        }
-        [JsonProperty] public MemeType MemeType { get; set; }
-        [JsonProperty] public bool MemeStickers { get; set; } // todo move all those meme_props to another class
         [JsonProperty] public bool AdminsOnly
         {
             get => _admins;
-            set { if (Chat < 0) _admins = value; }
+            set
+            {
+                if (Chat < 0) _admins = value;
+            }
         }
+        [JsonProperty] public MemeSettings Meme { get; set; }
+
+        private FileIO<WitlessDB> FileIO { get; }
+
+        private Counter Saves      { get; } = new();
+        private Counter Generation { get; } = new();
+
+        public bool Banned, Loaded, HasUnsavedStuff;
 
         public WitlessDB Words { get; set; }
         public Copypaster Baka { get; set; }
-
-        public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
-
-        public bool Banned, Loaded, HasUnsavedStuff;
 
         public void Eat(string text)                   => Baka.Eat(text, out _);
         public bool Eat(string text, out string eaten) => Baka.Eat(text, out eaten);
@@ -85,6 +73,8 @@ namespace Witlesss
 
         public string GenerateByWord    (string word) => Baka.GenerateByWord    (word);
         public string GenerateByLastWord(string word) => Baka.GenerateByLastWord(word);
+        
+        public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
 
         public void Count() => Generation.Count();
         public bool Ready() => Generation.Ready();
@@ -143,5 +133,29 @@ namespace Witlesss
             Backup();
             File.Delete(Path);
         }
+    }
+
+    public class MemeSettings
+    {
+        private int _quality, _chance;
+
+        public MemeSettings(int pics = 20, int jpg = 75)
+        {
+            Chance = pics;
+            Quality = jpg;
+        }
+        
+        [JsonProperty] public int Chance
+        {
+            get => _chance;
+            set => _chance = Math.Clamp(value, 0, 100);
+        }
+        [JsonProperty] public int Quality
+        {
+            get => _quality;
+            set => _quality = Math.Clamp(value, 0, 100);
+        }
+        [JsonProperty] public MemeType Type { get; set; }
+        [JsonProperty] public bool Stickers { get; set; }
     }
 }

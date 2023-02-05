@@ -8,10 +8,10 @@
 
             if (HasIntArgument(Text, out int value))
             {
-                Baka.MemeQuality = value;
+                Baka.Meme.Quality = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, XD(string.Format(SET_Q_RESPONSE, Baka.MemeQuality)));
-                Log($"{Title} >> JPG QUALITY >> {Baka.MemeQuality}%");
+                Bot.SendMessage(Chat, XD(string.Format(SET_Q_RESPONSE, Baka.Meme.Quality)));
+                Log($"{Title} >> JPG QUALITY >> {Baka.Meme.Quality}%");
             }
             else
                 Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "quality"));

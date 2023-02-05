@@ -9,7 +9,7 @@ namespace Witlesss
     public class Copypaster
     {
         public  const string   START = "_start",      END = "_end";
-        private const string S_START = $" {START}", S_END = $"{END} ";
+        private const string S_START = $"{START} ", S_END = $" {END}";
         private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
 

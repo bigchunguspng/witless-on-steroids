@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -115,7 +114,7 @@ namespace Witlesss
                 else if (input.StartsWith("/w "))                                // write
                 {
                     SendMessage(_active, text);
-                    witless.Eat(text, out _);
+                    witless.Eat(text);
                     Log($@"{_active} >> {text}", ConsoleColor.Yellow);
                 }
             }
@@ -276,20 +275,10 @@ namespace Witlesss
         private void FixDBs() => Bakas.ForEach(FixDB);
         private void FixDB(Witless witless)
         {
-            NormalizeWitlessDB(witless.Words);
-            witless.SaveNoMatterWhat();
-        }
-
-        private void NormalizeWitlessDB(WitlessDB words)
-        {
-            foreach (var word in words)
-            foreach (string next in word.Value.Keys)
+            if (WitlessExist(witless.Chat)) // todo such thing for all those "do this shit with every baka" commands
             {
-                if (!words.ContainsKey(next))
-                {
-                    words.TryAdd(next, new ConcurrentDictionary<string, float>());
-                    words[next].TryAdd(Witless.END, 1F);
-                }
+                witless.Baka.FixWitlessDB();
+                witless.SaveNoMatterWhat();
             }
         }
     }

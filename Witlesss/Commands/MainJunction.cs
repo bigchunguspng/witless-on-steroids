@@ -145,7 +145,7 @@ namespace Witlesss.Commands
 
         private bool DoStartCommand(string command)
         {
-            var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, Witless.Default(Chat));
+            var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, Witless.AverageBaka(Chat));
             if (success)
             {
                 Bot.SaveChatList();
@@ -159,7 +159,7 @@ namespace Witlesss.Commands
         private async void WitlessPoop(Witless witless, long chat, string text, string title)
         {
             await Task.Delay(AssumedResponseTime(150, text));
-            Bot.SendMessage(chat, witless.TryToGenerate());
+            Bot.SendMessage(chat, witless.Generate());
             Log($"{title} >> FUNNY");
         }
     }

@@ -14,7 +14,7 @@
                 }
 
                 Text = Text.Substring(words[0].Length + 1);
-                Text = Baka.GenerateByWordBackwards(word.ToLower()) + Text.Substring(word.Length);
+                Text = Baka.GenerateByLastWord(word.ToLower()) + Text.Substring(word.Length);
                 Bot.SendMessage(Chat, TextInLetterCase(Text, GetMode(word)));
                 Log($"{Title} >> FUNNY BY LAST WORD");
             }

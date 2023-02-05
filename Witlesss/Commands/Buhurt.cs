@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using static Witlesss.Copypaster;
 
 namespace Witlesss.Commands
 {
@@ -14,16 +15,16 @@ namespace Witlesss.Commands
                 length = System.Math.Clamp(value, 2, 16);
             
             var lines = new List<string>(length);
-            var words = _baguette[Witless.START];
-            var word = Witless.PickWord(words);
+            var words = _baguette[START];
+            var word = PickWord(words);
 
             AddTextLine();
 
             words = _baguette["_mid"];
             for (int i = 1; i < length; i++)
             {
-                word = Witless.PickWord(words);
-                if (word == Witless.END) break;
+                word = PickWord(words);
+                if (word == END) break;
                 AddTextLine();
             }
 
@@ -42,8 +43,8 @@ namespace Witlesss.Commands
             else if (word.EndsWith  ("..")) xs = Baka.Words.Keys.Where(x => x.EndsWith(word[..^2])).ToArray();
             else if (word.Contains  (' ') ) return word.Split()[0] + ' ' + Baka.GenerateByWord(PullWord(word.Split()[1]));
             else
-                return Baka.Words.ContainsKey(word) ? word : Witless.START;
-            return xs.Length > 0 ? xs.ElementAt(Random.Next(xs.Length)) : Witless.START;
+                return Baka.Words.ContainsKey(word) ? word : START;
+            return xs.Length > 0 ? xs.ElementAt(Random.Next(xs.Length)) : START;
         }
     }
 }

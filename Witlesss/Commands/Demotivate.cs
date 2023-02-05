@@ -104,9 +104,9 @@ namespace Witlesss.Commands
 
         private DgText GetDemotivatorText(string text)
         {
-            string a, b = Baka.TryToGenerate();
+            string a, b = Baka.Generate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
-            if (string.IsNullOrEmpty(text)) a = Baka.TryToGenerate();
+            if (string.IsNullOrEmpty(text)) a = Baka.Generate();
             else
             {
                 var s = text.Split('\n', 2);

@@ -144,7 +144,7 @@ namespace Witlesss.Commands
                 if (string.IsNullOrEmpty(text))                     continue;
                 if (text.StartsWith("System.Collections.Generic"))  continue;
 
-                Baka.Eat(text, out _);
+                Baka.Eat(text);
                 save.Add(text);
             }
 
@@ -165,7 +165,7 @@ namespace Witlesss.Commands
             foreach (string text in list)
             {
                 if (text.Count(c => c == ' ') >= _max) continue;
-                Baka.Eat(text, out _);
+                Baka.Eat(text);
             }
         }
         private void GetMaxWordsPerLine()

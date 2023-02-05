@@ -111,7 +111,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
         string a, b;
         if (string.IsNullOrEmpty(text))
         {
-            (a, b) = (Baka.TryToGenerate(), Baka.TryToGenerate());
+            (a, b) = (Baka.Generate(), Baka.Generate());
                 
             var c = Extension.Random.Next(10);
             if (c == 0) a = "";
@@ -131,7 +131,7 @@ public class MakeMeme : WitlessCommand, ImageProcessor
             else
             {
                 a = text;
-                b = AddBottomText() ? Baka.TryToGenerate() : "";
+                b = AddBottomText() ? Baka.Generate() : "";
             }
         }
         return new DgText(a, b);

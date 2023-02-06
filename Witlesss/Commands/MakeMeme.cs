@@ -73,7 +73,7 @@ namespace Witlesss.Commands
             {
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
-                var c = Extension.Random.Next(10);
+                var c = Random.Next(10);
                 if (c == 0) a = "";
                 if (a.Length > 25)
                 {

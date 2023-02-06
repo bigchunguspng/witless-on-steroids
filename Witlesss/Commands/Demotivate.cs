@@ -8,7 +8,7 @@ namespace Witlesss.Commands
     {
         private readonly Regex _dg = new(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
 
-        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*");
+        private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*");
         private string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
         
         private readonly string D_VIDEO = "DEMOTIVATOR [^] VID";

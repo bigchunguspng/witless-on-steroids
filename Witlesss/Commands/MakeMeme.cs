@@ -9,7 +9,7 @@ namespace Witlesss.Commands
     {
         private readonly Regex _meme = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
 
-        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
+        private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
         private string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 
         private readonly string M_VIDEO = "MEME [M] VID";

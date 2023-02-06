@@ -30,7 +30,7 @@ namespace Witlesss.Commands
             Download(fileID);
 
             var repeats = 1;
-            if (Text != null && regex)
+            if (regex)
             {
                 var match = Regex.Match(Text, @"\d");
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;

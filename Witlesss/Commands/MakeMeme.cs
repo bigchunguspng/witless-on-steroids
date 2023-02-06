@@ -1,15 +1,19 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using static Witlesss.JpegCoder;
 using static Witlesss.Memes;
 
 namespace Witlesss.Commands
 {
-    public class MakeMeme : WitlessCommand, ImageProcessor
+    public class MakeMeme : MakeMemeCore, ImageProcessor
     {
         private readonly Regex _meme = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
+
+        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
+        private string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
+
+        private readonly string M_VIDEO = "MEME [M] VID";
+        private readonly string M_STICK = "MEME [M] STICKER";
 
         public ImageProcessor SetUp(Message message, Witless witless, int w, int h)
         {
@@ -19,16 +23,8 @@ namespace Witlesss.Commands
         
             return this;
         }
-    
-        public override void Run()
-        {
-            PassQuality(Baka);
 
-            var x = Message.ReplyToMessage;
-            if (ProcessMessage(Message) || ProcessMessage(x)) return;
-
-            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, "Мемы"));
-        }
+        public override void Run() => Run(ProcessMessage, "Мемы");
 
         private bool ProcessMessage(Message mess)
         {
@@ -55,52 +51,16 @@ namespace Witlesss.Commands
             }
             else if (mess.Sticker is { IsAnimated: false} ss)
             {
-                ProcessSticker(ss.FileId);
+                ProcessStick(ss.FileId);
             }
             else return false;
 
             return true;
         }
 
-        public void ProcessPhoto(string fileID)
-        {
-            var repeats = 1;
-            Bot.Download(fileID, Chat, out string path);
-            if (Text != null && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*"))
-            {
-                var match = Regex.Match(Text, @"\d");
-                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
-            }
-            for (int i = 0; i < repeats; i++)
-            {
-                using var stream = File.OpenRead(Bot.MemeService.MakeMeme(path, Texts()));
-                Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            }
-            Log($"{Title} >> MEME [{(repeats == 1 ? "M" : repeats)}]");
-        }
-
-        public void ProcessSticker(string fileID)
-        {
-            Bot.Download(fileID, Chat, out string path);
-
-            var extension = ".png";
-            if (Text != null && Text.Contains('x'))
-                extension = ".jpg";
-            using var stream = File.OpenRead(Bot.MemeService.MakeMemeFromSticker(path, Texts(), extension));
-            Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Log($"{Title} >> MEME [M] STICKER");
-        }
-
-        private void ProcessVideo(string fileID)
-        {
-            if (Bot.ChatIsBanned(Baka)) return;
-
-            var time = DateTime.Now;
-            Bot.Download(fileID, Chat, out string path);
-            using var stream = File.OpenRead(Bot.MemeService.MakeVideoMeme(path, Texts()));
-            Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
-            Log($@"{Title} >> MEME [M] VID >> TIME: {DateTime.Now - time:s\.fff}");
-        }
+        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, Texts, M_PHOTO, M.MakeMeme, REPEAT_RX());
+        public  void ProcessStick(string fileID) => DoStick(fileID, Texts, M_STICK, M.MakeMemeFromSticker);
+        private void ProcessVideo(string fileID) => DoVideo(fileID, Texts, M_VIDEO, M.MakeVideoMeme);
 
         private DgText Texts() => GetMemeText(RemoveCommand(Text));
 
@@ -144,7 +104,7 @@ namespace Witlesss.Commands
     {
         ImageProcessor SetUp(Message message, Witless witless, int w, int h);
 
-        void ProcessPhoto  (string fileID);
-        void ProcessSticker(string fileID);
+        void ProcessPhoto(string fileID);
+        void ProcessStick(string fileID);
     }
 }

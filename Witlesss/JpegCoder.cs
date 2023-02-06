@@ -18,8 +18,8 @@ namespace Witlesss
             EncoderParameters = new EncoderParameters(count: 1);
         }
 
-        public static void PassQuality(Witless witless) => PassQuality(witless.Meme.Quality);
-        public static void PassQuality(int value)
+        public  static void PassQuality(Witless witless) => PassQuality(witless.Meme.Quality);
+        private static void PassQuality(int value)
         {
             if (JpegQuality == value) return;
 

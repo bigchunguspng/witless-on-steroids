@@ -74,7 +74,7 @@ namespace Witlesss.Commands
                 }
                 else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
                 {
-                    GetMemeMaker(s.Width, s.Height).ProcessSticker(s.FileId);
+                    GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
                 }
                 else if (witless.Ready() && !witless.Banned) WitlessPoop(witless, Chat, Text, Title);
 

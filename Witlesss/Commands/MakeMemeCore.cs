@@ -12,7 +12,6 @@ namespace Witlesss.Commands
     {
         private DateTime _time;
         private string   _path;
-        private int   _repeats;
 
         protected Memes M => Bot.MemeService;
 
@@ -30,17 +29,18 @@ namespace Witlesss.Commands
         {
             Download(fileID);
 
+            var repeats = 1;
             if (Text != null && regex)
             {
                 var match = Regex.Match(Text, @"\d");
-                _repeats  = match.Success && int.TryParse(match.Value, out int x) ? x : 1;
+                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }
-            for (int i = 0; i < _repeats; i++)
+            for (int i = 0; i < repeats; i++)
             {
                 using var stream = File.OpenRead(produce(_path, texts()));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
-            Log($"{Title} >> {log(_repeats)}");
+            Log($"{Title} >> {log(repeats)}");
         }
 
         protected void DoStick(string fileID, Func<DgText> texts, string log, MemeMakerX produce)

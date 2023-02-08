@@ -104,6 +104,10 @@ namespace Witlesss
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
 
+        public void LoadUnlessLoaded()
+        {
+            if (!Loaded) Load();
+        }
         public void Load()
         {
             Words = FileIO.LoadData();

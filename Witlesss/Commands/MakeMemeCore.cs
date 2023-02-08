@@ -54,7 +54,7 @@ namespace Witlesss.Commands
 
         protected void DoVideo(string fileID, Func<DgText> texts, string log, MemeMaker produce)
         {
-            if (Bot.ChatIsBanned(Baka)) return;
+            if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
             WriteTime();
             Download(fileID);

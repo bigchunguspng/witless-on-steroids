@@ -104,8 +104,8 @@ namespace Witlesss.Commands
             else if (command == "/sex"     ) _command = _sticker;
             else if (command == "/g"       ) _command = _audio;
             else if (command == "/debug"   ) _command = _debug;
-            else                             return false;
-            if      (Bot.ChatIsBanned(Chat)) return false;
+            else                                          return false;
+            if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
             
             _command.Pass(Message);
             _command.Run();
@@ -151,7 +151,7 @@ namespace Witlesss.Commands
                 Bot.SaveChatList();
                 Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
                 Bot.SendMessage(Chat, START_RESPONSE);
-                Bot.PullBanStatus(Chat);
+                Bot.ThorRagnarok.PullBanStatus(Chat);
             }
             return success;
         }

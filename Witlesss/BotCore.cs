@@ -11,7 +11,7 @@ namespace Witlesss
 {
     public abstract class BotCore
     {
-        protected readonly TelegramBotClient Client = new(File.ReadAllText(".token"));
+        public readonly TelegramBotClient Client = new(File.ReadAllText(".token"));
 
         public void SendMessage(long chat, string text)
         {
@@ -76,7 +76,7 @@ namespace Witlesss
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка(9.txt"));
         }
 
-        protected int PingChat(long chat)
+        public int PingChat(long chat)
         {
             try
             {

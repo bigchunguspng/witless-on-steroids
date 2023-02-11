@@ -64,16 +64,16 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't send the {what} --> " + e.Message);
+                LogError($"{chat} >> Can't send the {what} --> " + FixErrorMessage(e.Message));
             }
         }
         
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath($@"{TEMP_FOLDER}\error.txt");
-            File.WriteAllText(path, e.Message);
+            File.WriteAllText(path, FixErrorMessage(e.Message));
             using var stream = File.OpenRead(path);
-            SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка(9.txt"));
+            SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
         }
 
         public int PingChat(long chat)
@@ -117,7 +117,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                SendMessage(chat, e.Message == "Bad Request: file is too big" ? Pick(FILE_TOO_BIG_RESPONSE) : e.Message);
+                SendMessage(chat, e.Message == "Bad Request: file is too big" ? Pick(FILE_TOO_BIG_RESPONSE) : XD(e.Message));
                 throw;
             }
         }

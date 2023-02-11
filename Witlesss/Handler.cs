@@ -37,7 +37,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{TitleOrUsername(message)} >> Can't process message --> {FixErrorMessage(e.Message)}");
+                LogError($"{TitleOrUsername(message)} >> BRUH -> {FixErrorMessage(e.Message)}");
 
                 if (e.Message.Contains("ffmpeg")) _bot.SendErrorDetails(message.Chat.Id, e);
             }

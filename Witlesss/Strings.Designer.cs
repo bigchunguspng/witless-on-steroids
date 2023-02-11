@@ -466,11 +466,20 @@ namespace Witlesss {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Если че правильно вот так:
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Инструкция в самолёте:&lt;/i&gt;&lt;/b&gt;
         ///
-        /// /set@piece_fap_bot 3
+        ///&lt;u&gt;Изменить интервал отправки текста&lt;/u&gt;:
         ///
-        ///(чем меньше значение - тем чаще я буду писать).
+        /// /set@piece_fap_bot 3 (число сообщений)
+        ///
+        ///&lt;u&gt;Изменить тип авто-мемов&lt;/u&gt;:
+        ///
+        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
+        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
+        ///
+        ///&lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
+        ///
+        /// /pics@piece_fap_bot [число] (%).
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {

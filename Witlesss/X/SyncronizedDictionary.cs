@@ -16,6 +16,8 @@ namespace Witlesss.X
             _sync = new object();
         }
 
+        public object Sync => _sync;
+
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             lock (_sync) return _dictionary.GetEnumerator();

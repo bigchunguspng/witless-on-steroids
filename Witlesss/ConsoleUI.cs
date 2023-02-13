@@ -19,7 +19,7 @@ namespace Witlesss
         private ChatList SussyBakas => Bot.SussyBakas;
         private Witless Active => SussyBakas[_active];
 
-        private IEnumerable<Witless> Bakas => Bot.Bakas;
+        private IEnumerable<Witless> Bakas => SussyBakas.Values;
 
 
         public void EnterConsoleLoop()

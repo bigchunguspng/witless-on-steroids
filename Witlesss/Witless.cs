@@ -99,7 +99,7 @@ namespace Witlesss
 
         public void SaveNoMatterWhat()
         {
-            FileIO.SaveData(Words);
+            lock (Words.Sync) FileIO.SaveData(Words);
             HasUnsavedStuff = false;
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }

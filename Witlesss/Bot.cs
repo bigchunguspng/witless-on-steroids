@@ -87,10 +87,13 @@ namespace Witlesss
             }
         }
 
-        public void SaveBakas () => Bakas.ForEach(witless => witless.SaveAndCount());
-        public void SaveDics  () => Bakas.ForEach(witless => witless.Save());
+        private void OkBuddies(Action<Witless> action)
+        {
+            lock (SussyBakas.Sync) SussyBakas.Values.ForEach(action);
+        }
 
-        public IEnumerable<Witless> Bakas => SussyBakas.Values;
+        public void SaveBakas () => OkBuddies(witless => witless.SaveAndCount());
+        public void SaveDics  () => OkBuddies(witless => witless.Save());
 
         public void RemoveChat(long id) => SussyBakas.Remove(id);
     }

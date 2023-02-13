@@ -21,14 +21,25 @@ namespace Witlesss.X
             lock (_sync) return _dictionary.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+        public void Add      (KeyValuePair<TKey, TValue> item) => Add(item.Key, item.Value);
+        public bool Remove   (KeyValuePair<TKey, TValue> item) => Contains(item) && Remove(item.Key);
+        public bool Contains (KeyValuePair<TKey, TValue> item)
         {
-            return GetEnumerator();
+            lock (_sync) return _dictionary.Contains(item);
         }
 
-        public void Add(KeyValuePair<TKey, TValue> item)
+        public bool Remove      (TKey key) { lock (_sync) return _dictionary.Remove(key); }
+        public bool ContainsKey (TKey key) { lock (_sync) return _dictionary.ContainsKey(key); }
+
+        public void Add    (TKey key, TValue value) { lock (_sync)        _dictionary.   Add(key, value); }
+        public bool TryAdd (TKey key, TValue value) { lock (_sync) return _dictionary.TryAdd(key, value); }
+
+        public bool TryGetValue (TKey key, out TValue value)
         {
-            lock (_sync) _dictionary.Add(item.Key, item.Value);
+            lock (_sync) return _dictionary.TryGetValue(key, out value);
         }
 
         public void Clear()
@@ -36,90 +47,19 @@ namespace Witlesss.X
             lock (_sync) _dictionary = new Dictionary<TKey, TValue>();
         }
 
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            lock (_sync) return _dictionary.Contains(item);
-        }
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) => throw new NotImplementedException();
 
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            var x = Contains(item);
-            if (x) Remove(item.Key);
-            return x;
-        }
-
-        public int Count
-        {
-            get
-            {
-                lock (_sync) return _dictionary.Count;
-            }
-        }
+        public int  Count { get { lock (_sync) return _dictionary.Count; } }
 
         public bool IsReadOnly => false;
 
-        public void Add(TKey key, TValue value)
-        {
-            lock (_sync) _dictionary.Add(key, value);
-        }
-
-        public bool TryAdd(TKey key, TValue value)
-        {
-            var x = !ContainsKey(key);
-
-            if (x) lock (_sync) Add(key, value);
-
-            return x;
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            lock (_sync) return _dictionary.ContainsKey(key);
-        }
-
-        public bool Remove(TKey key)
-        {
-            lock (_sync) return _dictionary.Remove(key);
-        }
-
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            var x = ContainsKey(key);
-            value = x ? this[key] : default;
-            return x;
-        }
-
         public TValue this[TKey key]
         {
-            get
-            {
-                lock (_sync) return _dictionary[key];
-            }
-            set
-            {
-                lock (_sync) _dictionary[key] = value;
-            }
+            get { lock (_sync) return _dictionary[key];         }
+            set { lock (_sync)        _dictionary[key] = value; }
         }
 
-        public ICollection<TKey> Keys
-        {
-            get
-            {
-                lock (_sync) return _dictionary.Keys;
-            }
-        }
-
-        public ICollection<TValue> Values
-        {
-            get
-            {
-                lock (_sync) return _dictionary.Values;
-            }
-        }
+        public ICollection<TKey>   Keys   { get { lock (_sync) return _dictionary.Keys;   } }
+        public ICollection<TValue> Values { get { lock (_sync) return _dictionary.Values; } }
     }
 }

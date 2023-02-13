@@ -27,6 +27,10 @@ namespace Witlesss.Commands
     {
         protected static Witless Baka;
 
-        protected static void DropBaka () => Baka = null;
+        protected static void DropBaka()
+        {
+            Baka.Unload();
+            Baka = null;
+        }
     }
 }

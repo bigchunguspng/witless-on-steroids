@@ -127,7 +127,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/set"       )) _c = _frequency;
             else if (CommandIs( "/fuse"      )) _c = _fuse;
             else if (CommandIs( "/move"      )) _c = _move;
-            else if (command == "/s_stickers" ) _c = _stickers; // todo replase s_
+            else if (command == "/stickers"   ) _c = _stickers;
             else if (command == "/chat"       ) _c = _chat;
             else if (command == "/s_admins"   ) _c = _admins;
             else if (command == "/delete"     ) _c = _delete;

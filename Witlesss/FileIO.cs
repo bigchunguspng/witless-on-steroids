@@ -29,8 +29,9 @@ namespace Witlesss
                 return result;
             }
 
-            using var reader = File.OpenText(_path);
-            return DeserializeObject<T>(reader.ReadToEnd());
+            using var stream = File.OpenText(_path);
+            using var reader = new JsonTextReader(stream);
+            return new JsonSerializer().Deserialize<T>(reader);
         }
 
         public void SaveData(T db)

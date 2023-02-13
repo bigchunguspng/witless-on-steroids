@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Commands
 {
-    public class MainJunction : Command
+    public class MainJunction : WitlessCommand
     {
         private Command  _command;
         private WitlessCommand _c;
@@ -51,22 +51,22 @@ namespace Witlesss.Commands
         {
             if (Bot.WitlessExist(Chat))
             {
-                var witless = Bot.SussyBakas[Chat];
+                Baka = Bot.SussyBakas[Chat];
 
                 if (Text is not null)
                 {
                     if (TextIsCommand(out var command))
                     {
-                        if (DoSimpleCommands(command) || DoWitlessCommands(command, witless)) return;
+                        if (DoSimpleCommands(command) || DoWitlessCommands(command)) return;
                     }
                     else
                     {
                         var text = Text.Clone().ToString();
-                        if (witless.Eat(text, out string eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                        if (Baka.Eat(text, out string eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
                     }
                 }
                 
-                witless.Count();
+                Baka.Count();
                 
                 if (Message.Photo?[^1] is { } p && HaveToMeme())
                 {
@@ -76,13 +76,13 @@ namespace Witlesss.Commands
                 {
                     GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
                 }
-                else if (witless.Ready() && !witless.Banned) WitlessPoop(witless, Chat, Text, Title);
+                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(Baka, Chat, Text, Title);
 
-                ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(Message, witless, w, h);
-                ImageProcessor SelectMemeMaker() => _mematics[witless.Meme.Type];
-                
-                bool HaveToMeme() => Extension.Random.Next(100) < witless.Meme.Chance;
-                bool HaveToMemeSticker() => witless.Meme.Stickers && HaveToMeme();
+                ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
+                ImageProcessor SelectMemeMaker() => _mematics[Baka.Meme.Type];
+
+                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance;
+                bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
             }
             else if (Text is not null && TextIsCommand(out var command))
             {
@@ -106,8 +106,7 @@ namespace Witlesss.Commands
             else if (command == "/debug"   ) _command = _debug;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
-            
-            _command.Pass(Message);
+
             _command.Run();
 
             return true;
@@ -115,7 +114,7 @@ namespace Witlesss.Commands
             bool CommandIs(string s) => command.StartsWith(s);
         }
 
-        private bool DoWitlessCommands(string command, Witless witless)
+        private bool DoWitlessCommands(string command)
         {
             if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(DgMode.Square);
             else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(DgMode.Wide);
@@ -128,14 +127,12 @@ namespace Witlesss.Commands
             else if (CommandIs( "/set"       )) _c = _frequency;
             else if (CommandIs( "/fuse"      )) _c = _fuse;
             else if (CommandIs( "/move"      )) _c = _move;
-            else if (command == "/s_stickers" ) _c = _stickers;
+            else if (command == "/s_stickers" ) _c = _stickers; // todo replase s_
             else if (command == "/chat"       ) _c = _chat;
             else if (command == "/s_admins"   ) _c = _admins;
             else if (command == "/delete"     ) _c = _delete;
             else return true;
 
-            _c.Pass(Message);
-            _c.Pass(witless);
             _c.Run();
             
             return true;
@@ -156,7 +153,7 @@ namespace Witlesss.Commands
             return success;
         }
         
-        private async void WitlessPoop(Witless witless, long chat, string text, string title)
+        private async void WitlessPoopAsync(Witless witless, long chat, string text, string title)
         {
             await Task.Delay(AssumedResponseTime(150, text));
             Bot.SendMessage(chat, witless.Generate());

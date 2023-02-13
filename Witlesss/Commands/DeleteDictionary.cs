@@ -10,19 +10,16 @@ namespace Witlesss.Commands
 
             string name = ValidFileName(Title.Split()[0]);
             string result = MoveDictionary(name);
-            
+
             if (result == "*") result = "*👊 никак*";
 
-            string path = Baka.Path;
-
-            if (!Bot.SussyBakas.Remove(Chat)) //todo null all shit in this command after this
-            {
-                Bot.SendMessage(Chat, "Чёт не вышло(9, ещё разок пропиши");
-                return;
-            }
+            Bot.RemoveChat(Chat);
             Bot.SaveChatList();
-            
-            File.Delete(path);
+
+            Baka.DeleteForever();
+
+            DropBaka();
+
             Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
             Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result));
         }

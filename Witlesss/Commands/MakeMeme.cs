@@ -15,12 +15,10 @@ namespace Witlesss.Commands
         private readonly string M_VIDEO = "MEME [M] VID";
         private readonly string M_STICK = "MEME [M] STICKER";
 
-        public ImageProcessor SetUp(Message message, Witless witless, int w, int h)
+        public ImageProcessor SetUp(int w, int h)
         {
-            Pass(message);
-            Pass(witless);
-            PassQuality(witless);
-        
+            PassQuality(Baka);
+
             return this;
         }
 
@@ -102,7 +100,7 @@ namespace Witlesss.Commands
 
     public interface ImageProcessor
     {
-        ImageProcessor SetUp(Message message, Witless witless, int w, int h);
+        ImageProcessor SetUp(int w, int h);
 
         void ProcessPhoto(string fileID);
         void ProcessStick(string fileID);

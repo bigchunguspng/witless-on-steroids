@@ -135,8 +135,10 @@ namespace Witlesss
         public void Delete()
         {
             Backup();
-            File.Delete(Path);
+            DeleteForever();
         }
+
+        public void DeleteForever() => File.Delete(Path);
     }
 
     public class MemeSettings

@@ -14,13 +14,11 @@ namespace Witlesss.Commands
         private readonly string D_VIDEO = "DEMOTIVATOR [^] VID";
         private readonly string D_STICK = "DEMOTIVATOR [#] STICKER";
 
-        public ImageProcessor SetUp(Message message, Witless witless, int w, int h)
+        public ImageProcessor SetUp(int w, int h)
         {
-            Pass(message);
-            Pass(witless);
             SelectModeAuto(w, h);
-            PassQuality(witless);
-            
+            PassQuality(Baka);
+
             return this;
         }
 

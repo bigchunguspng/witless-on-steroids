@@ -4,19 +4,20 @@ namespace Witlesss.Commands
 {
     public abstract class Command
     {
-        protected Message Message;
-        protected string Text, Title;
-        protected long Chat;
-        protected bool ChatIsPrivate => Chat > 0;
-        
         public static Bot Bot;
 
+        protected static Message Message;
+        protected static string  Text, Title;
+        protected static long    Chat;
+
+        protected bool ChatIsPrivate => Chat > 0;
+        
         public void Pass(Message message)
         {
             Message = message;
-            Text = message.Caption ?? message.Text;
-            Chat = message.Chat.Id;
-            Title = TitleOrUsername(message);
+            Text    = message.Caption ?? message.Text;
+            Chat    = message.Chat.Id;
+            Title   = TitleOrUsername(message);
         }
 
         public abstract void Run();
@@ -24,8 +25,8 @@ namespace Witlesss.Commands
 
     public abstract class WitlessCommand : Command
     {
-        protected Witless Baka;
+        protected static Witless Baka;
 
-        public void Pass(Witless witless) => Baka = witless;
+        protected static void DropBaka () => Baka = null;
     }
 }

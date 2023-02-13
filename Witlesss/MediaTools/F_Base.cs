@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MediaToolkit.Core;
 using MediaToolkit.Tasks;
 using MediaToolkit.Util;
-using static Witlesss.MediaType;
+using static Witlesss.X.MediaType;
 using static Witlesss.Memes;
 
 namespace Witlesss.MediaTools

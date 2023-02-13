@@ -2,7 +2,7 @@
 using System.Drawing.Imaging;
 using System.Linq;
 
-namespace Witlesss
+namespace Witlesss.X
 {
     public static class JpegCoder
     {

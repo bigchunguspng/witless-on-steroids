@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Witlesss
+namespace Witlesss.X
 {
     public static class Logger
     {

@@ -1,4 +1,4 @@
-﻿using static Witlesss.MediaType;
+﻿using static Witlesss.X.MediaType;
 
 namespace Witlesss.MediaTools
 {

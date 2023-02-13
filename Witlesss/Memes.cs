@@ -8,7 +8,7 @@ using MediaToolkit.Tasks;
 using Telegram.Bot.Types;
 using Witlesss.MediaTools;
 using static System.Globalization.CultureInfo;
-using static Witlesss.JpegCoder;
+using static Witlesss.X.JpegCoder;
 using MD = System.Threading.Tasks.Task<MediaToolkit.Tasks.GetMetadataResult>;
 using TS = System.TimeSpan;
 

@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
-using static Witlesss.LetterCaseMode;
+using static Witlesss.X.LetterCaseMode;
 
-namespace Witlesss
+namespace Witlesss.X
 {
     public static class Extension
     {

@@ -9,7 +9,7 @@ using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using static Witlesss.JpegCoder;
+using static Witlesss.X.JpegCoder;
 
 namespace Witlesss
 {

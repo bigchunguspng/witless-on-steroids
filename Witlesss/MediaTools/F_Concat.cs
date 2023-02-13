@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using static Witlesss.MediaType;
+using static Witlesss.X.MediaType;
 
 namespace Witlesss.MediaTools
 {

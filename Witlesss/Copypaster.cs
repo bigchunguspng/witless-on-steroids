@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WordChart = System.Collections.Concurrent.ConcurrentDictionary<string, float>;
+using WordChart = Witlesss.X.SyncronizedDictionary<string, float>;
 
 namespace Witlesss
 {
@@ -62,13 +62,13 @@ namespace Witlesss
             for (var i = 0; i < list.Count - 1; i++)
             {
                 string word = list[i];
-                if (!Words.ContainsKey(word)) Words.TryAdd(word, new WordChart());
+                if (!Words.ContainsKey(word)) Words.Add(word, new WordChart());
 
                 string next = list[i + 1];
                 if (Words[word].ContainsKey(next))
                     Words[word][next] = MathF.Round(Words[word][next] + weight, 1);
                 else
-                    Words[word].TryAdd(next, weight);
+                    Words[word].Add(next, weight);
             }
             return string.Join(' ', list.GetRange(1, list.Count - 2));
         }
@@ -264,8 +264,8 @@ namespace Witlesss
             {
                 if (!Words.ContainsKey(next))
                 {
-                    Words.TryAdd(next, new WordChart());
-                    Words[next].TryAdd(END, 1F);
+                    Words.Add(next, new WordChart());
+                    Words[next].Add(END, 1F);
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
-using static Witlesss.JpegCoder;
+using static Witlesss.X.JpegCoder;
 using static Witlesss.Memes;
 
 namespace Witlesss.Commands

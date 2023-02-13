@@ -92,6 +92,6 @@ namespace Witlesss
 
         public IEnumerable<Witless> Bakas => SussyBakas.Values;
 
-        public void RemoveChat(long id) => SussyBakas.TryRemove(id, out _);
+        public void RemoveChat(long id) => SussyBakas.Remove(id);
     }
 }

@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using StrInt     = System.Func<int, string>;
-using MemeMaker  = System.Func<string, Witlesss.Extension.DgText, string>;
-using MemeMakerX = System.Func<string, Witlesss.Extension.DgText, string, string>;
+using MemeMaker  = System.Func<string, Witlesss.X.Extension.DgText, string>;
+using MemeMakerX = System.Func<string, Witlesss.X.Extension.DgText, string, string>;
 
 namespace Witlesss.Commands
 {

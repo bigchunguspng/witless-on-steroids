@@ -15,7 +15,7 @@ namespace Witlesss.Commands
 
             string path = Baka.Path;
 
-            if (!Bot.SussyBakas.TryRemove(Chat, out _))
+            if (!Bot.SussyBakas.Remove(Chat)) //todo null all shit in this command after this
             {
                 Bot.SendMessage(Chat, "Чёт не вышло(9, ещё разок пропиши");
                 return;

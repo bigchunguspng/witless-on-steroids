@@ -13,7 +13,7 @@ namespace Witlesss
         private int _w, _h, _s, _d;
         private Pen _outline;
         private bool _resize;
-        private readonly SolidBrush   _white = new(Color.FromArgb(255, 255, 255));
+        //private readonly SolidBrush   _white = new(Color.FromArgb(255, 255, 255));
         private readonly FontFamily    _font = new("Impact");
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
@@ -64,8 +64,11 @@ namespace Witlesss
                 g.DrawPath(_outline, path);
                 _outline.Dispose();
             }
-            g.FillPath(_white, path);
+            g.FillPath(TextColor, path);
         }
+
+        private static SolidBrush TextColor => new(Color.FromArgb(X, X, X));
+        private static int X => Extension.Random.Next(80, 256);
 
         private Image GetImage(string path)
         {

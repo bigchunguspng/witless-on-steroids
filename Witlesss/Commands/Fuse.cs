@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
 namespace Witlesss.Commands
@@ -23,13 +24,13 @@ namespace Witlesss.Commands
             var a = Text.Split();
             if (a.Length > 2)
             {
-                string name = Text.Substring(Text.IndexOf(' ') + 1);
+                string name = Regex.Match(Text, @"(his\sall)|(((\d{2,4}-+){2}\d+)(\s-\s)*){2}").Value;
                 var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
                 var files = GetFiles(path);
 
                 GetMaxWordsPerLine();
                 
-                if (name.StartsWith("his all"))
+                if (name == "his all")
                 {
                     foreach (string file in files) EatHistorySimple(file);
                     GoodEnding();

@@ -13,7 +13,8 @@ namespace Witlesss.Commands
 
             Bot.Download(_fileID, Chat, out string path);
 
-            Bot.SendSticker(Chat, new InputOnlineFile(File.OpenRead(Bot.MemeService.Stickerize(path))));
+            using var stream = File.OpenRead(Bot.MemeService.Stickerize(path));
+            Bot.SendSticker(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> STICK [!]");
         }
 

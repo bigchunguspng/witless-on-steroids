@@ -171,7 +171,7 @@ namespace Witlesss.Commands
         }
         private void GetMaxWordsPerLine()
         {
-            bool valuePassed = int.TryParse(Text.Substring(Text.LastIndexOf(' ') + 1), out _max);
+            bool valuePassed = int.TryParse(Text[(Text.LastIndexOf(' ') + 1)..], out _max);
             if (!valuePassed) _max = int.MaxValue;
         }
         

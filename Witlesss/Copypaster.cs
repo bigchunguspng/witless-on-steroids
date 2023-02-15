@@ -195,7 +195,7 @@ namespace Witlesss
 
             if (word.Length > 3)
             {
-                w = alt == END ? word.Substring(word.Length - 3) : word.Remove(3);
+                w = alt == END ? word[^3..] : word.Remove(3);
                 words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> so_SBA S lisba -> LISik
                 if (words.Count > 0) return RandomWord();
             }

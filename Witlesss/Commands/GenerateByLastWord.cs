@@ -7,15 +7,15 @@
             if (Text.Contains(' '))
             {
                 var words = Text.Split();
-                string word = words[1];
+                var word = words[1];
                 if (words.Length > 2)
                 {
-                    word = string.Join(' ', words[1..3]);
+                    word = string.Join(' ', words[1..3]); // take two first words
                 }
 
-                Text = Text.Substring(words[0].Length + 1);
-                Text = Baka.GenerateByLastWord(word.ToLower()) + Text.Substring(word.Length);
-                Bot.SendMessage(Chat, TextInLetterCase(Text, GetMode(word)));
+                var text = RemoveCommand(words[0]);
+                text = Baka.GenerateByLastWord(word.ToLower()) + text.Substring(word.Length);
+                Bot.SendMessage(Chat, TextInLetterCase(text, GetMode(word)));
                 Log($"{Title} >> FUNNY BY LAST WORD");
             }
             else

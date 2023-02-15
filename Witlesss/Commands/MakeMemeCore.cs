@@ -29,12 +29,7 @@ namespace Witlesss.Commands
         {
             Download(fileID);
 
-            var repeats = 1;
-            if (regex)
-            {
-                var match = Regex.Match(Text, @"\d");
-                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
-            }
+            var repeats = GetRepeats(regex);
             for (int i = 0; i < repeats; i++)
             {
                 using var stream = File.OpenRead(produce(_path, texts()));
@@ -70,5 +65,16 @@ namespace Witlesss.Commands
 
         private void   WriteTime() => _time  = DateTime.Now;
         private string CheckStopWatch() => $@"{DateTime.Now - _time:s\.fff}";
+        
+        public static int GetRepeats(bool regex)
+        {
+            var repeats = 1;
+            if (regex)
+            {
+                var match = Regex.Match(Text, @"\d");
+                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
+            }
+            return repeats;
+        }
     }
 }

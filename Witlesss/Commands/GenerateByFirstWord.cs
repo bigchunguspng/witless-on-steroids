@@ -4,33 +4,31 @@
     {
         public override void Run()
         {
-            if (Text.Contains(' ')) // todo fix one word output
+            if (Text.Contains(' ')) // todo repeater
             {
                 var words = Text.Split();
-                string word = words[^1];
-                string start = words[1];
+                var word = words[^1];
                 if (words.Length > 2)
                 {
-                    word = string.Join(' ', words[^2..]);
+                    word = string.Join(' ', words[^2..]); // take two last words
                 }
 
-                Text = Text.Substring(words[0].Length + 1);
-                Text = Text.Remove(Text.Length - word.Length) + Baka.GenerateByWord(word.ToLower());
-                Bot.SendMessage(Chat, TextInLetterCase(Text, GetMode(start)));
+                var text = RemoveCommand(words[0]);
+                text = text.Remove(text.Length - word.Length) + Baka.GenerateByWord(word.ToLower());
+                Bot.SendMessage(Chat, TextInLetterCase(text, GetMode(words[1])));
                 Log($"{Title} >> FUNNY BY WORD");
             }
             else
                 Bot.SendMessage(Chat, A_MANUAL);
         }
 
-        protected LetterCaseMode GetMode(string s)
+        protected string  RemoveCommand  (string s) => Text.Substring(s.Length + 1);
+
+        protected LetterCaseMode GetMode (string s)
         {
-            if      (s == s.ToLower())
-                return LetterCaseMode.Lower;
-            else if (s == s.ToUpper() && s.Length > 1)
-                return LetterCaseMode.Upper;
-            else
-                return LetterCaseMode.Sentence;
+            if (s == s.ToLower()) return LetterCaseMode.Lower;
+            if (s == s.ToUpper()) return LetterCaseMode.Upper;
+            return                       LetterCaseMode.Sentence;
         }
     }
 }

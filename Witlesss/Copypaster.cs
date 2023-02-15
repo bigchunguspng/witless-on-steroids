@@ -184,23 +184,36 @@ namespace Witlesss
 
             if (word.Contains(' '))
             {
-                word = alt == END? word.Split()[0] : word.Split()[1];
+                word = alt == END ? word.Split()[0] : word.Split()[1];
                 separated = true;
                 if (Words.ContainsKey(word)) return word;
             }
 
-            var words = Words.Keys.Where(KeyHasWord).ToList();
-            if (words.Count > 0) return words[Extension.Random.Next(words.Count)];
+            var w = word;
+            var words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> megalisba S lisba -> lisball
+            if (words.Count > 0) return RandomWord();
 
-            words     = Words.Keys.Where(WordHasKey).ToList();
-            if (words.Count < 1) return alt;
+            if (word.Length > 3)
+            {
+                w = alt == END ? word.Substring(word.Length - 3) : word.Remove(3);
+                words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> so_SBA S lisba -> LISik
+                if (words.Count > 0) return RandomWord();
+            }
+            if (word.Length > 1)
+            {
+                w = word;
+                words = Words.Keys.Where(WordHasKey).ToList(); // E lisba -> a S lisba -> lisb
+                if (words.Count > 0)
+                {
+                    return words.First(x => x.Length == words.Max(s => s.Length));
+                }
+            }
+            return alt;
 
-            words.Sort(Comparison);
-            return words[0];
+            string RandomWord() => words[Extension.Random.Next(words.Count)];
 
-            int  Comparison(string x, string y) => y.Length - x.Length;
-            bool WordHasKey(string x) => alt == END ? word.EndsWith(x, StringComparison.Ordinal) : word.StartsWith(x, StringComparison.Ordinal);
-            bool KeyHasWord(string x) => alt == END ? x.EndsWith(word, StringComparison.Ordinal) : x.StartsWith(word, StringComparison.Ordinal);
+            bool WordHasKey(string x) => alt == END ? w.EndsWith(x, StringComparison.Ordinal) : w.StartsWith(x, StringComparison.Ordinal);
+            bool KeyHasWord(string x) => alt == END ? x.EndsWith(w, StringComparison.Ordinal) : x.StartsWith(w, StringComparison.Ordinal);
         }
 
         public  string Generate(string word)

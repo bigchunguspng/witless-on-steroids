@@ -13,19 +13,19 @@ namespace Witlesss
         private int _w, _h, _s, _d;
         private Pen _outline;
         private bool _resize;
-        //private readonly SolidBrush   _white = new(Color.FromArgb(255, 255, 255));
+        //private readonly SolidBrush   _white = new(Color.FromArgb(255, 255, 255)); //todo /colors
+        private readonly int _m = 10;
         private readonly FontFamily    _font = new("Impact");
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
         private static readonly Regex Ext = new("(.png)|(.jpg)");
-        private readonly int _m = 10;
 
         public void SetUp(Size size)
         {
             _w = size.Width;
             _h = size.Height;
             _s = Math.Max((int)Math.Min(_w, 1.5 * _h) / 12, 12);
-            _d = _h / 3 * 2;
+            _d = _h / 3 * 2;    // upper margin for bottom text
         }
 
         public string MakeImpactMeme(string path, DgText text)

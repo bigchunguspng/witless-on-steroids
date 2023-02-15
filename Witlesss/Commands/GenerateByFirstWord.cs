@@ -1,34 +1,55 @@
-﻿namespace Witlesss.Commands
+﻿using System.Text.RegularExpressions;
+using static Witlesss.Commands.MakeMemeCore;
+
+namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
+        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/a\S*\d+\S*");
+
         public override void Run()
         {
-            if (Text.Contains(' ')) // todo repeater
+            if (Text.Contains(' '))
             {
                 var words = Text.Split();
                 var word = words[^1];
+                var mode = GetMode(words[1]);
                 if (words.Length > 2)
                 {
-                    word = string.Join(' ', words[^2..]); // take two last words
+                    word = string.Join(' ', words[^2..]); // take last two words
                 }
 
+                word = word.ToLower();
+
                 var text = RemoveCommand(words[0]);
-                text = text.Remove(text.Length - word.Length) + Baka.GenerateByWord(word.ToLower());
-                Bot.SendMessage(Chat, TextInLetterCase(text, GetMode(words[1])));
-                Log($"{Title} >> FUNNY BY WORD");
+                var outset = text.Remove(text.Length - word.Length);
+                var repeats = GetRepeats(REPEAT_RX());
+                for (int i = 0; i < repeats; i++)
+                {
+                    text = outset + Baka.GenerateByWord(word);
+                    Bot.SendMessage(Chat, TextInLetterCase(text, mode));
+                }
+
+                LogXD(repeats, "FUNNY BY WORD");
             }
             else
                 Bot.SendMessage(Chat, A_MANUAL);
         }
-
-        protected string  RemoveCommand  (string s) => Text.Substring(s.Length + 1);
 
         protected LetterCaseMode GetMode (string s)
         {
             if (s == s.ToLower()) return LetterCaseMode.Lower;
             if (s == s.ToUpper()) return LetterCaseMode.Upper;
             return                       LetterCaseMode.Sentence;
+        }
+
+        protected string  RemoveCommand  (string s) => Text[(s.Length + 1)..];
+
+        protected void LogXD(int repeats, string s)
+        {
+            var message = $"{Title} >> {s}";
+            if (repeats > 1) message += $" [{repeats}]";
+            Log(message);
         }
     }
 }

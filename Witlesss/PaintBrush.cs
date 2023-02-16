@@ -12,17 +12,24 @@ namespace Witlesss
     
     public class RandomBrush : PaintBrush
     {
+        private readonly MemeGenerator _imgflip;
+
+        public RandomBrush(MemeGenerator mg) => _imgflip = mg;
+
         public SolidBrush Brush => RandomColor();
 
-        private static SolidBrush RandomColor()
+        private SolidBrush RandomColor()
         {
             var h = Extension.Random.Next(360);
             var s = Extension.Random.NextDouble();
             var v = Extension.Random.NextDouble();
 
+            var o = Math.Min(_imgflip.OutlineWidth, 6);
             var x = Math.Min(Math.Abs(240 - h), 60);
 
-            s = s * (0.75 + x / 240D); // <-- removes dark blue
+            s = s * (0.75 + x / 240D);  // <-- removes dark blue
+            s = s * (0.25 + 0.125 * o); // <-- makes small text brighter
+
             v = 1 - 0.3 * v * Math.Sqrt(s);
 
             return new SolidBrush(ColorFromHSV(h, s, v));

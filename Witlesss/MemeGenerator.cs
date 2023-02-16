@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
@@ -14,14 +15,18 @@ namespace Witlesss
         private int _w, _h, _s, _d;
         private Pen _outline;
         private bool _resize;
-        private readonly int _m = 10;
+        private const int _m = 10;
         private readonly FontFamily    _font = new("Impact");
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
+        private readonly Dictionary<ColorMode, PaintBrush> _brushes;
         private static readonly Regex Ext = new("(.png)|(.jpg)");
 
-        private readonly PaintBrush[] _brushes = { new RandomBrush(), new WhiteBrush() };
-        private SolidBrush Brush() => _brushes[(int) WitlessCommand.Baka.Meme.Dye].Brush;
+        public MemeGenerator() => _brushes = new Dictionary<ColorMode, PaintBrush>
+        {
+            { ColorMode.Color, new RandomBrush(this) },
+            { ColorMode.White, new WhiteBrush() }
+        };
 
         public void SetUp(Size size)
         {
@@ -30,6 +35,8 @@ namespace Witlesss
             _s = Math.Max((int)Math.Min(_w, 1.5 * _h) / 12, 12);
             _d = _h / 3 * 2;    // upper margin for bottom text
         }
+
+        public int OutlineWidth => (int)Math.Round(_s / 6D);
 
         public string MakeImpactMeme(string path, DgText text)
         {
@@ -60,7 +67,7 @@ namespace Witlesss
 
             using var path = new GraphicsPath();
             path.AddString(text, _font, 0, size, rect, f);
-            for (int i = size / 6; i > 0; i--)
+            for (int i = OutlineWidth; i > 0; i--)
             {
                 _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
                 _outline.LineJoin = LineJoin.Round;
@@ -69,6 +76,8 @@ namespace Witlesss
             }
             g.FillPath(Brush(), path);
         }
+
+        private SolidBrush Brush() => _brushes[WitlessCommand.Baka.Meme.Dye].Brush;
 
         private Image GetImage(string path)
         {

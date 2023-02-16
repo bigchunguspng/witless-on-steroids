@@ -146,14 +146,9 @@ namespace Witlesss
         private static Size NormalizeSize(Size s, int limit = 512)
         {
             double lim = limit;
-            if (s.Width > s.Height)
-            {
-                return new Size(limit, (int)(s.Height / (s.Width / lim)));
-            }
-            else
-            {
-                return new Size((int)(s.Width / (s.Height / lim)), limit);
-            }
+            return s.Width > s.Height
+                ? new Size(limit, (int)(s.Height / (s.Width / lim)))
+                : new Size((int)(s.Width / (s.Height / lim)), limit);
         }
         private static Size FitSize      (Size s, int max = 1280)
         {
@@ -175,6 +170,4 @@ namespace Witlesss
             }
         }
     }
-
-    public enum DgMode { Square, Wide }
 }

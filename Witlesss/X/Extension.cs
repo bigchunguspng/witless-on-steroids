@@ -158,20 +158,20 @@ namespace Witlesss.X
         public static string XD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
         public static string Pick(string[] responses) => responses[Random.Next(responses.Length)];
 
-        public static readonly string[] FILE_TOO_BIG_RESPONSE = new []
+        public static readonly string[] FILE_TOO_BIG_RESPONSE =
         {
             "пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"
         };
-        public static readonly string[] UNKNOWN_CHAT_RESPONSE = new []
+        public static readonly string[] UNKNOWN_CHAT_RESPONSE =
         {
             "ты кто?", "я тебя не знаю чувак 😤", "сними маску, я тебя не узнаю", "а ты кто 😲", "понасоздают каналов... 😒"
         };
-        public static readonly string[] NOT_ADMIN_RESPONSE = new []
+        public static readonly string[] NOT_ADMIN_RESPONSE =
         {
             "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
         };
 
-        private static readonly string[] RANDOM_EMOJI = new []
+        private static readonly string[] RANDOM_EMOJI =
         {
             "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭",
             "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉"
@@ -219,37 +219,5 @@ namespace Witlesss.X
                 LogError("CAN'T DEL TEMP >> " + e.Message);
             }
         }
-    }
-
-    public enum SpeedMode
-    {
-        Fast,
-        Slow
-    }
-
-    public enum MediaType
-    {
-        Audio,
-        Video,
-        Movie // video with sound
-    }
-
-    public enum MemeType
-    {
-        Dg,
-        Meme
-    }
-
-    public enum ColorMode
-    {
-        Color,
-        White
-    }
-
-    public enum LetterCaseMode
-    {
-        Lower,
-        Upper,
-        Sentence
     }
 }

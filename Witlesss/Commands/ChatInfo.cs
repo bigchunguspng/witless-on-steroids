@@ -10,6 +10,7 @@
                 Baka.Meme.Chance,
                 Baka.Meme.Quality,
                 Baka.Meme.Stickers ? "ON" : "OFF",
+                Baka.Meme.Dye == ColorMode.Color ? "цветной" : "белый",
                 Baka.Meme.Type == MemeType.Dg ? "демотиваторами" : "мемами",
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));

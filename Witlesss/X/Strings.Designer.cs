@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace Witlesss.X {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -133,6 +136,15 @@ namespace Witlesss.X {
         internal static string CHATLIST_FILENAME {
             get {
                 return ResourceManager.GetString("CHATLIST_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to текст в мемах будет {0}.
+        /// </summary>
+        internal static string COLORS_RESPONSE {
+            get {
+                return ResourceManager.GetString("COLORS_RESPONSE", resourceCulture);
             }
         }
         

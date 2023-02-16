@@ -314,4 +314,7 @@ s   - save and exit
     <data name="SET_MEMES_RESPONSE" xml:space="preserve">
         <value>Картинки будут превращаться в {0}</value>
     </data>
+    <data name="COLORS_RESPONSE" xml:space="preserve">
+        <value>текст в мемах будет {0}</value>
+    </data>
 </root>

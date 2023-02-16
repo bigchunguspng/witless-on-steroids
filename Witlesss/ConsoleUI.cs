@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using MediaToolkit.Util;
 using Telegram.Bot;
+using Witlesss.Commands;
 
 namespace Witlesss
 {
@@ -101,8 +102,8 @@ namespace Witlesss
 
         private void ActivateLastChat()
         {
-            _active = Bot.Fork.LastChat;
-            Log($"ACTIVE CHAT >> {_active} ({Bot.Fork.LastChatTitle})");
+            _active = Command.Chat;
+            Log($"ACTIVE CHAT >> {_active} ({Command.Title})");
         }
 
         private void ClearDics() => Bakas.ForEach(ClearDic);

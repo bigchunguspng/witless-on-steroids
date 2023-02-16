@@ -8,8 +8,8 @@ namespace Witlesss.Commands
 
         protected static Message Message { get; private set; }
         protected static string  Text    { get; private set; }
-        protected static string  Title   { get; private set; }
-        protected static long    Chat    { get; private set; }
+        public    static string  Title   { get; private set; }
+        public    static   long  Chat    { get; private set; }
 
         protected bool ChatIsPrivate => Chat > 0;
         
@@ -26,7 +26,9 @@ namespace Witlesss.Commands
 
     public abstract class WitlessCommand : Command
     {
-        protected static Witless Baka;
+        public static Witless Baka { get; private set; }
+
+        protected static void SetBaka(Witless witless) => Baka = witless;
 
         protected static void DropBaka()
         {

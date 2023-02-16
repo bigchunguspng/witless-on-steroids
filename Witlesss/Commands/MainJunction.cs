@@ -29,12 +29,10 @@ namespace Witlesss.Commands
         private readonly SetProbability _probability = new();
         private readonly SetQuality _quality = new();
         private readonly ToggleStickers _stickers = new();
+        private readonly ToggleColors _colors = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
         private readonly Dictionary<MemeType, ImageProcessor> _mematics;
-
-        public long   LastChat      => Chat;
-        public string LastChatTitle => Title;
 
         public MainJunction() => _mematics = new Dictionary<MemeType, ImageProcessor>()
         {
@@ -51,7 +49,7 @@ namespace Witlesss.Commands
         {
             if (Bot.WitlessExist(Chat))
             {
-                Baka = Bot.SussyBakas[Chat];
+                SetBaka(Bot.SussyBakas[Chat]);
 
                 if (Text is not null)
                 {
@@ -128,6 +126,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/fuse"      )) _c = _fuse;
             else if (CommandIs( "/move"      )) _c = _move;
             else if (command == "/stickers"   ) _c = _stickers;
+            else if (command == "/colors"     ) _c = _colors;
             else if (command == "/chat"       ) _c = _chat;
             else if (command == "/s_admins"   ) _c = _admins;
             else if (command == "/delete"     ) _c = _delete;

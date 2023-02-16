@@ -162,6 +162,7 @@ namespace Witlesss
             set => _quality = Math.Clamp(value, 0, 100);
         }
         [JsonProperty] public MemeType Type { get; set; }
+        [JsonProperty] public ColorMode Dye { get; set; }
         [JsonProperty] public bool Stickers { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
+using Witlesss.Commands;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
 using static Witlesss.X.JpegCoder;
@@ -13,12 +14,14 @@ namespace Witlesss
         private int _w, _h, _s, _d;
         private Pen _outline;
         private bool _resize;
-        //private readonly SolidBrush   _white = new(Color.FromArgb(255, 255, 255)); //todo /colors
         private readonly int _m = 10;
         private readonly FontFamily    _font = new("Impact");
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
         private static readonly Regex Ext = new("(.png)|(.jpg)");
+
+        private readonly PaintBrush[] _brushes = { new RandomBrush(), new WhiteBrush() };
+        private SolidBrush Brush() => _brushes[(int) WitlessCommand.Baka.Meme.Dye].Brush;
 
         public void SetUp(Size size)
         {
@@ -64,21 +67,7 @@ namespace Witlesss
                 g.DrawPath(_outline, path);
                 _outline.Dispose();
             }
-            g.FillPath(RandomColor(), path);
-        }
-
-        private static SolidBrush RandomColor()
-        {
-            var h = Extension.Random.Next(360);
-            var s = Extension.Random.NextDouble();
-            var v = Extension.Random.NextDouble();
-
-            var x = Math.Min(Math.Abs(240 - h), 60);
-
-            s = s * (0.75 + x / 240D); // <-- removes dark blue
-            v = 1 - 0.3 * v * Math.Sqrt(s);
-
-            return new SolidBrush(ColorFromHSV(h, s, v));
+            g.FillPath(Brush(), path);
         }
 
         private Image GetImage(string path)
@@ -101,30 +90,6 @@ namespace Witlesss
             var crop = new Rectangle(0, 0, image.Width - 1, image.Height - 1);
             var bitmap = new Bitmap(image);
             return bitmap.Clone(crop, bitmap.PixelFormat);
-        }
-
-        private static Color ColorFromHSV(double hue, double saturation, double value)
-        {
-            var sextants = hue / 60;
-            var triangle = Math.Floor(sextants);
-            int dye = Convert.ToInt32(triangle) % 6;
-            var fraction = sextants - triangle;
-
-            value = value * 255;
-            int v = Convert.ToInt32(value);
-            int p = Convert.ToInt32(value * (1 - saturation));
-            int q = Convert.ToInt32(value * (1 - saturation * fraction));
-            int t = Convert.ToInt32(value * (1 - saturation * (1 - fraction)));
-
-            return dye switch
-            {
-                0 => Color.FromArgb(v, t, p),
-                1 => Color.FromArgb(q, v, p),
-                2 => Color.FromArgb(p, v, t),
-                3 => Color.FromArgb(p, q, v),
-                4 => Color.FromArgb(t, p, v),
-                _ => Color.FromArgb(v, p, q)
-            };
         }
     }
 }

@@ -239,7 +239,13 @@ namespace Witlesss.X
         Dg,
         Meme
     }
-    
+
+    public enum ColorMode
+    {
+        Color,
+        White
+    }
+
     public enum LetterCaseMode
     {
         Lower,

@@ -164,7 +164,7 @@ namespace Witlesss
         public string GenerateByWord(string word)
         {
             string match = FindMatch(word, START, out bool separated);
-            string result = Baka.Generate(match);
+            string result = Generate(match);
             if (separated) result = word.Split()[0] + " " + result;
             return result;
         }

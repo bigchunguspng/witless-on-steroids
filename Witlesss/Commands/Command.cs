@@ -6,12 +6,12 @@ namespace Witlesss.Commands
     {
         public static Bot Bot;
 
-        protected static Message Message { get; private set; }
-        protected static string  Text    { get; private set; }
-        public    static string  Title   { get; private set; }
-        public    static   long  Chat    { get; private set; }
+        public static Message Message { get; private set; }
+        public static string  Text    { get; private set; }
+        public static string  Title   { get; private set; }
+        public static long    Chat    { get; private set; }
 
-        protected bool ChatIsPrivate => Chat > 0;
+        public static bool    ChatIsPrivate => Chat > 0;
         
         public void Pass(Message message)
         {

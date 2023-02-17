@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using Witlesss.Commands;
 
 namespace Witlesss
 {
@@ -30,7 +31,6 @@ namespace Witlesss
                 witless.Interval = 1;
                 witless.Meme.Chance = 100;
                 witless.Meme.Stickers = true;
-                witless.Meme.Type = MemeType.Meme;
             }
 
             witless.Load();
@@ -72,10 +72,10 @@ namespace Witlesss
             {
                 return Baka.Generate(word);
             }
-            catch (Exception e)
+            catch
             {
-                LogError(e.Message);
-                return "";
+                LogError($"{TitleOrUsername(Command.Message)} >> NO TEXT!?");
+                return "ахахаххахахахахах";
             }
         }
 

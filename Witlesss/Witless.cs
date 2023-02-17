@@ -25,6 +25,14 @@ namespace Witlesss
         {
             var witless = new Witless(chat);
 
+            if (chat > 0) // DMs
+            {
+                witless.Interval = 1;
+                witless.Meme.Chance = 100;
+                witless.Meme.Stickers = true;
+                witless.Meme.Type = MemeType.Meme;
+            }
+
             witless.Load();
             return witless;
         }

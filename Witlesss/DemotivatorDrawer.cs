@@ -187,7 +187,7 @@ namespace Witlesss
             }
         }
 
-        private List<List<string>> GetEmojiPngs(IList<Match> matches)
+        public static List<List<string>> GetEmojiPngs(IList<Match> matches)
         {
             var emoji = new List<List<string>>(matches.Count);
             

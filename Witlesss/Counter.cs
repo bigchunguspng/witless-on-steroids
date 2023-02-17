@@ -5,7 +5,7 @@ namespace Witlesss
     public class Counter
     {
         private readonly int _min, _max;
-        private int _declared, _actual, _counter;
+        private int _interval, _counter;
 
         public Counter(int min = 1, int max = 62)
         {
@@ -15,25 +15,13 @@ namespace Witlesss
 
         public int Interval
         {
-            get => _declared;
-            set
-            {
-                _declared = Math.Clamp(value, _min, _max);
-                _actual = _declared;
-            }
+            get => _interval;
+            set => _interval = Math.Clamp(value, _min, _max);
         }
 
-        public void Count()
-        {
-            _counter ++;
-            _counter %= _actual;
-        }
+        public void Count() => _counter = (_counter + 1) % _interval;
 
-        public bool Ready()  => _counter == 0;
-
-        public void Stop()   => _actual = int.MaxValue;
-
-        public void Resume() => _actual = _declared;
+        public bool Ready() => _counter == 0;
 
         public void Reset() => _counter = 0;
     }

@@ -12,13 +12,8 @@ namespace Witlesss
         private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
 
-        public Copypaster(Witless baka) => Baka = baka;
+        public WitlessDB Words { get; set; }
 
-        private Witless Baka { get; }
-
-        private WitlessDB Words => Baka.Words;
-        
-        
         public bool Eat(string text, out string eaten)
         {
             eaten = null;
@@ -36,8 +31,6 @@ namespace Witlesss
             {
                 eaten = EatAdvanced(words);
             }
-            
-            Baka.HasUnsavedStuff = true;
             return true;
 
             bool TextIsUnacceptable(string s) => Regex.IsMatch(s, @"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
@@ -168,7 +161,7 @@ namespace Witlesss
             if (separated) result = word.Split()[0] + " " + result;
             return result;
         }
-        public string GenerateByLastWord(string word)
+        public string GenerateByLast(string word)
         {
             string match = FindMatch(word, END, out bool separated);
             string result = GenerateBackwards(match);

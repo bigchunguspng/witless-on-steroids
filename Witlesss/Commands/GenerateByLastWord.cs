@@ -26,7 +26,7 @@ namespace Witlesss.Commands
                 var repeats = GetRepeats(REPEAT_RX());
                 for (int i = 0; i < repeats; i++)
                 {
-                    text = Baka.GenerateByLastWord(word.ToLower()) + ending;
+                    text = Baka.GenerateByLast(word.ToLower()) + ending;
                     Bot.SendMessage(Chat, TextInLetterCase(text, mode));
                 }
 

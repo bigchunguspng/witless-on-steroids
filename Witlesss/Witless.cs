@@ -16,7 +16,7 @@ namespace Witlesss
             Interval = interval;
             
             Meme   = new MemeSettings();
-            Baka   = new Copypaster(this);
+            Baka   = new Copypaster();
             FileIO = new FileIO<WitlessDB>(Path);
 
             Saves.Interval = 10;
@@ -60,16 +60,21 @@ namespace Witlesss
 
         public bool Banned, Loaded, HasUnsavedStuff;
 
-        public WitlessDB Words { get; set; }
         public Copypaster Baka { get; set; }
+        public WitlessDB Words
+        {
+            get => Baka.Words;
+            set => Baka.Words = value;
+        }
 
-        public void Eat(string text)                   => Baka.Eat(text, out _);
-        public bool Eat(string text, out string eaten) => Baka.Eat(text, out eaten);
+        public void Eat(string text)                   => HasUnsavedStuff = Baka.Eat(text, out _);
+        public bool Eat(string text, out string eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
 
         public string Generate(string word = Copypaster.START)
         {
             try
             {
+                Log(HasUnsavedStuff.ToString());
                 return Baka.Generate(word);
             }
             catch
@@ -79,8 +84,8 @@ namespace Witlesss
             }
         }
 
-        public string GenerateByWord    (string word) => Baka.GenerateByWord    (word);
-        public string GenerateByLastWord(string word) => Baka.GenerateByLastWord(word);
+        public string GenerateByWord(string word) => Baka.GenerateByWord(word);
+        public string GenerateByLast(string word) => Baka.GenerateByLast(word);
         
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
 

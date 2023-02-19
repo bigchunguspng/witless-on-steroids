@@ -15,7 +15,7 @@ namespace Witlesss
 
         public void SendMessage(long chat, string text)
         {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true, disableWebPagePreview: true);
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
             TrySend(task, chat, "message");
         }
 

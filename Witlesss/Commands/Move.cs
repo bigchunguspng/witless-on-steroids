@@ -37,7 +37,7 @@ namespace Witlesss.Commands
 
             if (SizeInBytes(Baka.Path) > 2)
             {
-                string path = UniquePath($@"{EXTRA_DBS_FOLDER}\{name}.json", name is "info" or "his");
+                string path = UniqueExtraDBsPath(name);
 
                 File.Copy(Baka.Path, path);
                 
@@ -46,6 +46,11 @@ namespace Witlesss.Commands
                 return result;
             }
             return "*"; // can't be in file name
+        }
+        
+        public static string UniqueExtraDBsPath(string name)
+        {
+            return UniquePath($@"{EXTRA_DBS_FOLDER}\{name}.json", name is "info" or "his");
         }
     }
 }

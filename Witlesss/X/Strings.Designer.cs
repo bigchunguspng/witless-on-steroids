@@ -467,6 +467,36 @@ namespace Witlesss.X {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Данная команда☝️поможет вам создать словарь 📔 влив который 😰 бот сможет накидывать вам 👾 рандомных постов ✍️ из определённого тг-канала
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt;
+        ///
+        /// /piece@piece_fap_bot [ссылка на последний пост] [название_без_пробелов]
+        ///
+        ///&lt;b&gt;Например:&lt;/b&gt;
+        ///
+        /// /piece@piece_fap_bot t.me/xd_bruh_asd/1337 BLACK_OSAKA.
+        /// </summary>
+        internal static string PIECE_MANUAL {
+            get {
+                return ResourceManager.GetString("PIECE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Готово!&lt;/b&gt; 🥂
+        ///
+        ///Чтобы влить словарь, пропишите:
+        ///
+        ///&lt;code&gt;/fuse@piece_fap_bot {0}&lt;/code&gt;.
+        /// </summary>
+        internal static string PIECE_RESPONSE {
+            get {
+                return ResourceManager.GetString("PIECE_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+.
         /// </summary>
         internal static string REGEX_EMOJI {

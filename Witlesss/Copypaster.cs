@@ -12,7 +12,7 @@ namespace Witlesss
         private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
 
-        public WitlessDB Words { get; set; }
+        public WitlessDB Words { get; set; } = new();
 
         public bool Eat(string text, out string eaten)
         {

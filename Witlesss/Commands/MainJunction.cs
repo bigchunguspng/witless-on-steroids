@@ -21,6 +21,7 @@ namespace Witlesss.Commands
         private readonly Move _move = new();
         private readonly GetChatID _chatID = new();
         private readonly ChatInfo _chat = new();
+        private readonly Piece _piece = new();
         private readonly DebugMessage _debug = new();
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
@@ -102,6 +103,7 @@ namespace Witlesss.Commands
             else if (command == "/sex"     ) _sc = _sticker;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/debug"   ) _sc = _debug;
+            else if (CommandIs( "/piece"  )) _sc = _piece;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
 

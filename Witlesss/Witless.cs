@@ -74,12 +74,11 @@ namespace Witlesss
         {
             try
             {
-                Log(HasUnsavedStuff.ToString());
                 return Baka.Generate(word);
             }
             catch
             {
-                LogError($"{TitleOrUsername(Command.Message)} >> NO TEXT!?");
+                LogError($"{Command.TitleOrUsername} >> NO TEXT!?");
                 return "ахахаххахахахахах";
             }
         }

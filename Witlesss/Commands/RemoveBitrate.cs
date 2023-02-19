@@ -27,7 +27,7 @@ namespace Witlesss.Commands
 
         protected string MediaFileName(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
 
-        protected string Sender => ValidFileName(SenderName(Message));
+        protected string Sender => ValidFileName(SenderName);
 
         protected bool NothingToProcess()
         {

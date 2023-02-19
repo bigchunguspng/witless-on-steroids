@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Witlesss.Commands;
 
 namespace Witlesss
 {
@@ -37,7 +38,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{TitleOrUsername(message)} >> BRUH -> {FixErrorMessage(e.Message)}");
+                LogError($"{Command.TitleOrUsername} >> BRUH -> {FixErrorMessage(e.Message)}");
 
                 if (e.Message.Contains("ffmpeg")) _bot.SendErrorDetails(message.Chat.Id, e);
             }

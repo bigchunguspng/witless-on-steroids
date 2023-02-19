@@ -95,7 +95,7 @@ namespace Witlesss
 
         private int OutlineWidth => (int)Math.Round(_s / 6D);
 
-        private SolidBrush Brush() => _brushes[WitlessCommand.Baka.Meme.Dye].Invoke();
+        private SolidBrush Brush() => _brushes[MakeMeme.Dye].Invoke();
 
         private Image GetImage(string path)
         {

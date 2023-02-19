@@ -7,7 +7,7 @@ namespace Witlesss.Commands
 {
     public class MakeMeme : MakeMemeCore, ImageProcessor
     {
-        private readonly Regex _meme = new(@"^\/meme\S* *", RegexOptions.IgnoreCase);
+        public MakeMeme() : base(new Regex(@"^\/meme\S* *", RegexOptions.IgnoreCase)) { }
 
         private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
         private string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
@@ -56,15 +56,11 @@ namespace Witlesss.Commands
             return true;
         }
 
-        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, Texts, M_PHOTO, M.MakeMeme, REPEAT_RX());
-        public  void ProcessStick(string fileID) => DoStick(fileID, Texts, M_STICK, M.MakeMemeFromSticker);
-        private void ProcessVideo(string fileID) => DoVideo(fileID, Texts, M_VIDEO, M.MakeVideoMeme);
+        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, M_PHOTO, M.MakeMeme, REPEAT_RX());
+        public  void ProcessStick(string fileID) => DoStick(fileID, M_STICK, M.MakeMemeFromSticker);
+        private void ProcessVideo(string fileID) => DoVideo(fileID, M_VIDEO, M.MakeVideoMeme);
 
-        private DgText Texts() => GetMemeText(RemoveCommand(Text));
-
-        private string RemoveCommand(string text) => text == null ? null : _meme.Replace(text, "");
-
-        private DgText GetMemeText(string text)
+        protected override DgText GetMemeText(string text)
         {
             string a, b;
             if (string.IsNullOrEmpty(text))
@@ -96,6 +92,8 @@ namespace Witlesss.Commands
         }
 
         private bool AddBottomText() => Text != null && Text.Split()[0].Contains('s');
+
+        public static ColorMode Dye  => Baka.Meme.Dye;
     }
 
     public interface ImageProcessor

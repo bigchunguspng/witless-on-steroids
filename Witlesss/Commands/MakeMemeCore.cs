@@ -13,6 +13,10 @@ namespace Witlesss.Commands
         private DateTime _time;
         private string   _path;
 
+        private readonly Regex _cmd;
+
+        protected MakeMemeCore(Regex cmd) => _cmd = cmd;
+
         protected Memes M => Bot.MemeService;
 
         protected void Run(Func<Message, bool> process, string type)
@@ -25,43 +29,48 @@ namespace Witlesss.Commands
             Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
         }
 
-        protected void DoPhoto(string fileID, Func<DgText> texts, StrInt log, MemeMaker produce, bool regex)
+        protected void DoPhoto(string fileID, StrInt log, MemeMaker produce, bool regex)
         {
             Download(fileID);
 
             var repeats = GetRepeats(regex);
             for (int i = 0; i < repeats; i++)
             {
-                using var stream = File.OpenRead(produce(_path, texts()));
+                using var stream = File.OpenRead(produce(_path, Texts()));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {log(repeats)}");
         }
 
-        protected void DoStick(string fileID, Func<DgText> texts, string log, MemeMakerX produce)
+        protected void DoStick(string fileID, string log, MemeMakerX produce)
         {
             Download(fileID);
 
-            using var stream = File.OpenRead(produce(_path, texts(), GetStickerExtension()));
+            using var stream = File.OpenRead(produce(_path, Texts(), GetStickerExtension()));
             Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> {log}");
         }
 
-        protected void DoVideo(string fileID, Func<DgText> texts, string log, MemeMaker produce)
+        protected void DoVideo(string fileID, string log, MemeMaker produce)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
             WriteTime();
             Download(fileID);
 
-            using var stream = File.OpenRead(produce(_path, texts()));
+            using var stream = File.OpenRead(produce(_path, Texts()));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> {log} >> TIME: {CheckStopWatch()}");
         }
-        
-        private void Download(string fileID) => Bot.Download(fileID, Chat, out _path);
+
+        protected abstract DgText GetMemeText(string text);
+
+        private DgText Texts() => GetMemeText(RemoveCommand(Text));
+        private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
 
         private string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
+        
+        private void Download(string fileID) => Bot.Download(fileID, Chat, out _path);
 
         private void   WriteTime() => _time  = DateTime.Now;
         private string CheckStopWatch() => $@"{DateTime.Now - _time:s\.fff}";
@@ -76,5 +85,6 @@ namespace Witlesss.Commands
             }
             return repeats;
         }
+
     }
 }

@@ -6,7 +6,7 @@ namespace Witlesss.Commands
 {
     public class Demotivate : MakeMemeCore, ImageProcessor
     {
-        private readonly Regex _dg = new(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase);
+        public Demotivate() : base(new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase)) { }
 
         private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*");
         private string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
@@ -18,16 +18,6 @@ namespace Witlesss.Commands
         {
             SelectModeAuto(w, h);
             PassQuality(Baka);
-
-            return this;
-        }
-
-        private void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
-        private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
-
-        public Demotivate SetUp(DgMode mode)
-        {
-            SetMode(mode);
 
             return this;
         }
@@ -53,16 +43,11 @@ namespace Witlesss.Commands
             return true;
         }
 
-        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, Texts, D_PHOTO, M.MakeDemotivator, REPEAT_RX());
-        public  void ProcessStick(string fileID) => DoStick(fileID, Texts, D_STICK, M.MakeStickerDemotivator);
-        private void ProcessVideo(string fileID) => DoVideo(fileID, Texts, D_VIDEO, M.MakeVideoDemotivator);
+        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator, REPEAT_RX());
+        public  void ProcessStick(string fileID) => DoStick(fileID, D_STICK, M.MakeStickerDemotivator);
+        private void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, M.MakeVideoDemotivator);
 
-
-        private DgText Texts() => GetDemotivatorText(RemoveDg(Text));
-
-        private string RemoveDg(string text) => text == null ? null : _dg.Replace(text, "");
-
-        private DgText GetDemotivatorText(string text)
+        protected override DgText GetMemeText(string text)
         {
             string a, b = Baka.Generate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
@@ -75,5 +60,15 @@ namespace Witlesss.Commands
             }
             return new DgText(a, b);
         }
+
+        public Demotivate SetUp(DgMode mode)
+        {
+            SetMode(mode);
+
+            return this;
+        }
+
+        private void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
+        private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
     }
 }

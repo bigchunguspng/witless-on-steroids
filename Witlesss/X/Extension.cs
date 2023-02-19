@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Telegram.Bot.Types;
 using static Witlesss.X.LetterCaseMode;
 
 namespace Witlesss.X
@@ -37,16 +36,7 @@ namespace Witlesss.X
             _   => Upper
         };
 
-        public static string SenderName(Message message) => message.SenderChat?.Title ?? UserFullName(message);
-        public static string TitleOrUsername(Message message) => Truncate(message.Chat.Id < 0 ? message.Chat.Title : UserFullName(message), 32);
-
-        private static string Truncate(string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
-        private static string UserFullName(Message message)
-        {
-            string name = message.From?.FirstName;
-            string last = message.From?.LastName ?? "";
-            return last == "" ? name : name + " " + last;
-        }
+        public static string Truncate(string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
 
         public record DgText(string A, string B);
 

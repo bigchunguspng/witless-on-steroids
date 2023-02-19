@@ -18,15 +18,25 @@ namespace Witlesss.Commands
             Message = message;
             Text    = message.Caption ?? message.Text;
             Chat    = message.Chat.Id;
-            Title   = TitleOrUsername(message);
+            Title   = TitleOrUsername;
         }
 
         public abstract void Run();
+        
+        public static string SenderName => Message.SenderChat?.Title  ?? UserFullName();
+        public static string TitleOrUsername => Truncate(ChatIsPrivate ? UserFullName() : Message.Chat.Title, 32);
+
+        private static string UserFullName()
+        {
+            string name = Message.From?.FirstName;
+            string last = Message.From?.LastName ?? "";
+            return last == "" ? name : name + " " + last;
+        }
     }
 
     public abstract class WitlessCommand : Command
     {
-        public static Witless Baka { get; private set; }
+        protected static Witless Baka { get; private set; }
 
         protected static void SetBaka(Witless witless) => Baka = witless;
 

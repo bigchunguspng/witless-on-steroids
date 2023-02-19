@@ -6,8 +6,8 @@ namespace Witlesss.Commands
 {
     public class MainJunction : WitlessCommand
     {
-        private Command  _command;
-        private WitlessCommand _c;
+        private Command        _sc;
+        private WitlessCommand _wc;
         private readonly MakeMeme _meme = new();
         private readonly Demotivate _demotivate = new();
         private readonly RemoveBitrate _bitrate = new();
@@ -92,20 +92,20 @@ namespace Witlesss.Commands
 
         private bool DoSimpleCommands(string command)
         {
-            if      (CommandIs( "/fast"   )) _command = _speed.SetMode(SpeedMode.Fast);
-            else if (CommandIs( "/slow"   )) _command = _speed.SetMode(SpeedMode.Slow);
-            else if (CommandIs( "/cut"    )) _command = _cut;
-            else if (CommandIs( "/sus"    )) _command = _sus;
-            else if (CommandIs( "/damn"   )) _command = _bitrate;
-            else if (command == "/reverse" ) _command = _reverse;
-            else if (command == "/chat_id" ) _command = _chatID;
-            else if (command == "/sex"     ) _command = _sticker;
-            else if (command == "/g"       ) _command = _audio;
-            else if (command == "/debug"   ) _command = _debug;
+            if      (CommandIs( "/fast"   )) _sc = _speed.SetMode(SpeedMode.Fast);
+            else if (CommandIs( "/slow"   )) _sc = _speed.SetMode(SpeedMode.Slow);
+            else if (CommandIs( "/cut"    )) _sc = _cut;
+            else if (CommandIs( "/sus"    )) _sc = _sus;
+            else if (CommandIs( "/damn"   )) _sc = _bitrate;
+            else if (command == "/reverse" ) _sc = _reverse;
+            else if (command == "/chat_id" ) _sc = _chatID;
+            else if (command == "/sex"     ) _sc = _sticker;
+            else if (command == "/g"       ) _sc = _audio;
+            else if (command == "/debug"   ) _sc = _debug;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
 
-            _command.Run();
+            _sc.Run();
 
             return true;
             
@@ -114,25 +114,25 @@ namespace Witlesss.Commands
 
         private bool DoWitlessCommands(string command)
         {
-            if      (CommandIs( "/dg"        )) _c = _demotivate.SetUp(DgMode.Square);
-            else if (CommandIs( "/dv"        )) _c = _demotivate.SetUp(DgMode.Wide);
-            else if (CommandIs( "/meme"      )) _c = _meme;
-            else if (CommandIs( "/a"         )) _c = _generate;
-            else if (CommandIs( "/zz"        )) _c = _generateB;
-            else if (CommandIs( "/b"         )) _c = _buhurt;
-            else if (CommandIs( "/quality"   )) _c = _quality;
-            else if (CommandIs( "/pics"      )) _c = _probability;
-            else if (CommandIs( "/set"       )) _c = _frequency;
-            else if (CommandIs( "/fuse"      )) _c = _fuse;
-            else if (CommandIs( "/move"      )) _c = _move;
-            else if (command == "/stickers"   ) _c = _stickers;
-            else if (command == "/colors"     ) _c = _colors;
-            else if (command == "/chat"       ) _c = _chat;
-            else if (command == "/s_admins"   ) _c = _admins;
-            else if (command == "/delete"     ) _c = _delete;
+            if      (CommandIs( "/dg"        )) _wc = _demotivate.SetUp(DgMode.Square);
+            else if (CommandIs( "/dv"        )) _wc = _demotivate.SetUp(DgMode.Wide);
+            else if (CommandIs( "/meme"      )) _wc = _meme;
+            else if (CommandIs( "/a"         )) _wc = _generate;
+            else if (CommandIs( "/zz"        )) _wc = _generateB;
+            else if (CommandIs( "/b"         )) _wc = _buhurt;
+            else if (CommandIs( "/quality"   )) _wc = _quality;
+            else if (CommandIs( "/pics"      )) _wc = _probability;
+            else if (CommandIs( "/set"       )) _wc = _frequency;
+            else if (CommandIs( "/fuse"      )) _wc = _fuse;
+            else if (CommandIs( "/move"      )) _wc = _move;
+            else if (command == "/stickers"   ) _wc = _stickers;
+            else if (command == "/colors"     ) _wc = _colors;
+            else if (command == "/chat"       ) _wc = _chat;
+            else if (command == "/s_admins"   ) _wc = _admins;
+            else if (command == "/delete"     ) _wc = _delete;
             else return true;
 
-            _c.Run();
+            _wc.Run();
             
             return true;
 

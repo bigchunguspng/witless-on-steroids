@@ -33,7 +33,7 @@ namespace Witlesss
 
             while (!File.Exists(FFMPEG_PATH))
             {
-                Log(@$"""{FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
+                Log($@"""{FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
                 Log("Press any key to continue...");
                 Console.ReadKey();
             }

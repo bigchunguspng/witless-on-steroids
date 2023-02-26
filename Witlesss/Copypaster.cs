@@ -186,6 +186,12 @@ namespace Witlesss
             var words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> megalisba S lisba -> lisball
             if (words.Count > 0) return RandomWord();
 
+            if (word.Length > 2 && alt == END ? word.StartsWith("..") : word.EndsWith(".."))
+            {
+                w = word.Trim('.');
+                words = Words.Keys.Where(KeyHasWord).ToList(); // E ...ba -> booBA S lisb... -> LISBowski
+                if (words.Count > 0) return RandomWord();
+            }
             if (word.Length > 3)
             {
                 w = alt == END ? word[^3..] : word.Remove(3);

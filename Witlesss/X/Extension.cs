@@ -128,7 +128,7 @@ namespace Witlesss.X
         };
         private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {
-            {"BA", MediaType.Movie}, {"DQ", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
+            {"BA", MediaType.Movie}, {"DQ", MediaType.Round}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
             {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}, {"Ag", MediaType.Video}
         };
 

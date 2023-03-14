@@ -9,7 +9,9 @@ namespace Witlesss.Commands
         {
             if (NoVideo()) return;
 
-            Bot.Download(FileID, Chat, out string path);
+            Bot.Download(FileID, Chat, out string path, out var type);
+            
+            if (type == MediaType.Round) path = Bot.MemeService.CropVideoNote(path);
 
             using var stream = File.OpenRead(Bot.MemeService.RemoveAudio(path));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
@@ -48,7 +50,7 @@ namespace Witlesss.Commands
             else if (mess.VideoNote is { } n)
             {
                 FileID = n.FileId;
-                Memes.PassSize(n.Length);
+                Memes.PassSize(272);
             }
             else return false;
 

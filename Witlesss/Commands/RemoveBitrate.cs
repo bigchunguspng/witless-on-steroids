@@ -69,6 +69,7 @@ namespace Witlesss.Commands
             if      (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, audio()));
             else if (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, video()));
             else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, video()));
+            else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream, video()));
         }
     }
 }

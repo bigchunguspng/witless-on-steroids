@@ -49,7 +49,7 @@ namespace Witlesss.Commands
             }
             else if (mess.VideoNote is { } n)
             {
-                PassSize(n.Length);
+                PassSize(272);
                 ProcessVideo(n.FileId);
             }
             else if (mess.Sticker is { IsAnimated: false} ss)

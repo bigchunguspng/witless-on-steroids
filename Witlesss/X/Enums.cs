@@ -10,7 +10,8 @@
     {
         Audio,
         Video,
-        Movie // video with sound
+        Movie, // video with sound
+        Round  // video note
     }
     
     public enum MemeType

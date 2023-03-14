@@ -16,6 +16,8 @@ namespace Witlesss.MediaTools
             _speed = speed;
             _fps = fps;
 
+            if (type == Round) type = Movie;
+            
             AddInput(input);
             AddOptions(FiltersNames[type], Filter(type));
             AddSizeFix(type, input);

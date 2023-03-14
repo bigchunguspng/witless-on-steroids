@@ -10,6 +10,8 @@ namespace Witlesss.MediaTools
     {
         public F_Concat(string inputA, string inputB, MediaType type) : base(SetOutName(inputA, "-C"))
         {
+            if (type == Round) type = Movie;
+
             AddInput(inputA);
             AddInput(inputB);
             AddSongFix(type);

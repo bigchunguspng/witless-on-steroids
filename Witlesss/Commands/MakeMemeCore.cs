@@ -10,8 +10,9 @@ namespace Witlesss.Commands
 {
     public abstract class MakeMemeCore : WitlessCommand
     {
-        private DateTime _time;
-        private string   _path;
+        private DateTime  _time;
+        private string    _path;
+        private MediaType _type;
 
         private readonly Regex _cmd;
 
@@ -58,6 +59,8 @@ namespace Witlesss.Commands
             WriteTime();
             Download(fileID);
 
+            if (_type == MediaType.Round) _path = Bot.MemeService.CropVideoNote(_path);
+
             using var stream = File.OpenRead(produce(_path, Texts()));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
             Log($@"{Title} >> {log} >> TIME: {CheckStopWatch()}");
@@ -70,7 +73,7 @@ namespace Witlesss.Commands
 
         private string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
         
-        private void Download(string fileID) => Bot.Download(fileID, Chat, out _path);
+        private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
 
         private void   WriteTime() => _time  = DateTime.Now;
         private string CheckStopWatch() => $@"{DateTime.Now - _time:s\.fff}";

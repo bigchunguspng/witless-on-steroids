@@ -54,6 +54,8 @@ namespace Witlesss.Commands
             }
             else if (mess.Voice is { } c)
                 FileID = c.FileId;
+            else if (mess.VideoNote is { } n)
+                FileID = n.FileId;
             else if (mess.Document is { MimeType: "audio/x-wav"} d)
                 FileID = d.FileId;
             else return false;

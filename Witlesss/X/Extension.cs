@@ -123,11 +123,12 @@ namespace Witlesss.X
         {
             {"BA", ".mp4"}, {"Cg", ".mp4"}, // Cg - animation
             {"CQ", ".mp3"}, {"Aw", ".mp3"}, // Aw - voice message / ogg
-            {"BQ", ".wav"}, {"Ag", ".jpg"}, {"CA", ".webm"}
+            {"BQ", ".wav"}, {"DQ", ".mp4"}, // DQ - video message
+            {"Ag", ".jpg"}, {"CA", ".webm"}
         };
         private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {
-            {"BA", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
+            {"BA", MediaType.Movie}, {"DQ", MediaType.Movie}, {"Cg", MediaType.Video}, {"CA", MediaType.Video},
             {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}, {"Ag", MediaType.Video}
         };
 

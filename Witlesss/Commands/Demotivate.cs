@@ -36,6 +36,8 @@ namespace Witlesss.Commands
                 ProcessVideo(mess.Sticker.FileId);
             else if (mess.Video is { })
                 ProcessVideo(mess.Video.FileId);
+            else if (mess.VideoNote is { })
+                ProcessVideo(mess.VideoNote.FileId);
             else if (mess.Sticker is { IsAnimated: false })
                 ProcessStick(mess.Sticker.FileId);
             else return false;

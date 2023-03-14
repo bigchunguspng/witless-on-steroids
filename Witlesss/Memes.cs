@@ -25,6 +25,7 @@ namespace Witlesss
         public static void PassSize(Sticker   s) => SourceSize = new Size(s.Width, s.Height);
         public static void PassSize(Animation a) => SourceSize = new Size(a.Width, a.Height);
         public static void PassSize(PhotoSize p) => SourceSize = new Size(p.Width, p.Height);
+        public static void PassSize(int       i) => SourceSize = new Size(i, i);
 
         public Memes()
         {

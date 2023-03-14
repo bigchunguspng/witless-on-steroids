@@ -47,6 +47,11 @@ namespace Witlesss.Commands
                 PassSize(v);
                 ProcessVideo(v.FileId);
             }
+            else if (mess.VideoNote is { } n)
+            {
+                PassSize(n.Length);
+                ProcessVideo(n.FileId);
+            }
             else if (mess.Sticker is { IsAnimated: false} ss)
             {
                 ProcessStick(ss.FileId);

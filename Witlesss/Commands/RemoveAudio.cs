@@ -45,6 +45,11 @@ namespace Witlesss.Commands
                 FileID = s.FileId;
                 Memes.PassSize(s);
             }
+            else if (mess.VideoNote is { } n)
+            {
+                FileID = n.FileId;
+                Memes.PassSize(n.Length);
+            }
             else return false;
 
             return true;

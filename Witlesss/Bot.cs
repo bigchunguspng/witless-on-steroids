@@ -95,5 +95,17 @@ namespace Witlesss
         public void SaveDics  () => OkBuddies(witless => witless.Save());
 
         public void RemoveChat(long id) => SussyBakas.Remove(id);
+        
+        public void Download(string fileID, long chat, out string path) => Download(fileID, chat, out path, out _);
+        public void Download(string fileID, long chat, out string path, out MediaType type)
+        {
+            string shortID = ShortID(fileID);
+            string extension = ExtensionFromID(shortID);
+            type = MediaTypeFromID(shortID);
+            path = UniquePath($@"{PICTURES_FOLDER}\{shortID}{extension}");
+            DownloadFile(fileID, path, chat).Wait();
+
+            if (type == MediaType.Movie && shortID.StartsWith("DQ")) path = MemeService.CropVideoNote(path);
+        }
     }
 }

@@ -18,4 +18,13 @@ namespace Witlesss.MediaTools
             AddOptions("-an", "-vcodec", "libx264", "-crf", "30");
         }
     }
+    
+    //ffmpeg -i input.mp4 -filter:v "crop=272:272:56:56" output.mp4
+    public class F_Crop : F_ToJPG
+    {
+        public F_Crop(string input, string extension = ".mp4") : base(input, extension)
+        {
+            AddOptions("-filter:v", "crop=272:272:56:56");
+        }
+    }
 }

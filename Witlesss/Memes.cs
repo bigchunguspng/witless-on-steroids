@@ -133,6 +133,8 @@ namespace Witlesss
                 return Execute(new F_Bitrate(path,    type: type));
         }
 
+        public  string CropVideoNote (string path) => Execute(new F_Crop(path));
+
         private double   GetDuration (string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
         private MediaStream GetMedia (string path) => GetMetadata(path).Result.Metadata.Streams.First();
         private async MD GetMetadata (string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));

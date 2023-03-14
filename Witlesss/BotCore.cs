@@ -96,15 +96,6 @@ namespace Witlesss
             }
         }
 
-        public void Download(string fileID, long chat, out string path) => Download(fileID, chat, out path, out _);
-        public void Download(string fileID, long chat, out string path, out MediaType type)
-        {
-            string shortID = ShortID(fileID);
-            string extension = ExtensionFromID(shortID);
-            type = MediaTypeFromID(shortID);
-            path = UniquePath($@"{PICTURES_FOLDER}\{shortID}{extension}");
-            DownloadFile(fileID, path, chat).Wait();
-        }
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
             Directory.CreateDirectory(PICTURES_FOLDER);

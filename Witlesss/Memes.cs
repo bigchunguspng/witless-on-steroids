@@ -133,6 +133,15 @@ namespace Witlesss
                 return Execute(new F_Bitrate(path,    type: type));
         }
 
+        public string ToVideoNote(string path)
+        {
+            var d = ToEven(Math.Min(SourceSize.Width, SourceSize.Height));
+            var x = (SourceSize.Width  - d) / 2;
+            var y = (SourceSize.Height - d) / 2;
+
+            return Execute(new F_ToVideoNote(path, new Rectangle(x, y, d, d)));
+        }
+
         public  string CropVideoNote (string path) => Execute(new F_Crop(path));
 
         private double   GetDuration (string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
@@ -141,7 +150,7 @@ namespace Witlesss
 
         private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
 
-        private static int ToEven (int x) => x + x % 2;
+        private static int ToEven (int x) => x - x % 2;
 
         public  static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
         public  static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;

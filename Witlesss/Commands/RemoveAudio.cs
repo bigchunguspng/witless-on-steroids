@@ -20,7 +20,7 @@ namespace Witlesss.Commands
             string VideoFilename() => "gif_fap_club.mp4";
         }
 
-        private bool NoVideo()
+        protected bool NoVideo()
         {
             if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
 

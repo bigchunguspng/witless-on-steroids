@@ -13,6 +13,7 @@ namespace Witlesss.Commands
         private readonly RemoveBitrate _bitrate = new();
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
+        private readonly ToVideoNote _note = new();
         private readonly ToSticker _sticker = new();
         private readonly Reverse _reverse = new();
         private readonly Sus _sus = new();
@@ -102,6 +103,7 @@ namespace Witlesss.Commands
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (command == "/sex"     ) _sc = _sticker;
             else if (command == "/g"       ) _sc = _audio;
+            else if (command == "/note"    ) _sc = _note;
             else if (command == "/debug"   ) _sc = _debug;
             else if (CommandIs( "/piece"  )) _sc = _piece;
             else                                          return false;

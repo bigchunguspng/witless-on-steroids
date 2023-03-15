@@ -27,4 +27,16 @@ namespace Witlesss.MediaTools
             AddOptions("-filter:v", "crop=272:272:56:56");
         }
     }
+
+    //ffmpeg -i input.mp4 -filter:v "crop=D:D:X:Y" -s 384x384 output.mp4
+    public class F_ToVideoNote : F_ToJPG
+    {
+        private static readonly Size VideoNoteSize = new(384, 384);
+        
+        public F_ToVideoNote(string input, Rectangle a, string extension = ".mp4") : base(input, extension)
+        {
+            AddOptions("-filter:v", $"crop={a.Width}:{a.Height}:{a.X}:{a.Y}");
+            AddSize(VideoNoteSize);
+        }
+    }
 }

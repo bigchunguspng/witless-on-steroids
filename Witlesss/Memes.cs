@@ -94,8 +94,12 @@ namespace Witlesss
 
             if (type > MediaType.Audio)
             {
-                double fps = RetrieveFPS(GetMedia(path).AvgFrameRate) * speed;
-                return Execute(new F_Speed(path, speed, type, Math.Min(fps, 90)));
+                double fps = Math.Min(RetrieveFPS(GetMedia(path).AvgFrameRate) * speed, 90);
+
+                try   { return MakeVideo(type); }
+                catch { return MakeVideo(MediaType.Video); }
+
+                string MakeVideo(MediaType t) => Execute(new F_Speed(path, speed, t, fps));
             }
             else
                 return Execute(new F_Speed(path, speed, type));

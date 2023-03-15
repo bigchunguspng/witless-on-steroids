@@ -20,6 +20,8 @@ namespace Witlesss.Commands
             string VideoFilename() => "gif_fap_club.mp4";
         }
 
+        protected virtual int VideoNoteSize() => 272;
+
         protected bool NoVideo()
         {
             if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
@@ -50,7 +52,7 @@ namespace Witlesss.Commands
             else if (mess.VideoNote is { } n)
             {
                 FileID = n.FileId;
-                Memes.PassSize(272);
+                Memes.PassSize(VideoNoteSize());
             }
             else return false;
 

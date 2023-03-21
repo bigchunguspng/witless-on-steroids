@@ -27,6 +27,7 @@ namespace Witlesss.Commands
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
         private readonly Buhurt _buhurt = new();
+        private readonly RandomMeme _reddit = new();
         private readonly SetFrequency _frequency = new();
         private readonly SetProbability _probability = new();
         private readonly SetQuality _quality = new();
@@ -105,6 +106,7 @@ namespace Witlesss.Commands
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;
             else if (command == "/debug"   ) _sc = _debug;
+            else if (CommandIs( "/w"      )) _sc = _reddit;
             else if (CommandIs( "/piece"  )) _sc = _piece;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;

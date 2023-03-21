@@ -19,9 +19,9 @@ namespace Witlesss
             TrySend(task, chat, "message");
         }
 
-        public void SendPhoto(long chat, InputOnlineFile photo)
+        public void SendPhoto(long chat, InputOnlineFile photo, string caption = null)
         {
-            var task = Client.SendPhotoAsync(chat, photo);
+            var task = Client.SendPhotoAsync(chat, photo, caption);
             TrySend(task, chat, "photo");
         }
 

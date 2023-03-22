@@ -17,4 +17,24 @@ namespace Witlesss.X
 
         public static void LogError(string message) => Log(message, ConsoleColor.Red);
     }
+    
+    public class StopWatch
+    {
+        private DateTime _time;
+
+        public StopWatch() => WriteTime();
+
+        public void Log(string message)
+        {
+            Logger.Log($@"{CheckStopWatch()} {message}");
+            WriteTime();
+        }
+
+        public void   WriteTime() => _time  = DateTime.Now;
+        public string CheckStopWatch()
+        {
+            var time = DateTime.Now - _time;
+            return time.Minutes > 1 ? $"{time:m' MINS'}" : $@"{time:s\.fff's'}";
+        }
+    }
 }

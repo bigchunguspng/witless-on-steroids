@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types.InputFiles;
 
@@ -10,17 +9,21 @@ namespace Witlesss.Commands
     public class RandomMeme : Command
     {
         private readonly Regex _url = new(@"""url"":""\S+?"""), _title = new(@"""title"":"".+?""");
+        private readonly HttpClient _client = new();
+        private HttpResponseMessage _response;
+        private readonly StopWatch _watch = new();
+        private readonly char[] separators = { ' ', '_' };
 
         private readonly string[] subreddits =
         {
             "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
             "dankmemes", "memes", "funnymemes","doodoofard", "21stcenturyhumour",
-            "breakingbadmemes", "minecraftmemes"
+            "breakingbadmemes", "minecraftmemes", "shitposting"
         };
 
         public override void Run()
         {
-            var arg = Text.Split()[0].Split('_', 2);
+            var arg = Text.Split(separators, 2);
             var sub = arg.Length > 1 ? arg[1] : RandomSub;
             
             var url = $"https://meme-api.com/gimme/{sub}";
@@ -35,10 +38,8 @@ namespace Witlesss.Commands
             var image = GetImage(s);
             var title = GetTitle(s);
 
-            var path = DownloadMeme(image);
-            
-            using var stream = File.OpenRead(path);
-            Bot.SendPhoto(Chat, new InputOnlineFile(stream), title);
+            Bot.SendPhoto(Chat, new InputOnlineFile(image), title); // todo catch ex >> dl > compress > send
+            _watch.Log("TO SEND PIC");
             Log($"{Title} >> r/{sub}");
         }
 
@@ -46,21 +47,13 @@ namespace Witlesss.Commands
 
         private string GetApiResponse(string url)
         {
-            using var client = new HttpClient();
-            using var response = client.GetAsync(url).Result;
-            return response.Content.ReadAsStringAsync().Result;
+            _watch.Log("WITHOUT REDDIT");
+            _response = _client.GetAsync(url).Result; // <-- the bottleneck
+            _watch.Log("TO GET RESPONSE");
+            return _response.Content.ReadAsStringAsync().Result;
         }
 
         private string GetImage(string s) => _url  .Match(s).Value[7..^1];
         private string GetTitle(string s) => _title.Match(s).Value[9..^1];
-
-        private string DownloadMeme(string url)
-        {
-            using var client = new WebClient();
-            var name = UniquePath($@"Memes\{url[18..^4]}.png");
-            client.DownloadFile(url, name);
-
-            return name;
-        }
     }
 }

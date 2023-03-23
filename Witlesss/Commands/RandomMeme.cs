@@ -23,7 +23,7 @@ namespace Witlesss.Commands
 
         public override void Run()
         {
-            var arg = Text.Split(separators, 2);
+            var arg = Text.Replace("@piece_fap_bot", "").Split(separators, 2);
             var sub = arg.Length > 1 ? arg[1] : RandomSub;
             
             var url = $"https://meme-api.com/gimme/{sub}";

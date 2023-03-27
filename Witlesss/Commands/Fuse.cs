@@ -66,7 +66,7 @@ namespace Witlesss.Commands
                 EatChatHistory(path);
                 GoodEnding();
             }
-            else Bot.SendMessage(Chat, FUSE_MANUAL);
+            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false);
 
             bool CanFuseHistory(out string fileID)
             {

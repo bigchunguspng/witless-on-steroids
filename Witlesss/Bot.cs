@@ -17,12 +17,16 @@ namespace Witlesss
 
         public  readonly MainJunction Fork = new();
         public  readonly Memes MemeService = new();
+        public  readonly RedditTool Reddit = new();
 
         private readonly ConsoleUI PlayStation8;
         public  readonly BanHammer ThorRagnarok;
 
-        public Bot()
+        public static void LaunchInstance() => new Bot().Run();
+
+        private Bot()
         {
+            Config.SetBotUsername(Client.GetMeAsync().Result.Username);
             Command.Bot = this;
 
             PlayStation8 = new ConsoleUI(this);
@@ -32,7 +36,7 @@ namespace Witlesss
             SussyBakas = ChatsIO.LoadData();
         }
 
-        public void Run()
+        private void Run()
         {
             ThorRagnarok.GiveBans();
 
@@ -51,6 +55,7 @@ namespace Witlesss
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
             Client.StartReceiving(new Handler(this), options);
+            Log($"This is the certified {Config.BotUsername} classic!", ConsoleColor.Yellow);
         }
 
         private void LoadSomeBakas()

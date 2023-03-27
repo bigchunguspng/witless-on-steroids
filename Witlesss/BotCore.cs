@@ -11,17 +11,22 @@ namespace Witlesss
 {
     public abstract class BotCore
     {
-        public readonly TelegramBotClient Client = new(File.ReadAllText(".token"));
+        public readonly TelegramBotClient Client = new(Config.TelegramToken);
 
         public void SendMessage(long chat, string text)
         {
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
             TrySend(task, chat, "message");
         }
-
-        public void SendPhoto(long chat, InputOnlineFile photo, string caption = null)
+        public void SendMessage(long chat, string text, bool preview)
         {
-            var task = Client.SendPhotoAsync(chat, photo, caption);
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true, disableWebPagePreview: !preview);
+            TrySend(task, chat, "message");
+        }
+
+        public void SendPhoto(long chat, InputOnlineFile photo)
+        {
+            var task = Client.SendPhotoAsync(chat, photo);
             TrySend(task, chat, "photo");
         }
 
@@ -61,7 +66,7 @@ namespace Witlesss
             TrySend(task, chat, "videonote");
         }
 
-        private void TrySend(Task task, long chat, string what)
+        private static void TrySend(Task task, long chat, string what)
         {
             try
             {
@@ -72,6 +77,15 @@ namespace Witlesss
             {
                 LogError($"{chat} >> Can't send the {what} --> " + FixErrorMessage(e.Message));
             }
+        }
+        
+        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendPhotoAsync(chat, photo, caption));
+        public void SendAnimaXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendAnimationAsync(chat, photo, caption: caption));
+
+        private static void SendOrThrow(Task task)
+        {
+            task.Wait();
+            if (task.IsFaulted) throw new Exception();
         }
         
         public void SendErrorDetails(long chat, Exception e)

@@ -1,59 +1,158 @@
-﻿using System.Net.Http;
+﻿using System.Net;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types.InputFiles;
 
+#pragma warning disable CS8509
 #pragma warning disable SYSLIB0014
 
 namespace Witlesss.Commands
 {
-    public class RandomMeme : Command
+    public class CheckReddit : Command
     {
-        private readonly Regex _url = new(@"""url"":""\S+?"""), _title = new(@"""title"":"".+?""");
-        private readonly HttpClient _client = new();
-        private HttpResponseMessage _response;
-        private readonly StopWatch _watch = new();
-        private readonly char[] separators = { ' ', '_' };
+        private readonly Regex _sub = new(@"(_|\s)([a-z0-9_]+)");
+        private readonly Regex _ops = new(@"-([hntrc][hdwmya]?)");
+        private readonly Regex _rep = new(@"^\/w[^\s_@]");
 
-        private readonly string[] subreddits =
-        {
-            "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
-            "dankmemes", "memes", "funnymemes","doodoofard", "21stcenturyhumour",
-            "breakingbadmemes", "minecraftmemes", "shitposting"
-        };
-
+        private RedditTool Reddit => Bot.Reddit;
+        
+        // input: /w[@piece_fap_club][_subreddit [-h/-n/-t/-c/-ta/...]]
         public override void Run()
         {
-            var arg = Text.Replace("@piece_fap_bot", "").Split(separators, 2);
-            var sub = arg.Length > 1 ? arg[1] : RandomSub;
+            if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
             
-            var url = $"https://meme-api.com/gimme/{sub}";
+            var input = Text.ToLower().Replace(Config.BotUsername, "");
 
-            var s = GetApiResponse(url);
-            if (s.Contains("\"code\":4"))
+            if (Message.ReplyToMessage is { Text: { } t } m && t.ToLower().StartsWith("/w"))
+            {
+                Pass(m);
+                Run(); // RECURSIVE
+            }
+            else if (_rep.IsMatch(input))
+            {
+                Log("LAST QUERY");
+                SendPost(Reddit.LastQueryOrRandom(Chat));
+            }
+            else
+            {
+                var sub = _sub.Match(input);
+                if (sub.Success)
+                {
+                    var subreddit = sub.Groups[2].Value;
+                    var ops = _ops.Match(input);
+                    if (ops.Success)
+                    {
+                        var options = ops.Groups[1].Value;
+                        var sorting = GetSortingMode(options);
+                        var period = GetTimePeriod(options, sorting);
+                        
+                        Log("SUBREDDIT + OPTIONS");
+                        SendPost(new SrQuery(subreddit, sorting, period));
+                    }
+                    else
+                    {
+                        Log("SUBREDDIT");
+                        SendPost(new SrQuery(subreddit));
+                    }
+                }
+                else
+                {
+                    Log("DEFAULT (RANDOM)");
+                    SendPost(Reddit.RandomSubQuery);
+                }
+            }
+        }
+
+        private void SendPost(SrQuery query)
+        {
+            var post = TryToGetPost(query);
+            if (post == null) return;
+
+            try
+            {
+                var file = new InputOnlineFile(post.URL);
+                var b = post.URL.EndsWith(".gif");
+                if (b) Bot.SendAnimaXD(Chat, file, post.Title);
+                else   Bot.SendPhotoXD(Chat, file, post.Title);
+            }
+            catch
+            {
+                var path = Bot.MemeService.Compress(DownloadMeme(post));
+                using var stream = File.OpenRead(path);
+                Bot.SendPhotoXD(Chat, new InputOnlineFile(stream), post.Title);
+            }
+            finally // jerk it
+            {
+                Log($"{Title} >> r/{post.Subreddit}");
+                Reddit.LogInfo();
+            }
+        }
+
+        private PostData TryToGetPost(SrQuery query)
+        {
+            try
+            {
+                return Reddit.PullPost(query, Chat);
+            }
+            catch
             {
                 Bot.SendMessage(Chat, "💀");
-                return;
+                return null;
             }
-
-            var image = GetImage(s);
-            var title = GetTitle(s);
-
-            Bot.SendPhoto(Chat, new InputOnlineFile(image), title); // todo catch ex >> dl > compress > send
-            _watch.Log("TO SEND PIC");
-            Log($"{Title} >> r/{sub}");
         }
 
-        private string RandomSub => subreddits[Random.Next(subreddits.Length)];
-
-        private string GetApiResponse(string url)
+        private static string DownloadMeme(PostData post)
         {
-            _watch.Log("WITHOUT REDDIT");
-            _response = _client.GetAsync(url).Result; // <-- the bottleneck
-            _watch.Log("TO GET RESPONSE");
-            return _response.Content.ReadAsStringAsync().Result;
+            var name = UniquePath($@"{PICTURES_FOLDER}\{post.Fullname}.png");
+            using var web = new WebClient();
+            web.DownloadFile(post.URL, name);
+
+            return name;
         }
 
-        private string GetImage(string s) => _url  .Match(s).Value[7..^1];
-        private string GetTitle(string s) => _title.Match(s).Value[9..^1];
+        private static SortingMode GetSortingMode(string options) => options[0] switch
+        {
+            'h' => SortingMode.Hot,
+            'n' => SortingMode.New,
+            't' => SortingMode.Top,
+            'r' => SortingMode.Rising,
+            'c' => SortingMode.Controversial
+        };
+
+        private static string GetTimePeriod(string options, SortingMode sorting)
+        {
+            return options.Length == 1 || SortingIsTimed(sorting) ? "all" : GetTimePeriod(options[1]);
+        }
+        private static string GetTimePeriod(char c) => c switch
+        {
+            'h' => "hour",
+            'd' => "day",
+            'w' => "week",
+            'm' => "month",
+            'y' => "year",
+            _   => "all"
+        };
+        private static bool SortingIsTimed(SortingMode s) => s is not SortingMode.Top and not SortingMode.Controversial;
+    }
+
+    public class GetRedditLink : Command
+    {
+        private RedditTool Reddit => Bot.Reddit;
+        
+        public override void Run()
+        {
+            if (Message.ReplyToMessage is { } message)
+            {
+                Pass(message);
+                if (Reddit.Recall(Text) is { } post)
+                {
+                    Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>", preview: false);
+                }
+                else
+                {
+                    Bot.SendMessage(Chat, $"{Pick(I_FORGOR_RESPONSE)} {Pick(FAIL_EMOJI)}");
+                }
+            }
+            else Bot.SendMessage(Chat,  string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
+        }
     }
 }

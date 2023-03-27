@@ -161,12 +161,17 @@ namespace Witlesss.X
         {
             "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
         };
+        public static readonly string[] I_FORGOR_RESPONSE =
+        {
+            "Сорян, не помню", "Сорян, не помню такого", "Забыл уже", "Не помню", "Я бы скинул, но уже потерял её"
+        };
 
         private static readonly string[] RANDOM_EMOJI =
         {
             "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭",
             "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉"
         };
+        public static readonly string[] FAIL_EMOJI = { "🤣", "😎", "🥰", "☺️", "💀", "😤", "😩" };
 
         public static string FileSize(string path) => FileSize(SizeInBytes(path));
         public static string FileSize(long  bytes)
@@ -181,7 +186,7 @@ namespace Witlesss.X
 
         public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
 
-        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path));
+        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 
         public static FileInfo[] GetFilesInfo(string path)
         {

@@ -342,4 +342,9 @@ s   - save and exit
 
 &lt;code&gt;/fuse@piece_fap_bot {0}&lt;/code&gt;</value>
     </data>
+    <data name="LINK_MANUAL" xml:space="preserve">
+        <value>Я храню ссылки на последние &lt;b&gt;&lt;i&gt;{0} постов с реддита&lt;/i&gt;&lt;/b&gt; которые я отослал с момента включения.
+
+Если вы за этим, пропишите /link в ответ на сообщение с постом</value>
+    </data>
 </root>

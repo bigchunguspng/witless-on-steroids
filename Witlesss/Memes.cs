@@ -86,6 +86,8 @@ namespace Witlesss
 
         public string Stickerize(string path) => Execute(new F_Resize(path, NormalizeSize(SourceSize), ".webp"));
 
+        public string Compress(string path) => Execute(new F_CompressImage(path));
+
         public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;

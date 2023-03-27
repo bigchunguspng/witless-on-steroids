@@ -10,4 +10,13 @@ namespace Witlesss.MediaTools
             AddInput(input);
         }
     }
+
+    //ffmpeg -i "input.png" -qscale:v 7 output.jpg
+    public class F_CompressImage : F_ToJPG
+    {
+        public F_CompressImage(string input) : base(input, ".jpg")
+        {
+            AddOptions("-qscale:v", "5");
+        }
+    }
 }

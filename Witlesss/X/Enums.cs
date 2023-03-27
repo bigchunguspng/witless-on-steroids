@@ -1,9 +1,19 @@
 ﻿namespace Witlesss.X
 {
-    public enum SpeedMode
+    public enum ColorMode { Color, White }
+
+    public enum DgMode    { Square, Wide }
+
+    public enum SpeedMode { Fast, Slow   }
+
+    public enum SortingMode
     {
-        Fast,
-        Slow
+        Hot, New, Top, Rising, Controversial    // reddit
+    }
+
+    public enum LetterCaseMode
+    {
+        Lower, Upper, Sentence         // text formatting
     }
 
     public enum MediaType
@@ -13,30 +23,6 @@
         Movie, // video with sound
         Round  // video note
     }
-    
-    public enum MemeType
-    {
-        Dg,
-        Meme
-    }
 
-    public enum ColorMode
-    {
-        Color,
-        White
-    }
-
-    public enum DgMode
-    {
-        Square,
-        Wide
-    }
-
-    public enum LetterCaseMode
-    {
-        Lower,
-        Upper,
-        Sentence
-    }
-
+    public enum MemeType  { Dg, Meme }
 }

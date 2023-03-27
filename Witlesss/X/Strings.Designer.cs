@@ -404,6 +404,17 @@ namespace Witlesss.X {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Я храню ссылки на последние &lt;b&gt;&lt;i&gt;{0} постов с реддита&lt;/i&gt;&lt;/b&gt; которые я отослал с момента включения.
+        ///
+        ///Если вы за этим, пропишите /link в ответ на сообщение с постом.
+        /// </summary>
+        internal static string LINK_MANUAL {
+            get {
+                return ResourceManager.GetString("LINK_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CHATLIST SAVED.
         /// </summary>
         internal static string LOG_CHATLIST_SAVED {

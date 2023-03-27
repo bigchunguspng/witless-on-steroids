@@ -4,8 +4,8 @@
     {
         private static void Main()
         {
-            var bot = new Bot();
-            bot.Run();
+            Config.ReadFromFile();
+            Bot .LaunchInstance();
         }
     }
 }

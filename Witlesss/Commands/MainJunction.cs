@@ -107,7 +107,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/damn"   )) _sc = _bitrate;
             else if (command == "/reverse" ) _sc = _reverse;
             else if (command == "/chat_id" ) _sc = _chatID;
-            else if (command == "/sex"     ) _sc = _sticker;
+            else if (CommandIs( "/sex"    )) _sc = _sticker;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;
             else if (command == "/debug"   ) _sc = _debug;

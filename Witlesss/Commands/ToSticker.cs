@@ -15,6 +15,7 @@ namespace Witlesss.Commands
 
             using var stream = File.OpenRead(Bot.MemeService.Stickerize(path));
             Bot.SendSticker(Chat, new InputOnlineFile(stream));
+            if (Text[^1] is 's' or 'S') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
 

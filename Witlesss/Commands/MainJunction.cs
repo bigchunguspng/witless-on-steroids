@@ -70,7 +70,7 @@ namespace Witlesss.Commands
                 
                 Baka.Count();
                 
-                if (Message.Photo?[^1] is { } p && HaveToMeme())
+                if (Message.Photo?[^1] is { } p && HaveToMemePhoto())
                 {
                     GetMemeMaker(p.Width, p.Height).ProcessPhoto(p.FileId);
                 }
@@ -83,8 +83,12 @@ namespace Witlesss.Commands
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
                 ImageProcessor SelectMemeMaker() => _mematics[Baka.Meme.Type];
 
-                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance;
                 bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
+                bool HaveToMemePhoto() => !BetterSkip() && HaveToMeme(TextIsMemable() ? 4 : 1);
+                bool HaveToMeme(int x = 1) => Extension.Random.Next(100 / x) < Baka.Meme.Chance;
+                bool BetterSkip() => Baka.Meme.Chance < 50 && PhotoHasShortCaption();
+                bool PhotoHasShortCaption() => Text is { } t && !t.Contains('\n');
+                bool TextIsMemable()        => Text is { } t &&  t.Contains('\n');
             }
             else if (Text is not null && TextIsCommand(out var command))
             {

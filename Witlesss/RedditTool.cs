@@ -14,7 +14,7 @@ namespace Witlesss
         private const int EXCLUDED_CAPACITY = 256, POST_LIMIT = 32;
         public  const int KEEP_POSTS = 50;
 
-        private bool HasEnoughPosts;
+        private bool HasEnoughPosts; // todo this by query (and move all query related stuff to a separate class)
         private PostData _post;
 
         private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken);
@@ -86,7 +86,7 @@ namespace Witlesss
                 CheckCache(query);
                 _post = Posts[query].Dequeue();
             }
-            while (HasEnoughPosts && Excluded.Contains(_post.Fullname));
+            while (HasEnoughPosts && Posts[query].Count > 0 && Excluded.Contains(_post.Fullname));
         }
 
         private void CheckCache(SrQuery query)

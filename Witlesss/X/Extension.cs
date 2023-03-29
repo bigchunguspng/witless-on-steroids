@@ -186,7 +186,7 @@ namespace Witlesss.X
 
         public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
 
-        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
+        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path));
 
         public static FileInfo[] GetFilesInfo(string path)
         {

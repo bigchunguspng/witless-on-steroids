@@ -26,11 +26,14 @@ namespace Witlesss
 
         private T NewT()
         {
-            CreateFilePath(_path);
+            if (PathIsNested) CreateFilePath(_path);
+
             T result = new();
             SaveData(result);
             return result;
         }
+
+        private bool PathIsNested => _path.Contains('\\') || _path.Contains('/');
     }
 
     public class FileIO_Static

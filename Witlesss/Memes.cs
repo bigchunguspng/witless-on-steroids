@@ -125,6 +125,8 @@ namespace Witlesss
 
         public string RemoveAudio(string path) => Execute(new F_ToAnimation(path, FitSize(SourceSize)));
 
+        public string CompressAnimation(string path) => Execute(new F_CompressAnimation(path));
+
         public string RemoveBitrate(string path, ref int bitrate, MediaType type)
         {
             if (type > MediaType.Audio)

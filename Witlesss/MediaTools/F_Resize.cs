@@ -11,9 +11,19 @@ namespace Witlesss.MediaTools
         }
     }
 
+    // ffmpeg -i "input.mp4" -s WxH -an -vcodec libx264 -crf 30 output.mp4
     public class F_ToAnimation : F_Resize
     {
         public F_ToAnimation(string input, Size size) : base(input, size)
+        {
+            AddOptions("-an", "-vcodec", "libx264", "-crf", "30");
+        }
+    }
+    
+    // ffmpeg -i "input.mp4" -an -vcodec libx264 -crf 30 output.mp4
+    public class F_CompressAnimation : F_ToJPG
+    {
+        public F_CompressAnimation(string input) : base(input, ".mp4")
         {
             AddOptions("-an", "-vcodec", "libx264", "-crf", "30");
         }

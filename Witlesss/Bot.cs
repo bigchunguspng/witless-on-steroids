@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediaToolkit.Util;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
 
@@ -12,12 +13,13 @@ namespace Witlesss
 {
     public class Bot : BotCore
     {
+        public  readonly User Me;
+        
         private readonly FileIO<ChatList> ChatsIO;
         public  readonly ChatList      SussyBakas;
 
         public  readonly MainJunction Fork = new();
         public  readonly Memes MemeService = new();
-        public  readonly RedditTool Reddit = new();
 
         private readonly ConsoleUI PlayStation8;
         public  readonly BanHammer ThorRagnarok;
@@ -26,8 +28,9 @@ namespace Witlesss
 
         private Bot()
         {
-            Config.SetBotUsername(Client.GetMeAsync().Result.Username);
             Command.Bot = this;
+            Me = Client.GetMeAsync().Result;
+            Config.SetBotUsername(Me.Username);
 
             PlayStation8 = new ConsoleUI(this);
             ThorRagnarok = new BanHammer(this);
@@ -56,6 +59,7 @@ namespace Witlesss
 
             Client.StartReceiving(new Handler(this), options);
             Log($"This is the certified {Config.BotUsername} classic!", ConsoleColor.Yellow);
+            Log($"=======\n{Me.FirstName} на связи!", ConsoleColor.Yellow);
         }
 
         private void LoadSomeBakas()

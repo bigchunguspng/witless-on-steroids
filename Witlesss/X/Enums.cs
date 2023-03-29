@@ -8,7 +8,8 @@
 
     public enum SortingMode
     {
-        Hot, New, Top, Rising, Controversial    // reddit
+        Hot = 'h',  New = 'n',  Top = 't',
+        Rising = 'r', Controversial = 'c'       // reddit
     }
 
     public enum LetterCaseMode

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.X.MemeType, Witlesss.Commands.ImageProcessor>;
 
 namespace Witlesss.Commands
 {
@@ -36,16 +36,16 @@ namespace Witlesss.Commands
         private readonly ToggleColors _colors = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
-        private readonly Dictionary<MemeType, ImageProcessor> _mematics;
+        private readonly MemeProcessors _mematics;
 
-        public MainJunction() => _mematics = new Dictionary<MemeType, ImageProcessor>()
+        public MainJunction() => _mematics = new MemeProcessors
         {
             { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }
         };
 
-        private bool TextIsCommand(out string command)
+        private static bool TextIsCommand(out string command)
         {
-            command = Text.ToLower().Replace(BOT_USERNAME, "");
+            command = RemoveBotMention();
             return Text.StartsWith('/');
         }
 

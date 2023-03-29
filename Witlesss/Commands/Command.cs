@@ -32,6 +32,8 @@ namespace Witlesss.Commands
             string last = Message.From?.LastName ?? "";
             return last == "" ? name : name + " " + last;
         }
+        
+        public static string RemoveBotMention() => Text.ToLower().Replace(Config.BotUsername, "");
     }
 
     public abstract class WitlessCommand : Command

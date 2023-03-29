@@ -42,7 +42,7 @@ namespace Witlesss
                 }
             } while (_input != "s");
             Bot.SaveDics();
-            Bot.Reddit.SaveExcluded();
+            RedditTool.Instance.SaveExcluded();
         }
 
         private void DoConsoleCommands()

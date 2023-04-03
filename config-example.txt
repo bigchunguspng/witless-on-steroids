@@ -1,0 +1,4 @@
+tg-token             =  VALUE
+reddit-app-id        =  VALUE
+reddit-refresh-token =  VALUE
+ffmpeg-path          = "VALUE" (like "C:\ffmpeg\bin\ffmpeg.exe")

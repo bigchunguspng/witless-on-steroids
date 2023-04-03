@@ -32,13 +32,13 @@ namespace Witlesss
             _drawers = new[] { new DemotivatorDrawer(), new DemotivatorDrawer(1280) };
             _imgflip = new MemeGenerator();
 
-            while (!File.Exists(FFMPEG_PATH))
+            while (!File.Exists(Config.FFMpegPath))
             {
-                Log($@"""{FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
+                Log($@"""{Config.FFMpegPath}"" not found. Put it here or close the window", ConsoleColor.Yellow);
                 Log("Press any key to continue...");
                 Console.ReadKey();
             }
-            _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
+            _service = MediaToolkitService.CreateInstance(Config.FFMpegPath);
         }
 
         public DgMode Mode;

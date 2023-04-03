@@ -119,7 +119,7 @@ namespace Witlesss
         {
             try
             {
-                string message = File.ReadAllText(".spam");
+                string message = File.ReadAllText("spam.txt");
                 foreach (var witless in Bakas)
                 {
                     if (SizeInBytes(witless.Path) > size)
@@ -131,7 +131,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError("SPAM FAILED :( " + e.Message);
+                LogError("SoRRY, CAN'T SPAM, BRO x_x" + e.Message);
             }
         }
 

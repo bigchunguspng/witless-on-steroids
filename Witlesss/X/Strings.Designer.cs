@@ -296,15 +296,6 @@ namespace Witlesss.X {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to C:\ffmpeg\bin\ffmpeg.exe.
-        /// </summary>
-        internal static string FFMPEG_PATH {
-            get {
-                return ResourceManager.GetString("FFMPEG_PATH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to К сожалению, я не нашёл словаря с таким названием.
         /// </summary>
         internal static string FUSE_FAIL_BASE {

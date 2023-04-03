@@ -130,9 +130,6 @@
 
 Копия словаря сохранена как &lt;b&gt;"{0}"&lt;/b&gt;</value>
     </data>
-    <data name="FFMPEG_PATH" xml:space="preserve">
-        <value>C:\ffmpeg\bin\ffmpeg.exe</value>
-    </data>
     <data name="DBS_FOLDER" xml:space="preserve">
         <value>Telegram-WitlessDBs</value>
     </data>

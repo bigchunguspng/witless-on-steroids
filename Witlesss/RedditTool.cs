@@ -38,7 +38,7 @@ namespace Witlesss
 
         private PostData _post;
 
-        private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken);
+        private readonly RedditClient client = new(RedditAppID, RedditToken);
         private readonly string[] subreddits = 
         {
             "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",

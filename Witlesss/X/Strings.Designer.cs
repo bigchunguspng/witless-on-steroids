@@ -87,11 +87,13 @@ namespace Witlesss.X {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to @piece_fap_bot.
+        ///   Looks up a localized string similar to This is the certified {0} classic!
+        ///=======
+        ///{1} на связи!.
         /// </summary>
-        internal static string BOT_USERNAME {
+        internal static string BUENOS_DIAS {
             get {
-                return ResourceManager.GetString("BOT_USERNAME", resourceCulture);
+                return ResourceManager.GetString("BUENOS_DIAS", resourceCulture);
             }
         }
         

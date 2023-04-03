@@ -58,8 +58,7 @@ namespace Witlesss
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
             Client.StartReceiving(new Handler(this), options);
-            Log($"This is the certified {Config.BotUsername} classic!", ConsoleColor.Yellow);
-            Log($"=======\n{Me.FirstName} на связи!", ConsoleColor.Yellow);
+            Log(string.Format(BUENOS_DIAS, BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
         }
 
         private void LoadSomeBakas()

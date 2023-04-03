@@ -33,7 +33,7 @@ namespace Witlesss.Commands
             return last == "" ? name : name + " " + last;
         }
         
-        public static string RemoveBotMention() => Text.ToLower().Replace(Config.BotUsername, "");
+        public static string RemoveBotMention() => Text.ToLower().Replace(BOT_USERNAME, "");
     }
 
     public abstract class WitlessCommand : Command

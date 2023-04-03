@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Witlesss
+namespace Witlesss // ReSharper disable InconsistentNaming
 {
     public static class Config
     {
         public static string TelegramToken { get; private set; }
         public static string RedditAppID   { get; private set; }
         public static string RedditToken   { get; private set; }
-        public static string BotUsername   { get; private set; }
-        public static string FFMpegPath    { get; private set; }
+        public static string BOT_USERNAME  { get; private set; }
+        public static string FFMPEG_PATH   { get; private set; }
 
         private const string path = "config.txt";
 
@@ -19,7 +19,7 @@ namespace Witlesss
             GetValue(@"t\S*g\S*token\s+=\s+(\S+)",   s => TelegramToken = s, "telegram-token"      );
             GetValue(   @"r\S*app\S*\s+=\s+(\S+)",   s => RedditAppID   = s, "reddit-app-id"       );
             GetValue( @"r\S*token\S*\s+=\s+(\S+)",   s => RedditToken   = s, "reddit-refresh-token");
-            GetValue(@"ff\S*path\S*\s+=\s+""(.+)""", s => FFMpegPath    = s, "ffmpeg-path"         );
+            GetValue(@"ff\S*path\S*\s+=\s+""(.+)""", s => FFMPEG_PATH   = s, "ffmpeg-path"         );
 
             void GetValue(string pattern, Action<string> action, string prop)
             {
@@ -33,6 +33,6 @@ namespace Witlesss
                 }
             }
         }
-        public static void SetBotUsername(string username) => BotUsername = $"@{username.ToLower()}";
+        public static void SetBotUsername(string username) => BOT_USERNAME = $"@{username.ToLower()}";
     }
 }

@@ -21,9 +21,6 @@
     <data name="START_RESPONSE" xml:space="preserve">
         <value>ВИРУСНАЯ БАЗА ОБНОВЛЕНА!</value>
     </data>
-    <data name="BOT_USERNAME" xml:space="preserve">
-        <value>@piece_fap_bot</value>
-    </data>
     <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;&lt;i&gt;Инструкция в самолёте:&lt;/i&gt;&lt;/b&gt;
 
@@ -343,5 +340,10 @@ s   - save and exit
         <value>Я храню ссылки на последние &lt;b&gt;&lt;i&gt;{0} постов с реддита&lt;/i&gt;&lt;/b&gt; которые я отослал с момента включения.
 
 Если вы за этим, пропишите /link в ответ на сообщение с постом</value>
+    </data>
+    <data name="BUENOS_DIAS" xml:space="preserve">
+        <value>This is the certified {0} classic!
+=======
+{1} на связи!</value>
     </data>
 </root>

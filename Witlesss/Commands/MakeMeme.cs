@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
-using static Witlesss.X.JpegCoder;
 using static Witlesss.Memes;
 
 namespace Witlesss.Commands
@@ -17,7 +16,7 @@ namespace Witlesss.Commands
 
         public ImageProcessor SetUp(int w, int h)
         {
-            PassQuality(Baka);
+            JpegCoder.PassQuality(Baka);
 
             return this;
         }

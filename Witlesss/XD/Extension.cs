@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static Witlesss.X.LetterCaseMode;
+using static Witlesss.XD.LetterCaseMode;
 
-namespace Witlesss.X
+namespace Witlesss.XD
 {
     public static class Extension
     {
@@ -133,7 +133,7 @@ namespace Witlesss.X
 
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {
-            string a = XD(Strings.SET_FREQUENCY_RESPONSE);
+            string a = XDDD(Strings.SET_FREQUENCY_RESPONSE);
             if (interval % 10 > 4 || interval % 10 == 0 || interval is > 10 and < 15)
                 a = $"{a} каждые {interval} сообщений";
             else if (interval % 10 > 1)
@@ -145,7 +145,7 @@ namespace Witlesss.X
             return a;
         }
 
-        public static string XD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
+        public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
         public static string Pick(string[] responses) => responses[Random.Next(responses.Length)];
 
         public static readonly string[] FILE_TOO_BIG_RESPONSE =

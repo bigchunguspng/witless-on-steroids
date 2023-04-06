@@ -141,7 +141,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                SendMessage(chat, e.Message == "Bad Request: file is too big" ? Pick(FILE_TOO_BIG_RESPONSE) : XD(e.Message));
+                SendMessage(chat, e.Message == "Bad Request: file is too big" ? Pick(FILE_TOO_BIG_RESPONSE) : XDDD(e.Message));
                 throw;
             }
         }

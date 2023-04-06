@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WordChart = Witlesss.X.SyncronizedDictionary<string, float>;
+using WordChart = Witlesss.XD.SyncronizedDictionary<string, float>;
 
 namespace Witlesss
 {

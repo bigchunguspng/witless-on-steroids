@@ -1,4 +1,4 @@
-﻿namespace Witlesss.X
+﻿namespace Witlesss.XD
 {
     public enum ColorMode { Color, White }
 

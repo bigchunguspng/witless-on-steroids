@@ -8,7 +8,7 @@
             
             Baka.Meme.Stickers = !Baka.Meme.Stickers;
             Bot.SaveChatList();
-            Bot.SendMessage(Chat, XD(string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ")));
+            Bot.SendMessage(Chat, XDDD(string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ")));
         }
     }
     
@@ -21,7 +21,7 @@
             var c = Baka.Meme.Dye == ColorMode.Color;
             Baka.Meme.Dye = c ? ColorMode.White : ColorMode.Color;
             Bot.SaveChatList();
-            Bot.SendMessage(Chat, XD(string.Format(COLORS_RESPONSE, c ? "белым" : "цветным")));
+            Bot.SendMessage(Chat, XDDD(string.Format(COLORS_RESPONSE, c ? "белым" : "цветным")));
         }
     }
 }

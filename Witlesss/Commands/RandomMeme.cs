@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Reddit.Controllers;
 using Telegram.Bot.Types.InputFiles;
-using static Witlesss.X.SortingMode;
+using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
 #pragma warning disable SYSLIB0014

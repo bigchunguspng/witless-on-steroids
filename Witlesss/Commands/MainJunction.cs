@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.X.MemeType, Witlesss.Commands.ImageProcessor>;
+using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.ImageProcessor>;
 
 namespace Witlesss.Commands
 {

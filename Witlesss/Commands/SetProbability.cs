@@ -10,7 +10,7 @@
             {
                 Baka.Meme.Chance = value;
                 Bot.SaveChatList();
-                Bot.SendMessage(Chat, XD(string.Format(SET_P_RESPONSE, Baka.Meme.Chance)));
+                Bot.SendMessage(Chat, XDDD(string.Format(SET_P_RESPONSE, Baka.Meme.Chance)));
                 Log($"{Title} >> MEME CHANCE >> {Baka.Meme.Chance}%");
             }
             else

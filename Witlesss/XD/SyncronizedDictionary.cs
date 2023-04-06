@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Witlesss.X
+namespace Witlesss.XD
 {
     public class SyncronizedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {

@@ -2,7 +2,7 @@
 using System.Drawing.Imaging;
 using System.Linq;
 
-namespace Witlesss.X
+namespace Witlesss.XD
 {
     public static class JpegCoder
     {
@@ -10,7 +10,7 @@ namespace Witlesss.X
         private static readonly ImageCodecInfo JpgEncoder;
         private static readonly EncoderParameters EncoderParameters;
 
-        public static long JpegQuality { get; private set; } = 120;
+        public static long Quality { get; private set; } = 120;
 
         static JpegCoder()
         {
@@ -21,9 +21,9 @@ namespace Witlesss.X
         public  static void PassQuality(Witless witless) => PassQuality(witless.Meme.Quality);
         private static void PassQuality(int value)
         {
-            if (JpegQuality == value) return;
+            if (Quality == value) return;
 
-            JpegQuality = value;
+            Quality = value;
             EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
         }
 

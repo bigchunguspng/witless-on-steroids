@@ -2,7 +2,6 @@
 using System.Drawing;
 using Telegram.Bot.Types;
 using Witlesss.MediaTools;
-using static Witlesss.X.JpegCoder;
 using TS = System.TimeSpan;
 
 namespace Witlesss
@@ -114,7 +113,7 @@ namespace Witlesss
 
         private static int ToEven (int x) => x - x % 2;
 
-        private static int Quality => JpegQuality > 80 ? 0 : 51 - (int)(JpegQuality * 0.42); // 0 | 17 - 51
+        private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 
         //public  static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
         //public  static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;

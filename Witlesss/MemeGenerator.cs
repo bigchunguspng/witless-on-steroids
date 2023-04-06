@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using Witlesss.Commands;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using static Witlesss.X.JpegCoder;
 
 namespace Witlesss
 {
@@ -44,10 +43,10 @@ namespace Witlesss
 
             if (_resize) image = CropFix(image);
 
-            return SaveImage(image, Ext.Replace(path, "-M.jpg"));
+            return JpegCoder.SaveImage(image, Ext.Replace(path, "-M.jpg"));
         }
 
-        public string BakeCaption(DgText text) => SaveImageTemp(DrawCaption(text, new Bitmap(_w, _h)));
+        public string BakeCaption(DgText text) => JpegCoder.SaveImageTemp(DrawCaption(text, new Bitmap(_w, _h)));
         private Image DrawCaption(DgText text, Image image)
         {
             using var graphics = Graphics.FromImage(image);

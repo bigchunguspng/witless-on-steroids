@@ -34,7 +34,7 @@ namespace Witlesss.Commands
                 if (x)
                 {
                     Bot.SaveChatList();
-                    Bot.SendMessage(Chat, XD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
+                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
                     Log($"{Title} >> MEMES TYPE >> {(Baka.Meme.Type == MemeType.Dg ? "D" : "M")}");
                 }
             }

@@ -9,7 +9,6 @@ using static System.Char;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
-using static Witlesss.X.JpegCoder;
 
 namespace Witlesss
 {
@@ -75,7 +74,7 @@ namespace Witlesss
 
         public string DrawDemotivator(string path, DgText text) => PasteImage(DrawFrame(text), path);
 
-        public string MakeFrame(DgText text) => SaveImageTemp(DrawFrame(text));
+        public string MakeFrame(DgText text) => JpegCoder.SaveImageTemp(DrawFrame(text));
         private Image DrawFrame(DgText text)
         {
             Image background = new Bitmap(_w, _h);
@@ -111,7 +110,7 @@ namespace Witlesss
             
             string output = Ext.Replace(picture, "-D.jpg");
             
-            return SaveImage(background, output);
+            return JpegCoder.SaveImage(background, output);
         }
 
         private KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));

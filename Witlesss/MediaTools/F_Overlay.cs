@@ -4,7 +4,7 @@ using FFMpegCore;
 using static Witlesss.MediaTools.F_SingleInput_Base;
 using Drawer = Witlesss.DemotivatorDrawer;
 
-namespace Witlesss.MediaTools
+namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 {
     // -i video -i image -filter_complex "[0:v]scale=690:420[vid];[vid][1:v]overlay=0:0"   meme.mp4
     // -i image -i video -filter_complex "[1:v]scale=620:530[vid];[0:v][vid]overlay=50:50" demo.mp4
@@ -23,7 +23,7 @@ namespace Witlesss.MediaTools
 
         private void ArgsMeme(FFMpegArgumentOptions o, int f)
         {
-            var v = FFProbe.Analyse(_a).PrimaryVideoStream!;
+            var v = GetVideoStream(_a);
             var s = FF_Extensions.ValidSize(v.Width, v.Height);
             o = BuildAndCompress(o, f, CoFi.Null.Scale("0:v", s, "vid").Overlay("vid", "1:v", Point.Empty));
         }

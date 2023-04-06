@@ -3,7 +3,7 @@ using FFMpegCore.Enums;
 using static Witlesss.Memes;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
-namespace Witlesss.MediaTools
+namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 {
     public class F_Resize : F_SingleInput_Base
     {

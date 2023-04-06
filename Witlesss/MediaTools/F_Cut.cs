@@ -2,7 +2,7 @@
 using FFMpegCore;
 using static Witlesss.MediaTools.ComplexFilterArgs;
 
-namespace Witlesss.MediaTools
+namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 {
     public class F_Cut : F_SingleInput_Base
     {
@@ -21,9 +21,7 @@ namespace Witlesss.MediaTools
         // output
         private void SusArgs(FFMpegArgumentOptions o)
         {
-            var i = MediaInfo();
-            if (i.video) o = o.FixWebmSize(i.v);
-            if (i.audio) o = o.FixSongArt(i.info);
+            var i = MediaInfoWithFixing(ref o);
 
             var nodes = CoFi.Null;
             var span = Span(i.info);
@@ -35,9 +33,7 @@ namespace Witlesss.MediaTools
         // -i input [-s WxH] [-vn] -ss 00:00:05 [-t 00:00:15] output
         private void CutArgs(FFMpegArgumentOptions o)
         {
-            var i = MediaInfo();
-            if (i.video) o = o.FixWebmSize(i.v);
-            if (i.audio) o = o.FixSongArt(i.info); // todo define as a method
+            o = AddFixes(o, MediaInfo());
 
             o = o.Seek(_span.Start);
             if (_span.Length != TimeSpan.Zero) o = o.WithDuration(_span.Length);

@@ -1,7 +1,7 @@
 ﻿using System;
 using FFMpegCore;
 
-namespace Witlesss.MediaTools
+namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 {
     // -i input [-vf "setpts=0.5*PTS,fps=60"][-s WxH] [-af "atempo=2.0"][-vn] output
     public class F_Speed : F_SingleInput_Base
@@ -14,9 +14,9 @@ namespace Witlesss.MediaTools
 
         private void Args(FFMpegArgumentOptions o)
         {
-            var i = MediaInfo();
-            if (i.video) o = o.WithVideoFilters(v => v.ChangeVideoSpeed(_speed).SetFPS(GetFPS())).FixWebmSize(i.v);
-            if (i.audio) o = o.WithAudioFilters(a => a.ChangeAudioSpeed(_speed)).FixSongArt(i.info);
+            var i = MediaInfoWithFixing(ref o);
+            if (i.video) o = o.WithVideoFilters(v => v.ChangeVideoSpeed(_speed).SetFPS(GetFPS()));
+            if (i.audio) o = o.WithAudioFilters(a => a.ChangeAudioSpeed(_speed));
 
             double GetFPS() => Math.Min(i.v.AvgFrameRate * _speed, 90D);
         }

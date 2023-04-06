@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using FFMpegCore;
+using FFO = FFMpegCore.FFMpegArgumentOptions;
+using FAP = FFMpegCore.FFMpegArgumentProcessor;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
+namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment InconsistentNaming
 {
     public abstract class F_SingleInput_Base
     {
@@ -10,19 +12,27 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         protected F_SingleInput_Base(string input) => _input = input;
 
-        protected static FFMpegArgumentProcessor GetFFMpegAP(string input, string output, Action<FFMpegArgumentOptions> action)
-        {
-            return FFMpegArguments.FromFileInput(input).OutputToFile(output, addArguments: action);
-        }
-        protected static string SetOutName_WEBM_safe(string path, string suffix)
+        public static string SetOutName_WEBM_safe(string path, string suffix)
         {
             string extension = Path.GetExtension(path);
             if (extension == ".webm") extension = ".mp4";
             return SetOutName(path, suffix, extension);
         }
+        public static string SetOutName(string path, string suffix, string extension)
+        {
+            return RemoveExtension(path) + suffix + extension;
+        }
 
         public static VideoStream GetVideoStream(string path) => FFProbe.Analyse(path).PrimaryVideoStream;
-        protected (IMediaAnalysis info, bool audio, bool video, VideoStream v) MediaInfo()
+
+        /// <summary> Gets media info + adds fixes to the options </summary>
+        protected MediaInfo MediaInfoWithFixing(ref FFO o)
+        {
+            var i = MediaInfo();
+            o = AddFixes(o, i);
+            return i;
+        }
+        protected MediaInfo MediaInfo()
         {
             var info = FFProbe.Analyse(_input);
             var v = info.PrimaryVideoStream;
@@ -30,26 +40,37 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
             var audio = a is { };
             var video = v is { AvgFrameRate: not double.NaN };
 
-            return (info, audio, video, v);
+            return new MediaInfo(info, audio, video, v);
         }
-        protected string Cook(string output, Action<FFMpegArgumentOptions> args) // waltuh
+        protected FFO AddFixes(FFO o, MediaInfo i)
+        {
+            if (i.video) o = o.FixWebmSize(i.v);
+            if (i.audio) o = o.FixSongArt(i.info);
+
+            return o;
+        }
+
+        protected string Cook(string output, Action<FFO> args) // waltuh
         {
             var processor = GetFFMpegAP(_input, output, args);
             Run(processor);
             
             return output;
         }
-        public static void Run(FFMpegArgumentProcessor processor)
+
+        public static void Run(FAP processor)
         {
             LogArguments(processor);
             processor.ProcessSynchronously();
         }
 
-        public static string SetOutName(string path, string suffix, string extension)
+        private static FAP GetFFMpegAP(string input, string output, Action<FFO> action)
         {
-            return RemoveExtension(path) + suffix + extension;
+            return FFMpegArguments.FromFileInput(input).OutputToFile(output, addArguments: action);
         }
-        
-        protected static void LogArguments(FFMpegArgumentProcessor a) => Log(string.Join(' ', a.Arguments));
+
+        private static void LogArguments(FAP a) => Log(string.Join(' ', a.Arguments));
     }
+
+    public record MediaInfo(IMediaAnalysis info, bool audio, bool video, VideoStream v);
 }

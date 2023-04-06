@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Witlesss.Commands;
 
@@ -12,8 +11,6 @@ namespace Witlesss
 {
     public class Bot : BotCore
     {
-        public  readonly User Me;
-        
         private readonly FileIO<ChatList> ChatsIO;
         public  readonly ChatList      SussyBakas;
 
@@ -28,7 +25,6 @@ namespace Witlesss
         private Bot()
         {
             Command.Bot = this;
-            Me = Client.GetMeAsync().Result;
             Config.SetBotUsername(Me.Username);
 
             PlayStation8 = new ConsoleUI(this);

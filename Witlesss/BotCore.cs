@@ -12,6 +12,9 @@ namespace Witlesss
     public abstract class BotCore
     {
         public readonly TelegramBotClient Client = new(TelegramToken);
+        public readonly User Me;
+
+        protected BotCore() => Me = Client.GetMeAsync().Result;
 
         public void SendMessage(long chat, string text)
         {
@@ -44,7 +47,8 @@ namespace Witlesss
 
         public void SendAudio(long chat, InputOnlineFile audio)
         {
-            var task = Client.SendAudioAsync(chat, audio);
+            using var cover = File.OpenRead("art.jpg"); //todo config path
+            var task = Client.SendAudioAsync(chat, audio, thumb: new InputMedia(cover, "xd"));
             TrySend(task, chat, "audio");
         }
 

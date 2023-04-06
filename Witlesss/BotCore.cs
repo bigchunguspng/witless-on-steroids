@@ -47,7 +47,7 @@ namespace Witlesss
 
         public void SendAudio(long chat, InputOnlineFile audio)
         {
-            using var cover = File.OpenRead("art.jpg"); //todo config path
+            using var cover = File.OpenRead(Config.ArtLocation);
             var task = Client.SendAudioAsync(chat, audio, thumb: new InputMedia(cover, "xd"));
             TrySend(task, chat, "audio");
         }

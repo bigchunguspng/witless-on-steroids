@@ -9,7 +9,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         public static string RedditAppID   { get; private set; }
         public static string RedditToken   { get; private set; }
         public static string BOT_USERNAME  { get; private set; }
-        public static string FFMPEG_PATH   { get; private set; }
+        public static string ArtLocation   { get; private set; }
 
         private const string path = "config.txt";
 
@@ -19,7 +19,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
             GetValue(@"t\S*g\S*token\s+=\s+(\S+)",   s => TelegramToken = s, "telegram-token"      );
             GetValue(   @"r\S*app\S*\s+=\s+(\S+)",   s => RedditAppID   = s, "reddit-app-id"       );
             GetValue( @"r\S*token\S*\s+=\s+(\S+)",   s => RedditToken   = s, "reddit-refresh-token");
-            GetValue(@"ff\S*path\S*\s+=\s+""(.+)""", s => FFMPEG_PATH   = s, "ffmpeg-path"         );
+            GetValue(@"a\S*art\S*\s+=\s+""?(.+)""?", s => ArtLocation   = s, "album-art"           );
 
             void GetValue(string pattern, Action<string> action, string prop)
             {

@@ -9,8 +9,8 @@ namespace Witlesss
 {
     public class Memes
     {
-        private readonly DemotivatorDrawer [] _drawers;
-        private readonly MemeGenerator        _imgflip;
+        private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
+        private readonly MemeGenerator        _imgflip = new();
         private static   Size SourceSize  = Size.Empty;
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
@@ -23,19 +23,6 @@ namespace Witlesss
         
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
-
-        public Memes()
-        {
-            _drawers = new[] { new DemotivatorDrawer(), new DemotivatorDrawer(1280) };
-            _imgflip = new MemeGenerator();
-
-            while (!File.Exists(Config.FFMPEG_PATH)) // todo something
-            {
-                Log($@"""{Config.FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
-                Log("Press any key to continue...");
-                Console.ReadKey();
-            }
-        }
 
         public DgMode Mode;
 

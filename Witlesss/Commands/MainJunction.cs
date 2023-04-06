@@ -94,7 +94,7 @@ namespace Witlesss.Commands
             {
                 if (DoSimpleCommands(command) || DoStartCommand(command)) return;
 
-                if (ChatIsPrivate || Text.Contains(BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                if (ChatIsPrivate || Text.Contains(Config.BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Witlesss.Commands
             bool CommandIs(string s) => command.StartsWith(s);
         }
 
-        private bool DoStartCommand(string command)
+        private static bool DoStartCommand(string command)
         {
             var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, Witless.AverageBaka(Chat));
             if (success)
@@ -164,7 +164,7 @@ namespace Witlesss.Commands
             return success;
         }
         
-        private async void WitlessPoopAsync(Witless witless, long chat, string text, string title)
+        private static async void WitlessPoopAsync(Witless witless, long chat, string text, string title)
         {
             await Task.Delay(AssumedResponseTime(150, text));
             Bot.SendMessage(chat, witless.Generate());

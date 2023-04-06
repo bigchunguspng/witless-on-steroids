@@ -8,11 +8,11 @@ namespace Witlesss.Commands
     {
         public MakeMeme() : base(new Regex(@"^\/meme\S* *", RegexOptions.IgnoreCase)) { }
 
-        private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
-        private string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
+        private static bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
+        private static string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 
-        private readonly string M_VIDEO = "MEME [M] VID";
-        private readonly string M_STICK = "MEME [M] STICKER";
+        private const string M_VIDEO = "MEME [M] VID";
+        private const string M_STICK = "MEME [M] STICKER";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -89,15 +89,15 @@ namespace Witlesss.Commands
                 else
                 {
                     a = text;
-                    b = AddBottomText() ? Baka.Generate() : "";
+                    b = AddBottomText ? Baka.Generate() : "";
                 }
             }
             return new DgText(a, b);
         }
 
-        private bool AddBottomText() => Text != null && Text.Split()[0].Contains('s');
+        private static bool AddBottomText => Text != null && Text.Split()[0].Contains('s');
 
-        public static ColorMode Dye  => Baka.Meme.Dye;
+        public static ColorMode Dye => Baka.Meme.Dye;
     }
 
     public interface ImageProcessor

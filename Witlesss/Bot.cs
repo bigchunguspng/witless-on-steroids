@@ -53,7 +53,7 @@ namespace Witlesss
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
             Client.StartReceiving(new Handler(this), options);
-            Log(string.Format(BUENOS_DIAS, BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
+            Log(string.Format(BUENOS_DIAS, Config.BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
         }
 
         private void LoadSomeBakas()

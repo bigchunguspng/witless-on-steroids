@@ -1,4 +1,5 @@
 ﻿using System;
+using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands
 {
@@ -18,16 +19,19 @@ namespace Witlesss.Commands
 
             var speed = 2D;
             if (HasDoubleArgument(Text, out double value))
-                speed = Mode == SpeedMode.Fast ? Math.Clamp(value, 0.5, 94) : Math.Clamp(value, 0.0107, 2);
+                speed = Mode == Fast ? ClampFast(value) : ClampSlow(value);
 
             Bot.Download(FileID, Chat, out string path, out var type);
                     
             string result = Memes.ChangeSpeed(path, speed, Mode);
             SendResult(result, type, VideoFilename, AudioFilename);
-            Log($"{Title} >> {(Mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
+            Log($"{Title} >> {(Mode == Fast ? "FAST" : "SLOW" )} [>>]");
 
-            string AudioFilename() => MediaFileName($"Are you {Sender.Split()[0]} or something.mp3");
+            string AudioFilename() => SongNameOr($"Are you {Sender.Split()[0]} or something.mp3");
             string VideoFilename() => $"piece_fap_club-{speed}.mp4";
+
+            double ClampFast(double v) => Math.Clamp(v, 0.5,   94);
+            double ClampSlow(double v) => Math.Clamp(v, 0.0107, 2);
         }
     }
 }

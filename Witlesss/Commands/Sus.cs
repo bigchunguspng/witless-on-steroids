@@ -17,7 +17,7 @@ namespace Witlesss.Commands
                     Bot.SendMessage(Chat, SUS_MANUAL);
                     return;
                 }
-                else argless = true;
+                argless = true;
             }
 
             Bot.Download(FileID, Chat, out string path, out var type);
@@ -28,7 +28,7 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> SUS [>_<]");
 
-            string AudioFilename() => MediaFileName($"Kid Named {WhenTheSenderIsSus()}.mp3");
+            string AudioFilename() => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");
             string VideoFilename() => "sus_fap_club.mp4";
 
             string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;

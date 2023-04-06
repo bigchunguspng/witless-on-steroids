@@ -5,7 +5,7 @@ namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
-        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/a\S*\d+\S*");
+        private static bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/a\S*\d+\S*");
 
         public override void Run()
         {
@@ -36,16 +36,16 @@ namespace Witlesss.Commands
                 Bot.SendMessage(Chat, A_MANUAL);
         }
 
-        protected LetterCaseMode GetMode (string s)
+        protected static LetterCaseMode GetMode (string s)
         {
             if (s == s.ToLower()) return LetterCaseMode.Lower;
             if (s == s.ToUpper()) return LetterCaseMode.Upper;
             return                       LetterCaseMode.Sentence;
         }
 
-        protected string  RemoveCommand  (string s) => Text[(s.Length + 1)..];
+        protected static string RemoveCommand   (string s) => Text[(s.Length + 1)..];
 
-        protected void LogXD(int repeats, string s)
+        protected static void LogXD(int repeats, string s)
         {
             var message = $"{Title} >> {s}";
             if (repeats > 1) message += $" [{repeats}]";

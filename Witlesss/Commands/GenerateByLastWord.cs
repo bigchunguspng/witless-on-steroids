@@ -5,7 +5,7 @@ namespace Witlesss.Commands
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {
-        private bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/zz\S*\d+\S*");
+        private static bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/zz\S*\d+\S*");
 
         public override void Run()
         {

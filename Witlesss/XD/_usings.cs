@@ -1,6 +1,5 @@
 ﻿// Global using directives
 
-global using static Witlesss.Config;
 global using        Witlesss.XD;
 global using static Witlesss.XD.Extension;
 global using static Witlesss.XD.Logger;

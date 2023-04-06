@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
@@ -80,28 +81,28 @@ namespace Witlesss.Commands
             bool IsJsonAttached(Message message) => message.Document?.MimeType is "application/json";
         }
 
-        private string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
-        private string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(EXTRA_DBS_FOLDER))}\n\n{BASE_SIZE()}";
-        private string FUSE_AVAILABLE_DATES()
+        private static string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
+        private static string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(EXTRA_DBS_FOLDER))}\n\n{BASE_SIZE()}";
+        private static string FUSE_AVAILABLE_DATES()
         {
             var files = GetFilesInfo($@"{CH_HISTORY_FOLDER}\{Chat}");
             var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
             if (files.Length > 0)
-                result += "\n\nМожно скормить всё сразу прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
+                result += "\n\nМожно скормить всё, прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
 
             return result;
         }
 
-        private string JsonList(FileInfo[] files)
+        private static string JsonList(FileInfo[] files)
         {
             if (files.Length == 0) return "\n*пусто*";
             
-            var result = "";
-            foreach (var file in files)
+            var res = new StringBuilder();
+            foreach (var db in files)
             {
-                result += $"\n<code>{file.Name.Replace(".json", "")}</code> ({FileSize(file.FullName)})";
+                res.Append($"\n<code>{db.Name.Replace(".json", "")}</code> ({FileSize(db.FullName)})");
             }
-            return result;
+            return res.ToString();
         }
 
         private void FuseWitlessDB(string name)

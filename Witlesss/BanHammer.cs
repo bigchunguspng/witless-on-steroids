@@ -55,7 +55,7 @@ namespace Witlesss
             return o;
         }
 
-        private string HoursLeft(DateTime date)
+        private static string HoursLeft(DateTime date)
         {
             var time = date - DateTime.Now;
             var hours = time.Hours + time.Days * 24;

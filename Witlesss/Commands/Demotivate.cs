@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
+using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands
 {
@@ -7,11 +8,11 @@ namespace Witlesss.Commands
     {
         public Demotivate() : base(new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase)) { }
 
-        private bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*");
-        private string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
-        
-        private readonly string D_VIDEO = "DEMOTIVATOR [^] VID";
-        private readonly string D_STICK = "DEMOTIVATOR [#] STICKER";
+        private static bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/d[vg]\S*\d+\S*");
+        private static string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
+
+        private const string D_VIDEO = "DEMOTIVATOR [^] VID";
+        private const string D_STICK = "DEMOTIVATOR [#] STICKER";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -69,7 +70,7 @@ namespace Witlesss.Commands
             return this;
         }
 
-        private void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? DgMode.Wide : DgMode.Square);
-        private void SetMode(DgMode mode = DgMode.Square) => Bot.MemeService.Mode = mode;
+        private static void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? Wide : Square);
+        private static void SetMode(DgMode mode = Square) => Bot.MemeService.Mode = mode;
     }
 }

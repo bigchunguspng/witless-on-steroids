@@ -35,7 +35,7 @@ namespace Witlesss.Commands
             void AddTextLine() => lines.Add(Baka.GenerateByWord(PullWord(word)).Trim('@').TrimStart());
         }
 
-        private string PullWord(string word)
+        private static string PullWord(string word)
         {
             string[] xs;
 

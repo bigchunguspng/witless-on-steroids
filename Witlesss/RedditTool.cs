@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Reddit;
 using Reddit.Controllers;
+using static Witlesss.Config;
 
 #pragma warning disable CS8524
 
@@ -207,21 +208,8 @@ namespace Witlesss
             QrCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
             return posts;
         }
-
-        // new & hot no time
-        // Query: q string, sort string, time string
-        /*public void Fart()
-        {
-            var qwe = client.Subreddit("okbuddybaka").Search();
-            var axb = client.Search(q: "osaka azumanga", sort: "new");
-            var axd = client.Subreddit("okbuddybaka").Search("osaka", sort: "new");
-            //var asd = client.SearchSubredditNames("osaka azumanga");
-            foreach (var post in axd)
-            {
-                Console.WriteLine(post.Title);
-            }
-        }*/
     }
+
 
     public interface RedditQuery { List<Post> GetPosts(string after = null); }
 

@@ -11,7 +11,7 @@ namespace Witlesss
 {
     public abstract class BotCore
     {
-        public readonly TelegramBotClient Client = new(TelegramToken);
+        public readonly TelegramBotClient Client = new(Config.TelegramToken);
         public readonly User Me;
 
         protected BotCore() => Me = Client.GetMeAsync().Result;

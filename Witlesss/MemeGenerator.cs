@@ -111,7 +111,7 @@ namespace Witlesss
             return image;
         }
 
-        private Image CropFix(Image image)
+        private static Image CropFix(Image image)
         {
             var crop = new Rectangle(0, 0, image.Width - 1, image.Height - 1);
             var bitmap = new Bitmap(image);

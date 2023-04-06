@@ -65,7 +65,7 @@ namespace Witlesss
             }
             return string.Join(' ', list.GetRange(1, list.Count - 2));
         }
-        private string[] Advance(string[] words)
+        private static string[] Advance(string[] words)
         {
             var tokens = new LinkedList<string>(words);
 
@@ -152,7 +152,7 @@ namespace Witlesss
                 }
             }
         }
-        private string[] Tokenize(string s) => s.ToLower().Replace("\n", LF_Spaced).Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        private static string[] Tokenize(string s) => s.ToLower().Replace("\n", LF_Spaced).Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
         public string GenerateByWord(string word)
         {

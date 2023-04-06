@@ -21,13 +21,13 @@ namespace Witlesss.Commands
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> DAMN [*]");
 
-            string AudioFilename() => MediaFileName($"Damn, {Sender}.mp3");
+            string AudioFilename() => SongNameOr($"Damn, {Sender}.mp3");
             string VideoFilename() => $"piece_fap_club-{value}.mp4";
         }
 
-        protected string MediaFileName(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
+        protected static string SongNameOr(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
 
-        protected string Sender => ValidFileName(SenderName);
+        protected static string Sender => ValidFileName(SenderName);
 
         protected bool NothingToProcess()
         {
@@ -63,7 +63,7 @@ namespace Witlesss.Commands
             return true;
         }
 
-        protected void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
+        protected static void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
         {
             using var stream = File.OpenRead(result);
             if      (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, audio()));

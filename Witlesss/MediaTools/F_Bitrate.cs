@@ -2,8 +2,7 @@
 
 namespace Witlesss.MediaTools
 {
-    // ffmpeg -i "input.mp3" -f mp3 -vn              -b:a 1k output.mp3
-    // ffmpeg -i "input.mp4" -vcodec libx264 -crf 45 -b:a 1k output.mp4
+    // -i input [-s WxH] [-vn] [-vcodec libx264 -crf 45] [-b:a 1k] [-f mp3] output
     public class F_Bitrate : F_SingleInput_Base
     {
         private readonly int _factor; // 0 lossless - 51 lowest quality

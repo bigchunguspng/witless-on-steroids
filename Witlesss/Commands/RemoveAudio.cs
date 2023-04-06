@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using static Witlesss.Memes;
 
 namespace Witlesss.Commands
 {
@@ -11,9 +12,9 @@ namespace Witlesss.Commands
 
             Bot.Download(FileID, Chat, out string path, out var type);
             
-            if (type == MediaType.Round) path = Memes.CropVideoNote(path);
+            if (type == MediaType.Round) path = CropVideoNote(path);
 
-            using var stream = File.OpenRead(Memes.RemoveAudio(path));
+            using var stream = File.OpenRead(RemoveAudio(path));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
             Log($"{Title} >> GIF [~]");
 
@@ -37,22 +38,22 @@ namespace Witlesss.Commands
             if (mess.Video is { } v)
             {
                 FileID = v.FileId;
-                Memes.PassSize(v);
+                PassSize(v);
             }
             else if (mess.Animation is { } a)
             {
                 FileID = a.FileId;
-                Memes.PassSize(a);
+                PassSize(a);
             }
             else if (mess.Sticker is { IsVideo: true } s)
             {
                 FileID = s.FileId;
-                Memes.PassSize(s);
+                PassSize(s);
             }
             else if (mess.VideoNote is { } n)
             {
                 FileID = n.FileId;
-                Memes.PassSize(VideoNoteSize());
+                PassSize(VideoNoteSize());
             }
             else return false;
 

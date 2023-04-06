@@ -16,9 +16,9 @@
             }
         }
 
-        private bool SenderHasPermission() => !Baka.AdminsOnly || SenderIsAdmin();
+        private static bool SenderHasPermission() => !Baka.AdminsOnly || SenderIsAdmin();
 
-        private bool SenderIsAdmin()
+        private static bool SenderIsAdmin()
         {
             if (Message.SenderChat != null)
             {
@@ -35,6 +35,6 @@
             return false;
         }
 
-        protected bool SenderIsSus() => !SenderHasPermission();
+        protected static bool SenderIsSus() => !SenderHasPermission();
     }
 }

@@ -41,6 +41,6 @@ namespace Witlesss.Commands
             else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
 
-        private string MEMES_TYPE() => Baka.Meme.Type == MemeType.Dg ? "демотивоторы" : "мемы";
+        private static string MEMES_TYPE() => Baka.Meme.Type == MemeType.Dg ? "демотивоторы" : "мемы";
     }
 }

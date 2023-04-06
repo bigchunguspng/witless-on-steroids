@@ -31,7 +31,7 @@ namespace Witlesss.Commands
             else Bot.SendMessage(Chat, MOVE_MANUAL);
         }
 
-        protected string MoveDictionary(string name)
+        protected static string MoveDictionary(string name)
         {
             Baka.Save();
 

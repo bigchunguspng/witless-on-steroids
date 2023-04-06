@@ -18,9 +18,9 @@ namespace Witlesss.Commands
 
         protected MakeMemeCore(Regex cmd) => _cmd = cmd;
 
-        protected Memes M => Bot.MemeService;
+        protected static Memes M => Bot.MemeService;
 
-        protected void Run(Func<Message, bool> process, string type)
+        protected static void Run(Func<Message, bool> process, string type)
         {
             JpegCoder.PassQuality(Baka);
 

@@ -106,9 +106,8 @@ namespace Witlesss
             Log($"ACTIVE CHAT >> {_active} ({Command.Title})");
         }
 
-        private void ClearDics() => Bakas.ForEach(ClearDic);
-
-        private void ClearDic(Witless witless)
+        private        void ClearDics() => Bakas.ForEach(ClearDic);
+        private static void ClearDic(Witless witless)
         {
             witless.Delete();
             witless.Load();

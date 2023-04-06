@@ -41,6 +41,6 @@ namespace Witlesss.MediaTools
         private static bool SizeIsInvalid(int w, int h) => (w | h) % 2 > 0;
         public  static Size ValidSize    (int w, int h) => new(ToEven(w), ToEven(h));
 
-        private static int ToEven(int x) => x - x % 2;
+        public  static int ToEven(int x) => x - x % 2;
     }
 }

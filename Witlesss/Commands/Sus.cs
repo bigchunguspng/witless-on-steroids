@@ -24,7 +24,7 @@ namespace Witlesss.Commands
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            string result = Bot.MemeService.Sus(path, new CutSpan(x.start, x.length), type);
+            string result = Memes.Sus(path, new CutSpan(x.start, x.length));
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> SUS [>_<]");
 

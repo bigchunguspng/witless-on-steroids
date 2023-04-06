@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using MediaToolkit.Util;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;

@@ -1,45 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using static Witlesss.X.MediaType;
+using FFMpegCore;
 
 namespace Witlesss.MediaTools
 {
-    // ffmpeg -i "input.mp4" -filter_complex "[0:v]setpts=0.5*PTS,fps=60;[0:a]atempo=2.0" output.mp4
-    // ffmpeg -i "input.mp4" -filter:v       "setpts=0.5*PTS,fps=60"                      output.mp4
-    // ffmpeg -i "input.mp3" -filter:a       "atempo=2.0"                             -vn output.mp3
-    public class F_Speed : F_Base
+    // -i input [-vf "setpts=0.5*PTS,fps=60"][-s WxH] [-af "atempo=2.0"][-vn] output
+    public class F_Speed : F_SingleInput_Base
     {
-        private readonly double _speed, _fps;
+        private readonly double _speed;
 
-        public F_Speed(string input, double speed, MediaType type, double fps = 0) : base(SetOutName(input, "-S"))
+        public F_Speed(string input, double speed) : base(input) => _speed = speed;
+
+        public string ChangeSpeed() => Cook(SetOutName_WEBM_safe(_input, "-S"), Args);
+
+        private void Args(FFMpegArgumentOptions o)
         {
-            _speed = speed;
-            _fps = fps;
+            var i = MediaInfo();
+            if (i.video) o = o.WithVideoFilters(v => v.ChangeVideoSpeed(_speed).SetFPS(GetFPS())).FixWebmSize(i.v);
+            if (i.audio) o = o.WithAudioFilters(a => a.ChangeAudioSpeed(_speed)).FixSongArt(i.info);
 
-            if (type == Round) type = Movie;
-            
-            AddInput(input);
-            AddOptions(FiltersNames[type], Filter(type));
-            AddSizeFix(type, input);
-            AddSongFix(type);
+            double GetFPS() => Math.Min(i.v.AvgFrameRate * _speed, 90D);
         }
-
-        private static readonly Dictionary<MediaType, string> FiltersNames = new()
-        {
-            { Audio, "-filter:a"       },
-            { Video, "-filter:v"       },
-            { Movie, "-filter_complex" }
-        };
-
-        private string FilterAudio() => $"atempo={FormatDouble(_speed)}";
-        private string FilterVideo() => $"setpts={FormatDouble(1 / _speed)}*PTS,fps={FormatDouble(_fps)}";
-        private string FilterMovie() => $"[0:v]{FilterVideo()};[0:a]{FilterAudio()}";
-        private string Filter(MediaType type) => type switch
-        {
-            Audio => FilterAudio(),
-            Video => FilterVideo(),
-            Movie => FilterMovie(),
-            _     => throw new ArgumentOutOfRangeException()
-        };
     }
 }

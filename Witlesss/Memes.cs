@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using MediaToolkit.Model;
-using MediaToolkit.Services;
-using MediaToolkit.Tasks;
 using Telegram.Bot.Types;
 using Witlesss.MediaTools;
-using static System.Globalization.CultureInfo;
 using static Witlesss.X.JpegCoder;
-using MD = System.Threading.Tasks.Task<MediaToolkit.Tasks.GetMetadataResult>;
 using TS = System.TimeSpan;
 
 namespace Witlesss
@@ -18,27 +11,28 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers;
         private readonly MemeGenerator        _imgflip;
-        private readonly IMediaToolkitService _service;
-        public  static   Size SourceSize  = Size.Empty;
+        private static   Size SourceSize  = Size.Empty;
 
         public static void PassSize(Video     v) => SourceSize = new Size(v.Width, v.Height);
         public static void PassSize(Sticker   s) => SourceSize = new Size(s.Width, s.Height);
         public static void PassSize(Animation a) => SourceSize = new Size(a.Width, a.Height);
         public static void PassSize(PhotoSize p) => SourceSize = new Size(p.Width, p.Height);
         public static void PassSize(int       i) => SourceSize = new Size(i, i);
+        
+        public static readonly Size      VideoNoteSize = new(384, 384);
+        public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
         public Memes()
         {
             _drawers = new[] { new DemotivatorDrawer(), new DemotivatorDrawer(1280) };
             _imgflip = new MemeGenerator();
 
-            while (!File.Exists(FFMPEG_PATH))
+            while (!File.Exists(FFMPEG_PATH)) // todo something
             {
                 Log($@"""{FFMPEG_PATH}"" not found. Put it here or close the window", ConsoleColor.Yellow);
                 Log("Press any key to continue...");
                 Console.ReadKey();
             }
-            _service = MediaToolkitService.CreateInstance(FFMPEG_PATH);
         }
 
         public DgMode Mode;
@@ -52,14 +46,12 @@ namespace Witlesss
 
         public string MakeStickerDemotivator(string path, DgText text, string extension)
         {
-            return MakeDemotivator(Execute(new F_ToJPG(path, extension)), text);
+            return MakeDemotivator(new F_Resize(path).Transcode(extension), text);
         }
 
         public string MakeVideoDemotivator(string path, DgText text)
         {
-            var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
-
-            return Execute(new F_Overlay(Drawer.MakeFrame(text), path, Drawer.Size, Drawer.Pic, quality));
+            return new F_Overlay(Drawer.MakeFrame(text), path).Demo(Quality, Drawer);
         }
 
         public string MakeMeme(string path, DgText text)
@@ -69,100 +61,64 @@ namespace Witlesss
 
         public string MakeMemeFromSticker(string path, DgText text, string extension)
         {
-            return MakeMeme(Execute(new F_ToJPG(path, extension)), text);
+            return MakeMeme(new F_Resize(path).Transcode(extension), text);
         }
 
         public string MakeVideoMeme(string path, DgText text)
         {
-            var quality = JpegQuality > 50 ? 0 : 51 - (int)(JpegQuality * 0.42);
-
             _imgflip.SetUp(SourceSize);
 
-            var b = IsWEBM(path) && SizeIsInvalid(SourceSize);
-            if (b) path = Execute(new F_Resize(path, CorrectedSize(SourceSize)));
-
-            return Execute(new F_Overlay(path, _imgflip.BakeCaption(text), SourceSize, Point.Empty, quality));
+            return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality);
         }
 
-        public string Stickerize(string path) => Execute(new F_Resize(path, NormalizeSize(SourceSize), ".webp"));
+        public static string Stickerize(string path) => new F_Resize(path).ToSticker(NormalizeSize(SourceSize));
 
-        public string Compress(string path) => Execute(new F_CompressImage(path));
+        public static string Compress(string path) => new F_Resize(path).CompressImage();
 
-        public string ChangeSpeed(string path, double speed, SpeedMode mode, MediaType type)
+        public static string ChangeSpeed(string path, double speed, SpeedMode mode)
         {
             if (mode == SpeedMode.Slow) speed = 1 / speed;
             
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
-            if (type > MediaType.Audio)
-            {
-                double fps = Math.Min(RetrieveFPS(GetMedia(path).AvgFrameRate) * speed, 90);
-
-                try   { return MakeVideo(type); }
-                catch { return MakeVideo(MediaType.Video); }
-
-                string MakeVideo(MediaType t) => Execute(new F_Speed(path, speed, t, fps));
-            }
-            else
-                return Execute(new F_Speed(path, speed, type));
+            return new F_Speed(path, speed).ChangeSpeed();
         }
         
-        public string Sus(string path, CutSpan s, MediaType type)
+        public static string Sus(string path, CutSpan s) => new F_Cut(path, s).Sus();
+
+        public static string Reverse(string path)        => new F_Reverse(path).Reverse();
+
+        public static string Cut(string path, CutSpan s) => new F_Cut(path, s).Cut();
+
+        public static string RemoveAudio(string path) => new F_Resize(path).ToAnimation(); //todo test
+
+        public static string CompressAnimation(string path) => new F_Resize(path).CompressAnimation(); //todo test
+
+        public static string RemoveBitrate(string path, int bitrate)
         {
-            var b = IsWEBM(path) && SizeIsInvalid(SourceSize);
-            if (b) path = Execute(new F_Resize(path, CorrectedSize(SourceSize)));
+            Log($"DAMN >> {bitrate}", ConsoleColor.Blue);
 
-            if (s.Length < TS.Zero) s = s with { Length = TS.FromSeconds(GetDuration(path) / 2D) };
-
-            if ((s.Start + s.Length).Ticks > 0) path = Cut(path, s, type);
-
-            return Execute(new F_Concat(path, Reverse(path, type), type));
-        }
-        
-        public string Reverse(string path, MediaType type)        => Execute(new F_Reverse(path, type));
-
-        public string Cut(string path, CutSpan s, MediaType type) => Execute(new F_Cut (path, s, type));
-
-        public string RemoveAudio(string path) => Execute(new F_ToAnimation(path, FitSize(SourceSize)));
-
-        public string CompressAnimation(string path) => Execute(new F_CompressAnimation(path));
-
-        public string RemoveBitrate(string path, ref int bitrate, MediaType type)
-        {
-            if (type > MediaType.Audio)
-            {
-                Log($"DAMN >> {bitrate}", ConsoleColor.Blue);
-
-                bitrate += 30;
-
-                return Execute(new F_Bitrate(path, bitrate, type));
-            }
-            else
-                return Execute(new F_Bitrate(path,    type: type));
+            return new F_Bitrate(path, bitrate).Compress();
         }
 
-        public string ToVideoNote(string path)
+        public static string ToVideoNote(string path)
         {
             var d = ToEven(Math.Min(SourceSize.Width, SourceSize.Height));
             var x = (SourceSize.Width  - d) / 2;
             var y = (SourceSize.Height - d) / 2;
 
-            return Execute(new F_ToVideoNote(path, new Rectangle(x, y, d, d)));
+            return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
-        public  string CropVideoNote (string path) => Execute(new F_Crop(path));
-
-        private double   GetDuration (string path) => double.Parse(GetMedia(path).Duration, InvariantCulture);
-        private MediaStream GetMedia (string path) => GetMetadata(path).Result.Metadata.Streams.First();
-        private async MD GetMetadata (string path) => await _service.ExecuteAsync(new FfTaskGetMetadata(path));
-
-        private string Execute(F_Base task) => _service.ExecuteAsync(task).Result;
+        public static string CropVideoNote(string path) => new F_Resize(path).CropVideoNote();
 
         private static int ToEven (int x) => x - x % 2;
 
-        public  static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
-        public  static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;
-        public  static Size CorrectedSize(Size s) => new(ToEven(s.Width), ToEven(s.Height));
+        private static int Quality => JpegQuality > 80 ? 0 : 51 - (int)(JpegQuality * 0.42); // 0 | 17 - 51
+
+        //public  static bool IsWEBM  (string path) => Path.GetExtension(path) == ".webm";
+        //public  static bool SizeIsInvalid(Size s) => (s.Width | s.Height) % 2 > 0;
+        private static Size CorrectedSize(Size s) => new(ToEven(s.Width), ToEven(s.Height));
         private static Size NormalizeSize(Size s, int limit = 512)
         {
             double lim = limit;
@@ -170,24 +126,10 @@ namespace Witlesss
                 ? new Size(limit, (int)(s.Height / (s.Width / lim)))
                 : new Size((int)(s.Width / (s.Height / lim)), limit);
         }
-        private static Size FitSize      (Size s, int max = 1280)
+        public static Size FitSize      (Size s, int max = 1280)
         {
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
             return CorrectedSize(s);
-        }
-
-        private double RetrieveFPS(string framerate, int alt = 30)
-        {
-            var fps = framerate.Split('/');
-            try
-            {
-                double result = int.Parse(fps[0]) / double.Parse(fps[1]);
-                return double.IsNaN(result) ? alt : result;
-            }
-            catch
-            {
-                return alt;
-            }
         }
     }
 }

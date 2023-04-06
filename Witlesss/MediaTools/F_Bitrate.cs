@@ -1,23 +1,25 @@
-﻿using static Witlesss.X.MediaType;
+﻿using FFMpegCore;
 
 namespace Witlesss.MediaTools
 {
     // ffmpeg -i "input.mp3" -f mp3 -vn              -b:a 1k output.mp3
-    // ffmpeg -i "input.mp4" -f mp4 -b:v 40k         -b:a 1k output.mp4  <-- obsolete
     // ffmpeg -i "input.mp4" -vcodec libx264 -crf 45 -b:a 1k output.mp4
-    public class F_Bitrate : F_Base
+    public class F_Bitrate : F_SingleInput_Base
     {
-        public F_Bitrate(string input, int bitrate = 0, MediaType type = Movie) : base(SetOutName(input, "-L"))
-        {
-            var a = type == Audio;
-            var v = type != Audio;
+        private readonly int _factor; // 0 lossless - 51 lowest quality
 
-            AddInput(input);
-            AddWhen(a, "-f", "mp3");
-            AddWhen(v, "-vcodec", "libx264", "-crf", bitrate.ToString());
-            AddOptions("-b:a", "1k");
-            AddSizeFix(type, input);
-            AddSongFix(type);
+        public F_Bitrate(string input, int factor) : base(input) => _factor = factor;
+
+        public string Compress() => Cook(SetOutName_WEBM_safe(_input, "-DAMN"), DamnArgs);
+
+        private void DamnArgs(FFMpegArgumentOptions o)
+        {
+            var i = MediaInfo();
+            if (i.video) o = o.FixWebmSize(i.v);
+            if (i.audio) o = o.FixSongArt(i.info);
+            if (i.video) o = o.WithVideoCodec("libx264").WithConstantRateFactor(_factor);
+            if (i.audio) o = o.WithAudioBitrate(154 - 3 * _factor);
+            if (i.audio && !i.video) o = o.ForceFormat("mp3");
         }
     }
 }

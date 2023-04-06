@@ -140,7 +140,7 @@ namespace Witlesss.Commands
             catch
             {
                 var meme = DownloadMeme(post, g ? ".gif" : ".png");
-                var path = g ? Bot.MemeService.CompressAnimation(meme) : Bot.MemeService.Compress(meme);
+                var path = g ? Memes.CompressAnimation(meme) : Memes.Compress(meme);
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));

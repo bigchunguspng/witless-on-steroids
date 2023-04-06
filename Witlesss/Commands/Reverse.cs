@@ -8,7 +8,7 @@
             
             Bot.Download(FileID, Chat, out string path, out var type);
             
-            string result = Bot.MemeService.Reverse(path, type);
+            string result = Memes.Reverse(path);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> REVERSED [<<]");
 

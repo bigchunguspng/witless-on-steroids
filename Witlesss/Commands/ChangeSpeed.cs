@@ -22,7 +22,7 @@ namespace Witlesss.Commands
 
             Bot.Download(FileID, Chat, out string path, out var type);
                     
-            string result = Bot.MemeService.ChangeSpeed(path, speed, Mode, type);
+            string result = Memes.ChangeSpeed(path, speed, Mode);
             SendResult(result, type, VideoFilename, AudioFilename);
             Log($"{Title} >> {(Mode == SpeedMode.Fast ? "FAST" : "SLOW" )} [>>]");
 

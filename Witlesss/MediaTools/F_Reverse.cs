@@ -1,18 +1,19 @@
-﻿namespace Witlesss.MediaTools
-{
-    // ffmpeg -i "input.mp4" -vf reverse -af areverse output.mp4
-    // ffmpeg -i "input.mp3" -vn         -af areverse output.mp3
-    public class F_Reverse : F_Base
-    {
-        public F_Reverse(string input, MediaType type) : base(SetOutName(input, "-R"))
-        {
-            var v = type > MediaType.Audio;
+﻿using FFMpegCore;
 
-            AddInput(input);
-            AddWhen(v, "-vf",  "reverse");
-            AddOptions("-af", "areverse");
-            AddSizeFix(type, input);
-            AddSongFix(type);
+namespace Witlesss.MediaTools
+{
+    // -i input [-vf reverse] [-af areverse] output
+    public class F_Reverse : F_SingleInput_Base
+    {
+        public F_Reverse(string input) : base(input) { }
+
+        public string Reverse() => Cook(SetOutName_WEBM_safe(_input, "-RVR"), Args);
+
+        private void Args(FFMpegArgumentOptions o)
+        {
+            var i = MediaInfo();
+            if (i.video) o = o.WithVideoFilters(v => v.ReverseVideo()).FixWebmSize(i.v);
+            if (i.audio) o = o.WithAudioFilters(a => a.ReverseAudio()).FixSongArt(i.info);
         }
     }
 }

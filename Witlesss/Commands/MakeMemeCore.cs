@@ -59,7 +59,7 @@ namespace Witlesss.Commands
             _watch.WriteTime();
             Download(fileID);
 
-            if (_type == MediaType.Round) _path = Bot.MemeService.CropVideoNote(_path);
+            if (_type == MediaType.Round) _path = Memes.CropVideoNote(_path);
 
             using var stream = File.OpenRead(produce(_path, Texts()));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));

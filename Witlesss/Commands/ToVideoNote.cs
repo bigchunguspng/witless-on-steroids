@@ -10,7 +10,7 @@ namespace Witlesss.Commands
             
             Bot.Download(FileID, Chat, out string path);
             
-            using var stream = File.OpenRead(Bot.MemeService.ToVideoNote(path));
+            using var stream = File.OpenRead(Memes.ToVideoNote(path));
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> NOTE (*)");
         }

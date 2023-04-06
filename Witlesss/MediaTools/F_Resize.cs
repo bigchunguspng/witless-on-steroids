@@ -1,52 +1,44 @@
 ﻿using System.Drawing;
+using FFMpegCore.Enums;
+using static Witlesss.Memes;
+using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
 namespace Witlesss.MediaTools
 {
-    // ffmpeg -i "input.webm" -s WxH output.mp4
-    public class F_Resize : F_ToJPG
+    public class F_Resize : F_SingleInput_Base
     {
-        public F_Resize(string input, Size size, string extension = ".mp4") : base(input, extension)
-        {
-            AddSize(size);
-        }
-    }
+        public F_Resize(string input) : base(input) { }
 
-    // ffmpeg -i "input.mp4" -s WxH -an -vcodec libx264 -crf 30 output.mp4
-    public class F_ToAnimation : F_Resize
-    {
-        public F_ToAnimation(string input, Size size) : base(input, size)
-        {
-            AddOptions("-an", "-vcodec", "libx264", "-crf", "30");
-        }
-    }
-    
-    // ffmpeg -i "input.mp4" -an -vcodec libx264 -crf 30 output.mp4
-    public class F_CompressAnimation : F_ToJPG
-    {
-        public F_CompressAnimation(string input) : base(input, ".mp4")
-        {
-            AddOptions("-an", "-vcodec", "libx264", "-crf", "30");
-        }
-    }
-    
-    //ffmpeg -i input.mp4 -filter:v "crop=272:272:56:56" output.mp4
-    public class F_Crop : F_ToJPG
-    {
-        public F_Crop(string input, string extension = ".mp4") : base(input, extension)
-        {
-            AddOptions("-filter:v", "crop=272:272:56:56");
-        }
-    }
-
-    //ffmpeg -i input.mp4 -filter:v "crop=D:D:X:Y" -s 384x384 output.mp4
-    public class F_ToVideoNote : F_ToJPG
-    {
-        private static readonly Size VideoNoteSize = new(384, 384);
         
-        public F_ToVideoNote(string input, Rectangle a, string extension = ".mp4") : base(input, extension)
+        public string Transcode (string extension) => Cook(SetOutName(_input, "-W", extension), null);
+
+        public string ToAnimation               () => Cook(SetOutName(_input, "-silent", ".mp4"), ToAnimationArgs);
+        public string ToVideoNote (Rectangle crop) => Cook(SetOutName(_input, "-vnote",  ".mp4"), o => ToVideoNoteArgs(o, crop));
+        public string ToSticker           (Size s) => Cook(SetOutName(_input, "-stick", ".webp"), o => o.Resize(s));
+
+        public string CompressImage     () => Cook(SetOutName(_input, "-small", ".jpg"), o => o.WithQscale(5)); // -qscale:v 5
+        public string CompressAnimation () => Cook(SetOutName(_input, "-small", ".mp4"), CompressAnimationArgs);
+
+        public string CropVideoNote     () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
+
+        
+        // -s WxH -an -vcodec libx264 -crf 30
+        private void ToAnimationArgs(FFMpAO o)
         {
-            AddOptions("-filter:v", $"crop={a.Width}:{a.Height}:{a.X}:{a.Y}");
-            AddSize(VideoNoteSize);
+            var v = GetVideoStream(_input);
+            var size = FitSize(new Size(v.Width, v.Height));
+            o = o.Resize(size).DisableChannel(Channel.Audio).WithVideoCodec("libx264").WithConstantRateFactor(30);
         }
+        private void CompressAnimationArgs(FFMpAO o)
+        {
+            var v = GetVideoStream(_input);
+            o = o.FixWebmSize(v).DisableChannel(Channel.Audio).WithVideoCodec("libx264").WithConstantRateFactor(30);
+        }
+
+        // -filter:v "crop=W:H:X:Y" -s 384x384 output.mp4
+        private static void ToVideoNoteArgs(FFMpAO o, Rectangle crop) => o = o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize);
+
+        // -filter:v "crop=272:272:56:56" output.mp4
+        private static void CropVideoNoteArgs(FFMpAO o) => o = o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
     }
 }

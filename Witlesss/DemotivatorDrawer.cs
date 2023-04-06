@@ -16,8 +16,6 @@ namespace Witlesss
     public class DemotivatorDrawer
     {
         private readonly int _w, _h;
-        private readonly Size _size;
-        private readonly Point _imageXY;
         private readonly Rectangle _frame;
         private readonly DrawableText _textA = new(), _textB = new();
         
@@ -50,14 +48,14 @@ namespace Witlesss
             var imageW = _w - imageMarginS * 2;
             var imageH = _h - imageMarginT - imageMarginB;
             
-            _size = new Size(imageW, imageH);
+            Size = new Size(imageW, imageH);
 
             var space = 5;
             int marginT = imageMarginT - space;
             int marginS = imageMarginS - space;
             int marginB = imageMarginB - space;
 
-            _imageXY = new Point(imageMarginS, imageMarginT);
+            Pic = new Point(imageMarginS, imageMarginT);
             _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
 
             if (width == 1280)
@@ -71,9 +69,9 @@ namespace Witlesss
                 _textB.P = TextParameters.LowerText(_h - imageMarginB + 84, _w);
             }
         }
-        
-        public Size Size => _size;
-        public Point Pic => _imageXY;
+
+        public Size Size { get; }
+        public Point Pic { get; }
 
         public string DrawDemotivator(string path, DgText text) => PasteImage(DrawFrame(text), path);
 
@@ -106,10 +104,10 @@ namespace Witlesss
         private string PasteImage(Image background, string picture)
         {
             using var graphics = Graphics.FromImage(background);
-            using var image = new Bitmap(Image.FromFile(picture), _size);
+            using var image = new Bitmap(Image.FromFile(picture), Size);
             
             graphics.CompositingMode = SourceCopy;
-            graphics.DrawImage(image, _imageXY);
+            graphics.DrawImage(image, Pic);
             
             string output = Ext.Replace(picture, "-D.jpg");
             

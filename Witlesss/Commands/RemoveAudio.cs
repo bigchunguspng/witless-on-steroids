@@ -11,9 +11,9 @@ namespace Witlesss.Commands
 
             Bot.Download(FileID, Chat, out string path, out var type);
             
-            if (type == MediaType.Round) path = Bot.MemeService.CropVideoNote(path);
+            if (type == MediaType.Round) path = Memes.CropVideoNote(path);
 
-            using var stream = File.OpenRead(Bot.MemeService.RemoveAudio(path));
+            using var stream = File.OpenRead(Memes.RemoveAudio(path));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFilename()));
             Log($"{Title} >> GIF [~]");
 

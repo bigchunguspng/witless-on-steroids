@@ -107,13 +107,12 @@ namespace Witlesss.X
             return chars.Aggregate(text, (current, c) => current.Replace(c, '_'));
         }
 
-        public static string SetOutName(string path, string suffix)
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            string extension = Path.GetExtension(path);
-            return RemoveExtension(path) + suffix + extension;
+            foreach (var element in source) action(element);
         }
 
-        private static string RemoveExtension(string path) => path.Remove(path.LastIndexOf('.'));
+        public static string RemoveExtension(string path) => path.Remove(path.LastIndexOf('.'));
 
         public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
         public static string ExtensionFromID(string id) => ExtensionsIDs[id.Remove(2)];

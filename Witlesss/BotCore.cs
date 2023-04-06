@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.MediaTools;
 
 namespace Witlesss
 {
@@ -79,11 +80,11 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't send the {what} --> " + FixErrorMessage(e.Message));
+                LogError($"{chat} >> Can't send the {what} --> " + FixedErrorMessage(e.Message));
             }
         }
         
-        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendPhotoAsync(chat, photo, caption));
+        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendPhotoAsync    (chat, photo, caption));
         public void SendAnimaXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendAnimationAsync(chat, photo, caption: caption));
 
         private static void SendOrThrow(Task task)
@@ -95,7 +96,9 @@ namespace Witlesss
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath($@"{TEMP_FOLDER}\error.txt");
-            File.WriteAllText(path, FixErrorMessage(e.Message));
+            var args = F_SingleInput_Base.FFMpegCommand;
+            var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), FixedErrorMessage(e.Message));
+            File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
         }

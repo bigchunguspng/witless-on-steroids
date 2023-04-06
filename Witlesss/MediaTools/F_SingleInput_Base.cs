@@ -69,7 +69,10 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
             return FFMpegArguments.FromFileInput(input).OutputToFile(output, addArguments: action);
         }
 
-        private static void LogArguments(FAP a) => Log(string.Join(' ', a.Arguments));
+        private static void LogArguments(FAP a) => _args = a.Arguments;
+
+        private static string _args;
+        public  static string FFMpegCommand => _args is { } ? $"ffmpeg {_args}" : "*А НЕТУ!!!*";
     }
 
     public record MediaInfo(IMediaAnalysis info, bool audio, bool video, VideoStream v);

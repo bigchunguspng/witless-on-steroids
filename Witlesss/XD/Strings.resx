@@ -346,4 +346,20 @@ s   - save and exit
 =======
 {1} на связи!</value>
     </data>
+    <data name="ASCII_FOLDER" xml:space="preserve">
+        <value>Telegram-Arts\ASCII</value>
+    </data>
+    <data name="FF_ERROR_REPORT" xml:space="preserve">
+        <value>Ошибка произошла во время выполнения следующей команды:
+
+{0}
+
+Если хотите чтоб её пофиксили - скиньте этот файл админу вместе с обрабатываемым файлом (づ｡◕‿‿◕｡)づ
+
+{1}
+
+Более детальный отчёт (для шарящих юзеров):
+
+{2}</value>
+    </data>
 </root>

@@ -167,10 +167,16 @@ namespace Witlesss.XD
 
         private static readonly string[] RANDOM_EMOJI =
         {
-            "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭",
+            "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
             "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉"
         };
         public static readonly string[] FAIL_EMOJI = { "🤣", "😎", "🥰", "☺️", "💀", "😤", "😩" };
+
+        public static string GetRandomASCII()
+        {
+            var files = GetFiles(ASCII_FOLDER);
+            return File.ReadAllText(files[Random.Next(files.Length)]);
+        }
 
         public static string FileSize(string path) => FileSize(SizeInBytes(path));
         public static string FileSize(long  bytes)
@@ -179,7 +185,7 @@ namespace Witlesss.XD
             return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }
 
-        public static string FixErrorMessage(string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
+        public static string FixedErrorMessage(string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
 
         public static long SizeInBytes(string path) => new FileInfo(path).Length;
 

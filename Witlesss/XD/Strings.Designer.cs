@@ -78,6 +78,15 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Telegram-Arts\ASCII.
+        /// </summary>
+        internal static string ASCII_FOLDER {
+            get {
+                return ResourceManager.GetString("ASCII_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-Backup.
         /// </summary>
         internal static string BACKUP_FOLDER {
@@ -294,6 +303,25 @@ namespace Witlesss.XD {
         internal static string EXTRA_DBS_FOLDER {
             get {
                 return ResourceManager.GetString("EXTRA_DBS_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ошибка произошла во время выполнения следующей команды:
+        ///
+        ///{0}
+        ///
+        ///Если хотите чтоб её пофиксили - скиньте этот файл админу вместе с обрабатываемым файлом (づ｡◕‿‿◕｡)づ
+        ///
+        ///{1}
+        ///
+        ///Более детальный отчёт (для шарящих юзеров):
+        ///
+        ///{2}.
+        /// </summary>
+        internal static string FF_ERROR_REPORT {
+            get {
+                return ResourceManager.GetString("FF_ERROR_REPORT", resourceCulture);
             }
         }
         

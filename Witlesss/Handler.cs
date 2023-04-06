@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -11,6 +12,7 @@ namespace Witlesss
     public class Handler : IUpdateHandler
     {
         private readonly Bot _bot;
+        private readonly Regex _ffmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         
         public Handler(Bot bot) => _bot = bot;
 
@@ -38,9 +40,9 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{Command.TitleOrUsername} >> BRUH -> {FixErrorMessage(e.Message)}");
+                LogError($"{Command.TitleOrUsername} >> BRUH -> {FixedErrorMessage(e.Message)}");
 
-                if (e.Message.Contains("ffmpeg")) _bot.SendErrorDetails(message.Chat.Id, e);
+                if (_ffmpeg.IsMatch(e.Message)) _bot.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

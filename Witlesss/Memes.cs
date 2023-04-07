@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Drawing;
-using Telegram.Bot.Types;
 using Witlesss.MediaTools;
-using static Witlesss.MediaTools.FF_Extensions;
 using TS = System.TimeSpan;
+using static Witlesss.MediaTools.FF_Extensions;
 
 namespace Witlesss
 {
@@ -11,16 +10,9 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
         private readonly MemeGenerator        _imgflip = new();
-        private static   Size SourceSize  = Size.Empty;
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 
-        public static void PassSize(Video     v) => SourceSize = new Size(v.Width, v.Height);
-        public static void PassSize(Sticker   s) => SourceSize = new Size(s.Width, s.Height);
-        public static void PassSize(Animation a) => SourceSize = new Size(a.Width, a.Height);
-        public static void PassSize(PhotoSize p) => SourceSize = new Size(p.Width, p.Height);
-        public static void PassSize(int       i) => SourceSize = new Size(i, i);
-        
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
@@ -55,7 +47,7 @@ namespace Witlesss
 
         public string MakeVideoMeme(string path, DgText text)
         {
-            _imgflip.SetUp(SourceSize);
+            _imgflip.SetUp(GetSize(path));
 
             return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality);
         }
@@ -82,15 +74,16 @@ namespace Witlesss
         public static string Reverse       (string path) => new F_Reverse(path).Reverse();
 
         public static string RemoveAudio   (string path) => new F_Resize(path).ToAnimation();
-        public static string Stickerize    (string path) => new F_Resize(path).ToSticker(NormalizeSize(SourceSize));
+        public static string Stickerize    (string path) => new F_Resize(path).ToSticker(NormalizeSize(GetSize(path)));
         public static string Compress      (string path) => new F_Resize(path).CompressImage();
         public static string CompressGIF   (string path) => new F_Resize(path).CompressAnimation();
         public static string CropVideoNote (string path) => new F_Resize(path).CropVideoNote();
         public static string ToVideoNote   (string path)
         {
-            var d = ToEven(Math.Min(SourceSize.Width, SourceSize.Height));
-            var x = (SourceSize.Width  - d) / 2;
-            var y = (SourceSize.Height - d) / 2;
+            var s = GetSize(path);
+            var d = ToEven(Math.Min(s.Width, s.Height));
+            var x = (s.Width  - d) / 2;
+            var y = (s.Height - d) / 2;
 
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
@@ -106,6 +99,11 @@ namespace Witlesss
             return s.Width > s.Height
                 ? new Size(limit, (int)(s.Height / (s.Width / lim)))
                 : new Size((int)(s.Width / (s.Height / lim)), limit);
+        }
+        private static Size GetSize(string path)
+        {
+            var v = F_SingleInput_Base.GetVideoStream(path);
+            return new Size(v.Width, v.Height);
         }
     }
 }

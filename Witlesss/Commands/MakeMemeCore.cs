@@ -29,6 +29,24 @@ namespace Witlesss.Commands
 
             Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
         }
+        protected bool ProcessMessage(Message mess)
+        {
+            if (mess is null) return false;
+            
+            if      (mess.Photo     is not null)              ProcessPhoto(mess.Photo[^1].FileId);
+            else if (mess.Animation is not null)              ProcessVideo(mess.Animation.FileId);
+            else if (mess.Sticker   is { IsVideo: true })     ProcessVideo(mess.Sticker  .FileId);
+            else if (mess.Video     is not null)              ProcessVideo(mess.Video    .FileId);
+            else if (mess.VideoNote is not null)              ProcessVideo(mess.VideoNote.FileId);
+            else if (mess.Sticker   is { IsAnimated: false }) ProcessStick(mess.Sticker  .FileId);
+            else return false;
+            
+            return true;
+        }
+
+        public    abstract void ProcessPhoto(string fileID);
+        public    abstract void ProcessStick(string fileID);
+        protected abstract void ProcessVideo(string fileID);
 
         protected void DoPhoto(string fileID, StrInt log, MemeMaker produce, bool regex)
         {
@@ -71,7 +89,7 @@ namespace Witlesss.Commands
         private DgText Texts() => GetMemeText(RemoveCommand(Text));
         private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
 
-        private string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
+        private static string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
         
         private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
         

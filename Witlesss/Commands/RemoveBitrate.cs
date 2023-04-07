@@ -41,23 +41,13 @@ namespace Witlesss.Commands
         {
             if (mess == null) return false;
 
-            if      (mess.Audio is { } a)
-                FileID = a.FileId;
-            else if (mess.Video is { } v)
-                FileID = v.FileId;
-            else if (mess.Animation is { } g)
-                FileID = g.FileId;
-            else if (mess.Sticker is { IsVideo: true } s)
-            {
-                FileID = s.FileId;
-                Memes.PassSize(s);
-            }
-            else if (mess.Voice is { } c)
-                FileID = c.FileId;
-            else if (mess.VideoNote is { } n)
-                FileID = n.FileId;
-            else if (mess.Document is { MimeType: "audio/x-wav"} d)
-                FileID = d.FileId;
+            if      (mess.Audio     is not null)                   FileID = mess.Audio    .FileId;
+            else if (mess.Video     is not null)                   FileID = mess.Video    .FileId;
+            else if (mess.Animation is not null)                   FileID = mess.Animation.FileId;
+            else if (mess.Sticker   is { IsVideo: true })          FileID = mess.Sticker  .FileId;
+            else if (mess.Voice     is not null)                   FileID = mess.Voice    .FileId;
+            else if (mess.VideoNote is not null)                   FileID = mess.VideoNote.FileId;
+            else if (mess.Document  is { MimeType: "audio/x-wav"}) FileID = mess.Document .FileId;
             else return false;
 
             return true;

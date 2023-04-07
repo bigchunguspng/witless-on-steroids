@@ -34,17 +34,14 @@ namespace Witlesss.Commands
             if (mess.Photo is { } p)
             {
                 _fileID = p[^1].FileId;
-                PassSize (p[^1]);
             }
             else if (mess.Document is { MimeType: "image/png" or "image/jpeg", Thumb: not null } d)
             {
                 _fileID = d.FileId;
-                PassSize (d.Thumb);
             }
             else if (mess.Sticker is { IsVideo: false, IsAnimated: false } s)
             {
                 _fileID = s.FileId;
-                PassSize (s);
             }
             else return false;
 

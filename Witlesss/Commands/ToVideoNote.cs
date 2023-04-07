@@ -14,7 +14,5 @@ namespace Witlesss.Commands
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> NOTE (*)");
         }
-
-        protected override int VideoNoteSize() => 384;
     }
 }

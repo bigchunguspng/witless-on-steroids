@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Telegram.Bot.Types;
 using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands
@@ -24,24 +23,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run(ProcessMessage, "Демотиваторы");
 
-        private bool ProcessMessage(Message mess)
-        {
-            if (mess is null) return false;
-            
-            if      (mess.Photo     is not null)              ProcessPhoto(mess.Photo[^1].FileId);
-            else if (mess.Animation is not null)              ProcessVideo(mess.Animation.FileId);
-            else if (mess.Sticker   is { IsVideo: true })     ProcessVideo(mess.Sticker  .FileId);
-            else if (mess.Video     is not null)              ProcessVideo(mess.Video    .FileId);
-            else if (mess.VideoNote is not null)              ProcessVideo(mess.VideoNote.FileId);
-            else if (mess.Sticker   is { IsAnimated: false }) ProcessStick(mess.Sticker  .FileId);
-            else return false;
-            
-            return true;
-        }
-
-        public  void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator, REPEAT_RX());
-        public  void ProcessStick(string fileID) => DoStick(fileID, D_STICK, M.MakeStickerDemotivator);
-        private void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, M.MakeVideoDemotivator);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator, REPEAT_RX());
+        public    override void ProcessStick(string fileID) => DoStick(fileID, D_STICK, M.MakeStickerDemotivator);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, M.MakeVideoDemotivator);
 
         protected override DgText GetMemeText(string text)
         {

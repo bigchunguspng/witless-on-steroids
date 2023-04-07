@@ -21,8 +21,6 @@ namespace Witlesss.Commands
             string VideoFilename() => "gif_fap_club.mp4";
         }
 
-        protected virtual int VideoNoteSize() => 272;
-
         protected bool NoVideo()
         {
             if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
@@ -35,26 +33,10 @@ namespace Witlesss.Commands
         {
             if (mess == null) return false;
 
-            if (mess.Video is { } v)
-            {
-                FileID = v.FileId;
-                PassSize(v);
-            }
-            else if (mess.Animation is { } a)
-            {
-                FileID = a.FileId;
-                PassSize(a);
-            }
-            else if (mess.Sticker is { IsVideo: true } s)
-            {
-                FileID = s.FileId;
-                PassSize(s);
-            }
-            else if (mess.VideoNote is { } n)
-            {
-                FileID = n.FileId;
-                PassSize(VideoNoteSize());
-            }
+            if      (mess.Video     is not null)          FileID = mess.Video    .FileId;
+            else if (mess.Sticker   is { IsVideo: true }) FileID = mess.Sticker  .FileId;
+            else if (mess.VideoNote is not null)          FileID = mess.VideoNote.FileId;
+            else if (mess.Animation is not null)          FileID = mess.Animation.FileId;
             else return false;
 
             return true;

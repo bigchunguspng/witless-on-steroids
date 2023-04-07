@@ -75,7 +75,7 @@ namespace Witlesss.MediaTools
         
         public QscaleArgument(int qscale) => _qscale = qscale;
 
-        public string Text => $"-qscale:v \"[{_qscale}]\"";
+        public string Text => $"-qscale:v {_qscale}";
     }
     public class ComplexFilterArgument : IArgument
     {

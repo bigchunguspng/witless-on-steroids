@@ -86,13 +86,8 @@ namespace Witlesss
         public ScQuery RandomSubQuery => new(RandomSub);
         private string RandomSub => subreddits[Extension.Random.Next(subreddits.Length)];
 
-        private void SetLastQuery(long chat, RedditQuery query)
-        {
-            if (LastQueries.ContainsKey(chat)) LastQueries[chat] = query;
-            else
-                LastQueries.Add(chat, query);
-        }
-        
+        private void SetLastQuery(long chat, RedditQuery query) => LastQueries[chat] = query;
+
         public PostData PullPost(RedditQuery query, long chat) // returns post, register post
         {
             Qr = query;
@@ -194,7 +189,7 @@ namespace Witlesss
         
         public void LogInfo() // todo delete... this is a debug method
         {
-            foreach (var que in Cache) Log($"Q: {que.Key.ToString()} C: {que.Value.Posts.Count}", ConsoleColor.Cyan);
+            foreach (var que in Cache) Log($"Q: {que.Key} C: {que.Value.Posts.Count}", ConsoleColor.Cyan);
         }
 
         public List<Subreddit> FindSubreddits(string search)

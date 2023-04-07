@@ -52,10 +52,8 @@ namespace Witlesss.Commands
             {
                 string name = a[1];
                 
-                if      (name == "info")
-                    Bot.SendMessage(Chat, FUSE_AVAILABLE_BASES());
-                else if (name == "his")
-                    Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
+                if      (name == "info") Bot.SendMessage(Chat, FUSE_AVAILABLE_BASES());
+                else if (name == "his" ) Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
                 else
                     FuseWitlessDB(name);
             }
@@ -63,7 +61,7 @@ namespace Witlesss.Commands
             {
                 string path = UniquePath($@"{CH_HISTORY_FOLDER}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json");
                 Bot.DownloadFile(fileID, path, Chat).Wait();
-                
+
                 EatChatHistory(path);
                 GoodEnding();
             }
@@ -128,7 +126,7 @@ namespace Witlesss.Commands
             bool BaseExists() => GetFiles(EXTRA_DBS_FOLDER).Contains(Path());
         }
 
-        private void EatChatHistory(string path)
+        private static void EatChatHistory(string path)
         {
             var io = new FileIO<ExpandoObject>(path);
 

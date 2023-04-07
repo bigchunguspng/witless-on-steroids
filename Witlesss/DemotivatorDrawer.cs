@@ -113,7 +113,7 @@ namespace Witlesss
             return JpegCoder.SaveImage(background, output);
         }
 
-        private KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
+        private static KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
 
         private void DrawText(DrawableText x)
         {

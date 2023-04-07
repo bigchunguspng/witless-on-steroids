@@ -37,12 +37,12 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
             var info = FFProbe.Analyse(_input);
             var v = info.PrimaryVideoStream;
             var a = info.PrimaryAudioStream;
-            var audio = a is { };
+            var audio = a is not null;
             var video = v is { AvgFrameRate: not double.NaN };
 
             return new MediaInfo(info, audio, video, v);
         }
-        protected FFO AddFixes(FFO o, MediaInfo i)
+        protected static FFO AddFixes(FFO o, MediaInfo i)
         {
             if (i.video) o = o.FixWebmSize(i.v);
             if (i.audio) o = o.FixSongArt(i.info);
@@ -72,7 +72,7 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
         private static void LogArguments(FAP a) => _args = a.Arguments;
 
         private static string _args;
-        public  static string FFMpegCommand => _args is { } ? $"ffmpeg {_args}" : "*А НЕТУ!!!*";
+        public  static string FFMpegCommand => _args is not null ? $"ffmpeg {_args}" : "*А НЕТУ!!!*";
     }
 
     public record MediaInfo(IMediaAnalysis info, bool audio, bool video, VideoStream v);

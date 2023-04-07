@@ -247,9 +247,8 @@ namespace Witlesss
             var words = new WordChart();
             foreach (var bunch in Words)
             {
-                if (bunch.Value.ContainsKey(word))
+                if (bunch.Value.TryGetValue(word, out float x))
                 {
-                    float x = bunch.Value[word];
                     if (!words.TryAdd(bunch.Key, x)) words[bunch.Key] += x;
                 }
             }

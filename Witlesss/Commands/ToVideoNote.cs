@@ -2,7 +2,7 @@
 
 namespace Witlesss.Commands
 {
-    public class ToVideoNote : RemoveAudio
+    public class ToVideoNote : VideoCommand
     {
         public override void Run()
         {

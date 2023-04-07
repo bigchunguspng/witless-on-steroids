@@ -1,6 +1,6 @@
 ﻿namespace Witlesss.Commands
 {
-    public class Reverse : RemoveBitrate
+    public class Reverse : AudioVideoCommand
     {
         public override void Run()
         {

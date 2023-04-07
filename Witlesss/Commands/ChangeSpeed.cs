@@ -3,7 +3,7 @@ using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands
 {
-    public class ChangeSpeed : RemoveBitrate
+    public class ChangeSpeed : AudioVideoCommand
     {
         private SpeedMode Mode;
 

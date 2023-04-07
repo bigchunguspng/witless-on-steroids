@@ -29,23 +29,17 @@ namespace Witlesss.Commands
 
         private bool GetPicID(Message mess)
         {
-            if (mess == null) return false;
+            if      (mess == null) return false;
 
-            if (mess.Photo is { } p)
-            {
-                _fileID = p[^1].FileId;
-            }
-            else if (mess.Document is { MimeType: "image/png" or "image/jpeg", Thumb: not null } d)
-            {
-                _fileID = d.FileId;
-            }
-            else if (mess.Sticker is { IsVideo: false, IsAnimated: false } s)
-            {
-                _fileID = s.FileId;
-            }
+            if      (mess.Photo    is { } p)                 _fileID = p[^1].FileId;
+            else if (mess.Document is { } d && IsPicture(d)) _fileID = d    .FileId;
+            else if (mess.Sticker  is { } s && IsStatic (s)) _fileID = s    .FileId;
             else return false;
 
             return true;
         }
+
+        private static bool IsStatic (Sticker  s) => s is { IsVideo: false, IsAnimated: false };
+        private static bool IsPicture(Document d) => d is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
     }
 }

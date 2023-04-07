@@ -3,7 +3,7 @@ using static System.TimeSpan;
 
 namespace Witlesss.Commands
 {
-    public class Cut : RemoveBitrate
+    public class Cut : AudioVideoCommand
     {
         public override void Run()
         {
@@ -26,15 +26,15 @@ namespace Witlesss.Commands
             string VideoFilename() => "cut_fap_club.mp4";
         }
 
-        protected (bool failed, TimeSpan start, TimeSpan length) GetArgs()
+        protected static (bool failed, TimeSpan start, TimeSpan length) GetArgs()
         {
             var s = Text.Split();
             int len = s.Length;
             if     (len == 2 && TextIsTimeSpan(s[1], out var length)) return (false, Zero,  length);      // [++]----]
-            if     (len >= 3 && TextIsTimeSpan(s[1], out var start))
+            if     (len >= 3 && TextIsTimeSpan(s[1], out var  start))
             {
-                if (len == 4 && TextIsTimeSpan(s[3], out var end))    return (false, start, end - start); // [-[++]--]
-                if             (TextIsTimeSpan(s[2], out length))     return (false, start, length);      // [-[++]--]
+                if (len == 4 && TextIsTimeSpan(s[3], out var    end)) return (false, start, end - start); // [-[++]--]
+                if             (TextIsTimeSpan(s[2], out     length)) return (false, start, length);      // [-[++]--]
                 else                                                  return (false, start, Zero);        // [-[+++++]
             }
             else                                                      return (true,  Zero,  Zero);        // [-------]

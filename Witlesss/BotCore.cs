@@ -129,12 +129,12 @@ namespace Witlesss
             string shortID = ShortID(fileID);
             string extension = ExtensionFromID(shortID);
             type = MediaTypeFromID(shortID);
-            path = UniquePath($@"{PICTURES_FOLDER}\{shortID}{extension}");
+            path = UniquePath($@"{PICTURES_FOLDER}\{chat}\{shortID}{extension}");
             DownloadFile(fileID, path, chat).Wait();
         }
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
-            Directory.CreateDirectory(PICTURES_FOLDER);
+            Directory.CreateDirectory($@"{PICTURES_FOLDER}\{chat}");
             try
             {
                 var file = await Client.GetFileAsync(fileId);

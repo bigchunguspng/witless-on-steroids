@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Reddit.Controllers;
 using Telegram.Bot.Types.InputFiles;
+using static Witlesss.XD.RedditGalleryParser;
 using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
@@ -132,6 +133,18 @@ namespace Witlesss.Commands
             var post = GetPostOrBust(query);
             if (post == null) return;
 
+            var a = post.URL.Contains("/gallery/");
+            if (a)  SendGalleryPost(post);
+            else SendSingleFilePost(post);
+
+            Log($"{Title} >> r/{post.Subreddit}");
+            Reddit.LogInfo(); // todo del temp method
+        }
+
+        private static void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));
+
+        private static void SendSingleFilePost(PostData post)
+        {
             var g = post.URL.EndsWith(".gif");
             try
             {
@@ -144,11 +157,6 @@ namespace Witlesss.Commands
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));
-            }
-            finally // jerk it
-            {
-                Log($"{Title} >> r/{post.Subreddit}");
-                Reddit.LogInfo();
             }
 
             void SendPicOrAnimation(InputOnlineFile file)

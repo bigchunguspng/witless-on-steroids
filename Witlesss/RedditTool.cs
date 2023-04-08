@@ -47,7 +47,7 @@ namespace Witlesss
             "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe"
         };
 
-        private readonly Regex _img = new(@"(.png|.jpg|.gif)$");
+        private readonly Regex _img = new(@"(\.png|\.jpg|\.gif)$|(reddit\.com\/gallery\/)");
 
         private readonly Dictionary<long, RedditQuery> LastQueries = new();
 

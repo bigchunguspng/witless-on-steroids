@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,12 +20,12 @@ namespace Witlesss
 
         public void SendMessage(long chat, string text)
         {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true);
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html);
             TrySend(task, chat, "message");
         }
         public void SendMessage(long chat, string text, bool preview)
         {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: true, disableWebPagePreview: !preview);
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableWebPagePreview: !preview);
             TrySend(task, chat, "message");
         }
 
@@ -69,6 +70,12 @@ namespace Witlesss
         {
             var task = Client.SendVideoNoteAsync(chat, note);
             TrySend(task, chat, "videonote");
+        }
+
+        public void SendAlbum(long chat, IEnumerable<IAlbumInputMedia> album)
+        {
+            var task = Client.SendMediaGroupAsync(chat, album);
+            TrySend(task, chat, "album");
         }
 
         private static void TrySend(Task task, long chat, string what)

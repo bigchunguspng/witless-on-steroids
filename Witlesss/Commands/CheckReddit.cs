@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Reddit.Controllers;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using static Witlesss.XD.RedditGalleryParser;
 using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
 #pragma warning disable SYSLIB0014
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
     public class CheckReddit : Command
     {
@@ -19,6 +20,8 @@ namespace Witlesss.Commands
         private readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
         private readonly Regex _wtf = new(@"^\/w[^\ss_@]");
+
+        private static readonly Regex _ul = new(@"<ul.*ul>"), _li = new(@"<li.*?href=""(.*?)"".*?li>");
 
         private static readonly RedditTool Reddit = RedditTool.Instance;
 
@@ -142,6 +145,26 @@ namespace Witlesss.Commands
         }
 
         private static void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));
+
+        private static IEnumerable<InputMediaPhoto> AlbumFromGallery(PostData post)
+        {
+            using var client = new WebClient();
+            string html = client.DownloadString(post.URL);
+
+            var list = _li.Matches(_ul.Match(html).Value);
+
+            var captioned = false;
+            return list.Select(GetInputMedia).Take(10);
+
+            InputMediaPhoto GetInputMedia(Match match)
+            {
+                var cap = captioned ? null : post.Title;
+                captioned = true;
+
+                var url = match.Groups[1].Value.Replace("&amp;", "&");
+                return new InputMediaPhoto(new InputMedia(url)) { Caption = cap };
+            }
+        }
 
         private static void SendSingleFilePost(PostData post)
         {

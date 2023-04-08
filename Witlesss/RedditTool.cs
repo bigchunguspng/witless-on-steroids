@@ -12,19 +12,11 @@ namespace Witlesss
 {
     public class RedditQueryCache
     {
-        // the number of posts that the tool scrolls before losing patience
-        // has to be cleared sometimes
-        //private const int EXCLUDED_CAPACITY = 128;
-        
         public DateTime RefreshDate;
         public bool HasEnoughPosts;
         public readonly Queue<PostData> Posts = new(RedditTool.POST_LIMIT);
-        //public Queue<string> Excluded = new(EXCLUDED_CAPACITY);
 
-        public RedditQueryCache()
-        {
-            RefreshDate = GetRefreshDate();
-        }
+        public RedditQueryCache() => UpdateRefreshDate();
 
         public void UpdateRefreshDate() => RefreshDate = GetRefreshDate();
 
@@ -36,8 +28,6 @@ namespace Witlesss
         public  const int POST_LIMIT = 32, KEEP_POSTS = 50;
 
         public static readonly RedditTool Instance = new();
-
-        private PostData _post;
 
         private readonly RedditClient client = new(RedditAppID, RedditToken);
         private readonly string[] subreddits = 
@@ -53,6 +43,7 @@ namespace Witlesss
 
         private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
 
+        private PostData _post;
         private RedditQuery Qr;
         private RedditQueryCache QrCache => Cache[Qr];
         

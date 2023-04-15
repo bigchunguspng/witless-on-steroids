@@ -75,7 +75,7 @@ namespace Witlesss
 
         public static string RemoveAudio   (string path) => new F_Resize(path).ToAnimation();
         public static string Stickerize    (string path) => new F_Resize(path).ToSticker(NormalizeSize(GetSize(path)));
-        public static string Compress      (string path) => new F_Resize(path).CompressImage();
+        public static string Compress      (string path) => new F_Resize(path).CompressImage(FitSize(GetSize(path), 2560));
         public static string CompressGIF   (string path) => new F_Resize(path).CompressAnimation();
         public static string CropVideoNote (string path) => new F_Resize(path).CropVideoNote();
         public static string ToVideoNote   (string path)

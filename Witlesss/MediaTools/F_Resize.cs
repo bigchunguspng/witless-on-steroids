@@ -16,10 +16,10 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         public string ToVideoNote (Rectangle crop) => Cook(SetOutName(_input, "-vnote",  ".mp4"), o => ToVideoNoteArgs(o, crop));
         public string ToSticker           (Size s) => Cook(SetOutName(_input, "-stick", ".webp"), o => o.Resize(s));
 
-        public string CompressImage     () => Cook(SetOutName(_input, "-small", ".jpg"), o => o.WithQscale(5)); // -qscale:v 5
-        public string CompressAnimation () => Cook(SetOutName(_input, "-small", ".mp4"), CompressAnimationArgs);
+        public string CompressImage (Size s) => Cook(SetOutName(_input, "-small", ".jpg"), o => o.Resize(s).WithQscale(5)); // -qscale:v 5
+        public string CompressAnimation   () => Cook(SetOutName(_input, "-small", ".mp4"), CompressAnimationArgs);
 
-        public string CropVideoNote     () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
+        public string CropVideoNote       () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
 
         
         // -s WxH -an -vcodec libx264 -crf 30

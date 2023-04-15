@@ -133,7 +133,7 @@ namespace Witlesss.XD
 
         public static string SET_FREQUENCY_RESPONSE(int interval)
         {
-            string a = XDDD(Strings.SET_FREQUENCY_RESPONSE);
+            string a = XDDD(Texts.SET_FREQUENCY_RESPONSE);
             if (interval % 10 > 4 || interval % 10 == 0 || interval is > 10 and < 15)
                 a = $"{a} каждые {interval} сообщений";
             else if (interval % 10 > 1)

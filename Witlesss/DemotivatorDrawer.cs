@@ -107,10 +107,8 @@ namespace Witlesss
             
             graphics.CompositingMode = SourceCopy;
             graphics.DrawImage(image, Pic);
-            
-            string output = Ext.Replace(picture, "-D.jpg");
-            
-            return JpegCoder.SaveImage(background, output);
+
+            return JpegCoder.SaveImage(background, Ext.Replace(picture, "-D.jpg"));
         }
 
         private static KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
@@ -257,14 +255,15 @@ namespace Witlesss
             }
         }
 
-        private class DrawableText
-        {
-            public Graphics G;
-            public string S;
-            public TextParameters P;
+    }
 
-            public void Pass(Graphics g, string s) { G = g; S = s; }
-        }
+    public class DrawableText
+    {
+        public Graphics G;
+        public string S;
+        public TextParameters P;
+
+        public void Pass(Graphics g, string s) { G = g; S = s; }
     }
 
     public class TextParameters

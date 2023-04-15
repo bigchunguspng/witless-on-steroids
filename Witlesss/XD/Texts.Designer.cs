@@ -21,14 +21,14 @@ namespace Witlesss.XD {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings {
+    internal class Texts {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Strings() {
+        internal Texts() {
         }
         
         /// <summary>
@@ -38,7 +38,7 @@ namespace Witlesss.XD {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Witlesss.XD.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Witlesss.XD.Texts", typeof(Texts).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -531,6 +531,35 @@ namespace Witlesss.XD {
         internal static string PIECE_RESPONSE {
             get {
                 return ResourceManager.GetString("PIECE_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Если ты это написал, то очевидно, ты ничего не понял 😣 и тебе нужна инструкция 📃, так ведь? 😎
+        ///
+        ///&lt;b&gt;&lt;i&gt;&lt;u&gt;Смотри кароче&lt;/u&gt;&lt;/i&gt;&lt;/b&gt;:
+        ///
+        ///&lt;code&gt;/w&lt;/code&gt; - самая простая команда, вводишь после неё любой текст ✍️ и я ищю подходящие посты по всему реддиту 🔍
+        ///&lt;code&gt;/ws&lt;/code&gt; - более сложная, после неё уже надо вводить название сабреддита 🎟, и я кидаю посты оттуда 🛒
+        ///
+        ///Думаю, важно напомнить☝️что большая часть контента на реддите - на английском 🤓, а еще нам много нсфв 🥵
+        ///
+        ///Это так, простенький гайд, бол [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string REDDIT_MANUAL {
+            get {
+                return ResourceManager.GetString("REDDIT_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Тут всё просто 😎👌
+        ///
+        ///Пишешь после команды любой текст (желательно англ.) и я выдаю список сабреддитов, которые подходят под запрос.
+        /// </summary>
+        internal static string REDDIT_SUBS_MANUAL {
+            get {
+                return ResourceManager.GetString("REDDIT_SUBS_MANUAL", resourceCulture);
             }
         }
         

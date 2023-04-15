@@ -58,7 +58,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, "*тут должна быть инструкция по /wss*");
+                    Bot.SendMessage(Chat, REDDIT_SUBS_MANUAL);
                 }
             }
             else if (input.StartsWith("/ws")) // [subreddit [-ops]]
@@ -78,7 +78,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, "*тут должна быть инструкция по /w и /ws*");
+                    Bot.SendMessage(Chat, REDDIT_MANUAL, preview: false);
                 }
             }
             else // /w search query [subreddit*] [-ops]

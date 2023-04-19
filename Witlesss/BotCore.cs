@@ -124,9 +124,7 @@ namespace Witlesss
             catch (Exception e)
             {
                 LogError($"{chat} >> Can't ping --> " + e.Message);
-                if (e.Message.Contains("Forbidden") || e.Message.Contains("chat not found") || e.Message.Contains("rights to send"))
-                    return -1;
-                return -2;
+                return ChatCanBeRemoved(e) ? -1 : -2;
             }
         }
 
@@ -162,5 +160,9 @@ namespace Witlesss
             admins.Wait();
             return admins.Result.Any(x => x.User.Id == user.Id);
         }
+
+        private static bool ChatCanBeRemoved(Exception e) => e.Message.Contains("Forbidden")      || 
+                                                             e.Message.Contains("chat not found") ||
+                                                             e.Message.Contains("rights to send");
     }
 }

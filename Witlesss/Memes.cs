@@ -108,12 +108,17 @@ namespace Witlesss
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
-        private static Size GrowSize     (Size s, int min =  256)
+        private static Size GrowSize     (Size s, int minW = 256, int minH = 192)
         {
-            if (s.Width < min || s.Height < min) s = NormalizeSize(s, min, reduce: false);
+            if (s.Width < minW || s.Height < minH)
+            {
+                var w = s.Width > s.Height;
+                s = NormalizeSize(s, w ? minH : minW, reduce: false);
+            }
+
             return ValidSize(s.Width, s.Height);
         }
-        public  static Size FitSize      (Size s, int max =  1280)
+        public  static Size FitSize      (Size s, int max = 1280)
         {
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
             return ValidSize(s.Width, s.Height);

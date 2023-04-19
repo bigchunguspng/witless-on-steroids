@@ -18,16 +18,14 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
             _b = b;
         }
 
-        public string Meme(int loss)                => Overlay(SetOutName(_a, "-M", ".mp4"), o => ArgsMeme(o, loss));
+        public string Meme(int loss, Size size)     => Overlay(SetOutName(_a, "-M", ".mp4"), o => ArgsMeme(o, loss, size));
         public string Demo(int loss, Drawer drawer) => Overlay(SetOutName(_b, "-D", ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
 
-        private void ArgsMeme(FFMpegArgumentOptions o, int f)
+        private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
         {
-            var v = GetVideoStream(_a);
-            var s = FF_Extensions.ValidSize(v.Width, v.Height);
             o = BuildAndCompress(o, f, CoFi.Null.Scale("0:v", s, "vid").Overlay("vid", "1:v", Point.Empty));
         }
-        private void ArgsDemo(FFMpegArgumentOptions o, int f, Size s, Point p)
+        private static void ArgsDemo(FFMpegArgumentOptions o, int f, Size s, Point p)
         {
             o = BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "vid").Overlay("0:v", "vid", p));
         }

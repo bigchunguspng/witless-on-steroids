@@ -12,10 +12,9 @@ namespace Witlesss
 {
     public class MemeGenerator
     {
-        private int _w, _h, _s, _d;
+        private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
         private bool _resize;
-        private const int _m = 10;
         private readonly FontFamily    _font = new("Impact");
         private readonly SolidBrush   _white = new(Color.White);
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
@@ -35,6 +34,7 @@ namespace Witlesss
             _h = size.Height;
             _s = Math.Max((int)Math.Min(_w, 1.5 * _h) / 12, 12);
             _d = _h / 3 * 2;    // upper margin for bottom text
+            _m = Math.Min(_h / 72, 10); // margin
         }
 
         public string MakeImpactMeme(string path, DgText text)
@@ -64,8 +64,19 @@ namespace Witlesss
         {
             if (string.IsNullOrEmpty(text)) return;
 
+            text = RemoveEmoji(text);
+
+            var s = size * 0.6f;
+            var r = rect.Size with { Height = rect.Size.Height * 3 };
+            while (g.MeasureString(text, new Font(_font, s), r).Height > rect.Size.Height && s > 2)
+            {
+                s *= 0.8f;
+            }
+            size = (int)(s / 0.6f);
+            _size = size;
+            
             using var path = new GraphicsPath();
-            path.AddString(RemoveEmoji(text), _font, 0, size, rect, f);
+            path.AddString(text, _font, 0, size, rect, f);
             for (int i = OutlineWidth; i > 0; i--)
             {
                 _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
@@ -73,7 +84,7 @@ namespace Witlesss
                 g.DrawPath(_outline, path);
                 _outline.Dispose();
             }
-            g.FillPath(Brush(), path);
+            g.FillPath(Brush, path);
         }
 
         private static string RemoveEmoji(string text)
@@ -92,11 +103,10 @@ namespace Witlesss
             return text;
         }
 
-        private int OutlineWidth => (int)Math.Round(_s / 6D);
+        private int OutlineWidth => (int)Math.Round(_size / 6D);
+        private SolidBrush Brush => _brushes[MakeMeme.Dye].Invoke();
 
-        private SolidBrush Brush() => _brushes[MakeMeme.Dye].Invoke();
-
-        private Image GetImage(string path)
+        protected Image GetImage(string path)
         {
             _resize = false;
             var image = new Bitmap(Image.FromFile(path));

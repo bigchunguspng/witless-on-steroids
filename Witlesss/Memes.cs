@@ -47,9 +47,10 @@ namespace Witlesss
 
         public string MakeVideoMeme(string path, DgText text)
         {
-            _imgflip.SetUp(GetSize(path));
+            var size = GrowSize(GetSize(path));
+            _imgflip.SetUp(size);
 
-            return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality);
+            return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality, size);
         }
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)
@@ -88,6 +89,11 @@ namespace Witlesss
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
+        public  static Size GrowSize     (Size s, int min =  256)
+        {
+            if (s.Width < min || s.Height < min) s = NormalizeSize(s, min);
+            return ValidSize(s.Width, s.Height);
+        }
         public  static Size FitSize      (Size s, int max =  1280)
         {
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);

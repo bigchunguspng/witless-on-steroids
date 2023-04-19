@@ -75,7 +75,7 @@ public class TopTextAttacher //: MemeGenerator
         _w = size.Width;
         _h = size.Height;
         // _m = Math.Min(_h / 72, 10);
-        _t = FF_Extensions.ToEven(_h / 2);
+        _t = FF_Extensions.ToEven(_w > _h ? _h / 2 : _w / 2);
         _full = _h + _t;
     }
     private Image GetImage(string path)

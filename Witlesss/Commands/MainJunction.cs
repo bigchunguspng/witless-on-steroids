@@ -9,6 +9,7 @@ namespace Witlesss.Commands
         private Command        _sc;
         private WitlessCommand _wc;
         private readonly MakeMeme _meme = new();
+        private readonly AddCaption _whenthe = new();
         private readonly Demotivate _demotivate = new();
         private readonly RemoveBitrate _bitrate = new();
         private readonly RemoveAudio _audio = new();
@@ -129,6 +130,7 @@ namespace Witlesss.Commands
             if      (CommandIs( "/dg"        )) _wc = _demotivate.SetUp(DgMode.Square);
             else if (CommandIs( "/dv"        )) _wc = _demotivate.SetUp(DgMode.Wide);
             else if (CommandIs( "/meme"      )) _wc = _meme;
+            else if (CommandIs( "/top"       )) _wc = _whenthe;
             else if (CommandIs( "/a"         )) _wc = _generate;
             else if (CommandIs( "/zz"        )) _wc = _generateB;
             else if (CommandIs( "/b"         )) _wc = _buhurt;

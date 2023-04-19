@@ -2,7 +2,7 @@
 
 namespace Witlesss.Commands
 {
-    public class MakeMeme : MakeMemeCore, ImageProcessor
+    public class MakeMeme : MakeMemeCore<DgText>, ImageProcessor
     {
         public MakeMeme() : base(new Regex(@"^\/meme\S* *", RegexOptions.IgnoreCase)) { }
 

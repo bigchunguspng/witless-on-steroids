@@ -87,7 +87,7 @@ namespace Witlesss
             g.FillPath(Brush, path);
         }
 
-        private static string RemoveEmoji(string text)
+        public static string RemoveEmoji(string text)
         {
             var matches = Regex.Matches(text, REGEX_EMOJI);
             if (matches.Count == 0) return text;
@@ -106,7 +106,7 @@ namespace Witlesss
         private int OutlineWidth => (int)Math.Round(_size / 6D);
         private SolidBrush Brush => _brushes[MakeMeme.Dye].Invoke();
 
-        protected Image GetImage(string path)
+        private Image GetImage(string path)
         {
             _resize = false;
             var image = new Bitmap(Image.FromFile(path));

@@ -2,13 +2,10 @@
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using StrInt     = System.Func<int, string>;
-using MemeMaker  = System.Func<string, Witlesss.XD.Extension.DgText, string>;
-using MemeMakerX = System.Func<string, Witlesss.XD.Extension.DgText, string, string>;
 
 namespace Witlesss.Commands
 {
-    public abstract class MakeMemeCore : WitlessCommand
+    public abstract class MakeMemeCore<T> : MakeMemeCore_Static
     {
         private string    _path;
         private MediaType _type;
@@ -18,17 +15,6 @@ namespace Witlesss.Commands
 
         protected MakeMemeCore(Regex cmd) => _cmd = cmd;
 
-        protected static Memes M => Bot.MemeService;
-
-        protected static void Run(Func<Message, bool> process, string type)
-        {
-            JpegCoder.PassQuality(Baka);
-
-            var x = Message.ReplyToMessage;
-            if (process(Message) || process(x)) return;
-
-            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
-        }
         protected bool ProcessMessage(Message mess)
         {
             if (mess is null) return false;
@@ -48,7 +34,7 @@ namespace Witlesss.Commands
         public    abstract void ProcessStick(string fileID);
         protected abstract void ProcessVideo(string fileID);
 
-        protected void DoPhoto(string fileID, StrInt log, MemeMaker produce, bool regex)
+        protected void DoPhoto(string fileID, Func<int, string> log, Func<string, T, string> produce, bool regex)
         {
             Download(fileID);
 
@@ -61,7 +47,7 @@ namespace Witlesss.Commands
             Log($"{Title} >> {log(repeats)}");
         }
 
-        protected void DoStick(string fileID, string log, MemeMakerX produce)
+        protected void DoStick(string fileID, string log, Func<string, T, string, string> produce)
         {
             Download(fileID);
 
@@ -70,7 +56,7 @@ namespace Witlesss.Commands
             Log($"{Title} >> {log}");
         }
 
-        protected void DoVideo(string fileID, string log, MemeMaker produce)
+        protected void DoVideo(string fileID, string log, Func<string, T, string> produce)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
@@ -84,15 +70,30 @@ namespace Witlesss.Commands
             Log($@"{Title} >> {log} >> TIME: {_watch.CheckStopWatch()}");
         }
 
-        protected abstract DgText GetMemeText(string text);
+        protected abstract T GetMemeText(string text);
+        private T Texts() => GetMemeText(RemoveCommand(Text));
 
-        private DgText Texts() => GetMemeText(RemoveCommand(Text));
         private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
-
-        private static string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
         
         private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
-        
+    }
+
+    public abstract class MakeMemeCore_Static : WitlessCommand
+    {
+        protected static Memes M => Bot.MemeService;
+
+        protected static void Run(Func<Message, bool> process, string type)
+        {
+            JpegCoder.PassQuality(Baka);
+
+            var x = Message.ReplyToMessage;
+            if (process(Message) || process(x)) return;
+
+            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
+        }
+
+        protected static string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
+
         public static int GetRepeats(bool regex)
         {
             var repeats = 1;
@@ -103,6 +104,5 @@ namespace Witlesss.Commands
             }
             return repeats;
         }
-
     }
 }

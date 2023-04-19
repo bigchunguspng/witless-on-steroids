@@ -10,6 +10,7 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
         private readonly MemeGenerator        _imgflip = new();
+        private readonly TopTextAttacher      _kapwing = new();
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 
@@ -52,6 +53,24 @@ namespace Witlesss
 
             return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality, size);
         }
+        
+        public string MakeWhenTheMeme(string path, string text)
+        {
+            return _kapwing.MakeTopTextMeme(path, text);
+        }
+
+        public string MakeWhenTheMemeFromSticker(string path, string text, string extension)
+        {
+            return MakeWhenTheMeme(new F_Resize(path).Transcode(extension), text);
+        }
+
+        public string MakeVideoWhenTheMeme(string path, string text)
+        {
+            var size = GrowSize(GetSize(path));
+            _kapwing.SetUp(size);
+
+            return new F_Overlay(_kapwing.BakeText(text), path).When(Quality, _kapwing.Cropping);
+        }
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)
         {
@@ -89,9 +108,9 @@ namespace Witlesss
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
-        public  static Size GrowSize     (Size s, int min =  256)
+        private static Size GrowSize     (Size s, int min =  256)
         {
-            if (s.Width < min || s.Height < min) s = NormalizeSize(s, min);
+            if (s.Width < min || s.Height < min) s = NormalizeSize(s, min, reduce: false);
             return ValidSize(s.Width, s.Height);
         }
         public  static Size FitSize      (Size s, int max =  1280)
@@ -99,10 +118,11 @@ namespace Witlesss
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
             return ValidSize(s.Width, s.Height);
         }
-        private static Size NormalizeSize(Size s, int limit = 512)
+        private static Size NormalizeSize(Size s, int limit = 512, bool reduce = true)
         {
             double lim = limit;
-            return s.Width > s.Height
+            var wide = s.Width > s.Height;
+            return reduce == wide
                 ? new Size(limit, (int)(s.Height / (s.Width / lim)))
                 : new Size((int)(s.Width / (s.Height / lim)), limit);
         }

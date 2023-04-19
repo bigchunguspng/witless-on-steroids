@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using static Witlesss.Commands.MakeMemeCore;
+using static Witlesss.Commands.MakeMemeCore_Static;
 
 namespace Witlesss.Commands
 {

@@ -3,7 +3,7 @@ using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands
 {
-    public class Demotivate : MakeMemeCore, ImageProcessor
+    public class Demotivate : MakeMemeCore<DgText>, ImageProcessor
     {
         public Demotivate() : base(new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase)) { }
 

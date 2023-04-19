@@ -33,8 +33,8 @@ namespace Witlesss.Commands
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
                 var c = Random.Next(10);
-                if (c == 0) a = "";
-                if (a.Length > 25)
+                if (c == 0 || OnlyBottomText) a = "";
+                else if (a.Length > 25)
                 {
                     if (c > 5) (a, b) = ("", a);
                     else b = "";
@@ -56,7 +56,8 @@ namespace Witlesss.Commands
             return new DgText(a, b);
         }
 
-        private static bool AddBottomText => Text != null && Text.Split()[0].Contains('s');
+        private static bool  AddBottomText => Text != null && Text.Split()[0].Contains('s');
+        private static bool OnlyBottomText => Text != null && Text.Split()[0].Contains('d');
 
         public static ColorMode Dye => Baka.Meme.Dye;
     }

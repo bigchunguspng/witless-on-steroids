@@ -1,4 +1,6 @@
-﻿namespace Witlesss.Commands
+﻿using System.Collections.Generic;
+
+namespace Witlesss.Commands
 {
     public class ChatInfo : WitlessCommand
     {
@@ -11,10 +13,17 @@
                 Baka.Meme.Quality,
                 Baka.Meme.Stickers ? "ON" : "OFF",
                 Baka.Meme.Dye == ColorMode.Color ? "цветной" : "белый",
-                Baka.Meme.Type == MemeType.Dg ? "демотиваторами" : "мемами",
+                types[Baka.Meme.Type],
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
             Bot.SendMessage(Chat, info);
         }
+
+        private readonly Dictionary<MemeType, string> types = new()
+        {
+            { MemeType.Meme, "стают мемами"     },
+            { MemeType.Dg,   "демотивируются"   },
+            { MemeType.Top,  "обретают подпись" }
+        };
     }
 }

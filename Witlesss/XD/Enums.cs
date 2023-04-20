@@ -25,5 +25,5 @@
         Round  // video note
     }
 
-    public enum MemeType  { Dg, Meme }
+    public enum MemeType  { Dg, Meme, Top }
 }

@@ -41,7 +41,7 @@ namespace Witlesss.Commands
 
         public MainJunction() => _mematics = new MemeProcessors
         {
-            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }
+            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }
         };
 
         private static bool TextIsCommand(out string command)

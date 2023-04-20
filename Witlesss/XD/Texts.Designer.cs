@@ -133,7 +133,7 @@ namespace Witlesss.XD {
         ///Качество картинок: {4}%
         ///Мемы из стикеров: {5}
         ///Текст в мемах: {6}
-        ///Пикчи стают: {7}
+        ///Пикчи: {7}
         ///Менять настройки могут: {8}.
         /// </summary>
         internal static string CHAT_INFO {
@@ -583,6 +583,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
         ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
+        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - верхний текст
         ///
         ///&lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
         ///
@@ -608,8 +609,9 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt;
         ///
-        ///(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы).
+        ///(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы / &lt;u&gt;т&lt;/u&gt;воё лицо когда...).
         /// </summary>
         internal static string SET_MEMES_MANUAL {
             get {

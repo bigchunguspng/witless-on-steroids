@@ -32,6 +32,7 @@
 
 &lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
 &lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
+&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - верхний текст
 
 &lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
 
@@ -214,7 +215,7 @@
 Качество картинок: {4}%
 Мемы из стикеров: {5}
 Текст в мемах: {6}
-Пикчи стают: {7}
+Пикчи: {7}
 Менять настройки могут: {8}</value>
     </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
@@ -309,8 +310,9 @@ s   - save and exit
 
 &lt;code&gt;/set@piece_fap_bot M&lt;/code&gt;
 &lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt;
 
-(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы)</value>
+(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы / &lt;u&gt;т&lt;/u&gt;воё лицо когда...)</value>
     </data>
     <data name="SET_MEMES_RESPONSE" xml:space="preserve">
         <value>Картинки будут превращаться в {0}</value>

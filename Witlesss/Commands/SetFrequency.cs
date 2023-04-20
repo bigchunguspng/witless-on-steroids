@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
@@ -29,18 +30,30 @@ namespace Witlesss.Commands
                     Baka.Meme.Type = MemeType.Dg;
                     x = true;
                 }
+                else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))
+                {
+                    Baka.Meme.Type = MemeType.Top;
+                    x = true;
+                }
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
                 if (x)
                 {
                     Bot.SaveChatList();
                     Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
-                    Log($"{Title} >> MEMES TYPE >> {(Baka.Meme.Type == MemeType.Dg ? "D" : "M")}");
+                    Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
                 }
             }
             else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
 
-        private static string MEMES_TYPE() => Baka.Meme.Type == MemeType.Dg ? "демотивоторы" : "мемы";
+        private static string MEMES_TYPE() => types[Baka.Meme.Type];
+        
+        private static readonly Dictionary<MemeType, string> types = new()
+        {
+            { MemeType.Meme, "мемы"     },
+            { MemeType.Dg,   "демотивоторы"   },
+            { MemeType.Top,  "картинки с подписью" }
+        };
     }
 }

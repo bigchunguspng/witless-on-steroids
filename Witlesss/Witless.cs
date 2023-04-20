@@ -32,8 +32,8 @@ namespace Witlesss
                 witless.Meme.Chance = 100;
                 witless.Meme.Stickers = true;
             }
-            witless.Meme.Type = Extension.Random.Next(2) == 0 ? MemeType.Dg     : MemeType.Meme;
-            witless.Meme.Dye  = Extension.Random.Next(2) == 0 ? ColorMode.Color : ColorMode.White;
+            witless.Meme.Type = (MemeType)Extension.Random.Next(3);
+            witless.Meme.Dye = (ColorMode)Extension.Random.Next(2);
 
             witless.Load();
             return witless;

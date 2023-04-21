@@ -181,21 +181,19 @@ namespace Witlesss.XD
             return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }
 
-        public static string FixedErrorMessage(string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
+        public static string FixedErrorMessage (string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
 
-        public static long SizeInBytes(string path) => new FileInfo(path).Length;
+        public static long SizeInBytes         (string path) => new FileInfo(path).Length;
+        public static bool FileEmptyOrNotExist (string path) => !File.Exists(path) || SizeInBytes(path) == 0;
+        public static void CreateFilePath      (string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 
-        public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
-
-        public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-        public static FileInfo[] GetFilesInfo(string path)
+        public static FileInfo[] GetFilesInfo  (string path)
         {
             Directory.CreateDirectory(path);
-            return new DirectoryInfo(path).GetFiles();
+            return new  DirectoryInfo(path).GetFiles();
         }
         
-        public static string[] GetFiles(string path)
+        public static string[]   GetFiles      (string path)
         {
             Directory.CreateDirectory(path);
             return Directory.GetFiles(path);

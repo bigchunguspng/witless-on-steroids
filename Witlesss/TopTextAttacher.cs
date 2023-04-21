@@ -20,7 +20,7 @@ public class TopTextAttacher //: MemeGenerator
     private void SetFontToDefault() => _sans = new(FontFamily, StartingFontSize(), FontStyle.Bold);
     private void MakeFontSmaller () => _sans = new(FontFamily, _sans.Size * 0.8f,  FontStyle.Bold);
 
-    private int StartingFontSize () => Math.Min(36, _t / 5);
+    private int StartingFontSize () => Math.Max(36, _t / 5);
 
     private int _w, _h, _t, _full;
 

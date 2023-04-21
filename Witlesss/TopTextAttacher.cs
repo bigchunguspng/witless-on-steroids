@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using Witlesss.MediaTools;
@@ -16,8 +17,10 @@ public class TopTextAttacher //: MemeGenerator
     private static readonly SolidBrush TextColor = new(Color.Black);
     private static readonly StringFormat Format = new() { Alignment = StringAlignment.Center, Trimming = StringTrimming.Word, LineAlignment = StringAlignment.Center };
 
-    private static void MakeFontSmaller () => _sans = new(FontFamily, _sans.Size * 0.8f, FontStyle.Bold);
-    private static void SetFontToDefault() => _sans = new(FontFamily, 36, FontStyle.Bold);
+    private void SetFontToDefault() => _sans = new(FontFamily, StartingFontSize(), FontStyle.Bold);
+    private void MakeFontSmaller () => _sans = new(FontFamily, _sans.Size * 0.8f,  FontStyle.Bold);
+
+    private int StartingFontSize () => Math.Min(36, _t / 5);
 
     private int _w, _h, _t, _full;
 
@@ -70,13 +73,13 @@ public class TopTextAttacher //: MemeGenerator
     
     public void SetUp(Size size)
     {
-        SetFontToDefault();
-        
         _w = size.Width;
         _h = size.Height;
         // _m = Math.Min(_h / 72, 10);
         _t = FF_Extensions.ToEven(_w > _h ? _h / 2 : _w / 2);
         _full = _h + _t;
+
+        SetFontToDefault();
     }
     private Image GetImage(string path)
     {

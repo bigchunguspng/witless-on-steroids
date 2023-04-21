@@ -137,4 +137,8 @@ namespace Witlesss
             return new Size(v.Width, v.Height);
         }
     }
+    
+    public record DgText(string A, string B);
+    
+    public record CutSpan(TimeSpan Start, TimeSpan Length);
 }

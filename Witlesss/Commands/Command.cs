@@ -22,9 +22,9 @@ namespace Witlesss.Commands
         }
 
         public abstract void Run();
-        
-        public static string SenderName => Message.SenderChat?.Title  ?? UserFullName();
-        public static string TitleOrUsername => Truncate(ChatIsPrivate ? UserFullName() : Message.Chat.Title, 32);
+
+        public static string SenderName => Message.SenderChat?.Title ?? UserFullName();
+        public static string TitleOrUsername => (ChatIsPrivate ? UserFullName() : Message.Chat.Title).Truncate(32);
 
         private static string UserFullName()
         {

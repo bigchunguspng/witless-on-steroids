@@ -11,7 +11,7 @@ namespace Witlesss.Commands
         public override void Run()
         {
             var length = 3;
-            if (HasIntArgument(Text, out int value))
+            if (Text.HasIntArgument(out int value))
                 length = System.Math.Clamp(value, 2, 16);
             
             var lines = new List<string>(length);

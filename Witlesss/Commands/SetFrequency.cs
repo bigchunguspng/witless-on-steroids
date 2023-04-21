@@ -9,7 +9,7 @@ namespace Witlesss.Commands
         {
             if (SenderIsSus()) return;
 
-            if (HasIntArgument(Text, out int value))
+            if (Text.HasIntArgument(out int value))
             {
                 Baka.Interval = value;
                 Bot.SaveChatList();

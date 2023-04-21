@@ -27,7 +27,7 @@ namespace Witlesss.Commands
                 for (int i = 0; i < repeats; i++)
                 {
                     text = Baka.GenerateByLast(word.ToLower()) + ending;
-                    Bot.SendMessage(Chat, TextInLetterCase(text, mode));
+                    Bot.SendMessage(Chat, text.ToLetterCase(mode));
                 }
 
                 LogXD(repeats, "FUNNY BY LAST WORD");

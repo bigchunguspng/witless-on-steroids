@@ -6,7 +6,7 @@
         {
             if (SenderIsSus()) return;
 
-            if (HasIntArgument(Text, out int value))
+            if (Text.HasIntArgument(out int value))
             {
                 Baka.Meme.Chance = value;
                 Bot.SaveChatList();

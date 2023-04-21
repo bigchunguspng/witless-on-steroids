@@ -20,7 +20,7 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
         }
         public static string SetOutName(string path, string suffix, string extension)
         {
-            return RemoveExtension(path) + suffix + extension;
+            return path.RemoveExtension() + suffix + extension;
         }
 
         public static VideoStream GetVideoStream(string path) => FFProbe.Analyse(path).PrimaryVideoStream;

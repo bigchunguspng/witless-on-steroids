@@ -226,7 +226,7 @@ namespace Witlesss
                 current = PickWord(Words[current]);
             }
 
-            return TextInRandomLetterCase(result.Replace(START, "").TrimStart());
+            return result.Replace(START, "").TrimStart().ToRandomLetterCase();
         }
         private string GenerateBackwards(string word)
         {
@@ -239,7 +239,7 @@ namespace Witlesss
                 current = PickWord(GetWordsBefore(current));
             }
 
-            return TextInRandomLetterCase(result.Replace(END, "").TrimEnd());
+            return result.Replace(END, "").TrimEnd().ToRandomLetterCase();
         }
 
         private WordChart GetWordsBefore(string word)

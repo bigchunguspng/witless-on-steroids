@@ -18,7 +18,7 @@ namespace Witlesss.Commands
             if (NothingToProcess()) return;
 
             var speed = 2D;
-            if (HasDoubleArgument(Text, out double value))
+            if (Text.HasDoubleArgument(out double value))
                 speed = Mode == Fast ? ClampFast(value) : ClampSlow(value);
 
             Bot.Download(FileID, Chat, out string path, out var type);

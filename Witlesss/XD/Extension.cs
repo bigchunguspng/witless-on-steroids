@@ -20,8 +20,8 @@ namespace Witlesss.XD
             return Math.Min(text.Length, 120) * 25;
         }
 
-        public static string TextInRandomLetterCase(string text) => TextInLetterCase(text, RandomLetterCase());
-        public static string TextInLetterCase(string text, LetterCaseMode mode) => mode switch
+        public static string ToRandomLetterCase(this string text) => ToLetterCase(text, RandomLetterCase());
+        public static string ToLetterCase(this string text, LetterCaseMode mode) => mode switch
         {
             Lower    => text.ToLower(),
             Upper    => text.ToUpper(),
@@ -36,26 +36,22 @@ namespace Witlesss.XD
             _   => Upper
         };
 
-        public static string Truncate(string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
+        public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
 
-        public record DgText(string A, string B);
-
-        public record CutSpan(TimeSpan Start, TimeSpan Length);
-
-        public static bool HasIntArgument(string text, out int value)
+        public static bool HasIntArgument(this string text, out int value)
         {
             value = 0;
             var words = text.Split();
             return words.Length > 1 && int.TryParse(words[1], out value);
         }
-        public static bool HasDoubleArgument(string text, out double value)
+        public static bool HasDoubleArgument(this string text, out double value)
         {
             value = 0;
             var words = text.Split();
             return words.Length > 1 && double.TryParse(words[1].Replace('.', ','), out value);
         }
 
-        public static bool TextIsTimeSpan(string arg, out TimeSpan span)
+        public static bool IsTimeSpan(this string arg, out TimeSpan span)
         {
             span = TimeSpan.Zero;
             arg = arg.TrimStart('-');
@@ -82,7 +78,7 @@ namespace Witlesss.XD
             while (File.Exists(path) || extra)
             {
                 cd = false;
-                var name  = Path.GetFileNameWithoutExtension(path);
+                var name  = Path.GetFileNameWithoutExtension(path) ?? "";
 
                 int index = name.LastIndexOf('_');
                 if (index > 0 && int.TryParse(name.AsSpan(index).TrimStart('_'), out int number))
@@ -112,7 +108,7 @@ namespace Witlesss.XD
             foreach (var element in source) action(element);
         }
 
-        public static string RemoveExtension(string path) => path.Remove(path.LastIndexOf('.'));
+        public static string RemoveExtension(this string path) => path.Remove(path.LastIndexOf('.'));
 
         public static string ShortID(string fileID) => fileID.Remove(62).Remove(2, 44);
         public static string ExtensionFromID(string id) => ExtensionsIDs[id.Remove(2)];

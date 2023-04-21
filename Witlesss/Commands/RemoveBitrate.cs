@@ -9,7 +9,7 @@ namespace Witlesss.Commands
             if (NothingToProcess()) return;
 
             var value = 15;
-            if (HasIntArgument(Text, out int b)) value = Math.Clamp(b, 0, 21);
+            if (Text.HasIntArgument(out int b)) value = Math.Clamp(b, 0, 21);
 
             Bot.Download(FileID, Chat, out string path, out var type);
 

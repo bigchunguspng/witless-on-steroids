@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Witlesss.MediaTools;
 
@@ -11,7 +13,7 @@ public class TopTextAttacher //: MemeGenerator
     //static TopTextAttacher() { _fonts.AddFontFile(@"D:\Downloads\Telegram Desktop\futura-extra-black-condensed-bt.ttf"); }
 
     private static readonly Regex Ext = new("(.png)|(.jpg)");
-    //private static PrivateFontCollection _fonts = new();
+    //private static readonly PrivateFontCollection _fonts = new();
     private static string FontFamily => "Segoe UI Black"; //_fonts.Families.First();
     private static Font _sans;
     private static readonly SolidBrush TextColor = new(Color.Black);
@@ -64,6 +66,7 @@ public class TopTextAttacher //: MemeGenerator
         graphics.Clear(Color.White);
         
         graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
         graphics.DrawString(text, _sans, TextColor, layout, Format);
 
         return image;
@@ -78,10 +81,10 @@ public class TopTextAttacher //: MemeGenerator
             MakeFontSmaller();
         }
 
-        if (text.Contains('\n'))
+        if (text.Count(c => c == '\n') > 2)
         {
             var ms = g.MeasureString(text, _sans, new SizeF(_w, _t));
-            if (ms.Width < _w * 0.75)
+            if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
                 ResizeFont(_sans.Size * k);

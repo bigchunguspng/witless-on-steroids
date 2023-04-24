@@ -74,6 +74,8 @@ namespace Witlesss.Commands
         private T Texts() => GetMemeText(RemoveCommand(Text));
 
         private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
+
+        private string GetStickerExtension() => Text != null && _cmd.Match(Text).Value.Contains('x') ? ".jpg" : ".png";
         
         private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
     }
@@ -91,8 +93,6 @@ namespace Witlesss.Commands
 
             Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
         }
-
-        protected static string GetStickerExtension() => Text != null && Text.Contains('x') ? ".jpg" : ".png";
 
         public static int GetRepeats(bool regex)
         {

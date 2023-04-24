@@ -120,7 +120,7 @@ namespace Witlesss
                 string message = File.ReadAllText("spam.txt");
                 foreach (var witless in Bakas)
                 {
-                    if (SizeInBytes(witless.Path) > size)
+                    if (File.Exists(witless.Path) && SizeInBytes(witless.Path) > size)
                     {
                         Bot.SendMessage(witless.Chat, message);
                         Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
@@ -129,7 +129,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError("SoRRY, CAN'T SPAM, BRO x_x" + e.Message);
+                LogError("SoRRY, CAN'T SPAM, BRO x_x " + e.Message);
             }
         }
 

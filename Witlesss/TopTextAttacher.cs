@@ -17,8 +17,10 @@ public class TopTextAttacher //: MemeGenerator
     private static readonly SolidBrush TextColor = new(Color.Black);
     private static readonly StringFormat Format = new() { Alignment = StringAlignment.Center, Trimming = StringTrimming.Word, LineAlignment = StringAlignment.Center };
 
-    private void SetFontToDefault() => _sans = new(FontFamily, StartingFontSize(), FontStyle.Bold);
-    private void MakeFontSmaller () => _sans = new(FontFamily, _sans.Size * 0.8f,  FontStyle.Bold);
+    private void ResizeFont(float size) => _sans = new(FontFamily, size, FontStyle.Bold);
+
+    private void SetFontToDefault() => ResizeFont(StartingFontSize());
+    private void MakeFontSmaller () => ResizeFont(_sans.Size * 0.8f);
 
     private int StartingFontSize () => Math.Max(36, _t / 5);
 
@@ -50,25 +52,50 @@ public class TopTextAttacher //: MemeGenerator
     private Image DrawText(string text)
     {
         text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
+
+        AdjustProportions(text);
+
+        var layout = new RectangleF(0, 0, _w, _t);
         
-        var textArea = new Bitmap(_w, _t);
-        using var graphics = Graphics.FromImage(textArea);
+        var image = new Bitmap(_w, _t);
+        using var graphics = Graphics.FromImage(image);
         
         graphics.CompositingMode = CompositingMode.SourceCopy;
         graphics.Clear(Color.White);
+        
+        graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.DrawString(text, _sans, TextColor, layout, Format);
 
-        while (graphics.MeasureString(text, _sans, new SizeF(_w, 3 * _h)).Height > _t)
+        return image;
+    }
+
+    private void AdjustProportions(string text)
+    {
+        using var g = Graphics.FromHwnd(IntPtr.Zero);
+
+        while (g.MeasureString(text, _sans, new SizeF(_w, 3 * _h)).Height > _t)
         {
             MakeFontSmaller();
         }
-        
-        var layout = new RectangleF(0, 0, _w, _t);
-        
-        graphics.CompositingMode = CompositingMode.SourceOver;
-        
-        graphics.DrawString(text, _sans, TextColor, layout, Format);
 
-        return textArea;
+        if (text.Contains('\n'))
+        {
+            var ms = g.MeasureString(text, _sans, new SizeF(_w, _t));
+            if (ms.Width < _w * 0.75)
+            {
+                var k = 0.9f * _w / ms.Width;
+                ResizeFont(_sans.Size * k);
+
+                var m = (_w - ms.Width * k) / 2;
+                if (ms.Height * k > _t)
+                {
+                    _t = FF_Extensions.ToEven((int)(ms.Height * k + m));
+                    _full = _h + _t;
+                }
+            }
+        }
+        
+        // if *min height option* minimize _t and reduce _full  
     }
     
     public void SetUp(Size size)
@@ -95,8 +122,6 @@ public class TopTextAttacher //: MemeGenerator
 
         return image;
     }
-    
-    //public string MakeFrame(DgText text) => JpegCoder.SaveImageTemp(DrawFrame(text));
     
     /*private Image DrawFrame(string text, Image image) // nooooooo u can't commit commented junkyard
     {

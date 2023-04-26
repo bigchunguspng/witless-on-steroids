@@ -11,7 +11,7 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRegularFont = false;
+    public static bool UseRegularFont = false, UseLeftAlignment = false, MinimizeHeight = false, WrapText = true;
     
     static IFunnyApp()
     {
@@ -24,9 +24,9 @@ public class IFunnyApp
     private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0]; // "Segoe UI Black";
     private static Font _sans;
     private static readonly SolidBrush TextColor = new(Color.Black);
-    private static readonly StringFormat Format = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center }; //=> UseRegularFont ? _formatR : _formatB;
-    //private static readonly StringFormat _formatR = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Center };
-    //private static readonly StringFormat _formatB = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
+    private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
+    private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };
+    private static readonly StringFormat _formatC = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
 
     private void ResizeFont(float size) => _sans = new(FontFamily, size);
 
@@ -36,6 +36,7 @@ public class IFunnyApp
     private int StartingFontSize () => Math.Max(36, _t / 5);
 
     private int _w, _h, _t, _full;
+    private float _lm;
 
     public Rectangle Cropping => new(0, _t, _w, _h);
 
@@ -62,21 +63,22 @@ public class IFunnyApp
     public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w,_h), DrawText(text)));
     private Image DrawText(string text)
     {
-        //text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
+        if (UseRegularFont) text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
 
         AdjustProportions(text);
 
-        var layout = new RectangleF(0, 0, _w, _t);
-        
+        var area = new RectangleF(_lm, 0, _w, _t);
+
         var image = new Bitmap(_w, _t);
         using var graphics = Graphics.FromImage(image);
         
-        graphics.CompositingMode = CompositingMode.SourceCopy;
         graphics.Clear(Color.White);
         
-        graphics.CompositingMode = CompositingMode.SourceOver;
-        graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-        graphics.DrawString(text, _sans, TextColor, layout, Format);
+        graphics.CompositingMode    = CompositingMode.SourceOver;
+        graphics.CompositingQuality = CompositingQuality.HighQuality;
+        graphics.PixelOffsetMode    = PixelOffsetMode.HighQuality;
+        graphics.TextRenderingHint  = TextRenderingHint.AntiAlias;
+        graphics.DrawString(text, _sans, TextColor, area, Format);
 
         return image;
     }
@@ -85,48 +87,64 @@ public class IFunnyApp
     {
         using var g = Graphics.FromHwnd(IntPtr.Zero);
 
-        while (g.MeasureString(text, _sans, new SizeF(_w, 3 * _h)).Height > _t)
+        var area = new SizeF(WrapText ? _w : _w * 3, _h * 5);
+        var sure = MeasureString();
+        while (sure.Height > _t || sure.Width > _w) // fixes "text is too big"
         {
             MakeFontSmaller();
+            sure = MeasureString();
+            if (WrapText && _sans.Size < 10)
+            {
+                ResizeFont(10);
+                sure = MeasureString();
+                SetCardHeight((int)sure.Height + 15);
+                
+                break;
+            }
         }
 
-        if (text.Count(c => c == '\n') > 2)
+        SizeF MeasureString() => g.MeasureString(text, _sans, area);
+        
+        if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
             var ms = g.MeasureString(text, _sans, new SizeF(_w, _t));
             if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
                 ResizeFont(_sans.Size * k);
+                sure = sure * k;
 
-                var m = (_w - ms.Width * k) / 2;
-                if (ms.Height * k > _t)
-                {
-                    _t = FF_Extensions.ToEven((int)(ms.Height * k + m));
-                    _full = _h + _t;
-                }
+                var m = (_w - sure.Width) / 2; // kinda top-bottom margin
+                if (sure.Height > _t) SetCardHeight((int)(sure.Height + m));
             }
         }
         
-        // if *min height option* minimize _t and reduce _full  
+        if (MinimizeHeight && sure.Height < 0.95 * _t) SetCardHeight((int)(sure.Height + _sans.Size));
+
+        if (UseLeftAlignment) _lm = Math.Min(_sans.Size / 3, _w - sure.Width);
     }
-    
+
     public void SetUp(Size size)
     {
         _w = size.Width;
         _h = size.Height;
-        // _m = Math.Min(_h / 72, 10);
-        _t = FF_Extensions.ToEven(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
-        _full = _h + _t;
+
+        SetCardHeight(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
+
+        _lm = 0;
 
         SetFontToDefault();
     }
+    private void SetCardHeight(int x)
+    {
+        _t = FF_Extensions.ToEven(x);
+        _full = _h + _t;
+    }
     private Image GetImage(string path)
     {
-        //_resize = false;
         var image = new Bitmap(Image.FromFile(path));
         if (image.Width < 200)
         {
-            //_resize = true;
             image = new Bitmap(Image.FromFile(path), new Size(200, image.Height * 200 / image.Width));
         }
 

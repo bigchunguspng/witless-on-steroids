@@ -29,11 +29,17 @@ namespace Witlesss.Commands
         {
             var empty = string.IsNullOrEmpty(Text);
             
-            IFunnyApp.UseRegularFont = !empty && _regular.IsMatch(Text);
+            IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(Text);
+            IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(Text);
+            IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(Text);
+            IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(Text);
             
             return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
         }
 
-        private static readonly Regex _regular = new(@"^\/top\S*reg\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _regular = new(@"^\/top\S*rg\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _left    = new(@"^\/top\S*la\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _height  = new(@"^\/top\S*mm\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *", RegexOptions.IgnoreCase);
     }
 }

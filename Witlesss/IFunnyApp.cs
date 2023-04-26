@@ -119,7 +119,7 @@ public class IFunnyApp
             }
         }
         
-        if (MinimizeHeight && sure.Height < 0.95 * _t) SetCardHeight((int)(sure.Height + _sans.Size));
+        if (MinimizeHeight && sure.Height < 0.95 * _t) SetCardHeight((int)(sure.Height + Math.Min(_sans.Size, 8)));
 
         if (UseLeftAlignment) _lm = Math.Min(_sans.Size / 3, _w - sure.Width);
     }

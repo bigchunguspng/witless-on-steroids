@@ -5,21 +5,30 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Witlesss.MediaTools;
+using static System.Drawing.StringAlignment;
 
-namespace Witlesss; // Bahnschrift SemiBold Condensed // Segoe UI
+namespace Witlesss; // ReSharper disable InconsistentNaming
 
-public class TopTextAttacher //: MemeGenerator
+public class IFunnyApp
 {
-    //static TopTextAttacher() { _fonts.AddFontFile(@"D:\Downloads\Telegram Desktop\futura-extra-black-condensed-bt.ttf"); }
+    public static bool UseRegularFont = false;
+    
+    static IFunnyApp()
+    {
+        _fonts.AddFontFile(Config.FontBold);
+        _fonts.AddFontFile(Config.FontRegular);
+    }
 
     private static readonly Regex Ext = new("(.png)|(.jpg)");
-    //private static readonly PrivateFontCollection _fonts = new();
-    private static string FontFamily => "Segoe UI Black"; //_fonts.Families.First();
+    private static readonly PrivateFontCollection _fonts = new();
+    private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0]; // "Segoe UI Black";
     private static Font _sans;
     private static readonly SolidBrush TextColor = new(Color.Black);
-    private static readonly StringFormat Format = new() { Alignment = StringAlignment.Center, Trimming = StringTrimming.Word, LineAlignment = StringAlignment.Center };
+    private static readonly StringFormat Format = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center }; //=> UseRegularFont ? _formatR : _formatB;
+    //private static readonly StringFormat _formatR = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Center };
+    //private static readonly StringFormat _formatB = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
 
-    private void ResizeFont(float size) => _sans = new(FontFamily, size, FontStyle.Bold);
+    private void ResizeFont(float size) => _sans = new(FontFamily, size);
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void MakeFontSmaller () => ResizeFont(_sans.Size * 0.8f);
@@ -53,7 +62,7 @@ public class TopTextAttacher //: MemeGenerator
     public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w,_h), DrawText(text)));
     private Image DrawText(string text)
     {
-        text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
+        //text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
 
         AdjustProportions(text);
 
@@ -106,7 +115,7 @@ public class TopTextAttacher //: MemeGenerator
         _w = size.Width;
         _h = size.Height;
         // _m = Math.Min(_h / 72, 10);
-        _t = FF_Extensions.ToEven(_w > _h ? _h / 2 : _w / 2);
+        _t = FF_Extensions.ToEven(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
         _full = _h + _t;
 
         SetFontToDefault();

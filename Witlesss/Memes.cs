@@ -10,7 +10,7 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
         private readonly MemeGenerator        _imgflip = new();
-        private readonly TopTextAttacher      _kapwing = new();
+        private readonly IFunnyApp            _kapwing = new();
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 

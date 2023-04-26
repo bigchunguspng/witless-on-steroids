@@ -19,12 +19,21 @@ namespace Witlesss.Commands
             return this;
         }
 
-        public override void Run() => Run(ProcessMessage, "Подобные приколы");
+        public override void Run() => Run("Подписанки"); // 🔥🔥🔥✍️
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, M.MakeWhenTheMeme, REPEAT_RX());
         public    override void ProcessStick(string fileID) => DoStick(fileID, C_STICK, M.MakeWhenTheMemeFromSticker);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, C_VIDEO, M.MakeVideoWhenTheMeme);
 
-        protected override string GetMemeText(string text) => string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+        protected override string GetMemeText(string text)
+        {
+            var empty = string.IsNullOrEmpty(Text);
+            
+            IFunnyApp.UseRegularFont = !empty && _regular.IsMatch(Text);
+            
+            return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+        }
+
+        private static readonly Regex _regular = new(@"^\/top\S*reg\S* *", RegexOptions.IgnoreCase);
     }
 }

@@ -19,7 +19,7 @@ namespace Witlesss.Commands
             return this;
         }
 
-        public override void Run() => Run(ProcessMessage, "Мемы");
+        public override void Run() => Run("Мемы");
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, M_PHOTO, M.MakeMeme, REPEAT_RX());
         public    override void ProcessStick(string fileID) => DoStick(fileID, M_STICK, M.MakeMemeFromSticker);

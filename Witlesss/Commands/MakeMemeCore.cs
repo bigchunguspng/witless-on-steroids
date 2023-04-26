@@ -14,8 +14,18 @@ namespace Witlesss.Commands
         private readonly Regex _cmd;
 
         protected MakeMemeCore(Regex cmd) => _cmd = cmd;
+        
+        protected void Run(string type)
+        {
+            JpegCoder.PassQuality(Baka);
 
-        protected bool ProcessMessage(Message mess)
+            var x = Message.ReplyToMessage;
+            if (ProcessMessage(Message) || ProcessMessage(x)) return;
+
+            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
+        }
+
+        private bool ProcessMessage(Message mess)
         {
             if (mess is null) return false;
             
@@ -83,16 +93,6 @@ namespace Witlesss.Commands
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
         protected static Memes M => Bot.MemeService;
-
-        protected static void Run(Func<Message, bool> process, string type)
-        {
-            JpegCoder.PassQuality(Baka);
-
-            var x = Message.ReplyToMessage;
-            if (process(Message) || process(x)) return;
-
-            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
-        }
 
         public static int GetRepeats(bool regex)
         {

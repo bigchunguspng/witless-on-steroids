@@ -12,7 +12,7 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 public class IFunnyApp
 {
     public static bool UseRegularFont = false, UseLeftAlignment = false, MinimizeHeight = false, WrapText = true;
-    public static int CropPercent = 0;
+    public static int  CropPercent = 0, MinFontSize = 10;
 
     static IFunnyApp()
     {
@@ -34,7 +34,7 @@ public class IFunnyApp
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void MakeFontSmaller () => ResizeFont(_sans.Size * 0.8f);
 
-    private int StartingFontSize () => Math.Max(36, _t / 5);
+    private int StartingFontSize () => Math.Max(Math.Max(36, _t / 5), MinFontSize);
 
     private int _w, _h, _t, _full, _crop_offset;
     private float _lm;
@@ -95,9 +95,9 @@ public class IFunnyApp
         {
             MakeFontSmaller();
             sure = MeasureString();
-            if (WrapText && _sans.Size < 10)
+            if (WrapText && _sans.Size < MinFontSize)
             {
-                ResizeFont(10);
+                ResizeFont(MinFontSize);
                 sure = MeasureString();
                 SetCardHeight((int)sure.Height + 15);
                 

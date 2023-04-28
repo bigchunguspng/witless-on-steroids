@@ -7,7 +7,7 @@ namespace Witlesss.Commands
     {
         public Demotivate() : base(new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase)) { }
 
-        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/d[vg]\S*[1-9](?!\d?%)\S*");
+        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/d[vg]\S*(?<!ms)[2-9](?!\d?%)\S*");
         private static string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
 
         private const string D_VIDEO = "DEMOTIVATOR [^] VID";

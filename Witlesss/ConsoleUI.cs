@@ -21,6 +21,8 @@ namespace Witlesss
 
         private IEnumerable<Witless> Bakas => SussyBakas.Values;
 
+        public static bool LoggedIntoReddit = false;
+
 
         public void EnterConsoleLoop()
         {
@@ -41,7 +43,7 @@ namespace Witlesss
                 }
             } while (_input != "s");
             Bot.SaveDics();
-            RedditTool.Instance.SaveExcluded();
+            if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
         private void DoConsoleCommands()

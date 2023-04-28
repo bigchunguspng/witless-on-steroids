@@ -53,7 +53,11 @@ namespace Witlesss
         private readonly FileIO<Queue<string>> ExcludedIO = new("reddit-posts.json");
         private readonly Counter counter = new() { Interval = 16 };
 
-        private RedditTool() => Excluded = ExcludedIO.LoadData();
+        private RedditTool()
+        {
+            Excluded = ExcludedIO.LoadData();
+            ConsoleUI.LoggedIntoReddit = true;
+        }
 
 
         private void Exclude(string fullname)

@@ -6,7 +6,7 @@ namespace Witlesss.Commands
     {
         public AddCaption() : base(new Regex(@"^\/top\S* *", RegexOptions.IgnoreCase)) { }
     
-        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/top\S*\[1-9](?!\d?%)\S*");
+        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/top\S*(?<!ms)[2-9](?!\d?%)\S*");
         private static string C_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "_" : x)}]";
 
         private const string C_VIDEO = "WHENTHE [^] VID";
@@ -35,6 +35,7 @@ namespace Witlesss.Commands
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(Text);
 
             IFunnyApp.CropPercent = !empty && _crop.IsMatch(Text) ? int.Parse(_crop.Match(Text).Groups[1].Value) : 100;
+            IFunnyApp.MinFontSize = !empty && _font.IsMatch(Text) ? int.Parse(_font.Match(Text).Groups[1].Value) : 10;
 
             return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
         }
@@ -44,5 +45,6 @@ namespace Witlesss.Commands
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _font    = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
     }
 }

@@ -18,9 +18,18 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
             _b = b;
         }
 
-        public string Meme(int loss, Size size)     => Overlay(SetOutName(_a, "-M", ".mp4"), o => ArgsMeme(o, loss, size));
-        public string Demo(int loss, Drawer drawer) => Overlay(SetOutName(_b, "-D", ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
-        public string When(int loss, Rectangle rec) => Overlay(SetOutName(_b, "-C", ".mp4"), o => ArgsDemo(o, loss, rec.Size, rec.Location));
+        public string Meme(int loss, Size size)
+        {
+            return Overlay(SetOutName(_a, "-M", ".mp4"), o => ArgsMeme(o, loss, size));
+        }
+        public string Demo(int loss, Drawer drawer)
+        {
+            return Overlay(SetOutName(_b, "-D", ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
+        }
+        public string When(int loss, Size s, Rectangle c, Point p)
+        {
+            return Overlay(SetOutName(_b, "-C", ".mp4"), o => ArgsWhen(o, loss, s, c, p));
+        }
 
         private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
         {
@@ -29,6 +38,10 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         private static void ArgsDemo(FFMpegArgumentOptions o, int f, Size s, Point p)
         {
             o = BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "vid").Overlay("0:v", "vid", p));
+        }
+        private static void ArgsWhen(FFMpegArgumentOptions o, int f, Size s, Rectangle c, Point p)
+        {
+            o = BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "v1").Crop("v1", c, "vid").Overlay("0:v", "vid", p));
         }
 
         private static FFMpegArgumentOptions BuildAndCompress(FFMpegArgumentOptions o, int f, CoFi filter)

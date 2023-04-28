@@ -10,7 +10,7 @@ namespace Witlesss
     {
         private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
         private readonly MemeGenerator        _imgflip = new();
-        private readonly IFunnyApp            _kapwing = new();
+        private readonly IFunnyApp            _ifunny  = new();
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 
@@ -56,7 +56,7 @@ namespace Witlesss
         
         public string MakeWhenTheMeme(string path, string text)
         {
-            return _kapwing.MakeTopTextMeme(path, text);
+            return _ifunny.MakeTopTextMeme(path, text);
         }
 
         public string MakeWhenTheMemeFromSticker(string path, string text, string extension)
@@ -67,9 +67,9 @@ namespace Witlesss
         public string MakeVideoWhenTheMeme(string path, string text)
         {
             var size = GrowSize(GetSize(path));
-            _kapwing.SetUp(size);
+            _ifunny.SetUp(size);
 
-            return new F_Overlay(_kapwing.BakeText(text), path).When(Quality, _kapwing.Cropping);
+            return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location);
         }
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)

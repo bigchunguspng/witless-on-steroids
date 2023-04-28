@@ -12,7 +12,8 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 public class IFunnyApp
 {
     public static bool UseRegularFont = false, UseLeftAlignment = false, MinimizeHeight = false, WrapText = true;
-    
+    public static int CropPercent = 0;
+
     static IFunnyApp()
     {
         _fonts.AddFontFile(Config.FontBold);
@@ -35,10 +36,11 @@ public class IFunnyApp
 
     private int StartingFontSize () => Math.Max(36, _t / 5);
 
-    private int _w, _h, _t, _full;
+    private int _w, _h, _t, _full, _crop_offset;
     private float _lm;
 
-    public Rectangle Cropping => new(0, _t, _w, _h);
+    public Rectangle Cropping => new(0, _crop_offset, _w, _h);
+    public Point     Location => new(0, _t); // overlay
 
     public string MakeTopTextMeme(string path, string text)
     {
@@ -54,13 +56,13 @@ public class IFunnyApp
         using var g = Graphics.FromImage(meme);
         
         g.CompositingMode = CompositingMode.SourceCopy;
+        g.DrawImage(source,  new Point(0, _t - _crop_offset));
         g.DrawImage(caption, new Point(0, 0));
-        g.DrawImage(source,  new Point(0, _t));
 
         return meme;
     }
 
-    public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w,_h), DrawText(text)));
+    public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
         if (UseRegularFont) text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
@@ -127,7 +129,9 @@ public class IFunnyApp
     public void SetUp(Size size)
     {
         _w = size.Width;
-        _h = size.Height;
+        _h = FF_Extensions.ToEven(size.Height * Math.Abs(CropPercent) / 100);
+
+        _crop_offset = CropPercent < 0 ? (size.Height - _h) / 2 : size.Height - _h;
 
         SetCardHeight(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
 

@@ -6,7 +6,7 @@ namespace Witlesss.Commands
     {
         public MakeMeme() : base(new Regex(@"^\/meme\S* *", RegexOptions.IgnoreCase)) { }
 
-        private static bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*\d+\S*");
+        private static bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*[1-9](?!\d?%)\S*");
         private static string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 
         private const string M_VIDEO = "MEME [M] VID";

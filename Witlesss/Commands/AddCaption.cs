@@ -6,7 +6,7 @@ namespace Witlesss.Commands
     {
         public AddCaption() : base(new Regex(@"^\/top\S* *", RegexOptions.IgnoreCase)) { }
     
-        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/top\S*\d+\S*");
+        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/top\S*\[1-9](?!\d?%)\S*");
         private static string C_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "_" : x)}]";
 
         private const string C_VIDEO = "WHENTHE [^] VID";
@@ -33,13 +33,16 @@ namespace Witlesss.Commands
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(Text);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(Text);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(Text);
-            
+
+            IFunnyApp.CropPercent = !empty && _crop.IsMatch(Text) ? int.Parse(_crop.Match(Text).Groups[1].Value) : 100;
+
             return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
         }
 
-        private static readonly Regex _regular = new(@"^\/top\S*rg\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _left    = new(@"^\/top\S*la\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _height  = new(@"^\/top\S*mm\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _regular = new(@"^\/top\S*rg\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _left    = new(@"^\/top\S*la\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
     }
 }

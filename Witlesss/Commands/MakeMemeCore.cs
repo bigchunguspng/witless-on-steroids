@@ -92,6 +92,8 @@ namespace Witlesss.Commands
 
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
+        private static readonly Regex _repeat = new(@"[1-9](?!\d?%)");
+
         protected static Memes M => Bot.MemeService;
 
         public static int GetRepeats(bool regex)
@@ -99,7 +101,7 @@ namespace Witlesss.Commands
             var repeats = 1;
             if (regex)
             {
-                var match = Regex.Match(Text, @"\d");
+                var match = _repeat.Match(Text);
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }
             return repeats;

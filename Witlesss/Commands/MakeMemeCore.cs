@@ -100,7 +100,7 @@ namespace Witlesss.Commands
 
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
-        protected static readonly Regex _repeat = new(@"(?<!ms)[2-9](?!\d?%)", RegexOptions.IgnoreCase);
+        protected static readonly Regex _repeat = new(@"(?:(?<!ms)(?<!ms\d)(?<!ms\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
 
         protected static Memes M => Bot.MemeService;
 

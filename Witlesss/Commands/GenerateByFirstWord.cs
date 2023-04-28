@@ -5,7 +5,7 @@ namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
-        private static bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/a\S*\d+\S*");
+        private static bool REPEAT_RX() => Regex.IsMatch(Text, @"^\/a\S*[2-9]\S*");
 
         public override void Run()
         {

@@ -44,11 +44,11 @@ namespace Witlesss.Commands
         public    abstract void ProcessStick(string fileID);
         protected abstract void ProcessVideo(string fileID);
 
-        protected void DoPhoto(string fileID, Func<int, string> log, Func<string, T, string> produce, bool regex)
+        protected void DoPhoto(string fileID, Func<int, string> log, Func<string, T, string> produce)
         {
             Download(fileID);
 
-            var repeats = GetRepeats(regex);
+            var repeats = GetRepeats(HasToBeRepeated());
             for (int i = 0; i < repeats; i++)
             {
                 using var stream = File.OpenRead(produce(_path, Texts()));
@@ -83,6 +83,14 @@ namespace Witlesss.Commands
         protected abstract T GetMemeText(string text);
         private T Texts() => GetMemeText(RemoveCommand(Text));
 
+        private bool HasToBeRepeated()
+        {
+            if (Text is null) return false;
+            var cmd = _cmd.Match(Text);
+            if (cmd.Success) return _repeat.IsMatch(cmd.Groups[1].Value);
+            return false;
+        }
+
         private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
 
         private string GetStickerExtension() => Text != null && _cmd.Match(Text).Value.Contains('x') ? ".jpg" : ".png";
@@ -92,7 +100,7 @@ namespace Witlesss.Commands
 
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
-        private static readonly Regex _repeat = new(@"(?<!ms)[2-9](?!\d?%)");
+        protected static readonly Regex _repeat = new(@"(?<!ms)[2-9](?!\d?%)", RegexOptions.IgnoreCase);
 
         protected static Memes M => Bot.MemeService;
 

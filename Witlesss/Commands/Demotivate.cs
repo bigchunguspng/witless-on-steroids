@@ -5,9 +5,8 @@ namespace Witlesss.Commands
 {
     public class Demotivate : MakeMemeCore<DgText>, ImageProcessor
     {
-        public Demotivate() : base(new Regex(@"^\/d[vg]\S* *", RegexOptions.IgnoreCase)) { }
+        public Demotivate() : base(new Regex(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase)) { }
 
-        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/d[vg]\S*(?<!ms)[2-9](?!\d?%)\S*");
         private static string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
 
         private const string D_VIDEO = "DEMOTIVATOR [^] VID";
@@ -23,7 +22,7 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Демотиваторы");
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator, REPEAT_RX());
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator);
         public    override void ProcessStick(string fileID) => DoStick(fileID, D_STICK, M.MakeStickerDemotivator);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, M.MakeVideoDemotivator);
 

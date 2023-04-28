@@ -4,9 +4,8 @@ namespace Witlesss.Commands
 {
     public class AddCaption : MakeMemeCore<string>, ImageProcessor
     {
-        public AddCaption() : base(new Regex(@"^\/top\S* *", RegexOptions.IgnoreCase)) { }
+        public AddCaption() : base(new Regex(@"^\/top(\S*) *", RegexOptions.IgnoreCase)) { }
     
-        private static bool REPEAT_RX() => Text is not null && Regex.IsMatch(Text, @"^\/top\S*(?<!ms)[2-9](?!\d?%)\S*");
         private static string C_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "_" : x)}]";
 
         private const string C_VIDEO = "WHENTHE [^] VID";
@@ -21,7 +20,7 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Подписанки"); // 🔥🔥🔥✍️
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, M.MakeWhenTheMeme, REPEAT_RX());
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, M.MakeWhenTheMeme);
         public    override void ProcessStick(string fileID) => DoStick(fileID, C_STICK, M.MakeWhenTheMemeFromSticker);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, C_VIDEO, M.MakeVideoWhenTheMeme);
 

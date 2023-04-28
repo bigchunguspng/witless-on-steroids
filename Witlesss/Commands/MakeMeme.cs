@@ -4,9 +4,8 @@ namespace Witlesss.Commands
 {
     public class MakeMeme : MakeMemeCore<DgText>, ImageProcessor
     {
-        public MakeMeme() : base(new Regex(@"^\/meme\S* *", RegexOptions.IgnoreCase)) { }
+        public MakeMeme() : base(new Regex(@"^\/meme(\S*) *", RegexOptions.IgnoreCase)) { }
 
-        private static bool REPEAT_RX() => Text is { } && Regex.IsMatch(Text, @"^\/meme\S*(?<!ms)[2-9](?!\d?%)\S*");
         private static string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 
         private const string M_VIDEO = "MEME [M] VID";
@@ -21,7 +20,7 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Мемы");
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, M_PHOTO, M.MakeMeme, REPEAT_RX());
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, M_PHOTO, M.MakeMeme);
         public    override void ProcessStick(string fileID) => DoStick(fileID, M_STICK, M.MakeMemeFromSticker);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, M_VIDEO, M.MakeVideoMeme);
 

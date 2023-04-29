@@ -583,7 +583,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
         ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
-        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - верхний текст
+        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
         ///
         ///&lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
         ///

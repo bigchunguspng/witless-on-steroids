@@ -38,11 +38,13 @@ namespace Witlesss.XD
 
         public static string SaveImageTemp(Image image)
         {
-            var path = UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png");
+            var path = GetTempPicName();
             image.Save(path);
             image.Dispose();
 
             return path;
         }
+
+        public static string GetTempPicName() => UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png");
     }
 }

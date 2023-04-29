@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using FFMpegCore;
 using Witlesss.MediaTools;
 using TS = System.TimeSpan;
 using static Witlesss.MediaTools.FF_Extensions;
@@ -68,6 +69,14 @@ namespace Witlesss
         {
             var size = GrowSize(GetSize(path));
             _ifunny.SetUp(size);
+            if (IFunnyApp.PickColor)
+            {
+                var temp = JpegCoder.GetTempPicName();
+                FFMpeg.Snapshot(path, temp);
+                _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(temp)));
+            }
+            else
+                _ifunny.SetDefaultColors();
 
             return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location);
         }

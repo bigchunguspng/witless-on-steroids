@@ -31,6 +31,7 @@ namespace Witlesss.Commands
             IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(Text);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(Text);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(Text);
+            IFunnyApp.PickColor        = !empty &&  _color  .IsMatch(Text);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(Text);
 
             IFunnyApp.CropPercent = !empty && _crop.IsMatch(Text) ? int.Parse(_crop.Match(Text).Groups[1].Value) : 100;
@@ -43,6 +44,7 @@ namespace Witlesss.Commands
         private static readonly Regex _left    = new(@"^\/top\S*la\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _color   = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _font    = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
     }

@@ -11,8 +11,12 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRegularFont = false, UseLeftAlignment = false, MinimizeHeight = false, WrapText = true;
+    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true, PickColor;
     public static int  CropPercent = 0, MinFontSize = 10;
+
+    private Color Background;
+    private SolidBrush TextColor;
+    private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
 
     static IFunnyApp()
     {
@@ -24,7 +28,6 @@ public class IFunnyApp
     private static readonly PrivateFontCollection _fonts = new();
     private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0]; // "Segoe UI Black";
     private static Font _sans;
-    private static readonly SolidBrush TextColor = new(Color.Black);
     private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
     private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };
     private static readonly StringFormat _formatC = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
@@ -74,7 +77,7 @@ public class IFunnyApp
         var image = new Bitmap(_w, _t);
         using var graphics = Graphics.FromImage(image);
         
-        graphics.Clear(Color.White);
+        graphics.Clear(Background);
         
         graphics.CompositingMode    = CompositingMode.SourceOver;
         graphics.CompositingQuality = CompositingQuality.HighQuality;
@@ -153,10 +156,53 @@ public class IFunnyApp
         }
 
         SetUp(image.Size);
+        SetColor(image);
 
         return image;
     }
-    
+
+    #region COLOR PICKING
+
+    private void SetColor(Bitmap image)
+    {
+        if (PickColor) SetSpecialColors(image);
+        else           SetDefaultColors();
+    }
+
+    public void SetSpecialColors(Bitmap image)
+    {
+        Background = AverageColor(image, new Rectangle(_w / 2, _crop_offset, 5, 5));
+        TextColor  = ChooseTextColor(Background);
+    }
+
+    public void SetDefaultColors()
+    {
+        Background = Color.White;
+        TextColor  = _black;
+    }
+
+    private SolidBrush ChooseTextColor(Color b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
+
+    private static Color AverageColor(Bitmap image, Rectangle where)
+    {
+        int r = 0, g = 0, b = 0;
+        int w = where.Width, h = where.Height, s = w * h;
+        int maxX = where.X + w, maxY = where.Y + h;
+
+        for (var x = where.X; x < maxX; x++)
+        for (var y = where.Y; y < maxY; y++)
+        {
+            var p = image.GetPixel(x, y);
+            r += p.R;
+            b += p.B;
+            g += p.G;
+        }
+
+        return Color.FromArgb(r / s, g / s, b / s);
+    }
+
+    #endregion
+
     /*private Image DrawFrame(string text, Image image) // nooooooo u can't commit commented junkyard
     {
         using var graphics = Graphics.FromImage(image); // HAHA, I WILL USE IT LATER :gigachad:

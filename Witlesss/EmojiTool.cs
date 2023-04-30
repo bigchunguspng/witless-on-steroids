@@ -74,7 +74,6 @@ namespace Witlesss
                     if (xd.EndsWith(".png"))
                     {
                         var image = new Bitmap(Image.FromFile(xd), p.EmojiSize);
-                        graphics.FillRectangle(new SolidBrush(Color.Goldenrod), x, y, p.EmojiS, p.EmojiS);
                         graphics.DrawImage(image, x, y);
                         MoveX(p.EmojiS);
                     }
@@ -96,7 +95,6 @@ namespace Witlesss
                 {
                     var format = Formats[0];
                     var layout = new RectangleF(x, y, width, h);
-                    graphics.FillRectangle(new SolidBrush(Color.MediumAquamarine), layout);
                     graphics.DrawString(s, p.Font, p.Color, layout, format);
                     MoveX(width);
                 }
@@ -119,7 +117,6 @@ namespace Witlesss
                         var cr = index < 0;
                         var trim = space ? cr ? "" : s[..index] : s[..chars];
                         layout.Width = ms.Width;
-                        graphics.FillRectangle(new SolidBrush(Color.BurlyWood), layout);
                         graphics.DrawString(trim, p.Font, p.Color, layout, format);
                         MoveX((int) ms.Width);
                         var next = space ? cr ? s : s[(index + 1)..] : s[chars..];

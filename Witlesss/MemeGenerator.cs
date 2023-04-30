@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Witlesss.Commands;
 using static System.Drawing.StringAlignment;
@@ -64,7 +63,7 @@ namespace Witlesss
         {
             if (string.IsNullOrEmpty(text)) return;
 
-            text = RemoveEmoji(text);
+            text = EmojiTool.RemoveEmoji(text);
 
             var s = size * 0.6f;
             var r = rect.Size with { Height = rect.Size.Height * 3 };
@@ -85,22 +84,6 @@ namespace Witlesss
                 _outline.Dispose();
             }
             g.FillPath(Brush, path);
-        }
-
-        public static string RemoveEmoji(string text)
-        {
-            var matches = Regex.Matches(text, REGEX_EMOJI);
-            if (matches.Count == 0) return text;
-
-            var emoji = DemotivatorDrawer.GetEmojiPngs(matches);
-            int m = 0;
-            foreach (var cluster in emoji)
-            {
-                var cleared = cluster.Select(path => path.EndsWith(".png") ? "" : path);
-                text = text.Replace(matches[m++].Value, string.Join("", cleared));
-            }
-
-            return text;
         }
 
         private int OutlineWidth => (int)Math.Round(_size / 6D);

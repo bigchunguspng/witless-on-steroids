@@ -17,6 +17,15 @@ public class IFunnyApp
     private Color Background;
     private SolidBrush TextColor;
     private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
+    private static readonly SolidBrush _transparent = new(Color.Transparent);
+
+    private int InitialMargin(int h) => (_t - h) / 2;
+
+    private int Spacing   => (int)(_sans.Size * 1.6);
+    private int EmojiSize => (int)(_sans.Size * 1.5);
+
+    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
+
 
     static IFunnyApp()
     {
@@ -58,7 +67,7 @@ public class IFunnyApp
         var meme = new Bitmap(_w, _full);
         using var g = Graphics.FromImage(meme);
         
-        g.CompositingMode = CompositingMode.SourceCopy;
+        g.CompositingMode = CompositingMode.SourceOver;
         g.DrawImage(source,  new Point(0, _t - _crop_offset));
         g.DrawImage(caption, new Point(0, 0));
 
@@ -68,13 +77,18 @@ public class IFunnyApp
     public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
-        if (UseRegularFont) text = MemeGenerator.RemoveEmoji(text); // todo drawing them instead
+        //if (UseRegularFont) text = EmojiTool.RemoveEmoji(text); // remember him? this is he now:
+        
+        var emoji = Regex.Matches(text, REGEX_EMOJI);
+        var funny = emoji.Count > 0;
 
-        AdjustProportions(text);
+        AdjustProportions(funny ? EmojiTool.ReplaceEmoji(text, UseRegularFont ? "aa" : "НН") : text);
 
-        var area = new RectangleF(_lm, 0, _w, _t);
+        var top = funny ? _t * 2 : _t;
 
-        var image = new Bitmap(_w, _t);
+        var area = new RectangleF(_lm, 0, _w, top);
+
+        var image = new Bitmap(_w, top);
         using var graphics = Graphics.FromImage(image);
         
         graphics.Clear(Background);
@@ -83,7 +97,20 @@ public class IFunnyApp
         graphics.CompositingQuality = CompositingQuality.HighQuality;
         graphics.PixelOffsetMode    = PixelOffsetMode.HighQuality;
         graphics.TextRenderingHint  = TextRenderingHint.AntiAlias;
-        graphics.DrawString(text, _sans, TextColor, area, Format);
+
+        if (funny)
+        {
+            var p = new TextParams(62, EmojiSize, _sans, TextColor, area, Format);
+            var h = (int)graphics.MeasureString(text, _sans, area.Size, Format, out _, out var lines).Height;
+            var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
+            var d = _t - h;
+            SetCardHeight(h * l / lines + d);
+
+            graphics.CompositingMode = CompositingMode.SourceCopy;
+            graphics.FillRectangle(_transparent, 0, _t, _w, top - _t);
+        }
+        else graphics.DrawString(text, _sans, TextColor, area, Format);
+        //graphics.DrawString(text, _sans, TextColor, area, Format);
 
         return image;
     }
@@ -238,3 +265,4 @@ public class IFunnyApp
         }
     }*/
 }
+public record TextParams(int Lines, int EmojiS, Font Font, SolidBrush Color, RectangleF Layout, StringFormat Format) : TextParameters;

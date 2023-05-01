@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,20 +13,12 @@ namespace Witlesss
         private readonly int _w, _h;
         private readonly Rectangle _frame;
         private readonly DrawableText _textA = new(), _textB = new();
-
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
         
-        private static readonly Pen White;
+        private static readonly Pen White = new(Color.White, 2);
         private static readonly Dictionary<Image, Point> Logos = new();
-        private static readonly Regex Ext = new("(.png)|(.jpg)");
-        private static readonly Random R = new();
 
-        static DemotivatorDrawer()
-        {
-            White = new Pen(Color.White, 2);
-
-            LoadLogos(WATERMARKS_FOLDER);
-        }
+        static DemotivatorDrawer() => LoadLogos(WATERMARKS_FOLDER);
 
         public DemotivatorDrawer(int width = 720, int height = 720)
         {
@@ -35,7 +26,7 @@ namespace Witlesss
             _h = height;
 
             var imageMarginT = 50;
-            int imageMarginS = width == 1280 ? 144 : 50;
+            var imageMarginS = width == 1280 ? 144 : 50;
             var imageMarginB = 140;
 
             var imageW = _w - imageMarginS * 2;
@@ -44,9 +35,9 @@ namespace Witlesss
             Size = new Size(imageW, imageH);
 
             var space = 5;
-            int marginT = imageMarginT - space;
-            int marginS = imageMarginS - space;
-            int marginB = imageMarginB - space;
+            var marginT = imageMarginT - space;
+            var marginS = imageMarginS - space;
+            var marginB = imageMarginB - space;
 
             Pic = new Point(imageMarginS, imageMarginT);
             _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
@@ -102,23 +93,17 @@ namespace Witlesss
             graphics.CompositingMode = SourceCopy;
             graphics.DrawImage(image, Pic);
 
-            return JpegCoder.SaveImage(background, Ext.Replace(picture, "-D.jpg"));
+            return JpegCoder.SaveImage(background, PngJpg.Replace(picture, "-D.jpg"));
         }
-
-        private static KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(R.Next(Logos.Count));
 
         private void DrawText(DrawableText x)
         {
             var emoji = Regex.Matches(x.S, REGEX_EMOJI);
-            if (emoji.Count > 0)
-            {
-                _emojer.DrawTextAndEmoji(x.G, x.S, emoji, x.P);
-            }
-            else
-            {
-                x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
-            }
+            if (emoji.Count > 0) _emojer.DrawTextAndEmoji(x.G,   x.S, emoji, x.P);
+            else x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
         }
+
+        private static KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(Random.Next(Logos.Count));
 
         private static void LoadLogos(string path)
         {
@@ -126,7 +111,7 @@ namespace Witlesss
             foreach (var file in files)
             {
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');
-                if (int.TryParse(coords[0], out int x) && int.TryParse(coords[^1], out int y))
+                if (int.TryParse(coords[0], out var x) && int.TryParse(coords[^1], out var y))
                     Logos.Add(Image.FromFile(file.FullName), new Point(x, y));
             }
         }
@@ -152,14 +137,15 @@ namespace Witlesss
         
         public Size EmojiSize => new(EmojiS, EmojiS);
     }
+
     public class DgTextParameters : TextParameters
     {
-        public int Lines           { get; init; }
-        public int EmojiS          { get; init; }
-        public Font Font           { get; init; }
-        public SolidBrush Color    { get; init; }
-        public RectangleF Layout   { get; init; }
-        public StringFormat Format { get; init; }
+        public int Lines           { get; private init; }
+        public int EmojiS          { get; private init; }
+        public Font Font           { get; private init; }
+        public SolidBrush Color    { get; private init; }
+        public RectangleF Layout   { get; private init; }
+        public StringFormat Format { get; private init; }
 
         public static DgTextParameters LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w);
         public static DgTextParameters UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w);

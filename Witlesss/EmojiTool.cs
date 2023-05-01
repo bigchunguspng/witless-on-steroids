@@ -91,38 +91,30 @@ namespace Witlesss
                 var rest = w - x;
                 var width = (int) Math.Min(graphics.MeasureString(s, p.Font).Width, rest);
 
-                if (width < rest)
+                if (width < rest) DrawSingleLineText(Formats[0]);
+                else if      (Dg) DrawSingleLineText(Formats[2]);
+                else
                 {
-                    var format = Formats[0];
+                    var format = Formats[1];
+                    var layout = new RectangleF(x, y, width, h);
+                    var ms = graphics.MeasureString(s, p.Font, layout.Size, format, out var chars, out _);
+                    var space = s.Contains(' ');
+                    var index = s[..chars].LastIndexOf(' ');
+                    var cr = index < 0;
+                    var trim = space ? cr ? "" : s[..index] : s[..chars];
+                    layout.Width = ms.Width;
+                    graphics.DrawString(trim, p.Font, p.Color, layout, format);
+                    MoveX((int)ms.Width);
+                    var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
+                    CR();
+                    DoText(next);
+                }
+
+                void DrawSingleLineText(StringFormat format)
+                {
                     var layout = new RectangleF(x, y, width, h);
                     graphics.DrawString(s, p.Font, p.Color, layout, format);
                     MoveX(width);
-                }
-                else
-                {
-                    if (Dg)
-                    {
-                        var format = Formats[2];
-                        var layout = new RectangleF(x, 0, width, h);
-                        graphics.DrawString(s, p.Font, p.Color, layout, format);
-                        MoveX(width);
-                    }
-                    else
-                    {
-                        var format = Formats[1];
-                        var layout = new RectangleF(x, y, width, h);
-                        var ms = graphics.MeasureString(s, p.Font, layout.Size, format, out var chars, out _);
-                        var space = s.Contains(' ');
-                        var index = s[..chars].LastIndexOf(' ');
-                        var cr = index < 0;
-                        var trim = space ? cr ? "" : s[..index] : s[..chars];
-                        layout.Width = ms.Width;
-                        graphics.DrawString(trim, p.Font, p.Color, layout, format);
-                        MoveX((int) ms.Width);
-                        var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
-                        CR();
-                        DoText(next);
-                    }
                 }
             }
             void MoveX(int o)

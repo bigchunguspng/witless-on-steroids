@@ -19,13 +19,13 @@ public class IFunnyApp
     private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
     private static readonly SolidBrush _transparent = new(Color.Transparent);
 
-    private int InitialMargin(int h) => (_t - h) / 2;
-
-    private int Spacing   => (int)(_sans.Size * 1.6);
-    private int EmojiSize => (int)(_sans.Size * 1.5);
-
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
 
+    private int _w, _h, _t, _full, _crop_offset;
+    private float _lm;
+
+    public Point     Location => new(0, _t);
+    public Rectangle Cropping => new(0, _crop_offset, _w, _h);
 
     static IFunnyApp()
     {
@@ -33,9 +33,8 @@ public class IFunnyApp
         _fonts.AddFontFile(Config.FontRegular);
     }
 
-    private static readonly Regex Ext = new("(.png)|(.jpg)");
     private static readonly PrivateFontCollection _fonts = new();
-    private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0]; // "Segoe UI Black";
+    private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0];
     private static Font _sans;
     private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
     private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };
@@ -43,23 +42,18 @@ public class IFunnyApp
 
     private void ResizeFont(float size) => _sans = new(FontFamily, size);
 
+    private int  StartingFontSize() => Math.Max(Math.Max(36, _t / 5), MinFontSize);
+
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
-    private void MakeFontSmaller () => ResizeFont(_sans.Size * 0.8f);
+    private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);
 
-    private int StartingFontSize () => Math.Max(Math.Max(36, _t / 5), MinFontSize);
-
-    private int _w, _h, _t, _full, _crop_offset;
-    private float _lm;
-
-    public Rectangle Cropping => new(0, _crop_offset, _w, _h);
-    public Point     Location => new(0, _t); // overlay
 
     public string MakeTopTextMeme(string path, string text)
     {
         var image = GetImage(path);
         var funny = DrawText(text);
 
-        return JpegCoder.SaveImage(Combine(image, funny), Ext.Replace(path, "-C.jpg"));
+        return JpegCoder.SaveImage(Combine(image, funny), PngJpg.Replace(path, "-C.jpg"));
     }
 
     private Image Combine(Image source, Image caption)
@@ -77,8 +71,6 @@ public class IFunnyApp
     public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
-        //if (UseRegularFont) text = EmojiTool.RemoveEmoji(text); // remember him? this is he now:
-        
         var emoji = Regex.Matches(text, REGEX_EMOJI);
         var funny = emoji.Count > 0;
 
@@ -110,10 +102,13 @@ public class IFunnyApp
             graphics.FillRectangle(_transparent, 0, _t, _w, top - _t);
         }
         else graphics.DrawString(text, _sans, TextColor, area, Format);
-        //graphics.DrawString(text, _sans, TextColor, area, Format);
 
         return image;
     }
+    
+    private int InitialMargin(int h) => (_t - h) / 2;
+    private int Spacing   => (int)(_sans.Size * 1.6);
+    private int EmojiSize => (int)(_sans.Size * 1.5);
 
     private void AdjustProportions(string text)
     {
@@ -123,7 +118,7 @@ public class IFunnyApp
         var sure = MeasureString();
         while (sure.Height > _t || sure.Width > _w) // fixes "text is too big"
         {
-            MakeFontSmaller();
+            DecreaseFontSize();
             sure = MeasureString();
             if (WrapText && _sans.Size < MinFontSize)
             {
@@ -176,11 +171,8 @@ public class IFunnyApp
     }
     private Image GetImage(string path)
     {
-        var image = new Bitmap(Image.FromFile(path));
-        if (image.Width < 200)
-        {
-            image = new Bitmap(Image.FromFile(path), new Size(200, image.Height * 200 / image.Width));
-        }
+        var pic = Image.FromFile(path);
+        var image = pic.Width < 200 ? new Bitmap(pic, new Size(200, pic.Height * 200 / pic.Width)) : new Bitmap(pic);
 
         SetUp(image.Size);
         SetColor(image);
@@ -229,40 +221,6 @@ public class IFunnyApp
     }
 
     #endregion
-
-    /*private Image DrawFrame(string text, Image image) // nooooooo u can't commit commented junkyard
-    {
-        using var graphics = Graphics.FromImage(image); // HAHA, I WILL USE IT LATER :gigachad:
-
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-        
-        TextParameters tp = new TextParameters{
-            Font   = new Font("Comic Sans", 20),
-            Lines  = 4,
-            EmojiS = 30,
-            Color  = new SolidBrush(Color.White),
-            Layout = new RectangleF(0, margin, width, 100),
-            Format = new StringFormat(StringFormatFlags.NoWrap) {Alignment = Center, Trimming = Word}
-        };
-
-        DrawText(new DrawableText{G = graphics});
-        //AddText(text.A, _s, graphics, _upper, new Rectangle(_m, _m, _w - 2 * _m, _h / 3 - _m));
-
-        return image;
-    }*/
-    
-    /*private void DrawText(DrawableText x)
-    {
-        var emoji = Regex.Matches(x.S, REGEX_EMOJI);
-        if (emoji.Count > 0)
-        {
-            DrawTextAndEmoji(x.G, x.S, emoji, x.P);
-        }
-        else
-        {
-            x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
-        }
-    }*/
 }
+
 public record TextParams(int Lines, int EmojiS, Font Font, SolidBrush Color, RectangleF Layout, StringFormat Format) : TextParameters;

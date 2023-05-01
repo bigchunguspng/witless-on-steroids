@@ -10,7 +10,7 @@ namespace Witlesss
     {
         public  const string   START = "_start",      END = "_end";
         private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
-        private readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
+        private readonly Regex _urls = new(@"\S+(:[\/\\])\S+"), _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
 
         public WitlessDB Words { get; set; } = new();
 
@@ -33,7 +33,7 @@ namespace Witlesss
             }
             return true;
 
-            bool TextIsUnacceptable(string s) => Regex.IsMatch(s, @"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
+            bool TextIsUnacceptable(string s) => _unacceptable.IsMatch(s);
             string ReplaceLinks(string s) => _urls.Replace(s, LINK);
             int TokenCount() => words.Length - words.Count(x => x == LF);
         }

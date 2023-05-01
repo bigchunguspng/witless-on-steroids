@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+using System.Linq;using System.Text.RegularExpressions;
 using static Witlesss.XD.LetterCaseMode;
 
 namespace Witlesss.XD
@@ -11,6 +10,7 @@ namespace Witlesss.XD
     public static class Extension
     {
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
+        public  static readonly Regex PngJpg = new("(.png)|(.jpg)");
         
         public static readonly Random Random = new();
 

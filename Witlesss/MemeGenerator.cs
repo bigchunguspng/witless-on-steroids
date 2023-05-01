@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text.RegularExpressions;
 using Witlesss.Commands;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
@@ -13,13 +12,11 @@ namespace Witlesss
     {
         private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
-        private bool _resize;
         private readonly FontFamily    _font = new("Impact");
         private readonly SolidBrush   _white = new(Color.White);
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
         private readonly Dictionary<ColorMode, Func<SolidBrush>> _brushes;
-        private static readonly Regex Ext = new("(.png)|(.jpg)");
 
         public MemeGenerator() => _brushes = new Dictionary<ColorMode, Func<SolidBrush>>
         {
@@ -38,11 +35,7 @@ namespace Witlesss
 
         public string MakeImpactMeme(string path, DgText text)
         {
-            var image = DrawCaption(text, GetImage(path));
-
-            if (_resize) image = CropFix(image);
-
-            return JpegCoder.SaveImage(image, Ext.Replace(path, "-M.jpg"));
+            return JpegCoder.SaveImage(DrawCaption(text, GetImage(path)), PngJpg.Replace(path, "-M.jpg"));
         }
 
         public string BakeCaption(DgText text) => JpegCoder.SaveImageTemp(DrawCaption(text, new Bitmap(_w, _h)));
@@ -76,7 +69,7 @@ namespace Witlesss
             
             using var path = new GraphicsPath();
             path.AddString(text, _font, 0, size, rect, f);
-            for (int i = OutlineWidth; i > 0; i--)
+            for (var i = OutlineWidth; i > 0; i--)
             {
                 _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
                 _outline.LineJoin = LineJoin.Round;
@@ -91,24 +84,12 @@ namespace Witlesss
 
         private Image GetImage(string path)
         {
-            _resize = false;
-            var image = new Bitmap(Image.FromFile(path));
-            if (image.Width < 200)
-            {
-                _resize = true;
-                image = new Bitmap(Image.FromFile(path), new Size(200, image.Height * 200 / image.Width));
-            }
+            var i = Image.FromFile(path);
+            var image = i.Width < 200 ? new Bitmap(i, new Size(200, i.Height * 200 / i.Width)) : new Bitmap(i);
 
             SetUp(image.Size);
 
             return image;
-        }
-
-        private static Image CropFix(Image image)
-        {
-            var crop = new Rectangle(0, 0, image.Width - 1, image.Height - 1);
-            var bitmap = new Bitmap(image);
-            return bitmap.Clone(crop, bitmap.PixelFormat);
         }
 
         private SolidBrush WhiteColor() => _white;
@@ -134,14 +115,14 @@ namespace Witlesss
         {
             var sextants = hue / 60;
             var triangle = Math.Floor(sextants);
-            int dye = Convert.ToInt32(triangle) % 6;
+            var dye = Convert.ToInt32(triangle) % 6;
             var fraction = sextants - triangle;
 
             value = value * 255;
-            int v = Convert.ToInt32(value);
-            int p = Convert.ToInt32(value * (1 - saturation));
-            int q = Convert.ToInt32(value * (1 - saturation * fraction));
-            int t = Convert.ToInt32(value * (1 - saturation * (1 - fraction)));
+            var v = Convert.ToInt32(value);
+            var p = Convert.ToInt32(value * (1 - saturation));
+            var q = Convert.ToInt32(value * (1 - saturation * fraction));
+            var t = Convert.ToInt32(value * (1 - saturation * (1 - fraction)));
 
             return dye switch
             {

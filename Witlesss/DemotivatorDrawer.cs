@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text.RegularExpressions;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
@@ -98,7 +97,7 @@ namespace Witlesss
 
         private void DrawText(DrawableText x)
         {
-            var emoji = Regex.Matches(x.S, REGEX_EMOJI);
+            var emoji = EmojiRegex.Matches(x.S);
             if (emoji.Count > 0) _emojer.DrawTextAndEmoji(x.G,   x.S, emoji, x.P);
             else x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
         }

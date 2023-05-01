@@ -10,7 +10,7 @@ namespace Witlesss.XD
     public static class Extension
     {
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
-        public  static readonly Regex PngJpg = new("(.png)|(.jpg)");
+        public  static readonly Regex PngJpg = new("(.png)|(.jpg)"), EmojiRegex = new (REGEX_EMOJI);
         
         public static readonly Random Random = new();
 

@@ -19,7 +19,6 @@ namespace Witlesss
 
         private bool Dg => MemeType == MemeType.Dg;
 
-        private static readonly Regex Emoji = new(REGEX_EMOJI);
         private static readonly StringFormat[] Formats = new[]
         {
             new StringFormat(NoWrap) { Alignment = Near, Trimming = None },
@@ -33,17 +32,17 @@ namespace Witlesss
             if (p.Lines > 1 && text.Contains('\n'))
             {
                 var s = Dg ? text.Split('\n') : text.Split('\n', 2);
-                var index1 = s[0].Length;
-                var index2 = s[0].Length + 1 + s[1].Length;
-                var matchesA = matches.Where(u => u.Index < off + index1).ToArray();
-                var matchesB = matches.Where(u => u.Index > off + index1 && u.Index <  off + index2).ToArray();
+                var index1 = off + s[0].Length;
+                var index2 = off + s[0].Length + 1 + s[1].Length;
+                var matchesA = matches.Where(u => u.Index < index1).ToList();
+                var matchesB = matches.Where(u => u.Index > index1 && u.Index < index2).ToList();
                 lines += DrawTextAndEmoji(g, s[0], matchesA, p, m,              m2, off);
-                lines += DrawTextAndEmoji(g, s[1], matchesB, p, m + m2 * lines, m2, off + index1);
+                lines += DrawTextAndEmoji(g, s[1], matchesB, p, m + m2 * lines, m2, index1 + 1);
 
                 return lines;
             }
 
-            var texts = Emoji.Replace(text, "\t").Split('\t');
+            var texts = EmojiRegex.Replace(text, "\t").Split('\t');
             var emoji = GetEmojiPngs(matches);
             var w = (int)p.Layout.Width;
             var h = (int)p.Layout.Height;
@@ -134,8 +133,8 @@ namespace Witlesss
 
             void RenderLine()
             {
-                var offset = IFunnyApp.UseLeftAlignment ? (int)Math.Min(p.Font.Size / 3, 5) : (w - max) / 2;
-                g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m));
+                var offset = !Dg && IFunnyApp.UseLeftAlignment ? (int)Math.Min(p.Font.Size / 3, 5) : (w - max) / 2;
+                g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m)); //todo move LA to the bottom
                 graphics.Clear(Color.Transparent);
             }
         }
@@ -143,7 +142,7 @@ namespace Witlesss
         public static string RemoveEmoji (string text) => ReplaceEmoji(text, "");
         public static string ReplaceEmoji(string text, string nn)
         {
-            var matches = Regex.Matches(text, REGEX_EMOJI);
+            var matches = EmojiRegex.Matches(text);
             if (matches.Count == 0) return text;
 
             var emoji = GetEmojiPngs(matches);

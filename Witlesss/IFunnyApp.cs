@@ -20,9 +20,11 @@ public class IFunnyApp
     private static readonly SolidBrush _transparent = new(Color.Transparent);
 
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
+    private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
 
     private int _w, _h, _t, _full, _crop_offset;
-    private float _lm;
+    private float _lm, _caps_fix;
+    private SizeF _measure;
 
     public Point     Location => new(0, _t);
     public Rectangle Cropping => new(0, _crop_offset, _w, _h);
@@ -71,14 +73,16 @@ public class IFunnyApp
     public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
-        var emoji = Regex.Matches(text, REGEX_EMOJI);
+        var emoji = EmojiRegex.Matches(text);
         var funny = emoji.Count > 0;
+        var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRegularFont ? "aa" : "НН") : text;
 
-        AdjustProportions(funny ? EmojiTool.ReplaceEmoji(text, UseRegularFont ? "aa" : "НН") : text);
+        AdjustProportions(textM);
+        AdjustTextPosition(text);
 
         var top = funny ? _t * 2 : _t;
 
-        var area = new RectangleF(_lm, 0, _w, top);
+        var area = new RectangleF(_lm, _caps_fix, _w, top);
 
         var image = new Bitmap(_w, top);
         using var graphics = Graphics.FromImage(image);
@@ -93,7 +97,7 @@ public class IFunnyApp
         if (funny)
         {
             var p = new TextParams(62, EmojiSize, _sans, TextColor, area, Format);
-            var h = (int)graphics.MeasureString(text, _sans, area.Size, Format, out _, out var lines).Height;
+            var h = (int)graphics.MeasureString(textM, _sans, area.Size, Format, out _, out var lines).Height;
             var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
             var d = _t - h;
             SetCardHeight(h * l / lines + d);
@@ -115,22 +119,23 @@ public class IFunnyApp
         using var g = Graphics.FromHwnd(IntPtr.Zero);
 
         var area = new SizeF(WrapText ? _w : _w * 3, _h * 5);
-        var sure = MeasureString();
-        while (sure.Height > _t || sure.Width > _w) // fixes "text is too big"
+
+        MeasureString();
+        while (_measure.Height > _t || _measure.Width > _w) // fixes "text is too big"
         {
             DecreaseFontSize();
-            sure = MeasureString();
+            MeasureString();
             if (WrapText && _sans.Size < MinFontSize)
             {
                 ResizeFont(MinFontSize);
-                sure = MeasureString();
-                SetCardHeight((int)sure.Height + 15);
+                MeasureString();
+                SetCardHeight((int)_measure.Height + 15);
                 
                 break;
             }
         }
 
-        SizeF MeasureString() => g.MeasureString(text, _sans, area);
+        void MeasureString() => _measure = g.MeasureString(text, _sans, area);
         
         if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
@@ -139,16 +144,22 @@ public class IFunnyApp
             {
                 var k = 0.9f * _w / ms.Width;
                 ResizeFont(_sans.Size * k);
-                sure = sure * k;
+                _measure = _measure * k;
 
-                var m = (_w - sure.Width) / 2; // kinda top-bottom margin
-                if (sure.Height > _t) SetCardHeight((int)(sure.Height + m));
+                if (_measure.Height > _t) SetCardHeight((int)(_measure.Height + (_w - _measure.Width) / 2));
             }
         }
         
-        if (MinimizeHeight && sure.Height < 0.95 * _t) SetCardHeight((int)(sure.Height + Math.Min(_sans.Size, 8)));
+        if (MinimizeHeight && _measure.Height < 0.95 * _t) SetCardHeight((int)(_measure.Height + Math.Min(_sans.Size, 8)));
 
-        if (UseLeftAlignment) _lm = Math.Min(_sans.Size / 3, _w - sure.Width);
+        if (UseLeftAlignment) _lm = Math.Min(_sans.Size / 3, _w - _measure.Width);
+    }
+
+    private void AdjustTextPosition(string s)
+    {
+        var b = !UseLeftAlignment && CAPS.Matches(s).Count + EmojiRegex.Matches(s).Sum(m => m.Length) * 3 > s.Length / 5;
+
+        _caps_fix = b ? _sans.Size * 0.0875f : 0;
     }
 
     public void SetUp(Size size)

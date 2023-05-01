@@ -48,12 +48,12 @@ public class IFunnyApp
     private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);
 
 
-    public string MakeTopTextMeme(string path, string text)
+    public string MakeCaptionMeme(string path, string text)
     {
         var image = GetImage(path);
         var funny = DrawText(text);
 
-        return JpegCoder.SaveImage(Combine(image, funny), PngJpg.Replace(path, "-C.jpg"));
+        return JpegCoder.SaveImage(Combine(image, funny), PngJpg.Replace(path, "-Top.jpg"));
     }
 
     private Image Combine(Image source, Image caption)

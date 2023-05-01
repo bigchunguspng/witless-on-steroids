@@ -20,9 +20,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Подписанки"); // 🔥🔥🔥✍️
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, M.MakeWhenTheMeme);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, C_STICK, M.MakeWhenTheMemeFromSticker);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, C_VIDEO, M.MakeVideoWhenTheMeme);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, M.MakeCaptionMeme);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, C_STICK, M.MakeCaptionMemeFromSticker);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, C_VIDEO, M.MakeVideoCaptionMeme);
 
         protected override string GetMemeText(string text)
         {

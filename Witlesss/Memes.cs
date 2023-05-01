@@ -22,6 +22,7 @@ namespace Witlesss
 
         private DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
+
         public string MakeDemotivator(string path, DgText text)
         {
             return Drawer.DrawDemotivator(path, text);
@@ -36,6 +37,7 @@ namespace Witlesss
         {
             return new F_Overlay(Drawer.MakeFrame(text), path).Demo(Quality, Drawer);
         }
+
 
         public string MakeMeme(string path, DgText text)
         {
@@ -54,18 +56,19 @@ namespace Witlesss
 
             return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality, size);
         }
-        
-        public string MakeWhenTheMeme(string path, string text)
+
+
+        public string MakeCaptionMeme(string path, string text)
         {
-            return _ifunny.MakeTopTextMeme(path, text);
+            return _ifunny.MakeCaptionMeme(path, text);
         }
 
-        public string MakeWhenTheMemeFromSticker(string path, string text, string extension)
+        public string MakeCaptionMemeFromSticker(string path, string text, string extension)
         {
-            return MakeWhenTheMeme(new F_Resize(path).Transcode(extension), text);
+            return MakeCaptionMeme(new F_Resize(path).Transcode(extension), text);
         }
 
-        public string MakeVideoWhenTheMeme(string path, string text)
+        public string MakeVideoCaptionMeme(string path, string text)
         {
             var size = GrowSize(GetSize(path));
             _ifunny.SetUp(size);
@@ -80,6 +83,7 @@ namespace Witlesss
 
             return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location);
         }
+
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)
         {

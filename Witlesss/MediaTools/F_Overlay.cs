@@ -20,15 +20,15 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         public string Meme(int loss, Size size)
         {
-            return Overlay(SetOutName(_a, "-M", ".mp4"), o => ArgsMeme(o, loss, size));
+            return Overlay(SetOutName(_a, "-M",   ".mp4"), o => ArgsMeme(o, loss, size));
         }
         public string Demo(int loss, Drawer drawer)
         {
-            return Overlay(SetOutName(_b, "-D", ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
+            return Overlay(SetOutName(_b, "-D",   ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
         }
         public string When(int loss, Size s, Rectangle c, Point p)
         {
-            return Overlay(SetOutName(_b, "-C", ".mp4"), o => ArgsWhen(o, loss, s, c, p));
+            return Overlay(SetOutName(_b, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p));
         }
 
         private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)

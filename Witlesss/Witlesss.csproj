@@ -5,6 +5,7 @@
         <TargetFramework>netcoreapp6.0</TargetFramework>
         <LangVersion>10</LangVersion>
         <Nullable>disable</Nullable>
+        <ApplicationIcon>XD\icon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

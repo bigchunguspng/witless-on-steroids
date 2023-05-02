@@ -11,8 +11,9 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true, PickColor;
-    public static int  CropPercent = 0, MinFontSize = 10;
+    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true, PickColor, UseGivenColor;
+    public static int CropPercent = 100, MinFontSize = 10;
+    public static Color GivenColor;
 
     private Color Background;
     private SolidBrush TextColor;
@@ -195,16 +196,21 @@ public class IFunnyApp
 
     private void SetColor(Bitmap image)
     {
-        if (PickColor) SetSpecialColors(image);
-        else           SetDefaultColors();
+        if  (UseGivenColor) SetCustomColors();
+        else if (PickColor) SetSpecialColors(image);
+        else                SetDefaultColors();
     }
 
     public void SetSpecialColors(Bitmap image)
     {
-        Background = AverageColor(image, new Rectangle(_w / 2, _crop_offset, 5, 5));
+        Background = AverageColor(image, new Rectangle(image.Width / 2, _crop_offset * image.Height / _h, 5, 5));
         TextColor  = ChooseTextColor(Background);
     }
-
+    public void SetCustomColors()
+    {
+        Background = GivenColor;
+        TextColor  = ChooseTextColor(Background);
+    }
     public void SetDefaultColors()
     {
         Background = Color.White;

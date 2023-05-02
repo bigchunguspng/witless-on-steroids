@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
@@ -27,12 +29,27 @@ namespace Witlesss.Commands
         protected override string GetMemeText(string text)
         {
             var empty = string.IsNullOrEmpty(Text);
-            
-            IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(Text);
-            IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(Text);
-            IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(Text);
-            IFunnyApp.PickColor        = !empty &&  _color  .IsMatch(Text);
-            IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(Text);
+            var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+
+            IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
+            IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
+
+            if (IFunnyApp.UseGivenColor)
+            {
+                var c = _colorXD.Match(dummy).Groups[1].Value;
+                dummy = dummy.Replace(c, "");
+                if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
+                var b = Enum.IsDefined(typeof(KnownColor), c);
+                if (b) IFunnyApp.   GivenColor = Color.FromName(c);
+                else   IFunnyApp.UseGivenColor = false;
+
+                IFunnyApp.PickColor = IFunnyApp.PickColor && !IFunnyApp.UseGivenColor;
+            }
+
+            IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(dummy);
+            IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
+            IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(dummy);
+            IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
             IFunnyApp.CropPercent = !empty && _crop.IsMatch(Text) ? int.Parse(_crop.Match(Text).Groups[1].Value) : 100;
             IFunnyApp.MinFontSize = !empty && _font.IsMatch(Text) ? int.Parse(_font.Match(Text).Groups[1].Value) : 10;
@@ -44,7 +61,8 @@ namespace Witlesss.Commands
         private static readonly Regex _left    = new(@"^\/top\S*la\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _color   = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorPP = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _font    = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
     }

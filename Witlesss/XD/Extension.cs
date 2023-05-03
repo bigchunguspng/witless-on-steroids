@@ -11,6 +11,7 @@ namespace Witlesss.XD
     {
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
         public  static readonly Regex PngJpg = new("(.png)|(.jpg)"), EmojiRegex = new (REGEX_EMOJI);
+        private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
         
         public static readonly Random Random = new();
 
@@ -181,7 +182,11 @@ namespace Witlesss.XD
             return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
         }
 
-        public static string FixedErrorMessage (string s) => s.Replace("One or more errors occurred. (", "").TrimEnd(')');
+        public static string FixedErrorMessage (string s)
+        {
+            var match = Errors.Match(s);
+            return match.Success ? match.Groups[1].Value : s;
+        }
 
         public static long SizeInBytes         (string path) => new FileInfo(path).Length;
         public static bool FileEmptyOrNotExist (string path) => !File.Exists(path) || SizeInBytes(path) == 0;

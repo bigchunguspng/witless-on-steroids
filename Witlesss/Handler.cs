@@ -11,10 +11,10 @@ namespace Witlesss
 {
     public class Handler : IUpdateHandler
     {
-        private readonly Bot _bot;
+        private readonly Command _command;
         private readonly Regex _ffmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         
-        public Handler(Bot bot) => _bot = bot;
+        public Handler(Command command) => _command = command;
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
@@ -35,14 +35,14 @@ namespace Witlesss
         {
             try
             {
-                _bot.Fork.Pass(message);
-                _bot.Fork.Run();
+                _command.Pass(message);
+                _command.Run();
             }
             catch (Exception e)
             {
                 LogError($"{Command.TitleOrUsername} >> BRUH -> {FixedErrorMessage(e.Message)}");
 
-                if (_ffmpeg.IsMatch(e.Message)) _bot.SendErrorDetails(message.Chat.Id, e);
+                if (_ffmpeg.IsMatch(e.Message)) Command.Bot.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

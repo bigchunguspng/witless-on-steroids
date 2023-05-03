@@ -14,13 +14,12 @@ namespace Witlesss
         private readonly FileIO<ChatList> ChatsIO;
         public  readonly ChatList      SussyBakas;
 
-        public  readonly MainJunction Fork = new();
         public  readonly Memes MemeService = new();
 
         private readonly ConsoleUI PlayStation8;
         public  readonly BanHammer ThorRagnarok;
 
-        public static void LaunchInstance() => new Bot().Run();
+        public static void LaunchInstance(Command command) => new Bot().Run(command);
 
         private Bot()
         {
@@ -34,25 +33,25 @@ namespace Witlesss
             SussyBakas = ChatsIO.LoadData();
         }
 
-        private void Run()
+        private void Run(Command command)
         {
             ThorRagnarok.GiveBans();
 
             ClearTempFiles();
 
             LoadSomeBakas();
-            StartListening();
+            StartListening(command);
             StartSaveLoopAsync(minutes: 2);
 
             PlayStation8.EnterConsoleLoop();
         }
 
-        private void StartListening()
+        private void StartListening(Command command)
         {
             var updates = new[] { UpdateType.Message, UpdateType.EditedMessage };
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
-            Client.StartReceiving(new Handler(this), options);
+            Client.StartReceiving(new Handler(command), options);
             Log(string.Format(BUENOS_DIAS, Config.BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
         }
 

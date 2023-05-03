@@ -173,4 +173,9 @@ namespace Witlesss.Commands
             Log($"{title} >> FUNNY");
         }
     }
+
+    public class Skip : Command
+    {
+        public override void Run() => Log($"{Title} >> {Text}", ConsoleColor.Gray);
+    }
 }

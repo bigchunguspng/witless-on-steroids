@@ -138,7 +138,7 @@ namespace Witlesss
             void RenderLine()
             {
                 var offset = !Dg && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X : (w - max) / 2;
-                g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m)); //todo move LA to the bottom
+                g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m));
                 graphics.Clear(Color.Transparent);
             }
         }

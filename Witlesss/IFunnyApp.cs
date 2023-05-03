@@ -25,6 +25,7 @@ public class IFunnyApp
 
     private int _w, _h, _t, _full, _ww, _crop_offset;
     private float _lm, _caps_fix;
+    private bool _extra_high;
     private SizeF _measure;
 
     public Point     Location => new(0, _t);
@@ -111,12 +112,14 @@ public class IFunnyApp
         return image;
     }
     
-    private int InitialMargin(int h) => (_t - h) / 2;
+    private int InitialMargin(int h) => UseLeftAlignment && !_extra_high ? _t - h : (_t - h) / 2;
     private int Spacing   => (int)(_sans.Size * 1.6);
     private int EmojiSize => (int)(_sans.Size * 1.5);
 
     private void AdjustProportions(string text)
     {
+        _extra_high = false;
+
         using var g = Graphics.FromHwnd(IntPtr.Zero);
 
         if (UseLeftAlignment)
@@ -136,13 +139,18 @@ public class IFunnyApp
             {
                 ResizeFont(MinFontSize);
                 MeasureString();
-                SetCardHeight((int)_measure.Height + 15);
+                SetCardHeightXD(_measure.Height + 15);
                 
                 break;
             }
         }
 
         void MeasureString() => _measure = g.MeasureString(text, _sans, area);
+        void SetCardHeightXD(float x)
+        {
+            SetCardHeight((int)x);
+            _extra_high = true;
+        }
         
         if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
@@ -153,7 +161,7 @@ public class IFunnyApp
                 ResizeFont(_sans.Size * k);
                 _measure = _measure * k;
 
-                if (_measure.Height > _t) SetCardHeight((int)(_measure.Height + (_w - _measure.Width) / 2));
+                if (_measure.Height > _t) SetCardHeightXD(_measure.Height + (_w - _measure.Width) / 2);
             }
         }
         

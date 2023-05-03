@@ -2,54 +2,53 @@
 using System.Drawing;
 using FFMpegCore;
 using Witlesss.MediaTools;
-using TS = System.TimeSpan;
 using static Witlesss.MediaTools.FF_Extensions;
 
 namespace Witlesss
 {
-    public class Memes
+    public static class Memes
     {
-        private readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
-        private readonly MemeGenerator        _imgflip = new();
-        private readonly IFunnyApp            _ifunny  = new();
+        private static readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
+        private static readonly MemeGenerator        _imgflip = new();
+        private static readonly IFunnyApp            _ifunny  = new();
+
+        private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
 
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
-        public DgMode Mode;
-
-        private DemotivatorDrawer Drawer => _drawers[(int) Mode];
+        public static DgMode Mode;
 
 
-        public string MakeDemotivator(string path, DgText text)
+        public static string MakeDemotivator(string path, DgText text)
         {
             return Drawer.DrawDemotivator(path, text);
         }
 
-        public string MakeStickerDemotivator(string path, DgText text, string extension)
+        public static string MakeStickerDemotivator(string path, DgText text, string extension)
         {
             return MakeDemotivator(new F_Resize(path).Transcode(extension), text);
         }
 
-        public string MakeVideoDemotivator(string path, DgText text)
+        public static string MakeVideoDemotivator(string path, DgText text)
         {
             return new F_Overlay(Drawer.MakeFrame(text), path).Demo(Quality, Drawer);
         }
 
 
-        public string MakeMeme(string path, DgText text)
+        public static string MakeMeme(string path, DgText text)
         {
             return _imgflip.MakeImpactMeme(path, text);
         }
 
-        public string MakeMemeFromSticker(string path, DgText text, string extension)
+        public static string MakeMemeFromSticker(string path, DgText text, string extension)
         {
             return MakeMeme(new F_Resize(path).Transcode(extension), text);
         }
 
-        public string MakeVideoMeme(string path, DgText text)
+        public static string MakeVideoMeme(string path, DgText text)
         {
             var size = GrowSize(GetSize(path));
             _imgflip.SetUp(size);
@@ -58,17 +57,17 @@ namespace Witlesss
         }
 
 
-        public string MakeCaptionMeme(string path, string text)
+        public static string MakeCaptionMeme(string path, string text)
         {
             return _ifunny.MakeCaptionMeme(path, text);
         }
 
-        public string MakeCaptionMemeFromSticker(string path, string text, string extension)
+        public static string MakeCaptionMemeFromSticker(string path, string text, string extension)
         {
             return MakeCaptionMeme(new F_Resize(path).Transcode(extension), text);
         }
 
-        public string MakeVideoCaptionMeme(string path, string text)
+        public static string MakeVideoCaptionMeme(string path, string text)
         {
             var size = GrowSize(GetSize(path));
             _ifunny.SetUp(size);
@@ -121,7 +120,7 @@ namespace Witlesss
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
-        private static Size GrowSize     (Size s, int minW = 256, int minH = 192)
+        private static Size GrowSize      (Size s, int minW = 256, int minH = 192)
         {
             if (s.Width < minW || s.Height < minH)
             {
@@ -131,12 +130,12 @@ namespace Witlesss
 
             return ValidSize(s.Width, s.Height);
         }
-        public  static Size FitSize      (Size s, int max = 1280)
+        public  static Size FitSize       (Size s, int max = 1280)
         {
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
             return ValidSize(s.Width, s.Height);
         }
-        private static Size NormalizeSize(Size s, int limit = 512, bool reduce = true)
+        private static Size NormalizeSize (Size s, int limit = 512, bool reduce = true)
         {
             double lim = limit;
             var wide = s.Width > s.Height;

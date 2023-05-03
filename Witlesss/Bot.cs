@@ -14,8 +14,6 @@ namespace Witlesss
         private readonly FileIO<ChatList> ChatsIO;
         public  readonly ChatList      SussyBakas;
 
-        public  readonly Memes MemeService = new();
-
         private readonly ConsoleUI PlayStation8;
         public  readonly BanHammer ThorRagnarok;
 

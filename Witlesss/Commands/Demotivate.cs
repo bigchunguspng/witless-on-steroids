@@ -22,9 +22,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Демотиваторы");
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, M.MakeDemotivator);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, D_STICK, M.MakeStickerDemotivator);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, M.MakeVideoDemotivator);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, Memes.MakeDemotivator);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, D_STICK, Memes.MakeStickerDemotivator);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, Memes.MakeVideoDemotivator);
 
         protected override DgText GetMemeText(string text)
         {
@@ -48,6 +48,6 @@ namespace Witlesss.Commands
         }
 
         private static void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? Wide : Square);
-        private static void SetMode(DgMode mode = Square) => Bot.MemeService.Mode = mode;
+        private static void SetMode(DgMode mode = Square) => Memes.Mode = mode;
     }
 }

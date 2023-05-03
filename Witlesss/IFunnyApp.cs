@@ -23,7 +23,7 @@ public class IFunnyApp
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
     private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
 
-    private int _w, _h, _t, _full, _crop_offset;
+    private int _w, _h, _t, _full, _ww, _crop_offset;
     private float _lm, _caps_fix;
     private SizeF _measure;
 
@@ -83,7 +83,7 @@ public class IFunnyApp
 
         var top = funny ? _t * 2 : _t;
 
-        var area = new RectangleF(_lm, _caps_fix, _w, top);
+        var area = new RectangleF(_lm, _caps_fix, _ww, top);
 
         var image = new Bitmap(_w, top);
         using var graphics = Graphics.FromImage(image);
@@ -119,10 +119,16 @@ public class IFunnyApp
     {
         using var g = Graphics.FromHwnd(IntPtr.Zero);
 
-        var area = new SizeF(WrapText ? _w : _w * 3, _h * 5);
+        if (UseLeftAlignment)
+        {
+            _lm = Math.Min(_sans.Size / 3, 5);
+            _ww = _w - (int)(2 * _lm);
+        }
+
+        var area = new SizeF(WrapText ? _ww : _ww * 3, _h * 5);
 
         MeasureString();
-        while (_measure.Height > _t || _measure.Width > _w) // fixes "text is too big"
+        while (_measure.Height > _t || _measure.Width > _ww) // fixes "text is too big"
         {
             DecreaseFontSize();
             MeasureString();
@@ -140,7 +146,7 @@ public class IFunnyApp
         
         if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
-            var ms = g.MeasureString(text, _sans, new SizeF(_w, _t));
+            var ms = g.MeasureString(text, _sans, new SizeF(_ww, _t));
             if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
@@ -152,8 +158,6 @@ public class IFunnyApp
         }
         
         if (MinimizeHeight && _measure.Height < 0.95 * _t) SetCardHeight((int)(_measure.Height + Math.Min(_sans.Size, 8)));
-
-        if (UseLeftAlignment) _lm = Math.Min(_sans.Size / 3, _w - _measure.Width);
     }
 
     private void AdjustTextPosition(string s)
@@ -173,6 +177,7 @@ public class IFunnyApp
         SetCardHeight(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
 
         _lm = 0;
+        _ww = _w;
 
         SetFontToDefault();
     }

@@ -22,7 +22,8 @@ namespace Witlesss
         private static readonly StringFormat[] Formats = new[]
         {
             new StringFormat(NoWrap) { Alignment = Near, Trimming = None },
-            new StringFormat(NoWrap) { Alignment = Near, Trimming = Word },
+            new StringFormat(NoWrap) { Alignment = Near, Trimming = Character },
+            new StringFormat(      ) { Alignment = Near, Trimming = Character },
             new StringFormat(NoWrap) { Alignment = Near, Trimming = EllipsisCharacter }
         };
 
@@ -88,22 +89,25 @@ namespace Witlesss
             void DoText(string s)
             {
                 var rest = w - x;
-                var width = (int) Math.Min(graphics.MeasureString(s, p.Font).Width, rest);
+                var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
+                var width = l > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
                 if (width < rest) DrawSingleLineText(Formats[0]);
-                else if      (Dg) DrawSingleLineText(Formats[2]);
+                else if      (Dg) DrawSingleLineText(Formats[3]);
                 else
                 {
                     var format = Formats[1];
-                    var layout = new RectangleF(x, y, width, h);
-                    var ms = graphics.MeasureString(s, p.Font, layout.Size, format, out var chars, out _);
-                    var space = s.Contains(' ');
+                    var layout = new RectangleF(x, y, rest, h);
+                    ms = graphics.MeasureString(s, p.Font,   layout.Size, format, out var chars, out _); // w - x
+                    _  = graphics.MeasureString(s, p.Font, p.Layout.Size, format, out var cw,    out _); // w
+                    var start = (int)(Math.Max(0.66f - x / p.Layout.Width, 0) * cw);
+                    var space = s[start..cw].Contains(' ');
                     var index = s[..chars].LastIndexOf(' ');
                     var cr = index < 0;
                     var trim = space ? cr ? "" : s[..index] : s[..chars];
                     layout.Width = ms.Width;
                     graphics.DrawString(trim, p.Font, p.Color, layout, format);
-                    MoveX((int)ms.Width);
+                    MoveX((int)graphics.MeasureString(trim, p.Font).Width);
                     var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
                     CR();
                     DoText(next);
@@ -133,7 +137,7 @@ namespace Witlesss
 
             void RenderLine()
             {
-                var offset = !Dg && IFunnyApp.UseLeftAlignment ? (int)Math.Min(p.Font.Size / 3, 5) : (w - max) / 2;
+                var offset = !Dg && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X : (w - max) / 2;
                 g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m)); //todo move LA to the bottom
                 graphics.Clear(Color.Transparent);
             }

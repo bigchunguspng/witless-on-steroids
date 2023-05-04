@@ -11,7 +11,8 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true, PickColor, UseGivenColor;
+    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true;
+    public static bool PickColor, UseGivenColor, BackInBlack;
     public static int CropPercent = 100, MinFontSize = 10;
     public static Color GivenColor;
 
@@ -64,6 +65,8 @@ public class IFunnyApp
     {
         var meme = new Bitmap(_w, _full);
         using var g = Graphics.FromImage(meme);
+
+        if (Memes.Sticker) g.Clear(BackInBlack ? Color.Black : Background);
         
         g.CompositingMode = CompositingMode.SourceOver;
         g.DrawImage(source,  new Point(0, _t - _crop_offset));

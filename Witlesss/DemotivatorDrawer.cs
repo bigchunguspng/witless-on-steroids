@@ -88,8 +88,7 @@ namespace Witlesss
         {
             using var graphics = Graphics.FromImage(background);
             using var image = new Bitmap(Image.FromFile(picture), Size);
-            
-            graphics.CompositingMode = SourceCopy;
+
             graphics.DrawImage(image, Pic);
 
             return JpegCoder.SaveImage(background, PngJpg.Replace(picture, "-D.jpg"));

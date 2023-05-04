@@ -19,6 +19,7 @@ namespace Witlesss
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
+        public static bool Sticker;
         public static DgMode Mode;
 
 
@@ -71,14 +72,10 @@ namespace Witlesss
         {
             var size = GrowSize(GetSize(path));
             _ifunny.SetUp(size);
-            if (IFunnyApp.PickColor)
-            {
-                var temp = JpegCoder.GetTempPicName();
-                FFMpeg.Snapshot(path, temp);
-                _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(temp)));
-            }
-            else if (IFunnyApp.UseGivenColor) _ifunny.SetCustomColors();
-            else                              _ifunny.SetDefaultColors();
+
+            if  (IFunnyApp.UseGivenColor) _ifunny.SetCustomColors();
+            else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(Snapshot(path))));
+            else                          _ifunny.SetDefaultColors();
 
             return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location);
         }
@@ -147,6 +144,13 @@ namespace Witlesss
         {
             var v = F_SingleInput_Base.GetVideoStream(path);
             return new Size(v.Width, v.Height);
+        }
+
+        private static string Snapshot(string path)
+        {
+            var temp = JpegCoder.GetTempPicName();
+            FFMpeg.Snapshot(path, temp);
+            return temp;
         }
     }
     

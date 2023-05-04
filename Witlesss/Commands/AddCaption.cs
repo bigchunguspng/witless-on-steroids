@@ -31,7 +31,6 @@ namespace Witlesss.Commands
             var empty = string.IsNullOrEmpty(Text);
             var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
 
-            IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
             IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 
             if (IFunnyApp.UseGivenColor)
@@ -42,10 +41,10 @@ namespace Witlesss.Commands
                 var b = Enum.IsDefined(typeof(KnownColor), c);
                 if (b) IFunnyApp.   GivenColor = Color.FromName(c);
                 else   IFunnyApp.UseGivenColor = false;
-
-                IFunnyApp.PickColor = IFunnyApp.PickColor && !IFunnyApp.UseGivenColor;
             }
 
+            IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
+            IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
             IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(dummy);
@@ -62,6 +61,7 @@ namespace Witlesss.Commands
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorPP = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _blackBG = new(@"^\/top\S*bb\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _font    = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);

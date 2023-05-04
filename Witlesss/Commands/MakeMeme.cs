@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
@@ -29,16 +31,26 @@ namespace Witlesss.Commands
             var empty = string.IsNullOrEmpty(Text);
             var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
 
+            MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
+            if (MemeGenerator.UseCustomBack)
+            {
+                var c = _custom_bg.Match(dummy).Groups[1].Value;
+                dummy = dummy.Replace(c, "");
+                if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
+                var d = Enum.IsDefined(typeof(KnownColor), c);
+                if (d) MemeGenerator.CustomBackground = Color.FromName(c);
+                else   MemeGenerator.UseCustomBack = false;
+            }
+            MemeGenerator.WrapText      =  empty ||     !_nowrap.IsMatch(dummy);
             var add_bottom_text         = !empty &&  _add_bottom.IsMatch(dummy);
             var only_bottom_text        = !empty && _only_bottom.IsMatch(dummy);
-            MemeGenerator.WrapText =  empty ||     !_nowrap.IsMatch(dummy);
 
             string a, b;
             if (string.IsNullOrEmpty(text))
             {
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
-                var c = Random.Next(10);
+                var c = Extension.Random.Next(10);
                 if (c == 0 || only_bottom_text) a = "";
                 else if (a.Length > 25)
                 {
@@ -65,6 +77,7 @@ namespace Witlesss.Commands
         private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*s\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
 
         public static ColorMode Dye => Baka.Meme.Dye;
     }

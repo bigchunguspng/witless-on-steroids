@@ -135,6 +135,7 @@ namespace Witlesss
             string extension = ExtensionFromID(shortID);
             type = MediaTypeFromID(shortID);
             path = UniquePath($@"{PICTURES_FOLDER}\{chat}\{shortID}{extension}");
+            Memes.Sticker = extension == ".webm";
             DownloadFile(fileID, path, chat).Wait();
         }
         public async Task DownloadFile(string fileId, string path, long chat = default)

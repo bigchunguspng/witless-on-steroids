@@ -10,7 +10,8 @@ namespace Witlesss
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true;
+        public static bool WrapText = true, UseCustomBack;
+        public static Color CustomBackground;
         
         private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
@@ -43,15 +44,22 @@ namespace Witlesss
         public string BakeCaption(DgText text) => JpegCoder.SaveImageTemp(DrawCaption(text, new Bitmap(_w, _h)));
         private Image DrawCaption(DgText text, Image image)
         {
-            using var graphics = Graphics.FromImage(image);
+            var back = Memes.Sticker ? new Bitmap(image.Width, image.Height) : image;
+            using var graphics = Graphics.FromImage(back);
 
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
+            if (Memes.Sticker)
+            {
+                graphics.Clear(UseCustomBack ? CustomBackground : Color.Black);
+                graphics.DrawImage(image, Point.Empty);
+            }
+
             AddText(text.A, _s, graphics, _upper, new Rectangle(_m, _m, _w - 2 * _m, _h / 3 - _m));
             AddText(text.B, _s, graphics, _lower, new Rectangle(_m, _d, _w - 2 * _m, _h / 3 - _m));
 
-            return image;
+            return back;
         }
 
         private void AddText(string text, int size, Graphics g, StringFormat f, Rectangle rect)

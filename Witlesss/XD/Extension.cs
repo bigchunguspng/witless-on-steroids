@@ -120,7 +120,7 @@ namespace Witlesss.XD
             {"BA", ".mp4"}, {"Cg", ".mp4"}, // Cg - animation
             {"CQ", ".mp3"}, {"Aw", ".mp3"}, // Aw - voice message / ogg
             {"BQ", ".wav"}, {"DQ", ".mp4"}, // DQ - video message
-            {"Ag", ".jpg"}, {"CA", ".webm"}
+            {"Ag", ".jpg"}, {"CA", ".webm"} // CA - stickers
         };
         private static readonly Dictionary<string, MediaType> MediaTypes = new()
         {

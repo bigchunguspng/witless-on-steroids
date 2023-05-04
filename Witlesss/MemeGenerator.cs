@@ -10,6 +10,8 @@ namespace Witlesss
 {
     public class MemeGenerator
     {
+        public static bool WrapText = true;
+        
         private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
         private readonly FontFamily    _font = new("Impact");
@@ -58,13 +60,16 @@ namespace Witlesss
 
             text = EmojiTool.RemoveEmoji(text);
 
-            var s = size * 0.6f;
+            var s = size * 0.75f;
             var r = rect.Size with { Height = rect.Size.Height * 3 };
-            while (g.MeasureString(text, new Font(_font, s), r).Height > rect.Size.Height && s > 2)
+            var go = true;
+            while (go)
             {
-                s *= 0.8f;
+                var ms = g.MeasureString(text, new Font(_font, s), r, f, out _, out var lines);
+                go = ms.Height > rect.Size.Height && s > 2 || !WrapText && lines > 1;
+                s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
             }
-            size = (int)(s / 0.6f);
+            size = (int)(s / 0.75f);
             _size = size;
             
             using var path = new GraphicsPath();

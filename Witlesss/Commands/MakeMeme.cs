@@ -26,13 +26,20 @@ namespace Witlesss.Commands
 
         protected override DgText GetMemeText(string text)
         {
+            var empty = string.IsNullOrEmpty(Text);
+            var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+
+            var add_bottom_text         = !empty &&  _add_bottom.IsMatch(dummy);
+            var only_bottom_text        = !empty && _only_bottom.IsMatch(dummy);
+            MemeGenerator.WrapText =  empty ||     !_nowrap.IsMatch(dummy);
+
             string a, b;
             if (string.IsNullOrEmpty(text))
             {
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
                 var c = Random.Next(10);
-                if (c == 0 || OnlyBottomText) a = "";
+                if (c == 0 || only_bottom_text) a = "";
                 else if (a.Length > 25)
                 {
                     if (c > 5) (a, b) = ("", a);
@@ -49,14 +56,15 @@ namespace Witlesss.Commands
                 else
                 {
                     a = text;
-                    b = AddBottomText ? Baka.Generate() : "";
+                    b = add_bottom_text ? Baka.Generate() : "";
                 }
             }
             return new DgText(a, b);
         }
 
-        private static bool  AddBottomText => Text != null && Text.Split()[0].Contains('s');
-        private static bool OnlyBottomText => Text != null && Text.Split()[0].Contains('d');
+        private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex  _add_bottom = new(@"^\/meme\S*s\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S* *", RegexOptions.IgnoreCase);
 
         public static ColorMode Dye => Baka.Meme.Dye;
     }

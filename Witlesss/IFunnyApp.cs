@@ -29,6 +29,8 @@ public class IFunnyApp
     private bool _extra_high;
     private SizeF _measure;
 
+    public static float FontSize => MathF.Round(_sans.Size, 2);
+
     public Point     Location => new(0, _t);
     public Rectangle Cropping => new(0, _crop_offset, _w, _h);
 

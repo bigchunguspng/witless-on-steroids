@@ -7,10 +7,11 @@ namespace Witlesss.Commands
     {
         public Demotivate() : base(new Regex(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase)) { }
 
-        private static string D_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
+        protected override string Log_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
 
-        private const string D_VIDEO = "DEMOTIVATOR [^] VID";
-        private const string D_STICK = "DEMOTIVATOR [#] STICKER";
+        protected override string Log_VIDEO { get; } = "DEMOTIVATOR [^] VID";
+        protected override string Log_STICK { get; } = "DEMOTIVATOR [#] STICKER";
+        protected override string VideoName => $"piece_fap_club-d{(Memes.Mode == Square ? "g" : "v")}.mp4";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -22,9 +23,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Демотиваторы");
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, D_PHOTO, Memes.MakeDemotivator);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, D_STICK, Memes.MakeStickerDemotivator);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, D_VIDEO, Memes.MakeVideoDemotivator);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeDemotivator);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeStickerDemotivator);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoDemotivator);
 
         protected override DgText GetMemeText(string text)
         {

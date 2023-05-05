@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static
     {
@@ -12,6 +12,11 @@ namespace Witlesss.Commands
         private readonly StopWatch _watch = new();
 
         private readonly Regex _cmd;
+
+        protected abstract string Log_PHOTO ( int x);
+        protected abstract string Log_VIDEO { get; }
+        protected abstract string Log_STICK { get; }
+        protected abstract string VideoName { get; }
 
         protected MakeMemeCore(Regex cmd) => _cmd = cmd;
         
@@ -44,7 +49,7 @@ namespace Witlesss.Commands
         public    abstract void ProcessStick(string fileID);
         protected abstract void ProcessVideo(string fileID);
 
-        protected void DoPhoto(string fileID, Func<int, string> log, Func<string, T, string> produce)
+        protected void DoPhoto(string fileID, Func<string, T, string> produce)
         {
             Download(fileID);
 
@@ -54,19 +59,19 @@ namespace Witlesss.Commands
                 using var stream = File.OpenRead(produce(_path, Texts()));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
-            Log($"{Title} >> {log(repeats)}");
+            Log($"{Title} >> {Log_PHOTO(repeats)}");
         }
 
-        protected void DoStick(string fileID, string log, Func<string, T, string, string> produce)
+        protected void DoStick(string fileID, Func<string, T, string, string> produce)
         {
             Download(fileID);
 
             using var stream = File.OpenRead(produce(_path, Texts(), GetStickerExtension()));
             Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Log($"{Title} >> {log}");
+            Log($"{Title} >> {Log_STICK}");
         }
 
-        protected void DoVideo(string fileID, string log, Func<string, T, string> produce)
+        protected void DoVideo(string fileID, Func<string, T, string> produce)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
@@ -76,8 +81,8 @@ namespace Witlesss.Commands
             if (_type == MediaType.Round) _path = Memes.CropVideoNote(_path);
 
             using var stream = File.OpenRead(produce(_path, Texts()));
-            Bot.SendAnimation(Chat, new InputOnlineFile(stream, "piece_fap_club.mp4"));
-            Log($@"{Title} >> {log} >> TIME: {_watch.CheckStopWatch()}");
+            Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+            Log($@"{Title} >> {Log_VIDEO} >> TIME: {_watch.CheckStopWatch()}");
         }
 
         protected abstract T GetMemeText(string text);

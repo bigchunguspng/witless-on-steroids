@@ -7,11 +7,12 @@ namespace Witlesss.Commands
     public class AddCaption : MakeMemeCore<string>, ImageProcessor
     {
         public AddCaption() : base(new Regex(@"^\/top(\S*) *", RegexOptions.IgnoreCase)) { }
-    
-        private static string C_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "_" : x)}]";
 
-        private const string C_VIDEO = "WHENTHE [^] VID";
-        private const string C_STICK = "WHENTHE [#] STICKER";
+        protected override string Log_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "=" : x)}]";
+
+        protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
+        protected override string Log_STICK { get; } = "WHENTHE [$] STICKER";
+        protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -22,9 +23,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Подписанки"); // 🔥🔥🔥✍️
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, C_PHOTO, Memes.MakeCaptionMeme);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, C_STICK, Memes.MakeCaptionMemeFromSticker);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, C_VIDEO, Memes.MakeVideoCaptionMeme);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeCaptionMeme);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeCaptionMemeFromSticker);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoCaptionMeme);
 
         protected override string GetMemeText(string text)
         {

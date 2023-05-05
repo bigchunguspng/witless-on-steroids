@@ -8,10 +8,11 @@ namespace Witlesss.Commands
     {
         public MakeMeme() : base(new Regex(@"^\/meme(\S*) *", RegexOptions.IgnoreCase)) { }
 
-        private static string M_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
+        protected override string Log_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 
-        private const string M_VIDEO = "MEME [M] VID";
-        private const string M_STICK = "MEME [M] STICKER";
+        protected override string Log_VIDEO { get; } = "MEME [M] VID";
+        protected override string Log_STICK { get; } = "MEME [M] STICKER";
+        protected override string VideoName { get; } = "piece_fap_club-meme.mp4";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -22,9 +23,9 @@ namespace Witlesss.Commands
 
         public override void Run() => Run("Мемы");
 
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, M_PHOTO, Memes.MakeMeme);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, M_STICK, Memes.MakeMemeFromSticker);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, M_VIDEO, Memes.MakeVideoMeme);
+        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeMeme);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeMemeFromSticker);
+        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoMeme);
 
         protected override DgText GetMemeText(string text)
         {

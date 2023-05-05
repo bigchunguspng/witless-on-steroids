@@ -181,11 +181,9 @@ namespace Witlesss
 
             bool IsValidPost(Post p) => p is LinkPost post && _img.IsMatch(post.URL);
         }
-        
-        public void LogInfo() // todo delete... this is a debug method
-        {
-            foreach (var que in Cache) Log($"Q: {que.Key} C: {que.Value.Posts.Count}", ConsoleColor.Cyan);
-        }
+
+        public int QueriesCached => Cache.Count;
+        public int   PostsCached => Cache.Values.Sum(c => c.Posts.Count);
 
         public List<Subreddit> FindSubreddits(string search)
         {
@@ -206,16 +204,12 @@ namespace Witlesss
     /// <summary> Uses searchbar on a main page </summary>
     public record SrQuery(string Q, string Sort, string Time) : RedditQuery
     {
-        public override string ToString() => $"{Q} ({Sort} {Time})";
-        
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
     /// <summary> Uses searchbar on a subreddit </summary>
     public record SsQuery(string Subreddit, string Q, string Sort, string Time) : RedditQuery
     {
-        public override string ToString() => $"r/{Subreddit} - {Q} ({Sort} {Time})";
-        
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
@@ -223,8 +217,6 @@ namespace Witlesss
     public record ScQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
     {
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.GetPosts(this, after);
-        
-        public override string ToString() => $"r/{Subreddit} ({Sort} {Time})";
     }
 
     public class PostData

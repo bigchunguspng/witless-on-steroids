@@ -140,8 +140,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             if (a)  SendGalleryPost(post);
             else SendSingleFilePost(post);
 
-            Log($"{Title} >> r/{post.Subreddit}");
-            Reddit.LogInfo(); // todo del temp method
+            Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }
 
         private static void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));

@@ -28,6 +28,7 @@ namespace Witlesss.Commands
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
         private readonly Buhurt _buhurt = new();
+        private readonly FuseRedditComments _comments = new();
         private readonly CheckReddit _reddit = new();
         private readonly GetRedditLink _link = new();
         private readonly SetFrequency _frequency = new();
@@ -79,7 +80,7 @@ namespace Witlesss.Commands
                 {
                     GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
                 }
-                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(Baka, Chat, Text, Title);
+                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(SnapshotMessageData());
 
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
                 ImageProcessor SelectMemeMaker() => _mematics[Baka.Meme.Type];
@@ -139,6 +140,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/set"       )) _wc = _frequency;
             else if (CommandIs( "/fuse"      )) _wc = _fuse;
             else if (CommandIs( "/move"      )) _wc = _move;
+            else if (CommandIs( "/xd"        )) _wc = _comments;
             else if (command == "/stickers"   ) _wc = _stickers;
             else if (command == "/colors"     ) _wc = _colors;
             else if (command == "/chat"       ) _wc = _chat;
@@ -166,11 +168,11 @@ namespace Witlesss.Commands
             return success;
         }
         
-        private static async void WitlessPoopAsync(Witless witless, long chat, string text, string title)
+        private static async void WitlessPoopAsync(WitlessCommandParams data)
         {
-            await Task.Delay(AssumedResponseTime(150, text));
-            Bot.SendMessage(chat, witless.Generate());
-            Log($"{title} >> FUNNY");
+            await Task.Delay(AssumedResponseTime(150, data.Text));
+            Bot.SendMessage(data.Chat, data.Baka.Generate());
+            Log($"{data.Title} >> FUNNY");
         }
     }
 

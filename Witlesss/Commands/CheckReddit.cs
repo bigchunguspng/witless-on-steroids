@@ -108,7 +108,6 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
 
             bool IsCommand(string a, string b) => a.ToLower().StartsWith(b);
-            string GetTime(string o, bool   b) => o.Length > 1 && b ? Times[o[1]] : Times['a'];
 
             string GetOptions(string alt)
             {
@@ -117,7 +116,9 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
         }
 
-        private static readonly Dictionary<char, string> Sorts = new()
+        public  static string GetTime(string o, bool b) => o.Length > 1 && b ? Times[o[1]] : Times['a'];
+
+        public  static readonly Dictionary<char, string> Sorts = new()
         {
             { 'r', "relevance" }, { 'h', "hot" }, { 't', "top" }, { 'n', "new" }, { 'c', "comments" }
         };
@@ -126,8 +127,8 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             { 'a', "all" }, { 'h', "hour" }, { 'd', "day" }, { 'w', "week" }, { 'm', "month" }, { 'y', "year" }
         };
         
-        private static bool TimeMatters(SortingMode s) => s is Top or Controversial;
-        private static bool TimeMatters(char        c) => c is not 'h' and not 'n';
+        public  static bool TimeMatters(SortingMode s) => s is Top or Controversial;
+        public  static bool TimeMatters(char        c) => c is not 'h' and not 'n';
 
         #region SENDING MEMES
 

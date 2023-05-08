@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Reddit;
 using Reddit.Controllers;
 using static Witlesss.Config;
@@ -141,6 +142,7 @@ namespace Witlesss
         {
             var queue = QrCache.Posts;
             var posts = Qr.GetPosts(after);
+            Count(posts);
             foreach (var post in FilterImagePosts(posts)) queue.Enqueue(post);
 
             // there are posts, but none of them are image
@@ -149,29 +151,64 @@ namespace Witlesss
                 ScrollReddit(posts[^1].Fullname, --patience);
             }
         }
-        
+
+
+        #region FETCHING COMMENTS
+
+        public Task<List<string>> GetComments(RedditQuery query, int count = POST_LIMIT) => Task.Run(() =>
+        {
+            var texts = new List<string>(count);
+            string after = null;
+            for (var i = 0; i < count; i += POST_LIMIT)
+            {
+                after = ScrollForComments(query, texts, after);
+            }
+
+            return texts;
+        });
+
+        private string ScrollForComments(RedditQuery query, List<string> list, string after)
+        {
+            var posts = query.GetPosts(after);
+            foreach (var post    in posts)
+            foreach (var comment in post.Comments.GetTop())
+            {
+                GetCommentTexts(comment, list);
+            }
+            return posts[^1].Fullname;
+        }
+
+        private void GetCommentTexts(Comment comment, List<string> list)
+        {
+            if (comment.Body is not null) list.Add(comment.Body);
+            foreach (var reply in comment.Replies) GetCommentTexts(reply, list);
+        }
+
+        #endregion
+
+
         public List<Post> GetPosts(ScQuery query, string after = null)
         {
             var sub = client.Subreddit(query.Subreddit).Posts;
-            return Count(query.Sort switch
+            return query.Sort switch
             {
                 SortingMode.Hot           => sub.GetHot          (after: after, limit: POST_LIMIT),
                 SortingMode.New           => sub.GetNew          (after: after, limit: POST_LIMIT),
                 SortingMode.Top           => sub.GetTop          (after: after, limit: POST_LIMIT, t: query.Time),
                 SortingMode.Rising        => sub.GetRising       (after: after, limit: POST_LIMIT),
                 SortingMode.Controversial => sub.GetControversial(after: after, limit: POST_LIMIT, t: query.Time)
-            });
+            };
         }
 
         public List<Post> SearchPosts(SsQuery s, string after = null)
         {
             var sub = client.Subreddit(s.Subreddit);
-            return Count(sub.Search   (s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT));
+            return sub   .Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
         public List<Post> SearchPosts(SrQuery s, string after = null)
         {
-            return Count(client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT));
+            return client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
         private List<PostData> FilterImagePosts(ICollection<Post> posts)
@@ -190,11 +227,10 @@ namespace Witlesss
             return client.SearchSubreddits(search).Where(s => s.Subscribers > 0).ToList();
         }
 
-        private List<Post> Count(List<Post> posts)
+        private void Count(List<Post> posts)
         {
             Log("Posts: " + posts.Count);
             QrCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
-            return posts;
         }
     }
 

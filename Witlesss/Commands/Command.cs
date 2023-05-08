@@ -47,5 +47,9 @@ namespace Witlesss.Commands
             Baka.Unload();
             Baka = null;
         }
+
+        protected static WitlessCommandParams SnapshotMessageData() => new(Baka, Chat, Text, Title);
     }
+
+    public record WitlessCommandParams(Witless Baka, long Chat, string Text, string Title);
 }

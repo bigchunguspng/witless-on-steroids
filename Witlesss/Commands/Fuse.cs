@@ -178,8 +178,9 @@ namespace Witlesss.Commands
         {
             Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
             Baka.SaveNoMatterWhat();
-            var difference = FileSize(SizeInBytes(Baka.Path) - _size);
-            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(Baka.Path), difference));
+            var newSize = SizeInBytes(Baka.Path);
+            var difference = FileSize(newSize - _size);
+            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), difference));
         }
     }
 }

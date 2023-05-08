@@ -111,7 +111,7 @@
         <value>Telegram-ChatsDB</value>
     </data>
     <data name="FUSE_SUCCESS_RESPONSE" xml:space="preserve">
-        <value>Cловарь беседы "{0}" обновлён!
+        <value>Cловарь беседы &lt;b&gt;{0}&lt;/b&gt; обновлён!
 Теперь он весит {1} (+{2})</value>
     </data>
     <data name="MOVE_MANUAL" xml:space="preserve">
@@ -380,5 +380,26 @@ s   - save and exit
         <value>Тут всё просто 😎👌
 
 Пишешь после команды любой текст (желательно англ.) и я выдаю список сабреддитов, которые подходят под запрос</value>
+    </data>
+    <data name="REDDIT_COMMENTS_START" xml:space="preserve">
+        <value>НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!
+
+(может занять до пары минут)</value>
+    </data>
+    <data name="REDDIT_COMMENTS_MANUAL" xml:space="preserve">
+        <value>&lt;b&gt;Синтаксис команды:&lt;/b&gt;
+
+&lt;code&gt;/xd [search query] [subreddit*] [-options]&lt;/code&gt;
+
+1. писать без квадратных скобок
+2. сабреддит выделяется звёздочкой
+3. опции необязательны
+4. запрос или сабреддит нужно указать
+
+&lt;b&gt;Например:&lt;/b&gt;
+
+☝️ &lt;code&gt;/xd osaka azumanga okbuddybaka*&lt;/code&gt;
+🤙 &lt;code&gt;/xd jesse breakingbadmemes*&lt;/code&gt;
+👌 &lt;code&gt;/xd amogus -cm&lt;/code&gt;</value>
     </data>
 </root>

@@ -8,9 +8,8 @@ namespace Witlesss.Commands
         private readonly Regex _que = new(@"^\/xd\S*\s((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
-        //private readonly Regex _num = new(@"(?<=-)(\d+)\S*$");
 
-        // input: /xd [search query] [subreddit*] [-ops] [-count]
+        // input: /xd [search query] [subreddit*] [-ops]
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
@@ -46,16 +45,16 @@ namespace Witlesss.Commands
                     query = new ScQuery(s, sort, time);
                 }
 
-                Bot.SendMessage(Chat, "НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!"); // todo normal texts
+                Bot.SendMessage(Chat, REDDIT_COMMENTS_START);
                 EatComments(SnapshotMessageData(), query, size);
             }
             else
             {
-                Bot.SendMessage(Chat, "REDDIT_COMMENTS_MANUAL.veg", preview: false);
+                Bot.SendMessage(Chat, REDDIT_COMMENTS_MANUAL, preview: false);
             }
         }
 
-        private async void EatComments(WitlessCommandParams x, RedditQuery query, long size) // todo count
+        private async void EatComments(WitlessCommandParams x, RedditQuery query, long size)
         {
             var timer = new StopWatch();
             var comments = await RedditTool.Instance.GetComments(query);
@@ -68,8 +67,9 @@ namespace Witlesss.Commands
             var newSize = SizeInBytes(x.Baka.Path);
             var difference = FileSize(newSize - size);
             var report = string.Format(FUSE_SUCCESS_RESPONSE, x.Title, FileSize(newSize), difference);
-            var sub = query is ScQuery sc ? sc.Subreddit : query is SsQuery ss ? ss.Subreddit : null;
-            var detais = $"\n\n Его пополнили {comments.Count} комментов с {sub ?? "разных сабреддитов"}";
+            var subreddit = query is ScQuery sc ? sc.Subreddit : query is SsQuery ss ? ss.Subreddit : null;
+            subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
+            var detais = $"\n\n Его пополнили {comments.Count} комментов с {subreddit}";
             Bot.SendMessage(x.Chat, report + detais);
             
         }

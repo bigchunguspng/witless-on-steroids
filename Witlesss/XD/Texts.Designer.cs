@@ -393,7 +393,7 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cловарь беседы &quot;{0}&quot; обновлён!
+        ///   Looks up a localized string similar to Cловарь беседы &lt;b&gt;{0}&lt;/b&gt; обновлён!
         ///Теперь он весит {1} (+{2}).
         /// </summary>
         internal static string FUSE_SUCCESS_RESPONSE {
@@ -531,6 +531,39 @@ namespace Witlesss.XD {
         internal static string PIECE_RESPONSE {
             get {
                 return ResourceManager.GetString("PIECE_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Синтаксис команды:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/xd [search query] [subreddit*] [-options]&lt;/code&gt;
+        ///
+        ///1. писать без квадратных скобок
+        ///2. сабреддит выделяется звёздочкой
+        ///3. опции необязательны
+        ///4. запрос или сабреддит нужно указать
+        ///
+        ///&lt;b&gt;Например:&lt;/b&gt;
+        ///
+        ///☝️ &lt;code&gt;/xd osaka azumanga okbuddybaka*&lt;/code&gt;
+        ///🤙 &lt;code&gt;/xd jesse breakingbadmemes*&lt;/code&gt;
+        ///👌 &lt;code&gt;/xd amogus -cm&lt;/code&gt;.
+        /// </summary>
+        internal static string REDDIT_COMMENTS_MANUAL {
+            get {
+                return ResourceManager.GetString("REDDIT_COMMENTS_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!
+        ///
+        ///(может занять до пары минут).
+        /// </summary>
+        internal static string REDDIT_COMMENTS_START {
+            get {
+                return ResourceManager.GetString("REDDIT_COMMENTS_START", resourceCulture);
             }
         }
         

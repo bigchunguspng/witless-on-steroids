@@ -16,8 +16,7 @@ namespace Witlesss.Commands
             if (WrongSyntax()) return;
 
             var cp = new Copypaster();
-            for (int i = 1; i <= _latest; i++)
-                cp.Eat(_url + i, out _);
+            for (int i = 1; i <= _latest; i++) cp.Eat(_url + i, out _);
 
             var path = Move.UniqueExtraDBsPath(_name);
             new FileIO<WitlessDB>(path).SaveData(cp.Words);

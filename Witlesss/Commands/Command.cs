@@ -34,6 +34,8 @@ namespace Witlesss.Commands
         }
         
         public static string RemoveBotMention() => Text.ToLower().Replace(Config.BOT_USERNAME, "");
+        
+        public static CommandParams SnapshotMessageData() => new(Chat, Text, Title);
     }
 
     public abstract class WitlessCommand : Command
@@ -48,8 +50,9 @@ namespace Witlesss.Commands
             Baka = null;
         }
 
-        protected static WitlessCommandParams SnapshotMessageData() => new(Baka, Chat, Text, Title);
+        protected new static WitlessCommandParams SnapshotMessageData() => new(Baka, Chat, Text, Title);
     }
 
+    public record        CommandParams              (long Chat, string Text, string Title);
     public record WitlessCommandParams(Witless Baka, long Chat, string Text, string Title);
 }

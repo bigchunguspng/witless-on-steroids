@@ -25,6 +25,7 @@ namespace Witlesss.Commands
         private readonly ChatInfo _chat = new();
         private readonly Piece _piece = new();
         private readonly DebugMessage _debug = new();
+        private readonly DownloadMusic _song = new();
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
         private readonly Buhurt _buhurt = new();
@@ -110,6 +111,7 @@ namespace Witlesss.Commands
             else if (command == "/reverse" ) _sc = _reverse;
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (CommandIs( "/sex"    )) _sc = _sticker;
+            else if (CommandIs( "/song"   )) _sc = _song;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;
             else if (command == "/debug"   ) _sc = _debug;

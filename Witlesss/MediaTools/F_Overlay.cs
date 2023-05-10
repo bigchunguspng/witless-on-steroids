@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Text;
 using FFMpegCore;
 using static Witlesss.MediaTools.F_SingleInput_Base;
 using Drawer = Witlesss.DemotivatorDrawer;
@@ -52,6 +54,27 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
             if (f > 23) o = o.WithAudioBitrate(154 - 3 * f);
 
             return o;
+        }
+
+        // -i track -i image -map 0:0 -map 1:0 -c copy
+        // -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)"
+        // -metadata artist="artist"
+        // -metadata title="title" song.mp3
+        public string AddTrackMetadata(string artist, string title)
+        {
+            var name = $"{Path.GetDirectoryName(_a)}/{(artist is null ? "" : $"{artist} - ")}{title}.mp3";
+            return Overlay(name, o => MetadataArgs(o, artist, title));
+        }
+
+        private static void MetadataArgs(FFMpegArgumentOptions o, string artist, string title)
+        {
+            var sb = new StringBuilder();
+            sb.Append("-map 0:0 -map 1:0 -c copy -id3v2_version 3 ");
+            sb.Append("-metadata:s:v title=\"Album cover\" ");
+            sb.Append("-metadata:s:v comment=\"Cover (front)\" ");
+            if (artist is not null) sb.Append("-metadata artist=\"").Append(artist).Append("\" ");
+            sb.Append                        ("-metadata title=\"" ).Append(title ).Append("\" ");
+            o = o.WithCustomArgument(sb.ToString());
         }
 
         private string Overlay(string output, Action<FFMpegArgumentOptions> action)

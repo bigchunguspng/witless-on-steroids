@@ -78,7 +78,19 @@ namespace Witlesss
             TrySend(task, chat, "album");
         }
 
-        private static void TrySend(Task task, long chat, string what)
+        public void EditMessage(long chat, int id, string text)
+        {
+            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
+            TrySend(task, chat, "message", "edit");
+        }
+
+        public void DeleteMessage(long chat, int id)
+        {
+            var task = Client.DeleteMessageAsync(chat, id);
+            TrySend(task, chat, "message", "delete");
+        }
+
+        private static void TrySend(Task task, long chat, string what, string action = "send")
         {
             try
             {
@@ -87,7 +99,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't send the {what} --> " + FixedErrorMessage(e.Message));
+                LogError($"{chat} >> Can't {action} {what} --> " + FixedErrorMessage(e.Message));
             }
         }
         

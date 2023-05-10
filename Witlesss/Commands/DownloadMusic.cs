@@ -48,7 +48,9 @@ namespace Witlesss.Commands
                 var ops = _ops.Match(RemoveBotMention());
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
 
-                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, cover, SnapshotMessageData()));
+                var message = Bot.PingChat(Chat, Pick(PLS_WAIT_RESPONSE));
+
+                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, cover, message, SnapshotMessageData()), Chat, message);
             }
             else
             {
@@ -58,14 +60,14 @@ namespace Witlesss.Commands
 
         private string GetPhotoFileID(Message message) => message?.Photo is { } p ? p[^1].FileId : null;
 
-        private async Task DownloadSongAsync(string url, string artist, string title, string options, string id, CommandParams cp)
+        private async Task DownloadSongAsync(string url, string artist, string title, string options, string file, int message, CommandParams cp)
         {
             var hq = options.Contains('q'); // high quality
             var no = options.Contains('n'); // name only
             var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
             var rb = options.Contains('c'); // remove brackets
 
-            var aa = id is not null; // art attached
+            var aa = file is not null; // art attached
             if (aa) xt = false;
 
             var audio = hq ?            " --audio-quality 0" : "";
@@ -79,10 +81,10 @@ namespace Witlesss.Commands
 
             await              RunCMD(cmd_a, dir);
             if      (xt) await RunCMD(cmd_v, dir);
-            else if (aa) await Bot.DownloadFile(id, $@"{dir}\thumb.jpg", cp.Chat);
+            else if (aa) await Bot.DownloadFile(file, $@"{dir}\thumb.jpg", cp.Chat);
 
             var di = new DirectoryInfo(dir);
-            var vid = di.GetFiles(xt ? "video xd.*" : "thumb.*")[0].FullName; // video : thumb itself
+            var vid = di.GetFiles(xt ? "video xd.*" : "thumb.*")[0].FullName;
             var mp3 = di.GetFiles(          "*xd.mp3"          )[0].FullName;
 
             var meta = _name.Match(Path.GetFileName(mp3));
@@ -97,6 +99,8 @@ namespace Witlesss.Commands
             var track = new F_Overlay(mp3, art).AddTrackMetadata(artist, title);
             var jpg = new F_Resize(xt ? art : track).Transcode(".jpg");
 
+            Bot.DeleteMessage(cp.Chat, message);
+
             await using var stream = File.OpenRead(track);
             Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, track), jpg);
             Log($"{cp.Title} >> YOUTUBE MUSIC [mp3]");
@@ -107,10 +111,10 @@ namespace Witlesss.Commands
             var info = new ProcessStartInfo("cmd.exe", cmd) { WorkingDirectory = directory };
             var process = new Process() { StartInfo = info };
             process.Start();
-            await RunSafelyAsync(process.WaitForExitAsync());
+            await process.WaitForExitAsync();
         }
 
-        private static async Task RunSafelyAsync(Task task)
+        private static async Task RunSafelyAsync(Task task, long chat, int id)
         {
             try
             {
@@ -120,6 +124,7 @@ namespace Witlesss.Commands
             catch (Exception e)
             {
                 LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
+                Bot.EditMessage(chat, id, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
             }
         }
     }

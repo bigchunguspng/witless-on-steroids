@@ -43,7 +43,8 @@ namespace Witlesss.Commands
                 var artist = args.Groups[2].Success ? args.Groups[2].Value : null;
                 var title  = args.Groups[3].Success ? args.Groups[3].Value : null;
 
-                var id = _url_prefix + _id.Match(url).Groups[1].Value;
+                var id = _id.Match(url).Groups[1].Value;
+                if (id.Length > 0) id = _url_prefix + id;
 
                 var ops = _ops.Match(RemoveBotMention());
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";

@@ -15,6 +15,8 @@ namespace Witlesss.Commands
         private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s]+) - )?([\S\s]+)? xd\.mp3");
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
         private readonly Regex  _ops = new(@"\/song(\S*[qnpc]+)+");
+
+        private readonly string _url_prefix = "https://youtu.be/";
         
         // input: /song(qnpc) URL [artist - ] [title]
         public override void Run()
@@ -36,7 +38,7 @@ namespace Witlesss.Commands
                 var artist = args.Groups[2].Success ? args.Groups[2].Value : null;
                 var title  = args.Groups[3].Success ? args.Groups[3].Value : null;
 
-                var id = _id.Match(url).Groups[1].Value;
+                var id = _url_prefix + _id.Match(url).Groups[1].Value;
 
                 var ops = _ops.Match(RemoveBotMention());
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";

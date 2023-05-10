@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.MediaTools;
 #pragma warning disable CS4014
@@ -11,25 +12,28 @@ namespace Witlesss.Commands
 {
     public class DownloadMusic : Command
     {
-        private readonly Regex _args = new(@"^\/song\S*\s(http\S*)\s*(?:([\S\s]+) - )?([\S\s]+)?");
-        private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s]+) - )?([\S\s]+)? xd\.mp3");
+        private readonly Regex _args = new(@"^\/song\S*\s(http\S*)\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
+        private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
         private readonly Regex  _ops = new(@"\/song(\S*[qnpc]+)+");
         private readonly Regex _bruh = new(@"(\s\(([\S\s][^\(]+)\))|(\s\[([\S\s][^\[]+)\])");
 
         private readonly string _url_prefix = "https://youtu.be/";
 
-        // input: /song(qnpc) URL [artist - ] [title] // todo pic attached or replyed = art
+        // input: /song(qnpc) URL [artist - ] [title]
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 
             var text = Text;
-            if (Message.ReplyToMessage is { Text: { } t } && t.StartsWith("http") && !t.Contains(' '))
+            var reply = Message.ReplyToMessage;
+            if (reply is { Text: { } t } && !text.Contains("http") && t.StartsWith("http") && !t.Contains(' '))
             {
                 var s = Text.Split(' ', 2);
                 text = s.Length == 2 ? $"{s[0]} {t} {s[1]}" : $"{s[0]} {t}";
             }
+
+            var cover = GetPhotoFileID(reply) ?? GetPhotoFileID(Message);
 
             var args = _args.Match(text);
 
@@ -44,7 +48,7 @@ namespace Witlesss.Commands
                 var ops = _ops.Match(RemoveBotMention());
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
 
-                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, SnapshotMessageData()));
+                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, cover, SnapshotMessageData()));
             }
             else
             {
@@ -52,15 +56,20 @@ namespace Witlesss.Commands
             }
         }
 
-        private async Task DownloadSongAsync(string url, string artist, string title, string options, CommandParams cp)
+        private string GetPhotoFileID(Message message) => message.Photo is { } p ? p[^1].FileId : null;
+
+        private async Task DownloadSongAsync(string url, string artist, string title, string options, string id, CommandParams cp)
         {
             var hq = options.Contains('q'); // high quality
             var no = options.Contains('n'); // name only
             var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
             var rb = options.Contains('c'); // remove brackets
 
-            var audio = hq ?      " --audio-quality 0" : "";
-            var thumb = xt ? "" : " --write-thumbnail -o \"thumbnail:thumb.%(ext)s\"";
+            var aa = id is not null; // art attached
+            if (aa) xt = false;
+
+            var audio = hq ?            " --audio-quality 0" : "";
+            var thumb = xt || aa ? "" : " --write-thumbnail -o \"thumbnail:thumb.%(ext)s\"";
 
             var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio}{thumb} {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
             var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video xd.%(ext)s\"" : null;
@@ -68,8 +77,9 @@ namespace Witlesss.Commands
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
-            await         RunCMD(cmd_a, dir);
-            if (xt) await RunCMD(cmd_v, dir);
+            await              RunCMD(cmd_a, dir);
+            if      (xt) await RunCMD(cmd_v, dir);
+            else if (aa) await Bot.DownloadFile(id, $@"{dir}\thumb.jpg", cp.Chat);
 
             var di = new DirectoryInfo(dir);
             var vid = di.GetFiles(xt ? "video xd.*" : "thumb.*")[0].FullName; // video : thumb itself
@@ -114,13 +124,5 @@ namespace Witlesss.Commands
                 // xd
             }
         }
-
-        // yt-dlp --no-mtime -k -x --audio-format mp3 [--audio-quality 0] [--write-thumbnail] https://youtu.be/ZGSt0b0pAHw -o "%(artist)s - %(title)s xd"
-
-        // yt-dlp --no-mtime -f 251 -k -x --audio-format mp3 [--audio-quality 0] [--write-thumbnail] https://youtu.be/ZGSt0b0pAHw -o "%(artist)s - %(title)s xd"
-        // yt-dlp --no-mtime -f b -k https://youtu.be/ZGSt0b0pAHw -o "%(artist)s - %(title)s xd.%(ext)s"
-
-        // ffmpeg -i "MONOGATARI Series - Hourousha xd.webm" -frames:v 1 -vf scale=-1:640 art3.png
-        // ffmpeg -i "MONOGATARI Series - Hourousha xd.mp3" -i art3.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -metadata artist="MONOGATARI OST" -metadata title="Hourousha" out_md.mp3
     }
 }

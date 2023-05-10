@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.MediaTools;
+#pragma warning disable CS4014
 
 namespace Witlesss.Commands
 {
@@ -12,18 +13,22 @@ namespace Witlesss.Commands
     {
         private readonly Regex _args = new(@"^\/song\S*\s(http\S*)\s*(?:([\S\s]+) - )?([\S\s]+)?");
         private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s]+) - )?([\S\s]+)? xd\.mp3");
-        private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/))([\w\d]+)");
+        private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
+        private readonly Regex  _ops = new(@"\/song(\S*[qnpc]+)+");
         
-        // input: /song URL [artist - ] [title] -qn
-        // -q - mid quality
-        // -n - name format: Title.mp3 (default: Artist - Title.mp3)
-        // -p - extract preview from video
-        // -c - remove text in (brackets)
+        // input: /song(qnpc) URL [artist - ] [title]
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 
-            var args = _args.Match(Text);
+            var text = Text;
+            if (Message.ReplyToMessage is { Text: { } t } && t.StartsWith("http") && !t.Contains(' '))
+            {
+                var s = Text.Split(' ', 2);
+                text = s.Length == 2 ? $"{s[0]} {t} {s[1]}" : $"{s[0]} {t}";
+            }
+
+            var args = _args.Match(text);
 
             if (args.Success)
             {
@@ -33,7 +38,10 @@ namespace Witlesss.Commands
 
                 var id = _id.Match(url).Groups[1].Value;
 
-                DownloadSongAsync(id, artist, title, SnapshotMessageData());
+                var ops = _ops.Match(RemoveBotMention());
+                var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
+
+                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, SnapshotMessageData()));
             }
             else
             {
@@ -41,51 +49,63 @@ namespace Witlesss.Commands
             }
         }
 
-        private async void DownloadSongAsync(string url, string artist, string title, CommandParams cp)
+        private async Task DownloadSongAsync(string url, string artist, string title, string options, CommandParams cp)
         {
-            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3 --audio-quality 0 {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
-            var cmd_v = $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video xd.%(ext)s\"";
+            var hq = options.Contains('q'); // high quality
+            var no = options.Contains('n'); // name only
+            var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
+            var rb = options.Contains('c'); // remove brackets
+
+            var audio = hq ? " --audio-quality 0" : "";
+            var thumb = xt ? "" : " --write-thumbnail";
+
+            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio}{thumb} {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
+            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video xd.%(ext)s\"" : null;
 
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
-            await DownloadShit(cmd_a, dir, cp.Chat);
-            await DownloadShit(cmd_v, dir, cp.Chat);
+            await         DownloadShit(cmd_a, dir);
+            if (xt) await DownloadShit(cmd_v, dir);
 
             var di = new DirectoryInfo(dir);
-            var mp4 = di.GetFiles("video xd.*")[0].FullName;
-            var mp3 = di.GetFiles(   "*xd.mp3")[0].FullName;
+            var vid = di.GetFiles(xt ? "video xd.*" : "*xd.webp")[0].FullName; // video : thumb itself
+            var mp3 = di.GetFiles(                    "*xd.mp3" )[0].FullName;
 
             var xd = _name.Match(Path.GetFileName(mp3));
             if (artist is null && xd.Groups[1].Success) artist = xd.Groups[1].Value;
             if (title  is null && xd.Groups[2].Success) title  = xd.Groups[2].Value;
 
-            var art = new F_Resize(mp4).ExportThumbnail();
+            var ffmpeg = new F_Resize(vid);
+            var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.Transcode(".png");
             var track = new F_Overlay(mp3, art).AddTrackMetadata(artist, title);
-            var jpg = new F_Resize(art).Transcode(".jpg");
+            var jpg = new F_Resize(xt ? art : track).Transcode(".jpg");
 
             await using var stream = File.OpenRead(track);
             Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, track), jpg);
             Log($"{cp.Title} >> SONG [mp3]");
         }
 
-        private static async Task DownloadShit(string cmd, string dir, long chat)
+        private static async Task DownloadShit(string cmd, string dir)
         {
             var info = new ProcessStartInfo("cmd.exe", cmd) { WorkingDirectory = dir };
             var process = new Process() { StartInfo = info };
             process.Start();
-            await RunSafelyAsync(process.WaitForExitAsync(), chat);
+            await RunSafelyAsync(process.WaitForExitAsync());
         }
 
-        private static async Task RunSafelyAsync(Task task, long chat)
+        private static async Task RunSafelyAsync(Task task)
         {
             try
             {
-                await task;
+                await task.ContinueWith(action =>
+                {
+                    LogError($"BRUH -> {FixedErrorMessage(action.Exception?.Message)}");
+                }, TaskContinuationOptions.NotOnRanToCompletion);
             }
-            catch (Exception e)
+            catch
             {
-                LogError($"{chat} >> BRUH -> {FixedErrorMessage(e.Message)}");
+                // xd
             }
         }
 

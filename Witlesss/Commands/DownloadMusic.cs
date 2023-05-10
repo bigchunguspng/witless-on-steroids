@@ -18,8 +18,8 @@ namespace Witlesss.Commands
         private readonly Regex _bruh = new(@"(\s\(([\S\s][^\(]+)\))|(\s\[([\S\s][^\[]+)\])");
 
         private readonly string _url_prefix = "https://youtu.be/";
-        
-        // input: /song(qnpc) URL [artist - ] [title]
+
+        // input: /song(qnpc) URL [artist - ] [title] // todo pic attached or replyed = art
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
@@ -83,7 +83,7 @@ namespace Witlesss.Commands
             if (rb) title = _bruh.Replace(title!, "");
 
             var ffmpeg = new F_Resize(vid);
-            var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.Transcode(".png");
+            var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.ResizeThumbnail();
             var track = new F_Overlay(mp3, art).AddTrackMetadata(artist, title);
             var jpg = new F_Resize(xt ? art : track).Transcode(".jpg");
 

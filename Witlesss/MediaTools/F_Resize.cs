@@ -24,6 +24,7 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         public string CropVideoNote       () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
 
         public string ExportThumbnail () => Cook($"{Path.GetDirectoryName(_input)}/art.png", ExportThumbnailArgs);
+        public string ResizeThumbnail () => Cook($"{Path.GetDirectoryName(_input)}/art.png", ResizeThumbnailArgs);
 
         
         // -s WxH -an -vcodec libx264 -crf 30
@@ -45,7 +46,8 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         // -filter:v "crop=272:272:56:56" output.mp4
         private static void CropVideoNoteArgs(FFMpAO o) => o = o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
 
-        // -ss 1 -frames:v 1 -s 640x640 art.png
-        private static void ExportThumbnailArgs(FFMpAO o) => o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => v.Scale(-1, 640));
+        // -ss 1 -frames:v 1 -vf scale=640:-1 art.png
+        private static void ExportThumbnailArgs(FFMpAO o) => o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => v.Scale(640, -1));
+        private static void ResizeThumbnailArgs(FFMpAO o) => o.WithVideoFilters(v => v.Scale(640, -1));
     }
 }

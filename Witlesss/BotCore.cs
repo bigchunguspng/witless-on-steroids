@@ -110,11 +110,11 @@ namespace Witlesss
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
         }
 
-        public int PingChat(long chat)
+        public int PingChat(long chat, string text = "😏", bool notify = true)
         {
             try
             {
-                var task = Client.SendTextMessageAsync(chat, "😏", disableNotification: true);
+                var task = Client.SendTextMessageAsync(chat, text, disableNotification: !notify);
 
                 task.Wait();
                 if (task.IsFaulted) throw new Exception(task.Exception?.Message);

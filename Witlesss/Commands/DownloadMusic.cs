@@ -33,7 +33,7 @@ namespace Witlesss.Commands
                 text = s.Length == 2 ? $"{s[0]} {t} {s[1]}" : $"{s[0]} {t}";
             }
 
-            var cover = GetPhotoFileID(reply) ?? GetPhotoFileID(Message);
+            var cover = GetPhotoFileID(Message) ?? GetPhotoFileID(reply);
 
             var args = _args.Match(text);
 
@@ -56,7 +56,7 @@ namespace Witlesss.Commands
             }
         }
 
-        private string GetPhotoFileID(Message message) => message.Photo is { } p ? p[^1].FileId : null;
+        private string GetPhotoFileID(Message message) => message?.Photo is { } p ? p[^1].FileId : null;
 
         private async Task DownloadSongAsync(string url, string artist, string title, string options, string id, CommandParams cp)
         {
@@ -114,14 +114,12 @@ namespace Witlesss.Commands
         {
             try
             {
-                await task.ContinueWith(action =>
-                {
-                    LogError($"BRUH -> {FixedErrorMessage(action.Exception?.Message)}");
-                }, TaskContinuationOptions.NotOnRanToCompletion);
+                await task;
+                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
             }
-            catch
+            catch (Exception e)
             {
-                // xd
+                LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
             }
         }
     }

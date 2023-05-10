@@ -150,7 +150,7 @@ namespace Witlesss
         }
         private int DeleteBlocker(Witless witless)
         {
-            int x = Bot.PingChat(witless.Chat);
+            var x = Bot.PingChat(witless.Chat, notify: false);
             if (x == -1) witless.Delete();
             else Bot.Client.DeleteMessageAsync(witless.Chat, x);
 

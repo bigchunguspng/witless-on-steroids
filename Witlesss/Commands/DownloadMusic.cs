@@ -65,16 +65,16 @@ namespace Witlesss.Commands
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
-            await         DownloadShit(cmd_a, dir);
-            if (xt) await DownloadShit(cmd_v, dir);
+            await         RunCMD(cmd_a, dir);
+            if (xt) await RunCMD(cmd_v, dir);
 
             var di = new DirectoryInfo(dir);
             var vid = di.GetFiles(xt ? "video xd.*" : "*xd.webp")[0].FullName; // video : thumb itself
             var mp3 = di.GetFiles(                    "*xd.mp3" )[0].FullName;
 
-            var xd = _name.Match(Path.GetFileName(mp3));
-            if (artist is null && xd.Groups[1].Success) artist = xd.Groups[1].Value;
-            if (title  is null && xd.Groups[2].Success) title  = xd.Groups[2].Value;
+            var meta = _name.Match(Path.GetFileName(mp3));
+            if (artist is null && meta.Groups[1].Success) artist = meta.Groups[1].Value;
+            if (title  is null && meta.Groups[2].Success) title  = meta.Groups[2].Value;
 
             var ffmpeg = new F_Resize(vid);
             var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.Transcode(".png");
@@ -86,9 +86,9 @@ namespace Witlesss.Commands
             Log($"{cp.Title} >> SONG [mp3]");
         }
 
-        private static async Task DownloadShit(string cmd, string dir)
+        private static async Task RunCMD(string cmd, string directory)
         {
-            var info = new ProcessStartInfo("cmd.exe", cmd) { WorkingDirectory = dir };
+            var info = new ProcessStartInfo("cmd.exe", cmd) { WorkingDirectory = directory };
             var process = new Process() { StartInfo = info };
             process.Start();
             await RunSafelyAsync(process.WaitForExitAsync());

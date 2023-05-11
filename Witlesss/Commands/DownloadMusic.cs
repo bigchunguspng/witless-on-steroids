@@ -16,7 +16,6 @@ namespace Witlesss.Commands
         private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
         private readonly Regex  _ops = new(@"\/song(\S*[qnpc]+)+");
-        private readonly Regex _bruh = new(@"(\s\(([\S\s][^\(]+)\))|(\s\[([\S\s][^\[]+)\])");
 
         private readonly string _url_prefix = "https://youtu.be/";
 
@@ -63,6 +62,8 @@ namespace Witlesss.Commands
 
         private async Task DownloadSongAsync(string url, string artist, string title, string options, string file, int message, CommandParams cp)
         {
+            var timer = new StopWatch();
+
             var hq = options.Contains('q'); // high quality
             var no = options.Contains('n'); // name only
             var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
@@ -93,7 +94,7 @@ namespace Witlesss.Commands
             if (title  is null && meta.Groups[2].Success) title  = meta.Groups[2].Value;
 
             if (no) artist = null;
-            if (rb) title = _bruh.Replace(title!, "");
+            if (rb) title = title.RemoveBrackets();
 
             var ffmpeg = new F_Resize(vid);
             var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.ResizeThumbnail();
@@ -104,7 +105,7 @@ namespace Witlesss.Commands
 
             await using var stream = File.OpenRead(track);
             Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, track), jpg);
-            Log($"{cp.Title} >> YOUTUBE MUSIC [mp3]");
+            Log($"{cp.Title} >> YOUTUBE MUSIC >> TIME: {timer.CheckStopWatch()}", ConsoleColor.Yellow);
         }
 
         private static async Task RunCMD(string cmd, string directory)

@@ -212,10 +212,11 @@ namespace Witlesss.XD
         public static void ClearTempFiles()
         {
             var path = TEMP_FOLDER;
+            var options = new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 };
             if (!Directory.Exists(path)) return;
             try
             {
-                var x = Directory.GetFiles(path).Length;
+                var x = Directory.GetFiles(path, "*", options).Length;
                 Directory.Delete(path, true);
                 Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
             }

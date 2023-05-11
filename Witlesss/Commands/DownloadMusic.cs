@@ -83,10 +83,9 @@ namespace Witlesss.Commands
             Directory.CreateDirectory(dir);
 
             var thumb = $@"{dir}\thumb.jpg";
-            await              RunCMD(cmd_a, dir);
-            if      (xt) await RunCMD(cmd_v, dir);
-            else if (aa) await Bot.DownloadFile(file, thumb, cp.Chat);
-            else thumb = await YouTubePreviewFetcher.DownloadPreview(id, dir);
+            var task_a =      RunCMD(cmd_a, dir);
+            var task_v = xt ? RunCMD(cmd_v, dir) : aa ? Bot.DownloadFile(file, thumb, cp.Chat) : Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(id, dir).Result);
+            await Task.WhenAll(task_a, task_v);
 
             var rezize = xt || aa || thumb.Contains("maxres");
 

@@ -43,7 +43,7 @@ namespace Witlesss.Commands
                 var title  = args.Groups[3].Success ? args.Groups[3].Value : null;
 
                 var id = _id.Match(url).Groups[1].Value;
-                if (id.Length > 0) id = _url_prefix + id;
+                if (id.Length < 1) throw new Exception("video id was too small");
 
                 var ops = _ops.Match(RemoveBotMention());
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
@@ -60,7 +60,7 @@ namespace Witlesss.Commands
 
         private string GetPhotoFileID(Message message) => message?.Photo is { } p ? p[^1].FileId : null;
 
-        private async Task DownloadSongAsync(string url, string artist, string title, string options, string file, int message, CommandParams cp)
+        private async Task DownloadSongAsync(string id, string artist, string title, string options, string file, int message, CommandParams cp)
         {
             var timer = new StopWatch();
 
@@ -72,22 +72,27 @@ namespace Witlesss.Commands
             var aa = file is not null; // art attached
             if (aa) xt = false;
 
-            var audio = hq ?            " --audio-quality 0" : "";
-            var thumb = xt || aa ? "" : " --write-thumbnail -o \"thumbnail:thumb.%(ext)s\"";
+            var audio = hq ? " --audio-quality 0" : "";
 
-            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio}{thumb} {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
+            var url = _url_prefix + id;
+
+            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio} {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
             var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video xd.%(ext)s\"" : null;
 
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
+            var thumb = $@"{dir}\thumb.jpg";
             await              RunCMD(cmd_a, dir);
             if      (xt) await RunCMD(cmd_v, dir);
-            else if (aa) await Bot.DownloadFile(file, $@"{dir}\thumb.jpg", cp.Chat);
+            else if (aa) await Bot.DownloadFile(file, thumb, cp.Chat);
+            else thumb = await YouTubePreviewFetcher.DownloadPreview(id, dir);
+
+            var rezize = xt || aa || thumb.Contains("maxres");
 
             var di = new DirectoryInfo(dir);
-            var vid = di.GetFiles(xt ? "video xd.*" : "thumb.*")[0].FullName;
-            var mp3 = di.GetFiles(          "*xd.mp3"          )[0].FullName;
+            var vid = xt ? di.GetFiles("video xd.*"  )[0].FullName : thumb;
+            var mp3 =      di.GetFiles(     "*xd.mp3")[0].FullName;
 
             var meta = _name.Match(Path.GetFileName(mp3));
             if (artist is null && meta.Groups[1].Success) artist = meta.Groups[1].Value;
@@ -96,8 +101,8 @@ namespace Witlesss.Commands
             if (no) artist = null;
             if (rb) title = title.RemoveBrackets();
 
-            var ffmpeg = new F_Resize(vid);
-            var art = xt ? ffmpeg.ExportThumbnail() : ffmpeg.ResizeThumbnail();
+            var ffmpg = new F_Resize(vid);
+            var art = xt ? ffmpg.ExportThumbnail(dir) : rezize ? ffmpg.ResizeThumbnail(dir) : ffmpg.Transcode(".png");
             var track = new F_Overlay(mp3, art).AddTrackMetadata(artist, title);
             var jpg = new F_Resize(xt ? art : track).Transcode(".jpg");
 

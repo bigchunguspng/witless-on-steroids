@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using FFMpegCore.Enums;
 using static Witlesss.Memes;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
@@ -23,8 +22,8 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         public string CropVideoNote       () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
 
-        public string ExportThumbnail () => Cook($"{Path.GetDirectoryName(_input)}/art.png", ExportThumbnailArgs);
-        public string ResizeThumbnail () => Cook($"{Path.GetDirectoryName(_input)}/art.png", ResizeThumbnailArgs);
+        public string ExportThumbnail (string dir) => Cook($"{dir}/art.png", ExportThumbnailArgs);
+        public string ResizeThumbnail (string dir) => Cook($"{dir}/art.png", ResizeThumbnailArgs);
 
         
         // -s WxH -an -vcodec libx264 -crf 30

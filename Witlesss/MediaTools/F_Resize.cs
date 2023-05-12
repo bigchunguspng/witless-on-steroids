@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using static Witlesss.Memes;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
@@ -12,6 +13,7 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         
         public string Transcode (string extension) => Cook(SetOutName(_input, "-W", extension), null);
+        public string TranscodeAs    (string path) => Cook(path, null);
 
         public string ToAnimation               () => Cook(SetOutName(_input, "-silent", ".mp4"), ToAnimationArgs);
         public string ToVideoNote (Rectangle crop) => Cook(SetOutName(_input, "-vnote",  ".mp4"), o => ToVideoNoteArgs(o, crop));
@@ -22,8 +24,8 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         public string CropVideoNote       () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
 
-        public string ExportThumbnail (string dir) => Cook($"{dir}/art.png", ExportThumbnailArgs);
-        public string ResizeThumbnail (string dir) => Cook($"{dir}/art.png", ResizeThumbnailArgs);
+        public string ExportThumbnail (string path, bool square) => Cook(path, o => ExportThumbnailArgs(o, square));
+        public string ResizeThumbnail (string path, bool square) => Cook(path, o => ResizeThumbnailArgs(o, square));
 
         
         // -s WxH -an -vcodec libx264 -crf 30
@@ -46,7 +48,20 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         private static void CropVideoNoteArgs(FFMpAO o) => o = o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
 
         // -ss 1 -frames:v 1 -vf scale=640:-1 art.png
-        private static void ExportThumbnailArgs(FFMpAO o) => o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => v.Scale(640, -1));
-        private static void ResizeThumbnailArgs(FFMpAO o) => o.WithVideoFilters(v => v.Scale(640, -1));
+        private static void ExportThumbnailArgs(FFMpAO o, bool square)
+        {
+            o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => SelectResizing(v, square));
+        }
+
+        private static void ResizeThumbnailArgs(FFMpAO o, bool square)
+        {
+            o.WithVideoFilters(v => SelectResizing(v, square));
+        }
+
+        // -vf "crop=w='min(iw,ih)':h='min(iw,ih)',scale=640:640"
+        private static void SelectResizing(VideoFilterOptions v, bool square)
+        {
+            v = square ? v.MakeSquare(640) : v.Scale(640, -1);
+        }
     }
 }

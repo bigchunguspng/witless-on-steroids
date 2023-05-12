@@ -15,7 +15,7 @@ namespace Witlesss.Commands
         private readonly Regex _args = new(@"^\/song\S*\s(http\S*)\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
         private readonly Regex _name = new(              @"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
-        private readonly Regex  _ops = new(@"\/song(\S*[qnpc]+)+");
+        private readonly Regex  _ops = new(@"\/song(\S+)");
 
         private readonly string _url_prefix = "https://youtu.be/";
 
@@ -68,6 +68,8 @@ namespace Witlesss.Commands
             var no = options.Contains('n'); // name only
             var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
             var rb = options.Contains('c'); // remove brackets
+            var up = options.Contains('u'); // artist is uploader
+            var cs = options.Contains('s'); // crop thumbnail to a square
 
             var aa = file is not null; // art attached
             if (aa) xt = false;
@@ -76,39 +78,41 @@ namespace Witlesss.Commands
 
             var url = _url_prefix + id;
 
-            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio} {url} -o \"{artist ?? "%(artist)s"} - {title ?? "%(title)s"} xd\"";
-            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video xd.%(ext)s\"" : null;
+            var output = $"{artist ?? (up ? "%(uploader)s" : "%(artist)s")} - {title ?? "%(title)s"} xd.%(ext)s";
+            var cmd_a = $"/C yt-dlp --no-mtime -f 251 -k -x --audio-format mp3{audio} {url} -o \"{output}\"";
+            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*[height<=720][filesize<15M]\" -k {url} -o \"video.%(ext)s\"" : null;
 
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
-            var thumb = $@"{dir}\thumb.jpg";
+            var thumb = $"{dir}/thumb.jpg";
             var task_a =      RunCMD(cmd_a, dir);
             var task_v = xt ? RunCMD(cmd_v, dir) : aa ? Bot.DownloadFile(file, thumb, cp.Chat) : Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(id, dir).Result);
             await Task.WhenAll(task_a, task_v);
 
-            var rezize = xt || aa || thumb.Contains("maxres");
+            var resize = cs || aa || thumb.Contains("maxres");
 
             var di = new DirectoryInfo(dir);
-            var vid = xt ? di.GetFiles("video xd.*"  )[0].FullName : thumb;
-            var mp3 =      di.GetFiles(     "*xd.mp3")[0].FullName;
+            var thumb_source = xt ? di.GetFiles("video.*"  )[0].FullName : thumb;
+            var audio_file   =      di.GetFiles(  "*xd.mp3")[0].FullName;
 
-            var meta = _name.Match(Path.GetFileName(mp3));
+            var meta = _name.Match(Path.GetFileName(audio_file));
             if (artist is null && meta.Groups[1].Success) artist = meta.Groups[1].Value;
             if (title  is null && meta.Groups[2].Success) title  = meta.Groups[2].Value;
 
             if (no) artist = null;
             if (rb) title = title.RemoveBrackets();
 
-            var ffmpg = new F_Resize(vid);
-            var art = xt ? ffmpg.ExportThumbnail(dir) : rezize ? ffmpg.ResizeThumbnail(dir) : ffmpg.Transcode(".png");
-            var track = new F_Overlay(mp3, art).AddTrackMetadata(artist, title);
-            var jpg = new F_Resize(xt ? art : track).Transcode(".jpg");
+            var png = $"{dir}/art.png";
+            var omg = new F_Resize(thumb_source);
+            var art = xt ? omg.ExportThumbnail(png, cs) : resize ? omg.ResizeThumbnail(png, cs) : omg.TranscodeAs(png);
+            var mp3 = new F_Overlay(audio_file, art).AddTrackMetadata(artist, title);
+            var jpg = new F_Resize(art).TranscodeAs($"{dir}/art.jpg");
 
             Bot.DeleteMessage(cp.Chat, message);
 
-            await using var stream = File.OpenRead(track);
-            Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, track), jpg);
+            await using var stream = File.OpenRead(mp3);
+            Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, mp3), jpg);
             Log($"{cp.Title} >> YOUTUBE MUSIC >> TIME: {timer.CheckStopWatch()}", ConsoleColor.Yellow);
         }
 

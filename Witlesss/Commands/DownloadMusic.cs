@@ -19,7 +19,7 @@ namespace Witlesss.Commands
 
         private readonly string _url_prefix = "https://youtu.be/";
 
-        // input: /song(qnpc) URL [artist - ] [title]
+        // input: /song[options] URL [artist - ][title]
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
@@ -54,7 +54,7 @@ namespace Witlesss.Commands
             }
             else
             {
-                Bot.SendMessage(Chat, "*SONG MANUAL*");
+                Bot.SendMessage(Chat, SONG_MANUAL);
             }
         }
 

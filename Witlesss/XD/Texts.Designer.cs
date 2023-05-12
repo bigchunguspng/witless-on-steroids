@@ -691,6 +691,28 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Как скачивать музыку с ютуба:&lt;/u&gt;&lt;/b&gt;
+        ///
+        ///Если коротко, то пишешь &lt;code&gt;/song *ссылка*&lt;/code&gt;, и ждешь...
+        ///
+        ///Или пишешь /song в ответ на сообщение со ссылкой, которую ты, к примеру, нашёл через @vid.
+        ///
+        ///&lt;b&gt;Кроме того:&lt;/b&gt;
+        ///
+        ///Если хочешь, можешь в конце указать автора и, через дефис, название (или просто название), например:
+        ///
+        ///&lt;code&gt;/song https://youtu.be/fB6elql_EdM Eminem - My Name Is
+        /// /song https://youtu.be/fB6elql_EdM Eminem&apos;s Name Is&lt;/code&gt;
+        ///
+        ///Также можешь найти в интернете 🔍 крутой арт на обложк [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SONG_MANUAL {
+            get {
+                return ResourceManager.GetString("SONG_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ВИРУСНАЯ БАЗА ОБНОВЛЕНА!.
         /// </summary>
         internal static string START_RESPONSE {

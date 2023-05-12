@@ -103,13 +103,13 @@ namespace Witlesss.Commands
             if (no) artist = null;
             if (rb) title = title.RemoveBrackets();
 
-            var png = $"{dir}/art.png";
+            var img = $"{dir}/art.jpg";
             var omg = new F_Resize(thumb_source);
-            var art = xt ? omg.ExportThumbnail(png, cs) : resize ? omg.ResizeThumbnail(png, cs) : omg.TranscodeAs(png);
+            var art = xt ? omg.ExportThumbnail(img, cs) : resize ? omg.ResizeThumbnail(img, cs) : omg.CompressJpeg(img, 2);
             var mp3 = new F_Overlay(audio_file, art).AddTrackMetadata(artist, title);
-            var jpg = new F_Resize(art).TranscodeAs($"{dir}/art.jpg");
+            var jpg = new F_Resize(art).CompressJpeg($"{dir}/jpg.jpg", 7);
 
-            Bot.DeleteMessage(cp.Chat, message);
+            Task.Run(() => Bot.DeleteMessage(cp.Chat, message));
 
             await using var stream = File.OpenRead(mp3);
             Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, mp3), jpg);

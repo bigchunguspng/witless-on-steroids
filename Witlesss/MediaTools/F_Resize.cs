@@ -13,7 +13,6 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         
         public string Transcode (string extension) => Cook(SetOutName(_input, "-W", extension), null);
-        public string TranscodeAs    (string path) => Cook(path, null);
 
         public string ToAnimation               () => Cook(SetOutName(_input, "-silent", ".mp4"), ToAnimationArgs);
         public string ToVideoNote (Rectangle crop) => Cook(SetOutName(_input, "-vnote",  ".mp4"), o => ToVideoNoteArgs(o, crop));
@@ -26,6 +25,7 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         public string ExportThumbnail (string path, bool square) => Cook(path, o => ExportThumbnailArgs(o, square));
         public string ResizeThumbnail (string path, bool square) => Cook(path, o => ResizeThumbnailArgs(o, square));
+        public string CompressJpeg    (string path, int  factor) => Cook(path, o => o.WithQscale(factor));
 
         
         // -s WxH -an -vcodec libx264 -crf 30
@@ -50,12 +50,12 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         // -ss 1 -frames:v 1 -vf scale=640:-1 art.png
         private static void ExportThumbnailArgs(FFMpAO o, bool square)
         {
-            o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => SelectResizing(v, square));
+            o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => SelectResizing(v, square)).WithQscale(2);
         }
 
         private static void ResizeThumbnailArgs(FFMpAO o, bool square)
         {
-            o.WithVideoFilters(v => SelectResizing(v, square));
+            o.WithVideoFilters(v => SelectResizing(v, square)).WithQscale(2);
         }
 
         // -vf "crop=w='min(iw,ih)':h='min(iw,ih)',scale=640:640"

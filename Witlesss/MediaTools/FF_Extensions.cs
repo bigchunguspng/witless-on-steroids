@@ -13,6 +13,7 @@ namespace Witlesss.MediaTools
         public static FFO WithComplexFilter (this FFO o, CoFi node) => o.WithArgument(new ComplexFilterArgument(node));
         public static FFO WithMapping    (this FFO o, string label) => o.WithArgument(new MapArgument         (label));
         public static FFO WithQscale       (this FFO o, int qscale) => o.WithArgument(new QscaleArgument     (qscale));
+        public static FFO WithCompression  (this FFO o, int factor) => o.WithVideoCodec("libx264").WithConstantRateFactor(factor);
 
         public static FFO FixWebmSize (this FFO o, VideoStream v) => SizeIsInvalid(v.Width, v.Height) ? o.Resize(ValidSize(v.Width, v.Height)) : o;
         public static FFO FixSongArt  (this FFO o, IMediaAnalysis info) => info.ErrorData.Count > 0   ? o.DisableChannel(Channel.Video)        : o;

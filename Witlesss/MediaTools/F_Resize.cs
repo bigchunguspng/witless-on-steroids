@@ -5,7 +5,7 @@ using FFMpegCore.Enums;
 using static Witlesss.Memes;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
+namespace Witlesss.MediaTools
 {
     public class F_Resize : F_SingleInput_Base
     {
@@ -33,24 +33,24 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         {
             var v = GetVideoStream(_input);
             var size = FitSize(new Size(v.Width, v.Height));
-            o = o.Resize(size).DisableChannel(Channel.Audio).WithVideoCodec("libx264").WithConstantRateFactor(30);
+            o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30);
         }
         private void CompressAnimationArgs(FFMpAO o)
         {
             var v = GetVideoStream(_input);
-            o = o.FixWebmSize(v).DisableChannel(Channel.Audio).WithVideoCodec("libx264").WithConstantRateFactor(30);
+            o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
         }
 
-        // -filter:v "crop=W:H:X:Y" -s 384x384 output.mp4
-        private static void ToVideoNoteArgs(FFMpAO o, Rectangle crop) => o = o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize);
+        // -filter:v "crop=W:H:X:Y" -s 384x384
+        private static void ToVideoNoteArgs(FFMpAO o, Rectangle crop) => o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize);
 
-        // -filter:v "crop=272:272:56:56" output.mp4
-        private static void CropVideoNoteArgs(FFMpAO o) => o = o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
+        // -filter:v "crop=272:272:56:56"
+        private static void CropVideoNoteArgs(FFMpAO o) => o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
 
-        // -ss 1 -frames:v 1 -vf scale=640:-1 art.png
+        // -ss 1 -frames:v 1 -vf
         private static void ExportThumbnailArgs(FFMpAO o, bool square)
         {
-            o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1).WithVideoFilters(v => SelectResizing(v, square)).WithQscale(2);
+            ResizeThumbnailArgs(o.Seek(TimeSpan.FromSeconds(1)).WithFrameOutputCount(1), square);
         }
 
         private static void ResizeThumbnailArgs(FFMpAO o, bool square)
@@ -58,10 +58,11 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
             o.WithVideoFilters(v => SelectResizing(v, square)).WithQscale(2);
         }
 
-        // -vf "crop=w='min(iw,ih)':h='min(iw,ih)',scale=640:640"
+        // -vf "crop=w='min(iw,ih)':h='min(iw,ih)',scale=640:640" / "scale=640:-1"
         private static void SelectResizing(VideoFilterOptions v, bool square)
         {
-            v = square ? v.MakeSquare(640) : v.Scale(640, -1);
+            if (square) v.MakeSquare(640);
+            else        v.Scale(640,  -1);
         }
     }
 }

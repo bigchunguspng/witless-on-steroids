@@ -4,7 +4,7 @@ using FFMpegCore;
 using FFO = FFMpegCore.FFMpegArgumentOptions;
 using FAP = FFMpegCore.FFMpegArgumentProcessor;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment InconsistentNaming
+namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
 {
     public abstract class F_SingleInput_Base
     {
@@ -26,11 +26,11 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
         public static VideoStream GetVideoStream(string path) => FFProbe.Analyse(path).PrimaryVideoStream;
 
         /// <summary> Gets media info + adds fixes to the options </summary>
-        protected MediaInfo MediaInfoWithFixing(ref FFO o)
+        protected MediaInfo MediaInfoWithFixing(FFO o)
         {
-            var i = MediaInfo();
-            o = AddFixes(o, i);
-            return i;
+            var info = MediaInfo();
+            AddFixes(o, info);
+            return info;
         }
         protected MediaInfo MediaInfo()
         {
@@ -42,18 +42,15 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment Inconsist
 
             return new MediaInfo(info, audio, video, v);
         }
-        protected static FFO AddFixes(FFO o, MediaInfo i)
+        protected static void AddFixes(FFO o, MediaInfo i)
         {
-            if (i.video) o = o.FixWebmSize(i.v);
-            if (i.audio) o = o.FixSongArt(i.info);
-
-            return o;
+            if (i.video) o.FixWebmSize(i.v);
+            if (i.audio) o.FixSongArt(i.info);
         }
 
         protected string Cook(string output, Action<FFO> args) // waltuh
         {
-            var processor = GetFFMpegAP(_input, output, args);
-            Run(processor);
+            Run(GetFFMpegAP(_input, output, args));
             
             return output;
         }

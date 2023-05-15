@@ -1,6 +1,6 @@
 ﻿using FFMpegCore;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
+namespace Witlesss.MediaTools
 {
     // -i input [-s WxH] [-vn] [-vf reverse] [-af areverse] output
     public class F_Reverse : F_SingleInput_Base
@@ -11,9 +11,9 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         private void Args(FFMpegArgumentOptions o)
         {
-            var i = MediaInfoWithFixing(ref o);
-            if (i.video) o = o.WithVideoFilters(v => v.ReverseVideo());
-            if (i.audio) o = o.WithAudioFilters(a => a.ReverseAudio());
+            var i = MediaInfoWithFixing(o);
+            if (i.video) o.WithVideoFilters(v => v.ReverseVideo());
+            if (i.audio) o.WithAudioFilters(a => a.ReverseAudio());
         }
     }
 }

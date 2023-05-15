@@ -2,7 +2,7 @@
 using FFMpegCore;
 using static Witlesss.MediaTools.ComplexFilterArgs;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
+namespace Witlesss.MediaTools
 {
     public class F_Cut : F_SingleInput_Base
     {
@@ -21,22 +21,22 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
         // output
         private void SusArgs(FFMpegArgumentOptions o)
         {
-            var i = MediaInfoWithFixing(ref o);
+            var i = MediaInfoWithFixing(o);
 
             var nodes = CoFi.Null;
             var span = Span(i.info);
             if (VF(i.video)) nodes = nodes.Trim("0:v", span, "vc").Split("v0", "v1").Reverse("v1", "vr").Concat("v0", "vr");
             if (AF(i.audio)) nodes = nodes.Trim("0:a", span, "ac").Split("a0", "a1").Reverse("a1", "ar").Concat("a0", "ar");
-            o = o.WithComplexFilter(nodes);
+            o.WithComplexFilter(nodes);
         }
 
         // -i input [-s WxH] [-vn] -ss 00:00:05 [-t 00:00:15] output
         private void CutArgs(FFMpegArgumentOptions o)
         {
-            o = AddFixes(o, MediaInfo());
+            AddFixes(o, MediaInfo());
 
-            o = o.Seek(_span.Start);
-            if (_span.Length != TimeSpan.Zero) o = o.WithDuration(_span.Length);
+            o.Seek(_span.Start);
+            if (_span.Length != TimeSpan.Zero) o.WithDuration(_span.Length);
         }
 
         private CutSpan Span(IMediaAnalysis i)

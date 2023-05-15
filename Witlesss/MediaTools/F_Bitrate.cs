@@ -1,6 +1,6 @@
 ﻿using FFMpegCore;
 
-namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
+namespace Witlesss.MediaTools
 {
     // -i input [-s WxH] [-vn] [-vcodec libx264 -crf 45] [-b:a 1k] [-f mp3] output
     public class F_Bitrate : F_SingleInput_Base
@@ -13,10 +13,10 @@ namespace Witlesss.MediaTools // ReSharper disable RedundantAssignment
 
         private void DamnArgs(FFMpegArgumentOptions o)
         {
-            var i = MediaInfoWithFixing(ref o);
-            if (i.video) o = o.WithVideoCodec("libx264").WithConstantRateFactor(_factor);
-            if (i.audio) o = o.WithAudioBitrate(154 - 3 * _factor);
-            if (i.audio && !i.video) o = o.ForceFormat("mp3");
+            var i = MediaInfoWithFixing(o);
+            if (i.video) o.WithCompression(_factor);
+            if (i.audio) o.WithAudioBitrate(154 - 3 * _factor);
+            if (i.audio && !i.video) o.ForceFormat("mp3");
         }
     }
 }

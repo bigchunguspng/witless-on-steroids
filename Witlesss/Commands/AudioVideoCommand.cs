@@ -34,7 +34,8 @@ namespace Witlesss.Commands
     {
         protected string FileID;
 
-        protected static string SongNameOr(string s) => Message.Audio?.FileName ?? Message.Document?.FileName ?? s;
+        protected static string SongNameOr(string  s) => SongNameIn(Message) ?? SongNameIn(Message.ReplyToMessage) ?? s;
+        private   static string SongNameIn(Message m) => m?.Audio?.FileName ?? m?.Document?.FileName;
 
         protected static string Sender => ValidFileName(SenderName);
 

@@ -28,9 +28,9 @@ namespace Witlesss.MediaTools
         {
             return Overlay(SetOutName(_b, "-D",   ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
         }
-        public string When(int loss, Size s, Rectangle c, Point p)
+        public string When(int loss, Size s, Rectangle c, Point p, bool blur)
         {
-            return Overlay(SetOutName(_b, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p));
+            return Overlay(SetOutName(_b, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p, blur));
         }
 
         private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
@@ -41,9 +41,10 @@ namespace Witlesss.MediaTools
         {
             BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "vid").Overlay("0:v", "vid", p));
         }
-        private static void ArgsWhen(FFMpegArgumentOptions o, int f, Size s, Rectangle c, Point p)
+        private static void ArgsWhen(FFMpegArgumentOptions o, int f, Size s, Rectangle c, Point p, bool blur)
         {
-            BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "v1").Crop("v1", c, "vid").Overlay("0:v", "vid", p));
+            var fi = CoFi.Null.Scale("1:v", s, "v1").Crop("v1", c, "vid").Overlay("0:v", "vid", p, blur ? "ova" : null);
+            BuildAndCompress(o, f, blur ? fi.Blur("ova", 1) : fi);
         }
 
         private static void BuildAndCompress(FFMpegArgumentOptions o, int f, CoFi filter)

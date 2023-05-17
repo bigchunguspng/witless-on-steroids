@@ -49,22 +49,28 @@ namespace Witlesss.Commands
             IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(dummy);
+            IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
-            IFunnyApp.CropPercent = !empty && _crop.IsMatch(Text) ? int.Parse(_crop.Match(Text).Groups[1].Value) : 100;
-            IFunnyApp.MinFontSize = !empty && _font.IsMatch(Text) ? int.Parse(_font.Match(Text).Groups[1].Value) : 10;
+            IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(Text) ? GetInt(  _crop) : 100;
+            IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(Text) ? GetInt(_fontMS) : 10;
+            IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(Text) ? GetInt(_fontSS) : 36;
 
             return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+
+            int GetInt(Regex x) => int.Parse(x.Match(Text).Groups[1].Value);
         }
 
         private static readonly Regex _regular = new(@"^\/top\S*rg\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _left    = new(@"^\/top\S*la\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _blur    = new(@"^\/top\S*blur\S* *",          RegexOptions.IgnoreCase);
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorPP = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _blackBG = new(@"^\/top\S*bb\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _font    = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
+        private static readonly Regex _fontMS  = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
+        private static readonly Regex _fontSS  = new(@"^\/top\S*?ss(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
     }
 }

@@ -105,7 +105,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
-        protected static readonly Regex _repeat = new(@"(?:(?<!ms)(?<!ms\d)(?<!ms\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
+        protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
 
         public static int GetRepeats(bool regex)
         {

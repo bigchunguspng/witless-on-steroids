@@ -18,6 +18,7 @@ namespace Witlesss.MediaTools
         private static string Overlay (Point p) => $"overlay={p.X}:{p.Y}";
         private static string Scale    (Size s) => $"scale={s.Width}:{s.Height}";
         private static string Crop(Rectangle r) => $"crop={r.Width}:{r.Height}:{r.X}:{r.Y}";
+        private static string Blur   (double b) => $"boxblur=1:{b}";
 
         private static string Trim  (CutSpan s) => $"{_a}trim=start='{TsFormat(s.Start)}':duration='{TsFormat(s.Length)}',{_a}{PTS}";
         private static string Split          () => $"{_a}split=2";
@@ -33,6 +34,7 @@ namespace Witlesss.MediaTools
         public static CoFi Trim    (this CoFi node, string input, CutSpan s,     string output = null) => new(input,   Trim(s), output, node);
         public static CoFi Reverse (this CoFi node, string input,                string output = null) => new(input, Reverse(), output, node);
         public static CoFi Crop    (this CoFi node, string input, Rectangle r,   string output = null) => new(input,   Crop(r), output, node);
+        public static CoFi Blur    (this CoFi node, string input, double b,      string output = null) => new(input,   Blur(b), output, node);
 
         public static CoFi Overlay (this CoFi node, string a, string b, Point p, string output = null) => CoFi.J(a, b, Overlay(p), output, node);
         public static CoFi Concat  (this CoFi node, string a, string b,          string output = null) => CoFi.J(a, b,   Concat(), output, node);

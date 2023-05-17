@@ -77,7 +77,7 @@ namespace Witlesss
             else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(Snapshot(path))));
             else                          _ifunny.SetDefaultColors();
 
-            return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location);
+            return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage);
         }
 
 

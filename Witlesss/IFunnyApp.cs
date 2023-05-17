@@ -12,8 +12,8 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 public class IFunnyApp
 {
     public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true;
-    public static bool PickColor, UseGivenColor, BackInBlack;
-    public static int CropPercent = 100, MinFontSize = 10;
+    public static bool PickColor, UseGivenColor, BackInBlack, BlurImage;
+    public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
     public static Color GivenColor;
 
     private Color Background;
@@ -49,7 +49,7 @@ public class IFunnyApp
 
     private void ResizeFont(float size) => _sans = new(FontFamily, size);
 
-    private int  StartingFontSize() => Math.Max(Math.Max(36, _t / 5), MinFontSize);
+    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, _t / 5), MinFontSize);
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);

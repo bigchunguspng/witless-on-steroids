@@ -49,7 +49,7 @@ public class IFunnyApp
 
     private void ResizeFont(float size) => _sans = new(FontFamily, size);
 
-    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, _t / 5), MinFontSize);
+    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, _t / 5 * DefFontSize / 36), MinFontSize);
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);

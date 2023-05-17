@@ -29,8 +29,10 @@ namespace Witlesss.Commands
 
         protected override string GetMemeText(string text)
         {
-            var empty = string.IsNullOrEmpty(Text);
-            var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+            var empty = Text is null && Baka.Meme.OptionsT is null;
+            var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
+            var topxd = input.Split(' ', 2)[0].ToLower().Length > 4;
+            var dummy = empty ? "" : topxd ? input : Baka.Meme.OptionsT ?? input;
 
             IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 
@@ -52,13 +54,13 @@ namespace Witlesss.Commands
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
-            IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(Text) ? GetInt(  _crop) : 100;
-            IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(Text) ? GetInt(_fontMS) : 10;
-            IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(Text) ? GetInt(_fontSS) : 36;
+            IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(dummy) ? GetInt(  _crop) : 100;
+            IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(dummy) ? GetInt(_fontMS) :  10;
+            IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) :  36;
 
             return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
 
-            int GetInt(Regex x) => int.Parse(x.Match(Text).Groups[1].Value);
+            int GetInt(Regex x) => int.Parse(x.Match(dummy).Groups[1].Value);
         }
 
         private static readonly Regex _regular = new(@"^\/top\S*rg\S* *",            RegexOptions.IgnoreCase);

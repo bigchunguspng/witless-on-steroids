@@ -18,30 +18,59 @@ namespace Witlesss.Commands
             }
             else if (Text.Contains(' '))
             {
-                var x = false;
-                var w = Text.Split()[1];
+                string command = null, result = null;
+                var t = false;
+                var o = false;
+                var s = Text.Split();
+                var w = s[1];
                 if      (Regex.IsMatch(w, @"^[MmМм]"))
                 {
-                    Baka.Meme.Type = MemeType.Meme;
-                    x = true;
+                    if (s.Length > 2)
+                    {
+                        command = "/meme";
+                        Baka.Meme.OptionsM = s[2] == "0" ? null : command + s[2];
+                        result = Baka.Meme.OptionsM ?? command;
+                        o = true;
+                    }
+                    else
+                    {
+                        Baka.Meme.Type = MemeType.Meme;
+                        t = true;
+                    }
                 }
                 else if (Regex.IsMatch(w, @"^[DdДд]"))
                 {
                     Baka.Meme.Type = MemeType.Dg;
-                    x = true;
+                    t = true;
                 }
                 else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))
                 {
-                    Baka.Meme.Type = MemeType.Top;
-                    x = true;
+                    if (s.Length > 2)
+                    {
+                        command = "/top";
+                        Baka.Meme.OptionsT = s[2] == "0" ? null : command + s[2];
+                        result = Baka.Meme.OptionsT ?? command;
+                        o = true;
+                    }
+                    else
+                    {
+                        Baka.Meme.Type = MemeType.Top;
+                        t = true;
+                    }
                 }
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
-                if (x)
+                if (t)
                 {
                     Bot.SaveChatList();
                     Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
                     Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
+                }
+                else if (o)
+                {
+                    Bot.SaveChatList();
+                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEME_OPS_RESPONSE, command, result)));
+                    Log($"{Title} >> MEMES OPTIONS");
                 }
             }
             else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);

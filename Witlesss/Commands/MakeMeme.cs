@@ -29,8 +29,10 @@ namespace Witlesss.Commands
 
         protected override DgText GetMemeText(string text)
         {
-            var empty = string.IsNullOrEmpty(Text);
-            var dummy = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+            var empty = Text is null && Baka.Meme.OptionsM is null;
+            var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
+            var memes = input.Split(' ', 2)[0].ToLower().Length > 5;
+            var dummy = empty ? "" : memes ? input : Baka.Meme.OptionsM ?? input;
 
             MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBack)

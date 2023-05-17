@@ -16,6 +16,8 @@ namespace Witlesss.Commands
                 types[Baka.Meme.Type],
                 Baka.AdminsOnly ? "Админы 😎" : "Все 😚");
             if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
+            if (Baka.Meme.OptionsM is not null) info += $"\nОпции /meme: <code>{Baka.Meme.OptionsM[5..]}</code>";
+            if (Baka.Meme.OptionsT is not null) info +=  $"\nОпции /top: <code>{Baka.Meme.OptionsT[4..]}</code>";
             Bot.SendMessage(Chat, info);
         }
 

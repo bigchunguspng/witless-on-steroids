@@ -618,9 +618,14 @@ namespace Witlesss.XD {
         ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
         ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
         ///
+        ///&lt;u&gt;Изменить опции в мемчиках по умолчанию&lt;/u&gt;:
+        ///
+        ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
+        ///
         ///&lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
         ///
-        /// /pics@piece_fap_bot [число] (%).
+        /// /pics@piece_fap [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -634,6 +639,15 @@ namespace Witlesss.XD {
         internal static string SET_FREQUENCY_RESPONSE {
             get {
                 return ResourceManager.GetString("SET_FREQUENCY_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Опции команды &lt;b&gt;{0}&lt;/b&gt; изменены на &lt;b&gt;{1}&lt;/b&gt;.
+        /// </summary>
+        internal static string SET_MEME_OPS_RESPONSE {
+            get {
+                return ResourceManager.GetString("SET_MEME_OPS_RESPONSE", resourceCulture);
             }
         }
         

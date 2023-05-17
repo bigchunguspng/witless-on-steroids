@@ -34,6 +34,11 @@
 &lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
 &lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
 
+&lt;u&gt;Изменить опции в мемчиках по умолчанию&lt;/u&gt;:
+
+&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
+
 &lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
 
 /pics@piece_fap_bot [число] (%)</value>
@@ -428,5 +433,8 @@ s   - save and exit
 &lt;code&gt;s&lt;/code&gt; - обрежет обложку до квадрата
 
 &lt;b&gt;Итого:&lt;/b&gt; &lt;code&gt;/song[опции] ссылка [автор - ][название]&lt;/code&gt;</value>
+    </data>
+    <data name="SET_MEME_OPS_RESPONSE" xml:space="preserve">
+        <value>Опции команды &lt;b&gt;{0}&lt;/b&gt; изменены на &lt;b&gt;{1}&lt;/b&gt;</value>
     </data>
 </root>

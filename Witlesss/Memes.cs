@@ -51,6 +51,7 @@ namespace Witlesss
 
         public static string MakeVideoMeme(string path, DgText text)
         {
+            Sticker = false;
             var size = GrowSize(GetSize(path));
             _imgflip.SetUp(size);
 

@@ -43,7 +43,7 @@ namespace Witlesss.Commands
                 var title  = args.Groups[3].Success ? args.Groups[3].Value : null;
 
                 var yt = url.Contains("youtu");
-                var id = yt ? _id.Match(url).Groups[1].Value : url.Contains('?') ? url[..url.IndexOf('?')] : url;
+                var id = yt ? _id.Match(url).Groups[1].Value : url;
                 if (id.Length < 1) throw new Exception("video id was too small");
 
                 var ops = _ops.Match(RemoveBotMention());
@@ -80,8 +80,8 @@ namespace Witlesss.Commands
             var url = yt ? _url_prefix + id : id;
 
             var output = $"{artist ?? (up ? "%(uploader)s" : "%(artist)s")} - {title ?? "%(title)s"} xd.%(ext)s";
-            var cmd_a = $"/C yt-dlp --no-mtime {(yt ? "-f 251 -k " : xt || aa ? "" : "--write-thumbnail ")}-x --audio-format mp3{audio} {url} -o \"{output}\"";
-            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*{(yt ? "[height<=720][filesize<15M]" : "")}\" -k {url} -o \"video.%(ext)s\"" : null;
+            var cmd_a = $"/C yt-dlp --no-mtime {(yt ? "-f 251 -k " : xt || aa ? "" : "--write-thumbnail ")}-x --audio-format mp3{audio} \"{url}\" -o \"{output}\"";
+            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*{(yt ? "[height<=720][filesize<15M]" : "")}\" -k \"{url}\" -o \"video.%(ext)s\"" : null;
 
             var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);

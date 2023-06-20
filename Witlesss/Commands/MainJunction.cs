@@ -89,7 +89,7 @@ namespace Witlesss.Commands
                 bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
                 bool HaveToMemePhoto() => !BetterSkip() && HaveToMeme(TextIsMemable() ? 4 : 1);
                 bool HaveToMeme(int x = 1) => Extension.Random.Next(100 / x) < Baka.Meme.Chance;
-                bool BetterSkip() => Baka.Meme.Chance < 50 && PhotoHasShortCaption();
+                bool BetterSkip() => Baka.Meme.Chance < 50 && PhotoHasShortCaption() || Text?.Length > 200;
                 bool PhotoHasShortCaption() => Text is { } t && !t.Contains('\n');
                 bool TextIsMemable()        => Text is { } t &&  t.Contains('\n');
             }

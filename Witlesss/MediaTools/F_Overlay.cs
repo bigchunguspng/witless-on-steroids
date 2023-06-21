@@ -57,7 +57,8 @@ namespace Witlesss.MediaTools
 
         public string AddTrackMetadata(string artist, string title)
         {
-            var name = $"{Path.GetDirectoryName(_a)}/{(artist is null ? "" : $"{artist} - ")}{title}.mp3";
+            var file = $"{(artist is null ? "" : $"{artist} - ")}{title}";
+            var name = $"{Path.GetDirectoryName(_a)}/{ValidFileName(file, '#')}.mp3";
             return Overlay(name, o => MetadataArgs(o, artist, title));
         }
 

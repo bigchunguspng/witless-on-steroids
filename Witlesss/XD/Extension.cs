@@ -98,10 +98,10 @@ namespace Witlesss.XD
             
             return path;
         }
-        public static string ValidFileName(string text)
+        public static string ValidFileName(string text, char x = '_')
         {
             var chars = Path.GetInvalidFileNameChars();
-            return chars.Aggregate(text, (current, c) => current.Replace(c, '_'));
+            return chars.Aggregate(text, (current, c) => current.Replace(c, x));
         }
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)

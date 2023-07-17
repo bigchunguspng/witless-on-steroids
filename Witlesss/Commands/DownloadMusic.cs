@@ -51,7 +51,7 @@ namespace Witlesss.Commands
 
                 var message = Bot.PingChat(Chat, Pick(PLS_WAIT_RESPONSE));
 
-                RunSafelyAsync(DownloadSongAsync(id, artist, title, options, cover, message, yt, SnapshotMessageData()), Chat, message);
+                Bot.RunSafelyAsync(DownloadSongAsync(id, artist, title, options, cover, message, yt, SnapshotMessageData()), Chat, message);
             }
             else
             {
@@ -125,20 +125,6 @@ namespace Witlesss.Commands
             var process = new Process() { StartInfo = info };
             process.Start();
             await process.WaitForExitAsync();
-        }
-
-        private static async Task RunSafelyAsync(Task task, long chat, int id)
-        {
-            try
-            {
-                await task;
-                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
-            }
-            catch (Exception e)
-            {
-                LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
-                Bot.EditMessage(chat, id, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
-            }
         }
     }
 }

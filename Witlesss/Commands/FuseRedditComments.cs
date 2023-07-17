@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+#pragma warning disable CS4014
 
 namespace Witlesss.Commands
 {
@@ -45,8 +47,8 @@ namespace Witlesss.Commands
                     query = new ScQuery(s, sort, time);
                 }
 
-                Bot.SendMessage(Chat, REDDIT_COMMENTS_START);
-                EatComments(SnapshotMessageData(), query, size);
+                var message = Bot.PingChat(Chat, REDDIT_COMMENTS_START);
+                Bot.RunSafelyAsync(EatComments(SnapshotMessageData(), query, size), Chat, message);
             }
             else
             {
@@ -54,7 +56,7 @@ namespace Witlesss.Commands
             }
         }
 
-        private async void EatComments(WitlessCommandParams x, RedditQuery query, long size)
+        private async Task EatComments(WitlessCommandParams x, RedditQuery query, long size)
         {
             var timer = new StopWatch();
             var comments = await RedditTool.Instance.GetComments(query);

@@ -112,6 +112,20 @@ namespace Witlesss
             if (task.IsFaulted) throw new Exception();
         }
         
+        public async Task RunSafelyAsync(Task task, long chat, int message)
+        {
+            try
+            {
+                await task;
+                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
+            }
+            catch (Exception e)
+            {
+                LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
+                EditMessage(chat, message, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
+            }
+        }
+        
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath($@"{TEMP_FOLDER}\error.txt");

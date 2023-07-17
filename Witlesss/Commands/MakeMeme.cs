@@ -6,7 +6,7 @@ namespace Witlesss.Commands
 {
     public class MakeMeme : MakeMemeCore<DgText>, ImageProcessor
     {
-        public MakeMeme() : base(new Regex(@"^\/meme(\S*) *", RegexOptions.IgnoreCase)) { }
+        protected override Regex _cmd { get; } = new(@"^\/meme(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
 

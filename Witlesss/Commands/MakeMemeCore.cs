@@ -11,15 +11,13 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         private MediaType _type;
         private readonly StopWatch _watch = new();
 
-        private readonly Regex _cmd;
+        protected abstract Regex _cmd { get; }
 
         protected abstract string Log_PHOTO ( int x);
         protected abstract string Log_VIDEO { get; }
         protected abstract string Log_STICK { get; }
         protected abstract string VideoName { get; }
 
-        protected MakeMemeCore(Regex cmd) => _cmd = cmd;
-        
         protected void Run(string type)
         {
             JpegCoder.PassQuality(Baka);

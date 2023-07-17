@@ -5,7 +5,7 @@ namespace Witlesss.Commands
 {
     public class Demotivate : MakeMemeCore<DgText>, ImageProcessor
     {
-        public Demotivate() : base(new Regex(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase)) { }
+        protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
 
@@ -15,9 +15,8 @@ namespace Witlesss.Commands
 
         public ImageProcessor SetUp(int w, int h)
         {
-            SelectModeAuto(w, h);
             JpegCoder.PassQuality(Baka);
-
+            SelectModeAuto(w, h);
             return this;
         }
 

@@ -6,7 +6,7 @@ namespace Witlesss.Commands
 {
     public class AddCaption : MakeMemeCore<string>, ImageProcessor
     {
-        public AddCaption() : base(new Regex(@"^\/top(\S*) *", RegexOptions.IgnoreCase)) { }
+        protected override Regex _cmd { get; } = new(@"^\/top(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "=" : x)}]";
 

@@ -10,12 +10,12 @@ namespace Witlesss
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseCustomBack;
+        public static bool WrapText = true, UseCustomBack, UseRoboto, UseItalic;
         public static Color CustomBackground;
         
         private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
-        private readonly FontFamily    _font = new("Impact");
+        private readonly FontFamily[] _fonts = new[] { new FontFamily("Impact"), new FontFamily("Roboto") };
         private readonly SolidBrush   _white = new(Color.White);
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
@@ -73,7 +73,7 @@ namespace Witlesss
             var go = true;
             while (go)
             {
-                var ms = g.MeasureString(text, new Font(_font, s), r, f, out _, out var lines);
+                var ms = g.MeasureString(text, SelectFont(s), r, f, out _, out var lines);
                 go = ms.Height > rect.Size.Height && s > 2 || !WrapText && lines > 1;
                 s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
             }
@@ -81,7 +81,7 @@ namespace Witlesss
             _size = size;
             
             using var path = new GraphicsPath();
-            path.AddString(text, _font, 0, size, rect, f);
+            path.AddString(text, CaptionFont, (int)CaptionStyle, size, rect, f);
             for (var i = OutlineWidth; i > 0; i--)
             {
                 _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
@@ -94,6 +94,10 @@ namespace Witlesss
 
         private int OutlineWidth => (int)Math.Round(_size / 6D);
         private SolidBrush Brush => _brushes[MakeMeme.Dye].Invoke();
+
+        private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
+        private FontFamily CaptionFont => _fonts[UseRoboto ? 1 : 0];
+        private FontStyle CaptionStyle => UseItalic ? FontStyle.Italic | FontStyle.Bold : UseRoboto ? FontStyle.Bold : FontStyle.Regular;
 
         private Image GetImage(string path)
         {

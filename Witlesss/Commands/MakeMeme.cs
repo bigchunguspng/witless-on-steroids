@@ -31,7 +31,7 @@ namespace Witlesss.Commands
         {
             var empty = Text is null && Baka.Meme.OptionsM is null;
             var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
-            var cmd   = input.Split(' ', 2)[0].ToLower();
+            var cmd   = input.Split(split_chars, 2)[0].ToLower();
             var memes = cmd.Length > 5 && cmd.StartsWith("/meme");
             var dummy = empty ? "" : memes ? input : Baka.Meme.OptionsM ?? input;
 

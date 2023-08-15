@@ -221,7 +221,7 @@ public class IFunnyApp
 
     public void SetSpecialColors(Bitmap image)
     {
-        Background = AverageColor(image, new Rectangle(image.Width / 2, _crop_offset * image.Height / _h, 5, 5));
+        Background = AverageColor(image, new Rectangle(image.Width / 2, _crop_offset, 5, 5));
         TextColor  = ChooseTextColor(Background);
     }
     public void SetCustomColors()

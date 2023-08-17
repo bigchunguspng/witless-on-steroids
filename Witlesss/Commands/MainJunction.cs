@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
 using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.ImageProcessor>;
 
 namespace Witlesss.Commands
@@ -86,8 +88,10 @@ namespace Witlesss.Commands
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
                 ImageProcessor SelectMemeMaker() => _mematics[Baka.Meme.Type];
 
-                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance;
+                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance && !BroSpoilers();
                 bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
+
+                bool BroSpoilers() => Message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
             }
             else if (Text is not null && TextIsCommand(out var command))
             {

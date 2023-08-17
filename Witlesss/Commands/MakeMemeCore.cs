@@ -84,7 +84,9 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         }
 
         protected abstract T GetMemeText(string text);
-        private T Texts() => GetMemeText(RemoveCommand(Text));
+        private T Texts() => GetMemeText(RemoveCommand(GetTextUnlessItsReposted()));
+
+        private string GetTextUnlessItsReposted() => Message.ForwardFromChat is null ? Text : null;
 
         private bool HasToBeRepeated()
         {

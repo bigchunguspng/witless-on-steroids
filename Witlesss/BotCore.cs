@@ -16,7 +16,22 @@ namespace Witlesss
         public readonly TelegramBotClient Client = new(Config.TelegramToken);
         public readonly User Me;
 
-        protected BotCore() => Me = Client.GetMeAsync().Result;
+        protected BotCore()
+        {
+            while (true)
+            {
+                try
+                {
+                    Me = Client.GetMeAsync().Result;
+                    break;
+                }
+                catch (Exception e)
+                {
+                    LogError(e.Message);
+                    Task.Delay(5000).Wait();
+                }
+            }
+        }
 
         public void SendMessage(long chat, string text)
         {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 using Witlesss.Commands;
 
 namespace Witlesss
@@ -81,7 +83,7 @@ namespace Witlesss
             catch
             {
                 LogError($"{Command.TitleOrUsername} >> NO TEXT!?");
-                return "ахахаххахахахахах";
+                return Command.Bot.Me.FirstName;
             }
         }
 

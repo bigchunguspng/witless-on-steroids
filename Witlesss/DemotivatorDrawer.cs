@@ -9,6 +9,8 @@ namespace Witlesss
 {
     public class DemotivatorDrawer
     {
+        public static bool AddLogo;
+
         private readonly int _w, _h;
         private readonly Rectangle _frame;
         private readonly DrawableText _textA = new(), _textB = new();
@@ -67,7 +69,7 @@ namespace Witlesss
             graphics.CompositingMode = SourceCopy;
             graphics.Clear(Color.Black);
             graphics.DrawRectangle(White, _frame);
-            if (_w == 720)
+            if (_w == 720 && AddLogo)
             {
                 var logo = PickRandomLogo();
                 graphics.DrawImage(logo.Key, logo.Value);

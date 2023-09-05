@@ -28,6 +28,11 @@ namespace Witlesss.Commands
 
         protected override DgText GetMemeText(string text)
         {
+            var empty = Text is null;
+            var input = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+
+            DemotivatorDrawer.AddLogo = empty || !_no_logo.IsMatch(input);
+            
             string a, b = Baka.Generate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
             if (string.IsNullOrEmpty(text)) a = Baka.Generate();
@@ -39,6 +44,8 @@ namespace Witlesss.Commands
             }
             return new DgText(a, b);
         }
+
+        private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *", RegexOptions.IgnoreCase);
 
         public Demotivate SetUp(DgMode mode)
         {

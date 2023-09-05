@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using Witlesss.Commands;
 
 namespace Witlesss

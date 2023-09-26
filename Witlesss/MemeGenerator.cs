@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using Witlesss.Commands;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
@@ -67,6 +68,9 @@ namespace Witlesss
             if (string.IsNullOrEmpty(text)) return;
 
             text = EmojiTool.RemoveEmoji(text);
+            text = text.TrimStart('\n');
+
+            var maxLines = text.Count(c => c == '\n') + 1;
 
             var s = size * 0.75f;
             var r = rect.Size with { Height = rect.Size.Height * 3 };
@@ -74,7 +78,7 @@ namespace Witlesss
             while (go)
             {
                 var ms = g.MeasureString(text, SelectFont(s), r, f, out _, out var lines);
-                go = ms.Height > rect.Size.Height && s > 2 || !WrapText && lines > 1;
+                go = ms.Height > rect.Size.Height && s > 2 || !WrapText && lines > maxLines;
                 s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
             }
             size = (int)(s / 0.75f);

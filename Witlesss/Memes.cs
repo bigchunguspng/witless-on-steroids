@@ -133,7 +133,7 @@ namespace Witlesss
             if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
             return ValidSize(s.Width, s.Height);
         }
-        private static Size NormalizeSize (Size s, int limit = 512, bool reduce = true)
+        public static Size NormalizeSize (Size s, int limit = 512, bool reduce = true)
         {
             double lim = limit;
             var wide = s.Width > s.Height;

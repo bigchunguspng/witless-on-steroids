@@ -6,7 +6,7 @@ using Witlesss.MediaTools;
 
 using static System.Drawing.StringAlignment;
 
-namespace Witlesss;
+namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class DynamicDemotivatorDrawer
 {
@@ -17,7 +17,7 @@ public class DynamicDemotivatorDrawer
 
     private int img_w, img_h, txt_h, full_w, full_h;
     private int mg_top;
-    private double ratio;
+    private float ratio;
     private Rectangle _frame;
     private Point _pic;
     
@@ -40,7 +40,7 @@ public class DynamicDemotivatorDrawer
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize);
 
-    private void ResizeFont(float size) => _sans = new(FontFamily, size);
+    private void ResizeFont(float size) => _sans = new(FontFamily, Math.Max(MinFontSize, size));
 
 
     static DynamicDemotivatorDrawer()
@@ -70,7 +70,7 @@ public class DynamicDemotivatorDrawer
         graphics.Clear(Color.Black);
 
         graphics.CompositingMode = CompositingMode.SourceOver;
-        graphics.DrawImage(funny, new Point((full_w - TextWidth) / 2, mg_top + img_h + FM));
+        graphics.DrawImage(funny, new Point((full_w - funny.Width) / 2, mg_top + img_h + FM));
         
         graphics.DrawRectangle(White, _frame);
 
@@ -98,17 +98,18 @@ public class DynamicDemotivatorDrawer
         var funny = emoji.Count > 0;
         var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRegularFont ? "aa" : "НН") : text; // todo find correct letters
 
-        AdjustProportions(textM); // adjust font size, txt_h -> full_h -> full_w
+        AdjustProportions(textM, out var width);
         //AdjustTextPosition(text);
 
         var height = funny ? txt_h * 2 : txt_h; // probably this fixes visibility of the last emoji-text line
+        width = width == 0 ? TextWidth : width;
 
-        var area = new RectangleF(0, 0, TextWidth, height);
+        var area = new RectangleF(0, 0, width, height);
 
-        var image = new Bitmap(TextWidth, height);
+        var image = new Bitmap(width, height);
         using var graphics = Graphics.FromImage(image);
         
-        graphics.Clear(Color.Indigo);
+        graphics.Clear(Color.Indigo); // todo replace with black when ready
         
         graphics.CompositingMode    = CompositingMode.SourceOver;
         graphics.CompositingQuality = CompositingQuality.HighQuality;
@@ -122,25 +123,21 @@ public class DynamicDemotivatorDrawer
             var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
             var d = txt_h - h;
             txt_h = h * l / lines + d; // i guess ???
+            AdjustTotalSize();
+            AdjustImageFrame();
         }
         else graphics.DrawString(text, _sans, TextColor, area, _format);
 
         return image;
     }
 
-    private void AdjustProportions(string text)
+    private void AdjustProportions(string text, out int width)
     {
-        // IF no \n's:
-        // try draw text: fits ? return :
-        // test text on wider card: fits ? calc final size :
-        // size \= 2 -> try upper step again
-        
-        // final size < min size ? make text min size + wrap it : return
-        // test wrapped text on 2*txt_h card: fits ? return : make card twice high
-        // fits ? make card exact size + return : repeat
+        width = 0;
 
         using var g = Graphics.FromHwnd(IntPtr.Zero);
-        var area = new SizeF(TextWidth, txt_h * 2);
+        var initial_w = TextWidth;
+        var area = new SizeF(initial_w, txt_h * 2);
         int lines;
         
         if (!text.Contains('\n'))
@@ -152,21 +149,29 @@ public class DynamicDemotivatorDrawer
             MeasureString();
             if (lines == 1) return; // 0.6 size + text fits + single line
             
-            var adjust = false;
-            while (_measure.Height > txt_h)
+            while (_sans.Size > MinFontSize && _measure.Height > txt_h)
             {
                 ResizeFont(_sans.Size * 0.5f);
                 MeasureString();
-                adjust = true;
             }
-            if (adjust)
+            
+            if (_sans.Size <= MinFontSize)
             {
-                ResizeFont(_sans.Size * (0.8f * txt_h / _measure.Height));
-                if (_sans.Size < MinFontSize)
-                {
-                    // wrap text
-                }
+                ResizeFont(MinFontSize);
+                area.Height *= 64;
+                MeasureString();
             }
+            
+            txt_h = (int)(_measure.Height + _sans.Size * 1.4f);
+            AdjustTotalSize();
+
+            width = TextWidth;
+
+            txt_h = (int)(txt_h * initial_w / (float)TextWidth);
+            txt_h = (int)(txt_h + _sans.Size * 1.4f);
+            AdjustTotalSize();
+            AdjustImageFrame();
+            
         }
         void MeasureString() => _measure = g.MeasureString(text, _sans, area, _format, out _, out lines);
     }
@@ -193,25 +198,28 @@ public class DynamicDemotivatorDrawer
         img_w = size.Width;
         img_h = size.Height;
 
-        ratio = img_w / (double)img_h;
+        ratio = img_w / (float)img_h;
 
         SetFontToDefault();
 
-        mg_top = (int)(img_h * 0.06);
-        txt_h  = (int)(_sans.Size * 2.4); // 75 -> 180
+        mg_top = (int)(img_h * 0.06f);
+        txt_h  = (int)(_sans.Size * 2.4f); // 75 -> 180
 
         AdjustTotalSize();
-
-        _pic = new Point((full_w - img_w) / 2, mg_top + 1);
-        
-        _frame = new Rectangle(_pic.X - FM, _pic.Y - FM, img_w + 2 * FM, img_h + 2 * FM);
+        AdjustImageFrame();
     }
 
-    private void AdjustTotalSize() // call this after changing txt_h
+    /// <summary> CALL THIS after changing <see cref="txt_h"/> </summary>
+    private void AdjustTotalSize()
     {
         full_h = FF_Extensions.ToEven(mg_top + img_h + FM + txt_h);
         full_w = FF_Extensions.ToEven((int)(full_h * ratio));
     }
+    private void AdjustImageFrame()
+    {
+        _pic = new Point((full_w - img_w) / 2, mg_top + 1);
+        _frame = new Rectangle(_pic.X - FM, _pic.Y - FM, img_w + 2 * FM, img_h + 2 * FM);
+    }
 
-    private int TextWidth => full_w - 2 * FM;
+    private int TextWidth => (full_w + img_w) / 2;
 }

@@ -75,7 +75,7 @@ namespace Witlesss
                     if (xd.EndsWith(".png"))
                     {
                         var image = new Bitmap(Image.FromFile(xd), p.EmojiSize);
-                        graphics.FillRectangle(new SolidBrush(Color.Chartreuse), new Rectangle(new Point(x, y), p.EmojiSize));
+                        //graphics.FillRectangle(new SolidBrush(Color.Chartreuse), new Rectangle(new Point(x, y), p.EmojiSize));
                         graphics.DrawImage(image, x, y);
                         MoveX(p.EmojiS);
                     }
@@ -118,7 +118,7 @@ namespace Witlesss
                         var trim = space ? cr ? "" : s[..index] : s[..chars];
                         ms = graphics.MeasureString(trim, p.Font, layout.Size, format); // todo test
                         layout.Width = ms.Width;
-                        graphics.FillRectangle(new SolidBrush(Color.Crimson), layout);
+                        //graphics.FillRectangle(new SolidBrush(Color.Crimson), layout);
                         graphics.DrawString(trim, p.Font, p.Color, layout, format);
                         MoveX((int)graphics.MeasureString(trim, p.Font).Width);
                         var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
@@ -129,7 +129,7 @@ namespace Witlesss
                     void DrawSingleLineText(StringFormat format)
                     {
                         var layout = new RectangleF(x, y, width, h);
-                        graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
+                        //graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
                         graphics.DrawString(s, p.Font, p.Color, layout, format);
                         MoveX(width);
                     }

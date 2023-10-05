@@ -32,7 +32,7 @@ namespace Witlesss
                 witless.Meme.Chance = 100;
                 witless.Meme.Stickers = true;
             }
-            witless.Meme.Type = (MemeType)Extension.Random.Next(3);
+            witless.Meme.Type = (MemeType)Extension.Random.Next(4);
             witless.Meme.Dye = (ColorMode)Extension.Random.Next(2);
 
             witless.Load();
@@ -181,5 +181,6 @@ namespace Witlesss
 
         [JsonProperty] public string OptionsM { get; set; }
         [JsonProperty] public string OptionsT { get; set; }
+        [JsonProperty] public string OptionsD { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace Witlesss
         private static readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
         private static readonly MemeGenerator        _imgflip = new();
         private static readonly IFunnyApp            _ifunny  = new();
+        private static readonly DynamicDemotivatorDrawer  _dp = new();
 
         private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
@@ -36,6 +37,23 @@ namespace Witlesss
         public static string MakeVideoDemotivator(string path, DgText text)
         {
             return new F_Overlay(Drawer.MakeFrame(text), path).Demo(Quality, Drawer);
+        }
+
+
+        public static string MakeDemotivatorB(string path, string text)
+        {
+            return _dp.DrawDemotivator(path, text);
+        }
+
+        public static string MakeStickerDemotivatorB(string path, string text, string extension)
+        {
+            return MakeDemotivatorB(new F_Resize(path).Transcode(extension), text);
+        }
+
+        public static string MakeVideoDemotivatorB(string path, string text)
+        {
+            throw new NotImplementedException();
+            return new F_Overlay(_dp.BakeFrame(text), path).Demo(Quality, Drawer);
         }
 
 

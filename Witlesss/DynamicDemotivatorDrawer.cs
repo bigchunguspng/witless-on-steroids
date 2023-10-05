@@ -10,9 +10,12 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
     public class DynamicDemotivatorDrawer
     {
-        // color font[times/rg] weight[bold/regular]
-        public static bool UseImpact = true, UseRoboto, UseBoldFont = true;
-        public static bool CropEdges;
+        public static bool UseImpact, UseRoboto, UseBoldFont;
+        public static bool CropEdges, UseGivenColor;
+        public static Color GivenColor;
+        
+        private SolidBrush TextColor;
+        private Pen FrameColor;
 
         private const int FM = 5;
 
@@ -25,6 +28,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         private Rectangle _frame;
 
         private readonly Pen White = new(Color.White, 2);
+        private readonly SolidBrush WhiteBrush = new(Color.White);
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
 
         // /
@@ -118,7 +122,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         
             g.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
         
-            g.DrawRectangle(White, _frame);
+            g.DrawRectangle(FrameColor, _frame);
 
             return background;
         }
@@ -140,7 +144,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
             var image = new Bitmap(width, height);
             using var graphics = Graphics.FromImage(image);
         
-            graphics.Clear(Color.Indigo); // todo replace with black when ready
+            graphics.Clear(Color.Black);
         
             graphics.CompositingMode    = CompositingMode.SourceOver;
             graphics.CompositingQuality = CompositingQuality.HighQuality;
@@ -164,8 +168,6 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         private int InitialMargin(int h) => (txt_h - h) / 2;
         private int Spacing   => (int)(_sans.Size * 1.6);
         private int EmojiSize => (int)(_sans.Size * 1.5);
-
-        private SolidBrush TextColor => new(Color.White);
 
         private string GetEmojiReplacement() => UseRoboto ? "aa" : UseImpact ? "НН" : UseBoldFont ? "гм" : "мя";
 
@@ -235,9 +237,15 @@ namespace Witlesss // ReSharper disable InconsistentNaming
             var image = new Bitmap(pic, size.Width < 200 ? new Size(200, size.Height * 200 / size.Width) : size);
 
             SetUp(image.Size);
-            //SetColor(image);
+            SetColor();
 
             return image;
+        }
+        
+        private void SetColor()
+        {
+            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : WhiteBrush;
+            FrameColor = UseGivenColor ? new Pen(GivenColor, 2)     : White;
         }
 
         public static Size FitSize(Size s, int max = 720)

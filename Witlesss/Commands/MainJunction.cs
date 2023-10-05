@@ -13,6 +13,7 @@ namespace Witlesss.Commands
         private readonly MakeMeme _meme = new();
         private readonly AddCaption _whenthe = new();
         private readonly Demotivate _demotivate = new();
+        private readonly Demotivate3000 _dp = new();
         private readonly RemoveBitrate _bitrate = new();
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
@@ -45,7 +46,7 @@ namespace Witlesss.Commands
 
         public MainJunction() => _mematics = new MemeProcessors
         {
-            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }
+            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }, { MemeType.Dp, _dp }
         };
 
         private static bool TextIsCommand(out string command)
@@ -130,7 +131,8 @@ namespace Witlesss.Commands
 
         private bool DoWitlessCommands(string command)
         {
-            if      (CommandIs( "/dg"        )) _wc = _demotivate.SetUp(DgMode.Square);
+            if      (CommandIs( "/dp"        )) _wc = _dp;
+            else if (CommandIs( "/dg"        )) _wc = _demotivate.SetUp(DgMode.Square);
             else if (CommandIs( "/dv"        )) _wc = _demotivate.SetUp(DgMode.Wide);
             else if (CommandIs( "/meme"      )) _wc = _meme;
             else if (CommandIs( "/top"       )) _wc = _whenthe;

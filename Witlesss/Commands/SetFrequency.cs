@@ -38,10 +38,25 @@ namespace Witlesss.Commands
                         t = true;
                     }
                 }
-                else if (Regex.IsMatch(w, @"^[DdДд]"))
+                else if (Regex.IsMatch(w, @"^[DdДд][GgГг]"))
                 {
                     Baka.Meme.Type = MemeType.Dg;
                     t = true;
+                }
+                else if (Regex.IsMatch(w, @"^[DdДд]"))
+                {
+                    if (s.Length > 2)
+                    {
+                        command = "/dp";
+                        Baka.Meme.OptionsD = s[2] == "0" ? null : command + s[2];
+                        result = Baka.Meme.OptionsD ?? command;
+                        o = true;
+                    }
+                    else
+                    {
+                        Baka.Meme.Type = MemeType.Dp;
+                        t = true;
+                    }
                 }
                 else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))
                 {
@@ -80,9 +95,10 @@ namespace Witlesss.Commands
         
         private static readonly Dictionary<MemeType, string> types = new()
         {
-            { MemeType.Meme, "мемы"         },
-            { MemeType.Dg,   "демотивоторы" },
-            { MemeType.Top,  "подписанки"   }
+            { MemeType.Meme, "мемы"           },
+            { MemeType.Dg,   "демотивоторы"   },
+            { MemeType.Top,  "подписанки"     },
+            { MemeType.Dp,   "демотивоторы-B" }
         };
     }
 }

@@ -11,7 +11,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
     public class DynamicDemotivatorDrawer
     {
         // color font[times/rg] weight[bold/regular]
-        public static bool UseImpact, UseRoboto = true, UseBoldFont = true;
+        public static bool UseImpact = true, UseRoboto, UseBoldFont = true;
         public static bool CropEdges;
 
         private const int FM = 5;
@@ -128,7 +128,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         {
             var emoji = EmojiRegex.Matches(text);
             var funny = emoji.Count > 0;
-            var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRoboto ? "aa" : "НН") : text; // todo find correct letters
+            var textM = funny ? EmojiTool.ReplaceEmoji(text, GetEmojiReplacement()) : text; // todo find correct letters
 
             AdjustProportions(textM, out var width);
 
@@ -166,6 +166,8 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         private int EmojiSize => (int)(_sans.Size * 1.5);
 
         private SolidBrush TextColor => new(Color.White);
+
+        private string GetEmojiReplacement() => UseRoboto ? "aa" : UseImpact ? "НН" : UseBoldFont ? "гм" : "мя";
 
         private void AdjustProportions(string text, out int width)
         {

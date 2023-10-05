@@ -124,7 +124,7 @@ namespace Witlesss
                 {
                     if (File.Exists(witless.Path) && SizeInBytes(witless.Path) > size)
                     {
-                        Bot.SendMessage(witless.Chat, message);
+                        Bot.SendMessage(witless.Chat, message, preview: false);
                         Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
                     }
                 }

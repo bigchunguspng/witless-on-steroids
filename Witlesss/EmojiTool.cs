@@ -17,7 +17,8 @@ namespace Witlesss
     {
         public MemeType MemeType { get; init; }
 
-        private bool Dg => MemeType == MemeType.Dg;
+        private bool Dg  => MemeType == MemeType.Dg;
+        private bool Top => MemeType == MemeType.Top;
 
         private static readonly StringFormat[] Formats = new[]
         {
@@ -74,6 +75,7 @@ namespace Witlesss
                     if (xd.EndsWith(".png"))
                     {
                         var image = new Bitmap(Image.FromFile(xd), p.EmojiSize);
+                        graphics.FillRectangle(new SolidBrush(Color.Chartreuse), new Rectangle(new Point(x, y), p.EmojiSize));
                         graphics.DrawImage(image, x, y);
                         MoveX(p.EmojiS);
                     }
@@ -88,36 +90,49 @@ namespace Witlesss
 
             void DoText(string s)
             {
+                s = s.TrimEnd(); // todo test
+                
                 var rest = w - x;
-                var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
-                var width = l > 1 ? rest : (int) Math.Min(ms.Width, rest);
-
-                if (width < rest) DrawSingleLineText(Formats[0]);
-                else if      (Dg) DrawSingleLineText(Formats[3]);
+                if (rest == 0)
+                {
+                    CR();
+                    DoText(s);
+                }
                 else
                 {
-                    var format = Formats[1];
-                    var layout = new RectangleF(x, y, rest, h);
-                    ms = graphics.MeasureString(s, p.Font,   layout.Size, format, out var chars, out _); // w - x
-                    _  = graphics.MeasureString(s, p.Font, p.Layout.Size, format, out var cw,    out _); // w
-                    var start = (int)(Math.Max(0.66f - x / p.Layout.Width, 0) * cw);
-                    var space = s[start..cw].Contains(' ');
-                    var index = s[..chars].LastIndexOf(' ');
-                    var cr = index < 0;
-                    var trim = space ? cr ? "" : s[..index] : s[..chars];
-                    layout.Width = ms.Width;
-                    graphics.DrawString(trim, p.Font, p.Color, layout, format);
-                    MoveX((int)graphics.MeasureString(trim, p.Font).Width);
-                    var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
-                    CR();
-                    DoText(next);
-                }
+                    var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
+                    var width = l > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
-                void DrawSingleLineText(StringFormat format)
-                {
-                    var layout = new RectangleF(x, y, width, h);
-                    graphics.DrawString(s, p.Font, p.Color, layout, format);
-                    MoveX(width);
+                    if (width < rest) DrawSingleLineText(Formats[0]);
+                    else if      (Dg) DrawSingleLineText(Formats[3]);
+                    else
+                    {
+                        var format = Formats[1];
+                        var layout = new RectangleF(x, y, rest, h);
+                        _ = graphics.MeasureString(s, p.Font,   layout.Size, format, out var chars, out _); // w - x
+                        _ = graphics.MeasureString(s, p.Font, p.Layout.Size, format, out var cw,    out _); // w
+                        var start = (int)(Math.Max(0.66f - x / p.Layout.Width, 0) * cw);
+                        var space = s[start..cw].Contains(' ');
+                        var index = s[..chars].LastIndexOf(' ');
+                        var cr = index < 0;
+                        var trim = space ? cr ? "" : s[..index] : s[..chars];
+                        ms = graphics.MeasureString(trim, p.Font, layout.Size, format); // todo test
+                        layout.Width = ms.Width;
+                        graphics.FillRectangle(new SolidBrush(Color.Crimson), layout);
+                        graphics.DrawString(trim, p.Font, p.Color, layout, format);
+                        MoveX((int)graphics.MeasureString(trim, p.Font).Width);
+                        var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
+                        CR();
+                        DoText(next);
+                    }
+
+                    void DrawSingleLineText(StringFormat format)
+                    {
+                        var layout = new RectangleF(x, y, width, h);
+                        graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
+                        graphics.DrawString(s, p.Font, p.Color, layout, format);
+                        MoveX(width);
+                    }
                 }
             }
             void MoveX(int o)
@@ -137,7 +152,7 @@ namespace Witlesss
 
             void RenderLine()
             {
-                var offset = !Dg && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X : (w - max) / 2;
+                var offset = Top && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X : (w - max) / 2;
                 g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m));
                 graphics.Clear(Color.Transparent);
             }

@@ -26,7 +26,7 @@ public class DynamicDemotivatorDrawer
     private bool shortText;
     public  void PassTextLength(string text) => shortText = text.Length < 8;
 
-    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
+    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dm };
     private static readonly Pen White = new(Color.White, 2);
     
     
@@ -75,15 +75,15 @@ public class DynamicDemotivatorDrawer
     private Image MakeFrame(Image caption)
     {
         Image background = new Bitmap(full_w, full_h);
-        using var graphics = Graphics.FromImage(background);
+        using var g = Graphics.FromImage(background);
 
-        graphics.CompositingMode = CompositingMode.SourceCopy;
-        graphics.Clear(Color.Black);
+        g.CompositingMode = CompositingMode.SourceCopy;
+        g.Clear(Color.Black);
 
-        graphics.CompositingMode = CompositingMode.SourceOver;
-        graphics.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
+        g.CompositingMode = CompositingMode.SourceOver;
+        g.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
         
-        graphics.DrawRectangle(White, _frame);
+        g.DrawRectangle(White, _frame);
 
         return background;
     }
@@ -118,8 +118,7 @@ public class DynamicDemotivatorDrawer
             var p = new TextParams(62, EmojiSize, _sans, TextColor, area, _format);
             var h = (int)graphics.MeasureString(textM, _sans, area.Size, _format, out _, out var lines).Height;
             var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
-            var d = txt_h - h;
-            txt_h = h * l / lines + d; // i guess ???
+            txt_h = txt_h - h + h * l / lines;
             AdjustTotalSize();
             AdjustImageFrame();
         }

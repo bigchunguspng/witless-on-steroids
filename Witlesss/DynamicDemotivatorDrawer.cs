@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Linq;
 using Witlesss.MediaTools;
 
 namespace Witlesss; // ReSharper disable InconsistentNaming
@@ -9,7 +10,8 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 public class DynamicDemotivatorDrawer
 {
     // color font[times/rg] weight[bold/regular]
-    public static bool UseImpact = true, UseRoboto = true, UseBoldFont;
+    public static bool UseImpact, UseRoboto = true, UseBoldFont = true;
+    public static bool CropEdges;
 
     private const int FM = 5;
 
@@ -22,7 +24,7 @@ public class DynamicDemotivatorDrawer
     private Rectangle _frame;
 
     private readonly Pen White = new(Color.White, 2);
-    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dm };
+    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
 
     // /
 
@@ -69,15 +71,36 @@ public class DynamicDemotivatorDrawer
     private Image PasteImage(Image background, Image image)
     {
         using var g = Graphics.FromImage(background);
-        
+
         g.DrawImage(image, _pic);
-        
-        return background;
+
+        var size = FitSize(background.Size, 1280);
+
+        return size == background.Size ? background : new Bitmap(background, size);
     }
 
     /// <summary> Makes a FRAME and adds TEXT</summary>
     private Image MakeFrame(Image caption)
     {
+        var safe_w = 1.5f * img_w;
+        if (caption.Width > safe_w) // can happen to "long" pictures with long text
+        {
+            var k = safe_w / caption.Width;
+            caption = new Bitmap(caption, new Size((int)safe_w, (int)(caption.Height * k)));
+
+            txt_h = caption.Height;
+            AdjustTotalSize();
+            AdjustImageFrame();
+        }
+
+        if (CropEdges && ratio > 1)
+        {
+            var offset = (full_w - caption.Width) / 2;
+            _pic  .X -= offset;
+            _frame.X -= offset;
+            full_w = caption.Width;
+        }
+        
         Image background = new Bitmap(full_w, full_h);
         using var g = Graphics.FromImage(background);
 
@@ -86,11 +109,12 @@ public class DynamicDemotivatorDrawer
 
         g.CompositingMode = CompositingMode.SourceOver;
         
-        if (caption.Width > full_w) // can happen to "tall" pictures with long ah copypastas
+        if (caption.Width > full_w) // can happen to "tall" pictures with long text
         {
             var k = full_w / (float)caption.Width;
             caption = new Bitmap(caption, new Size(full_w, (int)(caption.Height * k)));
         }
+        
         g.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
         
         g.DrawRectangle(White, _frame);
@@ -149,10 +173,12 @@ public class DynamicDemotivatorDrawer
 
         using var g = Graphics.FromHwnd(IntPtr.Zero);
         var initial_w = TextWidth;
-        var area = new SizeF(initial_w, txt_h * 2);
+        var rows = Math.Max(text.Count(c => c == '\n'), 1) + 1;
+        var height = txt_h * rows / 2;
+        var area = new SizeF(initial_w, height * 2 * ratio);
         int lines;
         
-        if (!text.Contains('\n'))
+        if (true /*!text.Contains('\n')*/)
         {
             MeasureString();
             if (lines == 1) return; // max size + text fits + single line
@@ -161,7 +187,7 @@ public class DynamicDemotivatorDrawer
             MeasureString();
             if (lines == 1) return; // 0.6 size + text fits + single line
             
-            while (_sans.Size > MinFontSize && measure.Height > txt_h)
+            while (_sans.Size > MinFontSize && measure.Height > height)
             {
                 ResizeFont(_sans.Size * 0.8f);
                 MeasureString();
@@ -179,8 +205,19 @@ public class DynamicDemotivatorDrawer
 
             width = TextWidth;
 
-            txt_h = (int)(txt_h * initial_w / (float)TextWidth);
-            txt_h = (int)(txt_h + _sans.Size * 1.4f);
+            area.Width = width;
+            MeasureString();
+
+            if (lines > 3)
+            {
+                txt_h = (int)(measure.Height + _sans.Size * 1.4f * Math.Pow(lines, 0.28));
+            }
+            else
+            {
+                txt_h = (int)(txt_h * initial_w / (float)TextWidth);
+                txt_h = (int)(txt_h + _sans.Size * 1.4f);
+            }
+            
             AdjustTotalSize();
             AdjustImageFrame();
         }

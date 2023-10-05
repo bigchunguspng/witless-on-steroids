@@ -24,7 +24,7 @@ public class DynamicDemotivatorDrawer
     private SizeF _measure;
 
     private bool shortText;
-    public  void CheckTextLength(string text) => shortText = text.Length < 8;
+    public  void PassTextLength(string text) => shortText = text.Length < 8;
 
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
     private static readonly Pen White = new(Color.White, 2);
@@ -48,35 +48,20 @@ public class DynamicDemotivatorDrawer
         _fonts.AddFontFile(Config.FontRegular);
     }
     
-    
+    public string BakeFrame(string text) => JpegCoder.SaveImageTemp(MakeFrame(DrawText(text)));
+
     public string DrawDemotivator(string path, string text)
     {
-        CheckTextLength(text);
+        PassTextLength(text);
 
         var image = GetImage(path);
-        var funny = DrawText(text); // draws only text block
+        var funny = DrawText(text);
 
-        var frame = CombineFrame(funny);
+        var frame = MakeFrame(funny);
 
         return JpegCoder.SaveImage(PasteImage(frame, image), PngJpg.Replace(path, "-Dg.jpg"));
     }
     
-    private Image CombineFrame(Image funny)
-    {
-        Image background = new Bitmap(full_w, full_h);
-        using var graphics = Graphics.FromImage(background);
-
-        graphics.CompositingMode = CompositingMode.SourceCopy;
-        graphics.Clear(Color.Black);
-
-        graphics.CompositingMode = CompositingMode.SourceOver;
-        graphics.DrawImage(funny, new Point((full_w - funny.Width) / 2, mg_top + img_h + FM));
-        
-        graphics.DrawRectangle(White, _frame);
-
-        return background;
-    }
-
     private Image PasteImage(Image background, Image image)
     {
         using var g = Graphics.FromImage(background);
@@ -86,12 +71,24 @@ public class DynamicDemotivatorDrawer
         return background;
     }
 
-    private int InitialMargin(int h) => (txt_h - h) / 2;
-    private int Spacing   => (int)(_sans.Size * 1.6);
-    private int EmojiSize => (int)(_sans.Size * 1.5);
+    /// <summary> Makes a FRAME and adds TEXT</summary>
+    private Image MakeFrame(Image caption)
+    {
+        Image background = new Bitmap(full_w, full_h);
+        using var graphics = Graphics.FromImage(background);
 
-    private SolidBrush TextColor => new(Color.White);
+        graphics.CompositingMode = CompositingMode.SourceCopy;
+        graphics.Clear(Color.Black);
 
+        graphics.CompositingMode = CompositingMode.SourceOver;
+        graphics.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
+        
+        graphics.DrawRectangle(White, _frame);
+
+        return background;
+    }
+
+    /// <summary> Draws ONLY a black box with a text </summary>
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);
@@ -131,6 +128,12 @@ public class DynamicDemotivatorDrawer
         return image;
     }
 
+    private int InitialMargin(int h) => (txt_h - h) / 2;
+    private int Spacing   => (int)(_sans.Size * 1.6);
+    private int EmojiSize => (int)(_sans.Size * 1.5);
+
+    private SolidBrush TextColor => new(Color.White);
+
     private void AdjustProportions(string text, out int width)
     {
         width = 0;
@@ -151,7 +154,7 @@ public class DynamicDemotivatorDrawer
             
             while (_sans.Size > MinFontSize && _measure.Height > txt_h)
             {
-                ResizeFont(_sans.Size * 0.5f);
+                ResizeFont(_sans.Size * 0.8f);
                 MeasureString();
             }
             

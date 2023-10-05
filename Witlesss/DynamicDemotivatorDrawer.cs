@@ -4,50 +4,54 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using Witlesss.MediaTools;
 
-using static System.Drawing.StringAlignment;
-
 namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class DynamicDemotivatorDrawer
 {
     // color font[times/rg] weight[bold/regular]
-    public static bool UseRegularFont = true, UseBoldFont = true;
-    
+    public static bool UseImpact = true, UseRoboto = true, UseBoldFont;
+
     private const int FM = 5;
 
-    private int img_w, img_h, txt_h, full_w, full_h;
-    private int mg_top;
+    private int TextWidth => (full_w + img_w) / 2;
+
+    private int img_w, img_h, txt_h, full_w, full_h, mg_top;
     private float ratio;
-    private Rectangle _frame;
+
     private Point _pic;
-    
-    private SizeF _measure;
+    private Rectangle _frame;
 
-    private bool shortText;
-    public  void PassTextLength(string text) => shortText = text.Length < 8;
-
+    private readonly Pen White = new(Color.White, 2);
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dm };
-    private static readonly Pen White = new(Color.White, 2);
-    
-    
-    private static readonly PrivateFontCollection _fonts = new();
-    private static FontFamily FontFamily => UseRegularFont ? _fonts.Families[0] : new FontFamily(DEMOTIVATOR_UPPER_FONT);
-    private static Font _sans;
-    private static readonly StringFormat _format = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
 
-    private float StartingFontSize => img_w * (shortText ? 0.15f : 0.1f);
-    private float MinFontSize => Math.Max(img_w * 0.03f, 12);
+    // /
 
-    private void SetFontToDefault() => ResizeFont(StartingFontSize);
-
-    private void ResizeFont(float size) => _sans = new(FontFamily, Math.Max(MinFontSize, size), UseBoldFont ? FontStyle.Bold : FontStyle.Regular);
-
-
-    static DynamicDemotivatorDrawer()
+    private readonly StringFormat _format = new()
     {
-        _fonts.AddFontFile(Config.FontRegular);
-    }
+        Alignment     = StringAlignment.Center,
+        LineAlignment = StringAlignment.Center,
+        Trimming      = StringTrimming.Word
+    };
+    private readonly FontFamily[] _fonts = new[]
+    {
+        new FontFamily(DEMOTIVATOR_UPPER_FONT), new FontFamily("Roboto"), new FontFamily("Impact") 
+    };
+    private FontFamily FontFamily => _fonts[UseImpact ? 2 : UseRoboto ? 1 : 0];
+    private Font _sans;
+
+    private void ResizeFont(float size) => _sans = new(FontFamily, Math.Max(MinFontSize, size), FontStyle);
+    private void SetFontSizeToDefault() => ResizeFont(StartingFontSize);
+
+    private bool text_is_short;
+    public  void PassTextLength(string text) => text_is_short = text.Length < 8;
+
+    private float StartingFontSize => img_w * (text_is_short ? 0.15f : 0.1f);
+    private float MinFontSize => Math.Max(img_w * 0.03f, 12);
     
+    private FontStyle FontStyle => UseBoldFont ? FontStyle.Bold : FontStyle.Regular;
+
+    // /
+
     public string BakeFrame(string text) => JpegCoder.SaveImageTemp(MakeFrame(DrawText(text)));
 
     public string DrawDemotivator(string path, string text)
@@ -99,12 +103,11 @@ public class DynamicDemotivatorDrawer
     {
         var emoji = EmojiRegex.Matches(text);
         var funny = emoji.Count > 0;
-        var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRegularFont ? "aa" : "НН") : text; // todo find correct letters
+        var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRoboto ? "aa" : "НН") : text; // todo find correct letters
 
         AdjustProportions(textM, out var width);
-        //AdjustTextPosition(text);
 
-        var height = funny ? txt_h * 2 : txt_h; // probably this fixes visibility of the last emoji-text line
+        var height = funny ? txt_h * 2 : txt_h;
         width = width == 0 ? TextWidth : width;
 
         var area = new RectangleF(0, 0, width, height);
@@ -141,7 +144,8 @@ public class DynamicDemotivatorDrawer
 
     private void AdjustProportions(string text, out int width)
     {
-        width = 0;
+        width = 0; 
+        SizeF measure;
 
         using var g = Graphics.FromHwnd(IntPtr.Zero);
         var initial_w = TextWidth;
@@ -157,7 +161,7 @@ public class DynamicDemotivatorDrawer
             MeasureString();
             if (lines == 1) return; // 0.6 size + text fits + single line
             
-            while (_sans.Size > MinFontSize && _measure.Height > txt_h)
+            while (_sans.Size > MinFontSize && measure.Height > txt_h)
             {
                 ResizeFont(_sans.Size * 0.8f);
                 MeasureString();
@@ -170,7 +174,7 @@ public class DynamicDemotivatorDrawer
                 MeasureString();
             }
             
-            txt_h = (int)(_measure.Height + _sans.Size * 1.4f);
+            txt_h = (int)(measure.Height + _sans.Size * 1.4f);
             AdjustTotalSize();
 
             width = TextWidth;
@@ -179,9 +183,9 @@ public class DynamicDemotivatorDrawer
             txt_h = (int)(txt_h + _sans.Size * 1.4f);
             AdjustTotalSize();
             AdjustImageFrame();
-            
         }
-        void MeasureString() => _measure = g.MeasureString(text, _sans, area, _format, out _, out lines);
+
+        void MeasureString() => measure = g.MeasureString(text, _sans, area, _format, out _, out lines);
     }
 
     private Image GetImage(string path)
@@ -208,7 +212,7 @@ public class DynamicDemotivatorDrawer
 
         ratio = img_w / (float)img_h;
 
-        SetFontToDefault();
+        SetFontSizeToDefault();
 
         mg_top = (int)(img_h * 0.06f);
         txt_h  = (int)(_sans.Size * 2.4f); // 75 -> 180
@@ -228,6 +232,4 @@ public class DynamicDemotivatorDrawer
         _pic = new Point((full_w - img_w) / 2, mg_top + 1);
         _frame = new Rectangle(_pic.X - FM, _pic.Y - FM, img_w + 2 * FM, img_h + 2 * FM);
     }
-
-    private int TextWidth => (full_w + img_w) / 2;
 }

@@ -11,7 +11,7 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 public class DynamicDemotivatorDrawer
 {
     // color font[times/rg] weight[bold/regular]
-    public static bool UseRegularFont, UseBoldFont;
+    public static bool UseRegularFont = true, UseBoldFont = true;
     
     private const int FM = 5;
 
@@ -40,7 +40,7 @@ public class DynamicDemotivatorDrawer
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize);
 
-    private void ResizeFont(float size) => _sans = new(FontFamily, Math.Max(MinFontSize, size));
+    private void ResizeFont(float size) => _sans = new(FontFamily, Math.Max(MinFontSize, size), UseBoldFont ? FontStyle.Bold : FontStyle.Regular);
 
 
     static DynamicDemotivatorDrawer()
@@ -81,6 +81,12 @@ public class DynamicDemotivatorDrawer
         g.Clear(Color.Black);
 
         g.CompositingMode = CompositingMode.SourceOver;
+        
+        if (caption.Width > full_w) // can happen to "tall" pictures with long ah copypastas
+        {
+            var k = full_w / (float)caption.Width;
+            caption = new Bitmap(caption, new Size(full_w, (int)(caption.Height * k)));
+        }
         g.DrawImage(caption, new Point((full_w - caption.Width) / 2, mg_top + img_h + FM));
         
         g.DrawRectangle(White, _frame);

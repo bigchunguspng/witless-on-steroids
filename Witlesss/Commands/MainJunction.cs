@@ -13,7 +13,7 @@ namespace Witlesss.Commands
         private readonly MakeMeme _meme = new();
         private readonly AddCaption _whenthe = new();
         private readonly Demotivate _demotivate = new();
-        private readonly Demotivate3000 _dp = new();
+        private readonly DemotivateProportional _dp = new();
         private readonly RemoveBitrate _bitrate = new();
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
-    public class Demotivate3000 : MakeMemeCore<string>, ImageProcessor
+    public class DemotivateProportional : MakeMemeCore<string>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*) *", RegexOptions.IgnoreCase);
 
@@ -21,7 +21,7 @@ namespace Witlesss.Commands
             return this;
         }
 
-        public override void Run() => Run("Демотиваторы-B");
+        public override void Run() => Run("Демотиваторы");
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeDemotivatorB);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeStickerDemotivatorB);

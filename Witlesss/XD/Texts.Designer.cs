@@ -614,18 +614,16 @@ namespace Witlesss.XD {
         ///
         ///&lt;u&gt;Изменить тип авто-мемов&lt;/u&gt;:
         ///
-        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
-        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы
-        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
+        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt; - демотиваторы
+        ///&lt;code&gt;/set@piece_fap_bot M &lt;/code&gt; - мемы
+        ///&lt;code&gt;/set@piece_fap_bot T &lt;/code&gt; - подписанки
+        ///&lt;code&gt;/set@piece_fap_bot D &lt;/code&gt; - демотиваторы-B
         ///
         ///&lt;u&gt;Изменить опции в мемчиках по умолчанию&lt;/u&gt;:
         ///
         ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-        ///
-        ///&lt;u&gt;Изменить частоту появления мемов&lt;/u&gt;:
-        ///
-        /// /pics@piece_fap [rest of string was truncated]&quot;;.
+        ///&lt;code [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {

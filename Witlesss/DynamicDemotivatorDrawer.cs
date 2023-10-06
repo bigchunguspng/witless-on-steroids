@@ -93,7 +93,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
                 var k = safe_w / caption.Width;
                 caption = new Bitmap(caption, new Size((int)safe_w, (int)(caption.Height * k)));
 
-                txt_h = caption.Height;
+                txt_h = (int)(txt_h * k);
                 AdjustTotalSize();
                 AdjustImageFrame();
             }
@@ -143,9 +143,13 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
             var image = new Bitmap(width, height);
             using var graphics = Graphics.FromImage(image);
-        
+
+#if DEBUG
+            graphics.Clear(Color.Indigo);
+#else
             graphics.Clear(Color.Black);
-        
+#endif
+
             graphics.CompositingMode    = CompositingMode.SourceOver;
             graphics.CompositingQuality = CompositingQuality.HighQuality;
             graphics.PixelOffsetMode    = PixelOffsetMode.HighQuality;

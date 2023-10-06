@@ -54,9 +54,10 @@ namespace Witlesss.Commands
             
             var caps                             = !empty &&    _caps.IsMatch(dummy);
 
-            var txt = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+            var gen = string.IsNullOrEmpty(text);
+            var txt = gen ? Baka.Generate() : text;
 
-            return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
+            return caps && (gen || txt.Length > 50) ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
         private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S* *",            RegexOptions.IgnoreCase);

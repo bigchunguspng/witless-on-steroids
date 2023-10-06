@@ -25,9 +25,9 @@ namespace Witlesss.Commands
         private readonly Dictionary<MemeType, string> types = new()
         {
             { MemeType.Meme, "стают мемами"     },
-            { MemeType.Dg,   "демотивируются"   },
+            { MemeType.Dg,   "демотивируются💀" },
             { MemeType.Top,  "обретают подпись" },
-            { MemeType.Dp,   "демотивируются-B" }
+            { MemeType.Dp,   "демотивируются💀" }
         };
     }
 }

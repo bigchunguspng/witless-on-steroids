@@ -289,6 +289,22 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;im&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
+        ///&lt;code&gt;bb&lt;/code&gt; - жирный шрифт
+        ///&lt;code&gt;up&lt;/code&gt; - верхний регистр
+        ///&lt;code&gt;cp&lt;/code&gt; - обрезать лишние края
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет текста и рамки.
+        /// </summary>
+        internal static string DP_OPTIONS {
+            get {
+                return ResourceManager.GetString("DP_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Emoji.
         /// </summary>
         internal static string EMOJI_FOLDER {
@@ -454,7 +470,7 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;{0} я делаю из&lt;/u&gt;:
+        ///   Looks up a localized string similar to &lt;u&gt;&lt;b&gt;{0} я делаю из&lt;/b&gt;&lt;/u&gt;:
         ///
         ///• картинок 📸, стикеров 🎟
         ///• видео 🎬, гифок🪣
@@ -466,6 +482,23 @@ namespace Witlesss.XD {
         internal static string MEME_MANUAL {
             get {
                 return ResourceManager.GetString("MEME_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;i&lt;/code&gt; - курсив
+        ///&lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
+        ///&lt;code&gt;d&lt;/code&gt; - только нижний текст
+        ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст
+        ///&lt;code&gt;w&lt;/code&gt; - не разрывать текст
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет плашки.
+        /// </summary>
+        internal static string MEME_OPTIONS {
+            get {
+                return ResourceManager.GetString("MEME_OPTIONS", resourceCulture);
             }
         }
         
@@ -614,16 +647,16 @@ namespace Witlesss.XD {
         ///
         ///&lt;u&gt;Изменить тип авто-мемов&lt;/u&gt;:
         ///
-        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt; - демотиваторы
-        ///&lt;code&gt;/set@piece_fap_bot M &lt;/code&gt; - мемы
-        ///&lt;code&gt;/set@piece_fap_bot T &lt;/code&gt; - подписанки
-        ///&lt;code&gt;/set@piece_fap_bot D &lt;/code&gt; - демотиваторы-B
+        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
+        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
+        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы👌
+        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt; - демотиваторы💀
         ///
         ///&lt;u&gt;Изменить опции в мемчиках по умолчанию&lt;/u&gt;:
         ///
         ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-        ///&lt;code [rest of string was truncated]&quot;;.
+        ///&lt;code&gt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -653,8 +686,9 @@ namespace Witlesss.XD {
         ///   Looks up a localized string similar to Выбрать тип авто-мемов:
         ///
         ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt;
         ///
         ///(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы / &lt;u&gt;т&lt;/u&gt;воё лицо когда...).
         /// </summary>
@@ -789,6 +823,28 @@ namespace Witlesss.XD {
         internal static string TEMP_FOLDER {
             get {
                 return ResourceManager.GetString("TEMP_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
+        ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
+        ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
+        ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета
+        ///&lt;code&gt;bb&lt;/code&gt; - чёрный фон (для стикеров)
+        ///&lt;code&gt;80%&lt;/code&gt; - обрезать 20% сверху
+        ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
+        ///&lt;code&gt;ms128&lt;/code&gt; - минимальный размер шрифта
+        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет плашки
+        ///&lt;code&gt;blur&lt;/code&gt; - лёгкое размытие 🎬.
+        /// </summary>
+        internal static string TOP_OPTIONS {
+            get {
+                return ResourceManager.GetString("TOP_OPTIONS", resourceCulture);
             }
         }
         

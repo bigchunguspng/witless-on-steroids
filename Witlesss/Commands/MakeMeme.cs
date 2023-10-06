@@ -21,7 +21,7 @@ namespace Witlesss.Commands
             return this;
         }
 
-        public override void Run() => Run("Мемы");
+        public override void Run() => Run("Мемы", MEME_OPTIONS);
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeMeme);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeMemeFromSticker);

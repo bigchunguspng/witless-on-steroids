@@ -118,7 +118,7 @@ namespace Witlesss
                         var index = s[..chars].LastIndexOf(' ');
                         var cr = index < 0;
                         var trim = space ? cr ? "" : s[..index] : s[..chars];
-                        ms = graphics.MeasureString(trim, p.Font, layout.Size, format); // todo test
+                        ms = graphics.MeasureString(trim, p.Font, layout.Size, format);
                         layout.Width = ms.Width;
 #if DEBUG
                         graphics.FillRectangle(new SolidBrush(Color.Crimson), layout);

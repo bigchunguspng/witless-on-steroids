@@ -21,7 +21,7 @@ namespace Witlesss.Commands
             return this;
         }
 
-        public override void Run() => Run("Демотиваторы");
+        public override void Run() => Run("Демотиваторы👌", DP_OPTIONS);
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeDemotivatorB);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeStickerDemotivatorB);

@@ -18,14 +18,15 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         protected abstract string Log_STICK { get; }
         protected abstract string VideoName { get; }
 
-        protected void Run(string type)
+        protected void Run(string type, string options = null)
         {
             JpegCoder.PassQuality(Baka);
 
             var x = Message.ReplyToMessage;
             if (ProcessMessage(Message) || ProcessMessage(x)) return;
 
-            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type));
+            var message = string.Format(MEME_MANUAL, type);
+            Bot.SendMessage(Chat, options is null ? message : $"{message}\n\n{options}");
         }
 
         private bool ProcessMessage(Message mess)

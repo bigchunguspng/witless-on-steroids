@@ -96,9 +96,9 @@ namespace Witlesss.Commands
         private static readonly Dictionary<MemeType, string> types = new()
         {
             { MemeType.Meme, "мемы"           },
-            { MemeType.Dg,   "демотиваторы"   },
+            { MemeType.Dg,   "демотиваторы💀" },
             { MemeType.Top,  "подписанки"     },
-            { MemeType.Dp,   "демотиваторы-B" }
+            { MemeType.Dp,   "демотиваторы👌" }
         };
     }
 }

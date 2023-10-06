@@ -8,10 +8,10 @@ namespace Witlesss.Commands
     {
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*) *", RegexOptions.IgnoreCase);
 
-        protected override string Log_PHOTO(int x) => $"EMOTIVATOR [{(x == 1 ? "_" : x)}]";
+        protected override string Log_PHOTO(int x) => $"DEMOTIVATOR-B [{(x == 1 ? "_" : x)}]";
 
-        protected override string Log_VIDEO { get; } = "EMOTIVATOR [^] VID";
-        protected override string Log_STICK { get; } = "EMOTIVATOR [#] STICKER";
+        protected override string Log_VIDEO { get; } = "DEMOTIVATOR-B [^] VID";
+        protected override string Log_STICK { get; } = "DEMOTIVATOR-B [#] STICKER";
         protected override string VideoName { get; } = "piece_fap_club-dp.mp4";
 
         public ImageProcessor SetUp(int w, int h)

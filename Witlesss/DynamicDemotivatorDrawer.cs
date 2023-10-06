@@ -271,8 +271,6 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
             mg_top = (int)Math.Max(img_h * 0.06f, 12);
             txt_h  = (int)(_sans.Size * 2.4f); // 75 -> 180
-            
-            Log($"h: {img_h}, w: {img_w}, mg: {mg_top}");
 
             AdjustTotalSize();
             AdjustImageFrame();

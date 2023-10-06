@@ -52,13 +52,18 @@ namespace Witlesss.Commands
             DynamicDemotivatorDrawer.UseBoldFont = !empty &&    _bold.IsMatch(dummy);
             DynamicDemotivatorDrawer.CropEdges   = !empty &&    _crop.IsMatch(dummy);
             
-            return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+            var caps                             = !empty &&    _caps.IsMatch(dummy);
+
+            var txt = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+
+            return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
         private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _impact  = new(@"^\/dp\S*im\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _bold    = new(@"^\/dp\S*bd\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _bold    = new(@"^\/dp\S*bb\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/dp\S*cp\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _caps    = new(@"^\/dp\S*up\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/dp\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
     }
 }

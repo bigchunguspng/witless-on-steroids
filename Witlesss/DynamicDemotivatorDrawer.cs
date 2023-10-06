@@ -27,6 +27,8 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         private Point _pic;
         private Rectangle _frame;
 
+        public  Point Location => _pic;
+
         private readonly Pen White = new(Color.White, 2);
         private readonly SolidBrush WhiteBrush = new(Color.White);
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
@@ -100,10 +102,11 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
             if (CropEdges && ratio > 1)
             {
-                var offset = (full_w - caption.Width) / 2;
+                var cap_w = FF_Extensions.ToEven(caption.Width);
+                var offset = (full_w - cap_w) / 2;
                 _pic  .X -= offset;
                 _frame.X -= offset;
-                full_w = caption.Width;
+                full_w = cap_w;
             }
         
             Image background = new Bitmap(full_w, full_h);
@@ -132,7 +135,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         {
             var emoji = EmojiRegex.Matches(text);
             var funny = emoji.Count > 0;
-            var textM = funny ? EmojiTool.ReplaceEmoji(text, GetEmojiReplacement()) : text; // todo find correct letters
+            var textM = funny ? EmojiTool.ReplaceEmoji(text, GetEmojiReplacement()) : text;
 
             AdjustProportions(textM, out var width);
 
@@ -245,16 +248,16 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
             return image;
         }
-        
-        private void SetColor()
-        {
-            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : WhiteBrush;
-            FrameColor = UseGivenColor ? new Pen(GivenColor, 2)     : White;
-        }
 
         public static Size FitSize(Size s, int max = 720)
         {
             return s.Width > max || s.Height > max ? Memes.NormalizeSize(s, max) : s;
+        }
+        
+        public void SetColor()
+        {
+            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : WhiteBrush;
+            FrameColor = UseGivenColor ? new Pen(GivenColor, 2)     : White;
         }
     
         public void SetUp(Size size)
@@ -266,8 +269,10 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 
             SetFontSizeToDefault();
 
-            mg_top = (int)(img_h * 0.06f);
+            mg_top = (int)Math.Max(img_h * 0.06f, 12);
             txt_h  = (int)(_sans.Size * 2.4f); // 75 -> 180
+            
+            Log($"h: {img_h}, w: {img_w}, mg: {mg_top}");
 
             AdjustTotalSize();
             AdjustImageFrame();

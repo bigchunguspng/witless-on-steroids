@@ -52,8 +52,16 @@ namespace Witlesss
 
         public static string MakeVideoDemotivatorB(string path, string text)
         {
-            throw new NotImplementedException();
-            return new F_Overlay(_dp.BakeFrame(text), path).Demo(Quality, Drawer);
+            _dp.PassTextLength(text);
+
+            var size = GrowSize(GetSize(path));
+            _dp.SetUp(size);
+            _dp.SetColor();
+
+            var frame = _dp.BakeFrame(text);
+            var full_size = FitSize(GetSize(frame), 720);
+
+            return new F_Overlay(frame, path).D300(Quality, size, _dp.Location, full_size);
         }
 
 
@@ -136,12 +144,14 @@ namespace Witlesss
             return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
         }
 
-        private static Size GrowSize      (Size s, int minW = 256, int minH = 192)
+        private static Size GrowSize      (Size s, int minWH = 400)
         {
-            if (s.Width < minW || s.Height < minH)
+            if (s.Width + s.Height < minWH)
             {
-                var w = s.Width > s.Height;
-                s = NormalizeSize(s, w ? minH : minW, reduce: false);
+                var ratio = s.Width / (float)s.Height;
+                var wide = s.Width > s.Height;
+                var lim = (int)(minWH * ratio / (ratio + 1));
+                s = NormalizeSize(s, lim, reduce: wide); // lim = W
             }
 
             return ValidSize(s.Width, s.Height);

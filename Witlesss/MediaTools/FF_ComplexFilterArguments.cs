@@ -15,7 +15,7 @@ namespace Witlesss.MediaTools
         
         private const string PTS = "setpts=PTS-STARTPTS"; // fixes dissync when doing /sus with duration < 1s on video with audio channel
 
-        private static string Overlay (Point p) => $"overlay={p.X}:{p.Y}";
+        private static string Overlay (Point p) => $"overlay={p.X}:{p.Y}:format=rgb";
         private static string Scale    (Size s) => $"scale={s.Width}:{s.Height}";
         private static string Crop(Rectangle r) => $"crop={r.Width}:{r.Height}:{r.X}:{r.Y}";
         private static string Blur   (double b) => $"boxblur=1:{b}";

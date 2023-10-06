@@ -32,6 +32,10 @@ namespace Witlesss.MediaTools
         {
             return Overlay(SetOutName(_b, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p, blur));
         }
+        public string D300(int loss, Size s, Point p, Size size)
+        {
+            return Overlay(SetOutName(_b, "-Dp",  ".mp4"), o => { ArgsDemo(o, loss, s, p); o.Resize(size); });
+        }
 
         private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
         {

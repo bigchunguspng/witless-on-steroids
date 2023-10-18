@@ -455,6 +455,7 @@ s   - save and exit
 
 &lt;code&gt;la&lt;/code&gt; - текст по левому краю
 &lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+&lt;code&gt;sg&lt;/code&gt; - шрифт &lt;i&gt;Segoe UI Black&lt;/i&gt;
 &lt;code&gt;mm&lt;/code&gt; - тонкая плашка
 &lt;code&gt;ww&lt;/code&gt; - не разрывать текст
 &lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета
@@ -473,8 +474,8 @@ s   - save and exit
 &lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
 &lt;code&gt;t&lt;/code&gt; - только верхний текст
 &lt;code&gt;d&lt;/code&gt; - только нижний текст
-&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст
+&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст (к своему)
 &lt;code&gt;w&lt;/code&gt; - не разрывать текст
-&lt;code&gt;#color#&lt;/code&gt; - цвет плашки</value>
+&lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры)</value>
     </data>
 </root>

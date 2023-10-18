@@ -492,9 +492,9 @@ namespace Witlesss.XD {
         ///&lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
         ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
         ///&lt;code&gt;d&lt;/code&gt; - только нижний текст
-        ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст
+        ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст (к своему)
         ///&lt;code&gt;w&lt;/code&gt; - не разрывать текст
-        ///&lt;code&gt;#color#&lt;/code&gt; - цвет плашки.
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры).
         /// </summary>
         internal static string MEME_OPTIONS {
             get {
@@ -831,6 +831,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
         ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;sg&lt;/code&gt; - шрифт &lt;i&gt;Segoe UI Black&lt;/i&gt;
         ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
         ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
         ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета
@@ -839,8 +840,7 @@ namespace Witlesss.XD {
         ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
         ///&lt;code&gt;ms128&lt;/code&gt; - минимальный размер шрифта
         ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта
-        ///&lt;code&gt;#color#&lt;/code&gt; - цвет плашки
-        ///&lt;code&gt;blur&lt;/code&gt; - лёгкое размытие 🎬.
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет пла [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TOP_OPTIONS {
             get {

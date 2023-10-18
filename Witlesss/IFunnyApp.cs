@@ -11,7 +11,7 @@ namespace Witlesss; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRegularFont, UseLeftAlignment, MinimizeHeight, WrapText = true;
+    public static bool UseRegularFont, UseSegoe, UseLeftAlignment, MinimizeHeight, WrapText = true;
     public static bool PickColor, UseGivenColor, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
     public static Color GivenColor;
@@ -41,7 +41,8 @@ public class IFunnyApp
     }
 
     private static readonly PrivateFontCollection _fonts = new();
-    private static FontFamily FontFamily => _fonts.Families[UseRegularFont ? 1 : 0];
+    private static FontFamily FontFamily => UseSegoe ? SegoeBlack : _fonts.Families[UseRegularFont ? 1 : 0];
+    private static FontFamily SegoeBlack = new("Segoe UI Black");
     private static Font _sans;
     private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
     private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };

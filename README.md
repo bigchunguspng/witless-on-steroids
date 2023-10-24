@@ -1,17 +1,15 @@
-**нечёткие приколы (name subject to change)** - Telegram-bot made for fun; originally just a text-generator.
+### Capabilities 👌:
+- Random text generation 💬
+- Memes and demotivators 📸🎬
+- Simple video and audio editing 🎬🎧
+- Images to stickers 📸 -> 🎟
+- Videos to videonotes / GIFs
+- Searching for posts on **[Reddit]**
+- Downloading music from **[YouTube]** (in the best way possible 😎)
 
-### Capabilities:
-- Random text generation
-- Memes and demotivators 📸/🎬
-- Simple video and audio editing 🎬/🎧
-- Converting images to stickers 📸 --> 🎟
-- Converting videos to animations and videonotes
-- Searching for memes on **[Reddit]**
-- Downloading music from YouTube (in the best way ever 😎)
+Can be used in **group chats** as well as in **DMs**. Text generation is based on an enchanced [Markov chain] algorithm. Text generation pack for your chat can be extended by sending messages and by fusing it with other chats packs, with reddit comments, and with [exported chat history]. Frequency of text generation can be changed.
 
-Bot can be used in **group chats** as well as in **DMs**. Text generation algorithm is based on a slightly enchanced [Markov chain]. **Text generation pack** for a **specific chat** can be increased by sending messages and fusing it with other chats' packs, with reddit comments, and with [exported chat history]. Frequency of text generation can be changed.
-
-### Initial setup
+### Initial setup ⚙️
 - Have **ffmpeg binaries** and **yt-dlp.exe** locations added to **Path**.
 - Create in the working directory **config.txt** file (see example).
 - Create in the working directory **_Telegram-Arts\ASCII_** folder and drop there some _ASCII-arts.txt_.
@@ -21,11 +19,12 @@ Bot can be used in **group chats** as well as in **DMs**. Text generation algori
 
 `{ "_start": { "_start": 1.0 }, "_mid": { "_end": 1.0, "_start": 3.0 } }`
 
-### Main console commands
+### Main console commands 💬
 - **s** - saves all data and shuts bot down
 - **/** - lists all console commands
 - **/sp** - send the message from **spam.txt** file to all chats
 
 [Reddit]: <https://www.reddit.com/>
+[YouTube]: <https://youtu.be/dQw4w9WgXcQ>
 [Markov chain]: <https://en.wikipedia.org/wiki/Markov_chain>
 [exported chat history]: <https://www.maketecheasier.com/export-telegram-chat-history/>

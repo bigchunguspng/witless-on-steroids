@@ -61,62 +61,82 @@ namespace Witlesss.Commands
 
         private string GetPhotoFileID(Message message) => message?.Photo is { } p ? p[^1].FileId : null;
 
-        private async Task DownloadSongAsync(string id, string artist, string title, string options, string file, int message, bool yt, CommandParams cp)
+        private async Task DownloadSongAsync
+        (
+            string id,
+            string artist,
+            string title,
+            string options,
+            string file,
+            int message,
+            bool yt,
+            CommandParams cp,
+            int format = 251
+        )
         {
-            var timer = new StopWatch();
+            try
+            {
+                var timer = new StopWatch();
 
-            var hq = options.Contains('q'); // high quality
-            var no = options.Contains('n'); // name only
-            var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
-            var rb = options.Contains('c'); // remove brackets
-            var up = options.Contains('u'); // artist is uploader
-            var cs = options.Contains('s'); // crop thumbnail to a square
+                var hq = options.Contains('q'); // high quality
+                var no = options.Contains('n'); // name only
+                var xt = options.Contains('p'); // extract thumbnail (from video) (otherwise use youtube one)
+                var rb = options.Contains('c'); // remove brackets
+                var up = options.Contains('u'); // artist is uploader
+                var cs = options.Contains('s'); // crop thumbnail to a square
 
-            var aa = file is not null; // art attached
-            if (aa) xt = false;
+                var aa = file is not null; // art attached
+                if (aa) xt = false;
 
-            var audio = hq ? " --audio-quality 0" : "";
+                var audio = hq ? " --audio-quality 0" : "";
 
-            var url = yt ? _url_prefix + id : id;
+                var url = yt ? _url_prefix + id : id;
 
-            var output = $"{artist ?? (up ? "%(uploader)s" : "%(artist)s")} - {title ?? "%(title)s"} xd.%(ext)s";
-            var cmd_a = $"/C yt-dlp --no-mtime {(yt ? "-f 251 -k " : xt || aa ? "" : "--write-thumbnail ")}-x --audio-format mp3{audio} \"{url}\" -o \"{output}\"";
-            var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*{(yt ? "[height<=720][filesize<15M]" : "")}\" -k \"{url}\" -o \"video.%(ext)s\"" : null;
+                var output = $"{artist ?? (up ? "%(uploader)s" : "%(artist)s")} - {title ?? "%(title)s"} xd.%(ext)s";
+                var cmd_a = $"/C yt-dlp --no-mtime {(yt ? $"-f {format} -k " : xt || aa ? "" : "--write-thumbnail ")}-x --audio-format mp3{audio} \"{url}\" -o \"{output}\"";
+                var cmd_v = xt ? $"/C yt-dlp --no-mtime -f \"bv*{(yt ? "[height<=720][filesize<15M]" : "")}\" -k \"{url}\" -o \"video.%(ext)s\"" : null;
 
-            var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
-            Directory.CreateDirectory(dir);
+                var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
+                Directory.CreateDirectory(dir);
 
-            var thumb = $"{dir}/thumb.jpg";
-            var task_a =      RunCMD(cmd_a, dir);
-            var task_v = xt ? RunCMD(cmd_v, dir) : aa ? Bot.DownloadFile(file, thumb, cp.Chat) : yt ? GetGoodYouTubeThumbnail() : Task.CompletedTask;
-            await Task.WhenAll(task_a, task_v);
+                var thumb = $"{dir}/thumb.jpg";
+                var task_a =      RunCMD(cmd_a, dir);
+                var task_v = xt ? RunCMD(cmd_v, dir) : aa ? Bot.DownloadFile(file, thumb, cp.Chat) : yt ? GetGoodYouTubeThumbnail() : Task.CompletedTask;
+                await Task.WhenAll(task_a, task_v);
             
-            Task GetGoodYouTubeThumbnail() => Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(id, dir).Result);
+                Task GetGoodYouTubeThumbnail() => Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(id, dir).Result);
 
-            var resize = cs || aa || thumb.Contains("maxres");
+                var resize = cs || aa || thumb.Contains("maxres");
 
-            var di = new DirectoryInfo(dir);
-            var thumb_source = xt ? di.GetFiles("video.*"  )[0].FullName : yt || aa ? thumb : di.GetFiles("*.jpg")[0].FullName;
-            var audio_file   =      di.GetFiles(  "*xd.mp3")[0].FullName;
+                var di = new DirectoryInfo(dir);
+                var thumb_source = xt ? di.GetFiles("video.*"  )[0].FullName : yt || aa ? thumb : di.GetFiles("*.jpg")[0].FullName;
+                var audio_file   =      di.GetFiles(  "*xd.mp3")[0].FullName;
 
-            var meta = _name.Match(Path.GetFileName(audio_file));
-            if (artist is null && meta.Groups[1].Success) artist = meta.Groups[1].Value;
-            if (title  is null && meta.Groups[2].Success) title  = meta.Groups[2].Value;
+                var meta = _name.Match(Path.GetFileName(audio_file));
+                if (artist is null && meta.Groups[1].Success) artist = meta.Groups[1].Value;
+                if (title  is null && meta.Groups[2].Success) title  = meta.Groups[2].Value;
 
-            if (no) artist = null;
-            if (rb) title = title.RemoveBrackets();
+                if (no) artist = null;
+                if (rb) title = title.RemoveBrackets();
 
-            var img = $"{dir}/art.jpg";
-            var omg = new F_Resize(thumb_source);
-            var art = xt ? omg.ExportThumbnail(img, cs) : resize ? omg.ResizeThumbnail(img, cs) : omg.CompressJpeg(img, 2);
-            var mp3 = new F_Overlay(audio_file, art).AddTrackMetadata(artist, title);
-            var jpg = new F_Resize(art).CompressJpeg($"{dir}/jpg.jpg", 7);
+                var img = $"{dir}/art.jpg";
+                var omg = new F_Resize(thumb_source);
+                var art = xt ? omg.ExportThumbnail(img, cs) : resize ? omg.ResizeThumbnail(img, cs) : omg.CompressJpeg(img, 2);
+                var mp3 = new F_Overlay(audio_file, art).AddTrackMetadata(artist, title);
+                var jpg = new F_Resize(art).CompressJpeg($"{dir}/jpg.jpg", 7);
 
-            Task.Run(() => Bot.DeleteMessage(cp.Chat, message));
+                Task.Run(() => Bot.DeleteMessage(cp.Chat, message));
 
-            await using var stream = File.OpenRead(mp3);
-            Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, mp3), jpg);
-            Log($"{cp.Title} >> YOUTUBE MUSIC >> TIME: {timer.CheckStopWatch()}", ConsoleColor.Yellow);
+                await using var stream = File.OpenRead(mp3);
+                Bot.SendAudio(cp.Chat, new InputOnlineFile(stream, mp3), jpg);
+                Log($"{cp.Title} >> YOUTUBE MUSIC >> TIME: {timer.CheckStopWatch()}", ConsoleColor.Yellow);
+            }
+            catch
+            {
+                if (format == 140) throw;
+
+                DownloadSongAsync(id, artist, title, options, file, message, yt, cp, 140);
+            }
         }
 
         private static async Task RunCMD(string cmd, string directory)

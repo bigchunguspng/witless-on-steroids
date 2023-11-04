@@ -8,16 +8,15 @@ using Drawer = Witlesss.DemotivatorDrawer;
 
 namespace Witlesss.MediaTools
 {
-    // -i video -i image -filter_complex "[0:v]scale=690:420[vid];[vid][1:v]overlay=0:0"   meme.mp4
-    // -i image -i video -filter_complex "[1:v]scale=620:530[vid];[0:v][vid]overlay=50:50" demo.mp4
+    // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
     public class F_Overlay
     {
         private readonly string _a, _b;
 
         public F_Overlay(string a, string b)
         {
-            _a = a;
-            _b = b;
+            _a = a; // video
+            _b = b; // image
         }
 
         public string Meme(int loss, Size size)
@@ -26,30 +25,32 @@ namespace Witlesss.MediaTools
         }
         public string Demo(int loss, Drawer drawer)
         {
-            return Overlay(SetOutName(_b, "-D",   ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
+            return Overlay(SetOutName(_a, "-D",   ".mp4"), o => ArgsDemo(o, loss, drawer.Size, drawer.Pic));
         }
         public string When(int loss, Size s, Rectangle c, Point p, bool blur)
         {
-            return Overlay(SetOutName(_b, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p, blur));
+            return Overlay(SetOutName(_a, "-Top", ".mp4"), o => ArgsWhen(o, loss, s, c, p, blur));
         }
         public string D300(int loss, Size s, Point p, Size size)
         {
-            return Overlay(SetOutName(_b, "-Dp",  ".mp4"), o => { ArgsDemo(o, loss, s, p); o.Resize(size); });
+            return Overlay(SetOutName(_a, "-Dp",  ".mp4"), o => { ArgsDemo(o, loss, s, p); o.Resize(size); });
         }
 
-        private static void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
+        private void ArgsMeme(FFMpegArgumentOptions o, int f, Size s)
         {
             BuildAndCompress(o, f, CoFi.Null.Scale("0:v", s, "vid").Overlay("vid", "1:v", Point.Empty));
         }
-        private static void ArgsDemo(FFMpegArgumentOptions o, int f, Size s, Point p)
+        private void ArgsDemo(FFMpegArgumentOptions o, int f, Size s, Point p)
         {
-            BuildAndCompress(o, f, CoFi.Null.Scale("1:v", s, "vid").Overlay("0:v", "vid", p));
+            BuildAndCompress(o, f, FixedFpsPic().Scale("0:v", s, "vid").Overlay("pic", "vid", p));
         }
-        private static void ArgsWhen(FFMpegArgumentOptions o, int f, Size s, Rectangle c, Point p, bool blur)
+        private void ArgsWhen(FFMpegArgumentOptions o, int f, Size s, Rectangle c, Point p, bool blur)
         {
-            var fi = CoFi.Null.Scale("1:v", s, "v1").Crop("v1", c, "vid").Overlay("0:v", "vid", p, blur ? "ova" : null);
+            var fi = FixedFpsPic().Scale("0:v", s, "v0").Crop("v0", c, "vid").Overlay("pic", "vid", p, blur ? "ova" : null);
             BuildAndCompress(o, f, blur ? fi.Blur("ova", 1) : fi);
         }
+
+        private CoFi FixedFpsPic() => CoFi.Null.Fps("1:v", new F_Resize(_a).GetFramerate(), "pic");
 
         private static void BuildAndCompress(FFMpegArgumentOptions o, int f, CoFi filter)
         {

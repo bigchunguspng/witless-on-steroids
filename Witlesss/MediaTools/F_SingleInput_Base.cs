@@ -48,6 +48,8 @@ namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
             if (i.audio) o.FixSongArt(i.info);
         }
 
+        public double GetFramerate() => MediaInfo().v.AvgFrameRate;
+
         protected string Cook(string output, Action<FFO> args) // waltuh
         {
             Run(GetFFMpegAP(_input, output, args));

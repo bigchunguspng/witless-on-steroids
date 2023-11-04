@@ -36,7 +36,7 @@ namespace Witlesss
 
         public static string MakeVideoDemotivator(string path, DgText text)
         {
-            return new F_Overlay(Drawer.MakeFrame(text), path).Demo(Quality, Drawer);
+            return new F_Overlay(path, Drawer.MakeFrame(text)).Demo(Quality, Drawer);
         }
 
 
@@ -61,7 +61,7 @@ namespace Witlesss
             var frame = _dp.BakeFrame(text);
             var full_size = FitSize(GetSize(frame), 720);
 
-            return new F_Overlay(frame, path).D300(Quality, size, _dp.Location, full_size);
+            return new F_Overlay(path, frame).D300(Quality, size, _dp.Location, full_size);
         }
 
 
@@ -104,7 +104,7 @@ namespace Witlesss
             else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(Snapshot(path))));
             else                          _ifunny.SetDefaultColors();
 
-            return new F_Overlay(_ifunny.BakeText(text), path).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage);
+            return new F_Overlay(path, _ifunny.BakeText(text)).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage);
         }
 
 

@@ -529,6 +529,17 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Найдено &lt;b&gt;{0}&lt;/b&gt; тредов.
+        ///
+        ///Начинаю поглощение интернета 😈.
+        /// </summary>
+        internal static string N_THREADS_FOUND_RESPONSE {
+            get {
+                return ResourceManager.GetString("N_THREADS_FOUND_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-Pictures.
         /// </summary>
         internal static string PICTURES_FOLDER {

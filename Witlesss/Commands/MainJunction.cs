@@ -32,6 +32,7 @@ namespace Witlesss.Commands
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
         private readonly Buhurt _buhurt = new();
+        private readonly FuseBoards _boards = new();
         private readonly FuseRedditComments _comments = new();
         private readonly CheckReddit _reddit = new();
         private readonly GetRedditLink _link = new();
@@ -138,6 +139,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/top"       )) _wc = _whenthe;
             else if (CommandIs( "/a"         )) _wc = _generate;
             else if (CommandIs( "/zz"        )) _wc = _generateB;
+            else if (CommandIs( "/board"     )) _wc = _boards;
             else if (CommandIs( "/b"         )) _wc = _buhurt;
             else if (CommandIs( "/quality"   )) _wc = _quality;
             else if (CommandIs( "/pics"      )) _wc = _probability;

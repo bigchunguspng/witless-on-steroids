@@ -155,7 +155,7 @@ namespace Witlesss
         {
             try
             {
-                var task = Client.SendTextMessageAsync(chat, text, disableNotification: !notify);
+                var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: !notify);
 
                 task.Wait();
                 if (task.IsFaulted) throw new Exception(task.Exception?.Message);

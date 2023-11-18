@@ -478,4 +478,9 @@ s   - save and exit
 &lt;code&gt;w&lt;/code&gt; - не разрывать текст
 &lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры)</value>
     </data>
+    <data name="N_THREADS_FOUND_RESPONSE" xml:space="preserve">
+        <value>Найдено &lt;b&gt;{0}&lt;/b&gt; тредов.
+
+Начинаю поглощение интернета 😈</value>
+    </data>
 </root>

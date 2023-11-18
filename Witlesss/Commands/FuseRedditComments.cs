@@ -73,7 +73,6 @@ namespace Witlesss.Commands
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\n Его пополнили {comments.Count} комментов с {subreddit}";
             Bot.SendMessage(x.Chat, report + detais);
-            
         }
     }
 }

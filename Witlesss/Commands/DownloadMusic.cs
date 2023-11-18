@@ -12,7 +12,6 @@ namespace Witlesss.Commands
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
         private readonly Regex  _ops = new(@"\/song(\S+)");
 
-        
 
         // input: /song[options] URL [artist - ][title]
         public override void Run()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
@@ -24,9 +25,24 @@ namespace Witlesss.Commands
 
             if (Text.StartsWith("/boards"))
             {
-                // Jarvis, list all boards
+                var boards = _chan.GetMainMenu("chan.txt"); // todo .Take(3) to keep formatting
+                
+                var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN</b> 🍀🍀🍀");
+                foreach (var group in boards)
+                {
+                    sb.Append($"\n\n<b><u>{group.Title}</u></b>");
+                    if (group.IsNSFW) sb.Append(" (NSFW🥵)");
+                    sb.Append("\n");
+                    foreach (var board in group.Boards)
+                    {
+                        sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
+                    }
+                }
 
-                Bot.SendMessage(Chat, "*тут должен быть список досок из ствоего класса.. ой тоесть с форчана*");
+                sb.Append(string.Format(CheckReddit.SEARCH_FOOTER, Bot.Me.FirstName));
+                var result = sb.ToString(); 
+                Log(result); // todo del as debug
+                Bot.SendMessage(Chat, result);
 
                 return;
             }
@@ -37,10 +53,9 @@ namespace Witlesss.Commands
 
                 var url = args[1];
                 var uri = ValidateUri(url);
-                
+
                 if (url.EndsWith("/archive"))
                 {
-                    // ARCHIVE
                     var threads = _chan.GetArchivedThreads(url);
                     var tasks = threads.Select(x => ScrapThreadAsync("https://" + uri.Host + x)).ToList();
 
@@ -49,16 +64,14 @@ namespace Witlesss.Commands
                 }
                 else if (url.Contains("/thread/"))
                 {
-                    // THREAD
                     var replies = _chan.GetThreadDisscusion(url).ToList();
                     var size = SizeInBytes(Baka.Path);
 
                     EatMany(replies, Baka, Title);
                     SendReport(Chat, Title, Baka, replies.Count, size);
                 }
-                else
+                else // BOARD
                 {
-                    // BOARD
                     var threads = _chan.GetThreads(url);
                     var tasks = threads.Select(x => ScrapThreadAsync(url + x)).ToList();
 
@@ -67,9 +80,7 @@ namespace Witlesss.Commands
                 }
             }
             else
-            {
-                Bot.SendMessage(Chat, "а куда?");
-            }
+                Bot.SendMessage(Chat, "Не можете выбрать? - пропишите <code>/boards</code>\n\nНажали случайно? понимаю 😏");
         }
 
         private Task<List<string>> ScrapThreadAsync(string url)
@@ -89,7 +100,7 @@ namespace Witlesss.Commands
                 throw;
             }
         }
-        
+
         private static async Task EatBoardDiscussion(WitlessCommandParams x, List<Task<List<string>>> tasks)
         {
             Log("wait all start", ConsoleColor.Green);
@@ -170,6 +181,59 @@ namespace Witlesss.Commands
             var doc = _web.Load(url);
 
             return doc.DocumentNode.SelectNodes(ARCHIVE_THREAD).Select(x => x.Attributes["href"].Value);
+        }
+
+        public List<BoardGroup> GetMainMenu(string path)
+        {
+            var doc = new HtmlDocument();
+            doc.Load(path);
+
+            var boards = new List<BoardGroup>();
+            var group = new BoardGroup();
+
+            var columns = doc.DocumentNode.SelectNodes("//div[@class='column']");
+            var nodes = columns.SelectMany(x => x.ChildNodes.Where(n => n.Name != "#text")).ToList();
+            var last = nodes.Last();
+
+            foreach (var node in nodes)
+            {
+                if (node.Name == "h3")
+                {
+                    var text = node.InnerText;
+                    if (text == "(NSFW)")
+                    {
+                        group.IsNSFW = true;
+                    }
+                    else
+                    {
+                        group.Title = HttpUtility.HtmlDecode(text);
+                    }
+                }
+                else if (node.Name == "ul")
+                {
+                    var items = node.ChildNodes.Where(x => x.Name == "li");
+                    foreach (var item in items)
+                    {
+                        var name = HttpUtility.HtmlDecode(item.InnerText);
+                        var href = "https:" + item.ChildNodes[0].Attributes["href"].Value;
+
+                        group.Boards.Add(new BoardGroup.Board(name, href));
+                    }
+                    boards.Add(group);
+                    if (node != last) group = new BoardGroup();
+                }
+            }
+
+            return boards;
+        }
+
+        public class BoardGroup
+        {
+            public string Title;
+            public bool IsNSFW;
+            public List<Board> Boards = new();
+
+            public record Board(string Title, string URL);
         }
     }
 }

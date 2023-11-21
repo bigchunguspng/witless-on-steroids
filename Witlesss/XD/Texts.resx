@@ -392,7 +392,7 @@ s   - save and exit
     <data name="REDDIT_COMMENTS_START" xml:space="preserve">
         <value>НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!
 
-(может занять до пары минут)</value>
+{0}</value>
     </data>
     <data name="REDDIT_COMMENTS_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;Синтаксис команды:&lt;/b&gt;
@@ -478,10 +478,10 @@ s   - save and exit
 &lt;code&gt;w&lt;/code&gt; - не разрывать текст
 &lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры)</value>
     </data>
-    <data name="N_THREADS_FOUND_RESPONSE" xml:space="preserve">
-        <value>Найдено &lt;b&gt;{0}&lt;/b&gt; тредов.
+    <data name="BOARD_START" xml:space="preserve">
+        <value>Тредов найдено: &lt;b&gt;{0}&lt;/b&gt;
 
-Начинаю поглощение интернета 😈</value>
+{1}</value>
     </data>
     <data name="BOARD_MANUAL" xml:space="preserve">
         <value>Этой командой можно скармливать мне треды с форча.
@@ -492,5 +492,8 @@ s   - save and exit
 Ссылка на архив = ссылка на доску + &lt;code&gt;archive&lt;/code&gt;
 
 💀На абордаж! 🏴‍☠️</value>
+    </data>
+    <data name="MAY_TAKE_A_WHILE" xml:space="preserve">
+        <value>(может занять до пары минут)</value>
     </data>
 </root>

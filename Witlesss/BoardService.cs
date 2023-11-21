@@ -18,14 +18,11 @@ namespace Witlesss
         private readonly HtmlWeb _web = new();
 
 
-        // https://boards.4channel.org/a/thread/XXX
-        public IEnumerable<string> GetThreadDisscusion(string url)
+        /// <summary> Returns every single line of anons discussion. </summary>
+        /// <param name="url">URL, like https://boards.4channel.org/a/thread/XXX</param>
+        public IEnumerable<string> GetThreadDiscussion(string url)
         {
-            var doc = _web.Load(url);
-
-            var blockquotes = doc.DocumentNode.SelectNodes(BLOCKQUOTE);
-
-            foreach (var block in blockquotes)
+            foreach (var block in GetDocument(url).SelectNodes(BLOCKQUOTE))
             {
                 var lines = block.InnerHtml.Split("<br>", StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
@@ -40,23 +37,26 @@ namespace Witlesss
             }
         }
 
-        // https://boards.4channel.org/a/ >> thread/259670255/onepiece
+        /// <summary> Returns thread URLs from a board page. </summary>
+        /// <param name="url">URL, like https://boards.4channel.org/a/</param>
         public IEnumerable<string> GetThreads(string url)
         {
-            var doc = _web.Load(url);
-
-            return doc.DocumentNode.SelectNodes(BOARD_THREAD).Select(x => x.Attributes["href"].Value);
+            return GetDocument(url).SelectNodes(BOARD_THREAD).Select(x => x.Attributes["href"].Value);
         }
 
-        // https://boards.4channel.org/a/archive >> /a/thread/XXX/le-text
+        /// <summary> Returns ARCHIVED thread URLs from a board ARCHIVE page. </summary>
+        /// <param name="url">URL, like https://boards.4channel.org/a/archive</param>
         public IEnumerable<string> GetArchivedThreads(string url)
         {
-            var doc = _web.Load(url);
-
-            return doc.DocumentNode.SelectNodes(ARCHIVE_THREAD).Select(x => x.Attributes["href"].Value);
+            return GetDocument(url).SelectNodes(ARCHIVE_THREAD).Select(x => x.Attributes["href"].Value);
         }
 
-        public List<BoardGroup> GetMainMenu(string path)
+        private HtmlNode GetDocument(string url) => _web.Load(url).DocumentNode;
+
+
+        /// <summary> Returns www.4chan.org or www.4channel.org boards. </summary>
+        /// <param name="path">Site main page source code .txt file path.</param>
+        public List<BoardGroup> GetBoardList(string path)
         {
             var doc = new HtmlDocument();
             doc.Load(path);

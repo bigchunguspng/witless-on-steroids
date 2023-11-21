@@ -249,11 +249,11 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         private const string SEARCH_HEADER = "По запросу <b>{0}</b> найдено <b>{1}</b> сообществ{2}:\n";
         private const string SUBS_LI       = "\n<code>{0}</code> - <i>{1}</i>";
-        public  const string SEARCH_FOOTER = "\n\nБлагодарим за использоване поисковика {0}";
+        public  const string SEARCH_FOOTER = "\n\nБлагодарим за использование поисковика {0}";
 
-        private static string FormatSubs(int x) => x switch
+        public  static string FormatSubs(int x, string bruh = "💀") => x switch
         {
-            < 1000      =>  x + "💀",
+            < 1000      =>  x + bruh,
             < 100_000   => (x / 1000D).ToString("0.#") + "k👌",
             < 1_000_000 =>  x / 1000      + "k👌",
             _           =>  x / 1_000_000 + "M 🤯"

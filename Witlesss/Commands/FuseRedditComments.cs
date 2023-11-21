@@ -47,7 +47,7 @@ namespace Witlesss.Commands
                     query = new ScQuery(s, sort, time);
                 }
 
-                var message = Bot.PingChat(Chat, REDDIT_COMMENTS_START);
+                var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
                 Bot.RunSafelyAsync(EatComments(SnapshotMessageData(), query, size), Chat, message);
             }
             else

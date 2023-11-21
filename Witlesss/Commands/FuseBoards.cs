@@ -14,8 +14,8 @@ namespace Witlesss.Commands
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
 
+        // /boards
         // /board [thread/archive/archive link]
-        // /boards  >>  get all boards
         public override void Run()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
@@ -31,40 +31,79 @@ namespace Witlesss.Commands
                 var args = Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 var url = args[1];
-                var uri = ValidateUri(url);
+                var uri = UrlOrBust(url);
 
                 if (url.EndsWith("/archive"))
                 {
                     var threads = _chan.GetArchivedThreads(url);
-                    var tasks = threads.Select(x => ScrapThreadAsync("https://" + uri.Host + x)).ToList();
+                    var tasks = threads.Select(x => GetDiscussionAsync("https://" + uri.Host + x)).ToList();
 
-                    var message = Bot.PingChat(Chat, string.Format(N_THREADS_FOUND_RESPONSE, tasks.Count));
-                    Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks), Chat, message);
+                    RespondAndStartEating(tasks);
                 }
                 else if (url.Contains("/thread/"))
                 {
-                    var replies = _chan.GetThreadDisscusion(url).ToList();
+                    var replies = _chan.GetThreadDiscussion(url).ToList();
                     var size = SizeInBytes(Baka.Path);
 
-                    EatMany(replies, Baka, Title);
-                    SendReport(Chat, Title, Baka, replies.Count, size);
+                    EatMany(replies, Baka, size, Chat, Title);
                 }
                 else // BOARD
                 {
                     var threads = _chan.GetThreads(url);
-                    var tasks = threads.Select(x => ScrapThreadAsync(url + x)).ToList();
+                    var tasks = threads.Select(x => GetDiscussionAsync(url + x)).ToList();
 
-                    var message = Bot.PingChat(Chat, string.Format(N_THREADS_FOUND_RESPONSE, tasks.Count));
-                    Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks), Chat, message);
+                    RespondAndStartEating(tasks);
                 }
             }
             else
                 Bot.SendMessage(Chat, BOARD_MANUAL);
         }
 
+        private Task<List<string>> GetDiscussionAsync(string url)
+        {
+            // Use IEnumerable<X>.ToList() if u want task to start right at this point!
+            // Otherwise enumeration will be triggered later (slower).
+            return Task.Run(() => _chan.GetThreadDiscussion(url).ToList());
+        }
+
+        private void RespondAndStartEating(List<Task<List<string>>> tasks)
+        {
+            var less_go = tasks.Count > 60 ? "Начинаю поглощение интернета 😈" : "頂きます！😋🍽";
+            var text = string.Format(BOARD_START, tasks.Count, less_go);
+            if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
+            var message = Bot.PingChat(Chat, text);
+            Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks), Chat, message);
+        }
+
+
+        private static async Task EatBoardDiscussion(WitlessCommandParams x, List<Task<List<string>>> tasks)
+        {
+            await Task.WhenAll(tasks);
+
+            var size = SizeInBytes(x.Baka.Path);
+
+            var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
+
+            EatMany(lines, x.Baka, size, x.Chat, x.Title);
+        }
+
+        private static void EatMany(ICollection<string> lines, Witless baka, long size, long chat, string title)
+        {
+            foreach (var text in lines) baka.Eat(text);
+            baka.SaveNoMatterWhat();
+            Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+
+            var newSize = SizeInBytes(baka.Path);
+            var difference = FileSize(newSize - size);
+            var report = string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), difference);
+            var detais = $"\n\n<b>Новых строк:</b> {CheckReddit.FormatSubs(lines.Count, "😏")}";
+            Bot.SendMessage(chat, report + detais);
+        }
+
+
         public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
         {
-            _boards ??= _chan.GetMainMenu("chan.txt");
+            _boards ??= _chan.GetBoardList("chan.txt");
 
             var boards = _boards.Skip(page * perPage).Take(perPage);
             var last = (int)Math.Ceiling(_boards.Count / (double)perPage) - 1;
@@ -81,10 +120,11 @@ namespace Witlesss.Commands
                     sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
                 }
             }
-
             sb.Append(string.Format(CheckReddit.SEARCH_FOOTER, Bot.Me.FirstName));
-            sb.Append("\n\nИспользуйте стрелочки для навигацции ☝️🤓");
-            var message = sb.ToString();
+            sb.Append("\n\nИспользуйте стрелочки для навигации ☝️🤓");
+
+            var text = sb.ToString();
+
 
             var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
             var buttons = new List<InlineKeyboardButton>() { inactive, inactive, inactive, inactive };
@@ -95,19 +135,15 @@ namespace Witlesss.Commands
             if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
 
             if (messageId < 0)
-                Bot.SendMessage(chat, message, new InlineKeyboardMarkup(buttons));
+                Bot.SendMessage(chat, text, new InlineKeyboardMarkup(buttons));
             else
-                Bot.EditMessage(chat, messageId, message, new InlineKeyboardMarkup(buttons));
+                Bot.EditMessage(chat, messageId, text, new InlineKeyboardMarkup(buttons));
 
             string CallbackData(int p) => $"b - {p} {perPage}";
         }
 
-        private Task<List<string>> ScrapThreadAsync(string url)
-        {
-            return Task.Run(() => _chan.GetThreadDisscusion(url).ToList()); // ToList() triggers enumeration
-        }
 
-        private Uri ValidateUri(string url)
+        private Uri UrlOrBust(string url)
         {
             try
             {
@@ -118,34 +154,6 @@ namespace Witlesss.Commands
                 Bot.SendMessage(Chat, "Dude, wrong URL 👉😄");
                 throw;
             }
-        }
-
-        private static async Task EatBoardDiscussion(WitlessCommandParams x, List<Task<List<string>>> tasks)
-        {
-            await Task.WhenAll(tasks);
-
-            var size = SizeInBytes(x.Baka.Path);
-
-            var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
-
-            EatMany(lines, x.Baka, x.Title);
-            SendReport(x.Chat, x.Title, x.Baka, lines.Count, size);
-        }
-
-        private static void EatMany(ICollection<string> strings, Witless baka, string title)
-        {
-            foreach (var text in strings) baka.Eat(text);
-            baka.SaveNoMatterWhat();
-            Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-        }
-
-        private static void SendReport(long chat, string title, Witless baka, int count, long size)
-        {
-            var newSize = SizeInBytes(baka.Path);
-            var difference = FileSize(newSize - size);
-            var report = string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), difference);
-            var detais = $"\n\n Его пополнили {count} строк";
-            Bot.SendMessage(chat, report + detais);
         }
     }
 }

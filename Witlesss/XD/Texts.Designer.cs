@@ -112,6 +112,17 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Тредов найдено: &lt;b&gt;{0}&lt;/b&gt;
+        ///
+        ///{1}.
+        /// </summary>
+        internal static string BOARD_START {
+            get {
+                return ResourceManager.GetString("BOARD_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is the certified {0} classic!
         ///=======
         ///{1} на связи!.
@@ -486,6 +497,15 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (может занять до пары минут).
+        /// </summary>
+        internal static string MAY_TAKE_A_WHILE {
+            get {
+                return ResourceManager.GetString("MAY_TAKE_A_WHILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;u&gt;&lt;b&gt;{0} я делаю из&lt;/b&gt;&lt;/u&gt;:
         ///
         ///• картинок 📸, стикеров 🎟
@@ -541,17 +561,6 @@ namespace Witlesss.XD {
         internal static string MOVING_DONE {
             get {
                 return ResourceManager.GetString("MOVING_DONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Найдено &lt;b&gt;{0}&lt;/b&gt; тредов.
-        ///
-        ///Начинаю поглощение интернета 😈.
-        /// </summary>
-        internal static string N_THREADS_FOUND_RESPONSE {
-            get {
-                return ResourceManager.GetString("N_THREADS_FOUND_RESPONSE", resourceCulture);
             }
         }
         
@@ -619,7 +628,7 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!
         ///
-        ///(может занять до пары минут).
+        ///{0}.
         /// </summary>
         internal static string REDDIT_COMMENTS_START {
             get {

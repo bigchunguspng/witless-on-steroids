@@ -17,7 +17,7 @@ namespace Witlesss
         private readonly ConsoleUI PlayStation8;
         public  readonly BanHammer ThorRagnarok;
 
-        public static void LaunchInstance(Command command) => new Bot().Run(command);
+        public static void LaunchInstance(CallBackHandlingCommand command) => new Bot().Run(command);
 
         private Bot()
         {
@@ -31,7 +31,7 @@ namespace Witlesss
             SussyBakas = ChatsIO.LoadData();
         }
 
-        private void Run(Command command)
+        private void Run(CallBackHandlingCommand command)
         {
             ThorRagnarok.GiveBans();
 
@@ -44,9 +44,9 @@ namespace Witlesss
             PlayStation8.EnterConsoleLoop();
         }
 
-        private void StartListening(Command command)
+        private void StartListening(CallBackHandlingCommand command)
         {
-            var updates = new[] { UpdateType.Message, UpdateType.EditedMessage };
+            var updates = new[] { UpdateType.Message, UpdateType.EditedMessage, UpdateType.CallbackQuery };
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
             Client.StartReceiving(new Handler(command), options);

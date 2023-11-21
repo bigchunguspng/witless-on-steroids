@@ -11,17 +11,18 @@ namespace Witlesss
 {
     public class Handler : IUpdateHandler
     {
-        private readonly Command _command;
+        private readonly CallBackHandlingCommand _command;
         private readonly Regex _ffmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         
-        public Handler(Command command) => _command = command;
+        public Handler(CallBackHandlingCommand command) => _command = command;
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             return update switch
             {
                 { Message:       { } message } => OnMessage(message),
-                { EditedMessage: { } message } => OnMessage(message)
+                { EditedMessage: { } message } => OnMessage(message),
+                { CallbackQuery: { } query   } => OnCallback(query)
             };
         }
 
@@ -45,6 +46,20 @@ namespace Witlesss
                 if (_ffmpeg.IsMatch(e.Message)) Command.Bot.SendErrorDetails(message.Chat.Id, e);
             }
 
+            return Task.CompletedTask;
+        }
+
+        private Task OnCallback(CallbackQuery query)
+        {
+            try
+            {
+                _command.OnCallback(query);
+            }
+            catch (Exception e)
+            {
+                LogError($"Callback >> BRUH -> {FixedErrorMessage(e.Message)}");
+            }
+            
             return Task.CompletedTask;
         }
     }

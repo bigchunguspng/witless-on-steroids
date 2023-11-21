@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.ImageProcessor>;
 
 namespace Witlesss.Commands
 {
-    public class MainJunction : WitlessCommand
+    public class MainJunction : CallBackHandlingCommand
     {
         private Command        _sc;
         private WitlessCommand _wc;
@@ -43,12 +44,17 @@ namespace Witlesss.Commands
         private readonly ToggleColors _colors = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
+        private readonly WitlessMainJunction _witless;
         private readonly MemeProcessors _mematics;
 
-        public MainJunction() => _mematics = new MemeProcessors
+        public MainJunction()
         {
-            { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }, { MemeType.Dp, _dp }
-        };
+            _witless = new WitlessMainJunction(this);
+            _mematics = new MemeProcessors
+            {
+                { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }, { MemeType.Dp, _dp }
+            };
+        }
 
         private static bool TextIsCommand(out string command)
         {
@@ -60,40 +66,7 @@ namespace Witlesss.Commands
         {
             if (Bot.WitlessExist(Chat))
             {
-                SetBaka(Bot.SussyBakas[Chat]);
-
-                if (Text is not null)
-                {
-                    if (TextIsCommand(out var command))
-                    {
-                        if (DoSimpleCommands(command) || DoWitlessCommands(command)) return;
-                    }
-                    else
-                    {
-                        var text = Text.Clone().ToString();
-                        if (Baka.Eat(text, out string eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
-                    }
-                }
-                
-                Baka.Count();
-                
-                if (Message.Photo?[^1] is { } p && HaveToMeme())
-                {
-                    GetMemeMaker(p.Width, p.Height).ProcessPhoto(p.FileId);
-                }
-                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
-                {
-                    GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
-                }
-                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(SnapshotMessageData());
-
-                ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
-                ImageProcessor SelectMemeMaker() => _mematics[Baka.Meme.Type];
-
-                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance && !BroSpoilers();
-                bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
-
-                bool BroSpoilers() => Message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
+                _witless.Run();
             }
             else if (Text is not null && TextIsCommand(out var command))
             {
@@ -180,10 +153,73 @@ namespace Witlesss.Commands
             Bot.SendMessage(data.Chat, data.Baka.Generate());
             Log($"{data.Title} >> FUNNY");
         }
+
+
+        public override void OnCallback(CallbackQuery query)
+        {
+            if (query.Data == null || query.Message == null) return;
+
+            var data = query.Data.Split(" - ", 2);
+            if (data[0] == "b")
+            {
+                var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+                var chat = query.Message.Chat.Id;
+
+                _boards.SendBoardList(chat, numbers[0], numbers[1], query.Message.MessageId);
+            }
+        }
+
+
+        private class WitlessMainJunction : WitlessCommand
+        {
+            private readonly MainJunction _parent;
+
+            public WitlessMainJunction(MainJunction parent) => _parent = parent;
+
+            public override void Run()
+            {
+                SetBaka(Bot.SussyBakas[Chat]);
+
+                if (Text is not null)
+                {
+                    if (TextIsCommand(out var command))
+                    {
+                        if (_parent.DoSimpleCommands(command) || _parent.DoWitlessCommands(command)) return;
+                    }
+                    else
+                    {
+                        var text = Text.Clone().ToString();
+                        if (Baka.Eat(text, out var eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                    }
+                }
+                
+                Baka.Count();
+                
+                if (Message.Photo?[^1] is { } p && HaveToMeme())
+                {
+                    GetMemeMaker(p.Width, p.Height).ProcessPhoto(p.FileId);
+                }
+                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
+                {
+                    GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
+                }
+                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(SnapshotMessageData());
+
+                ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
+                ImageProcessor SelectMemeMaker() => _parent._mematics[Baka.Meme.Type];
+
+                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance && !BroSpoilers();
+                bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
+
+                bool BroSpoilers() => Message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
+            }
+        }
     }
 
-    public class Skip : Command
+    public class Skip : CallBackHandlingCommand
     {
         public override void Run() => Log($"{Title} >> {Text}", ConsoleColor.Gray);
+
+        public override void OnCallback(CallbackQuery query) => Log(query.Data ?? "-", ConsoleColor.Yellow);
     }
 }

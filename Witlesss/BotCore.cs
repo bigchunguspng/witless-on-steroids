@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
+using Telegram.Bot.Types.ReplyMarkups;
 using Witlesss.MediaTools;
 
 namespace Witlesss
@@ -42,6 +43,11 @@ namespace Witlesss
         {
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableWebPagePreview: !preview);
             TrySend(task, chat, "message");
+        }
+        public void SendMessage(long chat, string text, InlineKeyboardMarkup inline)
+        {
+            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, replyMarkup: inline);
+            TrySend(task, chat, "message [+][-]");
         }
 
         public void SendPhoto(long chat, InputOnlineFile photo)
@@ -97,6 +103,11 @@ namespace Witlesss
         {
             var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
             TrySend(task, chat, "message", "edit");
+        }
+        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup inline)
+        {
+            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html, replyMarkup: inline);
+            TrySend(task, chat, "message [+][-]", "edit");
         }
 
         public void DeleteMessage(long chat, int id)

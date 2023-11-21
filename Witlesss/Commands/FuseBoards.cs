@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
+using Telegram.Bot.Types.ReplyMarkups;
 
 #pragma warning disable CS4014
 
@@ -14,6 +15,7 @@ namespace Witlesss.Commands
     public class FuseBoards : WitlessCommand
     {
         private readonly BoardService _chan = new();
+        private List<BoardService.BoardGroup> _boards;
 
         // /board [thread link]
         // /board [archive link]
@@ -25,24 +27,7 @@ namespace Witlesss.Commands
 
             if (Text.StartsWith("/boards"))
             {
-                var boards = _chan.GetMainMenu("chan.txt"); // todo .Take(3) to keep formatting
-                
-                var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN</b> 🍀🍀🍀");
-                foreach (var group in boards)
-                {
-                    sb.Append($"\n\n<b><u>{group.Title}</u></b>");
-                    if (group.IsNSFW) sb.Append(" (NSFW🥵)");
-                    sb.Append("\n");
-                    foreach (var board in group.Boards)
-                    {
-                        sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
-                    }
-                }
-
-                sb.Append(string.Format(CheckReddit.SEARCH_FOOTER, Bot.Me.FirstName));
-                var result = sb.ToString(); 
-                Log(result); // todo del as debug
-                Bot.SendMessage(Chat, result);
+                SendBoardList(Chat, 0, 2);
 
                 return;
             }
@@ -81,6 +66,46 @@ namespace Witlesss.Commands
             }
             else
                 Bot.SendMessage(Chat, "Не можете выбрать? - пропишите <code>/boards</code>\n\nНажали случайно? понимаю 😏");
+        }
+
+        public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
+        {
+            _boards ??= _chan.GetMainMenu("chan.txt");
+
+            var boards = _boards.Skip(page * perPage).Take(perPage);
+            var last = (int)Math.Ceiling(_boards.Count / (double)perPage) - 1;
+                
+            var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN BOARDS</b> 🍀🍀🍀");
+            sb.Append(" [PAGE: ").Append(page + 1).Append("/").Append(last + 1).Append("]");
+            foreach (var group in boards)
+            {
+                sb.Append($"\n\n<b><u>{group.Title}</u></b>");
+                if (group.IsNSFW) sb.Append(" (NSFW🥵)");
+                sb.Append("\n");
+                foreach (var board in group.Boards)
+                {
+                    sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
+                }
+            }
+
+            sb.Append(string.Format(CheckReddit.SEARCH_FOOTER, Bot.Me.FirstName));
+            sb.Append("\n\nИспользуйте стрелочки для навигацции ☝️🤓");
+            var message = sb.ToString();
+
+            var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
+            var buttons = new List<InlineKeyboardButton>() { inactive, inactive, inactive, inactive };
+
+            if (page > 1       ) buttons[0] = InlineKeyboardButton.WithCallbackData("⏪", CallbackData(0));
+            if (page > 0       ) buttons[1] = InlineKeyboardButton.WithCallbackData("⬅️", CallbackData(page - 1));
+            if (page < last    ) buttons[2] = InlineKeyboardButton.WithCallbackData("➡️", CallbackData(page + 1));
+            if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
+
+            if (messageId < 0)
+                Bot.SendMessage(chat, message, new InlineKeyboardMarkup(buttons));
+            else
+                Bot.EditMessage(chat, messageId, message, new InlineKeyboardMarkup(buttons));
+
+            string CallbackData(int p) => $"b - {p} {perPage}";
         }
 
         private Task<List<string>> ScrapThreadAsync(string url)
@@ -231,7 +256,7 @@ namespace Witlesss.Commands
         {
             public string Title;
             public bool IsNSFW;
-            public List<Board> Boards = new();
+            public readonly List<Board> Boards = new();
 
             public record Board(string Title, string URL);
         }

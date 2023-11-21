@@ -52,6 +52,11 @@ namespace Witlesss.Commands
 
         protected new static WitlessCommandParams SnapshotMessageData() => new(Baka, Chat, Text, Title);
     }
+    
+    public abstract class CallBackHandlingCommand : Command
+    {
+        public abstract void OnCallback(CallbackQuery query);
+    }
 
     public record        CommandParams              (long Chat, string Text, string Title);
     public record WitlessCommandParams(Witless Baka, long Chat, string Text, string Title);

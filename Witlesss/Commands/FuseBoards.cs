@@ -17,9 +17,7 @@ namespace Witlesss.Commands
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
 
-        // /board [thread link]
-        // /board [archive link]
-        // /board [board link]
+        // /board [thread/archive/archive link]
         // /boards  >>  get all boards
         public override void Run()
         {
@@ -28,7 +26,6 @@ namespace Witlesss.Commands
             if (Text.StartsWith("/boards"))
             {
                 SendBoardList(Chat, 0, 2);
-
                 return;
             }
 
@@ -65,7 +62,7 @@ namespace Witlesss.Commands
                 }
             }
             else
-                Bot.SendMessage(Chat, "Не можете выбрать? - пропишите <code>/boards</code>\n\nНажали случайно? понимаю 😏");
+                Bot.SendMessage(Chat, BOARD_MANUAL);
         }
 
         public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
@@ -121,16 +118,14 @@ namespace Witlesss.Commands
             }
             catch
             {
-                Bot.SendMessage(Chat, "dude, wrong url");
+                Bot.SendMessage(Chat, "Dude, wrong URL 👉😄");
                 throw;
             }
         }
 
         private static async Task EatBoardDiscussion(WitlessCommandParams x, List<Task<List<string>>> tasks)
         {
-            Log("wait all start", ConsoleColor.Green);
             await Task.WhenAll(tasks);
-            Log("wait all end", ConsoleColor.Red);
 
             var size = SizeInBytes(x.Baka.Path);
 
@@ -138,7 +133,6 @@ namespace Witlesss.Commands
 
             EatMany(lines, x.Baka, x.Title);
             SendReport(x.Chat, x.Title, x.Baka, lines.Count, size);
-            Log("yumy threads", ConsoleColor.Yellow);
         }
 
         private static void EatMany(ICollection<string> strings, Witless baka, string title)
@@ -163,6 +157,7 @@ namespace Witlesss.Commands
         private const string BOARD_THREAD = "//a[@class='replylink'][. = 'Reply']";
         private const string ARCHIVE_THREAD = "//a[@class='quotelink']";
         private const string BLOCKQUOTE = "//blockquote";
+        private const string COLUMN = "//div[@class='column']";
 
         private readonly Regex _quote = new(@"<span class=""quote"">([\s\S]+?)<\/span>");
         private readonly HtmlWeb _web = new();
@@ -171,7 +166,6 @@ namespace Witlesss.Commands
         // https://boards.4channel.org/a/thread/XXX
         public IEnumerable<string> GetThreadDisscusion(string url)
         {
-            Log("A --- " + url);
             var doc = _web.Load(url);
 
             var blockquotes = doc.DocumentNode.SelectNodes(BLOCKQUOTE);
@@ -189,7 +183,6 @@ namespace Witlesss.Commands
                     yield return HttpUtility.HtmlDecode(text.Replace("<s>", "").Replace("</s>", ""));
                 }
             }
-            Log("B --- " + url);
         }
 
         // https://boards.4channel.org/a/ >> thread/259670255/onepiece
@@ -216,7 +209,7 @@ namespace Witlesss.Commands
             var boards = new List<BoardGroup>();
             var group = new BoardGroup();
 
-            var columns = doc.DocumentNode.SelectNodes("//div[@class='column']");
+            var columns = doc.DocumentNode.SelectNodes(COLUMN);
             var nodes = columns.SelectMany(x => x.ChildNodes.Where(n => n.Name != "#text")).ToList();
             var last = nodes.Last();
 

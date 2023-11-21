@@ -96,6 +96,22 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Этой командой можно скармливать мне треды с форча.
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/board [ссылка на тред/доску/архив]&lt;/code&gt;
+        ///
+        ///Список досок - &lt;code&gt;/boards&lt;/code&gt;
+        ///Ссылка на архив = ссылка на доску + &lt;code&gt;archive&lt;/code&gt;
+        ///
+        ///💀На абордаж! 🏴‍☠️.
+        /// </summary>
+        internal static string BOARD_MANUAL {
+            get {
+                return ResourceManager.GetString("BOARD_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is the certified {0} classic!
         ///=======
         ///{1} на связи!.

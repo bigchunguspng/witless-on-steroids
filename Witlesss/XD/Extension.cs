@@ -142,6 +142,28 @@ namespace Witlesss.XD
             return a;
         }
 
+        private static readonly Regex _lat = new(@"[A-Za-z]+");
+        private static readonly Regex _cyr = new(@"[А-я]+");
+
+        public static bool IsMostlyCyrillic(string text)
+        {
+            return _cyr.Matches(text).Count > _lat.Matches(text).Count;
+        }
+        
+        private static readonly Regex _ukrD = new(@"[ієїґ]");
+        private static readonly Regex _rusD = new(@"[ыэъё]");
+        private static readonly Regex _ukrM = new(@"[авдж]");
+        private static readonly Regex _rusM = new(@"[еоть]");
+
+        public static bool LooksLikeUkrainian(string text, out bool sure)
+        {
+            var u = _ukrD.Matches(text).Count;
+            var r = _rusD.Matches(text).Count;
+
+            sure = u > 0 || text.Length > 80;
+            return u == r ? _ukrM.Matches(text).Count > _rusM.Matches(text).Count : u > r;
+        }
+
         public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
         public static string Pick(string[] responses) => responses[Random.Next(responses.Length)];
 

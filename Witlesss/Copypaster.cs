@@ -9,7 +9,8 @@ namespace Witlesss
     public class Copypaster
     {
         public  const string   START = "_start",      END = "_end";
-        private const string    LINK = "[ссылка удалена]", LF = "_LF", LF_Spaced = $" {LF} ";
+        private const string    LINK = "[ссылка удалена]", LINK_eng = "[deleted]", LINK_ua = "[видалено]";
+        private const string      LF = "_LF", LF_Spaced = $" {LF} ";
         private readonly Regex _urls = new(@"\S+(:[\/\\])\S+"), _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
 
         public WitlessDB Words { get; set; } = new();
@@ -226,6 +227,8 @@ namespace Witlesss
                 current = PickWord(Words[current]);
             }
 
+            result = LocalizeLinkRemovals(result);
+
             return result.Replace(START, "").TrimStart().ToRandomLetterCase();
         }
         private string GenerateBackwards(string word)
@@ -239,7 +242,21 @@ namespace Witlesss
                 current = PickWord(GetWordsBefore(current));
             }
 
+            result = LocalizeLinkRemovals(result);
+
             return result.Replace(END, "").TrimEnd().ToRandomLetterCase();
+        }
+
+        private string LocalizeLinkRemovals(string text)
+        {
+            if (!text.Contains(LINK)) return text;
+
+            var temp = text.Replace(LINK, "_+-+_");
+
+            var cyr = IsMostlyCyrillic(temp);
+            var ukr = cyr && LooksLikeUkrainian(temp, out var sure) && sure;
+
+            return cyr && !ukr ? text : text.Replace(LINK, ukr ? LINK_ua : LINK_eng);
         }
 
         private WordChart GetWordsBefore(string word)

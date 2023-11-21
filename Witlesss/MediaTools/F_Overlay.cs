@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using FFMpegCore;
 using static Witlesss.MediaTools.F_SingleInput_Base;
-using Drawer = Witlesss.DemotivatorDrawer;
+using Drawer = Witlesss.Services.Memes.DemotivatorDrawer;
 
 namespace Witlesss.MediaTools
 {

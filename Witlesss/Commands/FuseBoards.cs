@@ -96,7 +96,7 @@ namespace Witlesss.Commands
             var newSize = SizeInBytes(baka.Path);
             var difference = FileSize(newSize - size);
             var report = string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), difference);
-            var detais = $"\n\n<b>Новых строк:</b> {CheckReddit.FormatSubs(lines.Count, "😏")}";
+            var detais = $"\n\n<b>Новых строк:</b> {BrowseReddit.FormatSubs(lines.Count, "😏")}";
             Bot.SendMessage(chat, report + detais);
         }
 
@@ -120,7 +120,7 @@ namespace Witlesss.Commands
                     sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
                 }
             }
-            sb.Append(string.Format(CheckReddit.SEARCH_FOOTER, Bot.Me.FirstName));
+            sb.Append(string.Format(BrowseReddit.SEARCH_FOOTER, Bot.Me.FirstName));
             sb.Append("\n\nИспользуйте стрелочки для навигации ☝️🤓");
 
             var text = sb.ToString();

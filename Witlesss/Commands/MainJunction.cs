@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.ImageProcessor>;
+using Witlesss.Commands.Editing;
+using Witlesss.Commands.Meme;
+using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.Meme.ImageProcessor>;
 
 namespace Witlesss.Commands
 {
@@ -32,10 +34,10 @@ namespace Witlesss.Commands
         private readonly DownloadMusic _song = new();
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
-        private readonly Buhurt _buhurt = new();
+        private readonly Bouhourt _bouhourt = new();
         private readonly FuseBoards _boards = new();
         private readonly FuseRedditComments _comments = new();
-        private readonly CheckReddit _reddit = new();
+        private readonly BrowseReddit _reddit = new();
         private readonly GetRedditLink _link = new();
         private readonly SetFrequency _frequency = new();
         private readonly SetProbability _probability = new();
@@ -113,7 +115,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/a"         )) _wc = _generate;
             else if (CommandIs( "/zz"        )) _wc = _generateB;
             else if (CommandIs( "/board"     )) _wc = _boards;
-            else if (CommandIs( "/b"         )) _wc = _buhurt;
+            else if (CommandIs( "/b"         )) _wc = _bouhourt;
             else if (CommandIs( "/quality"   )) _wc = _quality;
             else if (CommandIs( "/pics"      )) _wc = _probability;
             else if (CommandIs( "/set"       )) _wc = _frequency;

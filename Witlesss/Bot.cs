@@ -49,7 +49,7 @@ namespace Witlesss
             var updates = new[] { UpdateType.Message, UpdateType.EditedMessage, UpdateType.CallbackQuery };
             var options = new ReceiverOptions { AllowedUpdates = updates };
 
-            Client.StartReceiving(new Handler(command), options);
+            Client.StartReceiving(new TelegramUpdateHandler(command), options);
             Log(string.Format(BUENOS_DIAS, Config.BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 #pragma warning disable CS4014
 
 namespace Witlesss.Commands
@@ -34,15 +35,15 @@ namespace Witlesss.Commands
 
                 if (que.Success)
                 {
-                    var sort = CheckReddit.Sorts  [o[0]];
-                    var time = CheckReddit.GetTime(o, CheckReddit.TimeMatters(o[0]));
+                    var sort = BrowseReddit.Sorts  [o[0]];
+                    var time = BrowseReddit.GetTime(o, BrowseReddit.TimeMatters(o[0]));
 
                     query = sub.Success ? new SsQuery(s, q, sort, time) : new SrQuery(q, sort, time);
                 }
                 else
                 {
                     var sort = (SortingMode)o[0];
-                    var time = CheckReddit.GetTime(o, CheckReddit.TimeMatters(sort));
+                    var time = BrowseReddit.GetTime(o, BrowseReddit.TimeMatters(sort));
 
                     query = new ScQuery(s, sort, time);
                 }
@@ -58,9 +59,9 @@ namespace Witlesss.Commands
 
         private async Task EatComments(WitlessCommandParams x, RedditQuery query, long size)
         {
-            var timer = new StopWatch();
+            var timer = new Stopwatch();
             var comments = await RedditTool.Instance.GetComments(query);
-            Log($"COMMENTS FETCHED >> {timer.CheckStopWatch()}");
+            Log($"COMMENTS FETCHED >> {timer.CheckElapsed()}");
 
             foreach (var text in comments) x.Baka.Eat(text);
             Log($"{x.Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);

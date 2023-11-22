@@ -162,12 +162,22 @@ namespace Witlesss.Commands
             if (query.Data == null || query.Message == null) return;
 
             var data = query.Data.Split(" - ", 2);
-            if (data[0] == "b")
+            if (data[0].StartsWith('b'))
             {
                 var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
                 var chat = query.Message.Chat.Id;
 
-                _boards.SendBoardList(chat, numbers[0], numbers[1], query.Message.MessageId);
+                if (data[0] == "b")
+                    _boards.SendBoardList(chat, numbers[0], numbers[1], query.Message.MessageId);
+                else
+                    _boards.SendSavedList(chat, numbers[0], numbers[1], query.Message.MessageId);
+            }
+            else if (data[0] == "fi")
+            {
+                var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+                var chat = query.Message.Chat.Id;
+
+                _fuse.SendFuseList(chat, numbers[0], numbers[1], query.Message.MessageId);
             }
         }
 

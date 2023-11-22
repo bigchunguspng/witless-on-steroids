@@ -15,6 +15,7 @@ namespace Witlesss.Commands
     {
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
+        private FileInfo[] _files;
 
         private static readonly SyncronizedDictionary<long, string> _names = new();
 
@@ -28,13 +29,9 @@ namespace Witlesss.Commands
 
             if (Text.StartsWith("/boards"))
             {
-                if (Text.EndsWith(" info"))
-                {
-                    Bot.SendMessage(Chat, $"Доступные доскиъ/трѣды:\n{Fuse.JsonList(GetFilesInfo(CHAN_FOLDER))}");
-                    return;
-                }
-                
-                SendBoardList(Chat, 0, 2);
+                if (Text.EndsWith(" info")) SendSavedList(Chat, 0, 25);
+                else                        SendBoardList(Chat, 0,  2);
+
                 return;
             }
 
@@ -165,11 +162,41 @@ namespace Witlesss.Commands
                 }
             }
             sb.Append(string.Format(BrowseReddit.SEARCH_FOOTER, Bot.Me.FirstName));
-            sb.Append("\n\nИспользуйте стрелочки для навигации ☝️🤓");
+            sb.Append(USE_ARROWS);
 
             var text = sb.ToString();
+            var buttons = GetPaginationKeyboard(page, perPage, last, "b");
 
+            SendOrEditMessage(chat, text, messageId, buttons);
+        }
 
+        public void SendSavedList(long chat, int page, int perPage, int messageId = -1)
+        {
+            var files = GetFilesInfo(CHAN_FOLDER);
+            if (_files is null || _files.Length != files.Length) _files = files;
+
+            var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
+            var sb = new StringBuilder("<b>Доступные доскиъ/трѣды:</b> ");
+            sb.Append("📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]\n");
+            sb.Append(Fuse.JsonList(_files, page, perPage));
+            sb.Append(USE_ARROWS);
+
+            var text = sb.ToString();
+            var buttons = GetPaginationKeyboard(page, perPage, lastPage, "bi");
+
+            SendOrEditMessage(chat, text, messageId, buttons);
+        }
+
+        public static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup buttons)
+        {
+            if (messageId < 0)
+                Bot.SendMessage(chat, text, buttons);
+            else
+                Bot.EditMessage(chat, messageId, text, buttons);
+        }
+
+        public static InlineKeyboardMarkup GetPaginationKeyboard(int page, int perPage, int last, string key)
+        {
             var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
             var buttons = new List<InlineKeyboardButton>() { inactive, inactive, inactive, inactive };
 
@@ -178,12 +205,9 @@ namespace Witlesss.Commands
             if (page < last    ) buttons[2] = InlineKeyboardButton.WithCallbackData("➡️", CallbackData(page + 1));
             if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
 
-            if (messageId < 0)
-                Bot.SendMessage(chat, text, new InlineKeyboardMarkup(buttons));
-            else
-                Bot.EditMessage(chat, messageId, text, new InlineKeyboardMarkup(buttons));
-
-            string CallbackData(int p) => $"b - {p} {perPage}";
+            return new InlineKeyboardMarkup(buttons);
+            
+            string CallbackData(int p) => $"{key} - {p} {perPage}";
         }
 
 

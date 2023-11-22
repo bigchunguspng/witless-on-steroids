@@ -914,6 +914,17 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///
+        ///Используйте стрелочки для навигации ☝️🤓.
+        /// </summary>
+        internal static string USE_ARROWS {
+            get {
+                return ResourceManager.GetString("USE_ARROWS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-Water.
         /// </summary>
         internal static string WATERMARKS_FOLDER {

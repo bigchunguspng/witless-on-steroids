@@ -14,6 +14,8 @@ namespace Witlesss.Commands
     {
         private long _size;
         private int   _max;
+        
+        private FileInfo[] _files;
 
         public override void Run()
         {
@@ -52,7 +54,7 @@ namespace Witlesss.Commands
             {
                 string name = a[1];
                 
-                if      (name == "info") Bot.SendMessage(Chat, FUSE_AVAILABLE_BASES());
+                if      (name == "info") SendFuseList(Chat, 0, 25);
                 else if (name == "his" ) Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
                 else
                     FuseWitlessDB(name);
@@ -79,28 +81,50 @@ namespace Witlesss.Commands
             bool IsJsonAttached(Message message) => message.Document?.MimeType is "application/json";
         }
 
-        private static string BASE_SIZE() => $"Словарь <b>этой беседы</b> весит {FileSize(Baka.Path)}";
-        private static string FUSE_AVAILABLE_BASES() => $"Доступные словари:\n{JsonList(GetFilesInfo(EXTRA_DBS_FOLDER))}\n\n{BASE_SIZE()}";
+        public void SendFuseList(long chat, int page, int perPage, int messageId = -1, bool fail = false)
+        {
+            var files = GetFilesInfo(EXTRA_DBS_FOLDER);
+            if (_files is null || _files.Length != files.Length) _files = files;
+
+            var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
+            var sb = new StringBuilder();
+            if (fail)
+            {
+                sb.Append(FUSE_FAIL_BASE).Append("\n\n");
+            }
+            sb.Append("<b>Доступные словари:</b> ");
+            sb.Append("📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]\n");
+            sb.Append(JsonList(_files, page, perPage));
+            sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.Path));
+            sb.Append(USE_ARROWS);
+
+            var text = sb.ToString();
+            var buttons = FuseBoards.GetPaginationKeyboard(page, perPage, lastPage, "fi");
+
+            FuseBoards.SendOrEditMessage(chat, text, messageId, buttons);
+        }
+
         private static string FUSE_AVAILABLE_DATES()
         {
             var files = GetFilesInfo($@"{CH_HISTORY_FOLDER}\{Chat}");
-            var result = $"Доступные диапазоны переписки:\n{JsonList(files)}";
+            var result = $"<b>Доступные диапазоны переписки:</b>\n{JsonList(files, 0, 100)}";
             if (files.Length > 0)
                 result += "\n\nМожно скормить всё, прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
 
             return result;
         }
 
-        public static string JsonList(FileInfo[] files)
+        public static string JsonList(FileInfo[] files, int page = 0, int perPage = 25)
         {
             if (files.Length == 0) return "\n*пусто*";
             
-            var res = new StringBuilder();
-            foreach (var db in files)
+            var sb = new StringBuilder();
+            foreach (var db in files.Skip(page * perPage).Take(perPage))
             {
-                res.Append($"\n<code>{db.Name.Replace(".json", "")}</code> ({FileSize(db.FullName)})");
+                sb.Append("\n<code>").Append(db.Name.Replace(".json", ""));
+                sb.Append("</code> (").Append(FileSize(db.FullName)).Append(")");
             }
-            return res.ToString();
+            return sb.ToString();
         }
 
         private void FuseWitlessDB(string name)
@@ -119,7 +143,11 @@ namespace Witlesss.Commands
                 new FusionCollab(Baka, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
                 GoodEnding();
             }
-            else Bot.SendMessage(Chat, passedID ? FUSE_FAIL_CHAT : $"{FUSE_FAIL_BASE}\n\n{FUSE_AVAILABLE_BASES()}");
+            else
+            {
+                if (passedID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
+                else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
+            }
 
             string Path() => $@"{EXTRA_DBS_FOLDER}\{name}.json";
             WitlessDB FromFile() => new FileIO<WitlessDB>(Path()).LoadData();

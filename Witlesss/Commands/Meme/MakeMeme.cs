@@ -29,11 +29,7 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string text)
         {
-            var empty = Text is null && Baka.Meme.OptionsM is null;
-            var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
-            var cmd   = input.Split(split_chars, 2)[0].ToLower();
-            var memes = cmd.Length > 5 && cmd.StartsWith("/meme");
-            var dummy = empty ? "" : memes ? input : Baka.Meme.OptionsM ?? input;
+            var dummy = GetDummy(Baka.Meme.OptionsM, "/meme", out var empty);
 
             MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBack)
@@ -82,13 +78,13 @@ namespace Witlesss.Commands.Meme
             return new DgText(a, b);
         }
 
-        private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex  _add_bottom = new(@"^\/meme\S*s\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex    _top_only = new(@"^\/meme\S*t\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex      _roboto = new(@"^\/meme\S*r\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex      _italic = new(@"^\/meme\S*i\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex  _add_bottom = new(@"^\/meme\S*s\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex    _top_only = new(@"^\/meme\S*t\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _roboto = new(@"^\/meme\S*r\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _italic = new(@"^\/meme\S*i\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
 
         public static ColorMode Dye => Baka.Meme.Dye;
     }

@@ -89,6 +89,18 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         private string GetTextUnlessItsReposted() => Message.ForwardFromChat is null ? Text : null;
 
+        protected string GetDummy(string options, string command, out bool empty)
+        {
+                empty = Text is null && options is null;
+            if (empty) return "";
+
+            var cmd   = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
+            var hasOp = cmd.Length > command.Length && cmd.StartsWith(command);
+            var plus  = hasOp && cmd.Contains('+');
+
+            return hasOp ? plus ? options + cmd[command.Length..] : cmd : options ?? cmd;
+        }
+
         private bool HasToBeRepeated()
         {
             if (Text is null) return false;

@@ -29,11 +29,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
-            var empty = Text is null && Baka.Meme.OptionsD is null;
-            var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
-            var cmd   = input.Split(split_chars, 2)[0].ToLower();
-            var topxd = cmd.Length > 3 && cmd.StartsWith("/dp");
-            var dummy = empty ? "" : topxd ? input : Baka.Meme.OptionsD ?? input;
+            var dummy = GetDummy(Baka.Meme.OptionsD, "/dp", out var empty);
             
             DynamicDemotivatorDrawer.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 
@@ -60,11 +56,11 @@ namespace Witlesss.Commands.Meme
             return caps && (gen || txt.Length > 50) ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
-        private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _impact  = new(@"^\/dp\S*im\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _bold    = new(@"^\/dp\S*bb\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _crop    = new(@"^\/dp\S*cp\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _caps    = new(@"^\/dp\S*up\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _colorXD = new(@"^\/dp\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _impact  = new(@"^\/dp\S*im\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _bold    = new(@"^\/dp\S*bb\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _caps    = new(@"^\/dp\S*up\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorXD = new(@"^\/dp\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
     }
 }

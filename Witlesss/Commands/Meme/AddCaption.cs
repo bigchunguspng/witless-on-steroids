@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands.Meme
@@ -29,11 +30,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
-            var empty = Text is null && Baka.Meme.OptionsT is null;
-            var input = Text is null ? "" : Text.Replace(Config.BOT_USERNAME, "");
-            var cmd   = input.Split(split_chars, 2)[0].ToLower();
-            var topxd = cmd.Length > 4 && cmd.StartsWith("/top");
-            var dummy = empty ? "" : topxd ? input : Baka.Meme.OptionsT ?? input;
+            var dummy = GetDummy(Baka.Meme.OptionsT, "/top", out var empty);
 
             IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 
@@ -66,18 +63,18 @@ namespace Witlesss.Commands.Meme
             int GetInt(Regex x) => int.Parse(x.Match(dummy).Groups[1].Value);
         }
 
-        private static readonly Regex _regular = new(@"^\/top\S*rg\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _segoe   = new(@"^\/top\S*sg\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _left    = new(@"^\/top\S*la\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _blur    = new(@"^\/top\S*blur\S* *",          RegexOptions.IgnoreCase);
-        private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _colorPP = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _colorFC = new(@"^\/top\S*fc\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _blackBG = new(@"^\/top\S*bb\S* *",            RegexOptions.IgnoreCase);
-        private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);
-        private static readonly Regex _fontMS  = new(@"^\/top\S*?ms(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
-        private static readonly Regex _fontSS  = new(@"^\/top\S*?ss(\d{1,3})\S* *",  RegexOptions.IgnoreCase);
+        private static readonly Regex _regular = new(@"^\/top\S*rg\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _segoe   = new(@"^\/top\S*sg\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _left    = new(@"^\/top\S*la\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _blur    = new(@"^\/top\S*blur\S*",          RegexOptions.IgnoreCase);
+        private static readonly Regex _height  = new(@"^\/top\S*mm\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorPP = new(@"^\/top\S*pp\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorFC = new(@"^\/top\S*fc\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _blackBG = new(@"^\/top\S*bb\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _fontMS  = new(@"^\/top\S*?ms(\d{1,3})\S*",  RegexOptions.IgnoreCase);
+        private static readonly Regex _fontSS  = new(@"^\/top\S*?ss(\d{1,3})\S*",  RegexOptions.IgnoreCase);
     }
 }

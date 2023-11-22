@@ -49,6 +49,7 @@ namespace Witlesss.Commands.Meme
 
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
+            IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
             IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(dummy);
             IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
@@ -72,6 +73,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _height  = new(@"^\/top\S*mm\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*ww\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorPP = new(@"^\/top\S*pp\S* *",            RegexOptions.IgnoreCase);
+        private static readonly Regex _colorFC = new(@"^\/top\S*fc\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _blackBG = new(@"^\/top\S*bb\S* *",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S* *", RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})%\S* *", RegexOptions.IgnoreCase);

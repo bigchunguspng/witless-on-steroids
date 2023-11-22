@@ -12,7 +12,7 @@ namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 public class IFunnyApp
 {
     public static bool UseRegularFont, UseSegoe, UseLeftAlignment, MinimizeHeight, WrapText = true;
-    public static bool PickColor, UseGivenColor, BackInBlack, BlurImage;
+    public static bool PickColor, ForceCenter, UseGivenColor, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
     public static Color GivenColor;
 
@@ -222,7 +222,7 @@ public class IFunnyApp
 
     public void SetSpecialColors(Bitmap image)
     {
-        Background = AverageColor(image, new Rectangle(image.Width / 2, _crop_offset, 5, 5));
+        Background = PickColorFromImage(image);
         TextColor  = ChooseTextColor(Background);
     }
     public void SetCustomColors()
@@ -238,22 +238,74 @@ public class IFunnyApp
 
     private SolidBrush ChooseTextColor(Color b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
 
-    private static Color AverageColor(Bitmap image, Rectangle where)
+    private Color PickColorFromImage(Bitmap image)
     {
-        int r = 0, g = 0, b = 0;
-        int w = where.Width, h = where.Height, s = w * h;
-        int maxX = where.X + w, maxY = where.Y + h;
+        var xd = ForceCenter ? 2 : 0;
 
-        for (var x = where.X; x < maxX; x++)
-        for (var y = where.Y; y < maxY; y++)
+        var colors = new Color[7];
+        colors[0] = AverageColorOnOffset(                  0);
+        colors[1] = AverageColorOnOffset(image.Width * 1 / 8);
+        colors[2] = AverageColorOnOffset(image.Width * 2 / 8);
+        colors[3] = AverageColorOnOffset(image.Width * 4 / 8);
+        colors[4] = AverageColorOnOffset(image.Width * 3 / 8);
+        colors[5] = AverageColorOnOffset(image.Width * 7 / 8);
+        colors[6] = AverageColorOnOffset(image.Width     - 5);
+
+        var difference = new int[7 - xd * 2];
+        for (var i = 0; i < colors.Length - xd * 2; i++)
+        {
+            difference[i] = colors[xd..^xd].Select(c => Difference(colors[i + xd], c)).OrderBy(x => x).Take(3).Sum();
+        }
+
+        foreach (var d in difference) Log(d.ToString());
+
+        var min = difference.Min();
+
+        return min > 950 ? Average(colors[0], colors[^1]) : colors[difference.ToList().IndexOf(min) + xd];
+
+        Color AverageColorOnOffset(int x)
+        {
+            var avg = AverageColor(image, new Rectangle(x, _crop_offset, 5, 5));
+            return BackInBlack ? avg : PutOver(Color.White, avg);
+        }
+    }
+
+    private static Color AverageColor(Bitmap image, Rectangle area)
+    {
+        int a = 0, r = 0, g = 0, b = 0;
+        int w = area.Width, h = area.Height, s = w * h;
+        int maxX = area.X + w, maxY = area.Y + h;
+
+        for (var x = area.X; x < maxX; x++)
+        for (var y = area.Y; y < maxY; y++)
         {
             var p = image.GetPixel(x, y);
+            a += p.A;
             r += p.R;
             b += p.B;
             g += p.G;
         }
 
-        return Color.FromArgb(r / s, g / s, b / s);
+        return Color.FromArgb(a / s, r / s, g / s, b / s);
+    }
+
+    private static int Difference(Color a, Color b)
+    {
+        return Math.Abs(a.R - b.R) + Math.Abs(a.G - b.G) + Math.Abs(a.B - b.B);
+    }
+
+    private static Color Average(Color a, Color b)
+    {
+        return Color.FromArgb(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
+
+        int Calc(byte x, byte y) => (x + y) / 2;
+    }
+
+    private static Color PutOver(Color a, Color b)
+    {
+        return Color.FromArgb(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
+
+        int Calc(byte x, byte y) => x * (255 - b.A) / 255 + y * b.A / 255; // lerp
     }
 
     #endregion

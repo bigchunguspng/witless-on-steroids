@@ -486,14 +486,31 @@ s   - save and exit
     <data name="BOARD_MANUAL" xml:space="preserve">
         <value>Этой командой можно скармливать мне треды с форча.
 
-&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/board [ссылка на тред/доску/архив]&lt;/code&gt;
+&lt;b&gt;Синтаксис:&lt;/b&gt;
+&lt;code&gt;/board [ссылка на тред/доску/архив]&lt;/code&gt;
+&lt;code&gt;/board [имя сохранёнки]&lt;/code&gt;
 
 Список досок - &lt;code&gt;/boards&lt;/code&gt;
+Список сохранёнок - &lt;code&gt;/boards info&lt;/code&gt;
 Ссылка на архив = ссылка на доску + &lt;code&gt;archive&lt;/code&gt;
 
 💀На абордаж! 🏴‍☠️</value>
     </data>
     <data name="MAY_TAKE_A_WHILE" xml:space="preserve">
         <value>(может занять до пары минут)</value>
+    </data>
+    <data name="CHAN_FOLDER" xml:space="preserve">
+        <value>Telegram-BoardDBs</value>
+    </data>
+    <data name="FUSE_FAIL_BOARD" xml:space="preserve">
+        <value>К сожалению, я не нашёл сохранённых обсуждений с таким названием
+
+&lt;code&gt;/boards@piece_fap_club info&lt;/code&gt;
+
+и выберите один из вариантов, или пропишите
+
+&lt;code&gt;/boards@piece_fap_club&lt;/code&gt;
+
+чтобы найти новый материал</value>
     </data>
 </root>

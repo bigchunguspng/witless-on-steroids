@@ -37,7 +37,7 @@ namespace Witlesss.XD
             _   => Upper
         };
 
-        public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 3)] + "..." : s;
+        public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
 
         public static bool HasIntArgument(this string text, out int value)
         {

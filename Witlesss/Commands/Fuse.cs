@@ -91,7 +91,7 @@ namespace Witlesss.Commands
             return result;
         }
 
-        private static string JsonList(FileInfo[] files)
+        public static string JsonList(FileInfo[] files)
         {
             if (files.Length == 0) return "\n*пусто*";
             
@@ -176,8 +176,8 @@ namespace Witlesss.Commands
         
         private void GoodEnding()
         {
-            Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
             Baka.SaveNoMatterWhat();
+            Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
             var newSize = SizeInBytes(Baka.Path);
             var difference = FileSize(newSize - _size);
             Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), difference));

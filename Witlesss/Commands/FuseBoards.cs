@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
+using static System.StringSplitOptions;
 
 #pragma warning disable CS4014
 
@@ -14,7 +16,11 @@ namespace Witlesss.Commands
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
 
+        private static readonly SyncronizedDictionary<long, string> _names = new();
+
         // /boards
+        // /boards info
+        // /board a.b.c - Y-M-D.json
         // /board [thread/archive/archive link]
         public override void Run()
         {
@@ -22,21 +28,54 @@ namespace Witlesss.Commands
 
             if (Text.StartsWith("/boards"))
             {
+                if (Text.EndsWith(" info"))
+                {
+                    Bot.SendMessage(Chat, $"Доступные доскиъ/трѣды:\n{Fuse.JsonList(GetFilesInfo(CHAN_FOLDER))}");
+                    return;
+                }
+                
                 SendBoardList(Chat, 0, 2);
                 return;
             }
 
             if (Text.Contains(' '))
             {
-                var args = Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var args = Text.Split(' ', 2, RemoveEmptyEntries);
 
                 var url = args[1];
+
+                if (url.Contains(' ')) // FUSE WITH JSON FILE
+                {
+                    var file = $@"{CHAN_FOLDER}\{url}.json";
+                    if (GetFiles(CHAN_FOLDER).Contains(file))
+                    {
+                        var size = SizeInBytes(Baka.Path);
+                        
+                        var list = new FileIO<List<string>>(file).LoadData();
+                        foreach (var line in list) Baka.Eat(line);
+                        Baka.SaveNoMatterWhat();
+                        Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+                        
+                        var newSize = SizeInBytes(Baka.Path);
+                        var difference = FileSize(newSize - size);
+                        Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), difference));
+                    }
+                    else
+                        Bot.SendMessage(Chat, FUSE_FAIL_BOARD);
+                    
+                    return;
+                }
+
                 var uri = UrlOrBust(url);
+
+                var host = uri.Host;
+                var name = string.Join('.', url.Split(new[] { host }, None)[1].Split('/', RemoveEmptyEntries).Take(3));
+                _names[Chat] = name;
 
                 if (url.EndsWith("/archive"))
                 {
                     var threads = _chan.GetArchivedThreads(url);
-                    var tasks = threads.Select(x => GetDiscussionAsync("https://" + uri.Host + x)).ToList();
+                    var tasks = threads.Select(x => GetDiscussionAsync("https://" + host + x)).ToList();
 
                     RespondAndStartEating(tasks);
                 }
@@ -87,11 +126,16 @@ namespace Witlesss.Commands
             EatMany(lines, x.Baka, size, x.Chat, x.Title);
         }
 
-        private static void EatMany(ICollection<string> lines, Witless baka, long size, long chat, string title)
+        private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title)
         {
             foreach (var text in lines) baka.Eat(text);
             baka.SaveNoMatterWhat();
             Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+
+            Directory.CreateDirectory(CHAN_FOLDER);
+            var path = $@"{CHAN_FOLDER}\{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json";
+            new FileIO<List<string>>(path).SaveData(lines);
+            _names.Remove(chat);
 
             var newSize = SizeInBytes(baka.Path);
             var difference = FileSize(newSize - size);

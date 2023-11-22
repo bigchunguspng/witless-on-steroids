@@ -98,9 +98,12 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to Этой командой можно скармливать мне треды с форча.
         ///
-        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/board [ссылка на тред/доску/архив]&lt;/code&gt;
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt;
+        ///&lt;code&gt;/board [ссылка на тред/доску/архив]&lt;/code&gt;
+        ///&lt;code&gt;/board [имя сохранёнки]&lt;/code&gt;
         ///
         ///Список досок - &lt;code&gt;/boards&lt;/code&gt;
+        ///Список сохранёнок - &lt;code&gt;/boards info&lt;/code&gt;
         ///Ссылка на архив = ссылка на доску + &lt;code&gt;archive&lt;/code&gt;
         ///
         ///💀На абордаж! 🏴‍☠️.
@@ -148,6 +151,15 @@ namespace Witlesss.XD {
         internal static string CH_HISTORY_FOLDER {
             get {
                 return ResourceManager.GetString("CH_HISTORY_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram-BoardDBs.
+        /// </summary>
+        internal static string CHAN_FOLDER {
+            get {
+                return ResourceManager.GetString("CHAN_FOLDER", resourceCulture);
             }
         }
         
@@ -374,6 +386,23 @@ namespace Witlesss.XD {
         internal static string FUSE_FAIL_BASE {
             get {
                 return ResourceManager.GetString("FUSE_FAIL_BASE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to К сожалению, я не нашёл сохранённых обсуждений с таким названием
+        ///
+        ///&lt;code&gt;/boards@piece_fap_club info&lt;/code&gt;
+        ///
+        ///и выберите один из вариантов, или пропишите
+        ///
+        ///&lt;code&gt;/boards@piece_fap_club&lt;/code&gt;
+        ///
+        ///чтобы найти новый материал.
+        /// </summary>
+        internal static string FUSE_FAIL_BOARD {
+            get {
+                return ResourceManager.GetString("FUSE_FAIL_BOARD", resourceCulture);
             }
         }
         

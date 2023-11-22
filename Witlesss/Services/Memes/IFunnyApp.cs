@@ -257,8 +257,6 @@ public class IFunnyApp
             difference[i] = colors[xd..^xd].Select(c => Difference(colors[i + xd], c)).OrderBy(x => x).Take(3).Sum();
         }
 
-        foreach (var d in difference) Log(d.ToString());
-
         var min = difference.Min();
 
         return min > 950 ? Average(colors[0], colors[^1]) : colors[difference.ToList().IndexOf(min) + xd];

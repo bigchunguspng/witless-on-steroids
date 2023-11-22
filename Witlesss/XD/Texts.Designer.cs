@@ -902,12 +902,12 @@ namespace Witlesss.XD {
         ///&lt;code&gt;ft&lt;/code&gt; - шрифт &lt;i&gt;Futura Extra Black&lt;/i&gt;
         ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
         ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
-        ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета (новый)
-        ///&lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (старый)
+        ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета (края)
+        ///&lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (центр)
         ///&lt;code&gt;bb&lt;/code&gt; - чёрный фон (для стикеров)
         ///&lt;code&gt;80%&lt;/code&gt; - обрезать 20% сверху
         ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
-        ///&lt;code&gt;ms128&lt;/code&gt;  [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;ms128&lt;/code&gt; -  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TOP_OPTIONS {
             get {

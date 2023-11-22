@@ -43,8 +43,8 @@ namespace Witlesss.Commands.Meme
                 else   DynamicDemotivatorDrawer.UseGivenColor = false;
             }
             
-            DynamicDemotivatorDrawer.UseRoboto   = !empty &&  _roboto.IsMatch(dummy);
-            DynamicDemotivatorDrawer.UseImpact   = !empty &&  _impact.IsMatch(dummy);
+            DynamicDemotivatorDrawer.UseRoboto   = !empty &&  _roboto.IsMatch(dummy) && !_times.IsMatch(dummy);
+            DynamicDemotivatorDrawer.UseImpact   = !empty &&  _impact.IsMatch(dummy) && !_times.IsMatch(dummy);
             DynamicDemotivatorDrawer.UseBoldFont = !empty &&    _bold.IsMatch(dummy);
             DynamicDemotivatorDrawer.CropEdges   = !empty &&    _crop.IsMatch(dummy);
             
@@ -58,6 +58,7 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _impact  = new(@"^\/dp\S*im\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _times   = new(@"^\/dp\S*tm\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _bold    = new(@"^\/dp\S*bb\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _caps    = new(@"^\/dp\S*up\S*",            RegexOptions.IgnoreCase);

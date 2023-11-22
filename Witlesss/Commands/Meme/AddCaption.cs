@@ -47,8 +47,8 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
             IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
-            IFunnyApp.UseRegularFont   = !empty &&  _regular.IsMatch(dummy);
-            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
+            IFunnyApp.UseRoboto   = !empty &&  _regular.IsMatch(dummy) && !_futura.IsMatch(dummy);
+            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy) && !_futura.IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(dummy);
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
@@ -65,6 +65,7 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _regular = new(@"^\/top\S*rg\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _segoe   = new(@"^\/top\S*sg\S*",            RegexOptions.IgnoreCase);
+        private static readonly Regex _futura  = new(@"^\/top\S*ft\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _left    = new(@"^\/top\S*la\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _blur    = new(@"^\/top\S*blur\S*",          RegexOptions.IgnoreCase);
         private static readonly Regex _height  = new(@"^\/top\S*mm\S*",            RegexOptions.IgnoreCase);

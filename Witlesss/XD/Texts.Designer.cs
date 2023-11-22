@@ -332,6 +332,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
         ///&lt;code&gt;im&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
+        ///&lt;code&gt;tm&lt;/code&gt; - шрифт &lt;i&gt;Times New Roman&lt;/i&gt;
         ///&lt;code&gt;bb&lt;/code&gt; - жирный шрифт
         ///&lt;code&gt;up&lt;/code&gt; - верхний регистр
         ///&lt;code&gt;cp&lt;/code&gt; - обрезать лишние края
@@ -555,6 +556,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;i&lt;/code&gt; - курсив
         ///&lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;p&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
         ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
         ///&lt;code&gt;d&lt;/code&gt; - только нижний текст
         ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст (к своему)
@@ -897,15 +899,15 @@ namespace Witlesss.XD {
         ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
         ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
         ///&lt;code&gt;sg&lt;/code&gt; - шрифт &lt;i&gt;Segoe UI Black&lt;/i&gt;
+        ///&lt;code&gt;ft&lt;/code&gt; - шрифт &lt;i&gt;Futura Extra Black&lt;/i&gt;
         ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
         ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
-        ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета
+        ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета (новый)
+        ///&lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (старый)
         ///&lt;code&gt;bb&lt;/code&gt; - чёрный фон (для стикеров)
         ///&lt;code&gt;80%&lt;/code&gt; - обрезать 20% сверху
         ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
-        ///&lt;code&gt;ms128&lt;/code&gt; - минимальный размер шрифта
-        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта
-        ///&lt;code&gt;#color#&lt;/code&gt; - цвет пла [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;ms128&lt;/code&gt;  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TOP_OPTIONS {
             get {

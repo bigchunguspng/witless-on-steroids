@@ -175,16 +175,18 @@ namespace Witlesss.Commands
             var files = GetFilesInfo(CHAN_FOLDER);
             if (_files is null || _files.Length != files.Length) _files = files;
 
+            var single = _files.Length <= perPage;
+
             var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
             var sb = new StringBuilder("<b>Доступные доскиъ/трѣды:</b> ");
-            sb.Append("📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]\n");
-            sb.Append(Fuse.JsonList(_files, page, perPage));
-            sb.Append(USE_ARROWS);
+            if (!single) sb.Append("📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
+            sb.Append('\n').Append(Fuse.JsonList(_files, page, perPage));
+            if (!single) sb.Append(USE_ARROWS);
 
             var text = sb.ToString();
-            var buttons = GetPaginationKeyboard(page, perPage, lastPage, "bi");
 
-            SendOrEditMessage(chat, text, messageId, buttons);
+            if (single) Bot.SendMessage(chat, text);
+            else SendOrEditMessage(chat, text, messageId, GetPaginationKeyboard(page, perPage, lastPage, "bi"));
         }
 
         public static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup buttons)

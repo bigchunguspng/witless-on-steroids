@@ -548,13 +548,6 @@ s   - save and exit
 &lt;code&gt;/crop 100 100 0 0&lt;/code&gt; 👈 с левого верхнего угла ↖️
 &lt;code&gt;/crop 100 100 w-100 h-100&lt;/code&gt; 👈 с правого нижнего угла ↘️
 
-&lt;b&gt;Спецэффекты:&lt;/b&gt;
-
-☝️&lt;code&gt;/crop shake&lt;/code&gt; - тряска
-│
-├─ &lt;u&gt;Параметры&lt;/u&gt; 👉 &lt;code&gt;%_обрезки скорость сдвиг&lt;/code&gt;
-└─ &lt;u&gt;По дефолту&lt;/u&gt; 👉 &lt;code&gt;0.95 random(0) random(0)&lt;/code&gt;
-
 &lt;b&gt;Более подробно &lt;a href='https://ffmpeg.org/ffmpeg-filters.html#crop'&gt;тут&lt;/a&gt;&lt;/b&gt;</value>
     </data>
     <data name="SCALE_MANUAL" xml:space="preserve">

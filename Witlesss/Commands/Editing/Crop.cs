@@ -6,24 +6,30 @@ namespace Witlesss.Commands.Editing
 {
     public class Crop : Scale
     {
-        private const string _filename = "piece_fap_crop.mp4";
+        private const string _crop  = "piece_fap_crop.mp4";
+        private const string _shake = "shake_fap_club.mp4";
+
+        private bool _isShakeMode; 
 
         public override void Run()
         {
             if (NoVideo()) return;
 
-            if (Text.Contains(' '))
+            var input = _isShakeMode ? "/crop " + Text : Text;
+            if (input.Contains(' '))
             {
-                var args = Text.Split(' ').Skip(1).ToArray();
+                string[] log = null;
+                var args = input.Split(' ').Skip(1).ToArray();
 
-                if (args[0].StartsWith("shake"))
+                if (_isShakeMode)
                 {
                     var crop   = 1 < args.Length ? args[1] : "0.95";
                     var speed  = 2 < args.Length ? args[2] : "random(0)";
                     var offset = 3 < args.Length ? args[3] : "random(0)";
                     args = F_Shake(crop, speed, offset).Split();
+                    log  = new[] { crop, speed, offset };
                 }
-                
+
                 for (var i = 0; i < Math.Min(args.Length, 4); i++)
                 {
                     var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
@@ -33,12 +39,24 @@ namespace Witlesss.Commands.Editing
                 if (args.Length > 4) args = args.Take(4).ToArray();
 
                 Bot.Download(FileID, Chat, out var path, out var type);
-                
-                SendResult(Memes.Crop(path, args), type, _filename);
-                Log($"{Title} >> CROP [{string.Join(':', args)}]");
+
+                SendResult(Memes.Crop(path, args), type, _isShakeMode ? _shake : _crop);
+                Log($"{Title} >> CROP [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else
                 Bot.SendMessage(Chat, CROP_MANUAL);
+        }
+
+        public Crop UseShakeMode()
+        {
+            _isShakeMode = true;
+            return this;
+        }
+
+        public Crop UseDefaultMode()
+        {
+            _isShakeMode = false;
+            return this;
         }
 
         private static string F_Shake(string a, string b, string c)

@@ -84,7 +84,8 @@ namespace Witlesss.Commands
         {
             if      (CommandIs( "/fast"   )) _sc = _speed.SetMode(SpeedMode.Fast);
             else if (CommandIs( "/slow"   )) _sc = _speed.SetMode(SpeedMode.Slow);
-            else if (CommandIs( "/crop"   )) _sc = _crop;
+            else if (CommandIs( "/crop"   )) _sc = _crop.UseDefaultMode();
+            else if (CommandIs( "/shake"  )) _sc = _crop.UseShakeMode();
             else if (CommandIs( "/cut"    )) _sc = _cut;
             else if (CommandIs( "/sus"    )) _sc = _sus;
             else if (CommandIs( "/damn"   )) _sc = _bitrate;

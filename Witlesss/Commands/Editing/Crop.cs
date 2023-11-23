@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types.InputFiles;
 
@@ -14,12 +15,23 @@ namespace Witlesss.Commands.Editing
 
             if (Text.Contains(' '))
             {
-                var args = Text.Split(' ', 5).Skip(1).ToArray();
-                for (var i = 0; i < args.Length; i++)
+                var args = Text.Split(' ').Skip(1).ToArray();
+
+                if (args[0].StartsWith("shake"))
                 {
-                    var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",         "iw");
+                    var crop   = 1 < args.Length ? args[1] : "0.95";
+                    var speed  = 2 < args.Length ? args[2] : "random(0)";
+                    var offset = 3 < args.Length ? args[3] : "random(0)";
+                    args = F_Shake(crop, speed, offset).Split();
+                }
+                
+                for (var i = 0; i < Math.Min(args.Length, 4); i++)
+                {
+                    var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
                     args[i] = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
                 }
+
+                if (args.Length > 4) args = args.Take(4).ToArray();
 
                 Bot.Download(FileID, Chat, out var path, out var type);
                 
@@ -27,9 +39,7 @@ namespace Witlesss.Commands.Editing
                 Log($"{Title} >> CROP [{string.Join(':', args)}]");
             }
             else
-            {
-                Bot.SendMessage(Chat, CUT_MANUAL); //todo manual
-            }
+                Bot.SendMessage(Chat, CROP_MANUAL);
         }
 
         private static void SendResult(string result, MediaType type)
@@ -39,13 +49,10 @@ namespace Witlesss.Commands.Editing
             else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, _filename));
             else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
         }
+
+        private static string F_Shake(string a, string b, string c)
+        {
+            return $"w*{a} h*{a} (w-out_w)/2+((w-out_w)/2)*sin(t*{b}-{c}) (h-out_h)/2+((h-out_h)/2)*sin(t*{b}+2*{c})";
+        }
     }
 }
-
-// (\d+|[\+\-*\/\(\)]|(in_w|iw|out_w|ow|in_h|ih|out_h|oh)|[xynt]|(sin|cos|PHI|pos|[sd]ar|a|[hv]sub))+
-
-//  w/2 h/2 (w-out_w)/2+((w-out_w)/2)*sin(t*10) (h-out_h)/2+((h-out_h)/2)*sin(t*13)
-
-// /crop w/2 h/2 (w-out_w)/2+((w-out_w)/2)*sin(n/10) (h-out_h)/2+((h-out_h)/2)*sin(n/7)
-
-// /crop w*0.75 h*0.75 (w-out_w)/2+((w-out_w)*2/3)*sin(t*60) (h-out_h)*2/3+((h-out_h)/2)*sin(t*60) - s_shake

@@ -240,6 +240,30 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Обрезка видео&lt;/u&gt;&lt;/b&gt; ✋🤚
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/crop ширина высота X Y&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Дефолтные значения:&lt;/b&gt; &lt;code&gt;w&lt;/code&gt;, &lt;code&gt;h&lt;/code&gt;, &lt;code&gt;x&lt;/code&gt;, &lt;code&gt;y&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Аргументы:&lt;/b&gt;
+        ///1. Разделяются пробелами
+        ///2. Передаются строго по порядку
+        ///3. Могут быть как числами, обозначающими кол-во пикселей, так и сложными тригонометрическими формулами по времени.
+        ///
+        ///
+        ///&lt;b&gt;Валидные примеры:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/crop min(w,h) min(w,h)&lt;/code&gt; 👈 обрезать до квадрата
+        ///&lt;code&gt;/crop w-20 h-20&lt;/code&gt; 👈 срезат [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CROP_MANUAL {
+            get {
+                return ResourceManager.GetString("CROP_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Укажите &lt;b&gt;таймкод начала&lt;/b&gt; фрагмента и его &lt;b&gt;длину&lt;/b&gt;, например:
         ///
         ///&lt;b&gt;/cut@piece_fap_bot 0:10&lt;/b&gt;

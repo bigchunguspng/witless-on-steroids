@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Crop : VideoCommand
+    public class Crop : Scale
     {
         private const string _filename = "piece_fap_crop.mp4";
 
@@ -35,24 +34,16 @@ namespace Witlesss.Commands.Editing
 
                 Bot.Download(FileID, Chat, out var path, out var type);
                 
-                SendResult(Memes.Crop(path, args), type);
+                SendResult(Memes.Crop(path, args), type, _filename);
                 Log($"{Title} >> CROP [{string.Join(':', args)}]");
             }
             else
                 Bot.SendMessage(Chat, CROP_MANUAL);
         }
 
-        private static void SendResult(string result, MediaType type)
-        {
-            using var stream = File.OpenRead(result);
-            if      (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, _filename));
-            else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, _filename));
-            else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
-        }
-
         private static string F_Shake(string a, string b, string c)
         {
-            return $"w*{a} h*{a} (w-out_w)/2+((w-out_w)/2)*sin(t*{b}-{c}) (h-out_h)/2+((h-out_h)/2)*sin(t*{b}+2*{c})";
+            return $"w*({a}) h*({a}) (w-out_w)/2+((w-out_w)/2)*sin(t*({b})-{c}) (h-out_h)/2+((h-out_h)/2)*sin(t*({b})+2*{c})";
         }
     }
 }

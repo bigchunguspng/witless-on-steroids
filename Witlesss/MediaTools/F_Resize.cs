@@ -21,6 +21,7 @@ namespace Witlesss.MediaTools
         public string CompressImage (Size s) => Cook(SetOutName(_input, "-small", ".jpg"), o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public string CompressAnimation   () => Cook(SetOutName(_input, "-small", ".mp4"), CompressAnimationArgs);
 
+        public string ScaleVideo(string[] s) => Cook(SetOutName(_input, "-s",     ".mp4"), o => o.WithCustomArgument(ScaleFilter(s)));
         public string CropVideo (string[] c) => Cook(SetOutName(_input, "-crop",  ".mp4"), o => CropGeneralArgs(o, c));
         public string CropVideoNote       () => Cook(SetOutName(_input, "-crop",  ".mp4"), CropVideoNoteArgs);
 
@@ -47,7 +48,8 @@ namespace Witlesss.MediaTools
 
         // -filter:v "crop=272:272:56:56"
         private static void CropVideoNoteArgs(FFMpAO o) => o.WithVideoFilters(v => v.Crop(VideoNoteCrop));
-        private static void CropGeneralArgs  (FFMpAO o, string[] c) => o.WithVideoFilters(v => v.Crop(c));
+        private static void   CropGeneralArgs(FFMpAO o, string[] c) => o.WithVideoFilters(v => v.Crop(c));
+        private static string   ScaleFilter(string[] s) => $"-vf \"scale={string.Join(':', s)},setsar=1\"";
 
         // -ss 1 -frames:v 1 -vf
         private static void ExportThumbnailArgs(FFMpAO o, bool square)

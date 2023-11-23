@@ -26,6 +26,7 @@ namespace Witlesss.Commands
         private readonly Sus _sus = new();
         private readonly Cut _cut = new();
         private readonly Crop _crop = new();
+        private readonly Scale _scale = new();
         private readonly Fuse _fuse = new();
         private readonly Move _move = new();
         private readonly GetChatID _chatID = new();
@@ -87,6 +88,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/cut"    )) _sc = _cut;
             else if (CommandIs( "/sus"    )) _sc = _sus;
             else if (CommandIs( "/damn"   )) _sc = _bitrate;
+            else if (CommandIs( "/scale"  )) _sc = _scale;
             else if (command == "/reverse" ) _sc = _reverse;
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (CommandIs( "/sex"    )) _sc = _sticker;

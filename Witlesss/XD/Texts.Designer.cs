@@ -730,6 +730,31 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Масштабирование&lt;/u&gt;&lt;/b&gt;
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Дефолтные значения:&lt;/b&gt; &lt;code&gt;w&lt;/code&gt;, &lt;code&gt;h&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Примеры:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/scale 100&lt;/code&gt; 👈 ширина - 100, соотношение сохраняется
+        ///&lt;code&gt;/scale -1 100&lt;/code&gt; 👈 высота - 100, соотношение сохраняется
+        ///&lt;code&gt;/scale 1280 720&lt;/code&gt; 👈 сами догадайтесь
+        ///
+        ///&lt;code&gt;/scale w/2&lt;/code&gt; 👈 уменьшить в два раза
+        ///&lt;code&gt;/scale -1 h/2&lt;/code&gt; 👈 тоже
+        ///&lt;code&gt;/scale w*2&lt;/code&gt; 👈 увеличить в два раза
+        ///
+        ///&lt;b&gt;Более подробно &lt;a  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SCALE_MANUAL {
+            get {
+                return ResourceManager.GetString("SCALE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Инструкция в самолёте:&lt;/i&gt;&lt;/b&gt;
         ///
         ///&lt;u&gt;Изменить интервал отправки текста&lt;/u&gt;:

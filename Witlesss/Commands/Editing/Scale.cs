@@ -8,14 +8,14 @@ namespace Witlesss.Commands.Editing
     {
         private const string _filename = "scale_fap_club.mp4";
 
-        public override void Run() //todo hd720
+        public override void Run()
         {
             if (NoVideo()) return;
 
             if (Text.Contains(' '))
             {
                 var args = Text.Split(' ').Skip(1).Take(2).ToArray();
-            
+
                 for (var i = 0; i < args.Length; i++)
                 {
                     var w = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
@@ -38,9 +38,9 @@ namespace Witlesss.Commands.Editing
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");
             }
             else
-                Bot.SendMessage(Chat, CROP_MANUAL); // todo manual
+                Bot.SendMessage(Chat, SCALE_MANUAL);
         }
-    
+
         protected static void SendResult(string result, MediaType type, string filename)
         {
             using var stream = File.OpenRead(result);

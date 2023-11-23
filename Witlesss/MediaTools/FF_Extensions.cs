@@ -22,7 +22,8 @@ namespace Witlesss.MediaTools
         public static VFO SetFPS           (this VFO o, double fps  ) => o.WithArgument(new FpsArgument   (fps  ));
         public static AFO ChangeAudioSpeed (this AFO o, double speed) => o.WithArgument(new AtempoArgument(speed));
         
-        public static VFO Crop       (this VFO o, Rectangle cropping) => o.WithArgument(new CropArgument(cropping));
+        public static VFO Crop       (this VFO o, Rectangle cropping) => o.WithArgument(new CropArgument  (cropping));
+        public static VFO Crop       (this VFO o, string[]  cropping) => o.WithArgument(new CropArgumentXD(cropping));
         public static VFO CropSquare (this VFO o)                     => o.WithArgument(new CropSquareArgument  ());
 
         public static VFO MakeSquare (this VFO o, int size) => o.CropSquare().Scale(size, size);

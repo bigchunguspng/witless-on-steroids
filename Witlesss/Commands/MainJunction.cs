@@ -25,6 +25,7 @@ namespace Witlesss.Commands
         private readonly Reverse _reverse = new();
         private readonly Sus _sus = new();
         private readonly Cut _cut = new();
+        private readonly Crop _crop = new();
         private readonly Fuse _fuse = new();
         private readonly Move _move = new();
         private readonly GetChatID _chatID = new();
@@ -82,6 +83,7 @@ namespace Witlesss.Commands
         {
             if      (CommandIs( "/fast"   )) _sc = _speed.SetMode(SpeedMode.Fast);
             else if (CommandIs( "/slow"   )) _sc = _speed.SetMode(SpeedMode.Slow);
+            else if (CommandIs( "/crop"   )) _sc = _crop;
             else if (CommandIs( "/cut"    )) _sc = _cut;
             else if (CommandIs( "/sus"    )) _sc = _sus;
             else if (CommandIs( "/damn"   )) _sc = _bitrate;

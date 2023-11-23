@@ -134,6 +134,7 @@ namespace Witlesss
         public static string Compress      (string path) => new F_Resize(path).CompressImage(FitSize(GetSize(path), 2560));
         public static string CompressGIF   (string path) => new F_Resize(path).CompressAnimation();
         public static string CropVideoNote (string path) => new F_Resize(path).CropVideoNote();
+        public static string Crop          (string path, string[] args) => new F_Resize(path).CropVideo(args);
         public static string ToVideoNote   (string path)
         {
             var s = GetSize(path);

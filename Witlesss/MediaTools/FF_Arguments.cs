@@ -32,6 +32,16 @@ namespace Witlesss.MediaTools
         public string Key   => "crop";
         public string Value => $"{_crop.Width}:{_crop.Height}:{_crop.X}:{_crop.Y}";
     }
+
+    public class CropArgumentXD : IVideoFilterArgument
+    {
+        private readonly string[] _crop;
+
+        public CropArgumentXD(string[]  crop) => _crop = crop;
+        
+        public string Key   => "crop";
+        public string Value => string.Join(':', _crop);
+    }
     public class CropSquareArgument : IVideoFilterArgument
     {
         public string Key   => "crop";

@@ -103,6 +103,7 @@ namespace Witlesss
             UniteTokensToRight(2, 2, 20);
             UniteTokensToLeft (2, 2, 5);
             UniteTokensToRight(3, 3, 4);
+            UniteTokensToRight(4, 2, 5);
 
             return tokens.ToArray();
 

@@ -144,7 +144,7 @@ namespace Witlesss.Commands
 
         public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
         {
-            _boards ??= _chan.GetBoardList("chan.txt");
+            _boards ??= _chan.GetBoardList("https://www.4chan.org/index.php");
 
             var boards = _boards.Skip(page * perPage).Take(perPage);
             var last = (int)Math.Ceiling(_boards.Count / (double)perPage) - 1;

@@ -55,16 +55,13 @@ namespace Witlesss.Services.Internet
 
 
         /// <summary> Returns www.4chan.org or www.4channel.org boards. </summary>
-        /// <param name="path">Site main page source code .txt file path.</param>
-        public List<BoardGroup> GetBoardList(string path)
+        /// <param name="url">Site main page URL.</param>
+        public List<BoardGroup> GetBoardList(string url)
         {
-            var doc = new HtmlDocument();
-            doc.Load(path);
-
             var boards = new List<BoardGroup>();
             var group = new BoardGroup();
 
-            var columns = doc.DocumentNode.SelectNodes(COLUMN);
+            var columns = GetDocument(url).SelectNodes(COLUMN);
             var nodes = columns.SelectMany(x => x.ChildNodes.Where(n => n.Name != "#text")).ToList();
             var last = nodes.Last();
 

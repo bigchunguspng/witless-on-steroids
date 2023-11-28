@@ -57,11 +57,13 @@ namespace Witlesss.Commands.Editing
             else if (m.Sticker   is { IsVideo: true })          FileID = m.Sticker  .FileId;
             else if (m.Voice     is not null)                   FileID = m.Voice    .FileId;
             else if (m.VideoNote is not null)                   FileID = m.VideoNote.FileId;
-            else if (m.Document  is { MimeType: "audio/x-wav"}) FileID = m.Document .FileId;
+            else if (m.Document  is not null && MightBeWav(m))  FileID = m.Document .FileId;
             else return false;
 
             return true;
         }
+
+        private bool MightBeWav(Message m) => m.Document!.FileName!.EndsWith(".wav");
 
         protected static void SendResult(string result, MediaType type, Func<string> video, Func<string> audio)
         {

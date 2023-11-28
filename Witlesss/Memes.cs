@@ -136,6 +136,7 @@ namespace Witlesss
         public static string CropVideoNote (string path) => new F_Resize(path).CropVideoNote();
         public static string Crop          (string path, string[] args) => new F_Resize(path).CropVideo (args);
         public static string Scale         (string path, string[] args) => new F_Resize(path).ScaleVideo(args);
+        public static string ToVoice       (string path) => new F_Resize(path).ToVoiceMessage();
         public static string ToVideoNote   (string path)
         {
             var s = GetSize(path);

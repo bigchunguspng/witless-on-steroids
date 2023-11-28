@@ -21,6 +21,7 @@ namespace Witlesss.Commands
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
         private readonly ToVideoNote _note = new();
+        private readonly ToVoiceMessage _voice = new();
         private readonly ToSticker _sticker = new();
         private readonly Reverse _reverse = new();
         private readonly Sus _sus = new();
@@ -96,6 +97,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/song"   )) _sc = _song;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;
+            else if (command == "/vova"    ) _sc = _voice;
             else if (command == "/debug"   ) _sc = _debug;
             else if (CommandIs( "/w"      )) _sc = _reddit;
             else if (CommandIs( "/link"   )) _sc = _link;

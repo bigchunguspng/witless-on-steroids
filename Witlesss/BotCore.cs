@@ -93,6 +93,12 @@ namespace Witlesss
             TrySend(task, chat, "videonote");
         }
 
+        public void SendVoice(long chat, InputOnlineFile voice)
+        {
+            var task = Client.SendVoiceAsync(chat, voice);
+            TrySend(task, chat, "voice");
+        }
+
         public void SendAlbum(long chat, IEnumerable<IAlbumInputMedia> album)
         {
             var task = Client.SendMediaGroupAsync(chat, album);

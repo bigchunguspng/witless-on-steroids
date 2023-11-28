@@ -15,6 +15,7 @@ namespace Witlesss.MediaTools
         public string Transcode (string extension) => Cook(SetOutName(_input, "-W", extension), null);
 
         public string ToAnimation               () => Cook(SetOutName(_input, "-silent", ".mp4"), ToAnimationArgs);
+        public string ToVoiceMessage            () => Cook(SetOutName(_input, "-voice",  ".ogg"), ToVoiceArgs);
         public string ToVideoNote (Rectangle crop) => Cook(SetOutName(_input, "-vnote",  ".mp4"), o => ToVideoNoteArgs(o, crop));
         public string ToSticker           (Size s) => Cook(SetOutName(_input, "-stick", ".webp"), o => o.Resize(s));
 
@@ -29,7 +30,9 @@ namespace Witlesss.MediaTools
         public string ResizeThumbnail (string path, bool square) => Cook(path, o => ResizeThumbnailArgs(o, square));
         public string CompressJpeg    (string path, int  factor) => Cook(path, o => o.WithQscale(factor));
 
-        
+        // -c:a libopus -b:a 48k -vn
+        private void ToVoiceArgs(FFMpAO o) => o.WithAudioCodec("libopus").WithAudioBitrate(48).DisableChannel(Channel.Video);
+
         // -s WxH -an -vcodec libx264 -crf 30
         private void ToAnimationArgs(FFMpAO o)
         {

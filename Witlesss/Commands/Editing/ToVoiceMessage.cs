@@ -10,7 +10,17 @@ public class ToVoiceMessage : AudioVideoCommand
 
         Bot.Download(FileID, Chat, out var path);
 
-        using var stream = File.OpenRead(Memes.ToVoice(path));
+        string voice;
+        try
+        {
+            voice = Memes.ToVoice(path);
+        }
+        catch
+        {
+            voice = "voice.ogg";
+        }
+
+        using var stream = File.OpenRead(voice);
         Bot.SendVoice(Chat, new InputOnlineFile(stream, "balls.ogg"));
         Log($"{Title} >> VOICE ~|||~");
     }

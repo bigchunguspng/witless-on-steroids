@@ -14,6 +14,7 @@ namespace Witlesss.MediaTools
         public string Key   => "setpts";
         public string Value => $"{FormatDouble(1 / _speed)}*PTS";
     }
+
     public class FpsArgument : IVideoFilterArgument
     {
         private readonly double _fps;
@@ -23,6 +24,7 @@ namespace Witlesss.MediaTools
         public string Key   => "fps";
         public string Value => FormatDouble(_fps);
     }
+
     public class CropArgument : IVideoFilterArgument
     {
         private readonly Rectangle _crop;
@@ -32,6 +34,7 @@ namespace Witlesss.MediaTools
         public string Key   => "crop";
         public string Value => $"{_crop.Width}:{_crop.Height}:{_crop.X}:{_crop.Y}";
     }
+
     public class CropArgumentXD : IVideoFilterArgument
     {
         private readonly string[] _crop;
@@ -41,11 +44,27 @@ namespace Witlesss.MediaTools
         public string Key   => "crop";
         public string Value => string.Join(':', _crop);
     }
-    public class CropSquareArgument : IVideoFilterArgument
+
+    public class ScaleArgumentXD : IVideoFilterArgument
     {
-        public string Key   => "crop";
-        public string Value => "w='min(iw,ih)':h='min(iw,ih)'";
+        private readonly string[] _scale;
+
+        public ScaleArgumentXD(string[] scale) => _scale = scale;
+        
+        public string Key   => "scale";
+        public string Value => string.Join(':', _scale);
     }
+
+    public class SampleRatioArgument : IVideoFilterArgument
+    {
+        private readonly double _ratio;
+
+        public SampleRatioArgument(double ratio) => _ratio = ratio;
+
+        public string Key   => "setsar";
+        public string Value => FormatDouble(_ratio);
+    }
+
     public class ReverseArgument : IVideoFilterArgument
     {
         public string Key   => null;
@@ -53,6 +72,7 @@ namespace Witlesss.MediaTools
     }
 
     #endregion
+
 
     #region IAudioFilterArguments
 
@@ -65,6 +85,7 @@ namespace Witlesss.MediaTools
         public string Key   => "atempo";
         public string Value => FormatDouble(_atempo);
     }
+
     public class AreverseArgument : IAudioFilterArgument
     {
         public string Key   => null;
@@ -72,6 +93,7 @@ namespace Witlesss.MediaTools
     }
 
     #endregion
+
 
     #region IArguments
 
@@ -83,6 +105,7 @@ namespace Witlesss.MediaTools
 
         public string Text => $"-map \"[{_label}]\"";
     }
+
     public class QscaleArgument : IArgument
     {
         private readonly int _qscale; // 1 - 31 (best - worst quality)
@@ -91,6 +114,7 @@ namespace Witlesss.MediaTools
 
         public string Text => $"-qscale:v {_qscale}";
     }
+
     public class ComplexFilterArgument : IArgument
     {
         private readonly string _xd;

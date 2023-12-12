@@ -21,10 +21,12 @@ namespace Witlesss.MediaTools
         public static VFO ChangeVideoSpeed (this VFO o, double speed) => o.WithArgument(new SpeedArgument (speed));
         public static VFO SetFPS           (this VFO o, double fps  ) => o.WithArgument(new FpsArgument   (fps  ));
         public static AFO ChangeAudioSpeed (this AFO o, double speed) => o.WithArgument(new AtempoArgument(speed));
+        public static VFO SampleRatio     (this VFO o, double ratio) => o.WithArgument(new SampleRatioArgument(ratio));
         
+        public static VFO Scale      (this VFO o, string[]   scaling) => o.WithArgument(new ScaleArgumentXD(scaling));
         public static VFO Crop       (this VFO o, Rectangle cropping) => o.WithArgument(new CropArgument  (cropping));
         public static VFO Crop       (this VFO o, string[]  cropping) => o.WithArgument(new CropArgumentXD(cropping));
-        public static VFO CropSquare (this VFO o)                     => o.WithArgument(new CropSquareArgument  ());
+        public static VFO CropSquare (this VFO o)                     => o.WithArgument(new CropArgumentXD(_squareCropping));
 
         public static VFO MakeSquare (this VFO o, int size) => o.CropSquare().Scale(size, size);
 
@@ -47,5 +49,7 @@ namespace Witlesss.MediaTools
         public  static Size ValidSize    (int w, int h) => new(ToEven(w), ToEven(h));
 
         public  static int ToEven(int x) => x - x % 2;
+
+        private static readonly string[] _squareCropping = new[] { "'min(iw,ih)'", "'min(iw,ih)'" };
     }
 }

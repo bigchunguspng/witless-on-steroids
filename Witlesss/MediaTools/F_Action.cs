@@ -40,7 +40,13 @@ namespace Witlesss.MediaTools
             processor.ProcessSynchronously();
         }
 
-        private static void LogArguments(FFMpegArgumentProcessor a) => _args = a.Arguments;
+        private static void LogArguments(FFMpegArgumentProcessor a)
+        {
+            _args = a.Arguments;
+#if DEBUG
+            Log("[FFMPEG] >> " + FFMpegCommand, ConsoleColor.DarkYellow);
+#endif
+        }
 
         private static string _args;
         public  static string FFMpegCommand => _args is not null ? $"ffmpeg {_args}" : "Live FFMpeg reaction:";

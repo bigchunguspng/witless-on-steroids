@@ -89,9 +89,8 @@ namespace Witlesss.MediaTools
         public F_Action CropVideoNote       () => ApplyEffects(o => o.WithVideoFilters(v => v.Crop(VideoNoteCrop)));
         public F_Action CropVideo (string[] c) => ApplyEffects(o => o.WithVideoFilters(v => v.Crop(c)));
 
-        public F_Action ScaleVideo(string[] s) => ApplyEffects(o => o.WithCustomArgument(ScaleFilter(s)));
-
-        private static string ScaleFilter(string[] s) => $@"-vf ""scale={string.Join(':', s)},setsar=1""";
+        // -vf "scale=W:H,setsar=1"
+        public F_Action ScaleVideo(string[] s) => ApplyEffects(o => o.WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
 
         #endregion
 

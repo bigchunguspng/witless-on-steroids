@@ -20,7 +20,7 @@ namespace Witlesss.Commands.Editing
                 {
                     var w = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
                     var h = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
-                    args[i] = h.Replace(",", "\\,");
+                    args[i] = h;
                 }
 
                 if (args.Length == 1) args = new[] { args[0], "-1" };
@@ -29,7 +29,7 @@ namespace Witlesss.Commands.Editing
                 {
                     var w = i == 0;
                     if (args[i] == "-1") args[i] = w ? "iw*oh/ih" : "ih*ow/iw";
-                    args[i] = $"min({(w ? "1920" : "1080")}\\,ceil(({args[i]})/2)*2)";
+                    args[i] = $"min({(w ? "1920" : "1080")},ceil(({args[i]})/2)*2)";
                 }
 
                 Bot.Download(FileID, Chat, out var path, out var type);

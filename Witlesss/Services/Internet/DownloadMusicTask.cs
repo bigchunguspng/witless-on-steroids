@@ -90,10 +90,10 @@ public class DownloadMusicTask
             if (rb) Title = Title.RemoveBrackets();
 
             var img = $"{dir}/art.jpg";
-            var omg = new F_Resize(thumb_source);
-            var art = xt ? omg.ExportThumbnail(img, cs) : resize ? omg.ResizeThumbnail(img, cs) : omg.CompressJpeg(img, 2);
-            var mp3 = new F_Overlay(audio_file, art).AddTrackMetadata(Artist, Title);
-            var jpg = new F_Resize(art).CompressJpeg($"{dir}/jpg.jpg", 7);
+            var omg = new F_Process(thumb_source);
+            var art = (xt ? omg.ExportThumbnail(cs) : resize ? omg.ResizeThumbnail(cs) : omg.CompressJpeg(2)).OutputAs(img);
+            var mp3 = new F_Combine(audio_file, art).AddTrackMetadata(Artist, Title);
+            var jpg = new F_Process(art).CompressJpeg(7).OutputAs($"{dir}/jpg.jpg");
 
             Task.Run(() => Bot.DeleteMessage(Cp.Chat, Message));
 

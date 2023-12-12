@@ -31,12 +31,12 @@ namespace Witlesss
 
         public static string MakeStickerDemotivator(string path, DgText text, string extension)
         {
-            return MakeDemotivator(new F_Resize(path).Transcode(extension), text);
+            return MakeDemotivator(Convert(path, extension), text);
         }
 
         public static string MakeVideoDemotivator(string path, DgText text)
         {
-            return new F_Overlay(path, Drawer.MakeFrame(text)).Demo(Quality, Drawer);
+            return new F_Combine(path, Drawer.MakeFrame(text)).Demo(Quality, Drawer).Output("-D");
         }
 
 
@@ -47,7 +47,7 @@ namespace Witlesss
 
         public static string MakeStickerDemotivatorB(string path, string text, string extension)
         {
-            return MakeDemotivatorB(new F_Resize(path).Transcode(extension), text);
+            return MakeDemotivatorB(Convert(path, extension), text);
         }
 
         public static string MakeVideoDemotivatorB(string path, string text)
@@ -61,7 +61,7 @@ namespace Witlesss
             var frame = _dp.BakeFrame(text);
             var full_size = FitSize(GetSize(frame), 720);
 
-            return new F_Overlay(path, frame).D300(Quality, size, _dp.Location, full_size);
+            return new F_Combine(path, frame).D300(Quality, size, _dp.Location, full_size).Output("-Dp");
         }
 
 
@@ -72,7 +72,7 @@ namespace Witlesss
 
         public static string MakeMemeFromSticker(string path, DgText text, string extension)
         {
-            return MakeMeme(new F_Resize(path).Transcode(extension), text);
+            return MakeMeme(Convert(path, extension), text);
         }
 
         public static string MakeVideoMeme(string path, DgText text)
@@ -81,7 +81,7 @@ namespace Witlesss
             var size = GrowSize(GetSize(path));
             _imgflip.SetUp(size);
 
-            return new F_Overlay(path, _imgflip.BakeCaption(text)).Meme(Quality, size);
+            return new F_Combine(path, _imgflip.BakeCaption(text)).Meme(Quality, size).Output("-M");
         }
 
 
@@ -92,7 +92,7 @@ namespace Witlesss
 
         public static string MakeCaptionMemeFromSticker(string path, string text, string extension)
         {
-            return MakeCaptionMeme(new F_Resize(path).Transcode(extension), text);
+            return MakeCaptionMeme(Convert(path, extension), text);
         }
 
         public static string MakeVideoCaptionMeme(string path, string text)
@@ -104,8 +104,11 @@ namespace Witlesss
             else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(Snapshot(path))));
             else                          _ifunny.SetDefaultColors();
 
-            return new F_Overlay(path, _ifunny.BakeText(text)).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage);
+            return new F_Combine(path, _ifunny.BakeText(text)).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage).Output("-Top");
         }
+
+
+        private static string Convert(string path, string extension) => new F_Process(path).Output("-W", extension);
 
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)
@@ -114,29 +117,29 @@ namespace Witlesss
             
             Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
 
-            return new F_Speed(path, speed).ChangeSpeed();
+            return new F_Process(path).ChangeSpeed(speed).Output_WEBM_safe("-S");
         }
 
         public static string RemoveBitrate(string path, int crf)
         {
             Log($"DAMN >> {crf}", ConsoleColor.Blue);
 
-            return new F_Bitrate(path, crf).Compress();
+            return new F_Process(path).Compress(crf).Output_WEBM_safe("-DAMN");
         }
         
-        public static string Sus(string path, CutSpan s) => new F_Cut(path, s).Sus();
-        public static string Cut(string path, CutSpan s) => new F_Cut(path, s).Cut();
+        public static string Sus(string path, CutSpan s) => new F_Cut(path, s).Sus().Output_WEBM_safe("-Sus");
+        public static string Cut(string path, CutSpan s) => new F_Cut(path, s).Cut().Output_WEBM_safe("-Cut");
 
-        public static string Reverse       (string path) => new F_Reverse(path).Reverse();
+        public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-RVR");
 
-        public static string RemoveAudio   (string path) => new F_Resize(path).ToAnimation();
-        public static string Stickerize    (string path) => new F_Resize(path).ToSticker(NormalizeSize(GetSize(path)));
-        public static string Compress      (string path) => new F_Resize(path).CompressImage(FitSize(GetSize(path), 2560));
-        public static string CompressGIF   (string path) => new F_Resize(path).CompressAnimation();
-        public static string CropVideoNote (string path) => new F_Resize(path).CropVideoNote();
-        public static string Crop          (string path, string[] args) => new F_Resize(path).CropVideo (args);
-        public static string Scale         (string path, string[] args) => new F_Resize(path).ScaleVideo(args);
-        public static string ToVoice       (string path) => new F_Resize(path).ToVoiceMessage();
+        public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
+        public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
+        public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
+        public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
+        public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");
+        public static string Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
+        public static string Scale         (string path, string[] args) => new F_Process(path).ScaleVideo(args).Output("-s");
+        public static string ToVoice       (string path) => new F_Process(path).ToVoiceMessage().Output("-voice", ".ogg");
         public static string ToVideoNote   (string path)
         {
             var s = GetSize(path);
@@ -144,7 +147,7 @@ namespace Witlesss
             var x = (s.Width  - d) / 2;
             var y = (s.Height - d) / 2;
 
-            return new F_Resize(path).ToVideoNote(new Rectangle(x, y, d, d));
+            return new F_Process(path).ToVideoNote(new Rectangle(x, y, d, d)).Output("-vnote");
         }
 
         private static Size GrowSize      (Size s, int minWH = 400)
@@ -174,7 +177,7 @@ namespace Witlesss
         }
         private static Size GetSize(string path)
         {
-            var v = F_SingleInput_Base.GetVideoStream(path);
+            var v = F_Action.GetVideoStream(path);
             return new Size(v.Width, v.Height);
         }
 

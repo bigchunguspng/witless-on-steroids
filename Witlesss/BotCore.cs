@@ -161,7 +161,7 @@ namespace Witlesss
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath($@"{TEMP_FOLDER}\error.txt");
-            var args = F_SingleInput_Base.FFMpegCommand;
+            var args = F_Action.FFMpegCommand;
             var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), FixedErrorMessage(e.Message));
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);

@@ -12,6 +12,8 @@ namespace Witlesss.MediaTools
         public F_Process(string input) : base(input) { }
 
 
+        #region MEDIA CONVERSION
+
         // -s WxH -an -vcodec libx264 -crf 30
         public F_Action ToAnimation() => ApplyEffects(o =>
         {
@@ -33,8 +35,12 @@ namespace Witlesss.MediaTools
         });
         public F_Action ToSticker        (Size size) => ApplyEffects(o => o.Resize(size));
 
+        #endregion
 
-        // -i input [-s WxH] [-vn] [-vcodec libx264 -crf 45] [-b:a 1k] [-f mp3] output
+
+        #region COMPRESSION
+
+        // [-s WxH] [-vn] [-vcodec libx264 -crf 45] [-b:a 1k] [-f mp3]
         public F_Action Compress(int factor) => ApplyEffects(o =>
         {
             // factor: 0 lossless - 51 lowest quality
@@ -44,16 +50,19 @@ namespace Witlesss.MediaTools
             if (i.audio && !i.video) o.ForceFormat("mp3");
         });
 
-        // -qscale:v 5
-        public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5));
+        public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public F_Action CompressAnimation   () => ApplyEffects(o =>
         {
             var v = GetVideoStream(_input);
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
         });
 
+        #endregion
 
-        // -i input [-s WxH] [-vn] [-vf reverse] [-af areverse] output
+
+        #region SPEED
+
+        // [-s WxH] [-vn] [-vf reverse] [-af areverse]
         public F_Action Reverse() => ApplyEffects(o =>
         {
             var i = MediaInfoWithFixing(o);
@@ -61,7 +70,7 @@ namespace Witlesss.MediaTools
             if (i.audio) o.WithAudioFilters(a => a.ReverseAudio());
         });
         
-        // -i input [-vf "setpts=0.5*PTS,fps=60"][-s WxH] [-af "atempo=2.0"][-vn] output
+        // [-vf "setpts=0.5*PTS,fps=60"][-s WxH] [-af "atempo=2.0"][-vn]
         public F_Action ChangeSpeed(double speed) => ApplyEffects(o =>
         {
             var i = MediaInfoWithFixing(o);
@@ -71,6 +80,10 @@ namespace Witlesss.MediaTools
             double GetFPS() => Math.Min(i.v.AvgFrameRate * speed, 90D);
         });
 
+        #endregion
+
+
+        #region CROP / SCALE
 
         // -filter:v "crop=272:272:56:56"
         public F_Action CropVideoNote       () => ApplyEffects(o => o.WithVideoFilters(v => v.Crop(VideoNoteCrop)));
@@ -80,6 +93,10 @@ namespace Witlesss.MediaTools
 
         private static string ScaleFilter(string[] s) => $@"-vf ""scale={string.Join(':', s)},setsar=1""";
 
+        #endregion
+
+
+        #region YT MUSIC
 
         public F_Action ExportThumbnail (bool square) => ApplyEffects(o => ExportThumbnail(o, square));
         public F_Action ResizeThumbnail (bool square) => ApplyEffects(o => ResizeThumbnail(o, square));
@@ -102,5 +119,7 @@ namespace Witlesss.MediaTools
             if (square) v.MakeSquare(640);
             else        v.Scale(640,  -1);
         }
+
+        #endregion
     }
 }

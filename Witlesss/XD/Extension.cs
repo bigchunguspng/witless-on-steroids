@@ -70,6 +70,8 @@ namespace Witlesss.XD
         
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
 
+        public static string Quote(string s) => $@"""{s}""";
+
         public static string UniquePath(string path, bool extra = false)
         {
             var cd = true;

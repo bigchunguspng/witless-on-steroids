@@ -4,10 +4,8 @@ namespace Witlesss.Commands
 {
     public class DeleteDictionary : Move
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-
             string name = ValidFileName(Title.Split()[0]);
             string result = MoveDictionary(name);
 

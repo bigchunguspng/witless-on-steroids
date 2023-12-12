@@ -3,12 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
-    public class SetFrequency : ToggleAdmins
+    public class SetFrequency : SettingsCommand
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-
             if (Text.HasIntArgument(out int value))
             {
                 Baka.Interval = value;

@@ -11,7 +11,7 @@ using static System.StringSplitOptions;
 
 namespace Witlesss.Commands
 {
-    public class FuseBoards : WitlessCommand
+    public class FuseBoards : SettingsCommand
     {
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
@@ -23,7 +23,7 @@ namespace Witlesss.Commands
         // /boards info
         // /board a.b.c - Y-M-D.json
         // /board [thread/archive/archive link]
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 

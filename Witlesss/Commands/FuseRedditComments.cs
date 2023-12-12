@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Commands
 {
-    public class FuseRedditComments : WitlessCommand
+    public class FuseRedditComments : SettingsCommand
     {
         private readonly Regex _que = new(@"^\/xd\S*\s((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
 
         // input: /xd [search query] [subreddit*] [-ops]
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 

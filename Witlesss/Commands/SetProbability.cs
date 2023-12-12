@@ -1,11 +1,9 @@
 ﻿namespace Witlesss.Commands
 {
-    public class SetProbability : ToggleAdmins
+    public class SetProbability : SettingsCommand
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-
             if (Text.HasIntArgument(out int value))
             {
                 Baka.Meme.Chance = value;

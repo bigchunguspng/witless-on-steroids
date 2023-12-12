@@ -1,23 +1,19 @@
 ﻿namespace Witlesss.Commands
 {
-    public class ToggleStickers : ToggleAdmins
+    public class ToggleStickers : SettingsCommand
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-            
             Baka.Meme.Stickers = !Baka.Meme.Stickers;
             Bot.SaveChatList();
             Bot.SendMessage(Chat, XDDD(string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ")));
         }
     }
     
-    public class ToggleColors : ToggleAdmins
+    public class ToggleColors : SettingsCommand
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-
             var c = Baka.Meme.Dye == ColorMode.Color;
             Baka.Meme.Dye = c ? ColorMode.White : ColorMode.Color;
             Bot.SaveChatList();

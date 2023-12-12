@@ -16,9 +16,7 @@
             }
         }
 
-        private static bool SenderHasPermission() => !Baka.AdminsOnly || SenderIsAdmin();
-
-        private static bool SenderIsAdmin()
+        protected static bool SenderIsAdmin()
         {
             if (Message.SenderChat != null)
             {
@@ -34,7 +32,20 @@
 
             return false;
         }
+    }
 
-        protected static bool SenderIsSus() => !SenderHasPermission();
+    /// <summary> Use this class for commands that <b>can be</b> restricted to admins only. </summary>
+    public abstract class SettingsCommand : ToggleAdmins
+    {
+        private static bool SenderIsSus() => Baka.AdminsOnly && !SenderIsAdmin();
+
+        public override void Run()
+        {
+            if (SenderIsSus()) return;
+
+            ExecuteAuthorized();
+        }
+
+        protected abstract void ExecuteAuthorized();
     }
 }

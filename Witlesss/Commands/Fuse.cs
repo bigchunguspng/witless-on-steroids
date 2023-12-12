@@ -10,17 +10,15 @@ using Telegram.Bot.Types;
 
 namespace Witlesss.Commands
 {
-    public class Fuse : ToggleAdmins
+    public class Fuse : SettingsCommand
     {
         private long _size;
         private int   _max;
         
         private FileInfo[] _files;
 
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-            
             Baka.Save();
             _size = SizeInBytes(Baka.Path);
 

@@ -3,12 +3,10 @@ using System.IO;
 
 namespace Witlesss.Commands
 {
-    public class Move : ToggleAdmins
+    public class Move : SettingsCommand
     {
-        public override void Run()
+        protected override void ExecuteAuthorized()
         {
-            if (SenderIsSus()) return;
-            
             var a = Text.Split();
             if (a.Length > 1)
             {

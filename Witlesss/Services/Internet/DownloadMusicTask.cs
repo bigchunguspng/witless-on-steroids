@@ -107,9 +107,11 @@ public class DownloadMusicTask
 
             var resize = CropSquare || ArtAttached || thumb.Contains("maxres");
 
-            var di = new DirectoryInfo(dir);
-            var thumb_source = ExtractThumb ? di.GetFiles("video.*")[0].FullName : YouTube || ArtAttached ? thumb : di.GetFiles("*.jpg")[0].FullName;
-            var audio_file = di.GetFiles("*xd.mp3")[0].FullName;
+            var directory = new DirectoryInfo(dir);
+            var thumb_source = ExtractThumb ? GetFile("video.*") : YouTube || ArtAttached ? thumb : GetFile("*.jpg");
+            var audio_file = GetFile("*xd.mp3");
+
+            string GetFile(string pattern) => directory.GetFiles(pattern)[0].FullName;
 
             var meta = _name.Match(Path.GetFileName(audio_file));
             if (Artist is null && meta.Groups[1].Success) Artist = meta.Groups[1].Value;

@@ -18,28 +18,28 @@ namespace Witlesss.MediaTools
         public static FFO FixWebmSize (this FFO o, VideoStream v) => SizeIsInvalid(v.Width, v.Height) ? o.Resize(ValidSize(v.Width, v.Height)) : o;
         public static FFO FixSongArt  (this FFO o, IMediaAnalysis info) => info.ErrorData.Count > 0   ? o.DisableChannel(Channel.Video)        : o;
 
-        public static VFO ChangeVideoSpeed (this VFO o, double speed) => o.WithArgument(new SpeedArgument (speed));
-        public static VFO SetFPS           (this VFO o, double fps  ) => o.WithArgument(new FpsArgument   (fps  ));
-        public static AFO ChangeAudioSpeed (this AFO o, double speed) => o.WithArgument(new AtempoArgument(speed));
-        public static VFO SampleRatio     (this VFO o, double ratio) => o.WithArgument(new SampleRatioArgument(ratio));
+        public static VFO ChangeVideoSpeed (this VFO o, double speed) => o.With(new SpeedArgument (speed));
+        public static AFO ChangeAudioSpeed (this AFO o, double speed) => o.With(new AtempoArgument(speed));
+        public static VFO SetFPS           (this VFO o, double fps  ) => o.With(new FpsArgument   (fps  ));
+        public static VFO SampleRatio      (this VFO o, double ratio) => o.With(new SampleRatioArgument(ratio));
         
-        public static VFO Scale      (this VFO o, string[]   scaling) => o.WithArgument(new ScaleArgumentXD(scaling));
-        public static VFO Crop       (this VFO o, Rectangle cropping) => o.WithArgument(new CropArgument  (cropping));
-        public static VFO Crop       (this VFO o, string[]  cropping) => o.WithArgument(new CropArgumentXD(cropping));
-        public static VFO CropSquare (this VFO o)                     => o.WithArgument(new CropArgumentXD(_squareCropping));
+        public static VFO Scale      (this VFO o, string[]   scaling) => o.With(new ScaleArgumentXD(scaling));
+        public static VFO Crop       (this VFO o, Rectangle cropping) => o.With(new CropArgument  (cropping));
+        public static VFO Crop       (this VFO o, string[]  cropping) => o.With(new CropArgumentXD(cropping));
+        public static VFO CropSquare (this VFO o)                     => o.With(new CropArgumentXD(_squareCropping));
 
         public static VFO MakeSquare (this VFO o, int size) => o.CropSquare().Scale(size, size);
 
-        public static VFO ReverseVideo (this VFO o) => o.WithArgument(new  ReverseArgument());
-        public static AFO ReverseAudio (this AFO o) => o.WithArgument(new AreverseArgument());
+        public static VFO ReverseVideo (this VFO o) => o.With(new  ReverseArgument());
+        public static AFO ReverseAudio (this AFO o) => o.With(new AreverseArgument());
 
 
-        private static VFO WithArgument(this VFO o, IVideoFilterArgument argument)
+        private static VFO With(this VFO o, IVideoFilterArgument argument)
         {
             o.Arguments.Add(argument);
             return o;
         }
-        private static AFO WithArgument(this AFO o, IAudioFilterArgument argument)
+        private static AFO With(this AFO o, IAudioFilterArgument argument)
         {
             o.Arguments.Add(argument);
             return o;

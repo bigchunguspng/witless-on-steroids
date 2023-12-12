@@ -3,66 +3,42 @@ using FFMpegCore.Arguments;
 
 namespace Witlesss.MediaTools
 {
-    #region IVideoFilterArguments
+    #region VIDEO
 
-    public class SpeedArgument : IVideoFilterArgument
+    public record SpeedArgument(double Speed) : IVideoFilterArgument
     {
-        private readonly double _speed;
-
-        public SpeedArgument(double speed) => _speed = speed;
-
         public string Key   => "setpts";
-        public string Value => $"{FormatDouble(1 / _speed)}*PTS";
+        public string Value => $"{FormatDouble(1 / Speed)}*PTS";
     }
 
-    public class FpsArgument : IVideoFilterArgument
+    public record FpsArgument(double FPS) : IVideoFilterArgument
     {
-        private readonly double _fps;
-
-        public FpsArgument(double fps) => _fps = fps;
-
         public string Key   => "fps";
-        public string Value => FormatDouble(_fps);
+        public string Value => FormatDouble(FPS);
     }
 
-    public class CropArgument : IVideoFilterArgument
+    public record CropArgument(Rectangle Crop) : IVideoFilterArgument
     {
-        private readonly Rectangle _crop;
-
-        public CropArgument(Rectangle rectangle) => _crop = rectangle;
-
         public string Key   => "crop";
-        public string Value => $"{_crop.Width}:{_crop.Height}:{_crop.X}:{_crop.Y}";
+        public string Value => $"{Crop.Width}:{Crop.Height}:{Crop.X}:{Crop.Y}";
     }
 
-    public class CropArgumentXD : IVideoFilterArgument
+    public record CropArgumentXD(string[] Crop) : IVideoFilterArgument
     {
-        private readonly string[] _crop;
-
-        public CropArgumentXD(string[] crop) => _crop = crop;
-        
         public string Key   => "crop";
-        public string Value => string.Join(':', _crop);
+        public string Value => string.Join(':', Crop);
     }
 
-    public class ScaleArgumentXD : IVideoFilterArgument
+    public record ScaleArgumentXD(string[] Scale) : IVideoFilterArgument
     {
-        private readonly string[] _scale;
-
-        public ScaleArgumentXD(string[] scale) => _scale = scale;
-        
         public string Key   => "scale";
-        public string Value => string.Join(':', _scale);
+        public string Value => string.Join(':', Scale);
     }
 
-    public class SampleRatioArgument : IVideoFilterArgument
+    public record SampleRatioArgument(double Ratio) : IVideoFilterArgument
     {
-        private readonly double _ratio;
-
-        public SampleRatioArgument(double ratio) => _ratio = ratio;
-
         public string Key   => "setsar";
-        public string Value => FormatDouble(_ratio);
+        public string Value => FormatDouble(Ratio);
     }
 
     public class ReverseArgument : IVideoFilterArgument
@@ -74,16 +50,12 @@ namespace Witlesss.MediaTools
     #endregion
 
 
-    #region IAudioFilterArguments
+    #region AUDIO
 
-    public class AtempoArgument : IAudioFilterArgument
+    public record AtempoArgument(double Atempo) : IAudioFilterArgument
     {
-        private readonly double _atempo;
-
-        public AtempoArgument(double atempo) => _atempo = atempo;
-
         public string Key   => "atempo";
-        public string Value => FormatDouble(_atempo);
+        public string Value => FormatDouble(Atempo);
     }
 
     public class AreverseArgument : IAudioFilterArgument
@@ -95,33 +67,21 @@ namespace Witlesss.MediaTools
     #endregion
 
 
-    #region IArguments
+    #region OTHER
 
-    public class MapArgument : IArgument
+    public record MapArgument(string Label) : IArgument
     {
-        private readonly string _label;
-        
-        public MapArgument(string label) => _label = label;
-
-        public string Text => $"-map \"[{_label}]\"";
+        public string Text => $"-map \"[{Label}]\"";
     }
 
-    public class QscaleArgument : IArgument
+    public record QscaleArgument(int Qscale) : IArgument
     {
-        private readonly int _qscale; // 1 - 31 (best - worst quality)
-        
-        public QscaleArgument(int qscale) => _qscale = qscale;
-
-        public string Text => $"-qscale:v {_qscale}";
+        public string Text => $"-qscale:v {Qscale}"; // 1 best quality - 31 worst quality
     }
 
-    public class ComplexFilterArgument : IArgument
+    public record ComplexFilterArgument(CoFi Node) : IArgument
     {
-        private readonly string _xd;
-        
-        public ComplexFilterArgument(CoFi node) => _xd = node.Text;
-
-        public string Text => $"-filter_complex \"{_xd}\"";
+        public string Text => $"-filter_complex \"{Node.Text}\"";
     }
 
     #endregion

@@ -104,8 +104,8 @@ namespace Witlesss
 
         private void ActivateLastChat()
         {
-            _active = Command.Chat;
-            Log($"ACTIVE CHAT >> {_active} ({Command.Title})");
+            (_active, var title) = Command.LastChat;
+            Log($"ACTIVE CHAT >> {_active} ({title})");
         }
 
         private        void ClearDics() => Bakas.ForEach(ClearDic);

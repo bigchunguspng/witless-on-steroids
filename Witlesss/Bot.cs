@@ -19,9 +19,11 @@ namespace Witlesss
 
         public static void LaunchInstance(CallBackHandlingCommand command) => new Bot().Run(command);
 
+        public static Bot Instance;
+
         private Bot()
         {
-            Command.Bot = this;
+            Instance = this;
             Config.SetBotUsername(Me.Username);
 
             PlayStation8 = new ConsoleUI(this);

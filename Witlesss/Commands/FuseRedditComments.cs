@@ -57,7 +57,7 @@ namespace Witlesss.Commands
             }
         }
 
-        private async Task EatComments(WitlessCommandParams x, RedditQuery query, long size)
+        private async Task EatComments(WitlessMessageData x, RedditQuery query, long size)
         {
             var timer = new Stopwatch();
             var comments = await RedditTool.Instance.GetComments(query);

@@ -80,8 +80,8 @@ namespace Witlesss
             }
             catch
             {
-                LogError($"{Command.TitleOrUsername} >> NO TEXT!?");
-                return Command.Bot.Me.FirstName;
+                LogError($"{Command.LastChat.Title} >> NO TEXT!?");
+                return Bot.Instance.Me.FirstName;
             }
         }
 

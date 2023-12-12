@@ -20,9 +20,9 @@ public class DownloadMusicTask
 
     private readonly string ID;
     private readonly string File;
-    private readonly int Message;
+    private readonly int MessageToDelete;
     private readonly bool YouTube;
-    private readonly CommandParams Cp;
+    private readonly MessageData Message;
 
     private readonly bool HighQuality, NameOnly, ExtractThumb, RemoveBrackets, Uploader, CropSquare, ArtAttached;
 
@@ -33,15 +33,15 @@ public class DownloadMusicTask
     public string Artist;
     public string Title;
 
-    private Bot Bot => Command.Bot;
+    private Bot Bot => Bot.Instance;
 
-    public DownloadMusicTask(string id, string options, string file, int message, bool yt, CommandParams cp, int format = 251)
+    public DownloadMusicTask(string id, string options, string file, int message, bool yt, MessageData data, int format = 251)
     {
         ID = id;
         File = file;
-        Message = message;
+        MessageToDelete = message;
         YouTube = yt;
-        Cp = cp;
+        Message = data;
         Format = format;
         
         HighQuality    = options.Contains('q');
@@ -100,7 +100,7 @@ public class DownloadMusicTask
             var thumb = $"{dir}/thumb.jpg";
 
             var task_a =                RunCMD(cmd_a, dir);
-            var task_v = ExtractThumb ? RunCMD(cmd_v, dir) : ArtAttached ? Bot.DownloadFile(File, thumb, Cp.Chat) : YouTube ? GetGoodYouTubeThumbnail() : Task.CompletedTask;
+            var task_v = ExtractThumb ? RunCMD(cmd_v, dir) : ArtAttached ? Bot.DownloadFile(File, thumb, Message.Chat) : YouTube ? GetGoodYouTubeThumbnail() : Task.CompletedTask;
             await Task.WhenAll(task_a, task_v);
 
             Task GetGoodYouTubeThumbnail() => Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(ID, dir).Result);
@@ -125,11 +125,11 @@ public class DownloadMusicTask
             var mp3 = new F_Combine(audio_file, art).AddTrackMetadata(Artist, Title);
             var jpg = new F_Process(art).CompressJpeg(7).OutputAs($"{dir}/jpg.jpg"); // telegram preview
 
-            Task.Run(() => Bot.DeleteMessage(Cp.Chat, Message));
+            Task.Run(() => Bot.DeleteMessage(Message.Chat, MessageToDelete));
 
             await using var stream = System.IO.File.OpenRead(mp3);
-            Bot.SendAudio(Cp.Chat, new InputOnlineFile(stream, mp3), jpg);
-            Log($"{Cp.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
+            Bot.SendAudio(Message.Chat, new InputOnlineFile(stream, mp3), jpg);
+            Log($"{Message.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
         }
         catch
         {

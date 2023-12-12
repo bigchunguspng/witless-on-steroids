@@ -112,7 +112,7 @@ namespace Witlesss.Commands
         }
 
 
-        private static async Task EatBoardDiscussion(WitlessCommandParams x, List<Task<List<string>>> tasks)
+        private static async Task EatBoardDiscussion(WitlessMessageData x, List<Task<List<string>>> tasks)
         {
             await Task.WhenAll(tasks);
 

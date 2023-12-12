@@ -41,9 +41,9 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{Command.TitleOrUsername} >> BRUH -> {FixedErrorMessage(e.Message)}");
+                LogError($"{Command.LastChat.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
 
-                if (_ffmpeg.IsMatch(e.Message)) Command.Bot.SendErrorDetails(message.Chat.Id, e);
+                if (_ffmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

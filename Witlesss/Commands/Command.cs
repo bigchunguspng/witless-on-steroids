@@ -4,53 +4,60 @@ namespace Witlesss.Commands
 {
     public abstract class Command
     {
-        public static Bot Bot;
+        protected static Bot Bot => Bot.Instance;
 
-        public static Message Message { get; private set; }
-        public static string  Text    { get; private set; }
-        public static string  Title   { get; private set; }
-        public static long    Chat    { get; private set; }
+        protected static Message Message { get; private set; }
+        protected static string  Text    { get; private set; }
+        protected static string  Title   { get; private set; }
+        protected static long    Chat    { get; private set; }
 
-        public static bool    ChatIsPrivate => Chat > 0;
+        protected static bool ChatIsPrivate => Chat > 0;
+
+        public static (long ID, string Title) LastChat => new(Chat, Title);
         
         public void Pass(Message message)
         {
             Message = message;
             Text    = message.Caption ?? message.Text;
             Chat    = message.Chat.Id;
-            Title   = TitleOrUsername;
+            Title   = ChatTitle;
         }
 
         public abstract void Run();
 
-        public static string SenderName => Message.SenderChat?.Title ?? UserFullName();
-        public static string TitleOrUsername => (ChatIsPrivate ? UserFullName() : Message.Chat.Title).Truncate(32);
+        protected static string SenderName => Message.SenderChat?.Title ?? GetUserFullName();
+        private   static string ChatTitle => (ChatIsPrivate ? GetUserFullName() : Message.Chat.Title).Truncate(32);
 
-        private static string UserFullName()
+        private static string GetUserFullName()
         {
             string name = Message.From?.FirstName;
             string last = Message.From?.LastName ?? "";
             return last == "" ? name : name + " " + last;
         }
-        
-        public static string RemoveBotMention() => Text.ToLower().Replace(Config.BOT_USERNAME, "");
-        
-        public static CommandParams SnapshotMessageData() => new(Chat, Text, Title);
+
+        protected static string RemoveBotMention() => Text.ToLower().Replace(Config.BOT_USERNAME, "");
+
+        /// <summary> Use this for async operations. </summary>
+        protected static MessageData SnapshotMessageData() => new(Chat, Text, Title);
     }
 
     public abstract class WitlessCommand : Command
     {
         protected static Witless Baka { get; private set; }
 
-        protected static void SetBaka(Witless witless) => Baka = witless;
+        protected static void SetBaka(Witless witless)
+        {
+            Baka = witless;
+        }
 
-        protected static void DropBaka()
+        protected static void DropBaka() // like it's hot 🔥
         {
             Baka.Unload();
             Baka = null;
         }
 
-        protected new static WitlessCommandParams SnapshotMessageData() => new(Baka, Chat, Text, Title);
+        /// <summary> Use this for async operations. </summary>
+        protected new static WitlessMessageData SnapshotMessageData() => new(Baka, Chat, Text, Title);
     }
     
     public abstract class CallBackHandlingCommand : Command
@@ -58,6 +65,6 @@ namespace Witlesss.Commands
         public abstract void OnCallback(CallbackQuery query);
     }
 
-    public record        CommandParams              (long Chat, string Text, string Title);
-    public record WitlessCommandParams(Witless Baka, long Chat, string Text, string Title);
+    public record        MessageData              (long Chat, string Text, string Title);
+    public record WitlessMessageData(Witless Baka, long Chat, string Text, string Title);
 }

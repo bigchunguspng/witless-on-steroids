@@ -156,11 +156,11 @@ namespace Witlesss.Commands
             return success;
         }
         
-        private static async void WitlessPoopAsync(WitlessCommandParams data)
+        private static async void WitlessPoopAsync(WitlessMessageData message)
         {
-            await Task.Delay(AssumedResponseTime(150, data.Text));
-            Bot.SendMessage(data.Chat, data.Baka.Generate());
-            Log($"{data.Title} >> FUNNY");
+            await Task.Delay(AssumedResponseTime(150, message.Text));
+            Bot.SendMessage(message.Chat, message.Baka.Generate());
+            Log($"{message.Title} >> FUNNY");
         }
 
 

@@ -79,7 +79,7 @@ namespace Witlesss.MediaTools
         public string Text => $"-qscale:v {Qscale}"; // 1 best quality - 31 worst quality
     }
 
-    public record ComplexFilterArgument(CoFi Node) : IArgument
+    public record ComplexFilterArgument(Filter Node) : IArgument
     {
         public string Text => $"-filter_complex \"{Node.Text}\"";
     }

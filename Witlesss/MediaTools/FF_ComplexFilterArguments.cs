@@ -27,68 +27,62 @@ namespace Witlesss.MediaTools
         private static string Concat         () => $"concat=n=2:v={(_a == "" ? "1" : "0:a=1")}";
 
         private static string TsFormat(TimeSpan s) => s.ToString("c").Replace(":", "\\:");
-        private static string DefaultInput(CoFi p) => p.Output is SingleLabel l ? l.Tag : null;
+        private static string DefaultInput(Filter p) => p.Output is SingleLabel l ? l.Tag : null;
 
-        public static CoFi Split   (this CoFi node, string a, string b) => CoFi.S(DefaultInput(node), Split(), a, b, node);
+        public static Filter Split   (this Filter node, string a, string b) => Filter.Split(DefaultInput(node), Split(), a, b, node);
 
-        public static CoFi Scale   (this CoFi node, string input, Size    s,     string output = null) => new(input,  Scale(s), output, node);
-        public static CoFi Trim    (this CoFi node, string input, CutSpan s,     string output = null) => new(input,   Trim(s), output, node);
-        public static CoFi Reverse (this CoFi node, string input,                string output = null) => new(input, Reverse(), output, node);
-        public static CoFi Crop    (this CoFi node, string input, Rectangle r,   string output = null) => new(input,   Crop(r), output, node);
-        public static CoFi Blur    (this CoFi node, string input, double b,      string output = null) => new(input,   Blur(b), output, node);
-        public static CoFi Fps     (this CoFi node, string input, double fps,    string output = null) => new(input,  FPS(fps), output, node);
+        public static Filter Scale   (this Filter node, string input, Size    s,     string output = null) => new(input,  Scale(s), output, node);
+        public static Filter Trim    (this Filter node, string input, CutSpan s,     string output = null) => new(input,   Trim(s), output, node);
+        public static Filter Reverse (this Filter node, string input,                string output = null) => new(input, Reverse(), output, node);
+        public static Filter Crop    (this Filter node, string input, Rectangle r,   string output = null) => new(input,   Crop(r), output, node);
+        public static Filter Blur    (this Filter node, string input, double b,      string output = null) => new(input,   Blur(b), output, node);
+        public static Filter Fps     (this Filter node, string input, double fps,    string output = null) => new(input,  FPS(fps), output, node);
 
-        public static CoFi Overlay (this CoFi node, string a, string b, Point p, string output = null) => CoFi.J(a, b, Overlay(p), output, node);
-        public static CoFi Concat  (this CoFi node, string a, string b,          string output = null) => CoFi.J(a, b,   Concat(), output, node);
+        public static Filter Overlay (this Filter node, string a, string b, Point p, string output = null) => Filter.Join(a, b, Overlay(p), output, node);
+        public static Filter Concat  (this Filter node, string a, string b,          string output = null) => Filter.Join(a, b,   Concat(), output, node);
     }
 
-    /// <summary> Represents a node of "-filter_complex" option </summary>
-    public class CoFi
+    /// <summary> Represents a node of "-filter_complex" option. </summary>
+    public class Filter
     {
-        private readonly CoFi Previous;
+        private readonly Filter Previous;
 
-        private readonly Label  Input;
-        private readonly string Things;
+        private readonly Label Input;
+        private readonly string Action;
         public  readonly Label Output;
 
         private string PriorText => Previous is null ? "" : $"{Previous.Text};";
         private string Out       => Output   is null ? "" :      Output.Text;
 
-        public static CoFi Null => null;
-        public static CoFi J(string a, string b, string things, string output, CoFi last = null) => new (new DoubleLabel(a, b), things, new SingleLabel(output), last);
-        public static CoFi S(string input,  string things, string a, string b, CoFi last = null) => new (new SingleLabel(input), things, new DoubleLabel(a,  b), last);
+        public static Filter Null => null;
+        public static Filter Join (string a, string b, string action, string output, Filter last = null) => new (new DoubleLabel(a, b), action, new SingleLabel(output), last);
+        public static Filter Split(string input,  string action, string a, string b, Filter last = null) => new (new SingleLabel(input), action, new DoubleLabel(a,  b), last);
 
-        public  CoFi(string input, string things, string output, CoFi last = null) : this(new SingleLabel(input), things, new SingleLabel(output), last) { }
-        private CoFi(Label  input, string things, Label  output, CoFi last = null)
+        public  Filter(string input, string action, string output, Filter last = null) : this(new SingleLabel(input), action, new SingleLabel(output), last) { }
+        private Filter(Label  input, string action, Label  output, Filter last = null)
         {
             Input  =  input;
+            Action = action;
             Output = output;
             Previous = last;
-            Things = things;
         }
 
-        public string Text => $"{PriorText}{Input.Text}{Things}{Out}";
+        public string Text => $"{PriorText}{Input.Text}{Action}{Out}";
     }
 
-    /// <summary> Input / Output label of a "-filter_complex" node </summary>
-    public interface Label { public string Text { get; } }
-
-    public class SingleLabel : Label
+    /// <summary> Input / Output label of a "-filter_complex" node. </summary>
+    public interface Label
     {
-        public SingleLabel(string tag) => Tag = tag;
-
-        public readonly string Tag;
-        public          string Text => Tag is null ? "" : $"[{Tag}]";
+        public string Text { get; }
     }
 
-    public class DoubleLabel : Label
+    public record SingleLabel(string Tag) : Label
     {
-        public DoubleLabel(string a, string b)
-        {
-            A = a;
-            B = b;
-        }
-        private readonly string A, B;
-        public           string Text => $"[{A}][{B}]";
+        public string Text => Tag is null ? "" : $"[{Tag}]";
+    }
+
+    public record DoubleLabel(string A, string B) : Label
+    {
+        public string Text => $"[{A}][{B}]";
     }
 }

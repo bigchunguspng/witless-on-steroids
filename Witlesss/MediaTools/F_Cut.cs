@@ -21,7 +21,7 @@ namespace Witlesss.MediaTools
         {
             var i = MediaInfoWithFixing(o);
 
-            var nodes = CoFi.Null;
+            var nodes = Filter.Null;
             var span = Span(i.info);
             if (VF(i.video)) nodes = nodes.Trim("0:v", span, "vc").Split("v0", "v1").Reverse("v1", "vr").Concat("v0", "vr");
             if (AF(i.audio)) nodes = nodes.Trim("0:a", span, "ac").Split("a0", "a1").Reverse("a1", "ar").Concat("a0", "ar");

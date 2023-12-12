@@ -22,7 +22,7 @@ namespace Witlesss.MediaTools
         // -i video -i image -filter_complex "[0:v]scale=620:420[vid];[vid][1:v]overlay=0:0"
         public F_Action Meme(int loss, Size size) => ApplyEffects(o =>
         {
-            BuildAndCompress(o, loss, CoFi.Null.Scale("0:v", size, "vid").Overlay("vid", "1:v", Point.Empty));
+            BuildAndCompress(o, loss, Filter.Null.Scale("0:v", size, "vid").Overlay("vid", "1:v", Point.Empty));
         });
 
         // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
@@ -51,9 +51,9 @@ namespace Witlesss.MediaTools
             BuildAndCompress(o, f, FixPicFps().Scale("0:v", s, "vid").Overlay("pic", "vid", p));
         }
 
-        private CoFi FixPicFps() => CoFi.Null.Fps("1:v", new F_Process(_video).GetFramerate(), "pic");
+        private Filter FixPicFps() => Filter.Null.Fps("1:v", new F_Process(_video).GetFramerate(), "pic");
 
-        private static void BuildAndCompress(FFO o, int factor, CoFi filter)
+        private static void BuildAndCompress(FFO o, int factor, Filter filter)
         {
             o.WithComplexFilter(filter);
 

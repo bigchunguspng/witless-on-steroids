@@ -11,48 +11,31 @@ using static Witlesss.Config;
 
 namespace Witlesss.Services.Internet
 {
+    /// <summary> Used to store upcoming posts for a single <see cref="RedditQuery"/>. </summary>
     public class RedditQueryCache
     {
+        /// <summary> DateTime by which the cache is relevant. </summary>
         public DateTime RefreshDate;
+
+        /// <summary> True if posts in queue AIN'T the last ones for the query. </summary>
         public bool HasEnoughPosts;
+
         public readonly Queue<PostData> Posts = new(RedditTool.POST_LIMIT);
 
         public RedditQueryCache() => UpdateRefreshDate();
 
-        public void UpdateRefreshDate() => RefreshDate = GetRefreshDate();
-
-        private static DateTime GetRefreshDate() => DateTime.Now + TimeSpan.FromHours(2);
+        public void UpdateRefreshDate() => RefreshDate = DateTime.Now + TimeSpan.FromHours(2);
     }
+
     public class RedditTool
     {
-        private const int EXCLUDED_CAPACITY = 256;
-        public  const int POST_LIMIT = 32, KEEP_POSTS = 50;
+        public const int POST_LIMIT = 32, KEEP_POSTS = 50;
 
         public static readonly RedditTool Instance = new();
 
         private readonly RedditClient client = new(RedditAppID, RedditToken);
-        private readonly string[] subreddits = 
-        {
-            "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
-            "dankmemes", "memes", "funnymemes", "doodoofard", "21stcenturyhumour",
-            "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe"
-        };
 
         private readonly Regex _img = new(@"(\.png|\.jpg|\.gif)$|(reddit\.com\/gallery\/)");
-
-        private readonly Dictionary<long, RedditQuery> LastQueries = new();
-
-        private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
-
-        private PostData _post;
-        private RedditQuery Qr;
-        private RedditQueryCache QrCache => Cache[Qr];
-        
-        private readonly Queue<PostData> LastSent = new(KEEP_POSTS);
-
-        private readonly        Queue<string>  Excluded;
-        private readonly FileIO<Queue<string>> ExcludedIO = new("reddit-posts.json");
-        private readonly Counter counter = new() { Interval = 16 };
 
         private RedditTool()
         {
@@ -61,59 +44,120 @@ namespace Witlesss.Services.Internet
         }
 
 
+        #region EXCLUSION
+
+        private const int EXCLUDED_CAPACITY = 256;
+
+        /// <summary> Posts that were sent to users recently, so they are no longer relevant. </summary>
+        private readonly        Queue<string>  Excluded;
+        private readonly FileIO<Queue<string>> ExcludedIO = new("reddit-posts.json");
+
         private void Exclude(string fullname)
         {
             if (Excluded.Count == EXCLUDED_CAPACITY) Excluded.Dequeue();
             Excluded.Enqueue(fullname);
-            
-            counter.Count();
-            if (counter.Ready()) SaveExcluded();
         }
-        public void SaveExcluded() => ExcludedIO.SaveData(Excluded);
 
-        public PostData Recall(string title) => LastSent.FirstOrDefault(x => x.Title == title);
-        private void Remember(PostData post)
+        public void SaveExcluded()
+        {
+            ExcludedIO.SaveData(Excluded);
+        }
+
+        #endregion
+
+
+        #region LAST POSTS
+
+        /// <summary> Used specifically for "/link" command. </summary>
+        private readonly Queue<PostData> LastSent = new(KEEP_POSTS);
+
+        private void Retain(PostData post)
         {
             if (LastSent.Count == KEEP_POSTS) LastSent.Dequeue();
             LastSent.Enqueue(post);
         }
 
-        public RedditQuery LastQueryOrRandom(long chat) => LastQueries.ContainsKey(chat) ? LastQueries[chat] : RandomSubQuery;
-        public ScQuery RandomSubQuery => new(RandomSub);
-        private string RandomSub => subreddits[Extension.Random.Next(subreddits.Length)];
-
-        private void SetLastQuery(long chat, RedditQuery query) => LastQueries[chat] = query;
-
-        public PostData PullPost(RedditQuery query, long chat) // returns post, register post
+        public PostData Recognize(string title)
         {
-            Qr = query;
-            
-            GetUnwatchedPost();
+            return LastSent.FirstOrDefault(x => x.Title == title);
+        }
 
-            Exclude (_post.Fullname);
-            Remember(_post);
+        #endregion
+
+
+        #region LAST QUERIES
+
+        /// <summary> Last queries by chat. </summary>
+        private readonly Dictionary<long, RedditQuery> LastQueries = new();
+
+        private void SetLastQuery(long chat, RedditQuery query)
+        {
+            LastQueries[chat] = query;
+        }
+
+        public RedditQuery GetLastOrRandomQuery(long chat)
+        {
+            return LastQueries.TryGetValue(chat, out var query) ? query : RandomSubredditQuery;
+        }
+
+        public ScQuery RandomSubredditQuery => new(RandomSubreddit);
+        private string RandomSubreddit => subreddits[Extension.Random.Next(subreddits.Length)];
+
+        private readonly string[] subreddits = 
+        {
+            "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
+            "dankmemes", "memes", "funnymemes", "doodoofard", "21stcenturyhumour",
+            "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe"
+        };
+
+        #endregion
+
+
+        #region PULLING POST
+
+        private PostData _post;
+
+        /// <summary> Upcoming posts by query. </summary>
+        private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
+
+        private RedditQuery      ThisQuery;
+        private RedditQueryCache ThisQueryCache => Cache[ThisQuery];
+
+        //
+
+        public PostData PullPost(RedditQuery query, long chat)
+        {
+            ThisQuery = query;
+            
+            GetLatestRelevantPost();
+
+            Exclude(_post.Fullname);
             SetLastQuery(chat, query);
+            Retain(_post);
             return _post;
         }
 
-        private void GetUnwatchedPost()
+        private void GetLatestRelevantPost()
         {
             do
             {
-                CheckCache();
-                _post = QrCache.Posts.Dequeue();
+                UpdateCache();
+                _post = ThisQueryCache.Posts.Dequeue();
             }
-            while (QrCache.HasEnoughPosts && QrCache.Posts.Count > 0 && Excluded.Contains(_post.Fullname));
+            while (ThisQueryCache.HasEnoughPosts && ThisQueryCache.Posts.Count > 0 && Excluded.Contains(_post.Fullname));
         }
 
-        private void CheckCache()
+        /// <summary>
+        /// Refills <see cref="Cache"/> with new posts if needed.
+        /// </summary>
+        private void UpdateCache()
         {
-            if (Cache.ContainsKey(Qr))
+            if (Cache.ContainsKey(ThisQuery)) // query has been used already
             {
-                var posts = QrCache.Posts;
-                if (QrCache.RefreshDate < DateTime.Now) // time to clear queue and load new posts
+                var posts = ThisQueryCache.Posts;
+                if (ThisQueryCache.RefreshDate < DateTime.Now) // time to clear queue and load new posts
                 {
-                    QrCache.UpdateRefreshDate();
+                    ThisQueryCache.UpdateRefreshDate();
                     posts.Clear();
                     Log("ScrollReddit (old posts)", ConsoleColor.DarkYellow);
                     ScrollReddit();
@@ -131,26 +175,42 @@ namespace Witlesss.Services.Internet
             }
             else // no posts in queue (and no queue too)
             {
-                Cache.Add(Qr, new RedditQueryCache());
+                Cache.Add(ThisQuery, new RedditQueryCache());
 
                 Log("ScrollReddit (new Q)", ConsoleColor.DarkYellow);
                 ScrollReddit();
             }
         }
 
+        /// <summary>
+        /// Gets the actual posts using <see cref="ThisQuery"/> and adds them to <see cref="ThisQueryCache"/>.
+        /// </summary>
         private void ScrollReddit(string after = null, int patience = 3)
         {
-            var queue = QrCache.Posts;
-            var posts = Qr.GetPosts(after);
-            Count(posts);
-            foreach (var post in FilterImagePosts(posts)) queue.Enqueue(post);
+            var posts = ThisQuery.GetPosts(after);
+            ThisQueryCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
 
-            // there are posts, but none of them are image
-            if (queue.Count == 0 && posts.Count > 0 && patience > 0 && QrCache.HasEnoughPosts)
+            var acceptable = GetOnlyImagePosts(posts);
+            foreach (var post in acceptable) ThisQueryCache.Posts.Enqueue(post);
+            
+            Log($"Posts: {acceptable.Count}/{posts.Count}");
+
+            // (there ARE posts, but NONE of them is an image)
+            if (ThisQueryCache.Posts.Count == 0 && posts.Count > 0 && patience > 0 && ThisQueryCache.HasEnoughPosts)
             {
                 ScrollReddit(posts[^1].Fullname, --patience);
             }
         }
+
+        private List<PostData> GetOnlyImagePosts(ICollection<Post> posts)
+        {
+            var pinned = Math.Max(0, posts.Count - POST_LIMIT);
+            return posts.Skip(pinned).Where(IsImagePost).Select(p => new PostData(p as LinkPost)).ToList();
+
+            bool IsImagePost(Post p) => p is LinkPost post && _img.IsMatch(post.URL);
+        }
+
+        #endregion
 
 
         #region FETCHING COMMENTS
@@ -178,6 +238,7 @@ namespace Witlesss.Services.Internet
             return posts[^1].Fullname;
         }
 
+        /// <summary> Collects text from the comment and all its replies. </summary>
         private void GetCommentTexts(Comment comment, List<string> list)
         {
             if (comment.Body is not null) list.Add(comment.Body);
@@ -186,6 +247,8 @@ namespace Witlesss.Services.Internet
 
         #endregion
 
+
+        #region GETTING POSTS
 
         public List<Post> GetPosts(ScQuery query, string after = null)
         {
@@ -202,22 +265,17 @@ namespace Witlesss.Services.Internet
 
         public List<Post> SearchPosts(SsQuery s, string after = null)
         {
-            var sub = client.Subreddit(s.Subreddit);
-            return sub   .Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
+            var subreddit = client.Subreddit(s.Subreddit);
+            return subreddit.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
         public List<Post> SearchPosts(SrQuery s, string after = null)
         {
-            return client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
+            return    client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
-        private List<PostData> FilterImagePosts(ICollection<Post> posts)
-        {
-            var pinned = Math.Max(0, posts.Count - POST_LIMIT);
-            return posts.Skip(pinned).Where(IsValidPost).Select(p => new PostData(p as LinkPost)).ToList();
+        #endregion
 
-            bool IsValidPost(Post p) => p is LinkPost post && _img.IsMatch(post.URL);
-        }
 
         public int QueriesCached => Cache.Count;
         public int   PostsCached => Cache.Values.Sum(c => c.Posts.Count);
@@ -226,30 +284,24 @@ namespace Witlesss.Services.Internet
         {
             return client.SearchSubreddits(search).Where(s => s.Subscribers > 0).ToList();
         }
-
-        private void Count(List<Post> posts)
-        {
-            Log("Posts: " + posts.Count);
-            QrCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
-        }
     }
 
 
     public interface RedditQuery { List<Post> GetPosts(string after = null); }
 
-    /// <summary> Uses searchbar on a main page </summary>
+    /// <summary> Uses <b>searchbar</b> on a main page. </summary>
     public record SrQuery(string Q, string Sort, string Time) : RedditQuery
     {
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
-    /// <summary> Uses searchbar on a subreddit </summary>
+    /// <summary> Uses <b>searchbar</b> on a <b>subreddit</b>. </summary>
     public record SsQuery(string Subreddit, string Q, string Sort, string Time) : RedditQuery
     {
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
-    /// <summary> Opens subreddit and scrolls for some posts </summary>
+    /// <summary> Opens subreddit and <b>scrolls</b> for some posts. </summary>
     public record ScQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
     {
         public List<Post> GetPosts(string after = null) => RedditTool.Instance.GetPosts(this, after);

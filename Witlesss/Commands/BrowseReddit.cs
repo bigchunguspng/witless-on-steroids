@@ -44,7 +44,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             else if (_wtf.IsMatch(input))
             {
                 Log("LAST QUERY");
-                SendPost(Reddit.LastQueryOrRandom(Chat));
+                SendPost(Reddit.GetLastOrRandomQuery(Chat));
             }
             else if (input.StartsWith("/wss")) // subreddit
             {
@@ -103,7 +103,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 else
                 {
                     Log("DEFAULT (RANDOM)");
-                    SendPost(Reddit.RandomSubQuery);
+                    SendPost(Reddit.RandomSubredditQuery);
                 }
             }
 
@@ -274,7 +274,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             if (Message.ReplyToMessage is { } message)
             {
                 Pass(message);
-                if (RedditTool.Instance.Recall(Text) is { } post)
+                if (RedditTool.Instance.Recognize(Text) is { } post)
                 {
                     Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>", preview: false);
                 }

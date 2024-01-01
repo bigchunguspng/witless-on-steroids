@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -32,6 +31,7 @@ namespace Witlesss
                     Task.Delay(5000).Wait();
                 }
             }
+            _downloader = new TelegramFileDownloader(this);
         }
 
         public void SendMessage(long chat, string text)
@@ -186,33 +186,20 @@ namespace Witlesss
             }
         }
 
+
+        private readonly TelegramFileDownloader _downloader;
+
         public void Download(string fileID, long chat, out string path) => Download(fileID, chat, out path, out _);
         public void Download(string fileID, long chat, out string path, out MediaType type)
         {
-            string shortID = ShortID(fileID);
-            string extension = ExtensionFromID(shortID);
-            type = MediaTypeFromID(shortID);
-            path = UniquePath($@"{PICTURES_FOLDER}\{chat}\{shortID}{extension}");
-            Memes.Sticker = extension == ".webm";
-            DownloadFile(fileID, path, chat).Wait();
+            _downloader.Download(fileID, chat, out path, out type);
         }
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
-            Directory.CreateDirectory($@"{PICTURES_FOLDER}\{chat}");
-            try
-            {
-                var file = await Client.GetFileAsync(fileId);
-                var stream = new FileStream(path, FileMode.Create);
-                Client.DownloadFileAsync(file.FilePath!, stream).Wait();
-                await stream.DisposeAsync();
-            }
-            catch (Exception e)
-            {
-                SendMessage(chat, e.Message.Contains("file is too big") ? Pick(FILE_TOO_BIG_RESPONSE) : XDDD(e.Message));
-                throw;
-            }
+            await _downloader.DownloadFile(fileId, path, chat);
         }
-        
+
+
         public bool UserIsAdmin(User user, long chat)
         {
             var admins = Client.GetChatAdministratorsAsync(chat);

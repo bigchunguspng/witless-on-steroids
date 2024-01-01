@@ -235,18 +235,28 @@ namespace Witlesss.XD
 
         public static void ClearTempFiles()
         {
-            var path = TEMP_FOLDER;
-            var options = new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 };
+            ClearDirectory(TEMP_FOLDER, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
+            ClearDirectory(CH_HISTORY_FOLDER, new EnumerationOptions() { RecurseSubdirectories = false});
+        }
+
+        private static void ClearDirectory(string path, EnumerationOptions options)
+        {
             if (!Directory.Exists(path)) return;
             try
             {
-                var x = Directory.GetFiles(path, "*", options).Length;
-                Directory.Delete(path, true);
-                Log($"DEL TEMP >> {x} FILES!", ConsoleColor.Yellow);
+                var files = Directory.GetFiles(path, "*", options);
+
+                if (options.RecurseSubdirectories) Directory.Delete(path, true);
+                else
+                {
+                    foreach (var file in files) File.Delete(file);
+                }
+
+                Log($"DEL TEMP [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
             }
             catch (Exception e)
             {
-                LogError("CAN'T DEL TEMP >> " + e.Message);
+                LogError($"CAN'T DEL TEMP [{path}] >> {e.Message}");
             }
         }
     }

@@ -31,12 +31,9 @@ namespace Witlesss.Services.Internet
 
             DownloadFile(fileID, path, chat).Wait();
             
-            _recent.Add(shortID, path);
-            if (new FileInfo(path).Length > 2_000_000)
-            {
-                _large.Add(shortID, path);
-            }
+            (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);
         }
+
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
             Directory.CreateDirectory($@"{PICTURES_FOLDER}\{chat}");
@@ -59,31 +56,30 @@ namespace Witlesss.Services.Internet
     {
         private readonly int _limit;
 
-        private readonly Queue<string> _cache;
-        private readonly Dictionary<string, string> _keys;
+        private readonly Queue<string> _keys;
+        private readonly Dictionary<string, string> _paths;
 
         public DownloadCache(int limit)
         {
             _limit = limit;
-            _cache = new Queue<string>(_limit);
-            _keys = new Dictionary<string, string>(_limit);
+            _keys = new Queue<string>(_limit);
+            _paths = new Dictionary<string, string>(_limit);
         }
 
         public void Add(string id, string path)
         {
-            if (_cache.Count == _limit)
+            if (_keys.Count == _limit)
             {
-                _cache.Dequeue();
-                _keys.Remove(id);
+                var key = _keys.Dequeue();
+                _paths.Remove(key);
             }
-            _cache.Enqueue(id);
-            _keys.Add(id, path);
-
+            _keys.Enqueue(id);
+            _paths.Add(id, path);
         }
 
         public bool Contains(string id, out string path)
         {
-            return _keys.TryGetValue(id, out path);
+            return _paths.TryGetValue(id, out path);
         }
     }
 }

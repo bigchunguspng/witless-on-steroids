@@ -108,7 +108,19 @@ namespace Witlesss
         }
 
 
-        private static string Convert(string path, string extension) => new F_Process(path).Output("-W", extension);
+        private static string Convert(string path, string extension)
+        {
+            var ffmpeg = new F_Process(path);
+            var name = ffmpeg.GetOutputName("-W", extension);
+            try
+            {
+                return ffmpeg.OutputAs(name);
+            }
+            catch // av_interleaved_write_frame(): I/O error
+            {
+                return name; // file is already exist - just use it
+            }
+        }
 
 
         public static string ChangeSpeed(string path, double speed, SpeedMode mode)

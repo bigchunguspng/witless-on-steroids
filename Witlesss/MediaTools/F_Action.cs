@@ -19,7 +19,12 @@ namespace Witlesss.MediaTools
 
         public string Output(string suffix, string extension = ".mp4")
         {
-            return Cook(NameSource.RemoveExtension() + suffix + extension);
+            return Cook(GetOutputName(suffix, extension));
+        }
+
+        public string GetOutputName(string suffix, string extension)
+        {
+            return NameSource.RemoveExtension() + suffix + extension;
         }
 
         public string Output_WEBM_safe(string suffix)

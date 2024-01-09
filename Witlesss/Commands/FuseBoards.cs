@@ -19,6 +19,8 @@ namespace Witlesss.Commands
 
         private static readonly SyncronizedDictionary<long, string> _names = new();
 
+        private List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList("https://www.4chan.org/index.php");
+
         // /boards
         // /boards info
         // /board a.b.c - Y-M-D.json
@@ -63,7 +65,7 @@ namespace Witlesss.Commands
                     return;
                 }
 
-                var uri = UrlOrBust(url);
+                var uri = UrlOrBust(ref url);
 
                 var host = uri.Host;
                 var name = string.Join('.', url.Split(new[] { host }, None)[1].Split('/', RemoveEmptyEntries).Take(3));
@@ -144,10 +146,8 @@ namespace Witlesss.Commands
 
         public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
         {
-            _boards ??= _chan.GetBoardList("https://www.4chan.org/index.php");
-
-            var boards = _boards.Skip(page * perPage).Take(perPage);
-            var last = (int)Math.Ceiling(_boards.Count / (double)perPage) - 1;
+            var boards = Boards.Skip(page * perPage).Take(perPage);
+            var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
                 
             var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN BOARDS</b> 🍀🍀🍀");
             sb.Append(" [PAGE: ").Append(page + 1).Append("/").Append(last + 1).Append("]");
@@ -213,10 +213,21 @@ namespace Witlesss.Commands
         }
 
 
-        private Uri UrlOrBust(string url)
+        private Uri UrlOrBust(ref string url)
         {
             try
             {
+                if (!url.Contains('/'))
+                {
+                    var ending = $"/{url}/";
+                    var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();
+                    var match = urls.FirstOrDefault(x => x.EndsWith(ending));
+                    if (match != null)
+                    {
+                        url = match;
+                    }
+                }
+
                 return new Uri(url);
             }
             catch

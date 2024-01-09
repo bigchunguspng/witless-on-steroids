@@ -23,7 +23,7 @@ namespace Witlesss.Commands.Editing
                 Log($"{Title} >> EQ [f-{f} g-{g} w-{w}]");
             }
             else
-                Bot.SendMessage(Chat, "HELP"); //todo EQ_MANUAL
+                Bot.SendMessage(Chat, EQ_MANUAL);
         }
 
         string AudioFilename() => SongNameOr($"Bassboosted by {Sender}.mp3");

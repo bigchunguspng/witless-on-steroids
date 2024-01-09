@@ -18,7 +18,7 @@
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
             else
-                Bot.SendMessage(Chat, "чувак ты думал что-то здесь будет?"); //todo VOLUME_MANUAL
+                Bot.SendMessage(Chat, VOLUME_MANUAL);
         }
 
         string AudioFilename() => SongNameOr($"{Sender} Sound Effect.mp3");

@@ -378,6 +378,29 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Эквалайзер&lt;/u&gt;&lt;/b&gt;
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/eq [частота,Hz] [сила,dB] [ширина,Hz]&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Дефолтные значения:&lt;/b&gt; &lt;code&gt;~&lt;/code&gt;, &lt;code&gt;10&lt;/code&gt;, &lt;code&gt;2000&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Примеры:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/eq 100&lt;/code&gt; 👈 поднять басы на 10dB
+        ///&lt;code&gt;/eq 1000&lt;/code&gt; 👈 поднять средние частоты на 10dB
+        ///&lt;code&gt;/eq 50 40 1000&lt;/code&gt; 👈 поднять частоту 50Hz на 40dB
+        ///&lt;code&gt;/eq 1000 100 10&lt;/code&gt; 👈 запикать
+        ///&lt;code&gt;/eq 10000 -50 8000&lt;/code&gt; 👈 заглушить высокие частоты
+        ///
+        ///&lt;b&gt;Более подробно &lt;a href=&apos;https://ffmpe [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EQ_MANUAL {
+            get {
+                return ResourceManager.GetString("EQ_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Telegram-ExtraDBs.
         /// </summary>
         internal static string EXTRA_DBS_FOLDER {
@@ -972,6 +995,28 @@ namespace Witlesss.XD {
         internal static string USE_ARROWS {
             get {
                 return ResourceManager.GetString("USE_ARROWS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Громкость&lt;/u&gt;&lt;/b&gt;
+        ///
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/vol число/формула&lt;/code&gt;
+        ///
+        ///&lt;b&gt;Примеры:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/vol 2&lt;/code&gt; 👈 сделать в 2 раза громче
+        ///&lt;code&gt;/vol 10&lt;/code&gt; 👈 сделать в 10 раз громче
+        ///&lt;code&gt;/vol 0.5&lt;/code&gt; 👈 сделать в 2 раза тише
+        ///&lt;code&gt;/vol 0.5+t*0.1&lt;/code&gt; 👈 рост громкости с ×0,5 до ×2 за 15 секунд
+        ///&lt;code&gt;/vol if(gt(t,1),1,t)&lt;/code&gt; 👈 плавный 1-секундный вход
+        ///&lt;code&gt;/vol if(gt(t,0.5),1,2*t)&lt;/code&gt; 👈 плавный полсекундный вход
+        ///
+        ///&lt;b&gt;Более подробно &lt;a href=&apos;https://ffmpeg.org//ffmpeg-filters. [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VOLUME_MANUAL {
+            get {
+                return ResourceManager.GetString("VOLUME_MANUAL", resourceCulture);
             }
         }
         

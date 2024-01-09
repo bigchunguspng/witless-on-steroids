@@ -152,6 +152,7 @@ namespace Witlesss
         public static string Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
         public static string Scale         (string path, string[] args) => new F_Process(path).ScaleVideo(args).Output("-s");
         public static string ChangeVolume  (string path, string   arg ) => new F_Process(path).ChangeVolume(arg).Output("-vol");
+        public static string EQ            (string path, double[] args) => new F_Process(path).EQ(args).Output("-EQ");
         public static string ToVoice       (string path) => new F_Process(path).ToVoiceMessage().Output("-voice", ".ogg");
         public static string ToVideoNote   (string path)
         {

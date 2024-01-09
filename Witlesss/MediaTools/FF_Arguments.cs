@@ -70,6 +70,12 @@ namespace Witlesss.MediaTools
         public string Value => $"'{Volume}':eval=frame";
     }
 
+    public record EqualizeArgument(double[] Args) : IAudioFilterArgument
+    {
+        public string Key   => "equalizer";
+        public string Value => $"f={Args[0]}:g={Args[1]}:t=h:width={Args[2]}";
+    }
+
     #endregion
 
 

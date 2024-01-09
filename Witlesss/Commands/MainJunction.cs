@@ -21,6 +21,7 @@ namespace Witlesss.Commands
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
         private readonly ChangeVolume _volume = new();
+        private readonly Equalize _equalize = new();
         private readonly ToVideoNote _note = new();
         private readonly ToVoiceMessage _voice = new();
         private readonly ToSticker _sticker = new();
@@ -96,6 +97,7 @@ namespace Witlesss.Commands
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (CommandIs( "/sex"    )) _sc = _sticker;
             else if (CommandIs( "/song"   )) _sc = _song;
+            else if (CommandIs( "/eq"    )) _sc = _equalize;
             else if (CommandIs( "/vol"    )) _sc = _volume;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;

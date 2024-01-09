@@ -89,6 +89,11 @@ namespace Witlesss.MediaTools
         {
             return ApplyEffects(o => o.WithAudioFilters(v => v.Volume(arg)).WithVideoCodec("copy"));
         }
+        
+        public F_Action EQ(double[] args)
+        {
+            return ApplyEffects(o => o.WithAudioFilters(v => v.Equalize(args)).WithVideoCodec("copy"));
+        }
 
         #endregion
 

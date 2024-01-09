@@ -32,6 +32,8 @@ public class AdvancedEdit : Command
             SendResult(Memes.Edit(path, options, extension), extension);
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
+        else
+            Bot.SendSticker(Chat, new InputOnlineFile(Pick(DUDE)));
     }
 
     private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";

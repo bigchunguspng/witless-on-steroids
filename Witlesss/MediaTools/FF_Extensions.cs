@@ -28,6 +28,8 @@ namespace Witlesss.MediaTools
         public static VFO Crop       (this VFO o, Rectangle cropping) => o.With(new CropArgument  (cropping));
         public static VFO Crop       (this VFO o, string[]  cropping) => o.With(new CropArgumentXD(cropping));
         public static VFO CropSquare (this VFO o)                     => o.With(new CropArgumentXD(_squareCropping));
+        
+        public static AFO Volume     (this AFO o, string volume) => o.With(new VolumeArgument(volume));
 
         public static VFO MakeSquare (this VFO o, int size) => o.CropSquare().Scale(size, size);
 

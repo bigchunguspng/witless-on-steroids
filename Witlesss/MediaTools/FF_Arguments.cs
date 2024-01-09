@@ -64,6 +64,12 @@ namespace Witlesss.MediaTools
         public string Value => "areverse";
     }
 
+    public record VolumeArgument(string Volume) : IAudioFilterArgument
+    {
+        public string Key   => "volume";
+        public string Value => $"'{Volume}':eval=frame";
+    }
+
     #endregion
 
 

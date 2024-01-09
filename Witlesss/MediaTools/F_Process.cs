@@ -83,6 +83,16 @@ namespace Witlesss.MediaTools
         #endregion
 
 
+        #region AUDIO
+
+        public F_Action ChangeVolume(string arg)
+        {
+            return ApplyEffects(o => o.WithAudioFilters(v => v.Volume(arg)).WithVideoCodec("copy"));
+        }
+
+        #endregion
+
+
         #region CROP / SCALE
 
         // -filter:v "crop=272:272:56:56"

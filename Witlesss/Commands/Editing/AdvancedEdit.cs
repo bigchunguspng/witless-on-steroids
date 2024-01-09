@@ -76,17 +76,25 @@ public class AdvancedEdit : Command
         return true;
     }
     
-    private static void SendResult(string result, string extension)
+    private void SendResult(string result, string extension)
     {
         var name = "made with piece_fap_bot";
 
+        var g = Text.Split(' ')[0].EndsWith("g");
+
         using var stream = File.OpenRead(result);
-        if      (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
+        if      (SendAsDocument())        Bot.SendDocument (Chat, New_InputOnlineFile());
+        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
         else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));
-        else if (extension == "mp3")      Bot.SendAudio    (Chat, new InputOnlineFile(stream, name + ".mp3"));
-        else if (extension == "mp4")      Bot.SendVideo    (Chat, new InputOnlineFile(stream, name + ".mp4"));
-        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Chat, new InputOnlineFile(stream, name + ".mp4"));
-        else                              Bot.SendDocument (Chat, new InputOnlineFile(stream, name + "." + extension));
+        else if (extension == "mp3")      Bot.SendAudio    (Chat, New_InputOnlineFile());
+        else if (SendAsGIF())             Bot.SendAnimation(Chat, New_InputOnlineFile());
+        else if (extension == "mp4")      Bot.SendVideo    (Chat, New_InputOnlineFile());
+        else                              Bot.SendDocument (Chat, New_InputOnlineFile());
+
+        bool SendAsGIF() => _gif.IsMatch(extension) || extension == "mp4" && g;
+        bool SendAsDocument() => _pic.IsMatch(extension) && g;
+
+        InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
     }
 
     private static readonly Regex _pic = new(@"^(png|jpe?g)$");

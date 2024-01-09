@@ -27,13 +27,16 @@ namespace Witlesss.MediaTools
         {
             o.WithAudioCodec("libopus").WithAudioBitrate(48).DisableChannel(Channel.Video);
         });
-        
+
         // -filter:v "crop=W:H:X:Y" -s 384x384
-        public F_Action ToVideoNote (Rectangle crop) => ApplyEffects(o =>
+        public F_Action ToVideoNote(Rectangle crop) => ApplyEffects(o =>
         {
             o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize);
         });
-        public F_Action ToSticker        (Size size) => ApplyEffects(o => o.Resize(size));
+
+        public F_Action ToSticker(Size size) => ApplyEffects(o => o.Resize(size));
+
+        public F_Action Edit(string options) => ApplyEffects(o => o.WithCustomArgument(options));
 
         #endregion
 

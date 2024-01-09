@@ -22,6 +22,7 @@ namespace Witlesss.Commands
         private readonly ChangeSpeed _speed = new();
         private readonly ChangeVolume _volume = new();
         private readonly Equalize _equalize = new();
+        private readonly AdvancedEdit _edit = new();
         private readonly ToVideoNote _note = new();
         private readonly ToVoiceMessage _voice = new();
         private readonly ToSticker _sticker = new();
@@ -97,7 +98,7 @@ namespace Witlesss.Commands
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (CommandIs( "/sex"    )) _sc = _sticker;
             else if (CommandIs( "/song"   )) _sc = _song;
-            else if (CommandIs( "/eq"    )) _sc = _equalize;
+            else if (CommandIs( "/eq"     )) _sc = _equalize;
             else if (CommandIs( "/vol"    )) _sc = _volume;
             else if (command == "/g"       ) _sc = _audio;
             else if (command == "/note"    ) _sc = _note;
@@ -106,6 +107,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/w"      )) _sc = _reddit;
             else if (CommandIs( "/link"   )) _sc = _link;
             else if (CommandIs( "/piece"  )) _sc = _piece;
+            else if (CommandIs( "/ffxd"   )) _sc = _edit;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
 

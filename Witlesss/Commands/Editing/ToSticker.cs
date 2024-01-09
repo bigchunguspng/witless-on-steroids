@@ -7,6 +7,7 @@ namespace Witlesss.Commands.Editing
     public class ToSticker : Command
     {
         private string _fileID;
+
         public override void Run()
         {
             if (NoPicture()) return;

@@ -988,6 +988,19 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 🎮 &lt;b&gt;SUPER GAMING BATTLE&lt;/b&gt; 🎳
+        ///
+        ///🫵 Одолей меня чтобы удалить словарь
+        ///
+        ///🏠 - я, 🚜 - ты.
+        /// </summary>
+        internal static string TRACTOR_GAME_RULES {
+            get {
+                return ResourceManager.GetString("TRACTOR_GAME_RULES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 
         ///
         ///Используйте стрелочки для навигации ☝️🤓.

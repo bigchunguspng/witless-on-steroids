@@ -192,6 +192,14 @@ namespace Witlesss.Commands
 
                 _fuse.SendFuseList(chat, numbers[0], numbers[1], query.Message.MessageId);
             }
+            else if (data[0] == "del")
+            {
+                var message = query.Message;
+                message.From = query.From;
+
+                _delete.Pass(message);
+                _delete.DoGameStep(message.Chat.Id, data[1], message.MessageId);
+            }
         }
 
 

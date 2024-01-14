@@ -54,8 +54,8 @@ namespace Witlesss.Commands
                 }
                 catch // wrong format
                 {
-                    // todo send guide + delete file
-                    Bot.SendMessage(Chat, "get JSONed lmao");
+                    File.Delete(path);
+                    Bot.SendMessage(Chat, GetJsonFormatExample());
                 }
             }
             else if (s.Length > 2 && s[1] == "his") // JSON HIS
@@ -87,7 +87,7 @@ namespace Witlesss.Commands
                 else
                     FuseWitlessDB(arg);
             }
-            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false); // todo change manual
+            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false);
         }
 
 
@@ -99,7 +99,7 @@ namespace Witlesss.Commands
         private bool HasDocument(Message message, string type)
         {
             var b = message is not null && message.Document?.MimeType == type;
-            if (b) _document = Message.Document;
+            if (b) _document = message.Document;
 
             return b;
         }
@@ -276,5 +276,19 @@ namespace Witlesss.Commands
 
 
         private string GetHistoryFolder() => $@"{FUSE_HISTORY_FOLDER}\{Chat}";
+
+        private string GetJsonFormatExample()
+        {
+            var sb = new StringBuilder(ONLY_ARRAY_JSON);
+            var count = Extension.Random.Next(3, 7);
+            sb.Append("\n\n<code>[");
+            for (var i = 0; i < count; i++)
+            {
+                sb.Append("\n    \"").Append(Baka.Generate()).Append("\"");
+                if (i < count - 1) sb.Append(",");
+            }
+            sb.Append("\n]</code>");
+            return sb.ToString();
+        }
     }
 }

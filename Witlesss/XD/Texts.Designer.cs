@@ -466,21 +466,15 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнять ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнить ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
         ///
-        ///1. &lt;u&gt;Словарь другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
+        ///1. &lt;u&gt;Словарём другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt; &lt;code&gt;/chat_id@piece_fap_bot&lt;/code&gt;, скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt; &lt;code&gt;/fuse [полученное число]&lt;/code&gt;
         ///
-        /// /chat_id@piece_fap_bot
+        ///Пример: &lt;code&gt;/fuse -1001541923355&lt;/code&gt;
         ///
-        ///скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt;
+        ///2. &lt;u&gt;Словарями&lt;/u&gt;, созданными командой /move. Список таковых можно получить прописав &lt;code&gt;/fuse info&lt;/code&gt;.
         ///
-        /// /fuse@piece_fap_bot [полученное число]
-        ///
-        ///Пример: &lt;i&gt;/fuse -1001541923355&lt;/i&gt;
-        ///
-        ///Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;
-        ///
-        ///2. &lt;u&gt;Словари созданные командой&lt;/u&gt; /move. Список таковых можно посмотреть прописав &lt;code&gt;/fuse@piece_fap_bot info&lt; [rest of string was truncated]&quot;;.
+        ///Выбрав нужный, пропишите &lt;code&gt;/fuse [имя]&lt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FUSE_MANUAL {
             get {
@@ -615,6 +609,15 @@ namespace Witlesss.XD {
         internal static string MOVING_DONE {
             get {
                 return ResourceManager.GetString("MOVING_DONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Годятся только &lt;b&gt;JSON&lt;/b&gt;-файлы, в виде &lt;b&gt;списка строк&lt;/b&gt;, например:.
+        /// </summary>
+        internal static string ONLY_ARRAY_JSON {
+            get {
+                return ResourceManager.GetString("ONLY_ARRAY_JSON", resourceCulture);
             }
         }
         

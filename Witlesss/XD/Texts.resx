@@ -46,31 +46,27 @@
 /pics@piece_fap_bot [число] (%)</value>
     </data>
     <data name="FUSE_MANUAL" xml:space="preserve">
-        <value>&lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнять ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
+        <value>&lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнить ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
 
-1. &lt;u&gt;Словарь другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt;
+1. &lt;u&gt;Словарём другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt; &lt;code&gt;/chat_id@piece_fap_bot&lt;/code&gt;, скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt; &lt;code&gt;/fuse [полученное число]&lt;/code&gt;
 
-/chat_id@piece_fap_bot
+Пример: &lt;code&gt;/fuse -1001541923355&lt;/code&gt;
 
-скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt;
+2. &lt;u&gt;Словарями&lt;/u&gt;, созданными командой /move. Список таковых можно получить прописав &lt;code&gt;/fuse info&lt;/code&gt;.
 
-/fuse@piece_fap_bot [полученное число]
+Выбрав нужный, пропишите &lt;code&gt;/fuse [имя]&lt;/code&gt;
 
-Пример: &lt;i&gt;/fuse -1001541923355&lt;/i&gt;
+3. &lt;u&gt;Файлами&lt;/u&gt;. Прикрепите &lt;b&gt;TXT&lt;/b&gt; или &lt;b&gt;JSON&lt;/b&gt; файл к команде, или отправьте её в ответ на файл. TXT-файлы бот потребляет построчно, JSON-файл должен содержать список строк: &lt;code&gt;["строка 1","строка 2","…"]&lt;/code&gt;.
 
-Слияние разово обновит словарь &lt;b&gt;этой беседы&lt;/b&gt;
+4. &lt;u&gt;Файлами&lt;/u&gt;, которые уже скармливали. Список таковых можно получить прописав &lt;code&gt;/fuse his&lt;/code&gt;.
 
-2. &lt;u&gt;Словари созданные командой&lt;/u&gt; /move. Список таковых можно посмотреть прописав &lt;code&gt;/fuse@piece_fap_bot info&lt;/code&gt;. Выбрав нужный, просто пропишите
+Выбрав нужный, пропишите &lt;code&gt;/fuse [имя]&lt;/code&gt;
 
-/fuse@piece_fap_bot [имя]
+5. &lt;u&gt;Комментами с реддитовских постов&lt;/u&gt; - команда &lt;code&gt;/xd&lt;/code&gt;
 
-3. &lt;u&gt;История переписки&lt;/u&gt;. Более подробно - &lt;a href='https://t.me/piece_fap_club/5000'&gt;тут&lt;/a&gt;
+6. &lt;u&gt;Тредами с форчана&lt;/u&gt; - команда &lt;code&gt;/board&lt;/code&gt;
 
-4. &lt;u&gt;История переписки&lt;/u&gt;, которую уже скармливали. Для начала пропишите &lt;code&gt;/fuse@piece_fap_bot his&lt;/code&gt; чтобы увидеть доступные диапазоны дат, скопируйте один из них и пропишите
-
-/fuse@piece_fap_bot [диапазон дат]
-
-Пример: &lt;i&gt;/fuse 2021-09-16 - 2021-10-20&lt;/i&gt;</value>
+7. &lt;u&gt;Историей переписки&lt;/u&gt;. Более подробно - &lt;b&gt;&lt;a href='https://t.me/piece_fap_club/12788'&gt;тут&lt;/a&gt;&lt;/b&gt;</value>
     </data>
     <data name="FUSE_FAIL_CHAT" xml:space="preserve">
         <value>К сожалению, у меня нет словаря этой беседы</value>
@@ -596,5 +592,8 @@ s   - save and exit
         <value>
 
 &lt;code&gt;/fuse@piece_fap_club his *&lt;/code&gt; - скормить всё сразу</value>
+    </data>
+    <data name="ONLY_ARRAY_JSON" xml:space="preserve">
+        <value>Годятся только &lt;b&gt;JSON&lt;/b&gt;-файлы, в виде &lt;b&gt;списка строк&lt;/b&gt;, например:</value>
     </data>
 </root>

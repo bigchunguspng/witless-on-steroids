@@ -137,24 +137,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chat-History.
-        /// </summary>
-        internal static string CH_HISTORY_FILE_PREFIX {
-            get {
-                return ResourceManager.GetString("CH_HISTORY_FILE_PREFIX", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-HistoryDBs.
-        /// </summary>
-        internal static string CH_HISTORY_FOLDER {
-            get {
-                return ResourceManager.GetString("CH_HISTORY_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Telegram-BoardDBs.
         /// </summary>
         internal static string CHAN_FOLDER {
@@ -429,15 +411,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to К сожалению, я не нашёл словаря с таким названием.
-        /// </summary>
-        internal static string FUSE_FAIL_BASE {
-            get {
-                return ResourceManager.GetString("FUSE_FAIL_BASE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to К сожалению, я не нашёл сохранённых обсуждений с таким названием
         ///
         ///&lt;code&gt;/boards@piece_fap_club info&lt;/code&gt;
@@ -464,28 +437,31 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
-        ///
-        ///&lt;code&gt;/fuse@piece_fap_club his&lt;/code&gt;
-        ///
-        ///и выберите один из вариантов, или пропишите
-        ///
-        ///&lt;code&gt;/fuse@piece_fap_club his all&lt;/code&gt;
-        ///
-        ///чтобы скормить всё сразу.
-        /// </summary>
-        internal static string FUSE_FAIL_DATES {
-            get {
-                return ResourceManager.GetString("FUSE_FAIL_DATES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ёкарный бабай)0.
         /// </summary>
         internal static string FUSE_FAIL_SELF {
             get {
                 return ResourceManager.GetString("FUSE_FAIL_SELF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///
+        ///&lt;code&gt;/fuse@piece_fap_club his *&lt;/code&gt; - скормить всё сразу.
+        /// </summary>
+        internal static string FUSE_HIS_ALL {
+            get {
+                return ResourceManager.GetString("FUSE_HIS_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telegram-HistoryDBs.
+        /// </summary>
+        internal static string FUSE_HISTORY_FOLDER {
+            get {
+                return ResourceManager.GetString("FUSE_HISTORY_FOLDER", resourceCulture);
             }
         }
         

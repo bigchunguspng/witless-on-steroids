@@ -75,9 +75,6 @@
     <data name="FUSE_FAIL_CHAT" xml:space="preserve">
         <value>К сожалению, у меня нет словаря этой беседы</value>
     </data>
-    <data name="FUSE_FAIL_BASE" xml:space="preserve">
-        <value>К сожалению, я не нашёл словаря с таким названием</value>
-    </data>
     <data name="FUSE_FAIL_SELF" xml:space="preserve">
         <value>ёкарный бабай)0</value>
     </data>
@@ -204,11 +201,8 @@
 
 зареверсит 3-секундный фрагмент, начиная с 10-й секунды</value>
     </data>
-    <data name="CH_HISTORY_FOLDER" xml:space="preserve">
+    <data name="FUSE_HISTORY_FOLDER" xml:space="preserve">
         <value>Telegram-HistoryDBs</value>
-    </data>
-    <data name="CH_HISTORY_FILE_PREFIX" xml:space="preserve">
-        <value>Chat-History</value>
     </data>
     <data name="COPIES_FOLDER" xml:space="preserve">
         <value>Telegram-CopyDBs</value>
@@ -227,17 +221,6 @@
     </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
         <value>cтикеры {0}будут ставать мемами в случайном порядке</value>
-    </data>
-    <data name="FUSE_FAIL_DATES" xml:space="preserve">
-        <value>К сожалению, я не нашёл переписки за этот диапазон дат, пропишите
-
-&lt;code&gt;/fuse@piece_fap_club his&lt;/code&gt;
-
-и выберите один из вариантов, или пропишите
-
-&lt;code&gt;/fuse@piece_fap_club his all&lt;/code&gt;
-
-чтобы скормить всё сразу</value>
     </data>
     <data name="ADMINS_RESPONSE" xml:space="preserve">
         <value>Параметры генерации смогут менять {0}</value>
@@ -608,5 +591,10 @@ s   - save and exit
 🫵 Одолей меня чтобы удалить словарь
 
 🏠 - я, 🚜 - ты</value>
+    </data>
+    <data name="FUSE_HIS_ALL" xml:space="preserve">
+        <value>
+
+&lt;code&gt;/fuse@piece_fap_club his *&lt;/code&gt; - скормить всё сразу</value>
     </data>
 </root>

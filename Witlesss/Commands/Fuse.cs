@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Witlesss.Commands
 {
@@ -24,8 +25,6 @@ namespace Witlesss.Commands
         protected int Limit = int.MaxValue;
 
         private Document _document;
-        
-        private FileInfo[] _files;
 
         protected override void ExecuteAuthorized()
         {
@@ -37,7 +36,7 @@ namespace Witlesss.Commands
             var s = Text.Split();
             if (FileAttached("text/plain")) // TXT
             {
-                var path = UniquePath($@"{CH_HISTORY_FOLDER}\{_document.FileName}");
+                var path = UniquePath($@"{FUSE_HISTORY_FOLDER}\{_document.FileName}");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 EatFromTxtFile(path);
@@ -45,7 +44,7 @@ namespace Witlesss.Commands
             }
             else if (FileAttached("application/json")) // JSON  /  ERROR >> JSON HIS GUIDE
             {
-                var path = UniquePath($@"{CH_HISTORY_FOLDER}\{Chat}\{_document.FileName}");
+                var path = UniquePath($@"{GetHistoryFolder()}\{_document.FileName}");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 try
@@ -55,19 +54,18 @@ namespace Witlesss.Commands
                 }
                 catch // wrong format
                 {
-                    // todo send guide
+                    // todo send guide + delete file
                     Bot.SendMessage(Chat, "get JSONed lmao");
                 }
             }
             else if (s.Length > 2 && s[1] == "his") // JSON HIS
             {
                 var name = string.Join(' ', s.Skip(2));
-                var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
-                var files = GetFiles(path, $"{name}.json");
+                var files = GetFiles(GetHistoryFolder(), $"{name}.json");
 
                 if (files.Length == 0)
                 {
-                    Bot.SendMessage(Chat, FUSE_FAIL_DATES); // todo change
+                    SendFusionHistory(Chat, 0, 25, messageId: -1, fail: true);
                 }
                 else if (name == "*")
                 {
@@ -85,7 +83,7 @@ namespace Witlesss.Commands
                 var arg = s[1];
                 
                 if      (arg == "info") SendFuseList(Chat, 0, 25);
-                else if (arg == "his" ) Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
+                else if (arg == "his" ) SendFusionHistory(Chat, 0, 25);
                 else
                     FuseWitlessDB(arg);
             }
@@ -110,35 +108,74 @@ namespace Witlesss.Commands
 
         public void SendFuseList(long chat, int page, int perPage, int messageId = -1, bool fail = false)
         {
-            var files = GetFilesInfo(EXTRA_DBS_FOLDER);
-            if (_files is null || _files.Length != files.Length) _files = files;
+            var directory = EXTRA_DBS_FOLDER;
+            SendFilesList(ExtraDBs, directory, chat, page, perPage, messageId, fail);
+        }
 
-            var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
+        public void SendFusionHistory(long chat, int page, int perPage, int messageId = -1, bool fail = false)
+        {
+            var directory = GetHistoryFolder();
+            SendFilesList(Historic, directory, chat, page, perPage, messageId, fail);
+        }
+
+        private record FusionListData(string Available, string Object, string Key, string Optional);
+
+        private readonly FusionListData ExtraDBs = new("Доступные словари", "словаря", "fi", "");
+        private readonly FusionListData Historic = new("Доступные файлы", "файла", "fh", FUSE_HIS_ALL);
+
+        private void SendFilesList
+        (
+            FusionListData data,
+            string directory,
+            long chat,
+            int page,
+            int perPage,
+            int messageId = -1,
+            bool fail = false
+        )
+        {
+            var files = GetFilesInfo(directory);
+            var oneshot = files.Length < perPage;
+            var empty = files.Length == 0;
+
+            var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
             var sb = new StringBuilder();
             if (fail)
             {
-                sb.Append(FUSE_FAIL_BASE).Append("\n\n");
+                sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
             }
-            sb.Append("<b>Доступные словари:</b> ");
-            sb.Append("📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]\n");
-            sb.Append(JsonList(_files, page, perPage));
+            sb.Append("<b>").Append(data.Available).Append(":</b>");
+            if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]");
+            sb.Append("\n").Append(JsonList(files, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.Path));
-            sb.Append(USE_ARROWS);
+            if (!empty) sb.Append(data.Optional);
+            if (!oneshot) sb.Append(USE_ARROWS);
 
-            var text = sb.ToString();
-            var buttons = FuseBoards.GetPaginationKeyboard(page, perPage, lastPage, "fi");
+            var buttons = oneshot ? null : GetPaginationKeyboard(page, perPage, lastPage, data.Key);
 
-            FuseBoards.SendOrEditMessage(chat, text, messageId, buttons);
+            SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
         }
 
-        private static string FUSE_AVAILABLE_DATES()
+        protected static InlineKeyboardMarkup GetPaginationKeyboard(int page, int perPage, int last, string key)
         {
-            var files = GetFilesInfo($@"{CH_HISTORY_FOLDER}\{Chat}");
-            var result = $"<b>Доступные диапазоны переписки:</b>\n{JsonList(files, 0, 100)}";
-            if (files.Length > 0)
-                result += "\n\nМожно скормить всё, прописав\n\n<code>/fuse@piece_fap_bot his all</code>";
+            var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
+            var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
 
-            return result;
+            if (page > 1       ) buttons[0] = InlineKeyboardButton.WithCallbackData("⏪", CallbackData(0));
+            if (page > 0       ) buttons[1] = InlineKeyboardButton.WithCallbackData("⬅️", CallbackData(page - 1));
+            if (page < last    ) buttons[2] = InlineKeyboardButton.WithCallbackData("➡️", CallbackData(page + 1));
+            if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
+
+            return new InlineKeyboardMarkup(buttons);
+            
+            string CallbackData(int p) => $"{key} - {p} {perPage}";
+        }
+
+        protected static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup buttons)
+        {
+            var b = messageId < 0;
+            if (b) Bot.SendMessage(chat, text, buttons);
+            else   Bot.EditMessage(chat, messageId, text, buttons);
         }
 
         protected static string JsonList(FileInfo[] files, int page = 0, int perPage = 25)
@@ -185,7 +222,7 @@ namespace Witlesss.Commands
             var lines = File.ReadAllLines(path);
             EatAllLines(lines);
 
-            var directory = $@"{CH_HISTORY_FOLDER}\{Chat}";
+            var directory = GetHistoryFolder();
             Directory.CreateDirectory(directory);
 
             var name = Path.GetFileNameWithoutExtension(path);
@@ -236,5 +273,8 @@ namespace Witlesss.Commands
         }
 
         #endregion
+
+
+        private string GetHistoryFolder() => $@"{FUSE_HISTORY_FOLDER}\{Chat}";
     }
 }

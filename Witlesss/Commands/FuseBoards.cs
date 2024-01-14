@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot.Types.ReplyMarkups;
 using static System.StringSplitOptions;
 
 #pragma warning disable CS4014
@@ -180,29 +179,6 @@ namespace Witlesss.Commands
 
             if (single) Bot.SendMessage(chat, text);
             else SendOrEditMessage(chat, text, messageId, GetPaginationKeyboard(page, perPage, lastPage, "bi"));
-        }
-
-        public static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup buttons)
-        {
-            if (messageId < 0)
-                Bot.SendMessage(chat, text, buttons);
-            else
-                Bot.EditMessage(chat, messageId, text, buttons);
-        }
-
-        public static InlineKeyboardMarkup GetPaginationKeyboard(int page, int perPage, int last, string key)
-        {
-            var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
-            var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
-
-            if (page > 1       ) buttons[0] = InlineKeyboardButton.WithCallbackData("⏪", CallbackData(0));
-            if (page > 0       ) buttons[1] = InlineKeyboardButton.WithCallbackData("⬅️", CallbackData(page - 1));
-            if (page < last    ) buttons[2] = InlineKeyboardButton.WithCallbackData("➡️", CallbackData(page + 1));
-            if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
-
-            return new InlineKeyboardMarkup(buttons);
-            
-            string CallbackData(int p) => $"{key} - {p} {perPage}";
         }
 
 

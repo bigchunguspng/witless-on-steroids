@@ -185,12 +185,15 @@ namespace Witlesss.Commands
                 else
                     _boards.SendSavedList(chat, numbers[0], numbers[1], query.Message.MessageId);
             }
-            else if (data[0] == "fi")
+            else if (data[0].StartsWith('f'))
             {
                 var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
                 var chat = query.Message.Chat.Id;
 
-                _fuse.SendFuseList(chat, numbers[0], numbers[1], query.Message.MessageId);
+                if (data[0] == "fi")
+                    _fuse.SendFuseList     (chat, numbers[0], numbers[1], query.Message.MessageId);
+                else
+                    _fuse.SendFusionHistory(chat, numbers[0], numbers[1], query.Message.MessageId);
             }
             else if (data[0] == "del")
             {

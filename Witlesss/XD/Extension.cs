@@ -236,7 +236,7 @@ namespace Witlesss.XD
         public static void ClearTempFiles()
         {
             ClearDirectory(TEMP_FOLDER, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
-            ClearDirectory(CH_HISTORY_FOLDER, new EnumerationOptions() { RecurseSubdirectories = false});
+            ClearDirectory(FUSE_HISTORY_FOLDER, new EnumerationOptions() { RecurseSubdirectories = false});
         }
 
         private static void ClearDirectory(string path, EnumerationOptions options)

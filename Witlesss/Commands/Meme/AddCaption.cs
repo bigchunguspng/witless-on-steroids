@@ -30,6 +30,8 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
+            var caption = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+
             var dummy = GetDummy(Baka.Meme.OptionsT, "/top", out var empty);
 
             IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
@@ -47,18 +49,23 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
             IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
-            IFunnyApp.UseRoboto   = !empty &&  _regular.IsMatch(dummy) && !_futura.IsMatch(dummy);
+            IFunnyApp.UseRoboto        = !empty &&  _regular.IsMatch(dummy) && !_futura.IsMatch(dummy);
             IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy) && !_futura.IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
             IFunnyApp.MinimizeHeight   = !empty &&  _height .IsMatch(dummy);
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
+            if (empty || !_regular.IsMatch(dummy) && !_futura.IsMatch(dummy))
+            {
+                IFunnyApp.UseSegoe = IsMostlyCyrillic(caption);
+            }
+
             IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(dummy) ? GetInt(  _crop) : 100;
             IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(dummy) ? GetInt(_fontMS) :  10;
             IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) :  36;
 
-            return string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+            return caption;
 
             int GetInt(Regex x) => int.Parse(x.Match(dummy).Groups[1].Value);
         }

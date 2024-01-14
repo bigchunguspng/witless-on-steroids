@@ -11,7 +11,7 @@ using static System.StringSplitOptions;
 
 namespace Witlesss.Commands
 {
-    public class FuseBoards : SettingsCommand
+    public class FuseBoards : Fuse
     {
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup> _boards;
@@ -39,25 +39,22 @@ namespace Witlesss.Commands
 
             if (Text.Contains(' '))
             {
+                Baka.Save();
+                Size = SizeInBytes(Baka.Path);
+
+                GetWordsPerLineLimit();
+                
                 var args = Text.Split(' ', 2, RemoveEmptyEntries);
 
                 var url = args[1];
 
                 if (url.Contains(' ')) // FUSE WITH JSON FILE
                 {
-                    var file = $@"{CHAN_FOLDER}\{url}.json";
-                    if (GetFiles(CHAN_FOLDER).Contains(file))
+                    var files = GetFiles(CHAN_FOLDER, $"{url}.json");
+                    if (files.Length > 0)
                     {
-                        var size = SizeInBytes(Baka.Path);
-                        
-                        var list = new FileIO<List<string>>(file).LoadData();
-                        foreach (var line in list) Baka.Eat(line);
-                        Baka.SaveNoMatterWhat();
-                        Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-                        
-                        var newSize = SizeInBytes(Baka.Path);
-                        var difference = FileSize(newSize - size);
-                        Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), difference));
+                        EatFromJsonFile(files[0]);
+                        GoodEnding();
                     }
                     else
                         Bot.SendMessage(Chat, FUSE_FAIL_BOARD);
@@ -81,9 +78,8 @@ namespace Witlesss.Commands
                 else if (url.Contains("/thread/"))
                 {
                     var replies = _chan.GetThreadDiscussion(url).ToList();
-                    var size = SizeInBytes(Baka.Path);
 
-                    EatMany(replies, Baka, size, Chat, Title);
+                    EatMany(replies, Baka, Size, Chat, Title, Limit);
                 }
                 else // BOARD
                 {
@@ -99,7 +95,7 @@ namespace Witlesss.Commands
 
         private Task<List<string>> GetDiscussionAsync(string url)
         {
-            // Use IEnumerable<X>.ToList() if u want task to start right at this point!
+            // Use .ToList() if u want the Task to start right at this point!
             // Otherwise enumeration will be triggered later (slower).
             return Task.Run(() => _chan.GetThreadDiscussion(url).ToList());
         }
@@ -110,11 +106,11 @@ namespace Witlesss.Commands
             var text = string.Format(BOARD_START, tasks.Count, less_go);
             if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
             var message = Bot.PingChat(Chat, text);
-            Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks), Chat, message);
+            Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks, Limit), Chat, message);
         }
 
 
-        private static async Task EatBoardDiscussion(WitlessMessageData x, List<Task<List<string>>> tasks)
+        private static async Task EatBoardDiscussion(WitlessMessageData x, List<Task<List<string>>> tasks, int limit)
         {
             await Task.WhenAll(tasks);
 
@@ -122,24 +118,21 @@ namespace Witlesss.Commands
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 
-            EatMany(lines, x.Baka, size, x.Chat, x.Title);
+            EatMany(lines, x.Baka, size, x.Chat, x.Title, limit);
         }
 
-        private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title)
+        private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title, int limit)
         {
-            foreach (var text in lines) baka.Eat(text);
-            baka.SaveNoMatterWhat();
-            Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+            EatAllLines(lines, baka, limit, out var eated);
+            SaveChanges(baka, title);
 
             Directory.CreateDirectory(CHAN_FOLDER);
             var path = $@"{CHAN_FOLDER}\{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json";
             new FileIO<List<string>>(path).SaveData(lines);
             _names.Remove(chat);
 
-            var newSize = SizeInBytes(baka.Path);
-            var difference = FileSize(newSize - size);
-            var report = string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), difference);
-            var detais = $"\n\n<b>Новых строк:</b> {BrowseReddit.FormatSubs(lines.Count, "😏")}";
+            var report = FUSION_SUCCESS_REPORT(baka, size, title);
+            var detais = $"\n\n<b>Новых строк:</b> {BrowseReddit.FormatSubs(eated, "😏")}";
             Bot.SendMessage(chat, report + detais);
         }
 
@@ -180,7 +173,7 @@ namespace Witlesss.Commands
             var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
             var sb = new StringBuilder("<b>Доступные доскиъ/трѣды:</b> ");
             if (!single) sb.Append("📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
-            sb.Append('\n').Append(Fuse.JsonList(_files, page, perPage));
+            sb.Append('\n').Append(JsonList(_files, page, perPage));
             if (!single) sb.Append(USE_ARROWS);
 
             var text = sb.ToString();
@@ -200,7 +193,7 @@ namespace Witlesss.Commands
         public static InlineKeyboardMarkup GetPaginationKeyboard(int page, int perPage, int last, string key)
         {
             var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
-            var buttons = new List<InlineKeyboardButton>() { inactive, inactive, inactive, inactive };
+            var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
 
             if (page > 1       ) buttons[0] = InlineKeyboardButton.WithCallbackData("⏪", CallbackData(0));
             if (page > 0       ) buttons[1] = InlineKeyboardButton.WithCallbackData("⬅️", CallbackData(page - 1));

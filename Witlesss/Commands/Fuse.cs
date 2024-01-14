@@ -20,8 +20,8 @@ namespace Witlesss.Commands
     
     public class Fuse : SettingsCommand
     {
-        private long _size;
-        private int _limit;
+        protected long Size;
+        protected int Limit = int.MaxValue;
 
         private Document _document;
         
@@ -30,8 +30,7 @@ namespace Witlesss.Commands
         protected override void ExecuteAuthorized()
         {
             Baka.Save();
-
-            _size = SizeInBytes(Baka.Path);
+            Size = SizeInBytes(Baka.Path);
 
             GetWordsPerLineLimit();
 
@@ -142,7 +141,7 @@ namespace Witlesss.Commands
             return result;
         }
 
-        public static string JsonList(FileInfo[] files, int page = 0, int perPage = 25)
+        protected static string JsonList(FileInfo[] files, int page = 0, int perPage = 25)
         {
             if (files.Length == 0) return "\n*пусто*";
             
@@ -181,12 +180,6 @@ namespace Witlesss.Commands
             else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
         }
 
-        private void EatFromJsonFile(string path)
-        {
-            var lines = new FileIO<List<string>>(path).LoadData();
-            EatAllLines(lines);
-        }
-
         private void EatFromTxtFile(string path)
         {
             var lines = File.ReadAllLines(path);
@@ -200,29 +193,46 @@ namespace Witlesss.Commands
             new FileIO<List<string>>(save).SaveData(lines.ToList());
         }
 
-        private void EatAllLines(IEnumerable<string> lines)
+        protected void EatFromJsonFile(string path)
         {
+            var lines = new FileIO<List<string>>(path).LoadData();
+            EatAllLines(lines);
+        }
+
+        private          void EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit, out _);
+        protected static void EatAllLines(IEnumerable<string> lines, Witless baka, int limit, out int eated)
+        {
+            eated = 0;
             foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                if (line.Count(c => c == ' ' || c == '\n') >= _limit) continue;
-                Baka.Eat(line);
+                if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
+                if (baka.Eat(line)) eated++;
             }
         }
 
-        private void GetWordsPerLineLimit()
+        protected void GetWordsPerLineLimit()
         {
-            var match = Regex.Match(Text, @"^\/fuse(\d+)");
-            _limit = match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
+            var match = Regex.Match(Text, @"^\/\S+(\d+)");
+            Limit = match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
         }
 
-        private void GoodEnding()
+        protected void GoodEnding()
         {
-            Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-            Baka.SaveNoMatterWhat();
-            var newSize = SizeInBytes(Baka.Path);
-            var difference = newSize - _size;
-            var message = string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), FileSize(difference));
-            Bot.SendMessage(Chat, message);
+            SaveChanges(Baka, Title);
+            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Title));
+        }
+
+        protected static void SaveChanges(Witless baka, string title)
+        {
+            Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+            baka.SaveNoMatterWhat();
+        }
+
+        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, string title)
+        {
+            var newSize = SizeInBytes(baka.Path);
+            var difference = newSize - size;
+            return string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), FileSize(difference));
         }
 
         #endregion

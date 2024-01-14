@@ -69,7 +69,7 @@ namespace Witlesss
             set => Baka.Words = value;
         }
 
-        public void Eat(string text)                   => HasUnsavedStuff = Baka.Eat(text, out _);
+        public bool Eat(string text)                   => HasUnsavedStuff = Baka.Eat(text, out _);
         public bool Eat(string text, out string eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
 
         public string Generate(string word = Copypaster.START)

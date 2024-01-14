@@ -1,12 +1,11 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 #pragma warning disable CS4014
 
 namespace Witlesss.Commands
 {
-    public class FuseRedditComments : SettingsCommand
+    public class FuseRedditComments : Fuse
     {
         private readonly Regex _que = new(@"^\/xd\S*\s((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
@@ -25,7 +24,10 @@ namespace Witlesss.Commands
 
             if (que.Success || sub.Success)
             {
-                var size = SizeInBytes(Baka.Path);
+                Baka.Save();
+                Size = SizeInBytes(Baka.Path);
+
+                GetWordsPerLineLimit();
 
                 var q = que.Success ? que.Groups[1].Value : null;
                 var s = sub.Success ? sub.Groups[1].Value : null;
@@ -49,7 +51,7 @@ namespace Witlesss.Commands
                 }
 
                 var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                Bot.RunSafelyAsync(EatComments(SnapshotMessageData(), query, size), Chat, message);
+                Bot.RunSafelyAsync(EatComments(SnapshotMessageData(), query, Size, Limit), Chat, message);
             }
             else
             {
@@ -57,22 +59,19 @@ namespace Witlesss.Commands
             }
         }
 
-        private async Task EatComments(WitlessMessageData x, RedditQuery query, long size)
+        private async Task EatComments(WitlessMessageData x, RedditQuery query, long size, int limit)
         {
             var timer = new Stopwatch();
             var comments = await RedditTool.Instance.GetComments(query);
             Log($"COMMENTS FETCHED >> {timer.CheckElapsed()}");
 
-            foreach (var text in comments) x.Baka.Eat(text);
-            Log($"{x.Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-            x.Baka.SaveNoMatterWhat();
+            EatAllLines(comments, x.Baka, limit, out var eated);
+            SaveChanges(x.Baka, x.Title);
 
-            var newSize = SizeInBytes(x.Baka.Path);
-            var difference = FileSize(newSize - size);
-            var report = string.Format(FUSE_SUCCESS_RESPONSE, x.Title, FileSize(newSize), difference);
+            var report = FUSION_SUCCESS_REPORT(x.Baka, size, x.Title);
             var subreddit = query is ScQuery sc ? sc.Subreddit : query is SsQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
-            var detais = $"\n\n Его пополнили {comments.Count} комментов с {subreddit}";
+            var detais = $"\n\n Его пополнили {eated} комментов с {subreddit}";
             Bot.SendMessage(x.Chat, report + detais);
         }
     }

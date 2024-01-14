@@ -14,8 +14,8 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract Regex _cmd { get; }
 
         protected abstract string Log_PHOTO ( int x);
+        protected abstract string Log_STICK ( int x);
         protected abstract string Log_VIDEO { get; }
-        protected abstract string Log_STICK { get; }
         protected abstract string VideoName { get; }
 
         protected void Run(string type, string options = null)
@@ -65,9 +65,13 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         {
             Download(fileID);
 
-            using var stream = File.OpenRead(produce(_path, Texts(), GetStickerExtension()));
-            Bot.SendPhoto(Chat, new InputOnlineFile(stream));
-            Log($"{Title} >> {Log_STICK}");
+            var repeats = GetRepeats(HasToBeRepeated());
+            for (int i = 0; i < repeats; i++)
+            {
+                using var stream = File.OpenRead(produce(_path, Texts(), GetStickerExtension()));
+                Bot.SendPhoto(Chat, new InputOnlineFile(stream));
+            }
+            Log($"{Title} >> {Log_STICK(repeats)}");
         }
 
         protected void DoVideo(string fileID, Func<string, T, string> produce)

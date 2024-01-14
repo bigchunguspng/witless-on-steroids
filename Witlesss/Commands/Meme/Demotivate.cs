@@ -8,9 +8,9 @@ namespace Witlesss.Commands.Meme
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
+        protected override string Log_STICK(int x) => $"DEMOTIVATOR [{(x == 1 ? "#" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "DEMOTIVATOR [^] VID";
-        protected override string Log_STICK { get; } = "DEMOTIVATOR [#] STICKER";
         protected override string VideoName => $"piece_fap_club-d{(Memes.Mode == Square ? "g" : "v")}.mp4";
 
         public ImageProcessor SetUp(int w, int h)

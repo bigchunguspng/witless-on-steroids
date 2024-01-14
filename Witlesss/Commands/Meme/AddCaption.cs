@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands.Meme
@@ -10,9 +9,9 @@ namespace Witlesss.Commands.Meme
         protected override Regex _cmd { get; } = new(@"^\/top(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "=" : x)}]";
+        protected override string Log_STICK(int x) => $"WHENTHE [{(x == 1 ? "$" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
-        protected override string Log_STICK { get; } = "WHENTHE [$] STICKER";
         protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
 
         public ImageProcessor SetUp(int w, int h)

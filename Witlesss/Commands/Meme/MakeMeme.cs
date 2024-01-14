@@ -9,9 +9,9 @@ namespace Witlesss.Commands.Meme
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
+        protected override string Log_STICK(int x) => $"MEME [{(x == 1 ? "M" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "MEME [M] VID";
-        protected override string Log_STICK { get; } = "MEME [M] STICKER";
         protected override string VideoName { get; } = "piece_fap_club-meme.mp4";
 
         public ImageProcessor SetUp(int w, int h)

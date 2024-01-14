@@ -227,10 +227,10 @@ namespace Witlesss.XD
             return new  DirectoryInfo(path).GetFiles();
         }
         
-        public static string[]   GetFiles      (string path)
+        public static string[]   GetFiles      (string path, string pattern = "*")
         {
             Directory.CreateDirectory(path);
-            return Directory.GetFiles(path);
+            return Directory.GetFiles(path, pattern);
         }
 
         public static void ClearTempFiles()

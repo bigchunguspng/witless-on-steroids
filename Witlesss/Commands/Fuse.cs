@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,74 +8,106 @@ using Telegram.Bot.Types;
 
 namespace Witlesss.Commands
 {
+    // FUSE modes:
+    
+    // DIC      - chat DBs      /fuse [id / name]
+    // TXT      - text lines    /fuse [file.txt]
+    // JSON     - json array    /fuse [xd.json]
+    // JSON HIS - json array    /fuse his [name / *]
+    // HIS      - json          /fuse [xd.json] -> ERROR >> GUIDE
+    //                          /fuse his       -> LIST
+    //                          /fuse info      -> LIST
+    
     public class Fuse : SettingsCommand
     {
         private long _size;
-        private int   _max;
+        private int _limit;
+
+        private Document _document;
         
         private FileInfo[] _files;
 
         protected override void ExecuteAuthorized()
         {
             Baka.Save();
+
             _size = SizeInBytes(Baka.Path);
 
-            var a = Text.Split();
-            if (a.Length > 2)
-            {
-                string name = Regex.Match(Text, @"(his\sall)|(((\d{2,4}-+){2}\d+)(\s-\s)*){2}").Value;
-                var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
-                var files = GetFiles(path);
+            GetWordsPerLineLimit();
 
-                GetMaxWordsPerLine();
-                
-                if (name == "his all")
+            var s = Text.Split();
+            if (FileAttached("text/plain")) // TXT
+            {
+                var path = UniquePath($@"{CH_HISTORY_FOLDER}\{_document.FileName}");
+                Bot.DownloadFile(_document.FileId, path, Chat).Wait();
+
+                EatFromTxtFile(path);
+                GoodEnding();
+            }
+            else if (FileAttached("application/json")) // JSON  /  ERROR >> JSON HIS GUIDE
+            {
+                var path = UniquePath($@"{CH_HISTORY_FOLDER}\{Chat}\{_document.FileName}");
+                Bot.DownloadFile(_document.FileId, path, Chat).Wait();
+
+                try
                 {
-                    foreach (string file in files) EatHistorySimple(file);
+                    EatFromJsonFile(path);
+                    GoodEnding();
+                }
+                catch // wrong format
+                {
+                    // todo send guide
+                    Bot.SendMessage(Chat, "get JSONed lmao");
+                }
+            }
+            else if (s.Length > 2 && s[1] == "his") // JSON HIS
+            {
+                var name = string.Join(' ', s.Skip(2));
+                var path = $@"{CH_HISTORY_FOLDER}\{Chat}";
+                var files = GetFiles(path, $"{name}.json");
+
+                if (files.Length == 0)
+                {
+                    Bot.SendMessage(Chat, FUSE_FAIL_DATES); // todo change
+                }
+                else if (name == "*")
+                {
+                    foreach (var file in files) EatFromJsonFile(file);
                     GoodEnding();
                 }
                 else
                 {
-                    var file = $@"{path}\{name}.json";
-                    if (files.Contains(file))
-                    {
-                        EatHistorySimple(file);
-                        GoodEnding();
-                    }
-                    else
-                        Bot.SendMessage(Chat, FUSE_FAIL_DATES);
+                    EatFromJsonFile(files[0]);
+                    GoodEnding();
                 }
             }
-            else if (a.Length > 1)
+            else if (s.Length == 2) // DIC
             {
-                string name = a[1];
+                var arg = s[1];
                 
-                if      (name == "info") SendFuseList(Chat, 0, 25);
-                else if (name == "his" ) Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
+                if      (arg == "info") SendFuseList(Chat, 0, 25);
+                else if (arg == "his" ) Bot.SendMessage(Chat, FUSE_AVAILABLE_DATES());
                 else
-                    FuseWitlessDB(name);
+                    FuseWitlessDB(arg);
             }
-            else if (CanFuseHistory(out string fileID))
-            {
-                string path = UniquePath($@"{CH_HISTORY_FOLDER}\{CH_HISTORY_FILE_PREFIX}-{Chat}.json");
-                Bot.DownloadFile(fileID, path, Chat).Wait();
-
-                EatChatHistory(path);
-                GoodEnding();
-            }
-            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false);
-
-            bool CanFuseHistory(out string fileID)
-            {
-                fileID = "";
-                if (IsJsonAttached(Message))
-                    fileID = Message.Document?.FileId;
-                else if (Message.ReplyToMessage != null && IsJsonAttached(Message.ReplyToMessage))
-                    fileID = Message.ReplyToMessage.Document?.FileId;
-                return fileID!.Length > 0;
-            }
-            bool IsJsonAttached(Message message) => message.Document?.MimeType is "application/json";
+            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false); // todo change manual
         }
+
+
+        private bool FileAttached(string type)
+        {
+            return HasDocument(Message, type) || HasDocument(Message.ReplyToMessage, type);
+        }
+
+        private bool HasDocument(Message message, string type)
+        {
+            var b = message is not null && message.Document?.MimeType == type;
+            if (b) _document = Message.Document;
+
+            return b;
+        }
+
+        #region LISTING
 
         public void SendFuseList(long chat, int page, int perPage, int messageId = -1, bool fail = false)
         {
@@ -125,88 +155,76 @@ namespace Witlesss.Commands
             return sb.ToString();
         }
 
-        private void FuseWitlessDB(string name)
+        #endregion
+
+        #region FUSION
+
+        private void FuseWitlessDB(string arg)
         {
-            bool passedID = long.TryParse(name, out long key);
-            if (key == Chat)
+            var argIsID = long.TryParse(arg, out var chat);
+            if (chat == Chat)
             {
                 Bot.SendMessage(Chat, FUSE_FAIL_SELF);
                 return;
             }
 
-            bool chatExist = passedID && Bot.WitlessExist(key);
-            bool baseExist = BaseExists();
-            if (chatExist || baseExist)
+            var chatExist = argIsID && Bot.WitlessExist(chat);
+            var files = chatExist ? null : GetFiles(EXTRA_DBS_FOLDER, $"{arg}.json");
+            var fileExist = files is { Length: > 0 };
+            if (chatExist || fileExist)
             {
-                new FusionCollab(Baka, chatExist ? Bot.SussyBakas[key].Words : FromFile()).Fuse();
+                var source = chatExist ? Bot.SussyBakas[chat].Words : new FileIO<WitlessDB>(files[0]).LoadData();
+                new FusionCollab(Baka, source).Fuse();
                 GoodEnding();
             }
-            else
-            {
-                if (passedID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
-                else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
-            }
-
-            string Path() => $@"{EXTRA_DBS_FOLDER}\{name}.json";
-            WitlessDB FromFile() => new FileIO<WitlessDB>(Path()).LoadData();
-            bool BaseExists() => GetFiles(EXTRA_DBS_FOLDER).Contains(Path());
+            else if (argIsID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
+            else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
         }
 
-        private static void EatChatHistory(string path)
+        private void EatFromJsonFile(string path)
         {
-            var io = new FileIO<ExpandoObject>(path);
-
-            var data = io.LoadData();
-            var list = (IList) data.First(x => x.Key == "messages").Value;
-            
-            var save = new List<string>(list.Count);
-            foreach (var message in list)
-            {
-                var mess = (IDictionary<string, object>) message;
-                if (mess["type"].ToString() == "service")           continue;
-                if (mess["from_id"].ToString() == "user1980917094") continue;
-
-                var text = mess["text"].ToString();
-                if (string.IsNullOrEmpty(text))                     continue;
-                if (text.StartsWith("System.Collections.Generic"))  continue;
-
-                Baka.Eat(text);
-                save.Add(text);
-            }
-
-            string date1 = FormatDate(((IDictionary<string, object>) list[0] )?["date"]);
-            string date2 = FormatDate(((IDictionary<string, object>) list[^1])?["date"]);
-
-            path = $@"{CH_HISTORY_FOLDER}\{Chat}";
-            Directory.CreateDirectory(path);
-            path = $@"{path}\{date1} - {date2}.json";
-            new FileIO<List<string>>(path).SaveData(save);
-
-            string FormatDate(object o) => ((DateTime) o).ToString("yyyy'-'MM'-'dd");
+            var lines = new FileIO<List<string>>(path).LoadData();
+            EatAllLines(lines);
         }
-        
-        private void EatHistorySimple(string path)
+
+        private void EatFromTxtFile(string path)
         {
-            var list = new FileIO<List<string>>(path).LoadData();
-            foreach (string text in list)
+            var lines = File.ReadAllLines(path);
+            EatAllLines(lines);
+
+            var directory = $@"{CH_HISTORY_FOLDER}\{Chat}";
+            Directory.CreateDirectory(directory);
+
+            var name = Path.GetFileNameWithoutExtension(path);
+            var save = UniquePath($@"{directory}\{name}.json");
+            new FileIO<List<string>>(save).SaveData(lines.ToList());
+        }
+
+        private void EatAllLines(IEnumerable<string> lines)
+        {
+            foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                if (text.Count(c => c == ' ') >= _max) continue;
-                Baka.Eat(text);
+                if (line.Count(c => c == ' ' || c == '\n') >= _limit) continue;
+                Baka.Eat(line);
             }
         }
-        private void GetMaxWordsPerLine()
+
+        private void GetWordsPerLineLimit()
         {
-            bool valuePassed = int.TryParse(Text[(Text.LastIndexOf(' ') + 1)..], out _max);
-            if (!valuePassed) _max = int.MaxValue;
+            var match = Regex.Match(Text, @"^\/fuse(\d+)");
+            _limit = match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
         }
-        
+
         private void GoodEnding()
         {
-            Baka.SaveNoMatterWhat();
             Log($"{Title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+            Baka.SaveNoMatterWhat();
             var newSize = SizeInBytes(Baka.Path);
-            var difference = FileSize(newSize - _size);
-            Bot.SendMessage(Chat, string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), difference));
+            var difference = newSize - _size;
+            var message = string.Format(FUSE_SUCCESS_RESPONSE, Title, FileSize(newSize), FileSize(difference));
+            Bot.SendMessage(Chat, message);
         }
+
+        #endregion
     }
 }

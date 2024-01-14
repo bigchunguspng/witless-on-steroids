@@ -35,16 +35,19 @@ namespace Witlesss.Commands
         }
 
 
-        private const string _default = "🚧", _house = "🏠", _destruction = "🏚", _bricks = "🧱", _tractor = "🚜", _tnt = "🧨", _boom = "💥";
+        private const string _default = "🚧", _house = "🏠", _detroit = "🏚", _bricks = "🧱"; 
+        private const string _tractor = "🚜", _tnt = "🧨", _boom = "💥", _fire = "🔥";
 
         private readonly Dictionary<long, List<List<InlineKeyboardButton>>> _games = new();
+
+        private List<List<InlineKeyboardButton>> _game;
 
         private InlineKeyboardMarkup GetMinigameKeyboard()
         {
             var cell = InlineKeyboardButton.WithCallbackData(_default);
             var rows = new List<List<InlineKeyboardButton>>() { Line(), Line(), Line(), Line() };
 
-            AddGameObjects(_house, 3);
+            AddGameObjects(_house, 3, data: false);
             AddGameObjects(_tractor, 1);
             AddGameObjects(_tnt, 2);
 
@@ -55,7 +58,7 @@ namespace Witlesss.Commands
 
             List<InlineKeyboardButton> Line() => new() { cell, cell, cell, cell };
 
-            void AddGameObjects(string obj, int count)
+            void AddGameObjects(string obj, int count, bool data = true)
             {
                 for (int i = 0; i < count;)
                 {
@@ -63,7 +66,7 @@ namespace Witlesss.Commands
                     var y = Extension.Random.Next(4);
                     if (rows[x][y].Text == _default)
                     {
-                        rows[x][y] = InlineKeyboardButton.WithCallbackData(obj, $"del - {obj} - {x}:{y}");
+                        rows[x][y] = data ? GetCallbackButton(x, y, obj) : InlineKeyboardButton.WithCallbackData(obj);
                         i++;
                     }
                 }
@@ -78,77 +81,46 @@ namespace Witlesss.Commands
             var x = int.Parse(n[0]);
             var y = int.Parse(n[1]);
 
-            var game = _games[chat];
+            _game = _games[chat];
 
             if (o == _tractor)
             {
                 var move = Extension.Random.Next(2) == 0 ? 1 : -1;
                 var vert = Extension.Random.Next(2) == 0;
 
-                var tx = vert ? (x + move + 4) % 4 : x;
-                var ty = vert ? y : (y + move + 4) % 4;
+                var tx = vert ? x : (x + move + 4) % 4;
+                var ty = vert ? (y + move + 4) % 4 : y;
+                var target = GetCell(tx, ty);
 
-                var target = game[tx][ty].Text;
                 if (target == _default || target == _bricks)
                 {
-                    game[tx][ty] = InlineKeyboardButton.WithCallbackData(_tractor, $"del - {_tractor} - {tx}:{ty}");
-                    game[x][y] = InlineKeyboardButton.WithCallbackData(_default);
+                    SetCell(tx, ty, GetCallbackButton(tx, ty, _tractor));
+                    SetCell(x, y, _default);
                 }
-                else if (target == _house)
-                {
-                    game[tx][ty] = InlineKeyboardButton.WithCallbackData(_destruction);
-                }
-                else if (target == _destruction)
-                {
-                    game[tx][ty] = InlineKeyboardButton.WithCallbackData(_bricks);
-                }
-                else if (target == _tnt)
-                {
-                    ExplodeTNT(tx, ty);
-                }
+                else if (target == _house)   SetCell(tx, ty, _detroit);
+                else if (target == _detroit) SetCell(tx, ty, _bricks);
+                else if (target == _tnt)     Explode(tx, ty);
                 else
                     return;
             }
-            else if (o == _tnt)
-            {
-                ExplodeTNT(x, y);
-            }
+            else if (o == _tnt) Explode(x, y);
             else
                 return;
 
-            void ExplodeTNT(int x, int y)
-            {
-                game[x][y] = InlineKeyboardButton.WithCallbackData(_boom);
+            Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
 
-                for (var i = 0; i < 3; i++)
-                for (var j = 0; j < 3; j++)
-                {
-                    var tx = (x - 1 + i + 4) % 4;
-                    var ty = (y - 1 + j + 4) % 4;
-                    var target = game[tx][ty].Text;
-                    
-                    if (target == _house || target == _destruction)
-                    {
-                        game[tx][ty] = InlineKeyboardButton.WithCallbackData(_bricks);
-                    }
-                    else if (target == _tnt || target == _tractor) ExplodeTNT(tx, ty);
-                }
-            }
+            var objects = _game.SelectMany(row => row.ToArray()).Select(cell => cell.Text).ToArray();
 
-            Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(game));
-
-            var objects = game.SelectMany(x => x.ToArray()).Select(x => x.Text).ToArray();
-
-            if (objects.Contains(_boom))
+            if (objects.Contains(_boom) || objects.Contains(_fire))
             {
                 Task.Delay(500).Wait();
                 for (var i = 0; i < 4; i++)
                 for (var j = 0; j < 4; j++)
                 {
-                    if (game[i][j].Text == _boom) 
-                        game[i][j] = InlineKeyboardButton.WithCallbackData(_default);
+                    var cell = GetCell(i, j);
+                    if (cell == _boom || cell == _fire) SetCell(i, j, _default);
                 }
-                Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(game));
+                Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
             }
 
             var noHousing = !objects.Contains(_house);
@@ -176,6 +148,40 @@ namespace Witlesss.Commands
 
                     DeleteTheDictionary();
                 }
+            }
+        }
+
+        private InlineKeyboardButton GetCallbackButton(int x, int y, string obj)
+        {
+            return InlineKeyboardButton.WithCallbackData(obj, $"del - {obj} - {x}:{y}");
+        }
+
+        private string GetCell(int x, int y) => _game[x][y].Text;
+
+        private void SetCell(int x, int y, InlineKeyboardButton button)
+        {
+            _game[x][y] = button;
+        }
+        private void SetCell(int x, int y, string obj)
+        {
+            _game[x][y] = InlineKeyboardButton.WithCallbackData(obj);
+        }
+        private void Explode(int x, int y, int radius = 1, bool tnt = true)
+        {
+            SetCell(x, y, tnt ? _boom : _fire);
+
+            var diameter = 1 + 2 * radius;
+            for (var i = 0; i < diameter; i++)
+            for (var j = 0; j < diameter; j++)
+            {
+                var tx = (x - radius + i + 4) % 4;
+                var ty = (y - radius + j + 4) % 4;
+                var target = GetCell(tx, ty);
+
+                if      (target == _house)   SetCell(tx, ty, tnt ? _bricks : _detroit);
+                else if (target == _detroit) SetCell(tx, ty, tnt ? _default : _bricks);
+                else if (target == _tractor) Explode(tx, ty, 0, tnt: false);
+                else if (target == _tnt)     Explode(tx, ty);
             }
         }
 

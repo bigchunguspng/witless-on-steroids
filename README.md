@@ -3,7 +3,9 @@
 - Memes and demotivators 📸🎬
 - Simple video and audio editing 🎬🎧
 - Images to stickers 📸 -> 🎟
+- Music to voice messages 🎧 -> 🎤
 - Videos to videonotes / GIFs
+- Executing any **[ffmpeg]** scripts
 - Searching for posts on **[Reddit]**
 - Downloading music from **[YouTube]** (in the best way possible 😎)
 
@@ -26,5 +28,6 @@ Can be used in **group chats** as well as in **DMs**. Text generation is based o
 
 [Reddit]: <https://www.reddit.com/>
 [YouTube]: <https://youtu.be/dQw4w9WgXcQ>
+[ffmpeg]: <https://ffmpeg.org/ffmpeg-filters.html>
 [Markov chain]: <https://en.wikipedia.org/wiki/Markov_chain>
 [exported chat history]: <https://www.maketecheasier.com/export-telegram-chat-history/>

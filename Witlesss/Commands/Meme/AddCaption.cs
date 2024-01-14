@@ -55,7 +55,7 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
-            if (empty || !_regular.IsMatch(dummy) && !_futura.IsMatch(dummy))
+            if (empty || !IFunnyApp.UseSegoe && !IFunnyApp.UseRoboto && !_futura.IsMatch(dummy))
             {
                 IFunnyApp.UseSegoe = IsMostlyCyrillic(caption);
             }

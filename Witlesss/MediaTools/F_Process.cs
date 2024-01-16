@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
+using System.Text;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using static Witlesss.Memes;
@@ -53,12 +55,95 @@ namespace Witlesss.MediaTools
             if (i.audio && !i.video) o.ForceFormat("mp3");
         });
 
+        public F_Action CompressImage (int qv) => ApplyEffects(o => o.WithQscale(qv));
         public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public F_Action CompressAnimation   () => ApplyEffects(o =>
         {
             var v = GetVideoStream(_input);
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
         });
+
+        public F_Action DeepFry           () => ApplyEffects(o => DeepFryArgs(o));
+        public F_Action DeepFryVideo(Size s) => ApplyEffects(o => DeepFryArgs(o.Resize(s), lessNoisy: true));
+
+        private static void DeepFryArgs(FFMpAO o, bool lessNoisy = false)
+        {
+            var sb = new StringBuilder("-filter_complex \"[v:0]");
+
+            // HUE SATURATION
+
+            sb.Append("huesaturation=").Append(RandomInt(-25, 25)); // [-180 - 180]
+            sb.Append  (":saturation=").Append(RandomDouble(-1, 1));
+            sb.Append   (":intensity=").Append(RandomDouble(-1, 1)); // was 0, 0.5
+            sb.Append    (":strength=").Append(RandomInt(1, 100)); // 1 - 100 // was 1, 14
+            if (IsOneIn(4))
+            {
+                var colors = new[] { 'r', 'g', 'b', 'c', 'm', 'y' };
+                var selectedColors = colors.Where(_ => IsOneIn(3)).ToArray();
+                if (selectedColors.Length > 0)
+                {
+                    sb.Append(":colors=").Append(string.Join('+', selectedColors));
+                }
+            }
+            if (IsOneIn(4))
+            {
+                var colors = new[] { "rw", "gw", "bw" };
+                var selectedColors = colors.Where(_ => IsOneIn(RandomInt(2, 3))).ToArray();
+                foreach (var color in selectedColors)
+                {
+                    sb.Append(":").Append(color).Append("=").Append(RandomDouble(0, 1));
+                }
+            }
+            sb.Append(",");
+
+            // https://ffmpeg.org/ffmpeg-filters.html#huesaturation
+
+            // UNSHARP
+
+            var lumaMatrixSize = RandomInt(1, 11) * 2 + 1; // [3 - 23], odd only, lx + ly <= 26
+            var lumaAmount = RandomDouble(-1.5, 1.5);  // [-1.5 - 1.5]
+
+            sb.Append("unsharp");
+            var b = IsOneIn(2);
+            var s = Math.Min(lumaMatrixSize, 26 - lumaMatrixSize);
+            sb.Append("=lx=").Append(b ? s : lumaMatrixSize);
+            sb.Append(":ly=").Append(b ? lumaMatrixSize : s);
+            sb.Append(":la=").Append(lumaAmount).Append(",");
+
+            // https://ffmpeg.org/ffmpeg-filters.html#unsharp-1
+
+            // NOISE
+
+            var n_min = lessNoisy ? 10 : 25;
+            var n_max = lessNoisy ? 45 : 100;
+            
+            sb.Append("noise").Append("=c0s=").Append(RandomInt(n_min, n_max)); // [0 - 100]
+            if (IsOneIn(4)) sb.Append(":c1s=").Append(RandomInt(n_min, n_max)); // yellow-blue
+            if (IsOneIn(4)) sb.Append(":c2s=").Append(RandomInt(n_min, n_max)); // red-green
+
+            sb.Append(":allf=t");
+            var flags = new[] { 'u', 'p', 'a' };
+            var selectedFlags = flags.Where(_ => IsOneIn(2)).ToArray();
+            foreach (var flag in selectedFlags)
+            {
+                sb.Append('+').Append(flag);
+            }
+            sb.Append("\"");
+
+            // https://ffmpeg.org/ffmpeg-filters.html#noise
+
+            o.WithCustomArgument(sb.ToString());
+
+            bool IsOneIn(int x) => Extension.Random.Next(x) == 0;
+
+            int    RandomInt   (int    min, int    max) => Extension.Random.Next(min, max + 1);
+            string RandomDouble(double min, double max)
+            {
+                var k = 10_000d;
+                var x = RandomInt((int)(min * k), (int)(max * k)) / k;
+                return FormatDouble(x);
+            }
+        }
 
         #endregion
 

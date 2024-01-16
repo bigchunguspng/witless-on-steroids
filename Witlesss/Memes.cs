@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using FFMpegCore;
 using Witlesss.MediaTools;
 using static Witlesss.MediaTools.FF_Extensions;
@@ -16,6 +17,7 @@ namespace Witlesss
         private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
         private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
+        private static int Qscale  => 31 + (int)(-0.29 * (int)JpegCoder.Quality); // 2 - 31
 
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
@@ -108,6 +110,24 @@ namespace Witlesss
         }
 
 
+        public static string DeepFryImage(string path, int _ = 0)
+        {
+            return new F_Process(CompressImage(path)).DeepFry().Output("-Nuked", Path.GetExtension(path));
+        }
+
+        public static string DeepFryStick(string path, int _ = 0, string extension = null) => DeepFryImage(path);
+
+        public static string DeepFryVideo(string path, int _ = 0)
+        {
+            var q = Quality;
+            if (q > 0)
+            {
+                path = new F_Process(path).Compress(q).Output_WEBM_safe("-DAMN");
+            }
+            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path))).Output("-DF");
+        }
+
+
         private static string Convert(string path, string extension)
         {
             var ffmpeg = new F_Process(path);
@@ -146,6 +166,7 @@ namespace Witlesss
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
         public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
+        public static string CompressImage (string path) => new F_Process(path).CompressImage(Qscale).Output("-small", ".jpg");
         public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");

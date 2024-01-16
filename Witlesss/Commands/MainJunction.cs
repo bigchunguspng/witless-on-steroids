@@ -18,6 +18,7 @@ namespace Witlesss.Commands
         private readonly Demotivate _demotivate = new();
         private readonly DemotivateProportional _dp = new();
         private readonly RemoveBitrate _bitrate = new();
+        private readonly MemeDeepFryer _fryer = new();
         private readonly RemoveAudio _audio = new();
         private readonly ChangeSpeed _speed = new();
         private readonly ChangeVolume _volume = new();
@@ -60,7 +61,11 @@ namespace Witlesss.Commands
             _witless = new WitlessMainJunction(this);
             _mematics = new MemeProcessors
             {
-                { MemeType.Dg, _demotivate }, { MemeType.Meme, _meme }, { MemeType.Top, _whenthe }, { MemeType.Dp, _dp }
+                { MemeType.Dg, _demotivate },
+                { MemeType.Meme, _meme },
+                { MemeType.Top, _whenthe },
+                { MemeType.Dp, _dp },
+                { MemeType.Nuke, _fryer }
             };
         }
 
@@ -130,6 +135,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/board"     )) _wc = _boards;
             else if (CommandIs( "/b"         )) _wc = _bouhourt;
             else if (CommandIs( "/quality"   )) _wc = _quality;
+            else if (CommandIs( "/nuke"      )) _wc = _fryer;
             else if (CommandIs( "/pics"      )) _wc = _probability;
             else if (CommandIs( "/set"       )) _wc = _frequency;
             else if (CommandIs( "/fuse"      )) _wc = _fuse;

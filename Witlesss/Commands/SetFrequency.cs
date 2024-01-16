@@ -41,6 +41,11 @@ namespace Witlesss.Commands
                     Baka.Meme.Type = MemeType.Dg;
                     t = true;
                 }
+                else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))
+                {
+                    Baka.Meme.Type = MemeType.Nuke;
+                    t = true;
+                }
                 else if (Regex.IsMatch(w, @"^[DdДд]"))
                 {
                     if (s.Length > 2)
@@ -96,7 +101,8 @@ namespace Witlesss.Commands
             { MemeType.Meme, "мемы"           },
             { MemeType.Dg,   "демотиваторы💀" },
             { MemeType.Top,  "подписанки"     },
-            { MemeType.Dp,   "демотиваторы👌" }
+            { MemeType.Dp,   "демотиваторы👌" },
+            { MemeType.Nuke, "картошку фри🍟" }
         };
     }
 }

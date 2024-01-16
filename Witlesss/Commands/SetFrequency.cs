@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
@@ -17,112 +18,48 @@ namespace Witlesss.Commands
             else if (Text.Contains(' '))
             {
                 string command = null, result = null;
-                var t = false;
-                var o = false;
-                var s = Text.Split();
-                var w = s[1];
-                if      (Regex.IsMatch(w, @"^[MmМм]"))
-                {
-                    if (s.Length > 2)
-                    {
-                        command = "/meme";
-                        Baka.Meme.OptionsM = s[2] == "0" ? null : command + s[2];
-                        result = Baka.Meme.OptionsM ?? command;
-                        o = true;
-                    }
-                    else
-                    {
-                        Baka.Meme.Type = MemeType.Meme;
-                        t = true;
-                    }
-                }
-                else if (Regex.IsMatch(w, @"^[DdДд][GgГг]"))
-                {
-                    if (s.Length > 2)
-                    {
-                        command = "/dg";
-                        Baka.Meme.OptionsG = s[2] == "0" ? null : command + s[2];
-                        result = Baka.Meme.OptionsG ?? command;
-                        o = true;
-                    }
-                    else
-                    {
-                        Baka.Meme.Type = MemeType.Dg;
-                        t = true;
-                    }
-                }
-                else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))
-                {
-                    if (s.Length > 2)
-                    {
-                        command = "/nuke";
-                        Baka.Meme.OptionsN = s[2] == "0" ? null : command + s[2];
-                        result = Baka.Meme.OptionsN ?? command;
-                        o = true;
-                    }
-                    else // todo refactor this shit
-                    {
-                        Baka.Meme.Type = MemeType.Nuke;
-                        t = true;
-                    }
-                }
-                else if (Regex.IsMatch(w, @"^[DdДд]"))
-                {
-                    if (s.Length > 2)
-                    {
-                        command = "/dp";
-                        Baka.Meme.OptionsD = s[2] == "0" ? null : command + s[2];
-                        result = Baka.Meme.OptionsD ?? command;
-                        o = true;
-                    }
-                    else
-                    {
-                        Baka.Meme.Type = MemeType.Dp;
-                        t = true;
-                    }
-                }
-                else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))
-                {
-                    if (s.Length > 2)
-                    {
-                        command = "/top";
-                        Baka.Meme.OptionsT = s[2] == "0" ? null : command + s[2];
-                        result = Baka.Meme.OptionsT ?? command;
-                        o = true;
-                    }
-                    else
-                    {
-                        Baka.Meme.Type = MemeType.Top;
-                        t = true;
-                    }
-                }
+                var typeWasChanged = false;
+                var optionsWereChanged = false;
+                var args = Text.Split();
+                var w = args[1];
+                if      (Regex.IsMatch(w, @"^[MmМм]"))       Set(x => Baka.Meme.OptionsM = x, MemeType.Meme, "/meme");
+                else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))   Set(x => Baka.Meme.OptionsT = x, MemeType.Top, "/top");
+                else if (Regex.IsMatch(w, @"^[DdДд]"))       Set(x => Baka.Meme.OptionsD = x, MemeType.Dp, "/dp");
+                else if (Regex.IsMatch(w, @"^[DdДд][GgГг]")) Set(x => Baka.Meme.OptionsG = x, MemeType.Dg, "/dg");
+                else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))   Set(x => Baka.Meme.OptionsN = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
-                if (t)
+                if (typeWasChanged)
                 {
                     Bot.SaveChatList();
-                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, MEMES_TYPE())));
+                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Meme.Type])));
                     Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
                 }
-                else if (o)
+                else if (optionsWereChanged)
                 {
                     Bot.SaveChatList();
                     Bot.SendMessage(Chat, XDDD(string.Format(SET_MEME_OPS_RESPONSE, command, result)));
                     Log($"{Title} >> MEMES OPTIONS");
                 }
+
+                void Set(Action<string> setOptions, MemeType type, string cmd)
+                {
+                    if (args.Length > 2)
+                    {
+                        command = cmd;
+                        result = args[2] == "0" ? null : command + args[2];
+                        setOptions(result);
+                        result ??= command;
+                        optionsWereChanged = true;
+                    }
+                    else
+                    {
+                        Baka.Meme.Type = type;
+                        typeWasChanged = true;
+                    }
+                }
             }
             else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
-
-        private static string MEMES_TYPE() => types[Baka.Meme.Type];
-        
-        private static readonly Dictionary<MemeType, string> types = new()
-        {
-            { MemeType.Meme, "мемы"           },
-            { MemeType.Dg,   "демотиваторы💀" },
-            { MemeType.Top,  "подписанки"     },
-            { MemeType.Dp,   "демотиваторы👌" },
-            { MemeType.Nuke, "картошку фри🍟" }
-        };
     }
 }

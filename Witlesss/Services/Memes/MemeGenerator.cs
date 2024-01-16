@@ -11,7 +11,7 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseCustomBack, UseRoboto, UseItalic;
+        public static bool WrapText = true, UseCustomBack, UseRoboto, UseItalic, ColorText;
         public static Color CustomBackground;
         
         private int _w, _h, _s, _d, _m, _size;
@@ -20,12 +20,12 @@ namespace Witlesss.Services.Memes
         private readonly SolidBrush   _white = new(Color.White);
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
-        private readonly Dictionary<ColorMode, Func<SolidBrush>> _brushes;
+        private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
 
-        public MemeGenerator() => _brushes = new Dictionary<ColorMode, Func<SolidBrush>>
+        public MemeGenerator() => _brushes = new Dictionary<bool, Func<SolidBrush>>
         {
-            { ColorMode.Color, RandomColor },
-            { ColorMode.White, WhiteColor }
+            { true, RandomColor },
+            { false, WhiteColor }
         };
 
         public void SetUp(Size size)
@@ -97,7 +97,7 @@ namespace Witlesss.Services.Memes
         }
 
         private int OutlineWidth => (int)Math.Round(_size / 6D);
-        private SolidBrush Brush => _brushes[MakeMeme.Dye].Invoke();
+        private SolidBrush Brush => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
         private FontFamily CaptionFont => _fonts[UseRoboto ? 1 : 0];

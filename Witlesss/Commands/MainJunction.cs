@@ -50,7 +50,6 @@ namespace Witlesss.Commands
         private readonly SetProbability _probability = new();
         private readonly SetQuality _quality = new();
         private readonly ToggleStickers _stickers = new();
-        private readonly ToggleColors _colors = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
         private readonly WitlessMainJunction _witless;
@@ -142,7 +141,6 @@ namespace Witlesss.Commands
             else if (CommandIs( "/move"      )) _wc = _move;
             else if (CommandIs( "/xd"        )) _wc = _comments;
             else if (command == "/stickers"   ) _wc = _stickers;
-            else if (command == "/colors"     ) _wc = _colors;
             else if (command == "/chat"       ) _wc = _chat;
             else if (command == "/s_admins"   ) _wc = _admins;
             else if (command == "/delete"     ) _wc = _delete;

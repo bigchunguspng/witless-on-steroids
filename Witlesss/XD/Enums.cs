@@ -1,7 +1,5 @@
 ﻿namespace Witlesss.XD
 {
-    public enum ColorMode { Color, White }
-
     public enum DgMode    { Square, Wide }
 
     public enum SpeedMode { Fast, Slow   }

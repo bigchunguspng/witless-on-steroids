@@ -47,6 +47,7 @@ namespace Witlesss.Commands.Meme
             MemeGenerator.WrapText      =  empty ||     !_nowrap.IsMatch(dummy);
             MemeGenerator.UseRoboto     = !empty &&      _roboto.IsMatch(dummy) && !_impact.IsMatch(dummy);
             MemeGenerator.UseItalic     = !empty &&      _italic.IsMatch(dummy);
+            MemeGenerator.ColorText     = !empty &&   _colorText.IsMatch(dummy);
             var add_bottom_text         = !empty &&  _add_bottom.IsMatch(dummy);
             var only_bottom_text        = !empty && _only_bottom.IsMatch(dummy);
             var only_top_text           = !empty &&    _top_only.IsMatch(dummy);
@@ -86,11 +87,10 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S*", RegexOptions.IgnoreCase);
         private static readonly Regex    _top_only = new(@"^\/meme\S*t\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _roboto = new(@"^\/meme\S*r\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex   _colorText = new(@"^\/meme\S*c\S*", RegexOptions.IgnoreCase); // todo document
         private static readonly Regex      _impact = new(@"^\/meme\S*p\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _italic = new(@"^\/meme\S*i\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
-
-        public static ColorMode Dye => Baka.Meme.Dye;
     }
 
     public interface ImageProcessor

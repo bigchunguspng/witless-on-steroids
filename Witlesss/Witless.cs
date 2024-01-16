@@ -33,7 +33,6 @@ namespace Witlesss
                 witless.Meme.Stickers = true;
             }
             witless.Meme.Type = (MemeType)Extension.Random.Next(4);
-            witless.Meme.Dye = (ColorMode)Extension.Random.Next(2);
 
             witless.Load();
             return witless;
@@ -176,7 +175,6 @@ namespace Witlesss
             set => _quality = Math.Clamp(value, 0, 100);
         }
         [JsonProperty] public MemeType Type { get; set; }
-        [JsonProperty] public ColorMode Dye { get; set; }
         [JsonProperty] public bool Stickers { get; set; }
 
         [JsonProperty] public string OptionsM { get; set; }

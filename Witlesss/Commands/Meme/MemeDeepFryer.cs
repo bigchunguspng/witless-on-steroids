@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Картошку фри");
+        public override void Run() => Run("Ядерные отходы");
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.DeepFryImage);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.DeepFryStick, false);

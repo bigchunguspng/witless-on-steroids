@@ -146,38 +146,11 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;{0}&lt;/b&gt;
-        ///
-        ///Вес словаря: {1}
-        ///Интервал генерации: {2}
-        ///Мемами стают: {3}% пикч
-        ///Качество картинок: {4}%
-        ///Мемы из стикеров: {5}
-        ///Текст в мемах: {6}
-        ///Пикчи: {7}
-        ///Менять настройки могут: {8}.
-        /// </summary>
-        internal static string CHAT_INFO {
-            get {
-                return ResourceManager.GetString("CHAT_INFO", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Telegram-ChatsDB.
         /// </summary>
         internal static string CHATLIST_FILENAME {
             get {
                 return ResourceManager.GetString("CHATLIST_FILENAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to текст в мемах будет {0}.
-        /// </summary>
-        internal static string COLORS_RESPONSE {
-            get {
-                return ResourceManager.GetString("COLORS_RESPONSE", resourceCulture);
             }
         }
         
@@ -572,6 +545,7 @@ namespace Witlesss.XD {
         ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
         ///
         ///&lt;code&gt;i&lt;/code&gt; - курсив
+        ///&lt;code&gt;c&lt;/code&gt; - цветной текст 🎨
         ///&lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
         ///&lt;code&gt;p&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
         ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
@@ -757,24 +731,27 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Инструкция в самолёте:&lt;/i&gt;&lt;/b&gt;
-        ///
-        ///&lt;u&gt;Изменить интервал отправки текста&lt;/u&gt;:
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Интервал отправки текста&lt;/u&gt;&lt;/b&gt;:
         ///
         /// /set@piece_fap_bot 3 (число сообщений)
         ///
-        ///&lt;u&gt;Изменить тип авто-мемов&lt;/u&gt;:
+        ///&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
         ///
-        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt; - мемы
-        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt; - подписанки
-        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt; - демотиваторы👌
-        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt; - демотиваторы💀
+        /// /set@piece_fap_bot [буква]
         ///
-        ///&lt;u&gt;Изменить опции в мемчиках по умолчанию&lt;/u&gt;:
+        ///&lt;code&gt;M &lt;/code&gt; - мемы☝️
+        ///&lt;code&gt;T &lt;/code&gt; - подписанки 💬
+        ///&lt;code&gt;D &lt;/code&gt; - демотиваторы👌
+        ///&lt;code&gt;Dg&lt;/code&gt; - демотиваторы💀
+        ///&lt;code&gt;N &lt;/code&gt; - фритюр 🍤
+        ///
+        ///&lt;b&gt;&lt;u&gt;Опции в мемчиках по умолчанию&lt;/u&gt;&lt;/b&gt;:
+        ///
+        ///&lt;code&gt;/set [буква] [опции]&lt;/code&gt;
         ///
         ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-        ///&lt;code&gt; [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;/set@piece_fap_bot [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -803,12 +780,16 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to Выбрать тип авто-мемов:
         ///
-        ///&lt;code&gt;/set@piece_fap_bot M&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot T&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot D&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt;
-        ///
-        ///(&lt;u&gt;м&lt;/u&gt;акросы / &lt;u&gt;д&lt;/u&gt;емотиваторы / &lt;u&gt;т&lt;/u&gt;воё лицо когда...).
+        ///&lt;code&gt;/meme&lt;/code&gt; ☝️👇
+        ///  └─ &lt;code&gt;/set@piece_fap_bot M &lt;/code&gt;
+        ///&lt;code&gt;/top &lt;/code&gt; 💬🔝
+        ///  └─ &lt;code&gt;/set@piece_fap_bot T &lt;/code&gt;
+        ///&lt;code&gt;/dp  &lt;/code&gt; ◼️▪️
+        ///  └─ &lt;code&gt;/set@piece_fap_bot D &lt;/code&gt;
+        ///&lt;code&gt;/dg  &lt;/code&gt; ◾️🔐
+        ///  └─ &lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt;
+        ///&lt;code&gt;/nuke&lt;/code&gt; 🍕🍤
+        ///  └─ &lt;code&gt;/set@piece_fap_bot N &lt;/code&gt;.
         /// </summary>
         internal static string SET_MEMES_MANUAL {
             get {

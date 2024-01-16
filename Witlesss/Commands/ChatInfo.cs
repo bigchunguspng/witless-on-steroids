@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Witlesss.Commands
 {
@@ -6,36 +7,55 @@ namespace Witlesss.Commands
     {
         public override void Run()
         {
-            var info = string.Format
-            (
-                CHAT_INFO, Title,
-                FileSize(Baka.Path),
-                Baka.Interval,
-                Baka.Meme.Chance,
-                Baka.Meme.Quality,
-                Baka.Meme.Stickers ? "ON" : "OFF",
-                Baka.Meme.Dye == ColorMode.Color ? "цветной" : "белый",
-                types[Baka.Meme.Type],
-                Baka.AdminsOnly ? "Админы 😎" : "Все 😚"
-            );
-            if (ChatIsPrivate) info = info.Remove(info.LastIndexOf('\n'));
-            if (Baka.Meme.OptionsM is not null) info += string.Format(OPTIONS, "meme", Baka.Meme.OptionsM[5..]);
-            if (Baka.Meme.OptionsT is not null) info += string.Format(OPTIONS, "top",  Baka.Meme.OptionsT[4..]);
-            if (Baka.Meme.OptionsD is not null) info += string.Format(OPTIONS, "dp",   Baka.Meme.OptionsD[3..]);
-            if (Baka.Meme.OptionsG is not null) info += string.Format(OPTIONS, "dg",   Baka.Meme.OptionsG[3..]);
-            if (Baka.Meme.OptionsN is not null) info += string.Format(OPTIONS, "nuke", Baka.Meme.OptionsN[5..]);
-            Bot.SendMessage(Chat, info); // todo sb
+            var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
+
+            var size = SizeInBytes(Baka.Path);
+            var icon = size switch
+            {
+                <      2_000 => "🗒",
+                <    200_000 => "📖",
+                <    800_000 => "📗",
+                <  4_000_000 => "📙",
+                < 16_000_000 => "📔",
+                _            => "📚"
+            };
+
+            sb.Append("\nВес словаря: ").Append(FileSize(size)).Append(' ').Append(icon);
+            sb.Append("\nИнтервал генерации: ").Append(Baka.Interval);
+            sb.Append("\nКачество графики: ").Append(Baka.Meme.Quality).Append('%');
+            if (!ChatIsPrivate)
+                sb.Append("\nМогут 🔩⚙️: ").Append(Baka.AdminsOnly ? "только админы 😎" : "все 🤠");
+
+            sb.Append("\n\n<u>Авто-мемы:</u>");
+            sb.Append("\nТип: ").Append(Types[Baka.Meme.Type]);
+            sb.Append("\nВероятность: ").Append(Baka.Meme.Chance).Append('%');
+            sb.Append("\nСтикеры: ").Append(Baka.Meme.Stickers ? "тоже 🍑" : "пропускаем");
+
+            bool ops;
+            var ob = new StringBuilder("\n\n<u>Опции</u>:");
+            if (IsNotNull(Baka.Meme.OptionsM)) AppendOptions("meme", Baka.Meme.OptionsM[5..]);
+            if (IsNotNull(Baka.Meme.OptionsT)) AppendOptions("top",  Baka.Meme.OptionsT[4..]);
+            if (IsNotNull(Baka.Meme.OptionsD)) AppendOptions("dp",   Baka.Meme.OptionsD[3..]);
+            if (IsNotNull(Baka.Meme.OptionsG)) AppendOptions("dg",   Baka.Meme.OptionsG[3..]);
+            if (IsNotNull(Baka.Meme.OptionsN)) AppendOptions("nuke", Baka.Meme.OptionsN[5..]);
+            if (ops) sb.Append(ob);
+
+            Bot.SendMessage(Chat, sb.ToString());
+
+            bool IsNotNull(string s) => ops = s is not null;
+            void AppendOptions(string cmd, string options)
+            {
+                ob.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
+            }
         }
 
-        private const string OPTIONS = "\nОпции /{0}: <code>{1}</code>";
-
-        private readonly Dictionary<MemeType, string> types = new()
+        public static readonly Dictionary<MemeType, string> Types = new()
         {
-            { MemeType.Meme, "стают мемами"     },
-            { MemeType.Dg,   "демотивируются💀" },
-            { MemeType.Top,  "обретают подпись" },
-            { MemeType.Dp,   "демотивируются👌" },
-            { MemeType.Nuke, "фритюрятся🍤"     }
+            { MemeType.Meme, "мемы"             },
+            { MemeType.Dg,   "демотиваторы💀"   },
+            { MemeType.Top,  "подписанки 💬"    },
+            { MemeType.Dp,   "демотиваторы👌"   },
+            { MemeType.Nuke, "ядерные отходы🍤" }
         };
     }
 }

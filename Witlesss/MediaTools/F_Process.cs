@@ -46,14 +46,16 @@ namespace Witlesss.MediaTools
         #region COMPRESSION
 
         // [-s WxH] [-vn] [-vcodec libx264 -crf 45] [-b:a 1k] [-f mp3]
-        public F_Action Compress(int factor) => ApplyEffects(o =>
+        public F_Action Compress(int factor) => ApplyEffects(o => AddCompression(o, factor));
+
+        private void AddCompression(FFMpAO o, int factor)
         {
             // factor: 0 lossless - 51 lowest quality
             var i = MediaInfoWithFixing(o);
             if (i.video) o.WithCompression(factor);
             if (i.audio) o.WithAudioBitrate(154 - 3 * factor);
             if (i.audio && !i.video) o.ForceFormat("mp3");
-        });
+        }
 
         public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public F_Action CompressAnimation   () => ApplyEffects(o =>
@@ -62,10 +64,10 @@ namespace Witlesss.MediaTools
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
         });
 
-        public F_Action DeepFry (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
-        public F_Action DeepFryVideo(Size s) => ApplyEffects(o => DeepFryArgs(o.Resize(s), lessNoisy: true));
+        public F_Action DeepFry        (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
+        public F_Action DeepFryVideo(Size s, int f) => ApplyEffects(o => DeepFryArgs(o.Resize(s), f, isVideo: true));
 
-        private void DeepFryArgs(FFMpAO o, int qscale = 0, bool lessNoisy = false)
+        private void DeepFryArgs(FFMpAO o, int compression = 0, bool isVideo = false)
         {
             var sb = new StringBuilder("-filter_complex \"[v:0]");
 
@@ -113,8 +115,8 @@ namespace Witlesss.MediaTools
 
             // NOISE
 
-            var n_min = lessNoisy ? 10 : 25;
-            var n_max = lessNoisy ? 45 : 100;
+            var n_min = isVideo ? 10 : 25;
+            var n_max = isVideo ? 45 : 100;
             
             sb.Append("noise").Append("=c0s=").Append(RandomInt(n_min, n_max)); // [0 - 100]
             if (IsOneIn(4)) sb.Append(":c1s=").Append(RandomInt(n_min, n_max)); // yellow-blue
@@ -131,8 +133,14 @@ namespace Witlesss.MediaTools
 
             // https://ffmpeg.org/ffmpeg-filters.html#noise
 
-            var q = qscale > 26 ? qscale : Math.Min(31, qscale + RandomInt(0, 10));
-            o.WithQscale(q).WithCustomArgument(sb.ToString());
+
+            var factor = isVideo
+                ? compression
+                : compression > 26 ? compression : Math.Min(31, compression + RandomInt(0, 10));
+
+            if (isVideo) AddCompression(o, factor);
+            o.WithQscale(factor).WithCustomArgument(sb.ToString());
+
 
             bool IsOneIn(int x) => Extension.Random.Next(x) == 0;
 

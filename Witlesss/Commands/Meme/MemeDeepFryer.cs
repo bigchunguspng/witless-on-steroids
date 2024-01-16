@@ -15,7 +15,7 @@ namespace Witlesss.Commands.Meme
         protected override string Options => Baka.Meme.OptionsN;
         protected override string Command { get; } = "/nuke";
 
-        public ImageProcessor SetUp(int w, int h)
+        public ImageProcessor SetUp(int w, int h) // Needs more nuking!
         {
             JpegCoder.PassQuality(Baka);
             

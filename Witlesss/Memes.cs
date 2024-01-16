@@ -120,12 +120,7 @@ namespace Witlesss
 
         public static string DeepFryVideo(string path, int _ = 0)
         {
-            var q = Quality;
-            if (q > 0)
-            {
-                path = new F_Process(path).Compress(q).Output_WEBM_safe("-DAMN");
-            }
-            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path))).Output("-DF");
+            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path)), Quality).Output_WEBM_safe("-DF");
         }
 
 

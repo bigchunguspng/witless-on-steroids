@@ -41,16 +41,20 @@ namespace Witlesss.Services.Internet
         /// <param name="url">URL, like https://boards.4channel.org/a/</param>
         public IEnumerable<string> GetThreads(string url)
         {
-            return GetDocument(url).SelectNodes(BOARD_THREAD).Select(x => x.Attributes["href"].Value);
+            return GetHrefs(url, BOARD_THREAD);
         }
 
         /// <summary> Returns ARCHIVED thread URLs from a board ARCHIVE page. </summary>
         /// <param name="url">URL, like https://boards.4channel.org/a/archive</param>
         public IEnumerable<string> GetArchivedThreads(string url)
         {
-            return GetDocument(url).SelectNodes(ARCHIVE_THREAD).Select(x => x.Attributes["href"].Value);
+            return GetHrefs(url, ARCHIVE_THREAD);
         }
 
+        private IEnumerable<string> GetHrefs(string url, string xpath)
+        {
+            return GetDocument(url).SelectNodes(xpath).Select(x => x.Attributes["href"].Value);
+        }
         private HtmlNode GetDocument(string url) => _web.Load(url).DocumentNode;
 
 

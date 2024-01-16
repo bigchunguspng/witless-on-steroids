@@ -187,7 +187,7 @@ namespace Witlesss.XD
         };
         public static readonly string[] PLS_WAIT_RESPONSE =
         {
-            "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "еду скачивать музон 🛒", "принял👌"
+            "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "еду скачивать музон 🛒", "принял👌", "ваш заказ принят 🥸"
         };
 
         private static readonly string[] RANDOM_EMOJI =

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Commands
 {
@@ -24,6 +25,8 @@ namespace Witlesss.Commands
         }
 
         public abstract void Run();
+
+        protected static DateTime MessageDateTime => Message.EditDate ?? Message.Date;
 
         protected static string SenderName => Message.SenderChat?.Title ?? GetUserFullName();
         private   static string ChatTitle => (ChatIsPrivate ? GetUserFullName() : Message.Chat.Title).Truncate(32);

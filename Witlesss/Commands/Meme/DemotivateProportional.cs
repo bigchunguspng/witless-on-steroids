@@ -13,6 +13,9 @@ namespace Witlesss.Commands.Meme
 
         protected override string Log_VIDEO { get; } = "DEMOTIVATOR-B [^] VID";
         protected override string VideoName { get; } = "piece_fap_club-dp.mp4";
+        
+        protected override string Options => Baka.Meme.OptionsD;
+        protected override string Command { get; } = "/dp";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -29,7 +32,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
-            var dummy = GetDummy(Baka.Meme.OptionsD, "/dp", out var empty);
+            var dummy = GetDummy(out var empty);
             
             DynamicDemotivatorDrawer.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 

@@ -13,6 +13,9 @@ namespace Witlesss.Commands.Meme
 
         protected override string Log_VIDEO { get; } = "MEME [M] VID";
         protected override string VideoName { get; } = "piece_fap_club-meme.mp4";
+        
+        protected override string Options => Baka.Meme.OptionsM;
+        protected override string Command { get; } = "/meme";
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -29,7 +32,7 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string text)
         {
-            var dummy = GetDummy(Baka.Meme.OptionsM, "/meme", out var empty);
+            var dummy = GetDummy(out var empty);
 
             MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBack)

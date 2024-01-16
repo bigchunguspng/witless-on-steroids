@@ -112,7 +112,8 @@ namespace Witlesss
 
         public static string DeepFryImage(string path, int _ = 0)
         {
-            return new F_Process(CompressImage(path)).DeepFry().Output("-Nuked", Path.GetExtension(path));
+            var extension = Sticker ? ".webp" : Path.GetExtension(path);
+            return new F_Process(path).DeepFry(Qscale).Output("-Nuked", extension);
         }
 
         public static string DeepFryStick(string path, int _ = 0, string extension = null) => DeepFryImage(path);
@@ -166,7 +167,6 @@ namespace Witlesss
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
         public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
-        public static string CompressImage (string path) => new F_Process(path).CompressImage(Qscale).Output("-small", ".jpg");
         public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");

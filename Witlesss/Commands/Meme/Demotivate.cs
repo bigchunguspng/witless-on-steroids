@@ -13,6 +13,9 @@ namespace Witlesss.Commands.Meme
         protected override string Log_VIDEO { get; } = "DEMOTIVATOR [^] VID";
         protected override string VideoName => $"piece_fap_club-d{(Memes.Mode == Square ? "g" : "v")}.mp4";
 
+        protected override string Options => Baka.Meme.OptionsG;
+        protected override string Command => Memes.Mode == Square ? "/dg" : "/dv";
+
         public ImageProcessor SetUp(int w, int h)
         {
             JpegCoder.PassQuality(Baka);
@@ -28,10 +31,9 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string text)
         {
-            var empty = Text is null;
-            var input = empty ? "" : Text.Replace(Config.BOT_USERNAME, "");
+            var dummy = GetDummy(out var empty);
 
-            DemotivatorDrawer.AddLogo = empty || !_no_logo.IsMatch(input);
+            DemotivatorDrawer.AddLogo = empty || !_no_logo.IsMatch(dummy);
             
             string a, b = Baka.Generate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE

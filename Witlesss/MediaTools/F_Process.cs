@@ -55,7 +55,6 @@ namespace Witlesss.MediaTools
             if (i.audio && !i.video) o.ForceFormat("mp3");
         });
 
-        public F_Action CompressImage (int qv) => ApplyEffects(o => o.WithQscale(qv));
         public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public F_Action CompressAnimation   () => ApplyEffects(o =>
         {
@@ -63,10 +62,10 @@ namespace Witlesss.MediaTools
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
         });
 
-        public F_Action DeepFry           () => ApplyEffects(o => DeepFryArgs(o));
+        public F_Action DeepFry (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
         public F_Action DeepFryVideo(Size s) => ApplyEffects(o => DeepFryArgs(o.Resize(s), lessNoisy: true));
 
-        private static void DeepFryArgs(FFMpAO o, bool lessNoisy = false)
+        private void DeepFryArgs(FFMpAO o, int qscale = 0, bool lessNoisy = false)
         {
             var sb = new StringBuilder("-filter_complex \"[v:0]");
 
@@ -132,7 +131,8 @@ namespace Witlesss.MediaTools
 
             // https://ffmpeg.org/ffmpeg-filters.html#noise
 
-            o.WithCustomArgument(sb.ToString());
+            var q = qscale > 26 ? qscale : Math.Min(31, qscale + RandomInt(0, 10));
+            o.WithQscale(q).WithCustomArgument(sb.ToString());
 
             bool IsOneIn(int x) => Extension.Random.Next(x) == 0;
 

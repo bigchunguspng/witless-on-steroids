@@ -38,13 +38,33 @@ namespace Witlesss.Commands
                 }
                 else if (Regex.IsMatch(w, @"^[DdДд][GgГг]"))
                 {
-                    Baka.Meme.Type = MemeType.Dg;
-                    t = true;
+                    if (s.Length > 2)
+                    {
+                        command = "/dg";
+                        Baka.Meme.OptionsG = s[2] == "0" ? null : command + s[2];
+                        result = Baka.Meme.OptionsG ?? command;
+                        o = true;
+                    }
+                    else
+                    {
+                        Baka.Meme.Type = MemeType.Dg;
+                        t = true;
+                    }
                 }
                 else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))
                 {
-                    Baka.Meme.Type = MemeType.Nuke;
-                    t = true;
+                    if (s.Length > 2)
+                    {
+                        command = "/nuke";
+                        Baka.Meme.OptionsN = s[2] == "0" ? null : command + s[2];
+                        result = Baka.Meme.OptionsN ?? command;
+                        o = true;
+                    }
+                    else // todo refactor this shit
+                    {
+                        Baka.Meme.Type = MemeType.Nuke;
+                        t = true;
+                    }
                 }
                 else if (Regex.IsMatch(w, @"^[DdДд]"))
                 {

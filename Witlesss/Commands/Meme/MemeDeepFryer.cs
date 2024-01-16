@@ -12,6 +12,9 @@ namespace Witlesss.Commands.Meme
         protected override string Log_VIDEO { get; } = "NUKED [*] VID";
         protected override string VideoName { get; } = "deep_fry_club.mp4";
 
+        protected override string Options => Baka.Meme.OptionsN;
+        protected override string Command { get; } = "/nuke";
+
         public ImageProcessor SetUp(int w, int h)
         {
             JpegCoder.PassQuality(Baka);
@@ -22,7 +25,7 @@ namespace Witlesss.Commands.Meme
         public override void Run() => Run("Картошку фри");
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.DeepFryImage);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.DeepFryStick);
+        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.DeepFryStick, false);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.DeepFryVideo);
 
         protected override int GetMemeText(string text) => 0;

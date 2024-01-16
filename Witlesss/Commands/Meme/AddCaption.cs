@@ -14,6 +14,9 @@ namespace Witlesss.Commands.Meme
         protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
         protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
 
+        protected override string Options => Baka.Meme.OptionsT;
+        protected override string Command { get; } = "/top";
+
         public ImageProcessor SetUp(int w, int h)
         {
             JpegCoder.PassQuality(Baka);
@@ -31,7 +34,7 @@ namespace Witlesss.Commands.Meme
         {
             var caption = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
 
-            var dummy = GetDummy(Baka.Meme.OptionsT, "/top", out var empty);
+            var dummy = GetDummy(out var empty);
 
             IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 

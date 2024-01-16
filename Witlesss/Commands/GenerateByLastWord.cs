@@ -23,7 +23,7 @@ namespace Witlesss.Commands
 
                 var text = RemoveCommand(words[0]);
                 var ending = text[word.Length..];
-                var repeats = GetRepeats(_repeat.IsMatch(Text));
+                var repeats = GetRepeats(_repeat.Match(Text));
                 for (int i = 0; i < repeats; i++)
                 {
                     text = Baka.GenerateByLast(word.ToLower()) + ending;

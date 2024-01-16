@@ -5,7 +5,7 @@ namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
-        private readonly Regex _repeat = new(@"^\/a\S*[2-9]\S*");
+        private static readonly Regex _repeat = new(@"^\/a\S*[2-9]\S*");
 
         public override void Run()
         {
@@ -23,7 +23,7 @@ namespace Witlesss.Commands
 
                 var text = RemoveCommand(words[0]);
                 var outset = text.Remove(text.Length - word.Length);
-                var repeats = GetRepeats(_repeat.IsMatch(Text));
+                var repeats = GetRepeats(_repeat.Match(Text));
                 for (int i = 0; i < repeats; i++)
                 {
                     text = outset + Baka.GenerateByWord(word);
@@ -50,6 +50,16 @@ namespace Witlesss.Commands
             var message = $"{Title} >> {s}";
             if (repeats > 1) message += $" [{repeats}]";
             Log(message);
+        }
+
+        protected static int GetRepeats(Match match)
+        {
+            var repeats = 1;
+            if (match.Success && int.TryParse(match.Value, out var x))
+            {
+                repeats = x;
+            }
+            return repeats;
         }
     }
 }

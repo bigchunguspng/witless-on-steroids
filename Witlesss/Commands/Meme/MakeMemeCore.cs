@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 {
@@ -11,12 +12,17 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         private MediaType _type;
         private readonly Stopwatch _watch = new();
 
+        private (long Chat, int Message, DateTime Date, string Dummy, bool Empty) _lastRequest;
+
         protected abstract Regex _cmd { get; }
 
         protected abstract string Log_PHOTO ( int x);
         protected abstract string Log_STICK ( int x);
         protected abstract string Log_VIDEO { get; }
         protected abstract string VideoName { get; }
+
+        protected abstract string Options { get; }
+        protected abstract string Command { get; }
 
         protected void Run(string type, string options = null)
         {
@@ -61,15 +67,23 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             Log($"{Title} >> {Log_PHOTO(repeats)}");
         }
 
-        protected void DoStick(string fileID, Func<string, T, string, string> produce)
+        protected void DoStick(string fileID, Func<string, T, string, string> produce, bool convert = true)
         {
             Download(fileID);
 
+            Memes.Sticker = true;
+
             var repeats = GetRepeats(HasToBeRepeated());
+            var sticker = SendAsSticker();
+            var extension = GetStickerExtension();
             for (int i = 0; i < repeats; i++)
             {
-                using var stream = File.OpenRead(produce(_path, Texts(), GetStickerExtension()));
-                Bot.SendPhoto(Chat, new InputOnlineFile(stream));
+                var result = produce(_path, Texts(), extension);
+                if (sticker && convert)
+                    result = new F_Process(result).Output("-stick", ".webp");
+                using var stream = File.OpenRead(result);
+                if (sticker) Bot.SendSticker(Chat, new InputOnlineFile(stream));
+                else         Bot.SendPhoto  (Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_STICK(repeats)}");
         }
@@ -93,30 +107,64 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         private string GetTextUnlessItsReposted() => Message.ForwardFromChat is null ? Text : null;
 
-        protected string GetDummy(string options, string command, out bool empty)
+        protected string GetDummy(out bool empty)
         {
-                empty = Text is null && options is null;
-            if (empty) return "";
+            var cached = _lastRequest is var x && x.Chat == Chat && x.Message == Message.MessageId && x.Date == MessageDateTime;
+            if (cached)
+            {
+                empty = _lastRequest.Empty;
+                return _lastRequest.Dummy;
+            }
 
-            var cmd   = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
-            var hasOp = cmd.Length > command.Length && cmd.StartsWith(command);
-            var plus  = hasOp && cmd.Contains('+');
+            _lastRequest.Chat = Chat;
+            _lastRequest.Date = MessageDateTime;
+            _lastRequest.Message = Message.MessageId;
 
-            return hasOp ? plus ? options + cmd[command.Length..] : cmd : options ?? cmd;
+                empty = Text is null && Options is null;
+            if (empty)
+                _lastRequest.Dummy = "";
+            else
+            {
+                var cmd   = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
+                var hasOp = cmd.Length > Command.Length && cmd.StartsWith(Command);
+                var plus  = hasOp && Options is not null && cmd.Contains('+');
+
+                _lastRequest.Dummy = hasOp ? plus ? Options + cmd[Command.Length..] : cmd : Options ?? cmd;
+            }
+            _lastRequest.Empty = empty;
+            return _lastRequest.Dummy;
         }
 
-        private bool HasToBeRepeated()
+        private bool HasToBeRepeated() => CheckForCondition(options => _repeat.IsMatch(options));
+        private bool SendAsSticker  () => CheckForCondition(options => options.Contains('='));
+
+        private bool CheckForCondition(Predicate<string> condition)
         {
-            if (Text is null) return false;
-            var cmd = _cmd.Match(Text);
-            if (cmd.Success) return _repeat.IsMatch(cmd.Groups[1].Value);
+            var dummy = GetDummy(out var empty);
+            if (!empty)
+            {
+                var match = _cmd.Match(dummy);
+                if (match.Success) return condition(match.Groups[1].Value);
+            }
             return false;
+        }
+
+        private int GetRepeats(bool hasToBeRepeated)
+        {
+            var repeats = 1;
+            var dummy = GetDummy(out _);
+            if (hasToBeRepeated)
+            {
+                var match = _repeat.Match(dummy);
+                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
+            }
+            return repeats;
         }
 
         private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
 
-        private string GetStickerExtension() => Text != null && _cmd.Match(Text).Value.Contains('x') ? ".jpg" : ".png";
-        
+        private string GetStickerExtension() => CheckForCondition(ops => ops.Contains('x')) ? ".jpg" : ".png";
+
         private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
     }
 
@@ -125,16 +173,5 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected static readonly char[] split_chars = new[] { ' ', '\n' };
         
         protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
-
-        public static int GetRepeats(bool regex)
-        {
-            var repeats = 1;
-            if (regex)
-            {
-                var match = _repeat.Match(Text);
-                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
-            }
-            return repeats;
-        }
     }
 }

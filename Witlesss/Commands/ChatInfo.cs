@@ -31,7 +31,7 @@ namespace Witlesss.Commands
             sb.Append("\nВероятность: ").Append(Baka.Meme.Chance).Append('%');
             sb.Append("\nСтикеры: ").Append(Baka.Meme.Stickers ? "тоже 🍑" : "пропускаем");
 
-            bool ops;
+            var ops = false;
             var ob = new StringBuilder("\n\n<u>Опции</u>:");
             if (IsNotNull(Baka.Meme.OptionsM)) AppendOptions("meme", Baka.Meme.OptionsM[5..]);
             if (IsNotNull(Baka.Meme.OptionsT)) AppendOptions("top",  Baka.Meme.OptionsT[4..]);
@@ -42,7 +42,13 @@ namespace Witlesss.Commands
 
             Bot.SendMessage(Chat, sb.ToString());
 
-            bool IsNotNull(string s) => ops = s is not null;
+            bool IsNotNull(string s)
+            {
+                var ok = s is not null;
+                ops |= ok;
+                return ok;
+            }
+
             void AppendOptions(string cmd, string options)
             {
                 ob.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");

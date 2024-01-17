@@ -167,7 +167,7 @@ namespace Witlesss.XD
         }
 
         public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
-        public static string Pick(string[] responses) => responses[Random.Next(responses.Length)];
+        public static T Pick<T>(T[] options) => options[Random.Next(options.Length)];
 
         public static readonly string[] FILE_TOO_BIG_RESPONSE =
         {

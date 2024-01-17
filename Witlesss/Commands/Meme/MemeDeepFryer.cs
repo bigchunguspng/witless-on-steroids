@@ -10,7 +10,7 @@ namespace Witlesss.Commands.Meme
         protected override string Log_STICK(int x) => $"NUKED [{(x == 1 ? "*" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "NUKED [*] VID";
-        protected override string VideoName { get; } = "deep_fry_club.mp4";
+        protected override string VideoName { get; } = "nuke_fap_club.mp4";
 
         protected override string Options => Baka.Meme.OptionsN;
         protected override string Command { get; } = "/nuke";

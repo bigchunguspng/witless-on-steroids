@@ -71,8 +71,33 @@ namespace Witlesss.MediaTools
         {
             var sb = new StringBuilder("-filter_complex \"[v:0]");
 
-            // HUE SATURATION
+            // PIXELIZE
+            if (IsOneIn(4))
+            {
+                var i = MediaInfo();
+                var p = Math.Max(2, Math.Min(i.v.Width, i.v.Height) / RandomInt(60, 120));
+                sb.Append("pixelize=").Append(p).Append(':').Append(p).Append(":p=3,");
+            }
+            // https://ffmpeg.org/ffmpeg-filters.html#pixelize
+            
+            // AMPLIFY
+            if (isVideo && IsOneIn(4))
+            {
+                sb.Append("amplify=").Append(RandomInt(1, 5)); // radius
+                sb.Append(":factor=").Append(RandomInt(1, 5));
 
+                var zeroes = RandomInt(0, 3);
+                sb.Append(":threshold=1").Append(new string('0', zeroes)); // 1-10-100-1000
+                if (zeroes == 3) // if threshold = 1000
+                {
+                    var values = new[] { 1, 10, 25, 50 };
+                    sb.Append(":tolerance=").Append(Pick(values));
+                }
+                sb.Append(',');
+            }
+            // https://ffmpeg.org/ffmpeg-filters.html#amplify
+
+            // HUE SATURATION
             sb.Append("huesaturation=").Append(RandomInt(-25, 25)); // [-180 - 180]
             sb.Append  (":saturation=").Append(RandomDouble(-1, 1));
             sb.Append   (":intensity=").Append(RandomDouble(-1, 1)); // was 0, 0.5
@@ -96,11 +121,9 @@ namespace Witlesss.MediaTools
                 }
             }
             sb.Append(",");
-
             // https://ffmpeg.org/ffmpeg-filters.html#huesaturation
 
             // UNSHARP
-
             var lumaMatrixSize = RandomInt(1, 11) * 2 + 1; // [3 - 23], odd only, lx + ly <= 26
             var lumaAmount = RandomDouble(-1.5, 1.5);  // [-1.5 - 1.5]
 
@@ -110,11 +133,9 @@ namespace Witlesss.MediaTools
             sb.Append("=lx=").Append(b ? s : lumaMatrixSize);
             sb.Append(":ly=").Append(b ? lumaMatrixSize : s);
             sb.Append(":la=").Append(lumaAmount).Append(",");
-
             // https://ffmpeg.org/ffmpeg-filters.html#unsharp-1
 
             // NOISE
-
             var n_min = isVideo ? 10 : 25;
             var n_max = isVideo ? 45 : 100;
             
@@ -130,7 +151,6 @@ namespace Witlesss.MediaTools
                 sb.Append('+').Append(flag);
             }
             sb.Append("\"");
-
             // https://ffmpeg.org/ffmpeg-filters.html#noise
 
 

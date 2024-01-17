@@ -38,7 +38,9 @@ namespace Witlesss.Commands
             return last == "" ? name : name + " " + last;
         }
 
-        protected static string RemoveBotMention() => Text.ToLower().Replace(Config.BOT_USERNAME, "");
+        protected static string TextWithoutBotUsername => RemoveBotMention(Text);
+
+        protected static string RemoveBotMention(string s) => s.ToLower().Replace(Config.BOT_USERNAME, "");
 
         /// <summary> Use this for async operations. </summary>
         protected static MessageData SnapshotMessageData() => new(Chat, Text, Title);

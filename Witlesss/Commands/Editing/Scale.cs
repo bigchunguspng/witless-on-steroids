@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Editing
             {
                 var args = Text.Split(' ').Skip(1).Take(2).ToArray();
 
-                if (_xs.IsMatch(RemoveBotMention()))
+                if (_xs.IsMatch(TextWithoutBotUsername))
                 {
                     if (args.Length > 0 && _number.IsMatch(args[0])) args[0] = args[0] + "*w";
                     if (args.Length > 1 && _number.IsMatch(args[1])) args[1] = args[1] + "*h";

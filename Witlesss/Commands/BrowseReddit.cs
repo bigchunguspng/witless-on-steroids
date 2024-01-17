@@ -34,7 +34,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 
-            var input = RemoveBotMention();
+            var input = TextWithoutBotUsername;
 
             if (Message.ReplyToMessage is { Text: { } t } message && IsCommand(t, "/w"))
             {

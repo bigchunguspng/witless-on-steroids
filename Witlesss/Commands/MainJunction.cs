@@ -70,7 +70,7 @@ namespace Witlesss.Commands
 
         private static bool TextIsCommand(out string command)
         {
-            command = RemoveBotMention();
+            command = TextWithoutBotUsername;
             return Text.StartsWith('/');
         }
 
@@ -111,7 +111,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/w"      )) _sc = _reddit;
             else if (CommandIs( "/link"   )) _sc = _link;
             else if (CommandIs( "/piece"  )) _sc = _piece;
-            else if (CommandIs( "/ffxd"   )) _sc = _edit;
+            else if (CommandIs( "/ff"     )) _sc = _edit;
             else                                          return false;
             if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
 

@@ -16,7 +16,7 @@ namespace Witlesss.Commands
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
 
-            var input = RemoveBotMention();
+            var input = TextWithoutBotUsername;
 
             var que = _que.Match(input);
             var sub = _sub.Match(input);

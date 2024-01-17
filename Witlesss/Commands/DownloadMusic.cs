@@ -40,7 +40,7 @@ namespace Witlesss.Commands
                 var id = yt ? _id.Match(url).Groups[1].Value : url;
                 if (id.Length < 1) throw new Exception("video id was too small");
 
-                var ops = _ops.Match(RemoveBotMention());
+                var ops = _ops.Match(TextWithoutBotUsername);
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
 
                 var message = Bot.PingChat(Chat, Pick(PLS_WAIT_RESPONSE));

@@ -10,16 +10,21 @@ public class AdvancedEdit : Command
 {
     private string FileID;
 
-    // /ffxd [options] [extension]
+    // /ffxd [options]      [extension]
+    // /ffv  [videofilters] [extension]
     public override void Run()
     {
         if (NothingToProcess()) return;
 
         if (Text.Contains(' '))
         {
-            var args = Text.Split(' ').Skip(1).ToArray();
+            var args = Text.Split(' ');
 
-            var options = string.Join(' ', args.SkipLast(1));
+            var cmd = RemoveBotMention(args[0]);
+            var vf = cmd.Contains('v');
+
+            var options = string.Join(' ', args.Skip(1).SkipLast(1));
+            if (vf) options = $"-vf \"{options}\"";
             var extension = args[^1];
 
             foreach (var c in extension)
@@ -29,7 +34,7 @@ public class AdvancedEdit : Command
 
             Bot.Download(FileID, Chat, out var path);
 
-            SendResult(Memes.Edit(path, options, extension), extension);
+            SendResult(Memes.Edit(path, options, extension), extension, g: cmd.Contains('g'));
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
         else
@@ -76,11 +81,9 @@ public class AdvancedEdit : Command
         return true;
     }
     
-    private void SendResult(string result, string extension)
+    private void SendResult(string result, string extension, bool g = false)
     {
         var name = "made with piece_fap_bot";
-
-        var g = Text.Split(' ')[0].EndsWith("g");
 
         using var stream = File.OpenRead(result);
         if      (SendAsDocument())        Bot.SendDocument (Chat, New_InputOnlineFile());

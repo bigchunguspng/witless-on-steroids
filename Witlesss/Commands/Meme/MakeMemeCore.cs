@@ -127,7 +127,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             {
                 var cmd   = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
                 var hasOp = cmd.Length > Command.Length && cmd.StartsWith(Command);
-                var plus  = hasOp && Options is not null && cmd.Contains('+');
+                var plus  = hasOp && Options is not null && (cmd.Contains('+') || Options.Contains('+'));
 
                 _lastRequest.Dummy = hasOp ? plus ? Options + cmd[Command.Length..] : cmd : Options ?? cmd;
             }

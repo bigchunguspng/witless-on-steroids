@@ -71,6 +71,13 @@ namespace Witlesss.MediaTools
         {
             var sb = new StringBuilder("-filter_complex \"[v:0]");
 
+            // VIGNETTE
+            if (isVideo && IsOneIn(4))
+            {
+                sb.Append("vignette=").Append(RandomDouble(0.1, 0.5)).Append(',');
+            }
+            // https://ffmpeg.org/ffmpeg-filters.html#vignette-1
+
             // PIXELIZE
             if (IsOneIn(4))
             {

@@ -22,9 +22,10 @@ public class AdvancedEdit : Command
 
             var cmd = RemoveBotMention(args[0]);
             var vf = cmd.Contains('v');
+            var af = cmd.Contains('a');
 
             var options = string.Join(' ', args.Skip(1).SkipLast(1));
-            if (vf) options = $"-vf \"{options}\"";
+            if (vf || af) options = $"-{(vf ? 'v' : 'a')}f \"{options}\"";
             var extension = args[^1];
 
             foreach (var c in extension)

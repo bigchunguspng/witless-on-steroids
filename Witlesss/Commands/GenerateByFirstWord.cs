@@ -1,11 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using static Witlesss.Commands.Meme.MakeMemeCore_Static;
 
 namespace Witlesss.Commands
 {
     public class GenerateByFirstWord : WitlessCommand
     {
-        private static readonly Regex _repeat = new(@"^\/a\S*[2-9]\S*");
+        private static readonly Regex _repeat = new(@"^\/a\S*([2-9])\S*");
 
         public override void Run()
         {
@@ -55,7 +54,7 @@ namespace Witlesss.Commands
         protected static int GetRepeats(Match match)
         {
             var repeats = 1;
-            if (match.Success && int.TryParse(match.Value, out var x))
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var x))
             {
                 repeats = x;
             }

@@ -1,11 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using static Witlesss.Commands.Meme.MakeMemeCore_Static;
 
 namespace Witlesss.Commands
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {
-        private readonly Regex _repeat = new(@"^\/zz\S*[2-9]\S*");
+        private readonly Regex _repeat = new(@"^\/zz\S*([2-9])\S*");
 
         public override void Run()
         {

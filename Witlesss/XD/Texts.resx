@@ -46,6 +46,8 @@
 &lt;code&gt;/set@piece_fap_bot Dg x=5n...&lt;/code&gt;
 &lt;code&gt;/set@piece_fap_bot N =3...&lt;/code&gt;
 
+&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить
+
 &lt;b&gt;&lt;u&gt;Частота появления мемов&lt;/u&gt;&lt;/b&gt;:
 
 /pics@piece_fap_bot 75 (число, %)

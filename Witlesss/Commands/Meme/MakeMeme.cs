@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string text)
         {
-            var dummy = GetDummy(out var empty);
+            var dummy = GetDummy(out var empty, out var command);
 
             MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBack)
@@ -51,9 +51,13 @@ namespace Witlesss.Commands.Meme
             var add_bottom_text         = !empty &&  _add_bottom.IsMatch(dummy);
             var only_bottom_text        = !empty && _only_bottom.IsMatch(dummy);
             var only_top_text           = !empty &&    _top_only.IsMatch(dummy);
+            var matchCaps               = !empty &&        _caps.IsMatch(dummy);
+
+            var gen = string.IsNullOrEmpty(text);
+            var caps = matchCaps && (gen || _caps.IsMatch(command));
 
             string a, b;
-            if (string.IsNullOrEmpty(text))
+            if (gen)
             {
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
@@ -79,7 +83,9 @@ namespace Witlesss.Commands.Meme
                     b = add_bottom_text ? Baka.Generate() : "";
                 }
             }
-            return new DgText(a, b);
+            return new DgText(AdjustCase(a), AdjustCase(b));
+
+            string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
         private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S*", RegexOptions.IgnoreCase);
@@ -87,9 +93,10 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S*", RegexOptions.IgnoreCase);
         private static readonly Regex    _top_only = new(@"^\/meme\S*t\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _roboto = new(@"^\/meme\S*r\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex   _colorText = new(@"^\/meme\S*c\S*", RegexOptions.IgnoreCase); // todo document
+        private static readonly Regex   _colorText = new(@"^\/meme\S*c\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _impact = new(@"^\/meme\S*p\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _italic = new(@"^\/meme\S*i\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex        _caps = new(@"^\/meme\S*u\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
     }
 

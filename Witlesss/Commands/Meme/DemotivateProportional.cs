@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
-            var dummy = GetDummy(out var empty);
+            var dummy = GetDummy(out var empty, out var command);
             
             DynamicDemotivatorDrawer.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
 
@@ -50,13 +50,14 @@ namespace Witlesss.Commands.Meme
             DynamicDemotivatorDrawer.UseImpact   = !empty &&  _impact.IsMatch(dummy) && !_times.IsMatch(dummy);
             DynamicDemotivatorDrawer.UseBoldFont = !empty &&    _bold.IsMatch(dummy);
             DynamicDemotivatorDrawer.CropEdges   = !empty &&    _crop.IsMatch(dummy);
-            
-            var caps                             = !empty &&    _caps.IsMatch(dummy);
+            var matchCaps                        = !empty &&    _caps.IsMatch(dummy);
 
             var gen = string.IsNullOrEmpty(text);
+            var caps = matchCaps && (gen || _caps.IsMatch(command));
+
             var txt = gen ? Baka.Generate() : text;
 
-            return caps && (gen || txt.Length > 50) ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
+            return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
         private static readonly Regex _roboto  = new(@"^\/dp\S*rg\S*",            RegexOptions.IgnoreCase);

@@ -455,6 +455,7 @@ s   - save and exit
 
 &lt;code&gt;i&lt;/code&gt; - курсив
 &lt;code&gt;c&lt;/code&gt; - цветной текст 🎨
+&lt;code&gt;u&lt;/code&gt; - верхний регистр
 &lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
 &lt;code&gt;p&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
 &lt;code&gt;t&lt;/code&gt; - только верхний текст

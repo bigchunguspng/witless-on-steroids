@@ -12,7 +12,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         private MediaType _type;
         private readonly Stopwatch _watch = new();
 
-        private (long Chat, int Message, DateTime Date, string Dummy, bool Empty) _lastRequest;
+        private (long Chat, int Message, DateTime Date, string Dummy, bool Empty, string Command) _lastRequest;
 
         protected abstract Regex _cmd { get; }
 
@@ -107,14 +107,18 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         private string GetTextUnlessItsReposted() => Message.ForwardFromChat is null ? Text : null;
 
-        protected string GetDummy(out bool empty)
+        protected string GetDummy(out bool empty) => GetDummy(out empty, out _);
+        protected string GetDummy(out bool empty, out string command)
         {
             var cached = _lastRequest is var x && x.Chat == Chat && x.Message == Message.MessageId && x.Date == MessageDateTime;
             if (cached)
             {
                 empty = _lastRequest.Empty;
+                command = _lastRequest.Command;
                 return _lastRequest.Dummy;
             }
+
+            command = GetCommand();
 
             _lastRequest.Chat = Chat;
             _lastRequest.Date = MessageDateTime;
@@ -125,14 +129,19 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
                 _lastRequest.Dummy = "";
             else
             {
-                var cmd   = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
-                var hasOp = cmd.Length > Command.Length && cmd.StartsWith(Command);
-                var plus  = hasOp && Options is not null && (cmd.Contains('+') || Options.Contains('+'));
+                var hasOp = command.Length > Command.Length && command.StartsWith(Command);
+                var plus  = hasOp && Options is not null && (command.Contains('+') || Options.Contains('+'));
 
-                _lastRequest.Dummy = hasOp ? plus ? Options + cmd[Command.Length..] : cmd : Options ?? cmd;
+                _lastRequest.Dummy = hasOp ? plus ? Options + command[Command.Length..] : command : Options ?? command;
             }
             _lastRequest.Empty = empty;
+            _lastRequest.Command = command;
             return _lastRequest.Dummy;
+        }
+
+        private string GetCommand()
+        {
+            return Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
         }
 
         private bool HasToBeRepeated() => CheckForCondition(options => _repeat.IsMatch(options));

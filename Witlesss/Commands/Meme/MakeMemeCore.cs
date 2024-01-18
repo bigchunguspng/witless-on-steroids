@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
@@ -144,7 +145,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
         }
 
-        private bool HasToBeRepeated() => CheckForCondition(options => _repeat.IsMatch(options));
+        private bool HasToBeRepeated() => CheckForCondition(options => _repeat.IsMatch(options) && TextIsGenerated());
         private bool SendAsSticker  () => CheckForCondition(options => options.Contains('='));
 
         private bool CheckForCondition(Predicate<string> condition)
@@ -156,6 +157,11 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
                 if (match.Success) return condition(match.Groups[1].Value);
             }
             return false;
+        }
+
+        private bool TextIsGenerated()
+        {
+            return Text is null || (Text.StartsWith('/') && !Text.Any(x => split_chars.Contains(x)));
         }
 
         private int GetRepeats(bool hasToBeRepeated)

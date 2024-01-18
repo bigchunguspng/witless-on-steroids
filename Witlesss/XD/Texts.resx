@@ -71,7 +71,7 @@
 
 4. &lt;u&gt;Файлами&lt;/u&gt;, которые уже скармливали. Список таковых можно получить прописав &lt;code&gt;/fuse his&lt;/code&gt;.
 
-Выбрав нужный, пропишите &lt;code&gt;/fuse [имя]&lt;/code&gt;
+Выбрав нужный, пропишите &lt;code&gt;/fuse his [имя]&lt;/code&gt;
 
 5. &lt;u&gt;Комментами с реддитовских постов&lt;/u&gt; - команда &lt;code&gt;/xd&lt;/code&gt;
 

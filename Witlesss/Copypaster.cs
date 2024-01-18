@@ -47,24 +47,30 @@ namespace Witlesss
         }
         private string EatSimple(string[] words, float weight = 1F)
         {
-            var list = new List<string>(words.Length + 2) { START };
-            
-            list.AddRange(words);
-            list.Add(END);
-            list.RemoveAll(x => x == LF);
-            
-            for (var i = 0; i < list.Count - 1; i++)
-            {
-                string word = list[i];
-                if (!Words.ContainsKey(word)) Words.Add(word, new WordChart());
+            var list = new LinkedList<string>(words);
 
-                string next = list[i + 1];
-                if (Words[word].ContainsKey(next))
-                    Words[word][next] = MathF.Round(Words[word][next] + weight, 1);
-                else
-                    Words[word].Add(next, weight);
+            list.AddFirst(START);
+            list.AddLast(END);
+
+            var node = list.First!;
+            while (node.Next != null)
+            {
+                var word = node.Value;
+                if (word != LF)
+                {
+                    if (!Words.ContainsKey(word)) Words.Add(word, new WordChart());
+
+                    var next = node.Next.Value;
+                    if (Words[word].ContainsKey(next))
+                        Words[word][next] = MathF.Round(Words[word][next] + weight, 1);
+                    else
+                        Words[word].Add(next, weight);
+                }
+                node = node.Next;
             }
-            return string.Join(' ', list.GetRange(1, list.Count - 2));
+            list.RemoveFirst();
+            list.RemoveLast();
+            return string.Join(' ', list);
         }
         private static string[] Advance(string[] words)
         {

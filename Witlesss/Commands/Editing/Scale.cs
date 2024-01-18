@@ -8,8 +8,7 @@ namespace Witlesss.Commands.Editing
     {
         private const string _filename = "scale_fap_club.mp4";
 
-        private readonly Regex _number = new(@"^\d+(\.\d+)*$");
-        private readonly Regex _xs = new(@"^\/scale\S*[xs]\S*");
+        private readonly Regex _number = new(@"^\d+(\.\d+)?$");
 
         public override void Run()
         {
@@ -19,10 +18,16 @@ namespace Witlesss.Commands.Editing
             {
                 var args = Text.Split(' ').Skip(1).Take(2).ToArray();
 
-                if (_xs.IsMatch(TextWithoutBotUsername))
+                MultiplyIfArgIsNumber(0, 'w');
+                MultiplyIfArgIsNumber(1, 'h');
+
+                void MultiplyIfArgIsNumber(int i, char side)
                 {
-                    if (args.Length > 0 && _number.IsMatch(args[0])) args[0] = args[0] + "*w";
-                    if (args.Length > 1 && _number.IsMatch(args[1])) args[1] = args[1] + "*h";
+                    if (args.Length > i && _number.IsMatch(args[i]))
+                    {
+                        var d = double.TryParse(args[i].Replace('.', ','), out var value);
+                        if (d && value < 5) args[i] = args[i] + '*' + side;
+                    }
                 }
 
                 for (var i = 0; i < args.Length; i++)

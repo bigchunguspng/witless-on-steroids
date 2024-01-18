@@ -537,17 +537,22 @@ s   - save and exit
 
 &lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота&lt;/code&gt;
 
-&lt;b&gt;Дефолтные значения:&lt;/b&gt; &lt;code&gt;w&lt;/code&gt;, &lt;code&gt;h&lt;/code&gt;
-
 &lt;b&gt;Примеры:&lt;/b&gt;
 
-&lt;code&gt;/scale 100&lt;/code&gt; 👈 ширина - 100, соотношение сохраняется
-&lt;code&gt;/scale -1 100&lt;/code&gt; 👈 высота - 100, соотношение сохраняется
-&lt;code&gt;/scale 1280 720&lt;/code&gt; 👈 сами догадайтесь
+&lt;code&gt;/scale 100&lt;/code&gt; 👈 ширина - 100px
+&lt;code&gt;/scale -1 100&lt;/code&gt; 👈 высота - 100px
+&lt;code&gt;/scale 1280 720&lt;/code&gt; 👈 big black...
 
-&lt;code&gt;/scale w/2&lt;/code&gt; 👈 уменьшить в два раза
-&lt;code&gt;/scale -1 h/2&lt;/code&gt; 👈 тоже
-&lt;code&gt;/scale w*2&lt;/code&gt; 👈 увеличить в два раза
+↗️ Увеличить в 2️⃣ раза:
+&lt;code&gt;/scale 2&lt;/code&gt;
+&lt;code&gt;/scale w*2&lt;/code&gt;
+&lt;code&gt;/scale -1 h*2&lt;/code&gt;
+
+↘️ Уменьшить в 2️⃣ раза:
+&lt;code&gt;/scale 0.5&lt;/code&gt;
+&lt;code&gt;/scale w/2&lt;/code&gt;
+
+По дефолту соотношение сторон сохраняется
 
 &lt;b&gt;Более подробно &lt;a href='https://ffmpeg.org/ffmpeg-filters.html#scale-1'&gt;тут&lt;/a&gt;&lt;/b&gt;</value>
     </data>

@@ -11,7 +11,7 @@ namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRoboto, UseSegoe, UseLeftAlignment, MinimizeHeight, WrapText = true;
+    public static bool UseRoboto, UseSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool PickColor, ForceCenter, UseGivenColor, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
     public static Color GivenColor;
@@ -171,7 +171,11 @@ public class IFunnyApp
             }
         }
         
-        if (MinimizeHeight && _measure.Height < 0.95 * _t) SetCardHeight((int)(_measure.Height + Math.Min(_sans.Size, 8)));
+        if (ThinCard && _measure.Height < 0.95 * _t)
+        {
+            var extraHeight = UltraThinCard ? _sans.Size * -0.1 : Math.Max(_sans.Size, 8);
+            SetCardHeight((int)(_measure.Height + extraHeight));
+        }
     }
 
     private void AdjustTextPosition(string s)

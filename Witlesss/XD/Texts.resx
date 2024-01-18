@@ -438,6 +438,7 @@ s   - save and exit
 &lt;code&gt;sg&lt;/code&gt; - шрифт &lt;i&gt;Segoe UI Black&lt;/i&gt;
 &lt;code&gt;ft&lt;/code&gt; - шрифт &lt;i&gt;Futura Extra Black&lt;/i&gt;
 &lt;code&gt;mm&lt;/code&gt; - тонкая плашка
+&lt;code&gt;mmm&lt;/code&gt; - супер тонкая плашка
 &lt;code&gt;ww&lt;/code&gt; - не разрывать текст
 &lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета (края)
 &lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (центр)

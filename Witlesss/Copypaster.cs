@@ -219,35 +219,39 @@ namespace Witlesss
 
         public  string Generate(string word)
         {
-            string result = "";
-            string current = word;
+            var tokens = new LinkedList<string>();
 
+            string current = word;
             while (current != END)
             {
-                result = result + " " + current;
+                tokens.AddLast(current);
                 current = PickWord(Words[current]);
             }
 
-            result = LocalizeLinkRemovals(result);
-
-            return result.Replace(START, "").TrimStart().ToRandomLetterCase();
+            if (tokens.First is { Value: START }) tokens.RemoveFirst();
+            
+            return CleanMess(tokens);
         }
         private string GenerateBackwards(string word)
         {
-            string result = "";
+            var tokens = new LinkedList<string>();
+
             string current = word;
-            
             while (current != START)
             {
-                result = current + " " + result;
+                tokens.AddFirst(current);
                 current = PickWord(GetWordsBefore(current));
             }
 
-            result = LocalizeLinkRemovals(result);
-
-            return result.Replace(END, "").TrimEnd().ToRandomLetterCase();
+            if (tokens.Last is { Value: END }) tokens.RemoveLast();
+            
+            return CleanMess(tokens);
         }
 
+        private string CleanMess(LinkedList<string> tokens)
+        {
+            return LocalizeLinkRemovals(string.Join(' ', tokens)).ToRandomLetterCase();
+        }
         private string LocalizeLinkRemovals(string text)
         {
             if (!text.Contains(LINK)) return text;

@@ -10,7 +10,7 @@ namespace Witlesss.Commands
     {
         private readonly Regex _args = new(@"^\/song\S*\s(http\S*|[A-Za-z0-9_-]{11,})\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
         private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([A-Za-z0-9_-]{11,})");
-        private readonly Regex   _pl = new(@"list=(PL[A-Za-z0-9_-]+)");
+        private readonly Regex   _pl = new(@"list=([A-Za-z0-9_-]+)");
         private readonly Regex  _ops = new(@"\/song(\S+)");
 
 

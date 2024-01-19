@@ -8,8 +8,9 @@ namespace Witlesss.Commands
 {
     public class DownloadMusic : Command
     {
-        private readonly Regex _args = new(@"^\/song\S*\s(http\S*)\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
-        private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([\w\d-]+)");
+        private readonly Regex _args = new(@"^\/song\S*\s(http\S*|[A-Za-z0-9_-]{11,})\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
+        private readonly Regex   _id = new(@"(?:(?:\?v=)|(?:v\/)|(?:\.be\/)|(?:embed\/)|(?:u\/1\/))([A-Za-z0-9_-]{11,})");
+        private readonly Regex   _pl = new(@"list=(PL[A-Za-z0-9_-]+)");
         private readonly Regex  _ops = new(@"\/song(\S+)");
 
 
@@ -20,10 +21,11 @@ namespace Witlesss.Commands
 
             var text = Text;
             var reply = Message.ReplyToMessage;
-            if (reply is { Text: { } t } && !text.Contains("http") && t.StartsWith("http") && !t.Contains(' '))
+            if (reply is { Text: { } t } && !text.Contains("http") && t.StartsWith("http"))
             {
                 var s = Text.Split(' ', 2);
-                text = s.Length == 2 ? $"{s[0]} {t} {s[1]}" : $"{s[0]} {t}";
+                var link = t.Split(' ', 2)[0];
+                text = s.Length == 2 ? $"{s[0]} {link} {s[1]}" : $"{s[0]} {link}";
             }
 
             var cover = GetPhotoFileID(Message) ?? GetPhotoFileID(reply);
@@ -38,14 +40,15 @@ namespace Witlesss.Commands
 
                 var yt = url.Contains("youtu");
                 var id = yt ? _id.Match(url).Groups[1].Value : url;
-                if (id.Length < 1) throw new Exception("video id was too small");
+                var pl = yt ? _pl.Match(url).Groups[1].Value : null;
+                if (id.Length < 1 && pl is null) throw new Exception("no video or playlist id found");
 
                 var ops = _ops.Match(TextWithoutBotUsername);
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
 
                 var message = Bot.PingChat(Chat, Pick(PLS_WAIT_RESPONSE));
 
-                var task = new DownloadMusicTask(id, options, cover, message, yt, SnapshotMessageData())
+                var task = new DownloadMusicTask(id, options, cover, message, yt, pl, SnapshotMessageData())
                 {
                     Artist = artist,
                     Title = title
@@ -55,7 +58,7 @@ namespace Witlesss.Commands
             }
             else
             {
-                Bot.SendMessage(Chat, SONG_MANUAL);
+                Bot.SendMessage(Chat, SONG_MANUAL, preview: false);
             }
         }
 

@@ -15,10 +15,12 @@ namespace Witlesss.Services.Internet;
 
 public class DownloadMusicTask
 {
-    private const string _YT_url_prefix = "https://youtu.be/";
+    private const string _YT_video = "https://youtu.be/";
+    private const string _YT_list  = "https://www.youtube.com/playlist?list=";
+
     private readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
 
-    private readonly string ID;
+    private readonly string ID, PlaylistID, PlayListIndex;
     private readonly string File;
     private readonly int MessageToDelete;
     private readonly bool YouTube;
@@ -35,12 +37,13 @@ public class DownloadMusicTask
 
     private Bot Bot => Bot.Instance;
 
-    public DownloadMusicTask(string id, string options, string file, int message, bool yt, MessageData data, int format = 251)
+    public DownloadMusicTask(string id, string options, string file, int message, bool yt, string pl, MessageData data, int format = 251)
     {
         ID = id;
         File = file;
         MessageToDelete = message;
         YouTube = yt;
+        PlaylistID = pl;
         Message = data;
         Format = format;
         
@@ -50,7 +53,10 @@ public class DownloadMusicTask
         RemoveBrackets = options.Contains('c');
         Uploader       = options.Contains('u'); // artist is uploader
         CropSquare     = options.Contains('s'); // crop thumbnail to a square
-        
+
+        PlayListIndex  = YouTube && PlaylistID is null ? null : Regex.Match(options, @"\d+").Value;
+        if (PlayListIndex?.Length < 1) PlayListIndex = null;
+
         ArtAttached = File is not null;
         ExtractThumb = ExtractThumb && !ArtAttached;
     }
@@ -65,6 +71,7 @@ public class DownloadMusicTask
         else if (!ExtractThumb && !ArtAttached)
             builder.Append("--write-thumbnail ");
         builder.Append("-x --audio-format mp3 ");
+        builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(Quote(url)).Append(" -o ").Append(Quote(output));
         return builder.ToString();
     }
@@ -76,6 +83,7 @@ public class DownloadMusicTask
         var builder = new StringBuilder("/C yt-dlp --no-mtime ");
         var format = "bv*" + (YouTube ? "[height<=720][filesize<15M]" : "");
         builder.Append("-f ").Append(Quote(format)).Append(" -k ");
+        builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(Quote(url)).Append(" -o ").Append(Quote("video.%(ext)s"));
         return builder.ToString();
     }
@@ -84,7 +92,11 @@ public class DownloadMusicTask
     {
         try
         {
-            var url = YouTube ? _YT_url_prefix + ID : ID;
+            var url = YouTube
+                ? PlaylistID.Length > 0 && (ID.Length < 1 || PlayListIndex is not null)
+                    ? _YT_list + PlaylistID
+                    : _YT_video + ID
+                : ID;
 
             var artist = Artist ?? (Uploader ? "%(uploader)s" : "%(artist)s");
             var title  = Title  ??                              "%(title)s";

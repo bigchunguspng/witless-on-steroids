@@ -142,7 +142,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/xd"        )) _wc = _comments;
             else if (command == "/stickers"   ) _wc = _stickers;
             else if (command == "/chat"       ) _wc = _chat;
-            else if (command == "/s_admins"   ) _wc = _admins;
+            else if (command == "/only_admins") _wc = _admins;
             else if (command == "/delete"     ) _wc = _delete;
             else return true;
 

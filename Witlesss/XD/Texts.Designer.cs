@@ -246,12 +246,12 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
         ///
-        ///• видео 🎬, гифками🪣
-        ///• видео-стикерами🍿
+        ///• видео 🎬, гифками 📺
+        ///• видео-стикерами 🎥
         ///• музыкой 🎧, wav-файлами🥭
         ///• кружками 📹, голосовыми🎙
         ///
-        ///Отправь её вместе с таким файлом 🗞 или в ответ на него✍️.
+        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
         /// </summary>
         internal static string DAMN_MANUAL {
             get {
@@ -468,9 +468,9 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
         ///
-        ///• видео 🎬, гифками🪣
-        ///• видеосообщениями 📹
-        ///• видео-стикерами🍿.
+        ///• видео 🎬, гифками 📺
+        ///• видео-сообщениями 📹
+        ///• видео-стикерами 🎥.
         /// </summary>
         internal static string G_MANUAL {
             get {
@@ -529,11 +529,11 @@ namespace Witlesss.XD {
         ///   Looks up a localized string similar to &lt;u&gt;&lt;b&gt;{0} я делаю из&lt;/b&gt;&lt;/u&gt;:
         ///
         ///• картинок 📸, стикеров 🎟
-        ///• видео 🎬, гифок🪣
-        ///• видео-стикеров🍿
-        ///• видеосообщений 📹
+        ///• видео 🎬, гифок 📺
+        ///• видео-стикеров 🎥
+        ///• видео-сообщений 📹
         ///
-        ///Напиши это вместе с таким файлом 🗞 или в ответ на него✍️.
+        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
         /// </summary>
         internal static string MEME_MANUAL {
             get {
@@ -636,19 +636,16 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;Синтаксис команды:&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;Пожирание коментов с Reddit:&lt;/b&gt;
         ///
         ///&lt;code&gt;/xd [search query] [subreddit*] [-options]&lt;/code&gt;
         ///
-        ///1. писать без квадратных скобок
-        ///2. сабреддит выделяется звёздочкой
-        ///3. опции необязательны
-        ///4. запрос или сабреддит нужно указать
+        ///&lt;b&gt;Примеры:&lt;/b&gt;
         ///
-        ///&lt;b&gt;Например:&lt;/b&gt;
-        ///
-        ///☝️ &lt;code&gt;/xd osaka azumanga okbuddybaka*&lt;/code&gt;
-        ///🤙 &lt;code&gt;/xd jesse breakingbadmemes*&lt;/code&gt;
+        ///☝️ &lt;code&gt;/xd osaka okbuddybaka*&lt;/code&gt;
+        ///👉 &lt;code&gt;/xd okbuddybaka*&lt;/code&gt;
+        ///👊 &lt;code&gt;/xd ohio rizz okbuddyretard*&lt;/code&gt;
+        ///🤙 &lt;code&gt;/xd real trap shit&lt;/code&gt;
         ///👌 &lt;code&gt;/xd amogus -cm&lt;/code&gt;.
         /// </summary>
         internal static string REDDIT_COMMENTS_MANUAL {
@@ -749,7 +746,7 @@ namespace Witlesss.XD {
         ///&lt;code&gt;T &lt;/code&gt; - подписанки 💬
         ///&lt;code&gt;D &lt;/code&gt; - демотиваторы👌
         ///&lt;code&gt;Dg&lt;/code&gt; - демотиваторы💀
-        ///&lt;code&gt;N &lt;/code&gt; - фритюр 🍤
+        ///&lt;code&gt;N &lt;/code&gt; - ядерный фритюр 🍤
         ///
         ///&lt;b&gt;&lt;u&gt;Опции в мемчиках по умолчанию&lt;/u&gt;&lt;/b&gt;:
         ///
@@ -757,7 +754,7 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
         ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;/set@piece [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -786,16 +783,11 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to Выбрать тип авто-мемов:
         ///
-        ///&lt;code&gt;/meme&lt;/code&gt; ☝️👇
-        ///  └─ &lt;code&gt;/set@piece_fap_bot M &lt;/code&gt;
-        ///&lt;code&gt;/top &lt;/code&gt; 💬🔝
-        ///  └─ &lt;code&gt;/set@piece_fap_bot T &lt;/code&gt;
-        ///&lt;code&gt;/dp  &lt;/code&gt; ◼️▪️
-        ///  └─ &lt;code&gt;/set@piece_fap_bot D &lt;/code&gt;
-        ///&lt;code&gt;/dg  &lt;/code&gt; ◾️🔐
-        ///  └─ &lt;code&gt;/set@piece_fap_bot Dg&lt;/code&gt;
-        ///&lt;code&gt;/nuke&lt;/code&gt; 🍕🍤
-        ///  └─ &lt;code&gt;/set@piece_fap_bot N &lt;/code&gt;.
+        ///&lt;code&gt;/meme&lt;/code&gt; ☝️👇 &lt;code&gt;/set M &lt;/code&gt;
+        ///&lt;code&gt;/top &lt;/code&gt; 💬🔝 &lt;code&gt;/set T &lt;/code&gt;
+        ///&lt;code&gt;/dp  &lt;/code&gt; ◼️▪️ &lt;code&gt;/set D &lt;/code&gt;
+        ///&lt;code&gt;/dg  &lt;/code&gt; ◾️🔐 &lt;code&gt;/set Dg&lt;/code&gt;
+        ///&lt;code&gt;/nuke&lt;/code&gt; 🍕🍤 &lt;code&gt;/set N &lt;/code&gt;.
         /// </summary>
         internal static string SET_MEMES_MANUAL {
             get {
@@ -844,18 +836,18 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Как скачивать музыку с ютуба:&lt;/u&gt;&lt;/b&gt;
         ///
-        ///Если коротко, то пишешь &lt;code&gt;/song *ссылка*&lt;/code&gt;, и ждешь...
+        ///Пишешь &lt;code&gt;/song *ссылка*&lt;/code&gt;, и ждешь...
         ///
-        ///Или пишешь /song в ответ на сообщение со ссылкой, которую ты, к примеру, нашёл через @vid.
+        ///Или пишешь &lt;code&gt;/song&lt;/code&gt; в ответ на сообщение со ссылкой, которую ты, к примеру, нашёл через @vid.
         ///
         ///&lt;b&gt;Кроме того:&lt;/b&gt;
         ///
-        ///Если хочешь, можешь в конце указать автора и, через дефис, название (или просто название), например:
+        ///Если хочешь, можешь в конце указать автора и название, или просто название, например:
         ///
-        ///&lt;code&gt;/song https://youtu.be/fB6elql_EdM Eminem - My Name Is
-        /// /song https://youtu.be/fB6elql_EdM Eminem&apos;s Name Is&lt;/code&gt;
+        ///&lt;blockquote&gt;/song https://youtu.be/fB6elql_EdM Eminem - My Name Is&lt;/blockquote&gt;
+        ///&lt;blockquote&gt;/song https://youtu.be/fB6elql_EdM Eminem&apos;s Name Is&lt;/blockquote&gt;
         ///
-        ///Также можешь найти в интернете 🔍 крутой арт на обложк [rest of string was truncated]&quot;;.
+        ///Также можешь найти 🔍 в интернете кр [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SONG_MANUAL {
             get {

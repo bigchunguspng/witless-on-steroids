@@ -20,18 +20,18 @@ namespace Witlesss.Commands.Editing
                 argless = true;
             }
 
-            Bot.Download(FileID, Chat, out string path, out var type);
+            Bot.Download(FileID, Chat, out var path, out var type);
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            string result = Memes.Sus(path, new CutSpan(x.start, x.length));
-            SendResult(result, type, VideoFilename, AudioFilename);
+            var result = Memes.Sus(path, new CutSpan(x.start, x.length));
+            SendResult(result, type);
             Log($"{Title} >> SUS [>_<]");
-
-            string AudioFilename() => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");
-            string VideoFilename() => "sus_fap_club.mp4";
-
-            string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
         }
+
+        protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");
+        protected override string VideoFileName { get; } = "sus_fap_club.mp4";
+
+        string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
     }
 }

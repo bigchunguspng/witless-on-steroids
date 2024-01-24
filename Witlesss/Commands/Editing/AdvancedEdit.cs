@@ -6,10 +6,8 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing;
 
-public class AdvancedEdit : Command
+public class AdvancedEdit : FileEditingCommand
 {
-    private string FileID;
-
     // /ffxd [options]      [extension]
     // /ffv  [videofilters] [extension]
     public override void Run()
@@ -39,36 +37,16 @@ public class AdvancedEdit : Command
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
         else
-            Bot.SendSticker(Chat, new InputOnlineFile(Pick(DUDE)));
+            SendManual();
     }
 
-    private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
-    private readonly string[] DUDE = new[]
+    protected override void SendManual()
     {
-        "CAACAgIAAxkBAAECZ1JlnXp-IZ7pQQ-65xXjPrf8xvLQnwACdDgAApAuAUsOAWZE2RxhujQE",
-        "CAACAgIAAxkBAAECZ1ZlnXqSnVFOCQ-ZxiYnSDNOvjqSywAC1TUAAurH-EqrUrbGIyDdGDQE",
-        "CAACAgIAAxkBAAECZ1plnXqxyEYT4UhvU9VSqpPLKURJzwACQjMAAnY7KEv2hp5tYChZ1TQE",
-        "CAACAgIAAxkBAAECZ15lnXrCZtJt1AHSZoZqVC3dYdt8lwACgTYAAhXhKUvA8pcpkfVJDTQE",
-        "CAACAgIAAxkBAAECZ2JlnXrva00d_k9_MeOhaK9kCx9zCgACmAwAAo3W-Enqi3-VH6it3TQE",
-        "CAACAgIAAxkBAAECZ2hlnXsUKryvKUXxZAY4MOHloG9-gQACfRAAAjnXSUgzwFOJH8ykBjQE",
-        "CAACAgIAAxkBAAECZ2plnXsj1OQUBQtMrMkr5Bv8tPH5bwACRw0AApUa-ElKPI21HNHo4jQE",
-        "CAACAgIAAxkBAAECZ2xlnXtHd7bVPVqydpWCZwbq2e9dUAAC7QwAAtua-EmTOpxJHSiIcjQE",
-        "CAACAgIAAxkBAAECZ3BlnXuokpG6KNRX4hVnbqNiQRtyqQACKScAAo8ZQEsx0p6zb98J0zQE",
-        "CAACAgIAAxkBAAECZ3JlnXvncYpVXuvyAXe01aNWYOauJAACDiMAAsX-SUha8rwmJSbb0TQE"
-    };
-
-    private bool NothingToProcess()
-    {
-        if (GetMediaFileID(Message) || GetMediaFileID(Message.ReplyToMessage)) return false;
-
         Bot.SendSticker(Chat, new InputOnlineFile(Pick(DUDE)));
-        return true;
     }
 
-    private bool GetMediaFileID(Message m)
+    protected override bool MessageContainsFile(Message m)
     {
-        if      (m == null) return false;
-
         if      (m.Photo     is not null)              FileID = m.Photo[^1].FileId;
         else if (m.Audio     is not null)              FileID = m.Audio    .FileId;
         else if (m.Video     is not null)              FileID = m.Video    .FileId;
@@ -81,7 +59,7 @@ public class AdvancedEdit : Command
 
         return true;
     }
-    
+
     private void SendResult(string result, string extension, bool g = false)
     {
         var name = "made with piece_fap_bot";
@@ -103,4 +81,19 @@ public class AdvancedEdit : Command
 
     private static readonly Regex _pic = new(@"^(png|jpe?g)$");
     private static readonly Regex _gif = new(@"^(gif|webm)$");
+
+    private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
+    private readonly string[] DUDE = new[]
+    {
+        "CAACAgIAAxkBAAECZ1JlnXp-IZ7pQQ-65xXjPrf8xvLQnwACdDgAApAuAUsOAWZE2RxhujQE",
+        "CAACAgIAAxkBAAECZ1ZlnXqSnVFOCQ-ZxiYnSDNOvjqSywAC1TUAAurH-EqrUrbGIyDdGDQE",
+        "CAACAgIAAxkBAAECZ1plnXqxyEYT4UhvU9VSqpPLKURJzwACQjMAAnY7KEv2hp5tYChZ1TQE",
+        "CAACAgIAAxkBAAECZ15lnXrCZtJt1AHSZoZqVC3dYdt8lwACgTYAAhXhKUvA8pcpkfVJDTQE",
+        "CAACAgIAAxkBAAECZ2JlnXrva00d_k9_MeOhaK9kCx9zCgACmAwAAo3W-Enqi3-VH6it3TQE",
+        "CAACAgIAAxkBAAECZ2hlnXsUKryvKUXxZAY4MOHloG9-gQACfRAAAjnXSUgzwFOJH8ykBjQE",
+        "CAACAgIAAxkBAAECZ2plnXsj1OQUBQtMrMkr5Bv8tPH5bwACRw0AApUa-ElKPI21HNHo4jQE",
+        "CAACAgIAAxkBAAECZ2xlnXtHd7bVPVqydpWCZwbq2e9dUAAC7QwAAtua-EmTOpxJHSiIcjQE",
+        "CAACAgIAAxkBAAECZ3BlnXuokpG6KNRX4hVnbqNiQRtyqQACKScAAo8ZQEsx0p6zb98J0zQE",
+        "CAACAgIAAxkBAAECZ3JlnXvncYpVXuvyAXe01aNWYOauJAACDiMAAsX-SUha8rwmJSbb0TQE"
+    };
 }

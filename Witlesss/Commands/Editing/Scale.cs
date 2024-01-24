@@ -1,18 +1,16 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using Telegram.Bot.Types.InputFiles;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing
 {
     public class Scale : VideoCommand
     {
-        private const string _filename = "scale_fap_club.mp4";
-
         private readonly Regex _number = new(@"^\d+(\.\d+)?$");
 
         public override void Run()
         {
-            if (NoVideo()) return;
+            if (NothingToProcess()) return;
 
             if (Text.Contains(' '))
             {
@@ -48,19 +46,18 @@ namespace Witlesss.Commands.Editing
 
                 Bot.Download(FileID, Chat, out var path, out var type);
 
-                SendResult(Memes.Scale(path, args), type, _filename);
+                SendResult(Memes.Scale(path, args), type);
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");
             }
             else
                 Bot.SendMessage(Chat, SCALE_MANUAL);
         }
 
-        protected static void SendResult(string result, MediaType type, string filename)
+        protected override string VideoFileName { get; } = "scale_fap_club.mp4";
+
+        protected override bool MessageContainsFile(Message m)
         {
-            using var stream = File.OpenRead(result);
-            if      (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, filename));
-            else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, filename));
-            else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            return GetVideoFileID(m) || GetPhotoFileID(m);
         }
     }
 }

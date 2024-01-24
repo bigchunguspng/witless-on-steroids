@@ -3,7 +3,7 @@ using static System.TimeSpan;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Cut : AudioVideoCommand
+    public class Cut : FileEditingCommand
     {
         public override void Run()
         {
@@ -16,20 +16,17 @@ namespace Witlesss.Commands.Editing
                 return;
             }
             
-            Bot.Download(FileID, Chat, out string path, out var type);
+            Bot.Download(FileID, Chat, out var path, out var type);
             
-            string result = Memes.Cut(path, new CutSpan(x.start, x.length));
-            SendResult(result, type, VideoFilename, AudioFilename);
+            var result = Memes.Cut(path, new CutSpan(x.start, x.length));
+            SendResult(result, type);
             Log($"{Title} >> CUT [8K-]");
-
-            string AudioFilename() => SongNameOr($"((({Sender}))).mp3");
-            string VideoFilename() => "cut_fap_club.mp4";
         }
 
         protected static (bool failed, TimeSpan start, TimeSpan length) GetArgs()
         {
             var s = Text.Split();
-            int len = s.Length;
+            var len = s.Length;
             if     (len == 2 && s[1].IsTimeSpan(out var length)) return (false, Zero,  length);      // [++]----]
             if     (len >= 3 && s[1].IsTimeSpan(out var  start))
             {
@@ -39,5 +36,8 @@ namespace Witlesss.Commands.Editing
             }
             else                                                 return (true,  Zero,  Zero);        // [-------]
         }
+        
+        protected override string AudioFileName => SongNameOr($"((({Sender}))).mp3");
+        protected override string VideoFileName { get; } = "cut_fap_club.mp4";
     }
 }

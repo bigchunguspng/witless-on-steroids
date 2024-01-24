@@ -1,6 +1,6 @@
 ﻿namespace Witlesss.Commands.Editing
 {
-    public class ChangeVolume : AudioVideoCommand
+    public class ChangeVolume : FileEditingCommand
     {
         private string _arg;
 
@@ -14,14 +14,14 @@
 
                 Bot.Download(FileID, Chat, out var path, out var type);
 
-                SendResult(Memes.ChangeVolume(path, _arg), type, VideoFilename, AudioFilename);
+                SendResult(Memes.ChangeVolume(path, _arg), type);
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
             else
                 Bot.SendMessage(Chat, VOLUME_MANUAL);
         }
 
-        string AudioFilename() => SongNameOr($"{Sender} Sound Effect.mp3");
-        string VideoFilename() => double.TryParse(_arg, out _) ? $"VOLUME-{_arg}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
+        protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");
+        protected override string VideoFileName => _arg.Length < 8 ? $"VOLUME-{ValidFileName(_arg)}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
     }
 }

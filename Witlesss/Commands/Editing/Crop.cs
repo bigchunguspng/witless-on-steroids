@@ -11,9 +11,21 @@ namespace Witlesss.Commands.Editing
 
         private bool _isShakeMode; 
 
+        public Crop UseShakeMode()
+        {
+            _isShakeMode = true;
+            return this;
+        }
+
+        public Crop UseDefaultMode()
+        {
+            _isShakeMode = false;
+            return this;
+        }
+
         public override void Run()
         {
-            if (NoVideo()) return;
+            if (NothingToProcess()) return;
 
             var input = _isShakeMode ? "/crop " + Text : Text;
             if (input.Contains(' '))
@@ -40,24 +52,16 @@ namespace Witlesss.Commands.Editing
 
                 Bot.Download(FileID, Chat, out var path, out var type);
 
-                SendResult(Memes.Crop(path, args), type, _isShakeMode ? _shake : _crop);
-                Log($"{Title} >> CROP [{string.Join(':', _isShakeMode ? log! : args)}]");
+                SendResult(Memes.Crop(path, args), type);
+                Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else
                 Bot.SendMessage(Chat, CROP_MANUAL);
         }
 
-        public Crop UseShakeMode()
-        {
-            _isShakeMode = true;
-            return this;
-        }
+        protected override string VideoFileName => _isShakeMode ? _shake : _crop;
 
-        public Crop UseDefaultMode()
-        {
-            _isShakeMode = false;
-            return this;
-        }
+        private string CropOrShake => _isShakeMode ? "SHAKE" : "CROP";
 
         private static string F_Shake(string a, string b, string c)
         {

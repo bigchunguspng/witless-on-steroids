@@ -2,7 +2,7 @@
 
 namespace Witlesss.Commands.Editing;
 
-public class ToVoiceMessage : AudioVideoCommand
+public class ToVoiceMessage : FileEditingCommand
 {
     public override void Run()
     {
@@ -10,17 +10,17 @@ public class ToVoiceMessage : AudioVideoCommand
 
         Bot.Download(FileID, Chat, out var path);
 
-        string voice;
+        string result;
         try
         {
-            voice = Memes.ToVoice(path);
+            result = Memes.ToVoice(path);
         }
         catch
         {
-            voice = "voice.ogg";
+            result = "voice.ogg";
         }
 
-        using var stream = File.OpenRead(voice);
+        using var stream = File.OpenRead(result);
         Bot.SendVoice(Chat, new InputOnlineFile(stream, "balls.ogg"));
         Log($"{Title} >> VOICE ~|||~");
     }

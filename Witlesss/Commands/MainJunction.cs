@@ -19,7 +19,7 @@ namespace Witlesss.Commands
         private readonly DemotivateProportional _dp = new();
         private readonly RemoveBitrate _bitrate = new();
         private readonly MemeDeepFryer _fryer = new();
-        private readonly RemoveAudio _audio = new();
+        private readonly ToAnimation _audio = new();
         private readonly ChangeSpeed _speed = new();
         private readonly ChangeVolume _volume = new();
         private readonly Equalize _equalize = new();

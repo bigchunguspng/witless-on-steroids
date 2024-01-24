@@ -2,7 +2,7 @@
 
 namespace Witlesss.Commands.Editing
 {
-    public class Equalize : AudioVideoCommand
+    public class Equalize : FileEditingCommand
     {
         // /eq [frequency, Hz] [gain, dB] [width, Hz]
         public override void Run()
@@ -19,14 +19,14 @@ namespace Witlesss.Commands.Editing
 
                 Bot.Download(FileID, Chat, out var path, out var type);
 
-                SendResult(Memes.EQ(path, new[] { f, g, w }), type, VideoFilename, AudioFilename);
-                Log($"{Title} >> EQ [f-{f} g-{g} w-{w}]");
+                SendResult(Memes.EQ(path, new[] { f, g, w }), type);
+                Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
             else
                 Bot.SendMessage(Chat, EQ_MANUAL);
         }
 
-        string AudioFilename() => SongNameOr($"Bassboosted by {Sender}.mp3");
-        string VideoFilename() => $"piece_fap_club ft. DJ {Sender}.mp4";
+        protected override string AudioFileName => SongNameOr($"Bassboosted by {Sender}.mp3");
+        protected override string VideoFileName => $"piece_fap_club ft. DJ {Sender}.mp4";
     }
 }

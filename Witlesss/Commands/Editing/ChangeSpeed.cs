@@ -3,13 +3,14 @@ using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands.Editing
 {
-    public class ChangeSpeed : AudioVideoCommand
+    public class ChangeSpeed : FileEditingCommand
     {
-        private SpeedMode Mode;
+        private double _speed;
+        private SpeedMode _mode;
 
         public ChangeSpeed SetMode(SpeedMode mode)
         {
-            Mode = mode;
+            _mode = mode;
             return this;
         }
 
@@ -17,21 +18,19 @@ namespace Witlesss.Commands.Editing
         {
             if (NothingToProcess()) return;
 
-            var speed = 2D;
-            if (Text.HasDoubleArgument(out double value))
-                speed = Mode == Fast ? ClampFast(value) : ClampSlow(value);
+            _speed = Text.HasDoubleArgument(out var x) ? _mode == Fast ? ClampFast(x) : ClampSlow(x) : 2D;
 
-            Bot.Download(FileID, Chat, out string path, out var type);
-                    
-            string result = Memes.ChangeSpeed(path, speed, Mode);
-            SendResult(result, type, VideoFilename, AudioFilename);
-            Log($"{Title} >> {(Mode == Fast ? "FAST" : "SLOW" )} [>>]");
+            Bot.Download(FileID, Chat, out var path, out var type);
 
-            string AudioFilename() => SongNameOr($"Are you {Sender.Split()[0]} or something.mp3");
-            string VideoFilename() => $"piece_fap_club-{speed}.mp4";
+            var result = Memes.ChangeSpeed(path, _speed, _mode);
+            SendResult(result, type);
+            Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 
             double ClampFast(double v) => Math.Clamp(v, 0.5,   94);
             double ClampSlow(double v) => Math.Clamp(v, 0.0107, 2);
         }
+
+        protected override string AudioFileName => SongNameOr($"Are you {Sender.Split()[0]} or something.mp3");
+        protected override string VideoFileName => $"piece_fap_club-{_speed}.mp4";
     }
 }

@@ -25,6 +25,8 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract string Options { get; }
         protected abstract string Command { get; }
 
+        protected virtual bool CropVideoNotes { get; } = true;
+
         protected void Run(string type, string options = null)
         {
             JpegCoder.PassQuality(Baka);
@@ -96,10 +98,14 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             _watch.WriteTime();
             Download(fileID);
 
-            if (_type == MediaType.Round) _path = Memes.CropVideoNote(_path);
+            if (CropVideoNotes && _type == MediaType.Round) _path = Memes.CropVideoNote(_path);
 
             using var stream = File.OpenRead(produce(_path, Texts()));
-            Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+            if (CropVideoNotes || _type != MediaType.Round)
+                Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+            else
+                Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+
             Log($@"{Title} >> {Log_VIDEO} >> TIME: {_watch.CheckElapsed()}");
         }
 

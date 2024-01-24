@@ -29,5 +29,7 @@ namespace Witlesss.Commands.Meme
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.DeepFryVideo);
 
         protected override int GetMemeText(string text) => 0;
+
+        protected override bool CropVideoNotes { get; } = false;
     }
 }

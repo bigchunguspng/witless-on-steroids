@@ -14,8 +14,6 @@ namespace Witlesss.Commands
         // input: /xd [search query] [subreddit*] [-ops]
         protected override void ExecuteAuthorized()
         {
-            if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
-
             var input = TextWithoutBotUsername;
 
             var que = _que.Match(input);

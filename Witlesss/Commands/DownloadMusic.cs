@@ -17,8 +17,6 @@ namespace Witlesss.Commands
         // input: /song[options] URL [artist - ][title]
         public override void Run()
         {
-            if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
-
             var text = Text;
             var reply = Message.ReplyToMessage;
             if (reply is { Text: { } t } && !text.Contains("http") && t.StartsWith("http"))

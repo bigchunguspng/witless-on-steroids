@@ -32,8 +32,6 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         // input: /w search query [subreddit*] [-ops]   (ops: -h/-n/-t/-c/-ta/...)
         public override void Run()
         {
-            if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
-
             var input = TextWithoutBotUsername;
 
             if (Message.ReplyToMessage is { Text: { } t } message && IsCommand(t, "/w"))

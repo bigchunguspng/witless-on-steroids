@@ -21,5 +21,7 @@ namespace Witlesss.Commands.Editing
         protected override string Manual { get; } = STICK_MANUAL;
 
         protected override bool MessageContainsFile(Message m) => GetPhotoFileID(m);
+
+        protected override bool ChatIsBanned() => false;
     }
 }

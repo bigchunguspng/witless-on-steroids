@@ -26,8 +26,6 @@ namespace Witlesss.Commands
         // /board [thread/archive/archive link]
         protected override void ExecuteAuthorized()
         {
-            if (Bot.ThorRagnarok.ChatIsBanned(Chat)) return;
-
             if (Text.StartsWith("/boards"))
             {
                 if (Text.EndsWith(" info")) SendSavedList(Chat, 0, 25);

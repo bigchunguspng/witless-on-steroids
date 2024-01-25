@@ -20,9 +20,11 @@ namespace Witlesss.Commands.Editing
 
             _speed = Text.HasDoubleArgument(out var x) ? _mode == Fast ? ClampFast(x) : ClampSlow(x) : 2D;
 
+            if (_mode == Slow) _speed = 1 / _speed;
+
             Bot.Download(FileID, Chat, out var path, out var type);
 
-            var result = Memes.ChangeSpeed(path, _speed, _mode);
+            var result = Memes.ChangeSpeed(path, _speed);
             SendResult(result, type);
             Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 

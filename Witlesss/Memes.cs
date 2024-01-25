@@ -120,7 +120,7 @@ namespace Witlesss
 
         public static string DeepFryVideo(string path, int _ = 0)
         {
-            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path)), Quality).Output_WEBM_safe("-DF");
+            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path)), Quality).Output_WEBM_safe("-Nuked");
         }
 
 
@@ -139,26 +139,13 @@ namespace Witlesss
         }
 
 
-        public static string ChangeSpeed(string path, double speed, SpeedMode mode)
-        {
-            if (mode == SpeedMode.Slow) speed = 1 / speed;
-            
-            Log($"SPEED >> {FormatDouble(speed)}", ConsoleColor.Blue);
+        public static string ChangeSpeed  (string path, double speed) => new F_Process(path).ChangeSpeed(speed).Output_WEBM_safe("-Speed");
+        public static string RemoveBitrate(string path, int      crf) => new F_Process(path).Compress(crf).Output_WEBM_safe("-DAMN");
 
-            return new F_Process(path).ChangeSpeed(speed).Output_WEBM_safe("-S");
-        }
-
-        public static string RemoveBitrate(string path, int crf)
-        {
-            Log($"DAMN >> {crf}", ConsoleColor.Blue);
-
-            return new F_Process(path).Compress(crf).Output_WEBM_safe("-DAMN");
-        }
-        
         public static string Sus(string path, CutSpan s) => new F_Cut(path, s).Sus().Output_WEBM_safe("-Sus");
         public static string Cut(string path, CutSpan s) => new F_Cut(path, s).Cut().Output_WEBM_safe("-Cut");
 
-        public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-RVR");
+        public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
         public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
@@ -166,7 +153,7 @@ namespace Witlesss
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");
         public static string Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
-        public static string Scale         (string path, string[] args) => new F_Process(path).ScaleVideo(args).Output("-s");
+        public static string Scale         (string path, string[] args) => new F_Process(path).ScaleVideo(args).Output("-scale");
         public static string ChangeVolume  (string path, string   arg ) => new F_Process(path).ChangeVolume(arg).Output("-vol");
         public static string EQ            (string path, double[] args) => new F_Process(path).EQ(args).Output("-EQ");
         public static string Edit          (string path, string options, string extension)

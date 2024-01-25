@@ -130,18 +130,22 @@ namespace Witlesss.XD
             {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}, {"Ag", MediaType.Video}
         };
 
-        public static string SET_FREQUENCY_RESPONSE(int interval)
+        public static string SET_FREQUENCY_RESPONSE(int n)
         {
-            string a = XDDD(Texts.SET_FREQUENCY_RESPONSE);
-            if (interval % 10 > 4 || interval % 10 == 0 || interval is > 10 and < 15)
-                a = $"{a} каждые {interval} сообщений";
-            else if (interval % 10 > 1)
-                a = $"{a} каждые {interval} сообщения";
-            else if (interval == 1)
-                a = $"{a} каждое ваше сообщение";
-            else
-                a = $"{a} каждое {interval} сообщение";
-            return a;
+            var a = XDDD(Texts.SET_FREQUENCY_RESPONSE);
+            var oe = ED(n, "ое", "ые", "ые");
+            var  e = ED(n,  "е",  "я",  "й");
+            return $"{a} кажд{oe} {(n == 1 ? "ваше" : n)} сообщени{e}";
+        }
+
+        public static string HOURS_ED(int hours) => ED(hours, "", "а", "ов");
+        public static string  MINS_ED(int  mins) => ED(mins, "у", "ы", "");
+
+        private static string ED(int x, string one, string twoFour, string any)
+        {
+            if (x % 10 > 4 || x % 10 == 0 || x is > 10 and < 15) return any;
+            else if (x % 10 > 1)                                 return twoFour;
+            else                                                 return one;
         }
 
         private static readonly Regex _lat = new(@"[A-Za-z]+");
@@ -190,7 +194,7 @@ namespace Witlesss.XD
             "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "еду скачивать музон 🛒", "принял👌", "ваш заказ принят 🥸"
         };
 
-        private static readonly string[] RANDOM_EMOJI =
+        public static readonly string[] RANDOM_EMOJI =
         {
             "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
             "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉", "🎻"

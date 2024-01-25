@@ -14,10 +14,11 @@ namespace Witlesss.Services.Technical
             WriteTime();
         }
 
-        public void   WriteTime() => _time  = DateTime.Now;
+        public void      WriteTime() => _time = DateTime.Now;
+        public TimeSpan GetElapsed() => DateTime.Now - _time;
         public string CheckElapsed()
         {
-            var time = DateTime.Now - _time;
+            var time = GetElapsed();
             return time.Minutes > 1 ? $"{time:m' MINS'}" : $@"{time:s\.fff's'}";
         }
     }

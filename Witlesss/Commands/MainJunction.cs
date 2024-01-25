@@ -54,6 +54,10 @@ namespace Witlesss.Commands
         private readonly DeleteDictionary _delete = new();
         private readonly WitlessMainJunction _witless;
         private readonly MemeProcessors _mematics;
+        private readonly Stopwatch _watch = new();
+
+        private long _lastChat;
+        private int   _annoyed;
 
         public MainJunction()
         {
@@ -76,6 +80,8 @@ namespace Witlesss.Commands
 
         public override void Run()
         {
+            _watch.WriteTime();
+
             if (Bot.WitlessExist(Chat))
             {
                 _witless.Run();
@@ -86,6 +92,16 @@ namespace Witlesss.Commands
 
                 if (ChatIsPrivate || Text.Contains(Config.BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
             }
+
+            SuspectForLongHangs(_watch.GetElapsed());
+        }
+
+        private void SuspectForLongHangs(TimeSpan time)
+        {
+            var hang = time.Seconds > 5;
+            _annoyed = hang && _lastChat == Chat ? _annoyed + 1 : 1;
+            if (hang) Bot.ThorRagnarok.Suspect(Chat, time * _annoyed);
+            _lastChat = Chat;
         }
 
         private bool DoSimpleCommands(string command)
@@ -112,8 +128,7 @@ namespace Witlesss.Commands
             else if (CommandIs( "/link"   )) _sc = _link;
             else if (CommandIs( "/piece"  )) _sc = _piece;
             else if (CommandIs( "/ff"     )) _sc = _edit;
-            else                                          return false;
-            if      (Bot.ThorRagnarok.ChatIsBanned(Chat)) return false;
+            else return false;
 
             _sc.Run();
 

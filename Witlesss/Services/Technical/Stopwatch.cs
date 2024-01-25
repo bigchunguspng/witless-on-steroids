@@ -16,10 +16,6 @@ namespace Witlesss.Services.Technical
 
         public void      WriteTime() => _time = DateTime.Now;
         public TimeSpan GetElapsed() => DateTime.Now - _time;
-        public string CheckElapsed()
-        {
-            var time = GetElapsed();
-            return time.Minutes > 1 ? $"{time:m' MINS'}" : $@"{time:s\.fff's'}";
-        }
+        public string CheckElapsed() => FormatTime(GetElapsed());
     }
 }

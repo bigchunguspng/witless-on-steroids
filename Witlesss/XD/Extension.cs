@@ -69,6 +69,10 @@ namespace Witlesss.XD
         }
         
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
+        public static string FormatTime(TimeSpan t)
+        {
+            return t.Minutes > 1 ? $"{t:m' MINS'}" : t.Minutes > 0 ? $@"{t:m' MIN 's\.fff's'}" : $@"{t:s\.fff's'}";
+        }
 
         public static string Quote(string s) => $@"""{s}""";
 

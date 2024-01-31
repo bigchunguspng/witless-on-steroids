@@ -112,7 +112,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract T GetMemeText(string text);
         private T Texts() => GetMemeText(RemoveCommand(GetTextUnlessItsReposted()));
 
-        private string GetTextUnlessItsReposted() => Message.ForwardFromChat is null ? Text : null;
+        private string GetTextUnlessItsReposted()
+        {
+            return Message.ForwardFromChat is null && Baka.Meme.Chance == 100 ? Text : null;
+        }
 
         protected string GetDummy(out bool empty) => GetDummy(out empty, out _);
         protected string GetDummy(out bool empty, out string command)

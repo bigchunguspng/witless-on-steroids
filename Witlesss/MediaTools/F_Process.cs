@@ -79,7 +79,7 @@ namespace Witlesss.MediaTools
             // https://ffmpeg.org/ffmpeg-filters.html#vignette-1
 
             // PIXELIZE
-            if (IsOneIn(4))
+            if (IsOneIn(isVideo ? 4 : 8))
             {
                 var i = MediaInfo();
                 var p = Math.Max(2, Math.Min(i.v.Width, i.v.Height) / RandomInt(60, 120));

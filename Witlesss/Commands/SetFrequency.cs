@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
@@ -24,8 +23,8 @@ namespace Witlesss.Commands
                 var w = args[1];
                 if      (Regex.IsMatch(w, @"^[MmМм]"))       Set(x => Baka.Meme.OptionsM = x, MemeType.Meme, "/meme");
                 else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))   Set(x => Baka.Meme.OptionsT = x, MemeType.Top, "/top");
-                else if (Regex.IsMatch(w, @"^[DdДд]"))       Set(x => Baka.Meme.OptionsD = x, MemeType.Dp, "/dp");
                 else if (Regex.IsMatch(w, @"^[DdДд][GgГг]")) Set(x => Baka.Meme.OptionsG = x, MemeType.Dg, "/dg");
+                else if (Regex.IsMatch(w, @"^[DdДд]"))       Set(x => Baka.Meme.OptionsD = x, MemeType.Dp, "/dp");
                 else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))   Set(x => Baka.Meme.OptionsN = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 

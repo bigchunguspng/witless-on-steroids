@@ -110,12 +110,15 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         }
 
         protected abstract T GetMemeText(string text);
-        private T Texts() => GetMemeText(RemoveCommand(GetTextUnlessItsReposted()));
+        private T Texts() => GetMemeText(RemoveCommand(GetTextOrNull()));
 
-        private string GetTextUnlessItsReposted()
+        private string GetTextOrNull()
         {
-            return _cmd.IsMatch(Text) || Message.ForwardFromChat is null && Baka.Meme.Chance == 100 ? Text : null;
+            return TextStartsWithCommand() || MessageIsNotReposted() && Baka.Meme.Chance == 100 ? Text : null;
         }
+
+        private bool TextStartsWithCommand() => Text != null && _cmd.IsMatch(Text);
+        private bool  MessageIsNotReposted() => Message.ForwardFromChat is null;
 
         protected string GetDummy(out bool empty) => GetDummy(out empty, out _);
         protected string GetDummy(out bool empty, out string command)
@@ -176,9 +179,9 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         private int GetRepeats(bool hasToBeRepeated)
         {
             var repeats = 1;
-            var dummy = GetDummy(out _);
             if (hasToBeRepeated)
             {
+                var dummy = GetDummy(out _);
                 var match = _repeat.Match(dummy);
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }

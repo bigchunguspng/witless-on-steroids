@@ -114,7 +114,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         private string GetTextUnlessItsReposted()
         {
-            return Message.ForwardFromChat is null && Baka.Meme.Chance == 100 ? Text : null;
+            return _cmd.IsMatch(Text) || Message.ForwardFromChat is null && Baka.Meme.Chance == 100 ? Text : null;
         }
 
         protected string GetDummy(out bool empty) => GetDummy(out empty, out _);

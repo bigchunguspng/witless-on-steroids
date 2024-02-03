@@ -17,6 +17,8 @@ public class Slice : VideoCommand
         Bot.RunSafelyAsync(new SliceAsync(SnapshotMessageData(), FileID).RunAsync(), Chat, -1);
     }
 
+    protected override string Manual { get; } = SLICE_MANUAL;
+
     protected override bool MessageContainsFile(Message m)
     {
         return GetVideoFileID(m) || GetAudioFileID(m) || GetVideoURL(m);

@@ -834,6 +834,23 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
+        ///
+        ///• видео 🎬, гифками 📺
+        ///• видео-стикерами 🎥
+        ///• музыкой 🎧, wav-файлами🥭
+        ///• кружками 📹, голосовыми🎙
+        ///• ссылками на видео📎
+        ///
+        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
+        /// </summary>
+        internal static string SLICE_MANUAL {
+            get {
+                return ResourceManager.GetString("SLICE_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Как скачивать музыку с ютуба:&lt;/u&gt;&lt;/b&gt;
         ///
         ///Пишешь &lt;code&gt;/song *ссылка*&lt;/code&gt;, и ждешь...

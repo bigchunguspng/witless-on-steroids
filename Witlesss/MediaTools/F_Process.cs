@@ -266,17 +266,16 @@ namespace Witlesss.MediaTools
             var minutes = seconds / 60;
 
             var timecodes = new List<(double A, double B)>();
-            var head = -60d;
+            var head = -seconds / 2;
             while (head < seconds)
             {
-                var step =
+                var step = IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 6 : seconds < 60 ? 4 : 2, 10) ? -1d : 1d;
+                step *=
                       seconds <  5 ? RandomDouble(seconds / 20, seconds / 10)
                     : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : seconds / 15
                     : seconds < 60 ? IsOneIn(5) ? RandomInt(2, 10) : 5
                     : minutes <  5 ? IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 30) : RandomInt(1, 5) :  5
-                    :                IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 60) : RandomInt(1, 5) : 10;
-
-                if (IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 6 : seconds < 60 ? 4 : 2, 10)) step = -step;
+                    :                IsOneIn(2) ? IsOneIn(2) ? BigLeap()         : RandomInt(1, 5) : 10;
 
                 var length = seconds < 5
                     ? RandomDouble(0.15, 0.35)
@@ -290,11 +289,17 @@ namespace Witlesss.MediaTools
                 timecodes.Add((a, b));
 
                 head = b;
+
+                double BigLeap()
+                {
+                    var avg = Math.Min(seconds + head, 2 * seconds - head);
+                    return step * RandomInt(10, Math.Max(10, (int)(0.1 * avg)));
+                }
             }
 
-            if (timecodes.Count > 48)
+            if (timecodes.Count > 36)
             {
-                var count = (int)Math.Round(timecodes.Count / 36d);
+                var count = (int)Math.Ceiling(timecodes.Count / 36d);
                 var take = timecodes.Count / count + 1;
                 var parts = new string[count];
 

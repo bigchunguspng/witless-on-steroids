@@ -148,6 +148,7 @@ namespace Witlesss
         public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
+        public static string Slice         (string path) => new F_Process(path).SliceRandom().Output("-slices", Path.GetExtension(path));
         public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
         public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");

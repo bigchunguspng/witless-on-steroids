@@ -12,8 +12,7 @@ namespace Witlesss
     public class TelegramUpdateHandler : IUpdateHandler
     {
         private readonly CallBackHandlingCommand _command;
-        private readonly Regex _ffmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
-        
+
         public TelegramUpdateHandler(CallBackHandlingCommand command) => _command = command;
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -43,7 +42,7 @@ namespace Witlesss
             {
                 LogError($"{Command.LastChat.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
 
-                if (_ffmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(message.Chat.Id, e);
+                if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(message.Chat.Id, e);
             }
 
             return Task.CompletedTask;

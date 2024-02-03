@@ -154,7 +154,9 @@ namespace Witlesss
             catch (Exception e)
             {
                 LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
-                EditMessage(chat, message, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
+
+                if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(chat, e);
+                if (message > 0) EditMessage(chat, message, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
             }
         }
         

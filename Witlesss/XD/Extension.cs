@@ -11,6 +11,7 @@ namespace Witlesss.XD
     {
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
         public  static readonly Regex PngJpg = new("(.png)|(.jpg)"), EmojiRegex = new (REGEX_EMOJI);
+        public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
         
         public static readonly Random Random = new();
@@ -19,6 +20,16 @@ namespace Witlesss.XD
         {
             if (text == null) return initialTime;
             return Math.Min(text.Length, 120) * 25;
+        }
+
+        public static bool IsOneIn         (int x) => Random.Next(x) == 0;
+        public static bool IsFirstOf(int a, int b) => Random.Next(a + b) < a;
+
+        public static int    RandomInt   (int    min, int    max) => Random.Next(min, max + 1);
+        public static double RandomDouble(double min, double max)
+        {
+            var k = 10_000d;
+            return RandomInt((int)(min * k), (int)(max * k)) / k;
         }
 
         public static string ToRandomLetterCase(this string text) => ToLetterCase(text, RandomLetterCase());
@@ -195,7 +206,11 @@ namespace Witlesss.XD
         };
         public static readonly string[] PLS_WAIT_RESPONSE =
         {
-            "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "еду скачивать музон 🛒", "принял👌", "ваш заказ принят 🥸"
+            "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "принял👌", "ваш заказ принят 🥸", "еду скачивать музон 🛒"
+        };
+        public static readonly string[] PROCESSING_RESPONSE =
+        {
+            "идёт обработка...", "вжжжжж...", "брррррр..."
         };
 
         public static readonly string[] RANDOM_EMOJI =

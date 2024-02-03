@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -169,15 +170,7 @@ namespace Witlesss.MediaTools
             o.WithQscale(factor).WithCustomArgument(sb.ToString());
 
 
-            bool IsOneIn(int x) => Extension.Random.Next(x) == 0;
-
-            int    RandomInt   (int    min, int    max) => Extension.Random.Next(min, max + 1);
-            string RandomDouble(double min, double max)
-            {
-                var k = 10_000d;
-                var x = RandomInt((int)(min * k), (int)(max * k)) / k;
-                return FormatDouble(x);
-            }
+            string RandomDouble(double min, double max) => FormatDouble(Extension.RandomDouble(min, max));
         }
 
         #endregion
@@ -255,6 +248,77 @@ namespace Witlesss.MediaTools
         {
             if (square) v.MakeSquare(640);
             else        v.Scale(640,  -1);
+        }
+
+        #endregion
+
+
+        #region OTHER
+
+        public F_Action SliceRandom() => ApplyEffects(SliceRandomArgs);
+
+        private void SliceRandomArgs(FFMpAO o)
+        {
+            var info = MediaInfo();
+            var seconds = info.video ? info.v.Duration.TotalSeconds : info.info.PrimaryAudioStream!.Duration.TotalSeconds;
+            var minutes = seconds / 60;
+
+            var timecodes = new List<(double A, double B)>();
+            var head = -60d;
+            while (head < seconds) // + stop on 1 minute
+            {
+                var step =
+                      seconds <  5 ? RandomDouble(seconds / 20, seconds / 10)
+                    : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : 2
+                    : seconds < 60 ? IsOneIn(5) ? RandomInt(2, 10) : 5
+                    : minutes <  5 ? IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 30) : RandomInt(1, 5) :  5
+                    :                IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 60) : RandomInt(1, 5) : 10;
+
+                if (IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 4 : 2, 10)) step = -step;
+
+                var length = seconds < 5
+                    ? RandomDouble(0.15, 0.35)
+                    : RandomDouble(0.25, Math.Min(0.35 + 0.005 * seconds, 1.25));
+
+                var a = Math.Clamp(head + step, 0, seconds - 0.15);
+                var b = Math.Min(a + length, seconds);
+
+                timecodes.Add((a, b));
+
+                head = b;
+            }
+
+            var sb = new StringBuilder("-filter_complex \"");
+            for (var i = 0; i < timecodes.Count; i++)
+            {
+                var time = timecodes[i];
+
+                if (info.video)
+                {
+                    sb.Append( "[0:v]trim=");
+                    AppendTimecodes();
+                    sb.Append( ",setpts=PTS-STARTPTS[v").Append(i).Append("];");
+                }
+                if (info.audio)
+                {
+                    sb.Append("[0:a]atrim=");
+                    AppendTimecodes();
+                    sb.Append(",asetpts=PTS-STARTPTS[a").Append(i).Append("];");
+                }
+
+                void AppendTimecodes() => sb.Append(Format(time.A)).Append(':').Append(Format(time.B));
+                string Format(double x) => FormatDouble(Math.Round(x, 3));
+            }
+            for (var i = 0; i < timecodes.Count; i++)
+            {
+                if (info.video) sb.Append("[v").Append(i).Append(']');
+                if (info.audio) sb.Append("[a").Append(i).Append(']');
+            }
+            sb.Append("concat=n=").Append(timecodes.Count);
+            sb.Append(":v=").Append(info.video ? 1 : 0);
+            sb.Append(":a=").Append(info.audio ? 1 : 0).Append('"');
+
+            o.WithCustomArgument(sb.ToString());
         }
 
         #endregion

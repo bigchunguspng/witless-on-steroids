@@ -152,7 +152,7 @@ public class DownloadMusicTask
         }
     }
 
-    private static async Task RunCMD(string cmd, string directory)
+    public static async Task RunCMD(string cmd, string directory)
     {
         var process = new Process()
         {

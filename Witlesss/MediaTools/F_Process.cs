@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using FFMpegCore.Arguments;
@@ -266,7 +267,7 @@ namespace Witlesss.MediaTools
 
             var timecodes = new List<(double A, double B)>();
             var head = -60d;
-            while (head < seconds) // + stop on 1 minute
+            while (head < seconds)
             {
                 var step =
                       seconds <  5 ? RandomDouble(seconds / 20, seconds / 10)
@@ -291,8 +292,53 @@ namespace Witlesss.MediaTools
                 head = b;
             }
 
+            if (timecodes.Count > 48)
+            {
+                var count = (int)Math.Round(timecodes.Count / 36d);
+                var take = timecodes.Count / count + 1;
+                var parts = new string[count];
+
+                Log($"SLICING LONG VIDEO!!! ({count} parts, {timecodes.Count} fragments)", ConsoleColor.Yellow);
+
+                for (var i = 0; i < count; i++)
+                {
+                    var offset = i * take;
+                    parts[i] = new F_Process(_input)
+                        .ApplyEffects(op => SliceRandomArgsPart(op, info, timecodes, offset, take))
+                        .Output($"-part-{i}", Path.GetExtension(_input));
+
+                    Log($"Part {i + 1} done!", ConsoleColor.Yellow);
+                }
+
+                var sb = new StringBuilder();
+                for (var i = 0; i < count; i++)
+                {
+                    sb.Append("-i \"").Append(parts[i]).Append("\" ");
+                }
+                sb.Append("-filter_complex \"");
+                for (var i = 1; i <= count; i++)
+                {
+                    if (info.video) sb.Append("[").Append(i).Append(":v]");
+                    if (info.audio) sb.Append("[").Append(i).Append(":a]");
+                }
+                sb.Append("concat=n=").Append(count);
+                sb.Append(":v=").Append(info.video ? 1 : 0);
+                sb.Append(":a=").Append(info.audio ? 1 : 0).Append('"');
+
+                o.WithCustomArgument(sb.ToString());
+            }
+            else
+            {
+                SliceRandomArgsPart(o, info, timecodes);
+            }
+        }
+
+        private void SliceRandomArgsPart(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0)
+        {
+            var count = take == 0 ? timecodes.Count : Math.Min(take, timecodes.Count - offset);
+
             var sb = new StringBuilder("-filter_complex \"");
-            for (var i = 0; i < timecodes.Count; i++)
+            for (var i = offset; i < offset + count; i++)
             {
                 var time = timecodes[i];
 
@@ -312,12 +358,12 @@ namespace Witlesss.MediaTools
                 void AppendTimecodes() => sb.Append(Format(time.A)).Append(':').Append(Format(time.B));
                 string Format(double x) => FormatDouble(Math.Round(x, 3));
             }
-            for (var i = 0; i < timecodes.Count; i++)
+            for (var i = offset; i < offset + count; i++)
             {
                 if (info.video) sb.Append("[v").Append(i).Append(']');
                 if (info.audio) sb.Append("[a").Append(i).Append(']');
             }
-            sb.Append("concat=n=").Append(timecodes.Count);
+            sb.Append("concat=n=").Append(count);
             sb.Append(":v=").Append(info.video ? 1 : 0);
             sb.Append(":a=").Append(info.audio ? 1 : 0).Append('"');
 

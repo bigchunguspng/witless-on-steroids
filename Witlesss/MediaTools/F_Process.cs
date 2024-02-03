@@ -260,7 +260,8 @@ namespace Witlesss.MediaTools
         private void SliceRandomArgs(FFMpAO o)
         {
             var info = MediaInfo();
-            var seconds = info.video ? info.v.Duration.TotalSeconds : info.info.PrimaryAudioStream!.Duration.TotalSeconds;
+            var soundOnly = info.audio && !info.video;
+            var seconds = info.video ? info.v.Duration.TotalSeconds : info.a.Duration.TotalSeconds;
             var minutes = seconds / 60;
 
             var timecodes = new List<(double A, double B)>();
@@ -269,16 +270,18 @@ namespace Witlesss.MediaTools
             {
                 var step =
                       seconds <  5 ? RandomDouble(seconds / 20, seconds / 10)
-                    : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : 2
+                    : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : seconds / 15
                     : seconds < 60 ? IsOneIn(5) ? RandomInt(2, 10) : 5
                     : minutes <  5 ? IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 30) : RandomInt(1, 5) :  5
                     :                IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 60) : RandomInt(1, 5) : 10;
 
-                if (IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 4 : 2, 10)) step = -step;
+                if (IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 6 : seconds < 60 ? 4 : 2, 10)) step = -step;
 
                 var length = seconds < 5
                     ? RandomDouble(0.15, 0.35)
-                    : RandomDouble(0.25, Math.Min(0.35 + 0.005 * seconds, 1.25));
+                    : RandomDouble(0.25, Math.Min(0.35 + 0.01 * seconds, 1.25));
+
+                if (soundOnly && minutes < 3) length *= RandomDouble(1.5, 3);
 
                 var a = Math.Clamp(head + step, 0, seconds - 0.15);
                 var b = Math.Min(a + length, seconds);

@@ -25,7 +25,7 @@ namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
             var audio = a is not null;
             var video = v is { AvgFrameRate: not double.NaN };
 
-            return new MediaInfo(info, audio, video, v);
+            return new MediaInfo(info, audio, video, v, a);
         }
         protected static void AddFixes(FFMpegArgumentOptions o, MediaInfo i)
         {
@@ -45,5 +45,5 @@ namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
         }
     }
 
-    public record MediaInfo(IMediaAnalysis info, bool audio, bool video, VideoStream v);
+    public record MediaInfo(IMediaAnalysis info, bool audio, bool video, VideoStream v, AudioStream a);
 }

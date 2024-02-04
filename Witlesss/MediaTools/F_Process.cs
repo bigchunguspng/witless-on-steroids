@@ -265,7 +265,7 @@ namespace Witlesss.MediaTools
             var seconds = info.video ? info.v.Duration.TotalSeconds : info.a.Duration.TotalSeconds;
             var minutes = seconds / 60;
 
-            var timecodes = new List<(double A, double B)>();
+            var timecodes = new List<TrimCode>();
             var head = -seconds / 2;
             while (head < seconds)
             {
@@ -286,7 +286,7 @@ namespace Witlesss.MediaTools
                 var a = Math.Clamp(head + step, 0, seconds - 0.15);
                 var b = Math.Min(a + length, seconds);
 
-                timecodes.Add((a, b));
+                timecodes.Add(new TrimCode(a, b));
 
                 head = b;
 
@@ -297,14 +297,14 @@ namespace Witlesss.MediaTools
                 }
             }
 
-            var onePiece = soundOnly || timecodes.Count <= 12;
+            var onePiece = soundOnly || minutes <= 5 && timecodes.Count <= 24;
             if (onePiece) ApplyTrims(o, info, timecodes);
             else    TrimPieceByPiece(o, info, timecodes, seconds);
         }
 
-        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, double seconds)
+        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
         {
-            var count = (int)Math.Ceiling(timecodes.Count / 12d);
+            var count = (int)Math.Ceiling(seconds / 210);
             var take = timecodes.Count / count + 1;
             var parts = new string[count];
             var codes = new double[count];
@@ -358,7 +358,7 @@ namespace Witlesss.MediaTools
             o.WithCustomArgument(sb.ToString());
         }
 
-        private void ApplyTrims(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0, double start = 0)
+        private void ApplyTrims(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, int offset = 0, int take = 0, double start = 0)
         {
             var count = take == 0 ? timecodes.Count : Math.Min(take, timecodes.Count - offset);
 
@@ -395,6 +395,8 @@ namespace Witlesss.MediaTools
         }
         
         private string Format(double x) => FormatDouble(Math.Round(x, 3));
+
+        private record TrimCode(double A, double B);
 
         #endregion
     }

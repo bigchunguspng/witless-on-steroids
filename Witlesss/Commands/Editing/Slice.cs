@@ -56,7 +56,7 @@ public class SliceAsync
     public async Task RunAsync()
     {
         string path;
-        var wait = -1;
+        int wait;
         var type = MediaType.Video;
         if (FileID.StartsWith("http"))
         {
@@ -72,14 +72,18 @@ public class SliceAsync
         else
         {
             Bot.Download(FileID, Chat, out path, out type);
+
+            wait = Bot.PingChat(Chat, XDDD(Pick(PROCESSING_RESPONSE)));
         }
+
+        await Task.Delay(10); // we need this method to run asynchronously in both scenarios
 
         var result = Memes.Slice(path);
 
-        if (wait > 0) Task.Run(() => Bot.DeleteMessage(Chat, wait));
+        Task.Run(() => Bot.DeleteMessage(Chat, wait));
 
         SendResult(result, type);
-        Log($"{Title} >> SLICED [-/~]");
+        Log($"{Title} >> SLICED [~/~]");
     }
 
     private void SendResult(string result, MediaType type)

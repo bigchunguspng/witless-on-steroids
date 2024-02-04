@@ -141,7 +141,8 @@ namespace Witlesss
         public static string Slice(string path)
         {
             var extension = Path.GetExtension(path);
-            if (extension == ".mp4" || extension == ".webm")
+            var video = extension == ".mp4" || extension == ".webm";
+            if (video)
             {
                 var size = GetSize(path);
                 var fits = FitSize(size, 720);
@@ -150,7 +151,7 @@ namespace Witlesss
                     path = Scale(path, new[] { fits.Width.ToString(), fits.Height.ToString() });
                 }
             }
-            return new F_Process(path).SliceRandom().Output("-slices", Path.GetExtension(path));
+            return new F_Process(path).SliceRandom().Output("-slices", video ? ".mp4" : ".mp3");
         }
 
         public static string ChangeSpeed  (string path, double speed) => new F_Process(path).ChangeSpeed(speed).Output_WEBM_safe("-Speed");

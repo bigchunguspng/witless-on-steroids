@@ -299,28 +299,50 @@ namespace Witlesss.MediaTools
 
             var onePiece = soundOnly || timecodes.Count <= 12;
             if (onePiece) ApplyTrims(o, info, timecodes);
-            else    TrimPieceByPiece(o, info, timecodes);
+            else    TrimPieceByPiece(o, info, timecodes, seconds);
         }
 
-        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes)
+        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, double seconds)
         {
             var count = (int)Math.Ceiling(timecodes.Count / 12d);
             var take = timecodes.Count / count + 1;
             var parts = new string[count];
+            var codes = new double[count];
 
             Log($"SLICING LONG VIDEO!!! ({count} parts, {timecodes.Count} trims)", ConsoleColor.Yellow);
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++) // split video into chunks
+            {
+                var index = i;
+                var indexOff = i * take;
+                var indexMax = Math.Min(timecodes.Count - 1, indexOff + take + 1);
+                var a = Math.Max(timecodes[indexOff].A - 10, 0);
+                var b = Math.Min(timecodes[indexMax].B + 5, seconds);
+
+                codes[i] = a;
+                parts[i] = new F_Process(_input).ApplyEffects(ops =>
+                {
+                    var builder = new StringBuilder("-c copy ");
+                    if (index > 0)         builder.Append("-ss ").Append(Format(a)).Append(' ');
+                    if (index + 1 < count) builder.Append("-to ").Append(Format(b));
+
+                    ops.WithCustomArgument(builder.ToString());
+                }).Output($"-part-{i}", Path.GetExtension(_input));
+            }
+
+            for (var i = 0; i < count; i++) // slice each chunk
             {
                 var offset = i * take;
-                parts[i] = new F_Process(_input)
-                    .ApplyEffects(ops => ApplyTrims(ops, info, timecodes, offset, take))
-                    .Output($"-part-{i}", Path.GetExtension(_input));
+                var start = codes[i];
+                parts[i] = new F_Process(parts[i]).ApplyEffects(ops =>
+                {
+                    ApplyTrims(ops, info, timecodes, offset, take, start);
+                }).Output("-slices", Path.GetExtension(_input));
 
                 Log($"PART {i + 1} >> DONE", ConsoleColor.Yellow);
             }
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(); // combine the results
             for (var i = 0; i < count; i++)
             {
                 sb.Append("-i \"").Append(parts[i]).Append("\" ");
@@ -336,7 +358,7 @@ namespace Witlesss.MediaTools
             o.WithCustomArgument(sb.ToString());
         }
 
-        private void ApplyTrims(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0)
+        private void ApplyTrims(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0, double start = 0)
         {
             var count = take == 0 ? timecodes.Count : Math.Min(take, timecodes.Count - offset);
 
@@ -349,11 +371,10 @@ namespace Witlesss.MediaTools
                 void AppendTrimming(char av, string a)
                 {
                     sb.Append("[0:").Append(av).Append(']').Append(a).Append("trim=");
-                    sb.Append(Format(timecodes[i].A)).Append(':');
-                    sb.Append(Format(timecodes[i].B));
+                    sb.Append(Format(timecodes[i].A - start)).Append(':');
+                    sb.Append(Format(timecodes[i].B - start));
                     sb.Append(',').Append(a).Append("setpts=PTS-STARTPTS[").Append(av).Append(i).Append("];");
                 }
-                string Format(double x) => FormatDouble(Math.Round(x, 3));
             }
             for (var i = offset; i < offset + count; i++)
             {
@@ -372,6 +393,8 @@ namespace Witlesss.MediaTools
             sb.Append(":a=").Append(info.audio ? 1 : 0);
             return sb;
         }
+        
+        private string Format(double x) => FormatDouble(Math.Round(x, 3));
 
         #endregion
     }

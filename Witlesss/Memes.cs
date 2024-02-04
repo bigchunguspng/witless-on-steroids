@@ -138,6 +138,20 @@ namespace Witlesss
             }
         }
 
+        public static string Slice(string path)
+        {
+            var extension = Path.GetExtension(path);
+            if (extension == ".mp4" || extension == ".webm")
+            {
+                var size = GetSize(path);
+                var fits = FitSize(size, 720);
+                if (size != fits)
+                {
+                    path = Scale(path, new[] { fits.Width.ToString(), fits.Height.ToString() });
+                }
+            }
+            return new F_Process(path).SliceRandom().Output("-slices", Path.GetExtension(path));
+        }
 
         public static string ChangeSpeed  (string path, double speed) => new F_Process(path).ChangeSpeed(speed).Output_WEBM_safe("-Speed");
         public static string RemoveBitrate(string path, int      crf) => new F_Process(path).Compress(crf).Output_WEBM_safe("-DAMN");
@@ -148,7 +162,6 @@ namespace Witlesss
         public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
-        public static string Slice         (string path) => new F_Process(path).SliceRandom().Output("-slices", Path.GetExtension(path));
         public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
         public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");

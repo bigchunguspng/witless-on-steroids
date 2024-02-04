@@ -297,13 +297,14 @@ namespace Witlesss.MediaTools
                 }
             }
 
-            if (timecodes.Count <= 32) ApplyTrims(o, info, timecodes);
-            else                 TrimPieceByPiece(o, info, timecodes);
+            var onePiece = soundOnly || timecodes.Count <= 12;
+            if (onePiece) ApplyTrims(o, info, timecodes);
+            else    TrimPieceByPiece(o, info, timecodes);
         }
 
         private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes)
         {
-            var count = (int)Math.Ceiling(timecodes.Count / 32d);
+            var count = (int)Math.Ceiling(timecodes.Count / 12d);
             var take = timecodes.Count / count + 1;
             var parts = new string[count];
 
@@ -316,7 +317,7 @@ namespace Witlesss.MediaTools
                     .ApplyEffects(ops => ApplyTrims(ops, info, timecodes, offset, take))
                     .Output($"-part-{i}", Path.GetExtension(_input));
 
-                Log($"Part {i + 1} done!", ConsoleColor.Yellow);
+                Log($"PART {i + 1} >> DONE", ConsoleColor.Yellow);
             }
 
             var sb = new StringBuilder();

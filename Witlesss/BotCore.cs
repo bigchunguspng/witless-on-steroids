@@ -122,7 +122,7 @@ namespace Witlesss
             TrySend(task, chat, "message", "delete");
         }
 
-        private static void TrySend(Task task, long chat, string what, string action = "send")
+        private static void TrySend(Task task, long chat, string what, string action = "send", int patience = 5)
         {
             try
             {
@@ -133,8 +133,8 @@ namespace Witlesss
             {
                 var reason = FixedErrorMessage(e.Message);
                 LogError($"{chat} >> Can't {action} {what} --> " + reason);
-                if (reason.Contains("Server Error"))
-                    TrySend(task, chat, what, action);
+                if (reason.Contains("Server Error") && patience > 0)
+                    TrySend(task, chat, what, action, patience - 1);
             }
         }
         

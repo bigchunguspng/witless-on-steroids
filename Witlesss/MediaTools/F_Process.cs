@@ -297,7 +297,7 @@ namespace Witlesss.MediaTools
                 }
             }
 
-            var onePiece = soundOnly || minutes <= 5 && timecodes.Count <= 24;
+            var onePiece = soundOnly || minutes <= 2 || minutes <= 5 && timecodes.Count <= 24;
             if (onePiece) ApplyTrims(o, info, timecodes);
             else    TrimPieceByPiece(o, info, timecodes, seconds);
         }

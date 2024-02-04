@@ -131,7 +131,10 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't {action} {what} --> " + FixedErrorMessage(e.Message));
+                var reason = FixedErrorMessage(e.Message);
+                LogError($"{chat} >> Can't {action} {what} --> " + reason);
+                if (reason.Contains("Server Error"))
+                    TrySend(task, chat, what, action);
             }
         }
         

@@ -297,70 +297,61 @@ namespace Witlesss.MediaTools
                 }
             }
 
-            if (timecodes.Count > 36)
-            {
-                var count = (int)Math.Ceiling(timecodes.Count / 36d);
-                var take = timecodes.Count / count + 1;
-                var parts = new string[count];
-
-                Log($"SLICING LONG VIDEO!!! ({count} parts, {timecodes.Count} fragments)", ConsoleColor.Yellow);
-
-                for (var i = 0; i < count; i++)
-                {
-                    var offset = i * take;
-                    parts[i] = new F_Process(_input)
-                        .ApplyEffects(op => SliceRandomArgsPart(op, info, timecodes, offset, take))
-                        .Output($"-part-{i}", Path.GetExtension(_input));
-
-                    Log($"Part {i + 1} done!", ConsoleColor.Yellow);
-                }
-
-                var sb = new StringBuilder();
-                for (var i = 0; i < count; i++)
-                {
-                    sb.Append("-i \"").Append(parts[i]).Append("\" ");
-                }
-                sb.Append("-filter_complex \"");
-                for (var i = 1; i <= count; i++)
-                {
-                    if (info.video) sb.Append("[").Append(i).Append(":v]");
-                    if (info.audio) sb.Append("[").Append(i).Append(":a]");
-                }
-                sb.Append("concat=n=").Append(count);
-                sb.Append(":v=").Append(info.video ? 1 : 0);
-                sb.Append(":a=").Append(info.audio ? 1 : 0).Append('"');
-
-                o.WithCustomArgument(sb.ToString());
-            }
-            else
-            {
-                SliceRandomArgsPart(o, info, timecodes);
-            }
+            if (timecodes.Count <= 32) ApplyTrims(o, info, timecodes);
+            else                 TrimPieceByPiece(o, info, timecodes);
         }
 
-        private void SliceRandomArgsPart(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0)
+        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes)
+        {
+            var count = (int)Math.Ceiling(timecodes.Count / 32d);
+            var take = timecodes.Count / count + 1;
+            var parts = new string[count];
+
+            Log($"SLICING LONG VIDEO!!! ({count} parts, {timecodes.Count} trims)", ConsoleColor.Yellow);
+
+            for (var i = 0; i < count; i++)
+            {
+                var offset = i * take;
+                parts[i] = new F_Process(_input)
+                    .ApplyEffects(ops => ApplyTrims(ops, info, timecodes, offset, take))
+                    .Output($"-part-{i}", Path.GetExtension(_input));
+
+                Log($"Part {i + 1} done!", ConsoleColor.Yellow);
+            }
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < count; i++)
+            {
+                sb.Append("-i \"").Append(parts[i]).Append("\" ");
+            }
+            sb.Append("-filter_complex \"");
+            for (var i = 1; i <= count; i++)
+            {
+                if (info.video) sb.Append("[").Append(i).Append(":v]");
+                if (info.audio) sb.Append("[").Append(i).Append(":a]");
+            }
+            AppendConcatenation(sb, count, info).Append('"');
+
+            o.WithCustomArgument(sb.ToString());
+        }
+
+        private void ApplyTrims(FFMpAO o, MediaInfo info, List<(double A, double B)> timecodes, int offset = 0, int take = 0)
         {
             var count = take == 0 ? timecodes.Count : Math.Min(take, timecodes.Count - offset);
 
             var sb = new StringBuilder("-filter_complex \"");
             for (var i = offset; i < offset + count; i++)
             {
-                var time = timecodes[i];
+                if (info.video) AppendTrimming('v', "");
+                if (info.audio) AppendTrimming('a', "a");
 
-                if (info.video)
+                void AppendTrimming(char av, string a)
                 {
-                    sb.Append( "[0:v]trim=");
-                    AppendTimecodes();
-                    sb.Append( ",setpts=PTS-STARTPTS[v").Append(i).Append("];");
+                    sb.Append("[0:").Append(av).Append(']').Append(a).Append("trim=");
+                    sb.Append(Format(timecodes[i].A)).Append(':');
+                    sb.Append(Format(timecodes[i].B));
+                    sb.Append(',').Append(a).Append("setpts=PTS-STARTPTS[").Append(av).Append(i).Append("];");
                 }
-                if (info.audio)
-                {
-                    sb.Append("[0:a]atrim=");
-                    AppendTimecodes();
-                    sb.Append(",asetpts=PTS-STARTPTS[a").Append(i).Append("];");
-                }
-
-                void AppendTimecodes() => sb.Append(Format(time.A)).Append(':').Append(Format(time.B));
                 string Format(double x) => FormatDouble(Math.Round(x, 3));
             }
             for (var i = offset; i < offset + count; i++)
@@ -368,11 +359,17 @@ namespace Witlesss.MediaTools
                 if (info.video) sb.Append("[v").Append(i).Append(']');
                 if (info.audio) sb.Append("[a").Append(i).Append(']');
             }
-            sb.Append("concat=n=").Append(count);
-            sb.Append(":v=").Append(info.video ? 1 : 0);
-            sb.Append(":a=").Append(info.audio ? 1 : 0).Append('"');
+            AppendConcatenation(sb, count, info).Append('"');
 
             o.WithCustomArgument(sb.ToString());
+        }
+
+        private StringBuilder AppendConcatenation(StringBuilder sb, int count, MediaInfo info)
+        {
+            sb.Append("concat=n=").Append(count);
+            sb.Append(":v=").Append(info.video ? 1 : 0);
+            sb.Append(":a=").Append(info.audio ? 1 : 0);
+            return sb;
         }
 
         #endregion

@@ -304,27 +304,37 @@ namespace Witlesss.MediaTools
 
         private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
         {
-            var count = (int)Math.Ceiling(seconds / 210);
-            var take = timecodes.Count / count + 1;
+            var count = seconds > 300 ? (int)Math.Ceiling(seconds / 210) : 2;
             var parts = new string[count];
             var codes = new double[count];
+            var takes = new    int[count];
 
             Log($"SLICING LONG VIDEO!!! ({count} parts, {timecodes.Count} trims)", ConsoleColor.Yellow);
 
+            var pieceLength = seconds / count;
+
+            var head = -1;
             for (var i = 0; i < count; i++) // split video into chunks
             {
-                var index = i;
-                var indexOff = i * take;
-                var indexMax = Math.Min(timecodes.Count - 1, indexOff + take + 1);
-                var a = Math.Max(timecodes[indexOff].A - 10, 0);
-                var b = Math.Min(timecodes[indexMax].B + 5, seconds);
+                var start = i * pieceLength;
+                var tail = timecodes.FindLastIndex(x => x.A > start && x.B <= start + pieceLength);
+                if (tail < 0) continue;
 
-                codes[i] = a;
+                var window = timecodes.Take(tail + 1).Skip(head + 1).ToList();
+                var ss = Math.Max(window.Min(x => x.A) - 10, 0);
+                var to = Math.Min(window.Max(x => x.B) + 5, seconds);
+
+                head = tail;
+
+                var index = i;
+
+                codes[i] = ss;
+                takes[i] = window.Count;
                 parts[i] = new F_Process(_input).ApplyEffects(ops =>
                 {
                     var builder = new StringBuilder("-c copy ");
-                    if (index > 0)         builder.Append("-ss ").Append(Format(a)).Append(' ');
-                    if (index + 1 < count) builder.Append("-to ").Append(Format(b));
+                    if (index > 0)         builder.Append("-ss ").Append(Format(ss)).Append(' ');
+                    if (index + 1 < count) builder.Append("-to ").Append(Format(to));
 
                     ops.WithCustomArgument(builder.ToString());
                 }).Output($"-part-{i}", Path.GetExtension(_input));
@@ -332,7 +342,8 @@ namespace Witlesss.MediaTools
 
             for (var i = 0; i < count; i++) // slice each chunk
             {
-                var offset = i * take;
+                var take = takes[i];
+                var offset = takes.Take(i).Sum();
                 var start = codes[i];
                 parts[i] = new F_Process(parts[i]).ApplyEffects(ops =>
                 {

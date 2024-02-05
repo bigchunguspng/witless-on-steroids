@@ -5,10 +5,8 @@ namespace Witlesss.Commands.Editing
 {
     public class Cut : FileEditingCommand
     {
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             var x = GetArgs();
             if (x.failed)
             {

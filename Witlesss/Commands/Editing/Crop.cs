@@ -23,10 +23,8 @@ namespace Witlesss.Commands.Editing
             return this;
         }
 
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             var input = _isShakeMode ? "/crop " + Text : Text;
             if (input.Contains(' '))
             {

@@ -6,10 +6,8 @@ namespace Witlesss.Commands.Editing
 {
     public class ToSticker : FileEditingCommand
     {
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             Bot.Download(FileID, Chat, out var path);
 
             using var stream = File.OpenRead(Stickerize(path));

@@ -4,10 +4,8 @@
     {
         private string _arg;
 
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             if (Text.Contains(' '))
             {
                 _arg = Text.Split(' ')[1];

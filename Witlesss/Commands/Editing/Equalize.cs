@@ -5,10 +5,8 @@ namespace Witlesss.Commands.Editing
     public class Equalize : FileEditingCommand
     {
         // /eq [frequency, Hz] [gain, dB] [width, Hz]
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             if (Text.Contains(' '))
             {
                 var args = Text.Split(' ').Skip(1).Take(3).ToArray();

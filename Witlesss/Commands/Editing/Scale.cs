@@ -8,10 +8,8 @@ namespace Witlesss.Commands.Editing
     {
         private readonly Regex _number = new(@"^\d+(\.\d+)?$");
 
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             if (Text.Contains(' '))
             {
                 var args = Text.Split(' ').Skip(1).Take(2).ToArray();

@@ -5,10 +5,8 @@ namespace Witlesss.Commands.Editing
 {
     public class ToAnimation : VideoCommand
     {
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             Bot.Download(FileID, Chat, out var path, out var type);
             
             if (type == MediaType.Round) path = CropVideoNote(path);

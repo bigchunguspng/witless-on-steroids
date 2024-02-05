@@ -14,10 +14,8 @@ namespace Witlesss.Commands.Editing
             return this;
         }
 
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             _speed = Text.HasDoubleArgument(out var x) ? _mode == Fast ? ClampFast(x) : ClampSlow(x) : 2D;
 
             if (_mode == Slow) _speed = 1 / _speed;

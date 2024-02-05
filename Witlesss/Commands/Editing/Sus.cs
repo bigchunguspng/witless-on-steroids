@@ -4,10 +4,8 @@ namespace Witlesss.Commands.Editing
 {
     public class Sus : Cut
     {
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             var argless = false;
             var x = GetArgs();
             if (x.failed)

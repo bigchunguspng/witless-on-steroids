@@ -2,10 +2,8 @@
 {
     public class Reverse : FileEditingCommand
     {
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-            
             Bot.Download(FileID, Chat, out var path, out var type);
             
             SendResult(Memes.Reverse(path), type);

@@ -6,10 +6,8 @@ namespace Witlesss.Commands.Editing
     {
         private int _value;
 
-        public override void Run()
+        protected override void Execute()
         {
-            if (NothingToProcess()) return;
-
             _value = Text.HasIntArgument(out var x) ? Math.Clamp(x, 0, 21) : 15;
 
             Bot.Download(FileID, Chat, out var path, out var type);

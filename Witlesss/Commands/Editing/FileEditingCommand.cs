@@ -17,15 +17,22 @@ namespace Witlesss.Commands.Editing
 
         protected virtual string Manual { get; } = DAMN_MANUAL;
 
-        protected bool NothingToProcess()
+        public override void Run()
         {
-            if (ChatIsBanned()) return true;
+            if (ItHasSomethingToProcess()) Execute();
+        }
 
-            if (GetFileFrom(Message) || GetFileFrom(Message.ReplyToMessage)) return false;
+        private bool ItHasSomethingToProcess()
+        {
+            if (ChatIsBanned()) return false;
+
+            if (GetFileFrom(Message) || GetFileFrom(Message.ReplyToMessage)) return true;
 
             SendManual();
-            return true;
+            return false;
         }
+
+        protected abstract void Execute();
 
         protected virtual bool ChatIsBanned() => Bot.ThorRagnarok.ChatIsBanned(Chat);
 

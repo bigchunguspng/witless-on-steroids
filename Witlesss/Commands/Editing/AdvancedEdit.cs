@@ -10,10 +10,8 @@ public class AdvancedEdit : FileEditingCommand
 {
     // /ffxd [options]      [extension]
     // /ffv  [videofilters] [extension]
-    public override void Run()
+    protected override void Execute()
     {
-        if (NothingToProcess()) return;
-
         if (Text.Contains(' '))
         {
             var args = Text.Split(' ');

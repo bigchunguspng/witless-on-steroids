@@ -13,6 +13,8 @@ public class DownloadVideoTask
     private readonly MessageData Message;
 
     private readonly Stopwatch Timer = new();
+    
+    private static readonly DownloadCache _cache = new(32);
 
     public DownloadVideoTask(string id, MessageData data)
     {
@@ -31,17 +33,25 @@ public class DownloadVideoTask
 
     public async Task<string> RunAsync()
     {
+        var directory = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
+        Directory.CreateDirectory(directory);
+
+        if (_cache.Contains(ID, out var path))
+        {
+            var copy = Path.Combine(directory, Path.GetFileName(path));
+            File.Copy(path, copy);
+            return copy;
+        }
+
         YouTube = ID.Contains("youtu");
 
-        var cmd = GetDownloadCommand(ID);
-
-        var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
-        Directory.CreateDirectory(dir);
-
-        await DownloadMusicTask.RunCMD(cmd, dir);
+        await DownloadMusicTask.RunCMD(GetDownloadCommand(ID), directory);
 
         Log($"{Message.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
 
-        return new DirectoryInfo(dir).GetFiles("video.mp4")[0].FullName;
+        var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;
+        _cache.Add(ID, result);
+
+        return result;
     }
 }

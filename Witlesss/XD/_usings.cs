@@ -1,5 +1,7 @@
 ﻿// Global using directives
 
+global using Witlesss.Commands.Core;
+global using Witlesss.Commands.Editing.Core;
 global using Witlesss.XD;
 global using Witlesss.Services;
 global using Witlesss.Services.Internet;

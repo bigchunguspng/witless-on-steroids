@@ -1,15 +1,8 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
-namespace Witlesss.Commands.Editing
+namespace Witlesss.Commands.Editing.Core
 {
-    public abstract class VideoCommand : FileEditingCommand
-    {
-        protected override string Manual { get; } = G_MANUAL;
-
-        protected override bool MessageContainsFile(Message m) => GetVideoFileID(m);
-    }
-
     public abstract class FileEditingCommand : Command
     {
         protected string      FileID;
@@ -95,9 +88,7 @@ namespace Witlesss.Commands.Editing
         protected virtual string VideoFileName { get; } = "piece_fap_club.mp3";
         protected virtual string AudioFileName { get; } = "piece_fap_club.mp4";
 
-        protected static string Sender => ValidFileName(SenderName);
-
-        protected static string SongNameOr(string  s) => SongNameIn(Message) ?? SongNameIn(Message.ReplyToMessage) ?? s;
-        private   static string SongNameIn(Message m) => m?.Audio?.FileName ?? m?.Document?.FileName;
+        protected static string Sender => ValidFileName(GetSenderName(Message));
+        protected static string SongNameOr(string s) => Extension.SongNameOr(Message, s);
     }
 }

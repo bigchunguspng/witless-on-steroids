@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Witlesss.Commands.Editing
 {
@@ -7,7 +8,7 @@ namespace Witlesss.Commands.Editing
         protected override void Execute()
         {
             var argless = false;
-            var x = GetArgs();
+            var x = ParseArgs(Text.Split().Skip(1).ToArray());
             if (x.failed)
             {
                 if (Text.Contains(' '))

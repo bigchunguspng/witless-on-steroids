@@ -118,6 +118,7 @@ namespace Witlesss
 
         public void DeleteMessage(long chat, int id)
         {
+            if (id <= 0) return;
             var task = Client.DeleteMessageAsync(chat, id);
             TrySend(task, chat, "message", "delete");
         }

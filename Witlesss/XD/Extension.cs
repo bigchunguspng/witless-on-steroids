@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
+using Telegram.Bot.Types;
 using static Witlesss.XD.LetterCaseMode;
 
 namespace Witlesss.XD
@@ -83,6 +84,21 @@ namespace Witlesss.XD
         public static string FormatTime(TimeSpan t)
         {
             return t.Minutes > 1 ? $"{t:m' MINS'}" : t.Minutes > 0 ? $@"{t:m' MIN 's\.fff's'}" : $@"{t:s\.fff's'}";
+        }
+        
+        public  static string SongNameOr(Message m, string  s) => SongNameIn(m) ?? SongNameIn(m.ReplyToMessage) ?? s;
+        private static string SongNameIn(Message m) => m?.Audio?.FileName ?? m?.Document?.FileName;
+        
+        public static bool ChatIsPrivate(long chat) => chat > 0;
+        
+        public static string GetSenderName(Message m) => m.SenderChat?.Title ?? GetUserFullName(m);
+        public static string GetChatTitle (Message m) => (ChatIsPrivate(m.Chat.Id) ? GetUserFullName(m) : m.Chat.Title).Truncate(32);
+
+        public static string GetUserFullName(Message m)
+        {
+            string name = m.From?.FirstName;
+            string last = m.From?.LastName ?? "";
+            return last == "" ? name : name + " " + last;
         }
 
         public static string Quote(string s) => $@"""{s}""";

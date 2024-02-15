@@ -1,41 +1,40 @@
 ﻿using System;
+using System.Linq;
 using static System.TimeSpan;
+
+#pragma warning disable CS4014
 
 namespace Witlesss.Commands.Editing
 {
-    public class Cut : FileEditingCommand
+    public class Cut : Slice
     {
         protected override void Execute()
         {
-            var x = GetArgs();
+            var args = Text.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
+
+            var x = ParseArgs(args);
             if (x.failed)
             {
                 Bot.SendMessage(Chat, CUT_MANUAL);
                 return;
             }
-            
-            Bot.Download(FileID, Chat, out var path, out var type);
-            
-            var result = Memes.Cut(path, new CutSpan(x.start, x.length));
-            SendResult(result, type);
-            Log($"{Title} >> CUT [8K-]");
+
+            var span = new CutSpan(x.start, x.length);
+
+            Bot.RunSafelyAsync(new CutAsync(SnapshotMessageData(), FileID, span).RunAsync(), Chat, -1);
         }
 
-        protected static (bool failed, TimeSpan start, TimeSpan length) GetArgs()
+        protected static (bool failed, TimeSpan start, TimeSpan length) ParseArgs(string[] s)
         {
-            var s = Text.Split();
             var len = s.Length;
-            if     (len == 2 && s[1].IsTimeSpan(out var length)) return (false, Zero,  length);      // [++]----]
-            if     (len >= 3 && s[1].IsTimeSpan(out var  start))
+            if     (len == 1 && s[0].IsTimeSpan(out var length)) return (false, Zero,  length);      // [++]----]
+            if     (len >= 2 && s[0].IsTimeSpan(out var  start))
             {
-                if (len == 4 && s[3].IsTimeSpan(out var    end)) return (false, start, end - start); // [-[++]--]
-                if             (s[2].IsTimeSpan(out     length)) return (false, start, length);      // [-[++]--]
+                if (len == 3 && s[2].IsTimeSpan(out var    end)) return (false, start, end - start); // [-[++]--]
+                if             (s[1].IsTimeSpan(out     length)) return (false, start, length);      // [-[++]--]
                 else                                             return (false, start, Zero);        // [-[+++++]
             }
             else                                                 return (true,  Zero,  Zero);        // [-------]
         }
-        
-        protected override string AudioFileName => SongNameOr($"((({Sender}))).mp3");
-        protected override string VideoFileName { get; } = "cut_fap_club.mp4";
     }
 }

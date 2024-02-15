@@ -12,6 +12,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         public static string ArtLocation   { get; private set; }
         public static string FontBold      { get; private set; }
         public static string FontRegular   { get; private set; }
+        public static long   AdminID       { get; private set; }
 
         private const string path = "config.txt";
 
@@ -24,6 +25,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
             GetValue(   @"a\S*art\S*\s+=\s+""(.+)""", s => ArtLocation   = s, "album-art"           );
             GetValue(  @"b\S*font\S*\s+=\s+""(.+)""", s => FontBold      = s,            "bold-font");
             GetValue(  @"r\S*font\S*\s+=\s+""(.+)""", s => FontRegular   = s,         "regular-font");
+            GetValue(  @"\S*admin\S*\s+=\s+(\S+)",    s => AdminID       = GetLong(s),    "admin-id");
 
             void GetValue(string pattern, Action<string> action, string prop)
             {
@@ -38,5 +40,7 @@ namespace Witlesss // ReSharper disable InconsistentNaming
             }
         }
         public static void SetBotUsername(string username) => BOT_USERNAME = $"@{username.ToLower()}";
+
+        private static long GetLong(string s) => long.TryParse(s, out var result) ? result : 0;
     }
 }

@@ -52,7 +52,7 @@ namespace Witlesss
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) Bot.SaveBakas();
             else if (_input == "/sd") SyncDics();
-            else if (_input == "/sp") Spam();
+            else if (_input == "/sp") Spam.SendSpam();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
@@ -64,7 +64,7 @@ namespace Witlesss
             else if (_input == "/l" ) ActivateLastChat();
             else if (_input == "/b" ) Thor.  BanChat(_active);
             else if (_input == "/ub") Thor.UnbanChat(_active);
-            else if (_input.StartsWith("/sp") && _input.HasIntArgument(out int a)) Spam(a);
+            else if (_input.StartsWith("/sp") && _input.HasIntArgument(out int a)) Spam.SendSpam(a);
             else if (_input.StartsWith("/ds") && _input.HasIntArgument(out int b)) DeleteBySize(b);
             else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out int c)) Thor.BanChat(_active, c);
         }
@@ -113,26 +113,6 @@ namespace Witlesss
         {
             witless.Delete();
             witless.Load();
-        }
-
-        private void Spam(int size = 2)
-        {
-            try
-            {
-                string message = File.ReadAllText("spam.txt");
-                foreach (var witless in Bakas)
-                {
-                    if (File.Exists(witless.Path) && SizeInBytes(witless.Path) > size)
-                    {
-                        Bot.SendMessage(witless.Chat, message, preview: false);
-                        Log($"MAIL SENT << {witless.Chat}", ConsoleColor.Yellow);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LogError("SoRRY, CAN'T SPAM, BRO x_x " + e.Message);
-            }
         }
 
         private void DeleteBlockers()

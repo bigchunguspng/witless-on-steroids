@@ -35,6 +35,7 @@ namespace Witlesss.Commands
         private readonly Slice _slice = new();
         private readonly Fuse _fuse = new();
         private readonly Move _move = new();
+        private readonly Spam _spam = new();
         private readonly GetChatID _chatID = new();
         private readonly ChatInfo _chat = new();
         private readonly Piece _piece = new();
@@ -120,6 +121,7 @@ namespace Witlesss.Commands
             else if (command == "/chat_id" ) _sc = _chatID;
             else if (CommandIs( "/sex"    )) _sc = _sticker;
             else if (CommandIs( "/song"   )) _sc = _song;
+            else if (CommandIs( "/spam"   )) _sc = _spam;
             else if (CommandIs( "/eq"     )) _sc = _equalize;
             else if (CommandIs( "/vol"    )) _sc = _volume;
             else if (command == "/g"       ) _sc = _audio;

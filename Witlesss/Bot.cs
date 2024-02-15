@@ -60,7 +60,7 @@ namespace Witlesss
             var directory = new DirectoryInfo(DBS_FOLDER);
             var selection = directory
                 .GetFiles(DB_FILE_PREFIX + "*.json")
-                .Where(x => DateTime.Now - x.LastWriteTime < TimeSpan.FromHours(2) && x.Length < 4_000_000)
+                .Where(x => x.LastWriteTime.HappenedWithinLast(TimeSpan.FromHours(2)) && x.Length < 4_000_000)
                 .Select(x => long.Parse(x.Name.Replace(DB_FILE_PREFIX + "-", "").Replace(".json", "")));
             foreach (var chat in selection) WitlessExist(chat); // <-- this loads the dictionary;
         }

@@ -120,6 +120,11 @@ namespace Witlesss.XD
             var chars = Path.GetInvalidFileNameChars();
             return chars.Aggregate(text, (current, c) => current.Replace(c, x));
         }
+        
+        public static bool HappenedWithinLast(this DateTime date, TimeSpan span)
+        {
+            return DateTime.Now - date < span;
+        }
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {

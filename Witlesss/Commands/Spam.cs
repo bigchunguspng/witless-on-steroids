@@ -27,7 +27,7 @@ public class Spam : Command
         Task.Run(() => SendSpam(size, split[2]));
     }
 
-    public static void SendSpam(int size = 2, string text = null)
+    public static void SendSpam(int size = 2_000_000, string text = null)
     {
         try
         {

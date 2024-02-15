@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Editing
             Bot.RunSafelyAsync(new CutAsync(SnapshotMessageData(), FileID, span).RunAsync(), Chat, -1);
         }
 
-        protected static (bool failed, TimeSpan start, TimeSpan length) ParseArgs(string[] s)
+        public static (bool failed, TimeSpan start, TimeSpan length) ParseArgs(string[] s)
         {
             var len = s.Length;
             if     (len == 1 && s[0].IsTimeSpan(out var length)) return (false, Zero,  length);      // [++]----]

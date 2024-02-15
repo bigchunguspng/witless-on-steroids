@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Sus : Cut
+    public class Sus : VideoCommand
     {
         protected override void Execute()
         {
             var argless = false;
-            var x = ParseArgs(Text.Split().Skip(1).ToArray());
+            var x = Cut.ParseArgs(Text.Split().Skip(1).ToArray());
             if (x.failed)
             {
                 if (Text.Contains(' '))

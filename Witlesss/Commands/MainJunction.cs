@@ -90,9 +90,12 @@ namespace Witlesss.Commands
             }
             else if (Text is not null && TextIsCommand(out var command))
             {
-                if (DoSimpleCommands(command) || DoStartCommand(command)) return;
+                var success = DoSimpleCommands(command) || DoStartCommand(command);
 
-                if (ChatIsPrivate || Text.Contains(Config.BOT_USERNAME)) Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                if (!success && (ChatIsPrivate || Text.Contains(Config.BOT_USERNAME)))
+                {
+                    Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                }
             }
 
             SuspectForLongHangs(_watch.GetElapsed());

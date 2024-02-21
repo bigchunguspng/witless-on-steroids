@@ -22,7 +22,7 @@ public class Tell : Command
         {
             var text = split[2];
             Bot.SendMessage(chat, text, preview: false);
-            if (Bot.SussyBakas.TryGetValue(chat, out var baka)) baka.Eat(text);
+            if (Bot.WitlessExist(chat)) Bot.SussyBakas[chat].Eat(text);
         }
     }
 }

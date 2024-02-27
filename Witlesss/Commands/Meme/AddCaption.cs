@@ -48,9 +48,7 @@ namespace Witlesss.Commands.Meme
                 else   IFunnyApp.UseGivenColor = false;
             }
 
-            var fonts = empty ? null : IFunnyApp.OtherFonts.Match(dummy);
-
-            IFunnyApp.UseOtherFont     = !empty && fonts.Success;
+            IFunnyApp.ExtraFonts.CheckKey(empty, dummy);
             IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
@@ -61,17 +59,14 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
-            if (IFunnyApp.UseOtherFont && fonts != null)
-                IFunnyApp.OtherFontKey = fonts.Groups[1].Value;
-
-            if (empty || !IFunnyApp.UseSegoe && !IFunnyApp.UseOtherFont)
+            if (empty || !IFunnyApp.UseSegoe && !ExtraFonts.UseOtherFont)
             {
                 var cyrillic = IsMostlyCyrillic(caption);
                 IFunnyApp.UseSegoe = cyrillic;
                 if (!cyrillic)
                 {
-                    IFunnyApp.UseOtherFont = true;
-                    IFunnyApp.OtherFontKey = "ft";
+                    ExtraFonts.UseOtherFont = true;
+                    ExtraFonts.OtherFontKey = "ft";
                 }
             }
 

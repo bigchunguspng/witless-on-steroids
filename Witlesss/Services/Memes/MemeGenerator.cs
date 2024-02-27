@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using Witlesss.Commands.Meme;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
 
@@ -11,12 +10,13 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseCustomBack, UseRoboto, UseItalic, ColorText;
+        public static bool WrapText = true, UseCustomBack, UseItalic, ColorText;
         public static Color CustomBackground;
+        public static readonly ExtraFonts ExtraFonts = new("meme");
         
         private int _w, _h, _s, _d, _m, _size;
         private Pen _outline;
-        private readonly FontFamily[] _fonts = new[] { new FontFamily("Impact"), new FontFamily("Roboto") };
+        private readonly FontFamily  _impact = new("Impact");
         private readonly SolidBrush   _white = new(Color.White);
         private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
         private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
@@ -100,8 +100,8 @@ namespace Witlesss.Services.Memes
         private SolidBrush Brush => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
-        private FontFamily CaptionFont => _fonts[UseRoboto ? 1 : 0];
-        private FontStyle CaptionStyle => UseItalic ? FontStyle.Italic | FontStyle.Bold : UseRoboto ? FontStyle.Bold : FontStyle.Regular;
+        private FontFamily CaptionFont => ExtraFonts.UseOtherFont ? ExtraFonts.GetOtherFont("rg") : _impact;
+        private FontStyle CaptionStyle => UseItalic ? FontStyle.Italic | FontStyle.Bold : ExtraFonts.OtherFontKey == "rg" ? FontStyle.Bold : FontStyle.Regular;
 
         private Image GetImage(string path)
         {

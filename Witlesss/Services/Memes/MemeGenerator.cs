@@ -10,9 +10,10 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseCustomBack, UseItalic, ColorText, ForceImpact;
+        public static bool WrapText = true, UseItalic, ColorText, ForceImpact;
         public static int FontMultiplier = 10;
-        public static Color CustomBackground;
+        public static bool UseCustomBg;
+        public static Color   CustomBg;
         public static readonly ExtraFonts ExtraFonts = new("meme", exclude: "ft");
         
         private int _w, _h, _marginBottomText, _margin, _startingSize, _size;
@@ -57,7 +58,7 @@ namespace Witlesss.Services.Memes
 
             if (Witlesss.Memes.Sticker)
             {
-                graphics.Clear(UseCustomBack ? CustomBackground : Color.Black);
+                graphics.Clear(UseCustomBg ? CustomBg : Color.Black);
                 graphics.DrawImage(image, Point.Empty);
             }
 

@@ -33,36 +33,40 @@ namespace Witlesss.Commands.Meme
         protected override DgText GetMemeText(string text)
         {
             var dummy = GetDummy(out var empty, out var command);
+            ParseOptions(empty, dummy);
+            return GetTextPair(text, empty, dummy, command);
+        }
 
-            MemeGenerator.UseCustomBack = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
-            if (MemeGenerator.UseCustomBack)
+        private void ParseOptions(bool empty, string dummy)
+        {
+            if (Memes.Sticker && !empty && _custom_bg.IsMatch(dummy))
             {
-                var c = _custom_bg.Match(dummy).Groups[1].Value;
-                dummy = dummy.Replace(c, "");
-                if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
-                var d = Enum.IsDefined(typeof(KnownColor), c);
-                if (d) MemeGenerator.CustomBackground = Color.FromName(c);
-                else   MemeGenerator.UseCustomBack = false;
+                MemeGenerator.UseCustomBg = true;
+                ParseColorOption(_custom_bg, ref dummy, ref MemeGenerator.CustomBg, ref MemeGenerator.UseCustomBg);
             }
 
             MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
-            MemeGenerator.WrapText       =  empty || CheckMatch(ref dummy, _nowrap);
-            MemeGenerator.UseItalic      = !empty && CheckMatch(ref dummy, _italic);
-            MemeGenerator.ForceImpact    = !empty && CheckMatch(ref dummy, _impact);
-            MemeGenerator.ColorText      = !empty && CheckMatch(ref dummy, _colorText);
-            var add_bottom_text          = !empty && CheckMatch(ref dummy, _add_bottom);
-            var only_bottom_text         = !empty && CheckMatch(ref dummy, _only_bottom);
-            var only_top_text            = !empty && CheckMatch(ref dummy, _top_only);
-            var matchCaps                = !empty && CheckMatch(ref dummy, _caps);
-            
+            MemeGenerator.WrapText       =  empty || !CheckMatch(ref dummy, _nowrap);
+            MemeGenerator.UseItalic      = !empty &&  CheckMatch(ref dummy, _italic);
+            MemeGenerator.ForceImpact    = !empty &&  CheckMatch(ref dummy, _impact);
+            MemeGenerator.ColorText      = !empty &&  CheckMatch(ref dummy, _colorText);
+
             int GetInt(Regex x)
             {
                 var match = x.Match(dummy);
                 CaptureOut(match.Groups[1], ref dummy);
                 return int.Parse(match.Groups[2].Value);
             }
+        }
 
+        private DgText GetTextPair(string text, bool empty, string dummy, string command)
+        {
+            var add_bottom_text  = !empty && CheckMatch(ref dummy, _add_bottom);
+            var only_bottom_text = !empty && CheckMatch(ref dummy, _only_bottom);
+            var only_top_text    = !empty && CheckMatch(ref dummy, _top_only);
+            var matchCaps        = !empty && CheckMatch(ref dummy, _caps);
+            
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(command));
 
@@ -98,18 +102,18 @@ namespace Witlesss.Commands.Meme
             string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
-        private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _impact = new(@"^\/meme\S*(m)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _italic = new(@"^\/meme\S*(i)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
         private static readonly Regex      _fontSS = new(@"^\/meme\S*?(ss)(\d{1,3})\S*", RegexOptions.IgnoreCase);
 
-        public static bool CheckMatch(ref string dummy, Regex regex)
+        private static bool CheckMatch(ref string dummy, Regex regex)
         {
             var match = regex.Match(dummy);
             if (match.Success) CaptureOut(match.Groups[1], ref dummy);
@@ -120,6 +124,16 @@ namespace Witlesss.Commands.Meme
         public static void CaptureOut(Capture group, ref string dummy)
         {
             dummy = dummy.Remove(group.Index) + "_" + dummy.Substring(group.Index + group.Length);
+        }
+
+        public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)
+        {
+            var c = regex.Match(dummy).Groups[1].Value;
+            dummy = dummy.Replace(c, "");
+            if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
+            var b = Enum.IsDefined(typeof(KnownColor), c);
+            if (b)  colorProperty = Color.FromName(c);
+            else useColorProperty = false;
         }
     }
 

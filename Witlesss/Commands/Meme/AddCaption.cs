@@ -36,16 +36,10 @@ namespace Witlesss.Commands.Meme
 
             var dummy = GetDummy(out var empty);
 
-            IFunnyApp.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
-
-            if (IFunnyApp.UseGivenColor)
+            if (!empty && _colorXD.IsMatch(dummy))
             {
-                var c = _colorXD.Match(dummy).Groups[1].Value;
-                dummy = dummy.Replace(c, "");
-                if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
-                var b = Enum.IsDefined(typeof(KnownColor), c);
-                if (b) IFunnyApp.   GivenColor = Color.FromName(c);
-                else   IFunnyApp.UseGivenColor = false;
+                IFunnyApp.UseGivenColor = true;
+                MakeMeme.ParseColorOption(_colorXD, ref dummy, ref IFunnyApp.GivenColor, ref IFunnyApp.UseGivenColor);
             }
 
             IFunnyApp.ExtraFonts.CheckKey(empty, ref dummy);

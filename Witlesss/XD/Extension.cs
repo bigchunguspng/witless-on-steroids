@@ -206,6 +206,11 @@ namespace Witlesss.XD
             return u == r ? _ukrM.Matches(text).Count > _rusM.Matches(text).Count : u > r;
         }
 
+        public static void CutCaptureOut(Capture group, ref string text)
+        {
+            text = text.Remove(group.Index) + "_" + text.Substring(group.Index + group.Length);
+        }
+
         public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
         public static T Pick<T>(T[] options) => options[Random.Next(options.Length)];
 

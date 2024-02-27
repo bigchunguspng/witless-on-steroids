@@ -39,9 +39,9 @@ namespace Witlesss.Commands.Meme
 
         private void ParseOptions(bool empty, string dummy)
         {
-            if (Memes.Sticker && !empty && _custom_bg.IsMatch(dummy))
+            MemeGenerator.UseCustomBg = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
+            if (MemeGenerator.UseCustomBg)
             {
-                MemeGenerator.UseCustomBg = true;
                 ParseColorOption(_custom_bg, ref dummy, ref MemeGenerator.CustomBg, ref MemeGenerator.UseCustomBg);
             }
 
@@ -55,7 +55,7 @@ namespace Witlesss.Commands.Meme
             int GetInt(Regex x)
             {
                 var match = x.Match(dummy);
-                CaptureOut(match.Groups[1], ref dummy);
+                CutCaptureOut(match.Groups[1], ref dummy);
                 return int.Parse(match.Groups[2].Value);
             }
         }
@@ -116,14 +116,9 @@ namespace Witlesss.Commands.Meme
         private static bool CheckMatch(ref string dummy, Regex regex)
         {
             var match = regex.Match(dummy);
-            if (match.Success) CaptureOut(match.Groups[1], ref dummy);
+            if (match.Success) CutCaptureOut(match.Groups[1], ref dummy);
 
             return match.Success;
-        }
-
-        public static void CaptureOut(Capture group, ref string dummy)
-        {
-            dummy = dummy.Remove(group.Index) + "_" + dummy.Substring(group.Index + group.Length);
         }
 
         public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)

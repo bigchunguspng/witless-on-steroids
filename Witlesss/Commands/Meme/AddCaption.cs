@@ -36,9 +36,9 @@ namespace Witlesss.Commands.Meme
 
             var dummy = GetDummy(out var empty);
 
-            if (!empty && _colorXD.IsMatch(dummy))
+            IFunnyApp.UseGivenColor = !empty && _colorXD.IsMatch(dummy);
+            if (IFunnyApp.UseGivenColor)
             {
-                IFunnyApp.UseGivenColor = true;
                 MakeMeme.ParseColorOption(_colorXD, ref dummy, ref IFunnyApp.GivenColor, ref IFunnyApp.UseGivenColor);
             }
 

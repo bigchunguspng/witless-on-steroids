@@ -48,7 +48,7 @@ namespace Witlesss.Commands.Meme
                 else   IFunnyApp.UseGivenColor = false;
             }
 
-            IFunnyApp.ExtraFonts.CheckKey(empty, dummy);
+            IFunnyApp.ExtraFonts.CheckKey(empty, ref dummy);
             IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);

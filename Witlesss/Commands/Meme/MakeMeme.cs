@@ -45,14 +45,23 @@ namespace Witlesss.Commands.Meme
                 else   MemeGenerator.UseCustomBack = false;
             }
 
-            MemeGenerator.ExtraFonts.CheckKey(empty, dummy);
-            MemeGenerator.WrapText      =  empty ||     !_nowrap.IsMatch(dummy);
-            MemeGenerator.UseItalic     = !empty &&      _italic.IsMatch(dummy);
-            MemeGenerator.ColorText     = !empty &&   _colorText.IsMatch(dummy);
-            var add_bottom_text         = !empty &&  _add_bottom.IsMatch(dummy);
-            var only_bottom_text        = !empty && _only_bottom.IsMatch(dummy);
-            var only_top_text           = !empty &&    _top_only.IsMatch(dummy);
-            var matchCaps               = !empty &&        _caps.IsMatch(dummy);
+            MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
+            MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
+            MemeGenerator.WrapText       =  empty || CheckMatch(ref dummy, _nowrap);
+            MemeGenerator.UseItalic      = !empty && CheckMatch(ref dummy, _italic);
+            MemeGenerator.ForceImpact    = !empty && CheckMatch(ref dummy, _impact);
+            MemeGenerator.ColorText      = !empty && CheckMatch(ref dummy, _colorText);
+            var add_bottom_text          = !empty && CheckMatch(ref dummy, _add_bottom);
+            var only_bottom_text         = !empty && CheckMatch(ref dummy, _only_bottom);
+            var only_top_text            = !empty && CheckMatch(ref dummy, _top_only);
+            var matchCaps                = !empty && CheckMatch(ref dummy, _caps);
+            
+            int GetInt(Regex x)
+            {
+                var match = x.Match(dummy);
+                CaptureOut(match.Groups[1], ref dummy);
+                return int.Parse(match.Groups[2].Value);
+            }
 
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(command));
@@ -89,15 +98,29 @@ namespace Witlesss.Commands.Meme
             string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
-        private static readonly Regex      _nowrap = new(@"^\/meme\S*w\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex  _add_bottom = new(@"^\/meme\S*s\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex _only_bottom = new(@"^\/meme\S*d\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex    _top_only = new(@"^\/meme\S*to\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex   _colorText = new(@"^\/meme\S*co\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _impact = new(@"^\/meme\S*im\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _italic = new(@"^\/meme\S*i\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex        _caps = new(@"^\/meme\S*up\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _impact = new(@"^\/meme\S*(m)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _italic = new(@"^\/meme\S*(i)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
+        private static readonly Regex      _fontSS = new(@"^\/meme\S*?(ss)(\d{1,3})\S*", RegexOptions.IgnoreCase);
+
+        public static bool CheckMatch(ref string dummy, Regex regex)
+        {
+            var match = regex.Match(dummy);
+            if (match.Success) CaptureOut(match.Groups[1], ref dummy);
+
+            return match.Success;
+        }
+
+        public static void CaptureOut(Capture group, ref string dummy)
+        {
+            dummy = dummy.Remove(group.Index) + "_" + dummy.Substring(group.Index + group.Length);
+        }
     }
 
     public interface ImageProcessor

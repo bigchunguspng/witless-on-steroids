@@ -10,11 +10,12 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseCustomBack, UseItalic, ColorText;
+        public static bool WrapText = true, UseCustomBack, UseItalic, ColorText, ForceImpact;
+        public static int FontMultiplier = 10;
         public static Color CustomBackground;
-        public static readonly ExtraFonts ExtraFonts = new("meme");
+        public static readonly ExtraFonts ExtraFonts = new("meme", exclude: "ft");
         
-        private int _w, _h, _s, _d, _m, _size;
+        private int _w, _h, _marginBottomText, _margin, _startingSize, _size;
         private Pen _outline;
         private readonly FontFamily  _impact = new("Impact");
         private readonly SolidBrush   _white = new(Color.White);
@@ -32,9 +33,12 @@ namespace Witlesss.Services.Memes
         {
             _w = size.Width;
             _h = size.Height;
-            _s = Math.Max((int)Math.Min(_w, 1.5 * _h) / 12, 12);
-            _d = _h / 3 * 2;    // upper margin for bottom text
-            _m = Math.Min(_h / 72, 10); // margin
+            
+            var minSide = (int)Math.Min(_w, 1.5 * _h);
+            _startingSize = Math.Max(minSide * FontMultiplier / 120, 12);
+            
+            _marginBottomText = _h / 3 * 2;
+            _margin = Math.Min(_h / 72, 10);
         }
 
         public string MakeImpactMeme(string path, DgText text)
@@ -57,8 +61,11 @@ namespace Witlesss.Services.Memes
                 graphics.DrawImage(image, Point.Empty);
             }
 
-            AddText(text.A, _s, graphics, _upper, new Rectangle(_m, _m, _w - 2 * _m, _h / 3 - _m));
-            AddText(text.B, _s, graphics, _lower, new Rectangle(_m, _d, _w - 2 * _m, _h / 3 - _m));
+            var width  = _w - 2 * _margin;
+            var height = _h / 3 - _margin;
+
+            AddText(text.A, _startingSize, graphics, _upper, new Rectangle(_margin, _margin,           width, height));
+            AddText(text.B, _startingSize, graphics, _lower, new Rectangle(_margin, _marginBottomText, width, height));
 
             return back;
         }
@@ -70,8 +77,8 @@ namespace Witlesss.Services.Memes
             text = EmojiTool.RemoveEmoji(text);
             text = text.TrimStart('\n');
 
+            // adjust font size
             var maxLines = text.Count(c => c == '\n') + 1;
-
             var s = size * 0.75f;
             var r = rect.Size with { Height = rect.Size.Height * 3 };
             var go = true;
@@ -83,7 +90,8 @@ namespace Witlesss.Services.Memes
             }
             size = (int)(s / 0.75f);
             _size = size;
-            
+
+            // write
             using var path = new GraphicsPath();
             path.AddString(text, CaptionFont, (int)CaptionStyle, size, rect, f);
             for (var i = OutlineWidth; i > 0; i--)
@@ -100,8 +108,16 @@ namespace Witlesss.Services.Memes
         private SolidBrush Brush => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
-        private FontFamily CaptionFont => ExtraFonts.UseOtherFont ? ExtraFonts.GetOtherFont("rg") : _impact;
-        private FontStyle CaptionStyle => UseItalic ? FontStyle.Italic | FontStyle.Bold : ExtraFonts.OtherFontKey == "rg" ? FontStyle.Bold : FontStyle.Regular;
+        private FontFamily CaptionFont => ForceImpact
+            ? _impact
+            : ExtraFonts.UseOtherFont
+                ? ExtraFonts.GetOtherFont("rg")
+                : _impact;
+        private FontStyle CaptionStyle => UseItalic
+            ? FontStyle.Italic | FontStyle.Bold
+            : ExtraFonts.OtherFontKey is "rg" or "cb"
+                ? FontStyle.Bold
+                : FontStyle.Regular;
 
         private Image GetImage(string path)
         {
@@ -112,6 +128,7 @@ namespace Witlesss.Services.Memes
 
             return image;
         }
+
 
         private SolidBrush WhiteColor() => _white;
         

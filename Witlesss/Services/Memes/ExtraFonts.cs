@@ -4,6 +4,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services.Memes
 {
@@ -27,20 +28,25 @@ namespace Witlesss.Services.Memes
             }
         }
 
-        public ExtraFonts(string cmd)
+        public ExtraFonts(string cmd, params string[] exclude)
         {
-            var names = Fonts.Keys.Select(Path.GetFileNameWithoutExtension);
+            var names = Fonts.Keys.Select(Path.GetFileNameWithoutExtension).Where(x => !exclude.Contains(x));
             OtherFonts = new Regex($@"^\/{cmd}\S*({string.Join('|', names)})\S*", RegexOptions.IgnoreCase);
         }
 
         public static FontFamily GetOtherFont(string @default) => Fonts[UseOtherFont ? OtherFontKey : @default];
 
-        public void CheckKey(bool empty, string dummy)
+        public void CheckKey(bool empty, ref string dummy)
         {
             var match = OtherFonts.Match(dummy);
 
             UseOtherFont = !empty && match.Success;
-            if (UseOtherFont) OtherFontKey = match.Groups[1].Value;
+            if (UseOtherFont)
+            {
+                var group = match.Groups[1];
+                OtherFontKey = group.Value;
+                MakeMeme.CaptureOut(group, ref dummy);
+            }
         }
     }
 }

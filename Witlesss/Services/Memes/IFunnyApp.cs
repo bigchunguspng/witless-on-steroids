@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Witlesss.MediaTools;
@@ -11,10 +13,11 @@ namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseRoboto, UseSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
+    public static bool UseOtherFont, UseSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool PickColor, ForceCenter, UseGivenColor, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
     public static Color GivenColor;
+    public static string OtherFontKey;
 
     private Color Background;
     private SolidBrush TextColor;
@@ -36,12 +39,22 @@ public class IFunnyApp
 
     static IFunnyApp()
     {
-        _fonts.AddFontFile(Config.FontBold);
-        _fonts.AddFontFile(Config.FontRegular);
+        var files = Directory.GetFiles(Config.Fonts);
+        Fonts = new(files.Length);
+        var names = files.Select(Path.GetFileNameWithoutExtension).ToList();
+        var collection = new PrivateFontCollection();
+        for (var i = 0; i < files.Length; i++)
+        {
+            collection.AddFontFile(files[i]);
+            Fonts.Add(names[i], collection.Families[i]);
+        }
+        OtherFonts = new Regex($@"^\/top\S*({string.Join('|', names)})\S*", RegexOptions.IgnoreCase);
     }
 
-    private static readonly PrivateFontCollection _fonts = new();
-    private static FontFamily FontFamily => UseSegoe ? SegoeBlack : _fonts.Families[UseRoboto ? 1 : 0];
+    public static readonly Regex OtherFonts;
+
+    private static readonly Dictionary<string, FontFamily> Fonts;
+    private static FontFamily FontFamily => UseSegoe ? SegoeBlack : UseOtherFont ? Fonts[OtherFontKey] : Fonts["ft"];
     private static FontFamily SegoeBlack = new("Segoe UI Black");
     private static Font _sans;
     private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
@@ -83,7 +96,7 @@ public class IFunnyApp
     {
         var emoji = EmojiRegex.Matches(text);
         var funny = emoji.Count > 0;
-        var textM = funny ? EmojiTool.ReplaceEmoji(text, UseRoboto ? "aa" : "НН") : text;
+        var textM = funny ? EmojiTool.ReplaceEmoji(text, UseOtherFont ? "aa" : "НН") : text;
 
         AdjustProportions(textM);
         AdjustTextPosition(text);

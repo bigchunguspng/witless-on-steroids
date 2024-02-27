@@ -48,20 +48,31 @@ namespace Witlesss.Commands.Meme
                 else   IFunnyApp.UseGivenColor = false;
             }
 
+            var fonts = empty ? null : IFunnyApp.OtherFonts.Match(dummy);
+
+            IFunnyApp.UseOtherFont     = !empty && fonts.Success;
+            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
             IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
             IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
             IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
-            IFunnyApp.UseRoboto        = !empty &&  _regular.IsMatch(dummy) && !_futura.IsMatch(dummy);
-            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy) && !_futura.IsMatch(dummy);
             IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
             IFunnyApp.ThinCard         = !empty &&  _thin   .IsMatch(dummy);
             IFunnyApp.UltraThinCard    = !empty &&  _thinner.IsMatch(dummy);
             IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
             IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
 
-            if (empty || !IFunnyApp.UseSegoe && !IFunnyApp.UseRoboto && !_futura.IsMatch(dummy))
+            if (IFunnyApp.UseOtherFont && fonts != null)
+                IFunnyApp.OtherFontKey = fonts.Groups[1].Value;
+
+            if (empty || !IFunnyApp.UseSegoe && !IFunnyApp.UseOtherFont)
             {
-                IFunnyApp.UseSegoe = IsMostlyCyrillic(caption);
+                var cyrillic = IsMostlyCyrillic(caption);
+                IFunnyApp.UseSegoe = cyrillic;
+                if (!cyrillic)
+                {
+                    IFunnyApp.UseOtherFont = true;
+                    IFunnyApp.OtherFontKey = "ft";
+                }
             }
 
             IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(dummy) ? GetInt(  _crop) : 100;
@@ -73,9 +84,7 @@ namespace Witlesss.Commands.Meme
             int GetInt(Regex x) => int.Parse(x.Match(dummy).Groups[1].Value);
         }
 
-        private static readonly Regex _regular = new(@"^\/top\S*rg\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _segoe   = new(@"^\/top\S*sg\S*",            RegexOptions.IgnoreCase);
-        private static readonly Regex _futura  = new(@"^\/top\S*ft\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _left    = new(@"^\/top\S*la\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _blur    = new(@"^\/top\S*blur\S*",          RegexOptions.IgnoreCase);
         private static readonly Regex _thin    = new(@"^\/top\S*mm\S*",            RegexOptions.IgnoreCase);

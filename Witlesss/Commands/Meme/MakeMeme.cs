@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Мемы", MEME_OPTIONS);
+        public override void Run() => Run("Мемы", OPTIONS + "/op_meme");
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeMeme);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeMemeFromSticker);
@@ -48,8 +48,8 @@ namespace Witlesss.Commands.Meme
             MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
             MemeGenerator.WrapText       =  empty || !CheckMatch(ref dummy, _nowrap);
-            MemeGenerator.UseItalic      = !empty &&  CheckMatch(ref dummy, _italic);
             MemeGenerator.ForceImpact    = !empty &&  CheckMatch(ref dummy, _impact);
+            MemeGenerator.UseItalic      = !empty &&  CheckMatch(ref dummy, _italic);
             MemeGenerator.ColorText      = !empty &&  CheckMatch(ref dummy, _colorText);
 
             int GetInt(Regex x)
@@ -107,19 +107,11 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _impact = new(@"^\/meme\S*(m)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _italic = new(@"^\/meme\S*(i)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _impact = new(@"^\/meme\S*(im)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
         private static readonly Regex      _fontSS = new(@"^\/meme\S*?(ss)(\d{1,3})\S*", RegexOptions.IgnoreCase);
-
-        private static bool CheckMatch(ref string dummy, Regex regex)
-        {
-            var match = regex.Match(dummy);
-            if (match.Success) CutCaptureOut(match.Groups[1], ref dummy);
-
-            return match.Success;
-        }
 
         public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)
         {

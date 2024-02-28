@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Подписанки", TOP_OPTIONS); // 🔥🔥🔥✍️
+        public override void Run() => Run("Подписанки", OPTIONS + "/op_top"); // 🔥🔥🔥✍️
 
         public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeCaptionMeme);
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeCaptionMemeFromSticker);

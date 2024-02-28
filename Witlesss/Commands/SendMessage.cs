@@ -1,8 +1,16 @@
 ﻿namespace Witlesss.Commands;
 
-public class GetChatID : Command
+public class SendMessage : Command
 {
-    public override void Run() => Bot.SendMessage(Chat, Chat.ToString());
+    private string _text;
+
+    public SendMessage WithText(string text)
+    {
+        _text = text;
+        return this;
+    }
+
+    public override void Run() => Bot.SendMessage(Chat, _text);
 }
 
 //                    L I V E   G O K U   R E A C T I O N :

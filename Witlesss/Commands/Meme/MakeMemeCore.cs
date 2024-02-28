@@ -200,5 +200,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected static readonly char[] split_chars = new[] { ' ', '\n' };
         
         protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
+
+        protected const string OPTIONS = "ℹ️ Список опций: ";
     }
 }

@@ -542,18 +542,23 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/meme&lt;/code&gt;:
         ///
         ///&lt;code&gt;i&lt;/code&gt; - курсив
         ///&lt;code&gt;c&lt;/code&gt; - цветной текст 🎨
         ///&lt;code&gt;u&lt;/code&gt; - верхний регистр
-        ///&lt;code&gt;r&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
-        ///&lt;code&gt;p&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
         ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
         ///&lt;code&gt;d&lt;/code&gt; - только нижний текст
         ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст (к своему)
         ///&lt;code&gt;w&lt;/code&gt; - не разрывать текст
-        ///&lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры).
+        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры)
+        ///
+        ///&lt;b&gt;Шрифты&lt;/b&gt;:
+        ///
+        ///&lt;code&gt;im&lt;/code&gt; - &lt;i&gt;Impact&lt;/i&gt;
+        ///&lt;code&gt;rg&lt;/code&gt; - &lt;i&gt;Roboto&lt;/i&gt;
+        ///&lt;code&gt;cb&lt;/code&gt; - &lt;i&gt;Creative Bl [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MEME_OPTIONS {
             get {
@@ -941,12 +946,9 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/top&lt;/code&gt;:
         ///
         ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
-        ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
-        ///&lt;code&gt;sg&lt;/code&gt; - шрифт &lt;i&gt;Segoe UI Black&lt;/i&gt;
-        ///&lt;code&gt;ft&lt;/code&gt; - шрифт &lt;i&gt;Futura Extra Black&lt;/i&gt;
         ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
         ///&lt;code&gt;mmm&lt;/code&gt; - супер тонкая плашка
         ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
@@ -954,7 +956,9 @@ namespace Witlesss.XD {
         ///&lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (центр)
         ///&lt;code&gt;bb&lt;/code&gt; - чёрный фон (для стикеров)
         ///&lt;code&gt;80%&lt;/code&gt; - обрезать 20% сверху
-        ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 1 [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
+        ///&lt;code&gt;ms128&lt;/code&gt; - минимальный размер шрифта
+        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TOP_OPTIONS {
             get {

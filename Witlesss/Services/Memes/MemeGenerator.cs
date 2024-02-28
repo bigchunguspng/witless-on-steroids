@@ -53,14 +53,15 @@ namespace Witlesss.Services.Memes
             var back = Witlesss.Memes.Sticker ? new Bitmap(image.Width, image.Height) : image;
             using var graphics = Graphics.FromImage(back);
 
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.InterpolationMode = InterpolationMode.Bilinear;
 
             if (Witlesss.Memes.Sticker)
             {
                 graphics.Clear(UseCustomBg ? CustomBg : Color.Black);
                 graphics.DrawImage(image, Point.Empty);
             }
+
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             var width  = _w - 2 * _margin;
             var height = _h / 3 - _margin;

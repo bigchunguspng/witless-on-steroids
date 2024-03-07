@@ -71,11 +71,16 @@ namespace Witlesss
         public bool Eat(string text)                   => HasUnsavedStuff = Baka.Eat(text, out _);
         public bool Eat(string text, out string eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
 
-        public string Generate(string word = Copypaster.START)
+        public string Generate(string word = Copypaster.START) => TextOrBust(Baka.Generate, word);
+
+        public string GenerateByWord(string word) => TextOrBust(Baka.GenerateByWord, word);
+        public string GenerateByLast(string word) => TextOrBust(Baka.GenerateByLast, word);
+
+        private string TextOrBust(Func<string, string> genetare, string word)
         {
             try
             {
-                return Baka.Generate(word);
+                return genetare(word);
             }
             catch
             {
@@ -84,9 +89,6 @@ namespace Witlesss
             }
         }
 
-        public string GenerateByWord(string word) => Baka.GenerateByWord(word);
-        public string GenerateByLast(string word) => Baka.GenerateByLast(word);
-        
         public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
 
         public void Count() => Generation.Count();

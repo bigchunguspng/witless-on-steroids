@@ -179,6 +179,8 @@ namespace Witlesss
 
         private string FindMatch(string word, string alt, out bool separated)
         {
+            if (Words.Count == 0) throw new Exception("бро так не генерят");
+
             separated = false;
 
             if (Words.ContainsKey(word)) return word;

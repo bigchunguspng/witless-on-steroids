@@ -11,12 +11,26 @@ namespace Witlesss.Commands
         public override void Run()
         {
             var length = 3;
+            var lengthSpecified = false;
             if (Text.HasIntArgument(out int value))
+            {
                 length = System.Math.Clamp(value, 2, 16);
-            
+                lengthSpecified = true;
+            }
+
+            string start = null;
+            var split = Text.Split(' ', lengthSpecified ? 3 : 2);
+            if (split.Length > (lengthSpecified ? 2 : 1))
+            {
+                start = split[^1].ToUpper();
+                length -= 1;
+            }
+
             var lines = new List<string>(length);
             var words = _baguette[START];
             var word = PickWord(words);
+
+            if (start != null) lines.Add(start);
 
             AddTextLine();
 

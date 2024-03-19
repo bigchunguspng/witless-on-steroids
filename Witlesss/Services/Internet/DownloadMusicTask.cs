@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -35,11 +36,19 @@ public class DownloadMusicTask
     public string Artist;
     public string Title;
 
+    private static HashSet<long> _rickrolled = new();
+
     private Bot Bot => Bot.Instance;
 
     public DownloadMusicTask(string id, string options, string file, int message, bool yt, string pl, MessageData data, int format = 251)
     {
-        ID = id;
+        var funnyId = "dQw4w9WgXcQ";
+        ID = IsAprilFools() && yt
+            ? _rickrolled.Contains(data.Chat) 
+                ? id 
+                : funnyId
+            : id;
+        if (ID == funnyId) _rickrolled.Add(data.Chat);
         File = file;
         MessageToDelete = message;
         YouTube = yt;

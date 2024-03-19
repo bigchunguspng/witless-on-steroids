@@ -32,6 +32,8 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
+            var april = IsAprilFools();
+
             var caption = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
 
             var dummy = GetDummy(out var empty);
@@ -43,15 +45,15 @@ namespace Witlesss.Commands.Meme
             }
 
             IFunnyApp.ExtraFonts.CheckKey(empty, ref dummy);
-            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
-            IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
-            IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
-            IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
-            IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
-            IFunnyApp.ThinCard         = !empty &&  _thin   .IsMatch(dummy);
-            IFunnyApp.UltraThinCard    = !empty &&  _thinner.IsMatch(dummy);
-            IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
-            IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
+            IFunnyApp.UseSegoe         = april ? Any() : !empty &&  _segoe  .IsMatch(dummy);
+            IFunnyApp.BackInBlack      = april ? Any() : !empty &&  _blackBG.IsMatch(dummy);
+            IFunnyApp.PickColor        = april ? Any() : !empty &&  _colorPP.IsMatch(dummy);
+            IFunnyApp.ForceCenter      = april ? Any() : !empty &&  _colorFC.IsMatch(dummy);
+            IFunnyApp.UseLeftAlignment = april ? Any() : !empty &&  _left   .IsMatch(dummy);
+            IFunnyApp.ThinCard         = april ? Any() : !empty &&  _thin   .IsMatch(dummy);
+            IFunnyApp.UltraThinCard    = april ? Any() : !empty &&  _thinner.IsMatch(dummy);
+            IFunnyApp.BlurImage        = april ? Any() : !empty &&  _blur   .IsMatch(dummy);
+            IFunnyApp.WrapText         = april ? Any() :  empty || !_nowrap .IsMatch(dummy);
 
             if (empty || !IFunnyApp.UseSegoe && !ExtraFonts.UseOtherFont)
             {
@@ -67,6 +69,11 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(dummy) ? GetInt(  _crop) : 100;
             IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(dummy) ? GetInt(_fontMS) :  10;
             IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) :  36;
+
+            if (april && !IFunnyApp.WrapText && caption.Length > 50)
+            {
+                IFunnyApp.WrapText = true;
+            }
 
             return caption;
 

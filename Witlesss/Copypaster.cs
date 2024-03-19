@@ -287,6 +287,11 @@ namespace Witlesss
 
         public static string PickWord(WordChart words)
         {
+            if (IsAprilFools())
+            {
+                return words.ElementAt(Extension.Random.Next(words.Count)).Key;
+            }
+
             float r = (float) Extension.Random.NextDouble() * words.Sum(chance => chance.Value);
 
             foreach (var chance in words)

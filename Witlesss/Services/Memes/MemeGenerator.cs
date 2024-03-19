@@ -98,7 +98,8 @@ namespace Witlesss.Services.Memes
             path.AddString(text, CaptionFont, (int)CaptionStyle, size, rect, f);
             for (var i = OutlineWidth; i > 0; i--)
             {
-                _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
+                var color = IsAprilFools() ? FunnyColor() : Color.FromArgb(128, 0, 0, 0);
+                _outline = new Pen(color, i);
                 _outline.LineJoin = LineJoin.Round;
                 g.DrawPath(_outline, path);
                 _outline.Dispose();
@@ -108,6 +109,12 @@ namespace Witlesss.Services.Memes
 
         private int OutlineWidth => (int)Math.Round(_size / 6D);
         private SolidBrush Brush => _brushes[ColorText].Invoke();
+
+        private Color FunnyColor()
+        {
+            return Color.FromArgb(128, RandomByte(), RandomByte(), RandomByte());
+        }
+        private int RandomByte() => Extension.Random.Next(256);
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
         private FontFamily CaptionFont => ForceImpact

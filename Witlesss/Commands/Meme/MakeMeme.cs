@@ -39,6 +39,8 @@ namespace Witlesss.Commands.Meme
 
         private void ParseOptions(bool empty, string dummy)
         {
+            var april = IsAprilFools();
+
             MemeGenerator.UseCustomBg = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBg)
             {
@@ -48,9 +50,9 @@ namespace Witlesss.Commands.Meme
             MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
             MemeGenerator.WrapText       =  empty || !CheckMatch(ref dummy, _nowrap);
-            MemeGenerator.ForceImpact    = !empty &&  CheckMatch(ref dummy, _impact);
-            MemeGenerator.UseItalic      = !empty &&  CheckMatch(ref dummy, _italic);
-            MemeGenerator.ColorText      = !empty &&  CheckMatch(ref dummy, _colorText);
+            MemeGenerator.ForceImpact    = april ? Any() : !empty &&  CheckMatch(ref dummy, _impact);
+            MemeGenerator.UseItalic      = april ? Any() : !empty &&  CheckMatch(ref dummy, _italic);
+            MemeGenerator.ColorText      = april ? Any() : !empty &&  CheckMatch(ref dummy, _colorText);
 
             int GetInt(Regex x)
             {
@@ -62,10 +64,12 @@ namespace Witlesss.Commands.Meme
 
         private DgText GetTextPair(string text, bool empty, string dummy, string command)
         {
-            var add_bottom_text  = !empty && CheckMatch(ref dummy, _add_bottom);
-            var only_bottom_text = !empty && CheckMatch(ref dummy, _only_bottom);
-            var only_top_text    = !empty && CheckMatch(ref dummy, _top_only);
-            var matchCaps        = !empty && CheckMatch(ref dummy, _caps);
+            var april = IsAprilFools();
+
+            var add_bottom_text  = april ? Any() : !empty && CheckMatch(ref dummy, _add_bottom);
+            var only_bottom_text = april ? Any() : !empty && CheckMatch(ref dummy, _only_bottom);
+            var only_top_text    = april ? Any() : !empty && CheckMatch(ref dummy, _top_only);
+            var matchCaps        = april ? Any() : !empty && CheckMatch(ref dummy, _caps);
             
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(command));

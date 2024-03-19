@@ -30,7 +30,9 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         public  Point Location => _pic;
 
         private readonly Pen White = new(Color.White, 2);
+        private readonly Pen Black = new(Color.Black, 2);
         private readonly SolidBrush WhiteBrush = new(Color.White);
+        private readonly SolidBrush BlackBrush = new(Color.Black);
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
 
         // /
@@ -113,7 +115,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             using var g = Graphics.FromImage(background);
 
             g.CompositingMode = CompositingMode.SourceCopy;
-            g.Clear(Color.Black);
+            g.Clear(IsAprilFools() ? Color.White : Color.Black);
 
             g.CompositingMode = CompositingMode.SourceOver;
         
@@ -150,7 +152,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 #if DEBUG
             graphics.Clear(Color.Indigo);
 #else
-            graphics.Clear(Color.Black);
+            graphics.Clear(IsAprilFools() ? Color.White : Color.Black);
 #endif
 
             graphics.CompositingMode    = CompositingMode.SourceOver;
@@ -256,8 +258,8 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         
         public void SetColor()
         {
-            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : WhiteBrush;
-            FrameColor = UseGivenColor ? new Pen(GivenColor, 2)     : White;
+            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : IsAprilFools() ? BlackBrush : WhiteBrush;
+            FrameColor = UseGivenColor ? new Pen(GivenColor, 2)     : IsAprilFools() ? Black : White;
         }
     
         public void SetUp(Size size)

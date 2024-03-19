@@ -16,7 +16,9 @@ namespace Witlesss
 
         private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
-        private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
+        private static int Quality => IsAprilFools()
+            ? Extension.Random.Next(17, 51)
+            : JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
         private static int Qscale  => 31 + (int)(-0.29 * (int)JpegCoder.Quality); // 2 - 31
 
         public static readonly Size      VideoNoteSize = new(384, 384);
@@ -28,7 +30,8 @@ namespace Witlesss
 
         public static string MakeDemotivator(string path, DgText text)
         {
-            return Drawer.DrawDemotivator(path, text);
+            var result = Drawer.DrawDemotivator(path, text);
+            return IsAprilFools() ? NICHOTKIE_PRIKOLY(result) : result;
         }
 
         public static string MakeStickerDemotivator(string path, DgText text, string extension)
@@ -44,7 +47,8 @@ namespace Witlesss
 
         public static string MakeDemotivatorB(string path, string text)
         {
-            return _dp.DrawDemotivator(path, text);
+            var result = _dp.DrawDemotivator(path, text);
+            return IsAprilFools() ? NICHOTKIE_PRIKOLY(result) : result;
         }
 
         public static string MakeStickerDemotivatorB(string path, string text, string extension)
@@ -69,7 +73,8 @@ namespace Witlesss
 
         public static string MakeMeme(string path, DgText text)
         {
-            return _imgflip.MakeImpactMeme(path, text);
+            var result = _imgflip.MakeImpactMeme(path, text);
+            return IsAprilFools() ? NICHOTKIE_PRIKOLY(result) : result;
         }
 
         public static string MakeMemeFromSticker(string path, DgText text, string extension)
@@ -89,7 +94,8 @@ namespace Witlesss
 
         public static string MakeCaptionMeme(string path, string text)
         {
-            return _ifunny.MakeCaptionMeme(path, text);
+            var result = _ifunny.MakeCaptionMeme(path, text);
+            return IsAprilFools() ? NICHOTKIE_PRIKOLY(result) : result;
         }
 
         public static string MakeCaptionMemeFromSticker(string path, string text, string extension)
@@ -113,7 +119,13 @@ namespace Witlesss
         public static string DeepFryImage(string path, int _ = 0)
         {
             var extension = Sticker ? ".webp" : Path.GetExtension(path);
-            return new F_Process(path).DeepFry(Qscale).Output("-Nuked", extension);
+            var upper = IsAprilFools() ? 3 : 1;
+            for (var i = 0; i < upper; i++)
+            {
+                path = new F_Process(path).DeepFry(Qscale).Output("-Nuked", extension);
+            }
+
+            return path;
         }
 
         public static string DeepFryStick(string path, int _ = 0, string extension = null) => DeepFryImage(path);
@@ -184,6 +196,16 @@ namespace Witlesss
             var y = (s.Height - d) / 2;
 
             return new F_Process(path).ToVideoNote(new Rectangle(x, y, d, d)).Output("-vnote");
+        }
+
+        private static string NICHOTKIE_PRIKOLY(string path)
+        {
+            var a1 = new[] { "min(1920,ceil((0.5*iw)/2)*2)", "min(1080,ceil((ih*ow/iw)/2)*2)" };
+            var a2 = new[] {   "min(1920,ceil((2*iw)/2)*2)", "min(1080,ceil((ih*ow/iw)/2)*2)" };
+            var bears = new F_Process(path ).ScaleVideo(a1).Output("-bears");
+            var bulls = new F_Process(bears).ScaleVideo(a2).Output("-bulls");
+
+            return bulls;
         }
 
         private static Size GrowSize      (Size s, int minWH = 400)

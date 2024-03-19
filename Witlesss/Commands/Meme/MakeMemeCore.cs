@@ -77,7 +77,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             Memes.Sticker = true;
 
             var repeats = GetRepeats(HasToBeRepeated());
-            var sticker = SendAsSticker();
+            var sticker = IsAprilFools() && Any() || SendAsSticker();
             var extension = GetStickerExtension();
             for (int i = 0; i < repeats; i++)
             {

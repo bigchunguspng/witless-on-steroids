@@ -101,6 +101,14 @@ namespace Witlesss.XD
             return last == "" ? name : name + " " + last;
         }
 
+        public static bool IsAprilFools()
+        {
+            var date = DateTime.Today;
+            return date.Month is 4 && date.Day is >= 1 and <= 3;
+        }
+
+        public static bool Any() => Random.Next(2) == 0;
+
         public static string Quote(string s) => $@"""{s}""";
 
         public static string UniquePath(string path, bool extra = false)

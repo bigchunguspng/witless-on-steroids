@@ -32,6 +32,8 @@ namespace Witlesss.Commands.Meme
 
         protected override string GetMemeText(string text)
         {
+            var april = IsAprilFools();
+
             var dummy = GetDummy(out var empty, out var command);
             
             DynamicDemotivatorDrawer.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
@@ -46,11 +48,11 @@ namespace Witlesss.Commands.Meme
                 else   DynamicDemotivatorDrawer.UseGivenColor = false;
             }
             
-            DynamicDemotivatorDrawer.UseRoboto   = !empty &&  _roboto.IsMatch(dummy) && !_times.IsMatch(dummy);
-            DynamicDemotivatorDrawer.UseImpact   = !empty &&  _impact.IsMatch(dummy) && !_times.IsMatch(dummy);
-            DynamicDemotivatorDrawer.UseBoldFont = !empty &&    _bold.IsMatch(dummy);
-            DynamicDemotivatorDrawer.CropEdges   = !empty &&    _crop.IsMatch(dummy);
-            var matchCaps                        = !empty &&    _caps.IsMatch(dummy);
+            DynamicDemotivatorDrawer.UseRoboto   = april ? Any() : !empty &&  _roboto.IsMatch(dummy) && !_times.IsMatch(dummy);
+            DynamicDemotivatorDrawer.UseImpact   = april ? Any() : !empty &&  _impact.IsMatch(dummy) && !_times.IsMatch(dummy);
+            DynamicDemotivatorDrawer.UseBoldFont = april ? Any() : !empty &&    _bold.IsMatch(dummy);
+            DynamicDemotivatorDrawer.CropEdges   = april ? Any() : !empty &&    _crop.IsMatch(dummy);
+            var matchCaps                        = april ? Any() : !empty &&    _caps.IsMatch(dummy);
 
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(command));

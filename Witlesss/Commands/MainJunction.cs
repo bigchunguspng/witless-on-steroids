@@ -256,6 +256,35 @@ namespace Witlesss.Commands
                     {
                         var text = Text.Clone().ToString();
                         if (Baka.Eat(text, out var eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                        
+                        if (IsAprilFools())
+                        {
+                            var txt = Text.ToLower();
+                            if (txt.StartsWith("я ") || txt.StartsWith("а я") || txt.StartsWith("ая"))
+                            {
+                                Bot.SendMessage(Chat, $"а я {Bot.Me.FirstName}".ToRandomLetterCase());
+                                return;
+                            }
+                            else
+                            {
+                                var space = txt.IndexOf(' ');
+                                if (space != -1 && space == txt.LastIndexOf(' ')) // if txt has only 1 space
+                                {
+                                    var split = txt.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                    if (split.Length == 2 && split[0].Length > 2 && split[1].Length > 2)
+                                    {
+                                        var h = split[0][0];
+                                        var c = split[1][0];
+                                        
+                                        var ood    = split[0].Substring(1);
+                                        var lassic = split[1].Substring(1);
+
+                                        Bot.SendMessage(Chat, $"{c}{ood} {h}{lassic}".ToRandomLetterCase());
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 
@@ -272,7 +301,9 @@ namespace Witlesss.Commands
                 else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(SnapshotMessageData());
 
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
-                ImageProcessor SelectMemeMaker() => _parent._mematics[Baka.Meme.Type];
+                ImageProcessor SelectMemeMaker() => IsAprilFools()
+                    ? _parent._mematics.ElementAt(Extension.Random.Next(_parent._mematics.Count)).Value
+                    : _parent._mematics[Baka.Meme.Type];
 
                 bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance && !BroSpoilers();
                 bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();

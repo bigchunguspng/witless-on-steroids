@@ -26,16 +26,20 @@ namespace Witlesss.MediaTools
             if (VF(i.video)) nodes = nodes.Trim("0:v", span, "vc").Split("v0", "v1").Reverse("v1", "vr").Concat("v0", "vr");
             if (AF(i.audio)) nodes = nodes.Trim("0:a", span, "ac").Split("a0", "a1").Reverse("a1", "ar").Concat("a0", "ar");
             o.WithComplexFilter(nodes);
+
+            if (i.video) o.FixPlayback();
         });
 
 
         // -i input [-s WxH] [-vn] -ss 00:00:05 [-t 00:00:15] output
         public F_Action Cut() => ApplyEffects(o =>
         {
-            AddFixes(o, MediaInfo());
+            var i = MediaInfo();
+            AddFixes(o, i);
 
             o.Seek(_span.Start);
             if (_span.Length != TimeSpan.Zero) o.WithDuration(_span.Length);
+            if (i.video) o.FixPlayback();
         });
 
 

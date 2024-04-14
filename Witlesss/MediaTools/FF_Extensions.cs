@@ -37,6 +37,8 @@ namespace Witlesss.MediaTools
         public static VFO ReverseVideo (this VFO o) => o.With(new  ReverseArgument());
         public static AFO ReverseAudio (this AFO o) => o.With(new AreverseArgument());
 
+        public static FFO FixPlayback  (this FFO o) => o.WithCustomArgument("-pix_fmt yuv420p");
+
 
         private static VFO With(this VFO o, IVideoFilterArgument argument)
         {

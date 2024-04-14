@@ -55,7 +55,7 @@ namespace Witlesss.MediaTools
 
         private static void BuildAndCompress(FFO o, int factor, Filter filter)
         {
-            o.WithComplexFilter(filter);
+            o.WithComplexFilter(filter).FixPlayback();
 
             if (factor >  0) o.WithCompression(factor);
             if (factor > 23) o.WithAudioBitrate(154 - 3 * factor);

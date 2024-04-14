@@ -23,7 +23,7 @@ namespace Witlesss.MediaTools
         {
             var v = GetVideoStream(_input);
             var size = FitSize(new Size(v.Width, v.Height));
-            o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30);
+            o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
 
         // -c:a libopus -b:a 48k -vn
@@ -35,7 +35,7 @@ namespace Witlesss.MediaTools
         // -filter:v "crop=W:H:X:Y" -s 384x384
         public F_Action ToVideoNote(Rectangle crop) => ApplyEffects(o =>
         {
-            o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize);
+            o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize).FixPlayback();
         });
 
         public F_Action ToSticker(Size size) => ApplyEffects(o => o.Resize(size));
@@ -54,7 +54,7 @@ namespace Witlesss.MediaTools
         {
             // factor: 0 lossless - 51 lowest quality
             var i = MediaInfoWithFixing(o);
-            if (i.video) o.WithCompression(factor);
+            if (i.video) o.WithCompression(factor).FixPlayback();
             if (i.audio) o.WithAudioBitrate(154 - 3 * factor);
             if (i.audio && !i.video) o.ForceFormat("mp3");
         }
@@ -63,7 +63,7 @@ namespace Witlesss.MediaTools
         public F_Action CompressAnimation   () => ApplyEffects(o =>
         {
             var v = GetVideoStream(_input);
-            o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30);
+            o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
 
         public F_Action DeepFry        (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
@@ -183,7 +183,7 @@ namespace Witlesss.MediaTools
         public F_Action Reverse() => ApplyEffects(o =>
         {
             var i = MediaInfoWithFixing(o);
-            if (i.video) o.WithVideoFilters(v => v.ReverseVideo());
+            if (i.video) o.WithVideoFilters(v => v.ReverseVideo()).FixPlayback();
             if (i.audio) o.WithAudioFilters(a => a.ReverseAudio());
         });
         
@@ -191,7 +191,7 @@ namespace Witlesss.MediaTools
         public F_Action ChangeSpeed(double speed) => ApplyEffects(o =>
         {
             var i = MediaInfoWithFixing(o);
-            if (i.video) o.WithVideoFilters(v => v.ChangeVideoSpeed(speed).SetFPS(GetFPS()));
+            if (i.video) o.WithVideoFilters(v => v.ChangeVideoSpeed(speed).SetFPS(GetFPS())).FixPlayback();
             if (i.audio) o.WithAudioFilters(a => a.ChangeAudioSpeed(speed));
 
             double GetFPS() => Math.Min(i.v.AvgFrameRate * speed, 90D);
@@ -218,11 +218,11 @@ namespace Witlesss.MediaTools
         #region CROP / SCALE
 
         // -filter:v "crop=272:272:56:56"
-        public F_Action CropVideoNote       () => ApplyEffects(o => o.WithVideoFilters(v => v.Crop(VideoNoteCrop)));
-        public F_Action CropVideo (string[] c) => ApplyEffects(o => o.WithVideoFilters(v => v.Crop(c)));
+        public F_Action CropVideoNote       () => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(VideoNoteCrop)));
+        public F_Action CropVideo (string[] c) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(c)));
 
         // -vf "scale=W:H,setsar=1"
-        public F_Action ScaleVideo(string[] s) => ApplyEffects(o => o.WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
+        public F_Action ScaleVideo(string[] s) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
 
         #endregion
 
@@ -300,6 +300,8 @@ namespace Witlesss.MediaTools
             var onePiece = soundOnly || minutes <= 2 || minutes <= 5 && timecodes.Count <= 24;
             if (onePiece) ApplyTrims(o, info, timecodes);
             else    TrimPieceByPiece(o, info, timecodes, seconds);
+
+            if (info.video) o.FixPlayback();
         }
 
         private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)

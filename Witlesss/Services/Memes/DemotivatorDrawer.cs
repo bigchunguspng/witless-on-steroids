@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
+using System.IO;
 using static System.Drawing.Drawing2D.CompositingMode;
 using static System.Drawing.StringAlignment;
 using static System.Drawing.StringTrimming;
@@ -17,7 +17,7 @@ namespace Witlesss.Services.Memes
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
         
         private static readonly Pen White = new(Color.White, 2);
-        private static readonly Dictionary<Image, Point> Logos = new();
+        private static readonly List<Logo> Logos = new();
 
         static DemotivatorDrawer() => LoadLogos(WATERMARKS_FOLDER);
 
@@ -72,7 +72,7 @@ namespace Witlesss.Services.Memes
             if (_w == 720 && AddLogo)
             {
                 var logo = PickRandomLogo();
-                graphics.DrawImage(logo.Key, logo.Value);
+                graphics.DrawImage(logo.Image, logo.Point);
             }
 
             graphics.CompositingMode = SourceOver;
@@ -103,19 +103,25 @@ namespace Witlesss.Services.Memes
             else x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
         }
 
-        private static KeyValuePair<Image, Point> PickRandomLogo() => Logos.ElementAt(Random.Next(Logos.Count));
+        private static Logo PickRandomLogo() => Logos[Random.Next(Logos.Count)];
 
         private static void LoadLogos(string path)
         {
-            var files = GetFilesInfo(path);
+            var files = GetFilesInfo(path, SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');
                 if (int.TryParse(coords[0], out var x) && int.TryParse(coords[^1], out var y))
-                    Logos.Add(Image.FromFile(file.FullName), new Point(x, y));
+                {
+                    var image = Image.FromFile(file.FullName);
+                    var logo = new Logo(image, new Point(x, y));
+                    Logos.Add(logo);
+                }
             }
         }
     }
+
+    public record Logo(Image Image, Point Point);
 
     public class DrawableText
     {

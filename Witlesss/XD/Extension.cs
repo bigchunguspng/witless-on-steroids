@@ -278,10 +278,10 @@ namespace Witlesss.XD
         public static bool FileEmptyOrNotExist (string path) => !File.Exists(path) || SizeInBytes(path) == 0;
         public static void CreateFilePath      (string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 
-        public static FileInfo[] GetFilesInfo  (string path)
+        public static FileInfo[] GetFilesInfo  (string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
             Directory.CreateDirectory(path);
-            return new  DirectoryInfo(path).GetFiles();
+            return new  DirectoryInfo(path).GetFiles("*", searchOption);
         }
         
         public static string[]   GetFiles      (string path, string pattern = "*")

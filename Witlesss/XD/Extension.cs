@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using static Witlesss.XD.LetterCaseMode;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Witlesss.XD
 {
@@ -315,6 +316,22 @@ namespace Witlesss.XD
             {
                 LogError($"CAN'T DEL TEMP [{path}] >> {e.Message}");
             }
+        }
+    }
+
+    public static class Helpers
+    {
+        public static Stopwatch GetStartedStopwatch()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            return sw;
+        }
+
+        public static void Log(this Stopwatch sw, string message)
+        {
+            Logger.Log($"{sw.Elapsed.TotalSeconds:##0.00000}\t{message}");
+            sw.Restart();
         }
     }
 }

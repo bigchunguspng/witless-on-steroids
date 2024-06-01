@@ -212,6 +212,7 @@ namespace Witlesss.Services.Memes
         Font Font           { get; }
         SolidBrush Color    { get; }
         RectangleF Layout   { get; }
+        RichTextOptions RTO { get; }
         //StringFormat Format { get; }
 
         public Size EmojiSize => new(EmojiS, EmojiS);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
+using SixLabors.ImageSharp;
 using Telegram.Bot.Types;
 using static Witlesss.XD.LetterCaseMode;
 using Stopwatch = System.Diagnostics.Stopwatch;
@@ -316,6 +317,15 @@ namespace Witlesss.XD
             {
                 LogError($"CAN'T DEL TEMP [{path}] >> {e.Message}");
             }
+        }
+
+        public static System.Drawing.Size Ok(this Size size) => new(size.Width, size.Height);
+        public static Size Ok(this System.Drawing.Size size) => new(size.Width, size.Height);
+
+        public static T GetRandomMemeber<T>() where T : Enum
+        {
+            var values = Enum.GetValues(typeof(T));
+            return (T)values.GetValue(Random.Next(values.Length))!;
         }
     }
 

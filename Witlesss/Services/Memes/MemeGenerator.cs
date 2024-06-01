@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
-using static System.Drawing.StringAlignment;
-using static System.Drawing.StringTrimming;
+using System.Numerics;
+using ColorHelper;
+using SixLabors.Fonts;
+using SixLabors.Fonts.Tables.AdvancedTypographic;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Drawing.Processing.Processors.Text;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Processors.Dithering;
 
 namespace Witlesss.Services.Memes
 {
@@ -18,10 +25,10 @@ namespace Witlesss.Services.Memes
         
         private int _w, _h, _marginBottomText, _margin, _startingSize, _size;
         private Pen _outline;
-        private readonly FontFamily  _impact = new("Impact");
+        private readonly FontFamily  _impact = SystemFonts.Get("Impact");
         private readonly SolidBrush   _white = new(Color.White);
-        private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
-        private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
+        //private readonly StringFormat _upper = new() { Alignment = Center, Trimming = Word };
+        //private readonly StringFormat _lower = new() { Alignment = Center, Trimming = Word, LineAlignment = Far};
         private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
 
         public MemeGenerator() => _brushes = new Dictionary<bool, Func<SolidBrush>>
@@ -44,35 +51,38 @@ namespace Witlesss.Services.Memes
 
         public string MakeImpactMeme(string path, DgText text)
         {
-            return JpegCoder.SaveImage(DrawCaption(text, GetImage(path)), PngJpg.Replace(path, "-M.jpg"));
+            return ImageSaver.SaveImage(DrawCaption(text, GetImage(path)), PngJpg.Replace(path, "-M.jpg"));
         }
 
-        public string BakeCaption(DgText text) => JpegCoder.SaveImageTemp(DrawCaption(text, new Bitmap(_w, _h)));
-        private Image DrawCaption(DgText text, Image image)
+        public string BakeCaption(DgText text)
         {
-            var back = Witlesss.Memes.Sticker ? new Bitmap(image.Width, image.Height) : image;
-            using var graphics = Graphics.FromImage(back);
+            var caption = DrawCaption(text, new Image<Rgba32>(_w, _h));
+            return ImageSaver.SaveImageTemp(caption);
+        }
 
-            graphics.InterpolationMode = InterpolationMode.Bilinear;
+        private Image DrawCaption(DgText text, Image<Rgba32> image)
+        {
+            var back = Witlesss.Memes.Sticker ? new Image<Rgba32>(image.Width, image.Height) : image;
+
+            //graphics.InterpolationMode = InterpolationMode.Bilinear;
 
             if (Witlesss.Memes.Sticker)
             {
-                graphics.Clear(UseCustomBg ? CustomBg : Color.Black);
-                graphics.DrawImage(image, Point.Empty);
+                back.Mutate(x => x.Fill(UseCustomBg ? CustomBg : Color.Black).DrawImage(image, opacity: 1));
             }
 
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            //graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             var width  = _w - 2 * _margin;
             var height = _h / 3 - _margin;
 
-            AddText(text.A, _startingSize, graphics, _upper, new Rectangle(_margin, _margin,           width, height));
-            AddText(text.B, _startingSize, graphics, _lower, new Rectangle(_margin, _marginBottomText, width, height));
+            AddText(text.A, _startingSize, back, /*_upper, */new Rectangle(_w / 2,      _margin, width, height));
+            AddText(text.B, _startingSize, back, /*_lower, */new Rectangle(_w / 2, _h - _margin, width, height));
 
             return back;
         }
 
-        private void AddText(string text, int size, Graphics g, StringFormat f, Rectangle rect)
+        private void AddText(string text, int size, Image<Rgba32> img, Rectangle rect)
         {
             if (string.IsNullOrEmpty(text)) return;
 
@@ -80,33 +90,53 @@ namespace Witlesss.Services.Memes
             text = text.TrimStart('\n');
 
             // adjust font size
-            var maxLines = text.Count(c => c == '\n') + 1;
+            //var maxLines = text.Count(c => c == '\n') + 1;
             var s = size * 0.75f;
-            var r = rect.Size with { Height = rect.Size.Height * 3 };
-            var go = true;
+            //var r = rect.Size with { Height = rect.Size.Height * 3 };
+            /*var go = true;
             while (go)
             {
-                var ms = g.MeasureString(text, SelectFont(s), r, f, out _, out var lines);
+                var ms = img.MeasureString(text, SelectFont(s), r, f, out _, out var lines);
                 go = ms.Height > rect.Size.Height && s > 2 || !WrapText && lines > maxLines;
                 s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
-            }
+            }*/
             size = (int)(s / 0.75f);
             _size = size;
 
             // write
-            using var path = new GraphicsPath();
+            var options = new RichTextOptions(SelectFont(s))
+            {
+                Dpi = 96,
+                TextAlignment = TextAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = rect.Y == _margin ? VerticalAlignment.Top : VerticalAlignment.Bottom,
+                Origin = rect.Location,
+                WrappingLength = _w - 2 * _margin,
+            };
+            var ow = OutlineWidth;
+            var penOptions = new PenOptions(Color.Black, ow)
+            {
+                JointStyle = GetRandomMemeber<JointStyle>(),
+                EndCapStyle = GetRandomMemeber<EndCapStyle>()
+            };
+            img.Mutate(x => x.DrawText(options, text, new SolidPen(penOptions)));
+            options.Origin += new Vector2(ow / 2F, ow / 3F);
+            img.Mutate(x => x.DrawText(options, text, new SolidBrush(Color.White)));
+
+            // todo implement outline using moving kernel
+            /*using var path = new GraphicsPath();
             path.AddString(text, CaptionFont, (int)CaptionStyle, size, rect, f);
             for (var i = OutlineWidth; i > 0; i--)
             {
                 _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
                 _outline.LineJoin = LineJoin.Round;
-                g.DrawPath(_outline, path);
+                img.DrawPath(_outline, path);
                 _outline.Dispose();
             }
-            g.FillPath(Brush, path);
+            img.FillPath(Brush, path);*/
         }
 
-        private int OutlineWidth => (int)Math.Round(_size / 6D);
+        private int OutlineWidth => (int)Math.Round(_size / 7D);
         private SolidBrush Brush => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
@@ -121,13 +151,20 @@ namespace Witlesss.Services.Memes
                 ? FontStyle.Bold
                 : FontStyle.Regular;
 
-        private Image GetImage(string path)
+        private Image<Rgba32> GetImage(string path)
         {
-            var i = Image.FromFile(path);
-            var image = i.Width < 200 ? new Bitmap(i, new Size(200, i.Height * 200 / i.Width)) : new Bitmap(i);
+            var info = Image.Identify(path);
+            var size = info.Width < 200 ? new Size(new Size(200, info.Height * 200 / info.Width)) : info.Size;
 
-            SetUp(image.Size);
+            SetUp(size);
 
+            var image = Image.Load<Rgba32>(path);
+            if (size != info.Size)
+            {
+                image.Mutate(x => x.Resize(size));
+            }
+
+            //image.Mutate(x => x.Dither(new OrderedDither((uint)d)));
             return image;
         }
 
@@ -137,42 +174,19 @@ namespace Witlesss.Services.Memes
         private SolidBrush RandomColor()
         {
             var h = Extension.Random.Next(360);
-            var s = Extension.Random.NextDouble();
-            var v = Extension.Random.NextDouble();
+            var s = (byte)Extension.Random.Next(byte.MaxValue);
+            var v = (byte)Extension.Random.Next(byte.MaxValue);
 
-            var o = Math.Min(OutlineWidth,       6);
+            /*var o = Math.Min(OutlineWidth,       6);
             var x = Math.Min(Math.Abs(240 - h), 60);
 
             s = s * (0.75 + x / 240D);  // <-- removes dark blue
             s = s * (0.25 + 0.125 * o); // <-- makes small text brighter
 
-            v = 1 - 0.3 * v * Math.Sqrt(s);
+            v = 1 - 0.3 * v * Math.Sqrt(s);*/
 
-            return new SolidBrush(ColorFromHSV(h, s, v));
-        }
-
-        private static Color ColorFromHSV(double hue, double saturation, double value)
-        {
-            var sextants = hue / 60;
-            var triangle = Math.Floor(sextants);
-            var dye = Convert.ToInt32(triangle) % 6;
-            var fraction = sextants - triangle;
-
-            value = value * 255;
-            var v = Convert.ToInt32(value);
-            var p = Convert.ToInt32(value * (1 - saturation));
-            var q = Convert.ToInt32(value * (1 - saturation * fraction));
-            var t = Convert.ToInt32(value * (1 - saturation * (1 - fraction)));
-
-            return dye switch
-            {
-                0 => Color.FromArgb(v, t, p),
-                1 => Color.FromArgb(q, v, p),
-                2 => Color.FromArgb(p, v, t),
-                3 => Color.FromArgb(p, q, v),
-                4 => Color.FromArgb(t, p, v),
-                _ => Color.FromArgb(v, p, q)
-            };
+            var c = ColorConverter.HslToRgb(new HSL(h, s, v));
+            return new SolidBrush(new Color(new Rgb24(c.R, c.G, c.B)));
         }
     }
 }

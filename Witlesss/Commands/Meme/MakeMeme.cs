@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
 
         public ImageProcessor SetUp(int w, int h)
         {
-            JpegCoder.PassQuality(Baka);
+            ImageSaver.PassQuality(Baka);
 
             return this;
         }
@@ -39,11 +39,11 @@ namespace Witlesss.Commands.Meme
 
         private void ParseOptions(bool empty, string dummy)
         {
-            MemeGenerator.UseCustomBg = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
+            /*MemeGenerator.UseCustomBg = Memes.Sticker && !empty && _custom_bg.IsMatch(dummy);
             if (MemeGenerator.UseCustomBg)
             {
                 ParseColorOption(_custom_bg, ref dummy, ref MemeGenerator.CustomBg, ref MemeGenerator.UseCustomBg);
-            }
+            }*/
 
             MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;

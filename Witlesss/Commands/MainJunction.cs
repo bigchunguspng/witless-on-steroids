@@ -11,8 +11,6 @@ namespace Witlesss.Commands
 {
     public class MainJunction : CallBackHandlingCommand
     {
-        private Command        _sc;
-        private WitlessCommand _wc;
         private readonly MakeMeme _meme = new();
         private readonly AddCaption _whenthe = new();
         private readonly Demotivate _demotivate = new();
@@ -59,6 +57,9 @@ namespace Witlesss.Commands
         private readonly MemeProcessors _mematics;
         private readonly Stopwatch _watch = new();
 
+        private readonly CommandRegistry<Command> _simpleCommands;
+        private readonly CommandRegistry<WitlessCommand> _witlessCommands;
+
         private long _lastChat;
         private int   _annoyed;
 
@@ -73,6 +74,59 @@ namespace Witlesss.Commands
                 { MemeType.Dp, _dp },
                 { MemeType.Nuke, _fryer }
             };
+
+            _simpleCommands = new CommandRegistry<Command>()
+                .Register("fast"   , () => _speed.SetMode(SpeedMode.Fast))
+                .Register("slow"   , () => _speed.SetMode(SpeedMode.Slow))
+                .Register("crop"   , () => _crop.UseDefaultMode())
+                .Register("shake"  , () => _crop.UseShakeMode())
+                .Register("scale"  , () => _scale)
+                .Register("slice"  , () => _slice)
+                .Register("cut"    , () => _cut)
+                .Register("sus"    , () => _sus)
+                .Register("damn"   , () => _bitrate)
+                .Register("reverse", () => _reverse)
+                .Register("sex"    , () => _sticker)
+                .Register("song"   , () => _song)
+                .Register("eq"     , () => _equalize)
+                .Register("vol"    , () => _volume)
+                .Register("g"      , () => _audio)
+                .Register("note"   , () => _note)
+                .Register("vova"   , () => _voice)
+                .Register("w"      , () => _reddit)
+                .Register("link"   , () => _link)
+                .Register("ff"     , () => _edit)
+                .Register("piece"  , () => _piece)
+                .Register("debug"  , () => _debug)
+                .Register("chat_id", () => _mail.WithText(Chat.ToString()))
+                .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
+                .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
+                .Register("spam"   , () => _spam)
+                .Register("tell"   , () => _tell)
+                .Build();
+
+            _witlessCommands = new CommandRegistry<WitlessCommand>()
+                .Register("dp"      , () => _dp)
+                .Register("dg"      , () => _demotivate.SetUp(DgMode.Square))
+                .Register("dv"      , () => _demotivate.SetUp(DgMode.Wide))
+                .Register("meme"    , () => _meme)
+                .Register("top"     , () => _whenthe)
+                .Register("nuke"    , () => _fryer)
+                .Register("a"       , () => _generate)
+                .Register("zz"      , () => _generateB)
+                .Register("b"       , () => _bouhourt)
+                .Register("set"     , () => _frequency)
+                .Register("pics"    , () => _probability)
+                .Register("quality" , () => _quality)
+                .Register("stickers", () => _stickers)
+                .Register("chat"    , () => _chat)
+                .Register("fuse"    , () => _fuse)
+                .Register("move"    , () => _move)
+                .Register("board"   , () => _boards)
+                .Register("xd"      , () => _comments)
+                .Register("delete"  , () => _delete)
+                .Register("admins"  , () => _admins)
+                .Build();
         }
 
         private static bool TextIsCommand(out string command)
@@ -112,71 +166,20 @@ namespace Witlesss.Commands
 
         private bool DoSimpleCommands(string command)
         {
-            if      (CommandIs( "/fast"   )) _sc = _speed.SetMode(SpeedMode.Fast);
-            else if (CommandIs( "/slow"   )) _sc = _speed.SetMode(SpeedMode.Slow);
-            else if (CommandIs( "/crop"   )) _sc = _crop.UseDefaultMode();
-            else if (CommandIs( "/shake"  )) _sc = _crop.UseShakeMode();
-            else if (CommandIs( "/scale"  )) _sc = _scale;
-            else if (CommandIs( "/slice"  )) _sc = _slice;
-            else if (CommandIs( "/cut"    )) _sc = _cut;
-            else if (CommandIs( "/sus"    )) _sc = _sus;
-            else if (CommandIs( "/damn"   )) _sc = _bitrate;
-            else if (command == "/reverse" ) _sc = _reverse;
-            else if (CommandIs( "/sex"    )) _sc = _sticker;
-            else if (CommandIs( "/song"   )) _sc = _song;
-            else if (CommandIs( "/eq"     )) _sc = _equalize;
-            else if (CommandIs( "/vol"    )) _sc = _volume;
-            else if (command == "/g"       ) _sc = _audio;
-            else if (command == "/note"    ) _sc = _note;
-            else if (command == "/vova"    ) _sc = _voice;
-            else if (CommandIs( "/w"      )) _sc = _reddit;
-            else if (CommandIs( "/link"   )) _sc = _link;
-            else if (CommandIs( "/ff"     )) _sc = _edit;
-            else if (CommandIs( "/piece"  )) _sc = _piece;
-            else if (command == "/debug"   ) _sc = _debug;
-            else if (command == "/chat_id" ) _sc = _mail.WithText(Chat.ToString());
-            else if (command == "/op_top"  ) _sc = _mail.WithText(TOP_OPTIONS);
-            else if (command == "/op_meme" ) _sc = _mail.WithText(MEME_OPTIONS);
-            else if (CommandIs( "/spam"   )) _sc = _spam;
-            else if (CommandIs( "/tell"   )) _sc = _tell;
-            else return false;
+            var func = _simpleCommands.Resolve(command);
+            if (func is null) return false;
 
-            _sc.Run();
-
+            func.Invoke().Run();
             return true;
-            
-            bool CommandIs(string s) => command.StartsWith(s);
         }
 
         private bool DoWitlessCommands(string command)
         {
-            if      (CommandIs( "/dp"        )) _wc = _dp;
-            else if (CommandIs( "/dg"        )) _wc = _demotivate.SetUp(DgMode.Square);
-            else if (CommandIs( "/dv"        )) _wc = _demotivate.SetUp(DgMode.Wide);
-            else if (CommandIs( "/meme"      )) _wc = _meme;
-            else if (CommandIs( "/top"       )) _wc = _whenthe;
-            else if (CommandIs( "/a"         )) _wc = _generate;
-            else if (CommandIs( "/zz"        )) _wc = _generateB;
-            else if (CommandIs( "/board"     )) _wc = _boards;
-            else if (CommandIs( "/b"         )) _wc = _bouhourt;
-            else if (CommandIs( "/quality"   )) _wc = _quality;
-            else if (CommandIs( "/nuke"      )) _wc = _fryer;
-            else if (CommandIs( "/pics"      )) _wc = _probability;
-            else if (CommandIs( "/set"       )) _wc = _frequency;
-            else if (CommandIs( "/fuse"      )) _wc = _fuse;
-            else if (CommandIs( "/move"      )) _wc = _move;
-            else if (CommandIs( "/xd"        )) _wc = _comments;
-            else if (command == "/stickers"   ) _wc = _stickers;
-            else if (command == "/chat"       ) _wc = _chat;
-            else if (command == "/only_admins") _wc = _admins;
-            else if (command == "/delete"     ) _wc = _delete;
-            else return true;
+            var func = _witlessCommands.Resolve(command);
+            if (func is null) return true;
 
-            _wc.Run();
-            
+            func.Invoke().Run();
             return true;
-
-            bool CommandIs(string s) => command.StartsWith(s);
         }
 
         private static bool DoStartCommand(string command)

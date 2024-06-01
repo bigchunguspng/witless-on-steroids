@@ -11,7 +11,9 @@ namespace Witlesss
         public  const string   START = "_start",      END = "_end";
         private const string    LINK = "[ссылка удалена]", LINK_eng = "[deleted]", LINK_ua = "[видалено]";
         private const string      LF = "_LF", LF_Spaced = $" {LF} ";
-        private readonly Regex _urls = new(@"\S+(:[\/\\])\S+"), _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
+
+        private static readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
+        private static readonly Regex _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
 
         public WitlessDB Words { get; set; } = new();
 

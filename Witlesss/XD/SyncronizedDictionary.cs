@@ -7,14 +7,8 @@ namespace Witlesss.XD
 {
     public class SyncronizedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private readonly object _sync;
-        private Dictionary<TKey, TValue> _dictionary;
-        
-        public SyncronizedDictionary()
-        {
-            _dictionary = new Dictionary<TKey, TValue>();
-            _sync = new object();
-        }
+        private readonly object _sync = new();
+        private Dictionary<TKey, TValue> _dictionary = new();
 
         public object Sync => _sync;
 

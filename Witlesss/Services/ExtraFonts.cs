@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SixLabors.Fonts;
 
 namespace Witlesss.Services
 {
@@ -18,13 +17,15 @@ namespace Witlesss.Services
         static ExtraFonts()
         {
             var files = Directory.GetFiles(Config.Fonts);
-            var collection = new PrivateFontCollection();
-            files.ForEach(file => collection.AddFontFile(file));
-            _fonts = new(files.Length);
+            var collection = new FontCollection();
+            files.ForEach(file => collection.Add(file));
+
+            _fonts = new Dictionary<string, FontFamily>(files.Length);
+            var families = collection.Families.ToArray();
             for (var i = 0; i < files.Length; i++)
             {
                 var key = Path.GetFileNameWithoutExtension(files[i]);
-                _fonts.Add(key!, collection.Families[i]);
+                _fonts.Add(key, families[i]);
             }
         }
 

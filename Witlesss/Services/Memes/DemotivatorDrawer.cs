@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using static System.Drawing.Drawing2D.CompositingMode;
-using static System.Drawing.StringAlignment;
-using static System.Drawing.StringTrimming;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Witlesss.Services.Memes
 {
@@ -12,11 +16,10 @@ namespace Witlesss.Services.Memes
         public static bool AddLogo;
 
         private readonly int _w, _h;
-        private readonly Rectangle _frame;
+        private readonly RectangleF _frame;
         private readonly DrawableText _textA = new(), _textB = new();
-        private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
-        
-        private static readonly Pen White = new(Color.White, 2);
+        //private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
+
         private static readonly List<Logo> Logos = new();
 
         static DemotivatorDrawer() => LoadLogos(WATERMARKS_FOLDER);
@@ -41,16 +44,16 @@ namespace Witlesss.Services.Memes
             var marginB = imageMarginB - space;
 
             Pic = new Point(imageMarginS, imageMarginT);
-            _frame = new Rectangle(marginS, marginT, _w - 2 * marginS, _h - marginT - marginB);
+            _frame = new RectangleF(marginS - 0.5F, marginT - 0.5F, _w - 2 * marginS, _h - marginT - marginB);
 
             if (width == 1280)
             {
-                _textA.P = DgTextParameters.LargeText(_h - imageMarginB + 28, _w);
+                _textA.P = DgTextParameters.LargeText(_h - imageMarginB + 33, _w);
                 _textB.P = DgTextParameters.LowerText(_h, 0);
             }
             else
             {
-                _textA.P = DgTextParameters.UpperText(_h - imageMarginB + 18, _w);
+                _textA.P = DgTextParameters.UpperText(_h - imageMarginB + 13, _w);
                 _textB.P = DgTextParameters.LowerText(_h - imageMarginB + 84, _w);
             }
         }
@@ -58,52 +61,120 @@ namespace Witlesss.Services.Memes
         public Size Size { get; }
         public Point Pic { get; }
 
-        public string DrawDemotivator(string path, DgText text) => PasteImage(DrawFrame(text), path);
+        public string DrawDemotivator(string path, DgText text)
+        {
 
-        public string MakeFrame(DgText text) => JpegCoder.SaveImageTemp(DrawFrame(text));
+            var sw = Helpers.GetStartedStopwatch();
+            var result = PasteImage(DrawFrame(text), path);
+            sw.Log("DrawDemotivator");
+            return result;
+        }
+
+        public string MakeFrame(DgText text) => ImageSaver.SaveImageTemp(DrawFrame(text));
         private Image DrawFrame(DgText text)
         {
-            Image background = new Bitmap(_w, _h);
-            using var graphics = Graphics.FromImage(background);
+            var background = new Image<Rgb24>(_w, _h, Color.Black);
 
-            graphics.CompositingMode = SourceCopy;
-            graphics.Clear(Color.Black);
-            graphics.DrawRectangle(White, _frame);
+            var ops_frame = new DrawingOptions
+            {
+                GraphicsOptions = new GraphicsOptions
+                {
+                    Antialias = false,
+                },
+            };
+            var penOptions = new PenOptions(Color.White, 1.5F)
+            {
+                JointStyle = JointStyle.Miter,
+                EndCapStyle = EndCapStyle.Polygon,
+            };
+            var pen = new SolidPen(penOptions);
+            background.Mutate(x => x.Draw(ops_frame, pen, _frame));
+
             if (_w == 720 && AddLogo)
             {
                 var logo = PickRandomLogo();
-                graphics.DrawImage(logo.Image, logo.Point);
+                background.Mutate(x => x.DrawImage(logo.Image, logo.Point, new GraphicsOptions()));
             }
 
-            graphics.CompositingMode = SourceOver;
+            /*var options = new DrawingOptions
+            {
+                GraphicsOptions = new GraphicsOptions
+                {
+                    AntialiasSubpixelDepth = 0,
+                    BlendPercentage = 0,
+                    Antialias = false,
+                    ColorBlendingMode = PixelColorBlendingMode.Normal,
+                    AlphaCompositionMode = PixelAlphaCompositionMode.SrcOver
+                },
+                ShapeOptions = new ShapeOptions
+                {
+                    ClippingOperation = ClippingOperation.None,
+                    IntersectionRule = IntersectionRule.EvenOdd
+                },
+                Transform = default
+            };*/
+            _textA.Pass(text.A);
+            _textB.Pass(text.B);
 
-            _textA.Pass(graphics, text.A);
-            _textB.Pass(graphics, text.B);
+            DrawText(background, _textA);
+            DrawText(background, _textB);
 
-            DrawText(_textA);
-            DrawText(_textB);
-            
             return background;
         }
 
         private string PasteImage(Image background, string picture)
         {
-            using var graphics = Graphics.FromImage(background);
-            using var image = new Bitmap(Image.FromFile(picture), Size);
+            //var options = new DecoderOptions { TargetSize = Size };
+            using var image = Image.Load(picture);
 
-            graphics.DrawImage(image, Pic);
+            image.Mutate(x => x.Resize(Size));
+            background.Mutate(x => x.DrawImage(image, Pic, new GraphicsOptions()));
 
-            return JpegCoder.SaveImage(background, PngJpg.Replace(picture, "-D.jpg"));
+            return ImageSaver.SaveImage(background, PngJpg.Replace(picture, "-D.jpg"));
         }
 
-        private void DrawText(DrawableText x)
+        private void DrawText(Image image, DrawableText t)
+        {
+            /*var emoji = EmojiRegex.Matches(t.S);
+            if (emoji.Count > 0) _emojer.DrawTextAndEmoji(t.G,   t.S, emoji, t.P);
+            else*/
+            {
+                var options = new DrawingOptions
+                {
+                    GraphicsOptions = new GraphicsOptions
+                    {
+                        AntialiasSubpixelDepth = 1,
+                        Antialias = true,
+                    },
+                };
+                //image.Mutate(x => x.Fill(t.P.EmojiS > 40 ? Color.Purple : Color.Aqua, t.P.Layout));
+                TextMeasurer.TryMeasureCharacterBounds(t.S, t.P.RTO, out var bounds);
+                var lines = 0;
+                for (var i = 0; i < bounds.Length - 1; i++)
+                {
+                    // detect 1st line break
+                    if (bounds[i].Bounds.X > bounds[i + 1].Bounds.X)
+                    {
+                        lines++;
+                        if (lines == t.P.Lines)
+                        {
+                            t.S = t.S[..i];
+                            break;
+                        }
+                    }
+                }
+                image.Mutate(x => x.DrawText(options, t.P.RTO, t.S, brush: t.P.Color, pen: null));
+            }
+        }
+
+        /*private void DrawText(DrawableText x)
         {
             var emoji = EmojiRegex.Matches(x.S);
             if (emoji.Count > 0) _emojer.DrawTextAndEmoji(x.G,   x.S, emoji, x.P);
             else x.G.DrawString(x.S, x.P.Font, x.P.Color, x.P.Layout, x.P.Format);
-        }
+        }*/
 
-        private static Logo PickRandomLogo() => Logos[Random.Next(Logos.Count)];
+        private static Logo PickRandomLogo() => Logos[Extension.Random.Next(Logos.Count)];
 
         private static void LoadLogos(string path)
         {
@@ -113,7 +184,7 @@ namespace Witlesss.Services.Memes
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');
                 if (int.TryParse(coords[0], out var x) && int.TryParse(coords[^1], out var y))
                 {
-                    var image = Image.FromFile(file.FullName);
+                    var image = Image.Load(file.FullName);
                     var logo = new Logo(image, new Point(x, y));
                     Logos.Add(logo);
                 }
@@ -125,11 +196,13 @@ namespace Witlesss.Services.Memes
 
     public class DrawableText
     {
-        public Graphics G;
         public string S;
-        public TextParameters P;
+        public DgTextParameters P;
 
-        public void Pass(Graphics g, string s) { G = g; S = s; }
+        public void Pass(string s)
+        {
+            S = s;
+        }
     }
 
     public interface TextParameters
@@ -139,8 +212,8 @@ namespace Witlesss.Services.Memes
         Font Font           { get; }
         SolidBrush Color    { get; }
         RectangleF Layout   { get; }
-        StringFormat Format { get; }
-        
+        //StringFormat Format { get; }
+
         public Size EmojiSize => new(EmojiS, EmojiS);
     }
 
@@ -151,24 +224,35 @@ namespace Witlesss.Services.Memes
         public Font Font           { get; private init; }
         public SolidBrush Color    { get; private init; }
         public RectangleF Layout   { get; private init; }
-        public StringFormat Format { get; private init; }
+        public RichTextOptions RTO { get; private init; }
 
-        public static DgTextParameters LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w);
-        public static DgTextParameters UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w);
-        public static DgTextParameters LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w);
+        public static DgTextParameters LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w, 1.00F);
+        public static DgTextParameters UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w, 1.36F);
+        public static DgTextParameters LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w, 1.39F);
 
-        private static Font LargeFont => new(DEMOTIVATOR_UPPER_FONT, 48);
-        private static Font UpperFont => new(DEMOTIVATOR_UPPER_FONT, 36);
-        private static Font LowerFont => new(DEMOTIVATOR_LOWER_FONT, 18);
+        private static Font LargeFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 64);
+        private static Font UpperFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 48);
+        private static Font LowerFont => new(SystemFonts.Get(DEMOTIVATOR_LOWER_FONT), 24);
 
-        private static DgTextParameters Construct(Font f, int l, int e, int margin, int width) => new()
+        private static DgTextParameters Construct
+        (
+            Font f, int l, int e, int margin, int width, float lineSpacing
+        ) => new()
         {
             Font   = f,
             Lines  = l,
             EmojiS = e,
-            Color  = new SolidBrush(System.Drawing.Color.White),
+            Color  = new SolidBrush(SixLabors.ImageSharp.Color.White),
             Layout = new RectangleF(0, margin, width, 100),
-            Format = new StringFormat(StringFormatFlags.NoWrap) { Alignment = Center, Trimming = Word }
+            RTO = new RichTextOptions(f)
+            {
+                LineSpacing = lineSpacing,
+                Origin = new Point(0, margin),
+                WrappingLength = width,
+                WordBreaking = WordBreaking.Standard,
+                TextAlignment = TextAlignment.Center,
+                KerningMode = KerningMode.Standard,
+            }
         };
     }
 }

@@ -1,36 +1,29 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Global
 {
-    public static class JpegCoder
+    public static class ImageSaver
     {
         private static int _temp;
-        private static readonly ImageCodecInfo JpgEncoder;
-        private static readonly EncoderParameters EncoderParameters;
 
-        public static long Quality { get; private set; } = 120;
+        public static int Quality { get; private set; }
 
-        static JpegCoder()
+        static ImageSaver()
         {
-            JpgEncoder = ImageCodecInfo.GetImageEncoders().First(x => x.FormatID == ImageFormat.Jpeg.Guid);
-            EncoderParameters = new EncoderParameters(count: 1);
+            Quality = 75;
         }
 
         public static void PassQuality(Witless witless) => PassQuality(witless.Meme.Quality);
         public static void PassQuality(int value)
         {
-            if (Quality == value) return;
-
             Quality = value;
-            EncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, value);
         }
 
         public static string SaveImage(Image image, string path)
         {
             path = UniquePath(path);
-            image.Save(path, JpgEncoder, EncoderParameters);
+            image.SaveAsJpeg(path, GetJpegEncoder());
             image.Dispose();
 
             return path;
@@ -39,11 +32,13 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
         public static string SaveImageTemp(Image image)
         {
             var path = GetTempPicName();
-            image.Save(path);
+            image.SaveAsPng(path);
             image.Dispose();
 
             return path;
         }
+
+        public static JpegEncoder GetJpegEncoder() => new() { Quality = Quality };
 
         public static string GetTempPicName() => UniquePath($@"{TEMP_FOLDER}\x_{_temp++}.png");
     }

@@ -70,7 +70,9 @@ namespace Witlesss.Services.Memes
             AddText(background, /*_upper, */text.A, _startingSize, new Rectangle(_w / 2,      _margin, width, height));
             AddText(background, /*_lower, */text.B, _startingSize, new Rectangle(_w / 2, _h - _margin, width, height));
 
-            return background;
+            var image = DrawShadow(background);
+            background.Dispose();
+            return image;
         }
 
         private void AddText(Image<Rgba32> background, string text, int size, Rectangle rect)
@@ -138,7 +140,7 @@ namespace Witlesss.Services.Memes
             WrappingLength = _w - 2 * _margin
         };
 
-        private int OutlineWidth => (int)Math.Round(_size / 7D);
+        private int GetOutlineWidth() => (int)Math.Round(_size / 15D);
         private SolidBrush Brush => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
@@ -199,6 +201,44 @@ namespace Witlesss.Services.Memes
 
             var rgb = ColorConverter.HslToRgb(new HSL(h, s, v));
             return new SolidBrush(rgb.ToRgb24());
+        }
+
+        // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
+
+        private Image<Rgba32> DrawShadow(Image<Rgba32> image)
+        {
+            var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
+
+            var w = GetOutlineWidth();
+
+            var sw = Helpers.GetStartedStopwatch();
+            for (var y = 0; y < image.Height; y++)
+            for (var x = 0; x < image.Width;  x++)
+            {
+                var textA = image[x, y].A;
+                if (textA == 0) continue;
+
+                for (var ky = -w; ky <= w; ky++)
+                for (var kx = -w; kx <= w; kx++)
+                {
+                    var sx = x + kx;
+                    var sy = y + ky;
+
+                    if (sx < 0 || sx >= image.Width || sy < 0 || sy >= image.Height) continue;
+
+                    var shadowA = shadowRealm[sx, sy].A;
+                    if (shadowA == 255) continue;
+
+                    var r = Math.Sqrt(kx * kx + ky * ky);
+                    var k = Math.Clamp(1 - (r - w), 0, 1);
+                    var a = (shadowA + k * textA).RoundInt().ClampByte();
+                    shadowRealm[sx, sy] = new Rgba32(0, 0, 0, a);
+                }
+            }
+
+            sw.Log("DrawShadow");
+            shadowRealm.Mutate(x => x.DrawImage(image, opacity: 1));
+            return shadowRealm;
         }
     }
 }

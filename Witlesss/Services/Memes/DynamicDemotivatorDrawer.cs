@@ -61,7 +61,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         // /
 
-        public string BakeFrame(string text) => JpegCoder.SaveImageTemp(MakeFrame(DrawText(text)));
+        public string BakeFrame(string text) => ImageSaver.SaveImageTemp(MakeFrame(DrawText(text)));
 
         public string DrawDemotivator(string path, string text)
         {
@@ -72,7 +72,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
             var frame = MakeFrame(funny);
 
-            return JpegCoder.SaveImage(PasteImage(frame, image), PngJpg.Replace(path, "-Dg.jpg"));
+            return ImageSaver.SaveImage(PasteImage(frame, image), PngJpg.Replace(path, "-Dg.jpg"));
         }
     
         private Image PasteImage(Image background, Image image)

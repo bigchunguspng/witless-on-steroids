@@ -29,7 +29,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected void Run(string type, string options = null)
         {
-            JpegCoder.PassQuality(Baka);
+            ImageSaver.PassQuality(Baka);
 
             var x = Message.ReplyToMessage;
             if (ProcessMessage(Message) || ProcessMessage(x)) return;

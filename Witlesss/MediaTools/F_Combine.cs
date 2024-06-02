@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using FFMpegCore;
+using SixLabors.ImageSharp;
 using Drawer = Witlesss.Services.Memes.DemotivatorDrawer;
 using FFO = FFMpegCore.FFMpegArgumentOptions;
 using FAP = FFMpegCore.FFMpegArgumentProcessor;
@@ -28,7 +28,7 @@ namespace Witlesss.MediaTools
         // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
         public F_Action Demo(int loss, Drawer drawer) => ApplyEffects(o =>
         {
-            ArgsDemo(o, loss, drawer.Size, drawer.Pic);
+            ArgsDemo(o, loss, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);
         });
 
         public F_Action When(int loss, Size size, Rectangle crop, Point point, bool blur) => ApplyEffects(o =>
@@ -42,7 +42,7 @@ namespace Witlesss.MediaTools
         public F_Action D300(int loss, Size image, Point point, Size frame) => ApplyEffects(o =>
         {
             ArgsDemo(o, loss, image, point);
-            o.Resize(frame);
+            o.Resize(frame.Ok());
         });
 
 

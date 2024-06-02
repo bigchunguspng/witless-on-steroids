@@ -17,7 +17,7 @@ namespace Witlesss.Commands.Meme
 
         public ImageProcessor SetUp(int w, int h) // Needs more nuking!
         {
-            JpegCoder.PassQuality(Baka);
+            ImageSaver.PassQuality(Baka);
             
             return this;
         }

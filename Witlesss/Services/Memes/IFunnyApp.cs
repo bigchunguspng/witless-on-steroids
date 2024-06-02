@@ -60,7 +60,7 @@ public class IFunnyApp
 
         var meme = Combine(image, funny);
 
-        return JpegCoder.SaveImage(meme, PngJpg.Replace(path, "-Top.jpg"));
+        return ImageSaver.SaveImage(meme, PngJpg.Replace(path, "-Top.jpg"));
     }
 
     private Image Combine(Image source, Image caption)
@@ -77,7 +77,7 @@ public class IFunnyApp
         return meme;
     }
 
-    public string BakeText(string text) => JpegCoder.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
+    public string BakeText(string text) => ImageSaver.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);

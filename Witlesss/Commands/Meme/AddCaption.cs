@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
 
         public ImageProcessor SetUp(int w, int h)
         {
-            JpegCoder.PassQuality(Baka);
+            ImageSaver.PassQuality(Baka);
 
             return this;
         }

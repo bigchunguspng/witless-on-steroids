@@ -16,8 +16,8 @@ namespace Witlesss
 
         private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
 
-        private static int Quality => JpegCoder.Quality > 80 ? 0 : 51 - (int)(JpegCoder.Quality * 0.42); // 0 | 17 - 51
-        private static int Qscale  => 31 + (int)(-0.29 * (int)JpegCoder.Quality); // 2 - 31
+        private static int Quality => ImageSaver.Quality > 80 ? 0 : 51 - (int)(ImageSaver.Quality * 0.42); // 0 | 17 - 51
+        private static int Qscale  => 31 + (int)(-0.29 * (int)ImageSaver.Quality); // 2 - 31
 
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
@@ -28,7 +28,7 @@ namespace Witlesss
 
         public static string MakeDemotivator(string path, DgText text)
         {
-            return Drawer.DrawDemotivator(path, text);
+            return Drawer.MakeDemotivator(path, text);
         }
 
         public static string MakeStickerDemotivator(string path, DgText text, string extension)
@@ -81,9 +81,9 @@ namespace Witlesss
         {
             Sticker = false;
             var size = GrowSize(GetSize(path));
-            _imgflip.SetUp(size);
+            _imgflip.SetUp(size.Ok());
 
-            return new F_Combine(path, _imgflip.BakeCaption(text)).Meme(Quality, size).Output("-M");
+            return new F_Combine(path, _imgflip.BakeCaption(text)).Meme(Quality, size.Ok()).Output("-M");
         }
 
 
@@ -219,7 +219,7 @@ namespace Witlesss
 
         private static string Snapshot(string path)
         {
-            var temp = JpegCoder.GetTempPicName();
+            var temp = ImageSaver.GetTempPicName();
             FFMpeg.Snapshot(path, temp);
             return temp;
         }

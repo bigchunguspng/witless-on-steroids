@@ -343,5 +343,13 @@ namespace Witlesss.XD
             Logger.Log($"{sw.Elapsed.TotalSeconds:##0.00000}\t{message}");
             sw.Restart();
         }
+
+        public static T MeasureTime<T>(Func<T> func, string caption)
+        {
+            var sw = GetStartedStopwatch();
+            var result = func.Invoke();
+            sw.Log(caption);
+            return result;
+        }
     }
 }

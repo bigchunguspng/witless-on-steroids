@@ -2,7 +2,9 @@
 using System.Drawing;
 using System.IO;
 using FFMpegCore;
+using Witlesss.Backrooms;
 using Witlesss.MediaTools;
+using static Witlesss.Backrooms.SizeHelpers;
 using static Witlesss.MediaTools.FF_Extensions;
 
 namespace Witlesss
@@ -69,7 +71,7 @@ namespace Witlesss
 
         public static string MakeMeme(string path, DgText text)
         {
-            return _imgflip.MakeImpactMeme(path, text);
+            return _imgflip.MakeMeme(path, text);
         }
 
         public static string MakeMemeFromSticker(string path, DgText text, string extension)
@@ -80,10 +82,10 @@ namespace Witlesss
         public static string MakeVideoMeme(string path, DgText text)
         {
             Sticker = false;
-            var size = GrowSize(GetSize(path));
-            _imgflip.SetUp(size.Ok());
+            var size = GetImageSize(path).GrowSize().ValidMp4Size();
+            _imgflip.SetUp(size);
 
-            return new F_Combine(path, _imgflip.BakeCaption(text)).Meme(Quality, size.Ok()).Output("-M");
+            return new F_Combine(path, _imgflip.MakeCaption(text)).Meme(Quality, size).Output("-M");
         }
 
 
@@ -120,7 +122,8 @@ namespace Witlesss
 
         public static string DeepFryVideo(string path, int _ = 0)
         {
-            return new F_Process(path).DeepFryVideo(GrowSize(GetSize(path)), Quality).Output_WEBM_safe("-Nuked");
+            var size = GetImageSize(path).GrowSize().ValidMp4Size();
+            return new F_Process(path).DeepFryVideo(size.Ok(), Quality).Output_WEBM_safe("-Nuked");
         }
 
 
@@ -144,8 +147,8 @@ namespace Witlesss
             var video = extension == ".mp4" || extension == ".webm";
             if (video)
             {
-                var size = GetSize(path);
-                var fits = FitSize(size, 720);
+                var size = GetImageSize(path);
+                var fits = size.FitSize(720).ValidMp4Size();
                 if (size != fits)
                 {
                     path = Scale(path, new[] { fits.Width.ToString(), fits.Height.ToString() });
@@ -163,8 +166,8 @@ namespace Witlesss
         public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
-        public static string Stickerize    (string path) => new F_Process(path).ToSticker(NormalizeSize(GetSize(path))).Output("-stick", ".webp");
-        public static string Compress      (string path) => new F_Process(path).CompressImage(FitSize(GetSize(path), 2560)).Output("-small", ".jpg");
+        public static string Stickerize    (string path) => new F_Process(path).ToSticker(GetImageSize(path).Normalize().Ok()).Output("-stick", ".webp");
+        public static string Compress      (string path) => new F_Process(path).CompressImage(GetImageSize(path).FitSize(2560).Ok()).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");
         public static string Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
@@ -178,43 +181,12 @@ namespace Witlesss
         public static string ToVoice       (string path) => new F_Process(path).ToVoiceMessage().Output("-voice", ".ogg");
         public static string ToVideoNote   (string path)
         {
-            var s = GetSize(path);
+            var s = GetImageSize(path);
             var d = ToEven(Math.Min(s.Width, s.Height));
             var x = (s.Width  - d) / 2;
             var y = (s.Height - d) / 2;
 
             return new F_Process(path).ToVideoNote(new Rectangle(x, y, d, d)).Output("-vnote");
-        }
-
-        private static Size GrowSize      (Size s, int minWH = 400)
-        {
-            if (s.Width + s.Height < minWH)
-            {
-                var ratio = s.Width / (float)s.Height;
-                var wide = s.Width > s.Height;
-                var lim = (int)(minWH * ratio / (ratio + 1));
-                s = NormalizeSize(s, lim, reduce: wide); // lim = W
-            }
-
-            return ValidSize(s.Width, s.Height);
-        }
-        public  static Size FitSize       (Size s, int max = 1280)
-        {
-            if (s.Width > max || s.Height > max) s = NormalizeSize(s, max);
-            return ValidSize(s.Width, s.Height);
-        }
-        public static Size NormalizeSize (Size s, int limit = 512, bool reduce = true)
-        {
-            double lim = limit;
-            var wide = s.Width > s.Height;
-            return reduce == wide
-                ? new Size(limit, (int)(s.Height / (s.Width / lim)))
-                : new Size((int)(s.Width / (s.Height / lim)), limit);
-        }
-        private static Size GetSize(string path)
-        {
-            var v = F_Action.GetVideoStream(path);
-            return new Size(v.Width, v.Height);
         }
 
         private static string Snapshot(string path)

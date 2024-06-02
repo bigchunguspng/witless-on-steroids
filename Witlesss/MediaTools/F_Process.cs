@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
+using Witlesss.Backrooms;
 using static Witlesss.Memes;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
@@ -22,7 +23,7 @@ namespace Witlesss.MediaTools
         public F_Action ToAnimation() => ApplyEffects(o =>
         {
             var v = GetVideoStream(_input);
-            var size = FitSize(new Size(v.Width, v.Height));
+            var size = new Size(v.Width, v.Height).Ok().FitSize().ValidMp4Size().Ok();
             o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
 

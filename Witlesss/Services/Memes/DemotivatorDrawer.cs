@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms;
 using Random = System.Random;
 
 namespace Witlesss.Services.Memes
@@ -86,6 +87,7 @@ namespace Witlesss.Services.Memes
 
         public Rectangle ImagePlacement { get; }
 
+        // LOGIC
         // todo find all memory leaks
 
         public string MakeDemotivator(string path, DgText text)
@@ -120,7 +122,7 @@ namespace Witlesss.Services.Memes
             else*/
             {
                 //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
-                var lineBreak = ImageHelpers.DetectLineBreak(text, o.Options, o.Lines);
+                var lineBreak = TextMeasuringHelpers.DetectLineBreak(text, o.Options, o.Lines);
                 var noLineBreaks = lineBreak == -1;
                 var textToRender = noLineBreaks ? text : text[..lineBreak];
 

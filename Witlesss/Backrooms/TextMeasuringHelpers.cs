@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SixLabors.Fonts;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace Witlesss.Backrooms;
@@ -27,25 +29,34 @@ public static class TextMeasuringHelpers
         return -1;
     }
 
-    public static int MeasureTextHeight(string text, TextOptions options, out int linesFilled)
+    public static Size MeasureTextSize(string text, TextOptions options, out int linesFilled)
     {
         var ops = new RichTextOptions(options.Font)
         {
             WrappingLength = options.WrappingLength
         };
         TextMeasurer.TryMeasureCharacterBounds(text, ops, out var bounds);
-        TextMeasurer.TryMeasureCharacterAdvances(text[0].ToString(), ops, out var advances);
+        TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
         linesFilled = 0;
-        for (var i = 0; i < bounds.Length - 1; i++)
+        var maxWidth = 0F;
+        var currentWidth = 0F;
+
+        for (var i = 0; i < bounds.Length; i++)
         {
-            if (bounds[i].Bounds.X > bounds[i + 1].Bounds.X) // line break
+            if (i + 1 == bounds.Length || bounds[i].Bounds.X > bounds[i + 1].Bounds.X)
             {
                 linesFilled++;
+                maxWidth = Math.Max(maxWidth, currentWidth);
+                currentWidth = 0F;
+            }
+            else
+            {
+                currentWidth += advances[i].Bounds.Width;
             }
         }
 
-        return (linesFilled * advances[0].Bounds.Height).RoundInt();
+        return new Size(maxWidth.RoundInt(), (linesFilled * advances[0].Bounds.Height).RoundInt());
     }
 
     // it's here for the future...

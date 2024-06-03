@@ -19,9 +19,7 @@ namespace Witlesss.Services.Memes
         public static Color   CustomBg;
         public static readonly ExtraFonts ExtraFonts = new("meme");
 
-        private Size _meme;
         private int _w, _h, _margin, _startingSize, _size;
-        private Pen _outline;
         private readonly SolidBrush   _white = new(Color.White);
         private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
 
@@ -66,17 +64,17 @@ namespace Witlesss.Services.Memes
             var width  = _w - 2 * _margin;
             var height = _h / 3 - _margin;
 
-            AddText(background, /*_upper, */text.A, _startingSize, new Rectangle(_w / 2,      _margin, width, height));
-            AddText(background, /*_lower, */text.B, _startingSize, new Rectangle(_w / 2, _h - _margin, width, height));
+            var s1 = AddText(background, text.A, _startingSize, new Rectangle(_w / 2,      _margin, width, height));
+            var s2 = AddText(background, text.B, _startingSize, new Rectangle(_w / 2, _h - _margin, width, height));
 
-            var image = DrawShadow(background);
+            var image = DrawShadow(background, s1, s2);
             background.Dispose();
             return image;
         }
 
-        private void AddText(Image<Rgba32> background, string text, int size, Rectangle rect)
+        private Size? AddText(Image<Rgba32> background, string text, int size, Rectangle rect)
         {
-            if (string.IsNullOrEmpty(text)) return;
+            if (string.IsNullOrEmpty(text)) return null;
 
             text = EmojiTool.RemoveEmoji(text);
             text = text.TrimStart('\n');
@@ -85,15 +83,16 @@ namespace Witlesss.Services.Memes
             var maxLines = text.Count(c => c == '\n') + 1;
             var s = (float)size;
             var go = true;
+            var textSize = Size.Empty;
             while (go)
             {
                 // todo replace with more efficient algorithm (or not, it takes ~ 1 millisecond per loop iter)
                 // ok, then replace with algorithm that gives more equal text distribution
 
                 var sw = Helpers.GetStartedStopwatch();
-                var height = TextMeasuringHelpers.MeasureTextHeight(text, DefaultTextOptions(s, rect), out var lines);
+                textSize = TextMeasuringHelpers.MeasureTextSize(text, DefaultTextOptions(s, rect), out var lines);
                 sw.Log("TextMeasuringHelpers.MeasureTextHeight");
-                go = height > rect.Size.Height && s > 5 || WrapText == false && lines > maxLines;
+                go = textSize.Height > rect.Size.Height && s > 5 || WrapText == false && lines > maxLines;
                 s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
             }
 
@@ -101,27 +100,10 @@ namespace Witlesss.Services.Memes
 
             // write
             var options = DefaultTextOptions(s, rect);
-            /*var ow = OutlineWidth;
-            var penOptions = new PenOptions(Color.Black, ow)
-            {
-                JointStyle = GetRandomMemeber<JointStyle>(),
-                EndCapStyle = GetRandomMemeber<EndCapStyle>()
-            };
-            background.Mutate(x => x.DrawText(options, text, new SolidPen(penOptions)));
-            options.Origin += new Vector2(ow / 2F, ow / 3F);*/
             background.Mutate(x => x.DrawText(options, text, new SolidBrush(Color.White)));
 
-            // todo implement outline using moving kernel
-            /*using var path = new GraphicsPath();
-            path.AddString(text, CaptionFont, (int)CaptionStyle, size, rect, f);
-            for (var i = OutlineWidth; i > 0; i--)
-            {
-                _outline = new Pen(Color.FromArgb(128, 0, 0, 0), i);
-                _outline.LineJoin = LineJoin.Round;
-                img.DrawPath(_outline, path);
-                _outline.Dispose();
-            }
-            img.FillPath(Brush, path);*/
+            var space = _size; // todo make all fonts same size >> space = _size / 2;
+            return new Size(Math.Min(_w, textSize.Width + space), textSize.Height + space);
         }
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)
@@ -193,9 +175,10 @@ namespace Witlesss.Services.Memes
             return new SolidBrush(rgb.ToRgb24());
         }
 
+
         // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
 
-        private Image<Rgba32> DrawShadow(Image<Rgba32> image)
+        private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom)
         {
             var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
 
@@ -208,34 +191,50 @@ namespace Witlesss.Services.Memes
 
             var sw = Helpers.GetStartedStopwatch();
 
-            for (var y = 0; y < image.Height; y++)
-            for (var x = 0; x < image.Width; x++)
+            if (top.HasValue)
             {
-                var textA = image[x, y].A;
-                if (textA == 0) continue;
+                var x = (_w - top.Value.Width) / 2;
+                ShadowImagePart(new Rectangle(new Point(x, 00), top.Value));
+            }
 
-                for (var ky = -w2; ky <= w2; ky++)
-                for (var kx = -w2; kx <= w2; kx++)
-                {
-                    var sx = x + kx;
-                    var sy = y + ky;
-
-                    if (sx < 0 || sx >= image.Width || sy < 0 || sy >= image.Height) continue;
-
-                    var shadowA = shadowRealm[sx, sy].A;
-                    if (shadowA == 255) continue;
-
-                    var k = func(kx, ky, w);
-                    if (k == 0) continue;
-
-                    var a = Math.Max(shadowA, k * textA).RoundInt().ClampByte();
-                    shadowRealm[sx, sy] = new Rgba32(0, 0, 0, a);
-                }
+            if (bottom.HasValue)
+            {
+                var x2 = (_w - bottom.Value.Width) / 2;
+                var y2 =  _h - bottom.Value.Height;
+                ShadowImagePart(new Rectangle(new Point(x2, y2), bottom.Value));
             }
 
             sw.Log("DrawShadow");
             shadowRealm.Mutate(x => x.DrawImage(image, opacity: 1));
             return shadowRealm;
+
+            void ShadowImagePart(Rectangle rectangle)
+            {
+                for (var y = rectangle.Y; y < rectangle.Bottom; y++)
+                for (var x = rectangle.X; x < rectangle.Right; x++)
+                {
+                    var textA = image[x, y].A;
+                    if (textA == 0) continue;
+
+                    for (var ky = y - w2; ky <= y + w2; ky++)
+                    for (var kx = x - w2; kx <= x + w2; kx++)
+                    {
+                        var sx = kx - x;
+                        var sy = ky - y;
+
+                        if (kx < 0 || kx >= image.Width || ky < 0 || ky >= image.Height) continue; // outside image
+
+                        var shadowA = shadowRealm[kx, ky].A;
+                        if (shadowA == 255) continue; // already shadowed
+
+                        var k = func(sx, sy, w);
+                        if (k == 0) continue; // too far from text
+
+                        var a = Math.Max(shadowA, k * textA).RoundInt().ClampByte();
+                        shadowRealm[kx, ky] = new Rgba32(0, 0, 0, a);
+                    }
+                }
+            }
         }
 
         private double RoundShadow(int kx, int ky, double w)

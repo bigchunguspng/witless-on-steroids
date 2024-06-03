@@ -49,7 +49,6 @@ namespace Witlesss.Commands.Meme
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
             MemeGenerator.WrapText       =  empty || !CheckMatch(ref dummy, _nowrap);
             MemeGenerator.ForceImpact    = !empty &&  CheckMatch(ref dummy, _impact);
-            MemeGenerator.UseItalic      = !empty &&  CheckMatch(ref dummy, _italic);
             MemeGenerator.ColorText      = !empty &&  CheckMatch(ref dummy, _colorText);
 
             int GetInt(Regex x)
@@ -102,12 +101,11 @@ namespace Witlesss.Commands.Meme
             string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
-        private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase); // todo remove collision
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _italic = new(@"^\/meme\S*(i)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _impact = new(@"^\/meme\S*(im)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);

@@ -8,11 +8,11 @@ namespace Witlesss.Services
 {
     public class ExtraFonts
     {
-        private readonly Regex _regex;
-        private static readonly Dictionary<string, FontFamily> _fonts;
+        private static readonly Dictionary<string, FontFamily> _families;
 
-        public static bool UseOtherFont;
-        public static string  OtherFontKey;
+        private readonly Regex _regex;
+
+        private string? _fontKey, _styleKey;
 
         static ExtraFonts()
         {
@@ -20,33 +20,63 @@ namespace Witlesss.Services
             var collection = new FontCollection();
             files.ForEach(file => collection.Add(file));
 
-            _fonts = new Dictionary<string, FontFamily>(files.Length);
+            var familyCodes = files
+                .Select(Path.GetFileNameWithoutExtension)
+                .OfType<string>()
+                .Where(x => !x.Contains('-')).ToArray();
+
+            _families = new Dictionary<string, FontFamily>(familyCodes.Length);
             var families = collection.Families.ToArray();
-            for (var i = 0; i < files.Length; i++)
+            for (var i = 0; i < familyCodes.Length; i++)
             {
-                var key = Path.GetFileNameWithoutExtension(files[i]);
-                _fonts.Add(key, families[i]);
+                _families.Add(familyCodes[i], families[i]);
             }
         }
 
         public ExtraFonts(string cmd, params string[] exclude)
         {
-            var names = _fonts.Keys.Select(Path.GetFileNameWithoutExtension).Where(x => !exclude.Contains(x));
-            _regex = new Regex($@"^\/{cmd}\S*({string.Join('|', names)})\S*", RegexOptions.IgnoreCase);
+            var codes = string.Join('|', _families.Keys.Where(x => !exclude.Contains(x)));
+            _regex = new Regex($@"^\/{cmd}\S*({codes})(-[bi]+)?\S*", RegexOptions.IgnoreCase);
         }
 
-        public static FontFamily GetOtherFont(string @default) => _fonts[UseOtherFont ? OtherFontKey : @default];
+        public FontFamily GetFontFamily(string @default, bool forceDefault = false)
+        {
+            return _families[forceDefault ? @default : _fontKey ?? @default];
+        }
+
+        public FontStyle GetFontStyle()
+        {
+            if (_styleKey is null) return FontStyle.Regular;
+
+            var b = _styleKey.Contains('b');
+            var i = _styleKey.Contains('i');
+
+            return (b, i) switch
+            {
+                (false, false) => FontStyle.Regular,
+                (false, true ) => FontStyle.Italic,
+                (true , false) => FontStyle.Bold,
+                (true , true ) => FontStyle.BoldItalic
+            };
+        }
 
         public void CheckKey(bool empty, ref string dummy)
         {
             var match = _regex.Match(dummy);
 
-            UseOtherFont = !empty && match.Success;
-            if (UseOtherFont)
+            var success = !empty && match.Success;
+            if (success)
             {
-                var group = match.Groups[1];
-                OtherFontKey = group.Value;
-                CutCaptureOut(group, ref dummy);
+                var g1 = match.Groups[1];
+                _fontKey = g1.Value;
+                var g2 = match.Groups[2];
+                _styleKey = g2.Success ? g2.Value : null;
+
+                CutCaptureOut(g1, ref dummy);
+            }
+            else
+            {
+                _fontKey = _styleKey = null;
             }
         }
     }

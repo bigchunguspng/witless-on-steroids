@@ -13,16 +13,15 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, UseItalic, ColorText, ForceImpact;
+        public static bool WrapText = true, ColorText, ForceImpact;
         public static int FontMultiplier = 10;
         public static bool UseCustomBg;
         public static Color   CustomBg;
-        public static readonly ExtraFonts ExtraFonts = new("meme", exclude: "ft");
+        public static readonly ExtraFonts ExtraFonts = new("meme");
 
         private Size _meme;
         private int _w, _h, _margin, _startingSize, _size;
         private Pen _outline;
-        private readonly FontFamily  _impact = SystemFonts.Get("Impact");
         private readonly SolidBrush   _white = new(Color.White);
         private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
 
@@ -140,20 +139,11 @@ namespace Witlesss.Services.Memes
             WrappingLength = _w - 2 * _margin
         };
 
-        private int GetOutlineWidth() => (int)Math.Round(_size / 15D);
         private SolidBrush Brush => _brushes[ColorText].Invoke();
 
-        private Font SelectFont(float size) => new(CaptionFont, size, CaptionStyle);
-        private FontFamily CaptionFont => ForceImpact
-            ? _impact
-            : ExtraFonts.UseOtherFont
-                ? ExtraFonts.GetOtherFont("rg")
-                : _impact;
-        private FontStyle CaptionStyle => UseItalic
-            ? FontStyle.Italic | FontStyle.Bold
-            : ExtraFonts.OtherFontKey is "rg" or "cb"
-                ? FontStyle.Bold
-                : FontStyle.Regular;
+        private Font SelectFont(float size) => new(CaptionFont, size, ExtraFonts.GetFontStyle());
+
+        private FontFamily CaptionFont => ExtraFonts.GetFontFamily("im", forceDefault: ForceImpact);
 
         private (Size size, ImageInfo info) GetImageSize(string path)
         {
@@ -209,17 +199,23 @@ namespace Witlesss.Services.Memes
         {
             var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
 
-            var w = GetOutlineWidth();
+            var nokia = CaptionFont.Name.Contains("Nokia");
+
+            var w = _size / (nokia ? 12D : 15D);
+            var w2 = (int)Math.Ceiling(w) + 2;
+
+            Func<int, int, double, double> func = nokia ? SquareShadow : RoundShadow;
 
             var sw = Helpers.GetStartedStopwatch();
+
             for (var y = 0; y < image.Height; y++)
-            for (var x = 0; x < image.Width;  x++)
+            for (var x = 0; x < image.Width; x++)
             {
                 var textA = image[x, y].A;
                 if (textA == 0) continue;
 
-                for (var ky = -w; ky <= w; ky++)
-                for (var kx = -w; kx <= w; kx++)
+                for (var ky = -w2; ky <= w2; ky++)
+                for (var kx = -w2; kx <= w2; kx++)
                 {
                     var sx = x + kx;
                     var sy = y + ky;
@@ -229,9 +225,10 @@ namespace Witlesss.Services.Memes
                     var shadowA = shadowRealm[sx, sy].A;
                     if (shadowA == 255) continue;
 
-                    var r = Math.Sqrt(kx * kx + ky * ky);
-                    var k = Math.Clamp(1 - (r - w), 0, 1);
-                    var a = (shadowA + k * textA).RoundInt().ClampByte();
+                    var k = func(kx, ky, w);
+                    if (k == 0) continue;
+
+                    var a = Math.Max(shadowA, k * textA).RoundInt().ClampByte();
                     shadowRealm[sx, sy] = new Rgba32(0, 0, 0, a);
                 }
             }
@@ -239,6 +236,20 @@ namespace Witlesss.Services.Memes
             sw.Log("DrawShadow");
             shadowRealm.Mutate(x => x.DrawImage(image, opacity: 1));
             return shadowRealm;
+        }
+
+        private double RoundShadow(int kx, int ky, double w)
+        {
+            var r = Math.Sqrt(kx * kx + ky * ky);
+            return Math.Clamp(1 - 2 * (r - w), 0, 1);
+        }
+
+        private double SquareShadow(int kx, int ky, double w)
+        {
+            var x = Math.Abs(kx);
+            var y = Math.Abs(ky);
+            var b = x > 0 && x < w && y > 0 && y < w;
+            return b ? 1 : 0;
         }
     }
 }

@@ -33,7 +33,8 @@ public static class TextMeasuringHelpers
     {
         var ops = new RichTextOptions(options.Font)
         {
-            WrappingLength = options.WrappingLength
+            WrappingLength = options.WrappingLength,
+            LineSpacing = options.LineSpacing
         };
         TextMeasurer.TryMeasureCharacterBounds(text, ops, out var bounds);
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);

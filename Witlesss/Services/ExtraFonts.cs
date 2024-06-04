@@ -60,6 +60,22 @@ namespace Witlesss.Services
             };
         }
 
+        public float GetLineSpacing() => GetRelativeSize();
+        public float GetSizeMultiplier() => 1 / GetRelativeSize();
+
+        private float GetRelativeSize() => _fontKey switch
+        {
+            "vn" => 32.25F / 26.25F,
+            "im" => 29.25F / 26.25F,
+            "vp" => 29.25F / 26.25F,
+            "vb" => 27F    / 26.25F,
+            "cr" => 25.5F  / 26.25F,
+            "tm" => 24.75F / 26.25F,
+            "cb" => 23F    / 26.25F,
+            "vg" => 21F    / 26.25F,
+            _    => 26.25F / 26.25F,
+        };
+
         public void CheckKey(bool empty, ref string dummy)
         {
             var match = _regex.Match(dummy);

@@ -47,6 +47,7 @@ namespace Witlesss.Commands.Meme
 
             MemeGenerator.ExtraFonts.CheckKey(empty, ref dummy);
             MemeGenerator.FontMultiplier = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) : 10;
+            MemeGenerator.ShadowOpacity  = !empty && _shadow.IsMatch(dummy) ? Math.Clamp(GetInt(_shadow), 0, 100) : 100;
             MemeGenerator.WrapText       =  empty || !CheckMatch(ref dummy, _nowrap);
             MemeGenerator.ForceImpact    = !empty &&  CheckMatch(ref dummy, _impact);
             MemeGenerator.ColorText      = !empty &&  CheckMatch(ref dummy, _colorText);
@@ -54,8 +55,13 @@ namespace Witlesss.Commands.Meme
             int GetInt(Regex x)
             {
                 var match = x.Match(dummy);
-                CutCaptureOut(match.Groups[1], ref dummy);
-                return int.Parse(match.Groups[2].Value);
+                var value = int.Parse(match.Groups[1].Value);
+                for (var i = match.Groups.Count - 1; i > 0; i--)
+                {
+                    CutCaptureOut(match.Groups[i], ref dummy);
+                }
+
+                return value;
             }
         }
 
@@ -109,7 +115,8 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _impact = new(@"^\/meme\S*(im)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex      _fontSS = new(@"^\/meme\S*?(ss)(\d{1,3})\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _fontSS = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.IgnoreCase);
 
         public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)
         {

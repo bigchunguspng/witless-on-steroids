@@ -14,14 +14,21 @@ namespace Witlesss.Services.Memes
     public class MemeGenerator
     {
         public static bool WrapText = true, ColorText, ForceImpact;
-        public static int FontMultiplier = 10;
+        public static int FontMultiplier = 10, ShadowOpacity = 100;
         public static bool UseCustomBg;
         public static Color   CustomBg;
         public static readonly ExtraFonts ExtraFonts = new("meme");
 
-        private int _w, _h, _margin, _startingSize, _size;
+        private int _w, _h, _margin, _centerX;
+        private Size _captionArea;
+        private float _startingSize;
         private readonly SolidBrush   _white = new(Color.White);
         private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
+
+        private readonly DrawingOptions _textDrawingOptions = new()
+        {
+            GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 16 }
+        };
 
         public MemeGenerator() => _brushes = new Dictionary<bool, Func<SolidBrush>>
         {
@@ -34,10 +41,12 @@ namespace Witlesss.Services.Memes
             _w = size.Width;
             _h = size.Height;
 
+            _centerX = _w / 2;
+
             _margin = Math.Min(_h / 72, 10);
 
             var minSide = (int)Math.Min(_w, 1.5 * _h);
-            _startingSize = Math.Max(minSide * FontMultiplier / 120, 12);
+            _startingSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
         }
 
         public string MakeMeme(string path, DgText text)
@@ -59,21 +68,25 @@ namespace Witlesss.Services.Memes
 
         private Image<Rgba32> DrawCaption(DgText text)
         {
-            var background = new Image<Rgba32>(_w, _h);
+            var canvas = new Image<Rgba32>(_w, _h);
 
-            var width  = _w - 2 * _margin;
-            var height = _h / 3 - _margin;
+            _captionArea = new Size(_w - 2 * _margin, _h / 3 - _margin);
 
-            var s1 = AddText(background, text.A, _startingSize, new Rectangle(_w / 2,      _margin, width, height));
-            var s2 = AddText(background, text.B, _startingSize, new Rectangle(_w / 2, _h - _margin, width, height));
+            var s1 = AddText(canvas, text.A, _startingSize,      _margin, out var lines1, out var height1);
+            var s2 = AddText(canvas, text.B, _startingSize, _h - _margin, out var lines2, out var height2);
 
-            var image = DrawShadow(background, s1, s2);
-            background.Dispose();
-            return image;
+            var avgTextHeight = (height1 + height2) / (lines1 + lines2);
+            return ShadowOpacity > 0 ? DrawShadow(canvas, s1, s2, avgTextHeight) : canvas;
         }
 
-        private Size? AddText(Image<Rgba32> background, string text, int size, Rectangle rect)
+        private Size? AddText
+        (
+            Image<Rgba32> background, string text, float size, int y, out int lines, out float textHeight
+        )
         {
+            lines = 0;
+            textHeight = 0F;
+
             if (string.IsNullOrEmpty(text)) return null;
 
             text = EmojiTool.RemoveEmoji(text);
@@ -81,29 +94,28 @@ namespace Witlesss.Services.Memes
 
             // adjust font size
             var maxLines = text.Count(c => c == '\n') + 1;
-            var s = (float)size;
             var go = true;
             var textSize = Size.Empty;
+            RichTextOptions options = null!;
             while (go)
             {
                 // todo replace with more efficient algorithm (or not, it takes ~ 1 millisecond per loop iter)
                 // ok, then replace with algorithm that gives more equal text distribution
 
                 var sw = Helpers.GetStartedStopwatch();
-                textSize = TextMeasuringHelpers.MeasureTextSize(text, DefaultTextOptions(s, rect), out var lines);
+                options = DefaultTextOptions(size, y);
+                textSize = TextMeasuringHelpers.MeasureTextSize(text, options, out lines);
                 sw.Log("TextMeasuringHelpers.MeasureTextHeight");
-                go = textSize.Height > rect.Size.Height && s > 5 || WrapText == false && lines > maxLines;
-                s *= go ? lines > 2 ? 0.8f : 0.9f : 1;
+                go = textSize.Height > _captionArea.Height && size > 5 || WrapText == false && lines > maxLines;
+                size *= go ? lines > 2 ? 0.8f : 0.9f : 1;
             }
 
-            _size = (int)s;
-
             // write
-            var options = DefaultTextOptions(s, rect);
-            background.Mutate(x => x.DrawText(options, text, new SolidBrush(Color.White)));
+            background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
 
-            var space = _size; // todo make all fonts same size >> space = _size / 2;
-            return new Size(Math.Min(_w, textSize.Width + space), textSize.Height + space);
+            textHeight = textSize.Height;
+            var space = (textSize.Height / 2F / lines).RoundInt();
+            return new Size(Math.Min(_w, textSize.Width + 2 * space), textSize.Height + space);
         }
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)
@@ -112,16 +124,17 @@ namespace Witlesss.Services.Memes
             return image;
         }
 
-        private RichTextOptions DefaultTextOptions(float fontSize, Rectangle rect) => new(SelectFont(fontSize))
+        private RichTextOptions DefaultTextOptions(float fontSize, int y) => new(SelectFont(fontSize))
         {
             TextAlignment = TextAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = rect.Y == _margin ? VerticalAlignment.Top : VerticalAlignment.Bottom,
-            Origin = rect.Location,
-            WrappingLength = _w - 2 * _margin
+            VerticalAlignment = y == _margin ? VerticalAlignment.Top : VerticalAlignment.Bottom,
+            Origin = new Point(_centerX, y),
+            WrappingLength = _captionArea.Width,
+            LineSpacing = ExtraFonts.GetLineSpacing()
         };
 
-        private SolidBrush Brush => _brushes[ColorText].Invoke();
+        private SolidBrush GetBrush() => _brushes[ColorText].Invoke();
 
         private Font SelectFont(float size) => new(CaptionFont, size, ExtraFonts.GetFontStyle());
 
@@ -160,52 +173,48 @@ namespace Witlesss.Services.Memes
         private SolidBrush RandomColor()
         {
             var h = Extension.Random.Next(360);
-            var s = (byte)Extension.Random.Next(byte.MaxValue);
-            var v = (byte)Extension.Random.Next(byte.MaxValue);
+            var s = (byte)Extension.Random.Next(50, 100);
+            var l = (byte)Extension.Random.Next(50,  95);
 
-            /*var o = Math.Min(OutlineWidth,       6);
-            var x = Math.Min(Math.Abs(240 - h), 60);
-
-            s = s * (0.75 + x / 240D);  // <-- removes dark blue
-            s = s * (0.25 + 0.125 * o); // <-- makes small text brighter
-
-            v = 1 - 0.3 * v * Math.Sqrt(s);*/
-
-            var rgb = ColorConverter.HslToRgb(new HSL(h, s, v));
+            var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
             return new SolidBrush(rgb.ToRgb24());
         }
 
 
         // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
 
-        private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom)
+        private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom, float avgTextHeight)
         {
             var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
 
             var nokia = CaptionFont.Name.Contains("Nokia");
 
-            var w = _size / (nokia ? 12D : 15D);
+            var w = avgTextHeight / (nokia ? 12D : 15D);
             var w2 = (int)Math.Ceiling(w) + 2;
 
-            Func<int, int, double, double> func = nokia ? SquareShadow : RoundShadow;
+            var opacity = ShadowOpacity / 100F;
+            var maxOpacity = (255 * opacity).RoundInt().ClampByte();
+
+            Func<int, int, double, double> getShadowOpacity = nokia ? SquareShadow : RoundShadow;
 
             var sw = Helpers.GetStartedStopwatch();
 
             if (top.HasValue)
             {
                 var x = (_w - top.Value.Width) / 2;
-                ShadowImagePart(new Rectangle(new Point(x, 00), top.Value));
+                ShadowImagePart(new Rectangle(new Point(x, 0), top.Value));
             }
 
             if (bottom.HasValue)
             {
-                var x2 = (_w - bottom.Value.Width) / 2;
-                var y2 =  _h - bottom.Value.Height;
-                ShadowImagePart(new Rectangle(new Point(x2, y2), bottom.Value));
+                var x = (_w - bottom.Value.Width) / 2;
+                var y =  _h - bottom.Value.Height;
+                ShadowImagePart(new Rectangle(new Point(x, y), bottom.Value));
             }
 
             sw.Log("DrawShadow");
             shadowRealm.Mutate(x => x.DrawImage(image, opacity: 1));
+            image.Dispose();
             return shadowRealm;
 
             void ShadowImagePart(Rectangle rectangle)
@@ -222,15 +231,16 @@ namespace Witlesss.Services.Memes
                         var sx = kx - x;
                         var sy = ky - y;
 
-                        if (kx < 0 || kx >= image.Width || ky < 0 || ky >= image.Height) continue; // outside image
+                        var outsideImage = kx < 0 || kx >= image.Width || ky < 0 || ky >= image.Height;
+                        if (outsideImage) continue;
 
                         var shadowA = shadowRealm[kx, ky].A;
-                        if (shadowA == 255) continue; // already shadowed
+                        if (shadowA == maxOpacity) continue;
 
-                        var k = func(sx, sy, w);
-                        if (k == 0) continue; // too far from text
+                        var shadowOpacity = opacity * getShadowOpacity(sx, sy, w);
+                        if (shadowOpacity == 0) continue;
 
-                        var a = Math.Max(shadowA, k * textA).RoundInt().ClampByte();
+                        var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
                         shadowRealm[kx, ky] = new Rgba32(0, 0, 0, a);
                     }
                 }

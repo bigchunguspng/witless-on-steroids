@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ColorHelper;
 using SixLabors.Fonts;
@@ -17,23 +16,17 @@ namespace Witlesss.Services.Memes
         public static int FontMultiplier = 10, ShadowOpacity = 100;
         public static bool UseCustomBg;
         public static Color   CustomBg;
+
         public static readonly ExtraFonts ExtraFonts = new("meme");
 
         private int _w, _h, _margin, _centerX;
         private Size _captionArea;
-        private float _startingSize;
-        private readonly SolidBrush   _white = new(Color.White);
-        private readonly Dictionary<bool, Func<SolidBrush>> _brushes;
+        private float _startingFontSize;
+        private readonly SolidBrush _white = new(Color.White);
 
         private readonly DrawingOptions _textDrawingOptions = new()
         {
             GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 16 }
-        };
-
-        public MemeGenerator() => _brushes = new Dictionary<bool, Func<SolidBrush>>
-        {
-            { true, RandomColor },
-            { false, WhiteColor }
         };
 
         public void SetUp(Size size)
@@ -42,11 +35,10 @@ namespace Witlesss.Services.Memes
             _h = size.Height;
 
             _centerX = _w / 2;
-
             _margin = Math.Min(_h / 72, 10);
 
             var minSide = (int)Math.Min(_w, 1.5 * _h);
-            _startingSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
+            _startingFontSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
         }
 
         public string MakeMeme(string path, DgText text)
@@ -72,8 +64,8 @@ namespace Witlesss.Services.Memes
 
             _captionArea = new Size(_w - 2 * _margin, _h / 3 - _margin);
 
-            var s1 = AddText(canvas, text.A, _startingSize,      _margin, out var lines1, out var height1);
-            var s2 = AddText(canvas, text.B, _startingSize, _h - _margin, out var lines2, out var height2);
+            var s1 = AddText(canvas, text.A, _startingFontSize,      _margin, out var lines1, out var height1);
+            var s2 = AddText(canvas, text.B, _startingFontSize, _h - _margin, out var lines2, out var height2);
 
             var avgTextHeight = (height1 + height2) / (lines1 + lines2);
             return ShadowOpacity > 0 ? DrawShadow(canvas, s1, s2, avgTextHeight) : canvas;
@@ -81,7 +73,9 @@ namespace Witlesss.Services.Memes
 
         private Size? AddText
         (
-            Image<Rgba32> background, string text, float size, int y, out int lines, out float textHeight
+            Image<Rgba32> background, string text,
+            float size, int y,
+            out int lines, out float textHeight
         )
         {
             lines = 0;
@@ -103,7 +97,7 @@ namespace Witlesss.Services.Memes
                 // ok, then replace with algorithm that gives more equal text distribution
 
                 var sw = Helpers.GetStartedStopwatch();
-                options = DefaultTextOptions(size, y);
+                options = GetDefaultTextOptions(size, y);
                 textSize = TextMeasuringHelpers.MeasureTextSize(text, options, out lines);
                 sw.Log("TextMeasuringHelpers.MeasureTextHeight");
                 go = textSize.Height > _captionArea.Height && size > 5 || WrapText == false && lines > maxLines;
@@ -124,7 +118,10 @@ namespace Witlesss.Services.Memes
             return image;
         }
 
-        private RichTextOptions DefaultTextOptions(float fontSize, int y) => new(SelectFont(fontSize))
+
+        // TEXT OPTIONS
+
+        private RichTextOptions GetDefaultTextOptions(float fontSize, int y) => new(GetFont(fontSize))
         {
             TextAlignment = TextAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -134,11 +131,24 @@ namespace Witlesss.Services.Memes
             LineSpacing = ExtraFonts.GetLineSpacing()
         };
 
-        private SolidBrush GetBrush() => _brushes[ColorText].Invoke();
+        private Font GetFont(float size) => new(GetFontFamily(), size, ExtraFonts.GetFontStyle());
 
-        private Font SelectFont(float size) => new(CaptionFont, size, ExtraFonts.GetFontStyle());
+        private FontFamily GetFontFamily() => ExtraFonts.GetFontFamily("im", forceDefault: ForceImpact);
 
-        private FontFamily CaptionFont => ExtraFonts.GetFontFamily("im", forceDefault: ForceImpact);
+        private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
+
+        private SolidBrush RandomColor()
+        {
+            var h = Extension.Random.Next(360);
+            var s = (byte)Extension.Random.Next(50, 100);
+            var l = (byte)Extension.Random.Next(50,  95);
+
+            var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
+            return new SolidBrush(rgb.ToRgb24());
+        }
+
+
+        // IMAGE
 
         private (Size size, ImageInfo info) GetImageSize(string path)
         {
@@ -168,26 +178,13 @@ namespace Witlesss.Services.Memes
         }
 
 
-        private SolidBrush WhiteColor() => _white;
-        
-        private SolidBrush RandomColor()
-        {
-            var h = Extension.Random.Next(360);
-            var s = (byte)Extension.Random.Next(50, 100);
-            var l = (byte)Extension.Random.Next(50,  95);
-
-            var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
-            return new SolidBrush(rgb.ToRgb24());
-        }
-
-
         // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
 
         private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom, float avgTextHeight)
         {
             var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
 
-            var nokia = CaptionFont.Name.Contains("Nokia");
+            var nokia = GetFontFamily().Name.Contains("Nokia");
 
             var w = avgTextHeight / (nokia ? 12D : 15D);
             var w2 = (int)Math.Ceiling(w) + 2;

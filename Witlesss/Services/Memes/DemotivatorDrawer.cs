@@ -203,6 +203,7 @@ namespace Witlesss.Services.Memes
                 TextAlignment = TextAlignment.Center,
                 WordBreaking = WordBreaking.Standard,
                 KerningMode = KerningMode.Standard,
+                FallbackFontFamilies = ExtraFonts.FallbackFamilies
             };
             return new DgTextOptions(options, lines, emojiSize);
         }

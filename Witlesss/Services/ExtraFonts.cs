@@ -33,6 +33,15 @@ namespace Witlesss.Services
             }
         }
 
+        public static List<FontFamily> FallbackFamilies { get; } =
+        [
+            SystemFonts.Get("Segoe UI"),
+            SystemFonts.Get("Segoe UI Symbol"),
+            SystemFonts.Get("Arial"),
+            SystemFonts.Get("Tahoma"),
+            SystemFonts.Get("Times New Roman")
+        ];
+
         public ExtraFonts(string cmd, params string[] exclude)
         {
             var codes = string.Join('|', _families.Keys.Where(x => !exclude.Contains(x)));

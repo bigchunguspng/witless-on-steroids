@@ -128,7 +128,8 @@ namespace Witlesss.Services.Memes
             VerticalAlignment = y == _margin ? VerticalAlignment.Top : VerticalAlignment.Bottom,
             Origin = new Point(_centerX, y),
             WrappingLength = _captionArea.Width,
-            LineSpacing = ExtraFonts.GetLineSpacing()
+            LineSpacing = ExtraFonts.GetLineSpacing(),
+            FallbackFontFamilies = ExtraFonts.FallbackFamilies
         };
 
         private Font GetFont(float size) => new(GetFontFamily(), size, ExtraFonts.GetFontStyle());

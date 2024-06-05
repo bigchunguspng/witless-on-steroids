@@ -88,7 +88,7 @@ namespace Witlesss.Services
                 var g2 = match.Groups[2];
                 _styleKey = g2.Success ? g2.Value : null;
 
-                CutCaptureOut(g1, ref dummy);
+                OptionsParsing.CutCaptureOut(g1, ref dummy);
             }
             else
             {

@@ -12,14 +12,14 @@ namespace Witlesss.Commands.Meme
         protected override string Log_VIDEO { get; } = "NUKED [*] VID";
         protected override string VideoName { get; } = "nuke_fap_club.mp4";
 
-        protected override string? Options => Baka.Meme.OptionsN;
-
         protected override string Command { get; } = "/nuke";
+
+        protected override string? DefaultOptions => Baka.Meme.OptionsN;
 
         public ImageProcessor SetUp(int w, int h) // Needs more nuking!
         {
             ImageSaver.PassQuality(Baka);
-            
+
             return this;
         }
 
@@ -29,9 +29,9 @@ namespace Witlesss.Commands.Meme
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.DeepFryStick, false);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.DeepFryVideo);
 
-        protected override void ParseOptions(bool empty, ref string dummy) { }
+        protected override void ParseOptions() { }
 
-        protected override int GetMemeText(string? text, bool empty, string dummy, string command) => 0;
+        protected override int GetMemeText(string? text) => 0;
 
         protected override bool CropVideoNotes { get; } = false;
     }

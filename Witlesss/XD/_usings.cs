@@ -1,5 +1,6 @@
 ﻿// Global using directives
 
+global using Witlesss.Backrooms;
 global using Witlesss.Commands.Core;
 global using Witlesss.Commands.Editing.Core;
 global using Witlesss.XD;

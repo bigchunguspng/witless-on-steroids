@@ -9,11 +9,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 {
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static
     {
-        private string    _path;
-        private MediaType _type;
-        private readonly Stopwatch _watch = new();
-
-        private (long Chat, int Message, DateTime Date, string Dummy, bool Empty, string Command) _lastRequest;
+        protected MemeRequest Request = default!;
 
         protected abstract Regex _cmd { get; }
 
@@ -22,13 +18,13 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract string Log_VIDEO { get; }
         protected abstract string VideoName { get; }
 
-        protected abstract string? Options { get; }
-
         protected abstract string Command { get; }
+
+        protected abstract string? DefaultOptions { get; }
 
         protected virtual bool CropVideoNotes { get; } = true;
 
-        protected void Run(string type, string options = null)
+        protected void Run(string type, string? options = null)
         {
             ImageSaver.PassQuality(Baka);
 
@@ -39,18 +35,18 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             Bot.SendMessage(Chat, options is null ? message : $"{message}\n\n{options}");
         }
 
-        private bool ProcessMessage(Message mess)
+        private bool ProcessMessage(Message? message)
         {
-            if (mess is null) return false;
-            
-            if      (mess.Photo     is not null)              ProcessPhoto(mess.Photo[^1].FileId);
-            else if (mess.Animation is not null)              ProcessVideo(mess.Animation.FileId);
-            else if (mess.Sticker   is { IsVideo: true })     ProcessVideo(mess.Sticker  .FileId);
-            else if (mess.Video     is not null)              ProcessVideo(mess.Video    .FileId);
-            else if (mess.VideoNote is not null)              ProcessVideo(mess.VideoNote.FileId);
-            else if (mess.Sticker   is { IsAnimated: false }) ProcessStick(mess.Sticker  .FileId);
+            if (message is null) return false;
+
+            if      (message.Photo     is not null)              ProcessPhoto(message.Photo[^1].FileId);
+            else if (message.Animation is not null)              ProcessVideo(message.Animation.FileId);
+            else if (message.Sticker   is { IsVideo: true })     ProcessVideo(message.Sticker  .FileId);
+            else if (message.Video     is not null)              ProcessVideo(message.Video    .FileId);
+            else if (message.VideoNote is not null)              ProcessVideo(message.VideoNote.FileId);
+            else if (message.Sticker   is { IsAnimated: false }) ProcessStick(message.Sticker  .FileId);
             else return false;
-            
+
             return true;
         }
 
@@ -60,15 +56,15 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected void DoPhoto(string fileID, Func<string, T, string> produce)
         {
-            Download(fileID);
+            Bot.Download(fileID, Chat, out var path);
+            Request = GetRequestData();
 
-            var dummy = GetDummy(out var empty, out var command);
-            ParseOptions(empty, ref dummy);
-            var repeats = GetRepeats(dummy, HasToBeRepeated());
+            ParseOptions();
+            var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(GetText(), empty, dummy, command);
-                using var stream = File.OpenRead(produce(_path, text));
+                var text = GetMemeText(GetText());
+                using var stream = File.OpenRead(produce(path, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_PHOTO(repeats)}");
@@ -76,19 +72,19 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected void DoStick(string fileID, Func<string, T, string, string> produce, bool convert = true)
         {
-            Download(fileID);
+            Bot.Download(fileID, Chat, out var path);
+            Request = GetRequestData();
 
             Memes.Sticker = true;
 
-            var dummy = GetDummy(out var empty, out var command);
-            ParseOptions(empty, ref dummy);
-            var repeats = GetRepeats(dummy, HasToBeRepeated());
-            var sticker = SendAsSticker();
+            ParseOptions();
+            var repeats = GetRepeatCount();
+            var sticker = SendAsSticker;
             var extension = GetStickerExtension();
-            for (int i = 0; i < repeats; i++)
+            for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(GetText(), empty, dummy, command);
-                var result = produce(_path, text, extension);
+                var text = GetMemeText(GetText());
+                var result = produce(path, text, extension);
                 if (sticker && convert)
                     result = new F_Process(result).Output("-stick", ".webp");
                 using var stream = File.OpenRead(result);
@@ -102,108 +98,83 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
-            _watch.WriteTime();
-            Download(fileID);
+            var sw = Helpers.GetStartedStopwatch();
+            Bot.Download(fileID, Chat, out var path, out var type);
+            Request = GetRequestData();
 
-            if (CropVideoNotes && _type == MediaType.Round) _path = Memes.CropVideoNote(_path);
+            if (CropVideoNotes && type == MediaType.Round) path = Memes.CropVideoNote(path);
 
-            var dummy = GetDummy(out var empty, out var command);
-            ParseOptions(empty, ref dummy);
-            var text = GetMemeText(GetText(), empty, dummy, command);
-            using var stream = File.OpenRead(produce(_path, text));
-            if (CropVideoNotes || _type != MediaType.Round)
-                Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
-            else
-                Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            ParseOptions();
+            var text = GetMemeText(GetText());
+            using var stream = File.OpenRead(produce(path, text));
+            var note = type == MediaType.Round && !CropVideoNotes;
+            if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
 
-            Log($@"{Title} >> {Log_VIDEO} >> TIME: {_watch.CheckElapsed()}");
+            Log($@"{Title} >> {Log_VIDEO} >> TIME: {FormatTime(sw.Elapsed)}");
         }
 
-        protected abstract void ParseOptions(bool empty, ref string dummy);
-        protected abstract T GetMemeText(string? text, bool empty, string dummy, string command);
-        //private T Texts() => GetMemeText(RemoveCommand(GetTextOrNull()));
+        protected abstract void ParseOptions();
+        protected abstract T GetMemeText(string? text);
+
 
         private string? GetText()
         {
-            var text = TextStartsWithCommand() || MessageIsNotReposted() && Baka.Meme.Chance == 100 ? Text : null;
-            return RemoveCommand(text);
+            if (Text is null) return null;
+
+            return _cmd.IsMatch(Text) || ChatIsPrivate ? RemoveCommand(Text) : null;
         }
 
-        private bool TextStartsWithCommand() => Text != null && _cmd.IsMatch(Text);
-        private bool  MessageIsNotReposted() => Message.ForwardFromChat is null;
-
-        protected string GetDummy(out bool empty) => GetDummy(out empty, out _);
-        protected string GetDummy(out bool empty, out string command)
+        private MemeRequest GetRequestData()
         {
-            var cached = _lastRequest is var x && x.Chat == Chat && x.Message == Message.MessageId && x.Date == MessageDateTime;
-            if (cached)
-            {
-                empty = _lastRequest.Empty;
-                command = _lastRequest.Command;
-                return _lastRequest.Dummy;
-            }
+            var defaults = DefaultOptions;
+            var dummy = string.Empty;
+            var command = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
+            var empty = Text is null && defaults is null;
 
-            command = GetCommand();
-
-            _lastRequest.Chat = Chat;
-            _lastRequest.Date = MessageDateTime;
-            _lastRequest.Message = Message.MessageId;
-
-                empty = Text is null && Options is null;
-            if (empty)
-                _lastRequest.Dummy = "";
-            else
-            {
-                var hasOp = command.Length > Command.Length && command.StartsWith(Command);
-                var plus  = hasOp && Options is not null && (command.Contains('+') || Options.Contains('+'));
-
-                _lastRequest.Dummy = hasOp ? plus ? Options + command[Command.Length..] : command : Options ?? command;
-            }
-            _lastRequest.Empty = empty;
-            _lastRequest.Command = command;
-            return _lastRequest.Dummy;
-        }
-
-        private string GetCommand()
-        {
-            return Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
-        }
-
-        private bool HasToBeRepeated() => CheckForCondition(options => _repeat.IsMatch(options) && TextIsGenerated());
-        private bool SendAsSticker  () => CheckForCondition(options => options.Contains('='));
-
-        private bool CheckForCondition(Predicate<string> condition)
-        {
-            var dummy = GetDummy(out var empty);
             if (!empty)
             {
-                var match = _cmd.Match(dummy);
-                if (match.Success) return condition(match.Groups[1].Value);
+                var hasOptions = command.Length > Command.Length && command.StartsWith(Command);
+                var combine = hasOptions && defaults is not null && (command.Contains('+') || defaults.Contains('+'));
+
+                dummy = hasOptions
+                    ? combine
+                        ? defaults + command[Command.Length..]
+                        : command
+                    : defaults ?? command;
             }
+
+            return new MemeRequest(dummy, empty, command);
+        }
+
+        // todo still repeat if random options are used (watermarks, randoms colors, ...)
+        private bool HasToBeRepeated => ConditionSatisfied(options => _repeat.IsMatch(options) && NoTextProvided);
+        private bool SendAsSticker   => ConditionSatisfied(options => options.Contains('='));
+        private bool NoTextProvided  => Text is null || (Text.StartsWith('/') && !Text.Any(x => split_chars.Contains(x)));
+
+        private bool ConditionSatisfied(Predicate<string> condition)
+        {
+            if (Request.Empty) return false;
+
+            var match = _cmd.Match(Request.Dummy);
+            if (match.Success) return condition(match.Groups[1].Value);
             return false;
         }
 
-        private bool TextIsGenerated()
-        {
-            return Text is null || (Text.StartsWith('/') && !Text.Any(x => split_chars.Contains(x)));
-        }
-
-        private int GetRepeats(string dummy, bool hasToBeRepeated)
+        private int GetRepeatCount()
         {
             var repeats = 1;
-            if (hasToBeRepeated)
+            if (HasToBeRepeated)
             {
-                var match = _repeat.Match(dummy);
-                if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
+                var match = _repeat.Match(Request.Dummy);
+                if (match.Success && int.TryParse(match.Value, out var x)) repeats = x;
             }
             return repeats;
         }
 
-        private string? RemoveCommand(string? text) => text is null ? null : _cmd.Replace(text, "");
+        private string RemoveCommand(string text) => _cmd.Replace(text, "");
 
-        private string GetStickerExtension() => CheckForCondition(ops => ops.Contains('x')) ? ".jpg" : ".png";
-
-        private void Download(string fileID) => Bot.Download(fileID, Chat, out _path, out _type);
+        private string GetStickerExtension() => ConditionSatisfied(ops => ops.Contains('x')) ? ".jpg" : ".png";
     }
 
     public abstract class MakeMemeCore_Static : WitlessCommand
@@ -213,5 +184,17 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
 
         protected const string OPTIONS = "ℹ️ Список опций: ";
+    }
+
+    public class MemeRequest(string dummy, bool empty, string command)
+    {
+        /// <summary> A combination of command and default options. </summary>
+        public string Dummy = dummy;
+
+        /// <summary> <b>True</b> if both message text and default options are null. </summary>
+        public bool Empty = empty;
+
+        /// <summary> Lowercase command text w/o bot username. </summary>
+        public string Command = command;
     }
 }

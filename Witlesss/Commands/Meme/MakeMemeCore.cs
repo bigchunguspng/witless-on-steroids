@@ -22,7 +22,8 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract string Log_VIDEO { get; }
         protected abstract string VideoName { get; }
 
-        protected abstract string Options { get; }
+        protected abstract string? Options { get; }
+
         protected abstract string Command { get; }
 
         protected virtual bool CropVideoNotes { get; } = true;
@@ -61,10 +62,13 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         {
             Download(fileID);
 
-            var repeats = GetRepeats(HasToBeRepeated());
-            for (int i = 0; i < repeats; i++)
+            var dummy = GetDummy(out var empty, out var command);
+            ParseOptions(empty, ref dummy);
+            var repeats = GetRepeats(dummy, HasToBeRepeated());
+            for (var i = 0; i < repeats; i++)
             {
-                using var stream = File.OpenRead(produce(_path, Texts()));
+                var text = GetMemeText(GetText(), empty, dummy, command);
+                using var stream = File.OpenRead(produce(_path, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_PHOTO(repeats)}");
@@ -76,12 +80,15 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             Memes.Sticker = true;
 
-            var repeats = GetRepeats(HasToBeRepeated());
+            var dummy = GetDummy(out var empty, out var command);
+            ParseOptions(empty, ref dummy);
+            var repeats = GetRepeats(dummy, HasToBeRepeated());
             var sticker = SendAsSticker();
             var extension = GetStickerExtension();
             for (int i = 0; i < repeats; i++)
             {
-                var result = produce(_path, Texts(), extension);
+                var text = GetMemeText(GetText(), empty, dummy, command);
+                var result = produce(_path, text, extension);
                 if (sticker && convert)
                     result = new F_Process(result).Output("-stick", ".webp");
                 using var stream = File.OpenRead(result);
@@ -100,7 +107,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             if (CropVideoNotes && _type == MediaType.Round) _path = Memes.CropVideoNote(_path);
 
-            using var stream = File.OpenRead(produce(_path, Texts()));
+            var dummy = GetDummy(out var empty, out var command);
+            ParseOptions(empty, ref dummy);
+            var text = GetMemeText(GetText(), empty, dummy, command);
+            using var stream = File.OpenRead(produce(_path, text));
             if (CropVideoNotes || _type != MediaType.Round)
                 Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
             else
@@ -109,12 +119,14 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             Log($@"{Title} >> {Log_VIDEO} >> TIME: {_watch.CheckElapsed()}");
         }
 
-        protected abstract T GetMemeText(string text);
-        private T Texts() => GetMemeText(RemoveCommand(GetTextOrNull()));
+        protected abstract void ParseOptions(bool empty, ref string dummy);
+        protected abstract T GetMemeText(string? text, bool empty, string dummy, string command);
+        //private T Texts() => GetMemeText(RemoveCommand(GetTextOrNull()));
 
-        private string GetTextOrNull()
+        private string? GetText()
         {
-            return TextStartsWithCommand() || MessageIsNotReposted() && Baka.Meme.Chance == 100 ? Text : null;
+            var text = TextStartsWithCommand() || MessageIsNotReposted() && Baka.Meme.Chance == 100 ? Text : null;
+            return RemoveCommand(text);
         }
 
         private bool TextStartsWithCommand() => Text != null && _cmd.IsMatch(Text);
@@ -176,19 +188,18 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return Text is null || (Text.StartsWith('/') && !Text.Any(x => split_chars.Contains(x)));
         }
 
-        private int GetRepeats(bool hasToBeRepeated)
+        private int GetRepeats(string dummy, bool hasToBeRepeated)
         {
             var repeats = 1;
             if (hasToBeRepeated)
             {
-                var dummy = GetDummy(out _);
                 var match = _repeat.Match(dummy);
                 if (match.Success && int.TryParse(match.Value, out int x)) repeats = x;
             }
             return repeats;
         }
 
-        private string RemoveCommand(string text) => text == null ? null : _cmd.Replace(text, "");
+        private string? RemoveCommand(string? text) => text is null ? null : _cmd.Replace(text, "");
 
         private string GetStickerExtension() => CheckForCondition(ops => ops.Contains('x')) ? ".jpg" : ".png";
 
@@ -197,7 +208,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
     public abstract class MakeMemeCore_Static : WitlessCommand
     {
-        protected static readonly char[] split_chars = new[] { ' ', '\n' };
+        protected static readonly char[] split_chars = [' ', '\n'];
         
         protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
 

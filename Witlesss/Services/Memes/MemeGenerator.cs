@@ -12,7 +12,7 @@ namespace Witlesss.Services.Memes
 {
     public class MemeGenerator
     {
-        public static bool WrapText = true, ColorText, ForceImpact;
+        public static bool WrapText = true, ColorText;
         public static int FontMultiplier = 10, ShadowOpacity = 100;
         public static bool UseCustomBg;
         public static Color   CustomBg;
@@ -133,7 +133,7 @@ namespace Witlesss.Services.Memes
 
         private Font GetFont(float size) => new(GetFontFamily(), size, ExtraFonts.GetFontStyle());
 
-        private FontFamily GetFontFamily() => ExtraFonts.GetFontFamily("im", forceDefault: ForceImpact);
+        private FontFamily GetFontFamily() => ExtraFonts.GetFontFamily("im");
 
         private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
 

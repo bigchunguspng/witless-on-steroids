@@ -36,7 +36,7 @@ namespace Witlesss.Services
         public ExtraFonts(string cmd, params string[] exclude)
         {
             var codes = string.Join('|', _families.Keys.Where(x => !exclude.Contains(x)));
-            _regex = new Regex($@"^\/{cmd}\S*({codes})(-[bi]+)?\S*", RegexOptions.IgnoreCase);
+            _regex = new Regex($@"^\/{cmd}\S*({codes})(-[bi]{{1,2}})?\S*", RegexOptions.IgnoreCase);
         }
 
         public FontFamily GetFontFamily(string @default, bool forceDefault = false)
@@ -65,15 +65,15 @@ namespace Witlesss.Services
 
         private float GetRelativeSize() => _fontKey switch
         {
-            "vn" => 32.25F / 26.25F,
-            "im" => 29.25F / 26.25F,
-            "vp" => 29.25F / 26.25F,
-            "vb" => 27F    / 26.25F,
-            "cr" => 25.5F  / 26.25F,
-            "tm" => 24.75F / 26.25F,
-            "cb" => 23F    / 26.25F,
-            "vg" => 21F    / 26.25F,
-            _    => 26.25F / 26.25F,
+            "vn" => 1.229F,
+            "im" => 1.114F,
+            "vp" => 1.114F,
+            "vb" => 1.029F,
+            "cr" => 0.971F,
+            "tm" => 0.943F,
+            "cb" => 0.876F,
+            "vg" => 0.8F,
+            _    => 1F,
         };
 
         public void CheckKey(bool empty, ref string dummy)

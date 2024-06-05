@@ -180,10 +180,10 @@ namespace Witlesss
         [JsonProperty] public MemeType Type { get; set; }
         [JsonProperty] public bool Stickers { get; set; }
 
-        [JsonProperty] public string OptionsM { get; set; }
-        [JsonProperty] public string OptionsT { get; set; }
-        [JsonProperty] public string OptionsD { get; set; }
-        [JsonProperty] public string OptionsG { get; set; }
-        [JsonProperty] public string OptionsN { get; set; }
+        [JsonProperty] public string? OptionsM { get; set; }
+        [JsonProperty] public string? OptionsT { get; set; }
+        [JsonProperty] public string? OptionsD { get; set; }
+        [JsonProperty] public string? OptionsG { get; set; }
+        [JsonProperty] public string? OptionsN { get; set; }
     }
 }

@@ -61,9 +61,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             ParseOptions();
             var repeats = GetRepeatCount();
+            var txt = GetProvidedText();
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(GetText());
+                var text = GetMemeText(txt);
                 using var stream = File.OpenRead(produce(path, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
@@ -81,9 +82,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
             var extension = GetStickerExtension();
+            var txt = GetProvidedText();
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(GetText());
+                var text = GetMemeText(txt);
                 var result = produce(path, text, extension);
                 if (sticker && convert)
                     result = new F_Process(result).Output("-stick", ".webp");
@@ -105,7 +107,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             if (CropVideoNotes && type == MediaType.Round) path = Memes.CropVideoNote(path);
 
             ParseOptions();
-            var text = GetMemeText(GetText());
+            var text = GetMemeText(GetProvidedText());
             using var stream = File.OpenRead(produce(path, text));
             var note = type == MediaType.Round && !CropVideoNotes;
             if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
@@ -118,7 +120,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract T GetMemeText(string? text);
 
 
-        private string? GetText()
+        private string? GetProvidedText()
         {
             if (Text is null) return null;
 
@@ -181,7 +183,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
     {
         protected static readonly char[] split_chars = [' ', '\n'];
         
-        protected static readonly Regex _repeat = new(@"(?:(?<![ms]s)(?<![ms]s\d)(?<![ms]s\d\d))[2-9](?!\d?%)", RegexOptions.IgnoreCase);
+        protected static readonly Regex _repeat = new(@"[2-9]", RegexOptions.IgnoreCase);
 
         protected const string OPTIONS = "ℹ️ Список опций: ";
     }

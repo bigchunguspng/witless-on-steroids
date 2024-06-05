@@ -49,10 +49,10 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string? text)
         {
-            var add_bottom_text  = !Request.Empty && CheckMatch(ref Request.Dummy, _add_bottom);
-            var only_bottom_text = !Request.Empty && CheckMatch(ref Request.Dummy, _only_bottom);
-            var only_top_text    = !Request.Empty && CheckMatch(ref Request.Dummy, _top_only);
-            var matchCaps        = !Request.Empty && CheckMatch(ref Request.Dummy, _caps);
+            var add_bottom_text  = !Request.Empty &&  _add_bottom.IsMatch(Request.Dummy);
+            var only_bottom_text = !Request.Empty && _only_bottom.IsMatch(Request.Dummy);
+            var only_top_text    = !Request.Empty &&    _top_only.IsMatch(Request.Dummy);
+            var matchCaps        = !Request.Empty &&        _caps.IsMatch(Request.Dummy);
             
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(Request.Command));

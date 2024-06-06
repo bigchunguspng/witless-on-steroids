@@ -53,4 +53,6 @@ public static class SizeHelpers
 
     public static Size ValidMp4Size(int w, int h) => new(w.ToEven(), h.ToEven());
     public static Size ValidMp4Size(this Size size) => new(size.Width.ToEven(), size.Height.ToEven());
+
+    public static Size CeilingInt(this SizeF size) => new(size.Width.CeilingInt(), size.Height.CeilingInt());
 }

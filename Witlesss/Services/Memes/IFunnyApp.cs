@@ -6,7 +6,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
@@ -29,7 +28,7 @@ public class IFunnyApp
     private int _w, _h; // <-- of the image
     private int _cardHeight, _fullHeight, _cropOffset, _textWidth;
     private float _marginLeft;
-    private float _capsFix; // <-- additional height offset to better center uppercase text
+    private float _textOffset;
     private bool _extraHigh;
     private SizeF _measure;
 
@@ -38,7 +37,7 @@ public class IFunnyApp
     public Point     Location => new(0, _cardHeight);
     public Rectangle Cropping => new(0, _cropOffset, _w, _h);
 
-    private static Font _font;
+    private static Font _font = default!;
     private static FontFamily FontFamily => ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
     private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
 
@@ -154,11 +153,9 @@ public class IFunnyApp
 
         if (UseLeftAlignment)
         {
-            _marginLeft = Math.Min(_font.Size / 3, 5);
+            _marginLeft = Math.Max(_w / 40F, 5);
             _textWidth = _w - (int)(2 * _marginLeft);
         }
-
-        //var area = new SizeF(WrapText ? _textWidth : _textWidth * 3, _h * 5);
 
         MeasureText();
         while (_measure.Height > _cardHeight || _measure.Width > _textWidth) // fixes "text is too big"
@@ -197,8 +194,8 @@ public class IFunnyApp
         void MeasureText()
         {
             var options = GetDefaultTextOptions();
-            options.WrappingLength = WrapText ? _textWidth : _textWidth * 3;
-            _measure = TextMeasuringHelpers.MeasureTextSize(text, GetDefaultTextOptions(), out _);
+            options.WrappingLength = WrapText ? _textWidth : -1;
+            _measure = TextMeasuringHelpers.MeasureTextSize(text, options, out _);
         }
 
         void SetCardHeightXD(float x)
@@ -210,11 +207,12 @@ public class IFunnyApp
 
     private void AdjustTextPosition(string s)
     {
-        var fix = /*!UseLeftAlignment &&*/ TextIsUppercaseEnough(s);
+        var offset = _font.Size * -0.147F; // todo different for every font ?
+        var caps = TextIsUppercaseEnough(s) ? _font.Size * 0.103F : 0; // todo different for every font
 
-        _capsFix = fix ? _font.Size * 0.103F : 0; // todo different for every font
+        _textOffset = offset + caps;
     }
-    
+
     private bool TextIsUppercaseEnough(string s)
     {
         var caps  = CAPS.Matches(s).Count;
@@ -224,16 +222,20 @@ public class IFunnyApp
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)
     {
-        TextAlignment = UseLeftAlignment ? TextAlignment.Start : TextAlignment.Center,
-        HorizontalAlignment = UseLeftAlignment ? HorizontalAlignment.Left : HorizontalAlignment.Center,
+        TextAlignment = UseLeftAlignment
+            ? TextAlignment.Start
+            : TextAlignment.Center,
+        HorizontalAlignment = UseLeftAlignment
+            ? HorizontalAlignment.Left
+            : HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
-        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _cardHeight / 2F + GetTextOffsetFix() + _capsFix),
+        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _cardHeight / 2F + _textOffset),
         WrappingLength = _textWidth,
         LineSpacing = ExtraFonts.GetLineSpacing() * 1.2F,
-        FallbackFontFamilies = ExtraFonts.FallbackFamilies
+        WordBreaking = WordBreaking.Standard,
+        KerningMode = KerningMode.Standard,
+        FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
-
-    private float GetTextOffsetFix() => FontSize * -0.147F; // todo different for every font ?
 
 
     // IMAGE

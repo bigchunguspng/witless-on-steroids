@@ -97,7 +97,7 @@ namespace Witlesss.Services.Memes
 
                 var sw = Helpers.GetStartedStopwatch();
                 options = GetDefaultTextOptions(size, y);
-                textSize = TextMeasuringHelpers.MeasureTextSize(text, options, out lines);
+                textSize = TextMeasuringHelpers.MeasureTextSize(text, options, out lines).CeilingInt();
                 sw.Log("TextMeasuringHelpers.MeasureTextHeight");
                 go = textSize.Height > _captionArea.Height && size > 5 || WrapText == false && lines > maxLines;
                 size *= go ? lines > 2 ? 0.8f : 0.9f : 1;

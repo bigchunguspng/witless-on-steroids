@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -29,7 +30,7 @@ public static class TextMeasuringHelpers
         return -1;
     }
 
-    public static Size MeasureTextSize(string text, TextOptions options, out int linesFilled)
+    public static SizeF MeasureTextSize(string text, TextOptions options, out int linesFilled)
     {
         var ops = new RichTextOptions(options.Font)
         {
@@ -57,7 +58,12 @@ public static class TextMeasuringHelpers
             }
         }
 
-        return new Size(maxWidth.RoundInt(), (linesFilled * advances[0].Bounds.Height).RoundInt());
+        linesFilled += Regex.Count(text, @"\n(?=[ \t]*\n)");
+
+        var fontHeight = advances[0].Bounds.Height;
+        var textHeight = fontHeight * linesFilled;
+        var lineSpacings = fontHeight * (ops.LineSpacing - 1) * (linesFilled - 1);
+        return new SizeF(maxWidth, textHeight + lineSpacings);
     }
 
     // it's here for the future...

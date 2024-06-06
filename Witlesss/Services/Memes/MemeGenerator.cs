@@ -6,7 +6,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms;
 
 namespace Witlesss.Services.Memes
 {
@@ -132,7 +131,7 @@ namespace Witlesss.Services.Memes
             FallbackFontFamilies = ExtraFonts.FallbackFamilies
         };
 
-        private Font GetFont(float size) => new(GetFontFamily(), size, ExtraFonts.GetFontStyle());
+        private Font GetFont(float size) => ExtraFonts.GetFont("im", size);
 
         private FontFamily GetFontFamily() => ExtraFonts.GetFontFamily("im");
 

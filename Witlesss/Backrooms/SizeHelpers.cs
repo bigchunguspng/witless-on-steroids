@@ -41,7 +41,7 @@ public static class SizeHelpers
         return new Size(width, height.RoundInt());
     }
 
-    public static Size GetImageSize(string path)
+    public static Size GetImageSize_FFmpeg(string path)
     {
         var v = F_Action.GetVideoStream(path);
         return new Size(v.Width, v.Height);

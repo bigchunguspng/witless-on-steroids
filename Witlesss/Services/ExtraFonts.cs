@@ -48,22 +48,33 @@ namespace Witlesss.Services
             _regex = new Regex($@"^\/{cmd}\S*({codes})(-[bi]{{1,2}})?\S*", RegexOptions.IgnoreCase);
         }
 
+        public Font GetFont(string @default, float size)
+        {
+            var family = GetFontFamily(@default);
+            return family.CreateFont(size, GetFontStyle(family));
+        }
+
         public FontFamily GetFontFamily(string @default, bool forceDefault = false)
         {
             return _families[forceDefault ? @default : _fontKey ?? @default];
         }
 
-        public FontStyle GetFontStyle()
+        public FontStyle GetFontStyle(FontFamily family)
         {
-            if (_styleKey is null) return FontStyle.Regular;
+            var available = family.GetAvailableStyles().ToHashSet();
+
+            var aR = available.Contains(FontStyle.Regular);
+            var aI = available.Contains(FontStyle.Italic);
+
+            if (_styleKey is null) return aR ? FontStyle.Regular : FontStyle.Bold;
 
             var b = _styleKey.Contains('b');
             var i = _styleKey.Contains('i');
 
             return (b, i) switch
             {
-                (false, false) => FontStyle.Regular,
-                (false, true ) => FontStyle.Italic,
+                (false, false) => aR ? FontStyle.Regular : FontStyle.Bold,
+                (false, true ) => aI ? FontStyle.Italic : FontStyle.BoldItalic,
                 (true , false) => FontStyle.Bold,
                 (true , true ) => FontStyle.BoldItalic
             };

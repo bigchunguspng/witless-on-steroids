@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using Witlesss.MediaTools;
-using static System.Drawing.StringAlignment;
 
 namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
-    public static bool UseSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
+    public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool UseGivenColor, PickColor, ForceCenter, BackInBlack, BlurImage;
     public static Color   GivenColor;
-    public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 36;
+    public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 48;
 
     private Color Background;
     private SolidBrush TextColor;
@@ -38,16 +39,18 @@ public class IFunnyApp
     public Rectangle Cropping => new(0, _cropOffset, _w, _h);
 
     private static Font _sans;
-    private static FontFamily FontFamily => UseSegoe ? SegoeBlack : ExtraFonts.GetOtherFont("ft");
-    private static FontFamily SegoeBlack = new("Segoe UI Black");
+    private static FontFamily FontFamily => ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
+    private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
 
+    /*
     private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
     private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };
     private static readonly StringFormat _formatC = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
+    */
 
-    private void ResizeFont(float size) => _sans = new(FontFamily, size);
+    private void ResizeFont(float size) => _sans = FontFamily.CreateFont(size, FontStyle);
 
-    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, _cardHeight / 5 * DefFontSize / 36), MinFontSize);
+    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, (_cardHeight / 3.75F).RoundInt() * DefFontSize / 48), MinFontSize);
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);
@@ -55,7 +58,11 @@ public class IFunnyApp
 
     public string MakeCaptionMeme(string path, string text)
     {
-        var image = GetImage(path);
+        var (size, info) = GetImageSize(path);
+        SetUp(size);
+
+        var image = GetImage(path, size, info);
+
         var funny = DrawText(text);
 
         var meme = Combine(image, funny);
@@ -65,43 +72,32 @@ public class IFunnyApp
 
     private Image Combine(Image source, Image caption)
     {
-        var meme = new Bitmap(_w, _fullHeight);
-        using var g = Graphics.FromImage(meme);
+        var meme = new Image<Rgba32>(_w, _fullHeight);
 
-        if (Witlesss.Memes.Sticker) g.Clear(BackInBlack ? Color.Black : Background);
-        
-        g.CompositingMode = CompositingMode.SourceOver;
-        g.DrawImage(source,  new Point(0, _cardHeight - _cropOffset));
-        g.DrawImage(caption, new Point(0, 0));
+        if (Witlesss.Memes.Sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
+
+        meme.Mutate(x => x.DrawImage(source, new Point(0, _cardHeight - _cropOffset), opacity: 1));
+        meme.Mutate(x => x.DrawImage(caption, new Point(0, 0), opacity: 1));
 
         return meme;
     }
 
-    public string BakeText(string text) => ImageSaver.SaveImageTemp(Combine(new Bitmap(_w, _h), DrawText(text)));
+    public string BakeText(string text) => ImageSaver.SaveImageTemp(Combine(new Image<Rgba32>(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);
         var funny = emoji.Count > 0;
-        var textM = funny ? EmojiTool.ReplaceEmoji(text, ExtraFonts.UseOtherFont ? "aa" : "НН") : text;
+        var textM = funny ? EmojiTool.ReplaceEmoji(text, "aa" /*: "НН"*/) : text;
 
         AdjustProportions(textM);
         AdjustTextPosition(text);
 
         var cardHeight = funny ? _cardHeight * 2 : _cardHeight;
-        var image = new Bitmap(_w, cardHeight);
+        var image = new Image<Rgba32>(_w, cardHeight, Background);
 
-        using var graphics = Graphics.FromImage(image);
-        
-        graphics.Clear(Background);
-        
-        graphics.CompositingMode    = CompositingMode.SourceOver;
-        graphics.CompositingQuality = CompositingQuality.HighQuality;
-        graphics.PixelOffsetMode    = PixelOffsetMode.HighQuality;
-        graphics.TextRenderingHint  = TextRenderingHint.AntiAlias;
+        //var area = new RectangleF(_marginLeft, _capsFix, _textWidth, cardHeight);
 
-        var area = new RectangleF(_marginLeft, _capsFix, _textWidth, cardHeight);
-
-        if (funny)
+        /*if (funny)
         {
             var p = new TextParams(62, EmojiSize, _sans, TextColor, area, Format);
             var h = (int)graphics.MeasureString(textM, _sans, area.Size, Format, out _, out var lines).Height;
@@ -112,7 +108,10 @@ public class IFunnyApp
             graphics.CompositingMode = CompositingMode.SourceCopy;
             graphics.FillRectangle(_transparent, 0, _cardHeight, _w, cardHeight - _cardHeight);
         }
-        else graphics.DrawString(text, _sans, TextColor, area, Format);
+        else*/
+        {
+            image.Mutate(x => x.DrawText(GetDefaultTextOptions(), text, TextColor, pen: null));
+        }
 
         return image;
     }
@@ -125,41 +124,32 @@ public class IFunnyApp
     {
         _extraHigh = false;
 
-        using var g = Graphics.FromHwnd(IntPtr.Zero);
-
         if (UseLeftAlignment)
         {
             _marginLeft = Math.Min(_sans.Size / 3, 5);
             _textWidth = _w - (int)(2 * _marginLeft);
         }
 
-        var area = new SizeF(WrapText ? _textWidth : _textWidth * 3, _h * 5);
+        //var area = new SizeF(WrapText ? _textWidth : _textWidth * 3, _h * 5);
 
-        MeasureString();
+        MeasureText();
         while (_measure.Height > _cardHeight || _measure.Width > _textWidth) // fixes "text is too big"
         {
             DecreaseFontSize();
-            MeasureString();
+            MeasureText();
             if (WrapText && _sans.Size < MinFontSize)
             {
                 ResizeFont(MinFontSize);
-                MeasureString();
+                MeasureText();
                 SetCardHeightXD(_measure.Height + 15);
                 
                 break;
             }
         }
-
-        void MeasureString() => _measure = g.MeasureString(text, _sans, area);
-        void SetCardHeightXD(float x)
-        {
-            SetCardHeight((int)x);
-            _extraHigh = true;
-        }
         
         if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
-            var ms = g.MeasureString(text, _sans, new SizeF(_textWidth, _cardHeight));
+            var ms = TextMeasuringHelpers.MeasureTextSize(text, GetDefaultTextOptions(), out _);
             if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
@@ -175,11 +165,24 @@ public class IFunnyApp
             var extraHeight = UltraThinCard ? _sans.Size * -0.1 : Math.Max(_sans.Size, 8);
             SetCardHeight((int)(_measure.Height + extraHeight));
         }
+
+        void MeasureText()
+        {
+            var options = GetDefaultTextOptions();
+            options.WrappingLength = WrapText ? _textWidth : _textWidth * 3;
+            _measure = TextMeasuringHelpers.MeasureTextSize(text, GetDefaultTextOptions(), out _);
+        }
+
+        void SetCardHeightXD(float x)
+        {
+            SetCardHeight((int)x);
+            _extraHigh = true;
+        }
     }
 
     private void AdjustTextPosition(string s)
     {
-        var fix = !UseLeftAlignment && TextIsUppercaseEnough(s);
+        var fix = /*!UseLeftAlignment &&*/ TextIsUppercaseEnough(s);
 
         _capsFix = fix ? _sans.Size * 0.0875f : 0;
     }
@@ -190,6 +193,16 @@ public class IFunnyApp
         var emoji = EmojiRegex.Matches(s).Sum(m => m.Length);
         return caps + 3 * emoji > s.Length / 5;
     }
+
+    private RichTextOptions GetDefaultTextOptions() => new(_sans)
+    {
+        TextAlignment = UseLeftAlignment ? TextAlignment.Start : TextAlignment.Center,
+        HorizontalAlignment = UseLeftAlignment ? HorizontalAlignment.Left : HorizontalAlignment.Center,
+        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _capsFix),
+        WrappingLength = _textWidth,
+        LineSpacing = ExtraFonts.GetLineSpacing() * 1.2F,
+        FallbackFontFamilies = ExtraFonts.FallbackFamilies
+    };
 
     public void SetUp(Size size)
     {
@@ -210,27 +223,40 @@ public class IFunnyApp
         _cardHeight = FF_Extensions.ToEven(x);
         _fullHeight = _h + _cardHeight;
     }
-    private Image GetImage(string path)
-    {
-        var pic = Image.FromFile(path);
-        var image = pic.Width < 200 ? new Bitmap(pic, new Size(200, pic.Height * 200 / pic.Width)) : new Bitmap(pic);
 
-        SetUp(image.Size);
+
+    // IMAGE
+
+    private (Size size, ImageInfo info) GetImageSize(string path)
+    {
+        var info = Image.Identify(path);
+        return (info.Size.EnureIsWideEnough(), info);
+    }
+
+    private Image<Rgba32> GetImage(string path, Size size, ImageInfo info)
+    {
+        var image = Image.Load<Rgba32>(path);
+        if (size != info.Size)
+        {
+            image.Mutate(x => x.Resize(size));
+        }
+
         SetColor(image);
 
         return image;
     }
 
-    #region COLOR PICKING
 
-    private void SetColor(Bitmap image)
+    // COLOR PICKING
+
+    private void SetColor(Image<Rgba32> image)
     {
         if  (UseGivenColor) SetCustomColors();
         else if (PickColor) SetSpecialColors(image);
         else                SetDefaultColors();
     }
 
-    public void SetSpecialColors(Bitmap image)
+    public void SetSpecialColors(Image<Rgba32> image)
     {
         Background = PickColorFromImage(image);
         TextColor  = ChooseTextColor(Background);
@@ -246,13 +272,13 @@ public class IFunnyApp
         TextColor  = _black;
     }
 
-    private SolidBrush ChooseTextColor(Color b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
+    private SolidBrush ChooseTextColor(Rgb24 b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
 
-    private Color PickColorFromImage(Bitmap image)
+    private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {
         var xd = ForceCenter ? 2 : 0;
 
-        var colors = new Color[7];
+        var colors = new Rgba32[7];
         colors[0] = AverageColorOnOffset(                  0);
         colors[1] = AverageColorOnOffset(image.Width * 1 / 8);
         colors[2] = AverageColorOnOffset(image.Width * 2 / 8);
@@ -271,14 +297,14 @@ public class IFunnyApp
 
         return min > 950 ? Average(colors[0], colors[^1]) : colors[difference.ToList().IndexOf(min) + xd];
 
-        Color AverageColorOnOffset(int x)
+        Rgba32 AverageColorOnOffset(int x)
         {
             var avg = AverageColor(image, new Rectangle(x, _cropOffset, 5, 5));
             return BackInBlack ? avg : PutOver(Color.White, avg);
         }
     }
 
-    private static Color AverageColor(Bitmap image, Rectangle area)
+    private static Rgba32 AverageColor(Image<Rgba32> image, Rectangle area)
     {
         int a = 0, r = 0, g = 0, b = 0;
         int w = area.Width, h = area.Height, s = w * h;
@@ -287,36 +313,34 @@ public class IFunnyApp
         for (var x = area.X; x < maxX; x++)
         for (var y = area.Y; y < maxY; y++)
         {
-            var p = image.GetPixel(x, y);
+            var p = image[x, y];
             a += p.A;
             r += p.R;
             b += p.B;
             g += p.G;
         }
 
-        return Color.FromArgb(a / s, r / s, g / s, b / s);
+        return new Rgba32((r / s).ClampByte(), (g / s).ClampByte(), (b / s).ClampByte(), (a / s).ClampByte());
     }
 
-    private static int Difference(Color a, Color b)
+    private static int Difference(Rgba32 a, Rgba32 b)
     {
         return Math.Abs(a.R - b.R) + Math.Abs(a.G - b.G) + Math.Abs(a.B - b.B);
     }
 
-    private static Color Average(Color a, Color b)
+    private static Rgba32 Average(Rgba32 a, Rgba32 b)
     {
-        return Color.FromArgb(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
+        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
 
         int Calc(byte x, byte y) => (x + y) / 2;
     }
 
-    private static Color PutOver(Color a, Color b)
+    private static Rgba32 PutOver(Rgba32 a, Rgba32 b)
     {
-        return Color.FromArgb(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
+        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
 
         int Calc(byte x, byte y) => x * (255 - b.A) / 255 + y * b.A / 255; // lerp
     }
-
-    #endregion
 }
 
-public record TextParams(int Lines, int EmojiS, Font Font, SolidBrush Color, RectangleF Layout, StringFormat Format) : TextParameters;
+//public record TextParams(int Lines, int EmojiS, Font Font, SolidBrush Color, RectangleF Layout, StringFormat Format) : TextParameters;

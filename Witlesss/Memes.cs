@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using FFMpegCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Witlesss.Backrooms;
 using Witlesss.MediaTools;
 using static Witlesss.Backrooms.SizeHelpers;
 using static Witlesss.MediaTools.FF_Extensions;
+using Rectangle = System.Drawing.Rectangle;
+using Size = System.Drawing.Size;
 
 namespace Witlesss
 {
@@ -82,7 +85,7 @@ namespace Witlesss
         public static string MakeVideoMeme(string path, DgText text)
         {
             Sticker = false;
-            var size = GetImageSize(path).GrowSize().ValidMp4Size();
+            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
             _imgflip.SetUp(size);
 
             return new F_Combine(path, _imgflip.MakeCaption(text)).Meme(Quality, size).Output("-M");
@@ -101,11 +104,11 @@ namespace Witlesss
 
         public static string MakeVideoCaptionMeme(string path, string text)
         {
-            var size = GrowSize(GetSize(path));
+            var size = GetImageSize_FFmpeg(path).GrowSize();
             _ifunny.SetUp(size);
 
             if  (IFunnyApp.UseGivenColor) _ifunny.SetCustomColors();
-            else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(new Bitmap(Image.FromFile(Snapshot(path))));
+            else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(Image.Load<Rgba32>(Snapshot(path)));
             else                          _ifunny.SetDefaultColors();
 
             return new F_Combine(path, _ifunny.BakeText(text)).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage).Output("-Top");
@@ -122,7 +125,7 @@ namespace Witlesss
 
         public static string DeepFryVideo(string path, int _ = 0)
         {
-            var size = GetImageSize(path).GrowSize().ValidMp4Size();
+            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
             return new F_Process(path).DeepFryVideo(size.Ok(), Quality).Output_WEBM_safe("-Nuked");
         }
 
@@ -147,7 +150,7 @@ namespace Witlesss
             var video = extension == ".mp4" || extension == ".webm";
             if (video)
             {
-                var size = GetImageSize(path);
+                var size = GetImageSize_FFmpeg(path);
                 var fits = size.FitSize(720).ValidMp4Size();
                 if (size != fits)
                 {
@@ -166,8 +169,8 @@ namespace Witlesss
         public static string Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static string RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
-        public static string Stickerize    (string path) => new F_Process(path).ToSticker(GetImageSize(path).Normalize().Ok()).Output("-stick", ".webp");
-        public static string Compress      (string path) => new F_Process(path).CompressImage(GetImageSize(path).FitSize(2560).Ok()).Output("-small", ".jpg");
+        public static string Stickerize    (string path) => new F_Process(path).ToSticker(GetImageSize_FFmpeg(path).Normalize().Ok()).Output("-stick", ".webp");
+        public static string Compress      (string path) => new F_Process(path).CompressImage(GetImageSize_FFmpeg(path).FitSize(2560).Ok()).Output("-small", ".jpg");
         public static string CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static string CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");
         public static string Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
@@ -181,7 +184,7 @@ namespace Witlesss
         public static string ToVoice       (string path) => new F_Process(path).ToVoiceMessage().Output("-voice", ".ogg");
         public static string ToVideoNote   (string path)
         {
-            var s = GetImageSize(path);
+            var s = GetImageSize_FFmpeg(path);
             var d = ToEven(Math.Min(s.Width, s.Height));
             var x = (s.Width  - d) / 2;
             var y = (s.Height - d) / 2;

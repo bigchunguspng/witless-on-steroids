@@ -33,27 +33,54 @@ public class IFunnyApp
     private bool _extraHigh;
     private SizeF _measure;
 
-    public static float FontSize => MathF.Round(_sans.Size, 2);
+    public static float FontSize => MathF.Round(_font.Size, 2);
 
     public Point     Location => new(0, _cardHeight);
     public Rectangle Cropping => new(0, _cropOffset, _w, _h);
 
-    private static Font _sans;
+    private static Font _font;
     private static FontFamily FontFamily => ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
     private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
 
-    /*
-    private static StringFormat Format => UseLeftAlignment ? _formatL : _formatC;
-    private static readonly StringFormat _formatL = new() { Alignment = Near,   Trimming = StringTrimming.Word, LineAlignment = Far };
-    private static readonly StringFormat _formatC = new() { Alignment = Center, Trimming = StringTrimming.Word, LineAlignment = Center };
-    */
 
-    private void ResizeFont(float size) => _sans = FontFamily.CreateFont(size, FontStyle);
+    private void ResizeFont(float size) => _font = FontFamily.CreateFont(size, FontStyle);
 
     private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, (_cardHeight / 3.75F).RoundInt() * DefFontSize / 48), MinFontSize);
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
-    private void DecreaseFontSize() => ResizeFont(_sans.Size * 0.8f);
+    private void DecreaseFontSize() => ResizeFont(_font.Size * 0.8f);
+
+
+    public void SetUp(Size size)
+    {
+        var cropPercent = Math.Abs(CropPercent) / 100F;
+
+        _w = size.Width;
+        _h = (size.Height * cropPercent).RoundInt().ToEven();
+
+        _cropOffset = size.Height - _h;
+        if (CropPercent < 0) _cropOffset = _cropOffset / 2;
+
+        var wide = _w > _h;
+        var cardHeight = wide
+            ? _w / _h > 7
+                ? _w / 7
+                : _h / 2
+            : _w / 2;
+
+        SetCardHeight(cardHeight);
+
+        _marginLeft = 0;
+        _textWidth = _w; // todo make it 0.98 * _w
+
+        SetFontToDefault();
+    }
+
+    private void SetCardHeight(int x)
+    {
+        _cardHeight = x.ToEven();
+        _fullHeight = _h + _cardHeight;
+    }
 
 
     public string MakeCaptionMeme(string path, string text)
@@ -110,6 +137,7 @@ public class IFunnyApp
         }
         else*/
         {
+            Console.WriteLine(FontSize);
             image.Mutate(x => x.DrawText(GetDefaultTextOptions(), text, TextColor, pen: null));
         }
 
@@ -117,8 +145,8 @@ public class IFunnyApp
     }
     
     private int InitialMargin(int h) => UseLeftAlignment && !_extraHigh ? _cardHeight - h : (_cardHeight - h) / 2;
-    private int Spacing   => (int)(_sans.Size * 1.6);
-    private int EmojiSize => (int)(_sans.Size * 1.5);
+    private int Spacing   => (int)(_font.Size * 1.6);
+    private int EmojiSize => (int)(_font.Size * 1.5);
 
     private void AdjustProportions(string text)
     {
@@ -126,7 +154,7 @@ public class IFunnyApp
 
         if (UseLeftAlignment)
         {
-            _marginLeft = Math.Min(_sans.Size / 3, 5);
+            _marginLeft = Math.Min(_font.Size / 3, 5);
             _textWidth = _w - (int)(2 * _marginLeft);
         }
 
@@ -137,7 +165,7 @@ public class IFunnyApp
         {
             DecreaseFontSize();
             MeasureText();
-            if (WrapText && _sans.Size < MinFontSize)
+            if (WrapText && _font.Size < MinFontSize)
             {
                 ResizeFont(MinFontSize);
                 MeasureText();
@@ -153,7 +181,7 @@ public class IFunnyApp
             if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
-                ResizeFont(_sans.Size * k);
+                ResizeFont(_font.Size * k);
                 _measure = _measure * k;
 
                 if (_measure.Height > _cardHeight) SetCardHeightXD(_measure.Height + (_w - _measure.Width) / 2);
@@ -162,7 +190,7 @@ public class IFunnyApp
         
         if (ThinCard && _measure.Height < 0.95 * _cardHeight)
         {
-            var extraHeight = UltraThinCard ? _sans.Size * -0.1 : Math.Max(_sans.Size, 8);
+            var extraHeight = UltraThinCard ? _font.Size * -0.1 : Math.Max(_font.Size, 8);
             SetCardHeight((int)(_measure.Height + extraHeight));
         }
 
@@ -184,7 +212,7 @@ public class IFunnyApp
     {
         var fix = /*!UseLeftAlignment &&*/ TextIsUppercaseEnough(s);
 
-        _capsFix = fix ? _sans.Size * 0.0875f : 0;
+        _capsFix = fix ? _font.Size * 0.103F : 0; // todo different for every font
     }
     
     private bool TextIsUppercaseEnough(string s)
@@ -194,35 +222,18 @@ public class IFunnyApp
         return caps + 3 * emoji > s.Length / 5;
     }
 
-    private RichTextOptions GetDefaultTextOptions() => new(_sans)
+    private RichTextOptions GetDefaultTextOptions() => new(_font)
     {
         TextAlignment = UseLeftAlignment ? TextAlignment.Start : TextAlignment.Center,
         HorizontalAlignment = UseLeftAlignment ? HorizontalAlignment.Left : HorizontalAlignment.Center,
-        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _capsFix),
+        VerticalAlignment = VerticalAlignment.Center,
+        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _cardHeight / 2F + GetTextOffsetFix() + _capsFix),
         WrappingLength = _textWidth,
         LineSpacing = ExtraFonts.GetLineSpacing() * 1.2F,
         FallbackFontFamilies = ExtraFonts.FallbackFamilies
     };
 
-    public void SetUp(Size size)
-    {
-        _w = size.Width;
-        _h = FF_Extensions.ToEven(size.Height * Math.Abs(CropPercent) / 100);
-
-        _cropOffset = CropPercent < 0 ? (size.Height - _h) / 2 : size.Height - _h;
-
-        SetCardHeight(_w > _h ? _w / _h > 7 ? _w / 7 : _h / 2 : _w / 2);
-
-        _marginLeft = 0;
-        _textWidth = _w;
-
-        SetFontToDefault();
-    }
-    private void SetCardHeight(int x)
-    {
-        _cardHeight = FF_Extensions.ToEven(x);
-        _fullHeight = _h + _cardHeight;
-    }
+    private float GetTextOffsetFix() => FontSize * -0.147F; // todo different for every font ?
 
 
     // IMAGE

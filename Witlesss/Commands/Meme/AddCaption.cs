@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands.Meme
 {
@@ -14,8 +12,9 @@ namespace Witlesss.Commands.Meme
         protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
         protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
 
-        protected override string Options => Baka.Meme.OptionsT;
         protected override string Command { get; } = "/top";
+
+        protected override string? DefaultOptions => Baka.Meme.OptionsT;
 
         public ImageProcessor SetUp(int w, int h)
         {
@@ -30,30 +29,36 @@ namespace Witlesss.Commands.Meme
         public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeCaptionMemeFromSticker);
         protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoCaptionMeme);
 
-        protected override string GetMemeText(string text)
+        protected override void ParseOptions()
         {
-            var caption = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
-
-            var dummy = GetDummy(out var empty);
-
-            IFunnyApp.UseGivenColor = !empty && _colorXD.IsMatch(dummy);
+            /*IFunnyApp.UseGivenColor = !empty && _colorXD.IsMatch(dummy);
             if (IFunnyApp.UseGivenColor)
             {
                 MakeMeme.ParseColorOption(_colorXD, ref dummy, ref IFunnyApp.GivenColor, ref IFunnyApp.UseGivenColor);
-            }
+            }*/
 
-            IFunnyApp.ExtraFonts.CheckKey(empty, ref dummy);
-            IFunnyApp.UseSegoe         = !empty &&  _segoe  .IsMatch(dummy);
-            IFunnyApp.BackInBlack      = !empty &&  _blackBG.IsMatch(dummy);
-            IFunnyApp.PickColor        = !empty &&  _colorPP.IsMatch(dummy);
-            IFunnyApp.ForceCenter      = !empty &&  _colorFC.IsMatch(dummy);
-            IFunnyApp.UseLeftAlignment = !empty &&  _left   .IsMatch(dummy);
-            IFunnyApp.ThinCard         = !empty &&  _thin   .IsMatch(dummy);
-            IFunnyApp.UltraThinCard    = !empty &&  _thinner.IsMatch(dummy);
-            IFunnyApp.BlurImage        = !empty &&  _blur   .IsMatch(dummy);
-            IFunnyApp.WrapText         =  empty || !_nowrap .IsMatch(dummy);
+            IFunnyApp.ExtraFonts.CheckKey(Request.Empty, ref Request.Dummy);
+            IFunnyApp.BackInBlack      = !Request.Empty &&  _blackBG.IsMatch(Request.Dummy);
+            IFunnyApp.PickColor        = !Request.Empty &&  _colorPP.IsMatch(Request.Dummy);
+            IFunnyApp.ForceCenter      = !Request.Empty &&  _colorFC.IsMatch(Request.Dummy);
+            IFunnyApp.UseLeftAlignment = !Request.Empty &&  _left   .IsMatch(Request.Dummy);
+            IFunnyApp.ThinCard         = !Request.Empty &&  _thin   .IsMatch(Request.Dummy);
+            IFunnyApp.UltraThinCard    = !Request.Empty &&  _thinner.IsMatch(Request.Dummy);
+            IFunnyApp.BlurImage        = !Request.Empty &&  _blur   .IsMatch(Request.Dummy);
+            IFunnyApp.WrapText         =  Request.Empty || !_nowrap .IsMatch(Request.Dummy);
 
-            if (empty || !IFunnyApp.UseSegoe && !ExtraFonts.UseOtherFont)
+            IFunnyApp.CropPercent = !Request.Empty &&   _crop.IsMatch(Request.Dummy) ? GetInt(  _crop) : 100;
+            IFunnyApp.MinFontSize = !Request.Empty && _fontMS.IsMatch(Request.Dummy) ? GetInt(_fontMS) :  10;
+            IFunnyApp.DefFontSize = !Request.Empty && _fontSS.IsMatch(Request.Dummy) ? GetInt(_fontSS) :  48;
+        }
+
+        protected override string GetMemeText(string? text)
+        {
+            var caption = string.IsNullOrEmpty(text) ? Baka.Generate() : text;
+
+            IFunnyApp.PreferSegoe = IsMostlyCyrillic(caption);
+            /*
+            if (Request.Empty || !IFunnyApp.UseSegoe && !ExtraFonts.UseOtherFont)
             {
                 var cyrillic = IsMostlyCyrillic(caption);
                 IFunnyApp.UseSegoe = cyrillic;
@@ -63,17 +68,13 @@ namespace Witlesss.Commands.Meme
                     ExtraFonts.OtherFontKey = "ft";
                 }
             }
-
-            IFunnyApp.CropPercent = !empty &&   _crop.IsMatch(dummy) ? GetInt(  _crop) : 100;
-            IFunnyApp.MinFontSize = !empty && _fontMS.IsMatch(dummy) ? GetInt(_fontMS) :  10;
-            IFunnyApp.DefFontSize = !empty && _fontSS.IsMatch(dummy) ? GetInt(_fontSS) :  36;
+            */
 
             return caption;
-
-            int GetInt(Regex x) => int.Parse(x.Match(dummy).Groups[1].Value);
         }
 
-        private static readonly Regex _segoe   = new(@"^\/top\S*sg\S*",            RegexOptions.IgnoreCase);
+        private int GetInt(Regex x) => int.Parse(x.Match(Request.Dummy).Groups[1].Value);
+
         private static readonly Regex _left    = new(@"^\/top\S*la\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _blur    = new(@"^\/top\S*blur\S*",          RegexOptions.IgnoreCase);
         private static readonly Regex _thin    = new(@"^\/top\S*mm\S*",            RegexOptions.IgnoreCase);

@@ -332,14 +332,14 @@ public class IFunnyApp
     {
         return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
 
-        int Calc(byte x, byte y) => (x + y) / 2;
+        byte Calc(byte x, byte y) => ((x + y) / 2).ClampByte();
     }
 
     private static Rgba32 PutOver(Rgba32 a, Rgba32 b)
     {
         return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
 
-        int Calc(byte x, byte y) => x * (255 - b.A) / 255 + y * b.A / 255; // lerp
+        byte Calc(byte x, byte y) => (x * (255 - b.A) / 255 + y * b.A / 255).ClampByte(); // lerp
     }
 }
 

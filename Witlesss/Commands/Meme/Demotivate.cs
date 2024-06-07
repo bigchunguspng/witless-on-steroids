@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DemotivatorDrawer.AddLogo = Request.Empty || !_no_logo.IsMatch(Request.Dummy);
+            DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);
         }
 
         protected override DgText GetMemeText(string? text)

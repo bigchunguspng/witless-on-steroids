@@ -40,20 +40,21 @@ namespace Witlesss.Commands.Meme
                 ParseColorOption(_custom_bg, ref dummy, ref MemeGenerator.CustomBg, ref MemeGenerator.UseCustomBg);
             }*/
 
-            MemeGenerator.ExtraFonts.CheckKey(Request.Empty, ref Request.Dummy);
-            MemeGenerator.FontMultiplier = !Request.Empty && _fontSS.IsMatch(Request.Dummy) ? GetInt(_fontSS, ref Request.Dummy) : 10;
-            MemeGenerator.ShadowOpacity  = !Request.Empty && _shadow.IsMatch(Request.Dummy) ? Math.Clamp(GetInt(_shadow, ref Request.Dummy), 0, 100) : 100;
-            MemeGenerator.WrapText       =  Request.Empty || !CheckMatch(ref Request.Dummy, _nowrap);
-            MemeGenerator.ColorText      = !Request.Empty &&  CheckMatch(ref Request.Dummy, _colorText);
+            MemeGenerator.ExtraFonts.CheckAndCut(Request);
+
+            MemeGenerator.FontMultiplier =            GetInt(Request, _fontSS, 10);
+            MemeGenerator.ShadowOpacity  = Math.Clamp(GetInt(Request, _shadow, 100), 0, 100);
+            MemeGenerator.WrapText       =      !CheckAndCut(Request, _nowrap);
+            MemeGenerator.ColorText      =       CheckAndCut(Request, _colorText);
         }
 
         protected override DgText GetMemeText(string? text)
         {
-            var add_bottom_text  = !Request.Empty &&  _add_bottom.IsMatch(Request.Dummy);
-            var only_bottom_text = !Request.Empty && _only_bottom.IsMatch(Request.Dummy);
-            var only_top_text    = !Request.Empty &&    _top_only.IsMatch(Request.Dummy);
-            var matchCaps        = !Request.Empty &&        _caps.IsMatch(Request.Dummy);
-            
+            var add_bottom_text  = Check(Request,  _add_bottom);
+            var only_bottom_text = Check(Request, _only_bottom);
+            var only_top_text    = Check(Request,    _top_only);
+            var matchCaps        = Check(Request,        _caps);
+
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(Request.Command));
 
@@ -89,18 +90,6 @@ namespace Witlesss.Commands.Meme
             string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
-        private int GetInt(Regex x, ref string dummy)
-        {
-            var match = x.Match(dummy);
-            var value = int.Parse(match.Groups[1].Value);
-            for (var i = match.Groups.Count - 1; i > 0; i--)
-            {
-                CutCaptureOut(match.Groups[i], ref dummy);
-            }
-
-            return value;
-        }
-
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
@@ -110,16 +99,6 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
         private static readonly Regex      _fontSS = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.IgnoreCase);
-
-        public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)
-        {
-            var c = regex.Match(dummy).Groups[1].Value;
-            dummy = dummy.Replace(c, "");
-            if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
-            var b = Enum.IsDefined(typeof(KnownColor), c);
-            if (b)  colorProperty = Color.FromName(c);
-            else useColorProperty = false;
-        }
     }
 
     public interface ImageProcessor

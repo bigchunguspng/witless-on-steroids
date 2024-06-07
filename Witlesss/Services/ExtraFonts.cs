@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
+using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services
 {
@@ -96,11 +97,11 @@ namespace Witlesss.Services
             _    => 1F,
         };
 
-        public void CheckKey(bool empty, ref string dummy)
+        public void CheckAndCut(MemeRequest request)
         {
-            var match = _regex.Match(dummy);
+            var match = _regex.Match(request.Dummy);
 
-            var success = !empty && match.Success;
+            var success = !request.Empty && match.Success;
             if (success)
             {
                 var g1 = match.Groups[1];
@@ -108,7 +109,8 @@ namespace Witlesss.Services
                 var g2 = match.Groups[2];
                 _styleKey = g2.Success ? g2.Value : null;
 
-                OptionsParsing.CutCaptureOut(g1, ref dummy);
+                OptionsParsing.CutCaptureOut(g2, request);
+                OptionsParsing.CutCaptureOut(g1, request);
             }
             else
             {

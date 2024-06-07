@@ -52,10 +52,10 @@ public class IFunnyApp
 
     public void SetUp(Size size)
     {
-        var cropPercent = Math.Abs(CropPercent) / 100F;
+        var crop = Math.Abs(CropPercent) / 100F;
 
         _w = size.Width;
-        _h = (size.Height * cropPercent).RoundInt().ToEven();
+        _h = (size.Height * crop).RoundInt().ToEven();
 
         _cropOffset = size.Height - _h;
         if (CropPercent < 0) _cropOffset = _cropOffset / 2;

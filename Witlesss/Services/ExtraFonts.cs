@@ -55,9 +55,9 @@ namespace Witlesss.Services
             return family.CreateFont(size, GetFontStyle(family));
         }
 
-        public FontFamily GetFontFamily(string @default, bool forceDefault = false)
+        public FontFamily GetFontFamily(string @default)
         {
-            return _families[forceDefault ? @default : _fontKey ?? @default];
+            return _families[_fontKey ??= @default];
         }
 
         public FontStyle GetFontStyle(FontFamily family)
@@ -84,6 +84,23 @@ namespace Witlesss.Services
         public float GetLineSpacing() => GetRelativeSize();
         public float GetSizeMultiplier() => 1 / GetRelativeSize();
 
+        public float GetVerticalOffset() => _fontKey switch
+        {
+            "bb" =>  0.035F,
+            "cb" =>  0.056F,
+            "cr" =>  0,
+            "ft" => -0.153F,
+            "im" => -0.076F,
+            "rg" => -0.076F,
+            "sg" => -0.16F,
+            "tm" => -0.083F,
+            "vb" => -0.021F,
+            "vg" => -0.076F,
+            "vp" => -0.021F,
+            "vn" =>  0,
+            _    =>  0,
+        };
+
         private float GetRelativeSize() => _fontKey switch
         {
             "vn" => 1.229F,
@@ -95,6 +112,14 @@ namespace Witlesss.Services
             "cb" => 0.876F,
             "vg" => 0.8F,
             _    => 1F,
+        };
+
+        private bool FontIsUppercase() => _fontKey switch
+        {
+            "cb" => true,
+            "vp" => true,
+            "vb" => true,
+            _ => false,
         };
 
         public void CheckAndCut(MemeRequest request)

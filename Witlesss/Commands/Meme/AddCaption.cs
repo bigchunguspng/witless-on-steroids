@@ -65,8 +65,8 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _left    = new(@"^\/top\S*(la)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _blur    = new(@"^\/top\S*(blur)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex _thin    = new(@"^\/top\S*(mm)\S*",   RegexOptions.IgnoreCase);
-        private static readonly Regex _thinner = new(@"^\/top\S*(mmm)\S*",  RegexOptions.IgnoreCase);
+        private static readonly Regex _thin    = new(@"^\/top\S*m(m)\S*",   RegexOptions.IgnoreCase);
+        private static readonly Regex _thinner = new(@"^\/top\S*(mm)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _nowrap  = new(@"^\/top\S*(ww)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _colorFC = new(@"^\/top\S*(fc)\S*",   RegexOptions.IgnoreCase);

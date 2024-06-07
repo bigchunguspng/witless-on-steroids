@@ -47,7 +47,7 @@ public class IFunnyApp
     private float StartingFontSize()
     {
         var multiplier = FontSizeMultiplier / 10F;
-        return Math.Max(Math.Max(48, _cardHeight / 3.75F) * multiplier, MinFontSize);
+        return Math.Max(Math.Max(48, _cardHeight / 3.75F) * multiplier, MinFontSize) * ExtraFonts.GetSizeMultiplier();
     }
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
@@ -191,7 +191,7 @@ public class IFunnyApp
         
         if (ThinCard && _measure.Height < 0.95 * _cardHeight)
         {
-            var extraHeight = UltraThinCard ? _font.Size * -0.1 : Math.Max(_font.Size, 8);
+            var extraHeight = UltraThinCard ? _font.Size * 0.1F : Math.Max(_font.Size, 8);
             SetCardHeight((int)(_measure.Height + extraHeight));
         }
 
@@ -211,10 +211,10 @@ public class IFunnyApp
 
     private void AdjustTextPosition(string s)
     {
-        var offset = _font.Size * -0.147F; // todo different for every font ?
+        var offset = _font.Size * ExtraFonts.GetVerticalOffset();
         var caps = TextIsUppercaseEnough(s) ? _font.Size * 0.103F : 0; // todo different for every font
 
-        _textOffset = offset + caps;
+        _textOffset = offset;// offset + caps;
     }
 
     private bool TextIsUppercaseEnough(string s)
@@ -233,13 +233,21 @@ public class IFunnyApp
             ? HorizontalAlignment.Left
             : HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
-        Origin = new PointF(UseLeftAlignment ? _marginLeft : _w / 2F, _cardHeight / 2F + _textOffset),
+        Origin = GetTextOrigin(),
         WrappingLength = _textWidth,
         LineSpacing = ExtraFonts.GetLineSpacing() * 1.2F,
         WordBreaking = WordBreaking.Standard,
         KerningMode = KerningMode.Standard,
         FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
+
+    private PointF GetTextOrigin()
+    {
+        var x = UseLeftAlignment ? _marginLeft : _w / 2F;
+        var y = _cardHeight / 2F + _textOffset;
+
+        return new PointF(x, y);
+    }
 
 
     // IMAGE

@@ -14,10 +14,10 @@ public class IFunnyApp
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool UseGivenColor, PickColor, ForceCenter, BackInBlack, BlurImage;
     public static Color   GivenColor;
-    public static int CropPercent = 100, MinFontSize = 10, DefFontSize = 48;
+    public static int CropPercent = 100, MinFontSize = 10, FontSizeMultiplier = 10;
 
-    private Color Background;
-    private SolidBrush TextColor;
+    private Rgba32 Background;
+    private SolidBrush TextColor = default!;
     private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
     private static readonly SolidBrush _transparent = new(Color.Transparent);
 
@@ -44,7 +44,11 @@ public class IFunnyApp
 
     private void ResizeFont(float size) => _font = FontFamily.CreateFont(size, FontStyle);
 
-    private int  StartingFontSize() => Math.Max(Math.Max(DefFontSize, (_cardHeight / 3.75F).RoundInt() * DefFontSize / 48), MinFontSize);
+    private float StartingFontSize()
+    {
+        var multiplier = FontSizeMultiplier / 10F;
+        return Math.Max(Math.Max(48, _cardHeight / 3.75F) * multiplier, MinFontSize);
+    }
 
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void DecreaseFontSize() => ResizeFont(_font.Size * 0.8f);
@@ -147,7 +151,7 @@ public class IFunnyApp
     private int Spacing   => (int)(_font.Size * 1.6);
     private int EmojiSize => (int)(_font.Size * 1.5);
 
-    private void AdjustProportions(string text)
+    private void AdjustProportions(string text) // todo change the algorithm
     {
         _extraHigh = false;
 
@@ -285,7 +289,7 @@ public class IFunnyApp
         TextColor  = _black;
     }
 
-    private SolidBrush ChooseTextColor(Rgb24 b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
+    private SolidBrush ChooseTextColor(Rgba32 b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {

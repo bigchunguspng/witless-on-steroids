@@ -47,9 +47,9 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BlurImage        =  CheckAndCut(Request, _blur   );
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
 
-            IFunnyApp.CropPercent = GetInt(Request, _crop,  100);
-            IFunnyApp.MinFontSize = GetInt(Request, _fontMS, 10);
-            IFunnyApp.DefFontSize = GetInt(Request, _fontSS, 48);
+            IFunnyApp.CropPercent        = GetInt(Request, _crop,  100);
+            IFunnyApp.MinFontSize        = GetInt(Request, _fontMS, 10);
+            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 10);
 
             IFunnyApp.ExtraFonts.CheckAndCut(Request);
         }
@@ -73,7 +73,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _blackBG = new(@"^\/top\S*(bbg)\S*",  RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/top\S*#([A-Za-z]+)#\S*",     RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",   RegexOptions.IgnoreCase);
+        private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",    RegexOptions.IgnoreCase);
         private static readonly Regex _fontMS  = new(@"^\/top\S*?(\d{1,3})(""ms)\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex _fontSS  = new(@"^\/top\S*?(\d{1,3})(""ss)\S*",  RegexOptions.IgnoreCase);
     }
 }

@@ -42,7 +42,7 @@ namespace Witlesss.Commands.Meme
 
             MemeGenerator.ExtraFonts.CheckAndCut(Request);
 
-            MemeGenerator.FontMultiplier =            GetInt(Request, _fontSS, 10);
+            MemeGenerator.FontMultiplier =            GetInt(Request, _fontSM, 10);
             MemeGenerator.ShadowOpacity  = Math.Clamp(GetInt(Request, _shadow, 100), 0, 100);
             MemeGenerator.WrapText       =      !CheckAndCut(Request, _nowrap);
             MemeGenerator.ColorText      =       CheckAndCut(Request, _colorText);
@@ -97,7 +97,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex      _fontSS = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.IgnoreCase);
     }
 

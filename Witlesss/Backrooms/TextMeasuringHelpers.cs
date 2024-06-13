@@ -49,15 +49,15 @@ public static class TextMeasuringHelpers
 
         for (var i = 0; i < bounds.Length; i++)
         {
-            if (i + 1 == bounds.Length || bounds[i].Bounds.X > bounds[i + 1].Bounds.X)
+            currentWidth += advances[i].Bounds.Width;
+
+            var endOfText = i + 1 == bounds.Length;
+            var endOfLine = !endOfText && bounds[i].Bounds.X > bounds[i + 1].Bounds.X;
+            if (endOfText || endOfLine)
             {
                 linesFilled++;
                 maxWidth = Math.Max(maxWidth, currentWidth);
                 currentWidth = 0F;
-            }
-            else
-            {
-                currentWidth += advances[i].Bounds.Width;
             }
         }
 

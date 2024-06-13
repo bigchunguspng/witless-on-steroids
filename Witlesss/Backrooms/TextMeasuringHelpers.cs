@@ -32,6 +32,10 @@ public static class TextMeasuringHelpers
 
     public static SizeF MeasureTextSize(string text, TextOptions options, out int linesFilled)
     {
+        linesFilled = 0;
+
+        if (string.IsNullOrEmpty(text)) return Size.Empty;
+
         var ops = new RichTextOptions(options.Font)
         {
             WrappingLength = options.WrappingLength,
@@ -40,7 +44,6 @@ public static class TextMeasuringHelpers
         TextMeasurer.TryMeasureCharacterBounds(text, ops, out var bounds);
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
-        linesFilled = 0;
         var maxWidth = 0F;
         var currentWidth = 0F;
 
@@ -64,6 +67,34 @@ public static class TextMeasuringHelpers
         var textHeight = fontHeight * linesFilled;
         var lineSpacings = fontHeight * (ops.LineSpacing - 1) * (linesFilled - 1);
         return new SizeF(maxWidth, textHeight + lineSpacings);
+    }
+
+    public static SizeF MeasureTextSizeSingleLine(string text, TextOptions options, out int charsFitted)
+    {
+        var ops = new RichTextOptions(options.Font)
+        {
+            WrappingLength = options.WrappingLength,
+            LineSpacing = options.LineSpacing
+        };
+        TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
+
+        var width = 0F;
+        charsFitted = 0;
+
+        foreach (var advance in advances)
+        {
+            var newWidth = width + advance.Bounds.Width;
+            if (newWidth > ops.WrappingLength)
+            {
+                charsFitted = advance.StringIndex;
+                break;
+            }
+
+            width = newWidth;
+        }
+
+        var textHeight = advances[0].Bounds.Height;
+        return new SizeF(width, textHeight * ops.LineSpacing);
     }
 
     // it's here for the future...

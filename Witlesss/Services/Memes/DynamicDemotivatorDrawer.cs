@@ -164,17 +164,18 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             //graphics.Clear(Color.Black);
 #endif
 
-            /*if (funny)
+            var options = GetDefaultTextOptions(area.Width, area.Height);
+            if (funny)
             {
-                var p = new TextParams(62, EmojiSize, _font, TextColor, area, _format);
-                var h = (int)graphics.MeasureString(textM, _font, area.Size, _format, out _, out var lines).Height;
-                var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
+                //var p = new TextParams(62, EmojiSize, _font, TextColor, area, _format);
+                var h = (int)TextMeasuringHelpers.MeasureTextSize(textM, options, out var lines).Height;
+                //var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
+                var l = _emojer.DrawTextAndEmoji(image, text, emoji, options, TextColor, area, EmojiSize, 62, InitialMargin(h), Spacing);
                 txt_h = txt_h - h + h * l / lines;
                 AdjustTotalSize();
                 AdjustImageFrame();
             }
-            else*/
-            image.Mutate(x => x.DrawText(_textOptions, GetDefaultTextOptions(area.Width, area.Height), text, TextColor, pen: null));
+            else image.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));
 
             return image;
         }
@@ -194,7 +195,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         private int InitialMargin(int h) => (txt_h - h) / 2;
         private int Spacing   => (int)(_font.Size * 1.6);
-        private int EmojiSize => (int)(_font.Size * 1.5);
+        private int EmojiSize => (int)(_font.Size * 1.125D);
 
         private string GetEmojiReplacement() => "aa"; // UseRoboto ? "aa" : UseImpact ? "НН" : UseBoldFont ? "гм" : "мя";
 

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static System.Drawing.StringAlignment;
-using static System.Drawing.StringFormatFlags;
-using static System.Drawing.StringTrimming;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Witlesss.Services
 {
@@ -20,42 +20,52 @@ namespace Witlesss.Services
         private bool Dg  => MemeType == MemeType.Dg;
         private bool Top => MemeType == MemeType.Top;
 
-        private static readonly StringFormat[] Formats = new[]
+        /*private static readonly StringFormat[] Formats = new[]
         {
             new StringFormat(NoWrap) { Alignment = Near, Trimming = None },
             new StringFormat(NoWrap) { Alignment = Near, Trimming = Character },
             new StringFormat(      ) { Alignment = Near, Trimming = Character },
             new StringFormat(NoWrap) { Alignment = Near, Trimming = EllipsisCharacter }
-        };
+        };*/
 
-        public int DrawTextAndEmoji(Graphics g, string text, IList<Match> matches, TextParameters p, int m = 0, int m2 = 34, int off = 0)
+        public int DrawTextAndEmoji
+        (
+            Image img,
+            string text,
+            IList<Match> matches,
+            TextOptions ops,
+            SolidBrush color,
+            RectangleF layout,
+            int emojiS,
+            int maxLines,
+            int m = 0, int m2 = 34, int off = 0
+        )
         {
             var lines = 0;
-            if (p.Lines > 1 && text.Contains('\n'))
+            if (maxLines > 1 && text.Contains('\n'))
             {
                 var s = Dg ? text.Split('\n') : text.Split('\n', 2);
                 var index1 = off + s[0].Length;
                 var index2 = off + s[0].Length + 1 + s[1].Length;
                 var matchesA = matches.Where(u => u.Index < index1).ToList();
                 var matchesB = matches.Where(u => u.Index > index1 && u.Index < index2).ToList();
-                lines += DrawTextAndEmoji(g, s[0], matchesA, p, m,              m2, off);
-                lines += DrawTextAndEmoji(g, s[1], matchesB, p, m + m2 * lines, m2, index1 + 1);
+                lines += DrawTextAndEmoji(img, s[0], matchesA, ops, color, layout, emojiS, maxLines, m,              m2, off);
+                lines += DrawTextAndEmoji(img, s[1], matchesB, ops, color, layout, emojiS, maxLines, m + m2 * lines, m2, index1 + 1);
 
                 return lines;
             }
 
             var texts = EmojiRegex.Replace(text, "\t").Split('\t');
             var emoji = GetEmojiPngs(matches);
-            var w = (int)p.Layout.Width;
-            var h = (int)p.Layout.Height;
+            var w = (int)layout.Width;
+            var h = (int)layout.Height;
 
-            using var textArea = new Bitmap(w, h);
-            using var graphics = Graphics.FromImage(textArea);
+            using var textArea = new Image<Rgba32>(w, h); // graphics
 
-            graphics.CompositingMode    = CompositingMode.SourceOver;
-            graphics.CompositingQuality = CompositingQuality.HighQuality;
-            graphics.PixelOffsetMode    = PixelOffsetMode.HighQuality;
-            graphics.TextRenderingHint  = TextRenderingHint.AntiAlias;
+            //textArea.CompositingMode    = CompositingMode.SourceOver;
+            //textArea.CompositingQuality = CompositingQuality.HighQuality;
+            //textArea.PixelOffsetMode    = PixelOffsetMode.HighQuality;
+            //textArea.TextRenderingHint  = TextRenderingHint.AntiAlias;
 
             int x = 0, y = 0, max = 0;
 
@@ -66,7 +76,7 @@ namespace Witlesss.Services
                 for (var j = 0; j < emoji[i].Count; j++)
                 {
                     var xd = emoji[i][j];
-                    if (p.EmojiS + x > w)
+                    if (emojiS + x > w)
                     {
                         if (Dg) break;
                         else     CR();
@@ -74,12 +84,12 @@ namespace Witlesss.Services
 
                     if (xd.EndsWith(".png"))
                     {
-                        var image = new Bitmap(Image.FromFile(xd), p.EmojiSize);
+                        var image = Image.Load<Rgba32>(new DecoderOptions() { TargetSize = new Size(emojiS, emojiS) }, xd);
 #if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Gold), new Rectangle(new Point(x, y), p.EmojiSize));
+                        graphics.FillRectangle(new SolidBrush(Color.Gold), new Rectangle(new Point(x, y), emojiSize));
 #endif
-                        graphics.DrawImage(image, x, y);
-                        MoveX(p.EmojiS);
+                        textArea.Mutate(ctx => ctx.DrawImage(image, new Point(x, y), new GraphicsOptions()));
+                        MoveX(emojiS);
                     }
                     else DoText(xd);
                 }
@@ -101,42 +111,57 @@ namespace Witlesss.Services
                 else
                 {
                     s = s.TrimEnd();
-
-                    var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
+                    
+                    var optionsW = new RichTextOptions(ops.Font)
+                    {
+                        WrappingLength = w,
+                        LineSpacing = ops.LineSpacing,
+                    };
+                    var ms = TextMeasuringHelpers.MeasureTextSize(s, optionsW, out var l);
+                    //var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
                     var width = l > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
-                    if (width < rest) DrawSingleLineText(Formats[0]);
-                    else if      (Dg) DrawSingleLineText(Formats[3]);
+                    if (width < rest) DrawSingleLineText(/*Formats[0]*/);
+                    else if      (Dg) DrawSingleLineText(/*Formats[3]*/);
                     else
                     {
-                        var format = Formats[1];
-                        var layout = new RectangleF(x, y, rest, h);
-                        _ = graphics.MeasureString(s, p.Font,   layout.Size, format, out var chars, out _); // w - x
-                        _ = graphics.MeasureString(s, p.Font, p.Layout.Size, format, out var cw,    out _); // w
-                        var start = (int)(Math.Max(0.66f - x / p.Layout.Width, 0) * cw);
+                        //var format = Formats[1];
+                        var layoutR = new RectangleF(x, y, rest, h);
+                        var optionsR = new RichTextOptions(ops.Font)
+                        {
+                            Origin = new Point(x, y),
+                            WrappingLength = rest,
+                            LineSpacing = ops.LineSpacing,
+                        };
+                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(s, optionsR, out var chars); // w - x
+                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(s, optionsW, out var cw); // w
+                        var start = (int)(Math.Max(0.66f - x / (float)w, 0) * cw);
                         var space = s[start..cw].Contains(' ');
                         var index = s[..chars].LastIndexOf(' ');
                         var cr = index < 0;
                         var trim = space ? cr ? "" : s[..index] : s[..chars];
-                        ms = graphics.MeasureString(trim, p.Font, layout.Size, format);
-                        layout.Width = ms.Width;
+                        ms = TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _);
+                        //layoutR.Width = ms.Width;
+                        optionsR.WrappingLength = ms.Width;
 #if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Crimson), layout);
+                        graphics.FillRectangle(new SolidBrush(Color.Crimson), layoutR);
 #endif
-                        graphics.DrawString(trim, p.Font, p.Color, layout, format);
-                        MoveX((int)graphics.MeasureString(trim, p.Font).Width);
+                        textArea.Mutate(ctx => ctx.DrawText(optionsR, trim, color));
+                        MoveX((int)TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _).Width);
                         var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
                         CR();
                         DoText(next);
                     }
 
-                    void DrawSingleLineText(StringFormat format)
+                    void DrawSingleLineText(/*StringFormat format*/)
                     {
-                        var layout = new RectangleF(x, y, width, h);
+                        //var layout = new RectangleF(x, y, width, h);
 #if DEBUG
                         graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
 #endif
-                        graphics.DrawString(s, p.Font, p.Color, layout, format);
+                        optionsW.Origin = new Point(x, y);
+                        textArea.Mutate(ctx => ctx.DrawText(optionsW, s, color));
+                        //graphics.DrawString(s, p.Font, p.Color, layout, format);
                         MoveX(width);
                     }
                 }
@@ -158,9 +183,9 @@ namespace Witlesss.Services
 
             void RenderLine()
             {
-                var offset = Top && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X : (w - max) / 2;
-                g.DrawImage(textArea, new Point(offset, (int)p.Layout.Y + m));
-                graphics.Clear(Color.Transparent);
+                var offset = /*Top && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X :*/ (w - max) / 2;
+                img.Mutate(ctx => ctx.DrawImage(textArea, new Point(offset, (int)layout.Y + m), new GraphicsOptions()));
+                textArea.Mutate(ctx => ctx.Fill(Color.Transparent));
             }
         }
 

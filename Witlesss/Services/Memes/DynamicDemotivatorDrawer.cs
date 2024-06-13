@@ -173,8 +173,9 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
                 AdjustTotalSize();
                 AdjustImageFrame();
 
-                var size = new Size(width, height);
+                var size = new Size(width, txt_h);
                 var point = new Point((size - textLayer.Size) / 2);
+                image = new Image<Rgba32>(width, txt_h, Color.Black); // todo dispose 'n shit
                 image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
             }
             else image.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));

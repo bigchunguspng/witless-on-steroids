@@ -151,7 +151,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
             AdjustProportions(textM, out var width);
 
-            var height = funny ? txt_h * 2 : txt_h;
+            var height = txt_h; //funny ? txt_h * 2 : txt_h;
             width = width == 0 ? TextWidth : width;
 
             var area = new RectangleF(0, 0, width, height);
@@ -167,13 +167,14 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var options = GetDefaultTextOptions(area.Width, area.Height);
             if (funny)
             {
-                //var p = new TextParams(62, EmojiSize, _font, TextColor, area, _format);
                 var h = (int)TextMeasuringHelpers.MeasureTextSize(textM, options, out var lines).Height;
-                //var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
-                var l = _emojer.DrawTextAndEmoji(image, text, emoji, options, TextColor, area, EmojiSize, 62, InitialMargin(h), Spacing);
-                txt_h = txt_h - h + h * l / lines;
+                var parameters = new EmojiTool.Options(TextColor, EmojiSize);
+                var textLayer = _emojer.DrawEmojiText(text, options, parameters);
+                txt_h = txt_h - h + textLayer.Height;
                 AdjustTotalSize();
                 AdjustImageFrame();
+                var point = new Point((area.Size.CeilingInt() - textLayer.Size) / 2);
+                image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
             }
             else image.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));
 

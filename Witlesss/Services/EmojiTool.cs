@@ -28,165 +28,181 @@ namespace Witlesss.Services
             new StringFormat(NoWrap) { Alignment = Near, Trimming = EllipsisCharacter }
         };*/
 
-        public int DrawTextAndEmoji
-        (
-            Image img,
-            string text,
-            IList<Match> matches,
-            TextOptions ops,
-            SolidBrush color,
-            RectangleF layout,
-            int emojiS,
-            int maxLines,
-            int m = 0, int m2 = 34, int off = 0
-        )
+        public record Options(SolidBrush Color, float EmojiSize, int MaxLines = -1);
+
+        public Image<Rgba32> DrawEmojiText(string text, TextOptions options, Options parameters)
         {
-            var lines = 0;
-            if (maxLines > 1 && text.Contains('\n'))
+            // RENDER EACH PARAGRAPH
+
+            var paragraphs = text.Split('\n');
+            var lines = paragraphs
+                .Select(paragraph => DrawEmojiTextParagraph(paragraph, options, parameters))
+                .SelectMany(x => x).ToList();
+
+            // COMBINE
+
+            var width = options.WrappingLength.CeilingInt();
+            var height = options.Font.Size * options.LineSpacing;
+
+            var canvas = new Image<Rgba32>(width, (lines.Count * height).RoundInt());
+
+            var offsetY = 0F;
+            foreach (var line in lines)
             {
-                var s = Dg ? text.Split('\n') : text.Split('\n', 2);
-                var index1 = off + s[0].Length;
-                var index2 = off + s[0].Length + 1 + s[1].Length;
-                var matchesA = matches.Where(u => u.Index < index1).ToList();
-                var matchesB = matches.Where(u => u.Index > index1 && u.Index < index2).ToList();
-                lines += DrawTextAndEmoji(img, s[0], matchesA, ops, color, layout, emojiS, maxLines, m,              m2, off);
-                lines += DrawTextAndEmoji(img, s[1], matchesB, ops, color, layout, emojiS, maxLines, m + m2 * lines, m2, index1 + 1);
-
-                return lines;
-            }
-
-            var texts = EmojiRegex.Replace(text, "\t").Split('\t');
-            var emoji = GetEmojiPngs(matches);
-            var w = (int)layout.Width;
-            var h = (int)layout.Height;
-
-            using var textArea = new Image<Rgba32>(w, h); // graphics
-
-            //textArea.CompositingMode    = CompositingMode.SourceOver;
-            //textArea.CompositingQuality = CompositingQuality.HighQuality;
-            //textArea.PixelOffsetMode    = PixelOffsetMode.HighQuality;
-            //textArea.TextRenderingHint  = TextRenderingHint.AntiAlias;
-
-            int x = 0, y = 0, max = 0;
-
-            for (var i = 0; i < emoji.Count; i++)
-            {
-                DoText(texts[i]);
-
-                for (var j = 0; j < emoji[i].Count; j++)
+                var x = options.HorizontalAlignment switch
                 {
-                    var xd = emoji[i][j];
-                    if (emojiS + x > w)
-                    {
-                        if (Dg) break;
-                        else     CR();
-                    }
-
-                    if (xd.EndsWith(".png"))
-                    {
-                        var image = Image.Load<Rgba32>(new DecoderOptions() { TargetSize = new Size(emojiS, emojiS) }, xd);
-#if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Gold), new Rectangle(new Point(x, y), emojiSize));
-#endif
-                        textArea.Mutate(ctx => ctx.DrawImage(image, new Point(x, y), new GraphicsOptions()));
-                        MoveX(emojiS);
-                    }
-                    else DoText(xd);
-                }
+                    HorizontalAlignment.Center => (width - line.Width) / 2,
+                    HorizontalAlignment.Right  =>  width - line.Width,
+                    _ => 0
+                };
+                var point = new Point(x, offsetY.RoundInt());
+                canvas.Mutate(ctx => ctx.DrawImage(line, point, opacity: 1));
+                offsetY += height;
+                line.Dispose();
             }
-            DoText(texts[^1]);
+
+            return canvas;
+        }
+
+        private List<Image<Rgba32>> DrawEmojiTextParagraph(string paragraph, TextOptions options, Options parameters)
+        {
+            var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
+            var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
+
+            var lines = new List<Image<Rgba32>>();
+
+            var width = options.WrappingLength.CeilingInt();
+            var height = (options.Font.Size * options.LineSpacing).CeilingInt();
+
+            var canvas = GetEmptyCanvas();
+
+            int x = 0, max = 0;
+
+            for (var i = 0; i < emojiChunks.Count; i++)
+            {
+                DrawText ( textChunks[i]);
+                DrawEmoji(emojiChunks[i]);
+            }
+            DrawText(textChunks[^1]);
 
             RenderLine();
 
-            return lines + 1;
+            return lines;
 
-            void DoText(string s)
+
+            // == FUN ==
+
+            void DrawEmoji(List<string> sequence)
             {
-                var rest = w - x;
+                var size = parameters.EmojiSize.RoundInt();
+                var decoder = new DecoderOptions() { TargetSize = new Size(size, size) }; // todo quality?
+
+                foreach (var emoji in sequence)
+                {
+                    if (size + x > width)
+                    {
+                        if (Dg) break;
+                        else     NewLine();
+                    }
+
+                    if (emoji.EndsWith(".png"))
+                    {
+                        var image = Image.Load<Rgba32>(decoder, emoji);
+#if DEBUG
+                        graphics.FillRectangle(new SolidBrush(Color.Gold), new Rectangle(new Point(x, y), emojiSize));
+#endif
+                        canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffset(), new GraphicsOptions()));
+                        MoveX(size);
+                    }
+                    else DrawText(emoji);
+                }
+            }
+
+            void DrawText(string text) // todo make emoji drawer a transient class with methods ?
+            {
+                var rest = width - x;
                 if (rest == 0)
                 {
-                    CR();
-                    DoText(s);
+                    NewLine();
+                    DrawText(text);
                 }
                 else
                 {
-                    s = s.TrimEnd();
+                    //text = text.TrimEnd();
                     
-                    var optionsW = new RichTextOptions(ops.Font)
+                    var optionsW = new RichTextOptions(options.Font)
                     {
-                        WrappingLength = w,
-                        LineSpacing = ops.LineSpacing,
+                        WrappingLength = width,
+                        LineSpacing = options.LineSpacing,
                     };
-                    var ms = TextMeasuringHelpers.MeasureTextSize(s, optionsW, out var l);
-                    //var ms = graphics.MeasureString(s, p.Font, p.Layout.Size, Formats[2], out _,  out var l);
-                    var width = l > 1 ? rest : (int) Math.Min(ms.Width, rest);
+                    var ms = TextMeasuringHelpers.MeasureTextSize(text, optionsW, out var linesFilled);
+                    var w = linesFilled > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
-                    if (width < rest) DrawSingleLineText(/*Formats[0]*/);
-                    else if      (Dg) DrawSingleLineText(/*Formats[3]*/);
+                    if (w < rest) DrawSingleLineText();
+                    else if  (Dg) DrawSingleLineText();
                     else
                     {
-                        //var format = Formats[1];
-                        var layoutR = new RectangleF(x, y, rest, h);
-                        var optionsR = new RichTextOptions(ops.Font)
+                        var optionsR = new RichTextOptions(options.Font)
                         {
-                            Origin = new Point(x, y),
+                            Origin = GetDrawingOffset(),
                             WrappingLength = rest,
-                            LineSpacing = ops.LineSpacing,
+                            LineSpacing = options.LineSpacing,
                         };
-                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(s, optionsR, out var chars); // w - x
-                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(s, optionsW, out var cw); // w
-                        var start = (int)(Math.Max(0.66f - x / (float)w, 0) * cw);
-                        var space = s[start..cw].Contains(' ');
-                        var index = s[..chars].LastIndexOf(' ');
+                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
+                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
+                        var start = (int)(Math.Max(0.66f - x / (float)width, 0) * cw);
+                        var space = text[start..cw].Contains(' ');
+                        var index = text[..chars].LastIndexOf(' ');
                         var cr = index < 0;
-                        var trim = space ? cr ? "" : s[..index] : s[..chars];
+                        var trim = space ? cr ? "" : text[..index] : text[..chars];
                         ms = TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _);
-                        //layoutR.Width = ms.Width;
                         optionsR.WrappingLength = ms.Width;
 #if DEBUG
                         graphics.FillRectangle(new SolidBrush(Color.Crimson), layoutR);
 #endif
-                        textArea.Mutate(ctx => ctx.DrawText(optionsR, trim, color));
+                        canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, parameters.Color));
                         MoveX((int)TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _).Width);
-                        var next = space ? cr ? s : s[(index + 1)..] : s[chars..];
-                        CR();
-                        DoText(next);
+                        var next = space ? cr ? text : text[(index + 1)..] : text[chars..];
+                        NewLine();
+                        DrawText(next);
                     }
 
-                    void DrawSingleLineText(/*StringFormat format*/)
+                    void DrawSingleLineText()
                     {
-                        //var layout = new RectangleF(x, y, width, h);
 #if DEBUG
                         graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
 #endif
-                        optionsW.Origin = new Point(x, y);
-                        textArea.Mutate(ctx => ctx.DrawText(optionsW, s, color));
-                        //graphics.DrawString(s, p.Font, p.Color, layout, format);
-                        MoveX(width);
+                        optionsW.Origin = GetDrawingOffset();
+                        canvas.Mutate(ctx => ctx.DrawText(optionsW, text, parameters.Color));
+                        MoveX(w);
                     }
                 }
             }
-            void MoveX(int o)
+
+            void MoveX(int offset)
             {
-                x += o;
+                x += offset;
                 max = Math.Max(x, max);
             }
-            void CR()
+
+            void NewLine()
             {
                 RenderLine();
 
                 x = 0;
                 max = 0;
-                y += m2;
-                lines++;
+
+                canvas = GetEmptyCanvas();
             }
 
             void RenderLine()
             {
-                var offset = /*Top && IFunnyApp.UseLeftAlignment ? (int)p.Layout.X :*/ (w - max) / 2;
-                img.Mutate(ctx => ctx.DrawImage(textArea, new Point(offset, (int)layout.Y + m), new GraphicsOptions()));
-                textArea.Mutate(ctx => ctx.Fill(Color.Transparent));
+                canvas.Mutate(ctx => ctx.Crop(max, canvas.Height));
+                lines.Add(canvas);
             }
+
+            Point GetDrawingOffset() => new(x, 0);
+            Image<Rgba32> GetEmptyCanvas() => new(width, height);
         }
 
         public static string RemoveEmoji (string text) => ReplaceEmoji(text, "");

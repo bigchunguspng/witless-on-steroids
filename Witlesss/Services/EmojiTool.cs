@@ -94,12 +94,13 @@ namespace Witlesss.Services
 
             void DrawEmoji(List<string> sequence)
             {
-                var size = parameters.EmojiSize.RoundInt();
-                var decoder = new DecoderOptions() { TargetSize = new Size(size, size) }; // todo quality?
+                var side = parameters.EmojiSize.RoundInt();
+                var size = new Size(side, side);
+                var decoder = new DecoderOptions() { TargetSize = size }; // todo quality?
 
                 foreach (var emoji in sequence)
                 {
-                    if (size + x > width)
+                    if (side + x > width)
                     {
                         if (Dg) break;
                         else     NewLine();
@@ -109,10 +110,10 @@ namespace Witlesss.Services
                     {
                         var image = Image.Load<Rgba32>(decoder, emoji);
 #if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Gold), new Rectangle(new Point(x, y), emojiSize));
+                        canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffset(), size)));
 #endif
                         canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffset(), new GraphicsOptions()));
-                        MoveX(size);
+                        MoveX(side);
                     }
                     else DrawText(emoji);
                 }
@@ -158,7 +159,7 @@ namespace Witlesss.Services
                         ms = TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _);
                         optionsR.WrappingLength = ms.Width;
 #if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Crimson), layoutR);
+                        canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, height)));
 #endif
                         canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, parameters.Color));
                         MoveX((int)TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _).Width);
@@ -170,7 +171,7 @@ namespace Witlesss.Services
                     void DrawSingleLineText()
                     {
 #if DEBUG
-                        graphics.FillRectangle(new SolidBrush(Color.Chocolate), layout);
+                        canvas.Mutate(ctx => ctx.Fill(Color.Chocolate, new Rectangle(x, 0, w, height)));
 #endif
                         optionsW.Origin = GetDrawingOffset();
                         canvas.Mutate(ctx => ctx.DrawText(optionsW, text, parameters.Color));

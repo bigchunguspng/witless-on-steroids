@@ -159,9 +159,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var image = new Image<Rgba32>(width, height, Color.Black);
 
 #if DEBUG
-            graphics.Clear(Color.Indigo);
-#else
-            //graphics.Clear(Color.Black);
+            image.Mutate(x => x.Clear(Color.Indigo));
 #endif
 
             var options = GetDefaultTextOptions(area.Width, area.Height);

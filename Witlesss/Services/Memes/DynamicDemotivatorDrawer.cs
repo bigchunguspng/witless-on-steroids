@@ -64,8 +64,8 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         private bool text_is_short;
         public  void PassTextLength(string text) => text_is_short = text.Length < 8;
 
-        private float StartingFontSize => img_w * (text_is_short ? 0.15f : 0.1f);
-        private float MinFontSize => Math.Max(img_w * 0.03f, 12);
+        private float StartingFontSize => img_w * (text_is_short ? 0.2f : 0.135f);
+        private float MinFontSize => Math.Max(img_w * 0.04f, 16);
 
         // /
 
@@ -234,7 +234,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
                 MeasureString();
             }
 
-            txt_h = (int)(measure.Height + _font.Size * 1.4f);
+            txt_h = (int)(measure.Height + _font.Size * 0.8F);
             AdjustTotalSize();
 
             width = TextWidth;
@@ -245,12 +245,12 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
             if (lines > 3)
             {
-                txt_h = (int)(measure.Height + _font.Size * 1.4f * Math.Pow(lines, 0.28));
+                txt_h = (int)(measure.Height + _font.Size * 0.8F * Math.Pow(lines, 0.28));
             }
             else
             {
                 txt_h = (int)(txt_h * initial_w / (float)TextWidth);
-                txt_h = (int)(txt_h + _font.Size * 1.4f);
+                txt_h = (int)(txt_h + _font.Size * 0.8F);
             }
 
             AdjustTotalSize();
@@ -306,7 +306,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             SetFontSizeToDefault();
 
             mg_top = (int)Math.Max(img_h * 0.06f, 12);
-            txt_h  = (int)(_font.Size * 2.4f); // 75 -> 180
+            txt_h  = (int)(_font.Size * 1.8F);
 
             AdjustTotalSize();
             AdjustImageFrame();

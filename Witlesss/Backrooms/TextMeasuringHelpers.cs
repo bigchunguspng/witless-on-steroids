@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace Witlesss.Backrooms;
 
@@ -36,11 +33,8 @@ public static class TextMeasuringHelpers
 
         if (string.IsNullOrEmpty(text)) return Size.Empty;
 
-        var ops = new RichTextOptions(options.Font)
-        {
-            WrappingLength = options.WrappingLength,
-            LineSpacing = options.LineSpacing
-        };
+        var ops = new TextOptions(options).WithDefaultAlignment();
+
         TextMeasurer.TryMeasureCharacterBounds(text, ops, out var bounds);
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
@@ -65,21 +59,18 @@ public static class TextMeasuringHelpers
 
         var fontHeight = advances[0].Bounds.Height;
         var textHeight = fontHeight * linesFilled;
-        var lineSpacings = fontHeight * (ops.LineSpacing - 1) * (linesFilled - 1);
-        return new SizeF(maxWidth, textHeight + lineSpacings);
+        //var lineSpacings = fontHeight * (ops.LineSpacing - 1) * (linesFilled - 1);
+        return new SizeF(maxWidth, textHeight /*+ lineSpacings*/);
     }
 
     public static SizeF MeasureTextSizeSingleLine(string text, TextOptions options, out int charsFitted)
     {
-        var ops = new RichTextOptions(options.Font)
-        {
-            WrappingLength = options.WrappingLength,
-            LineSpacing = options.LineSpacing
-        };
+        var ops = new TextOptions(options).WithDefaultAlignment();
+
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
         var width = 0F;
-        charsFitted = 0;
+        charsFitted = text.Length;
 
         foreach (var advance in advances)
         {
@@ -98,7 +89,7 @@ public static class TextMeasuringHelpers
     }
 
     // it's here for the future...
-    public static List<TextMeasurement> GetTextGlyphBounds(string text, TextOptions options)
+    /*public static List<TextMeasurement> GetTextGlyphBounds(string text, TextOptions options)
     {
         var lines = text.Split('\n');
         return lines.Select(line => GetLineGlyphBounds(line, options)).ToList();
@@ -106,7 +97,7 @@ public static class TextMeasuringHelpers
 
     public static TextMeasurement GetLineGlyphBounds(string text, TextOptions options)
     {
-        var ops = new RichTextOptions(options.Font);
+        var ops = new TextOptions(options);
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
         var result = new List<WordMeasurement>();
@@ -146,5 +137,5 @@ public static class TextMeasuringHelpers
         public List<WordMeasurement> Words { get; } = words;
     }
 
-    public record WordMeasurement(string Word, float Width);
+    public record WordMeasurement(string Word, float Width);*/
 }

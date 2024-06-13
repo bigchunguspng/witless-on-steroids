@@ -30,7 +30,7 @@ namespace Witlesss.Services
 
         public record Options(SolidBrush Color, float EmojiSize, int MaxLines = -1);
 
-        public Image<Rgba32> DrawEmojiText(string text, TextOptions options, Options parameters)
+        public Image<Rgba32> DrawEmojiText(string text, RichTextOptions options, Options parameters, out int linesFilled)
         {
             // RENDER EACH PARAGRAPH
 
@@ -38,6 +38,7 @@ namespace Witlesss.Services
             var lines = paragraphs
                 .Select(paragraph => DrawEmojiTextParagraph(paragraph, options, parameters))
                 .SelectMany(x => x).ToList();
+            linesFilled = lines.Count;
 
             // COMBINE
 
@@ -64,7 +65,7 @@ namespace Witlesss.Services
             return canvas;
         }
 
-        private List<Image<Rgba32>> DrawEmojiTextParagraph(string paragraph, TextOptions options, Options parameters)
+        private List<Image<Rgba32>> DrawEmojiTextParagraph(string paragraph, RichTextOptions options, Options parameters)
         {
             var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
             var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
@@ -131,11 +132,10 @@ namespace Witlesss.Services
                 {
                     //text = text.TrimEnd();
                     
-                    var optionsW = new RichTextOptions(options.Font)
+                    var optionsW = new RichTextOptions(options)
                     {
-                        WrappingLength = width,
-                        LineSpacing = options.LineSpacing,
-                    };
+                        WrappingLength = width
+                    }.WithDefaultAlignment();
                     var ms = TextMeasuringHelpers.MeasureTextSize(text, optionsW, out var linesFilled);
                     var w = linesFilled > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
@@ -143,12 +143,10 @@ namespace Witlesss.Services
                     else if  (Dg) DrawSingleLineText();
                     else
                     {
-                        var optionsR = new RichTextOptions(options.Font)
+                        var optionsR = new RichTextOptions(options)
                         {
-                            Origin = GetDrawingOffset(),
-                            WrappingLength = rest,
-                            LineSpacing = options.LineSpacing,
-                        };
+                            Origin = GetDrawingOffset(), WrappingLength = rest
+                        }.WithDefaultAlignment();
                         _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
                         _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
                         var start = (int)(Math.Max(0.66f - x / (float)width, 0) * cw);
@@ -157,7 +155,7 @@ namespace Witlesss.Services
                         var cr = index < 0;
                         var trim = space ? cr ? "" : text[..index] : text[..chars];
                         ms = TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _);
-                        optionsR.WrappingLength = ms.Width;
+                        optionsR.WrappingLength = ms.Width + 0.05F; // safe space, fixes text being not rendered.
 #if DEBUG
                         canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, height)));
 #endif

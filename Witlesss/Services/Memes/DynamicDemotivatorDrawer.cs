@@ -151,7 +151,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
             AdjustProportions(textM, out var width);
 
-            var height = txt_h; //funny ? txt_h * 2 : txt_h;
+            var height = txt_h;
             width = width == 0 ? TextWidth : width;
 
             var area = new RectangleF(0, 0, width, height);
@@ -165,13 +165,16 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var options = GetDefaultTextOptions(area.Width, area.Height);
             if (funny)
             {
-                var h = (int)TextMeasuringHelpers.MeasureTextSize(textM, options, out var lines).Height;
+                var heightExpected = (int)TextMeasuringHelpers.MeasureTextSize(textM, options, out var linesExpected).Height;
                 var parameters = new EmojiTool.Options(TextColor, EmojiSize);
-                var textLayer = _emojer.DrawEmojiText(text, options, parameters);
-                txt_h = txt_h - h + textLayer.Height;
+                var textLayer = _emojer.DrawEmojiText(text, options, parameters, out var linesActual);
+
+                txt_h = txt_h + (heightExpected * (linesActual / (float)linesExpected - 1)).RoundInt();
                 AdjustTotalSize();
                 AdjustImageFrame();
-                var point = new Point((area.Size.CeilingInt() - textLayer.Size) / 2);
+
+                var size = new Size(width, height);
+                var point = new Point((size - textLayer.Size) / 2);
                 image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
             }
             else image.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));
@@ -194,7 +197,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         private int InitialMargin(int h) => (txt_h - h) / 2;
         private int Spacing   => (int)(_font.Size * 1.6);
-        private int EmojiSize => (int)(_font.Size * 1.125D);
+        private int EmojiSize => (int)(_font.Size * ExtraFonts.GetLineSpacing() * 1.2F);
 
         private string GetEmojiReplacement() => "aa"; // UseRoboto ? "aa" : UseImpact ? "НН" : UseBoldFont ? "гм" : "мя";
 

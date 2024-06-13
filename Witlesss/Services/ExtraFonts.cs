@@ -40,7 +40,9 @@ namespace Witlesss.Services
             SystemFonts.Get("Segoe UI Symbol"),
             SystemFonts.Get("Arial"),
             SystemFonts.Get("Tahoma"),
-            SystemFonts.Get("Times New Roman")
+            SystemFonts.Get("Times New Roman"),
+            SystemFonts.Get("Microsoft YaHei"),
+            SystemFonts.Get("MS PGothic"),
         ];
 
         public ExtraFonts(string cmd, params string[] exclude)

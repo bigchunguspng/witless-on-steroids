@@ -61,12 +61,12 @@ namespace Witlesss
         {
             _dp.PassTextLength(text);
 
-            var size = GrowSize(GetSize(path));
+            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
             _dp.SetUp(size);
             _dp.SetColor();
 
             var frame = _dp.BakeFrame(text);
-            var full_size = FitSize(GetSize(frame), 720);
+            var full_size = GetImageSize_FFmpeg(frame).FitSize(720);
 
             return new F_Combine(path, frame).D300(Quality, size, _dp.Location, full_size).Output("-Dp");
         }

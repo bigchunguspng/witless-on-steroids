@@ -1,35 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Witlesss.Commands.Editing;
 using Witlesss.Commands.Meme;
-using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.Meme.ImageProcessor>;
 
 namespace Witlesss.Commands
 {
     public class CommandRouter : CommandAndCallbackRouter
     {
-        private readonly MakeMeme _meme = new();
-        private readonly AddCaption _whenthe = new();
-        private readonly Demotivate _demotivate = new();
-        private readonly DemotivateProportional _dp = new();
-        private readonly RemoveBitrate _bitrate = new();
-        private readonly MemeDeepFryer _fryer = new();
-        private readonly ToAnimation _audio = new();
-        private readonly ChangeSpeed _speed = new();
-        private readonly ChangeVolume _volume = new();
-        private readonly Equalize _equalize = new();
-        private readonly AdvancedEdit _edit = new();
-        private readonly ToVideoNote _note = new();
-        private readonly ToVoiceMessage _voice = new();
-        private readonly ToSticker _sticker = new();
-        private readonly Reverse _reverse = new();
-        private readonly Sus _sus = new();
-        private readonly Cut _cut = new();
-        private readonly Crop _crop = new();
-        private readonly Scale _scale = new();
-        private readonly Slice _slice = new();
         private readonly Fuse _fuse = new();
         private readonly Move _move = new();
         private readonly Spam _spam = new();
@@ -38,7 +18,6 @@ namespace Witlesss.Commands
         private readonly ChatInfo _chat = new();
         private readonly Piece _piece = new();
         private readonly DebugMessage _debug = new();
-        private readonly DownloadMusic _song = new();
         private readonly GenerateByFirstWord _generate = new();
         private readonly GenerateByLastWord _generateB = new();
         private readonly Bouhourt _bouhourt = new();
@@ -53,7 +32,8 @@ namespace Witlesss.Commands
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
         private readonly WitlessCommandRouter _witless;
-        private readonly MemeProcessors _mematics;
+
+        private readonly Dictionary<MemeType, Func<ImageProcessor>> _mematics;
 
         private readonly CommandRegistry<AnyCommand<CommandContext>> _simpleCommands;
         private readonly CommandRegistry<AnyCommand<WitlessContext>> _witlessCommands;
@@ -61,36 +41,36 @@ namespace Witlesss.Commands
         public CommandRouter()
         {
             _witless = new WitlessCommandRouter(this);
-            _mematics = new MemeProcessors
+            _mematics = new Dictionary<MemeType, Func<ImageProcessor>>
             {
-                { MemeType.Dg, _demotivate },
-                { MemeType.Meme, _meme },
-                { MemeType.Top, _whenthe },
-                { MemeType.Dp, _dp },
-                { MemeType.Nuke, _fryer }
+                { MemeType.Dg,   () => new Demotivate() },
+                { MemeType.Meme, () => new MakeMeme() },
+                { MemeType.Top,  () => new AddCaption() },
+                { MemeType.Dp,   () => new DemotivateProportional() },
+                { MemeType.Nuke, () => new MemeDeepFryer() }
             };
 
             _simpleCommands = new CommandRegistry<AnyCommand<CommandContext>>()
-                .Register("fast"   , () => _speed.SetMode(SpeedMode.Fast))
-                .Register("slow"   , () => _speed.SetMode(SpeedMode.Slow))
-                .Register("crop"   , () => _crop.UseDefaultMode())
-                .Register("shake"  , () => _crop.UseShakeMode())
-                .Register("scale"  , () => _scale)
-                .Register("slice"  , () => _slice)
-                .Register("cut"    , () => _cut)
-                .Register("sus"    , () => _sus)
-                .Register("damn"   , () => _bitrate)
-                .Register("reverse", () => _reverse)
-                .Register("sex"    , () => _sticker)
-                .Register("song"   , () => _song)
-                .Register("eq"     , () => _equalize)
-                .Register("vol"    , () => _volume)
-                .Register("g"      , () => _audio)
-                .Register("note"   , () => _note)
-                .Register("vova"   , () => _voice)
+                .Register("fast"   , () => new ChangeSpeed().SetMode(SpeedMode.Fast))
+                .Register("slow"   , () => new ChangeSpeed().SetMode(SpeedMode.Slow))
+                .Register("crop"   , () => new Crop().UseDefaultMode())
+                .Register("shake"  , () => new Crop().UseShakeMode())
+                .Register("scale"  , () => new Scale())
+                .Register("slice"  , () => new Slice())
+                .Register("cut"    , () => new Cut())
+                .Register("sus"    , () => new Sus())
+                .Register("song"   , () => new DownloadMusic())
+                .Register("damn"   , () => new RemoveBitrate())
+                .Register("reverse", () => new Reverse())
+                .Register("eq"     , () => new Equalize())
+                .Register("vol"    , () => new ChangeVolume())
+                .Register("g"      , () => new ToAnimation())
+                .Register("sex"    , () => new ToSticker())
+                .Register("note"   , () => new ToVideoNote())
+                .Register("vova"   , () => new ToVoiceMessage())
                 .Register("w"      , () => _reddit)
                 .Register("link"   , () => _link)
-                .Register("ff"     , () => _edit)
+                .Register("ff"     , () => new AdvancedEdit())
                 .Register("piece"  , () => _piece)
                 .Register("debug"  , () => _debug)
                 .Register("chat_id", () => _mail.WithText(Context.Chat.ToString()))
@@ -101,12 +81,12 @@ namespace Witlesss.Commands
                 .Build();
 
             _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
-                .Register("dp"      , () => _dp)
-                .Register("dg"      , () => _demotivate.SetUp(DgMode.Square))
-                .Register("dv"      , () => _demotivate.SetUp(DgMode.Wide))
-                .Register("meme"    , () => _meme)
-                .Register("top"     , () => _whenthe)
-                .Register("nuke"    , () => _fryer)
+                .Register("dp"      , () => new DemotivateProportional())
+                .Register("dg"      , () => new Demotivate().SetUp(DgMode.Square))
+                .Register("dv"      , () => new Demotivate().SetUp(DgMode.Wide))
+                .Register("meme"    , () => new MakeMeme())
+                .Register("top"     , () => new AddCaption())
+                .Register("nuke"    , () => new MemeDeepFryer())
                 .Register("a"       , () => _generate)
                 .Register("zz"      , () => _generateB)
                 .Register("b"       , () => _bouhourt)
@@ -128,7 +108,7 @@ namespace Witlesss.Commands
         {
             if (Bot.WitlessExist(Context.Chat))
             {
-                _witless.Pass(Context.Message, Bot.SussyBakas[Context.Chat]);
+                _witless.Pass(Context, Bot.SussyBakas[Context.Chat]);
                 _witless.Run();
             }
             else if (Context.Command is not null)
@@ -156,7 +136,7 @@ namespace Witlesss.Commands
             var func = _witlessCommands.Resolve(Context.Command);
             if (func is null) return true;
 
-            func.Invoke().Execute(new WitlessContext(Context.Message, baka));
+            func.Invoke().Execute(new WitlessContext(Context, baka));
             return true;
         }
 
@@ -210,9 +190,9 @@ namespace Witlesss.Commands
 
         private class WitlessCommandRouter(CommandRouter parent) : AnyCommandRouter<WitlessContext>
         {
-            public void Pass(Message message, Witless baka)
+            public void Pass(CommandContext context, Witless baka)
             {
-                Context = new WitlessContext(message, baka);
+                Context = new WitlessContext(context, baka);
             }
 
             public override void Run()
@@ -242,7 +222,12 @@ namespace Witlesss.Commands
                 else if (Context.Baka.Ready() && !Context.Baka.Banned) WitlessPoopAsync(Context);
 
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
-                ImageProcessor SelectMemeMaker() => parent._mematics[Context.Baka.Meme.Type];
+                ImageProcessor SelectMemeMaker()
+                {
+                    var mematic = parent._mematics[Context.Baka.Meme.Type].Invoke();
+                    mematic.Pass(Context);
+                    return mematic;
+                }
 
                 bool HaveToMeme() => Extension.Random.Next(100) < Context.Baka.Meme.Chance && !BroSpoilers();
                 bool HaveToMemeSticker() => Context.Baka.Meme.Stickers && HaveToMeme();

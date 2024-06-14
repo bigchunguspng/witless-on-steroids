@@ -26,6 +26,11 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected virtual bool CropVideoNotes  { get; } = true;
         protected virtual bool ConvertStickers { get; } = true;
 
+        public void Pass(WitlessContext context)
+        {
+            Context = context;
+        }
+
         protected async Task RunInternal(string type, string? options = null)
         {
             ImageSaver.PassQuality(Baka);

@@ -24,7 +24,7 @@ namespace Witlesss.Commands
 
                 word = word.ToLower();
 
-                var text = Text!;
+                var text = Args!;
                 var outset = text.Remove(text.Length - word.Length);
                 var repeats = GetRepeats(_repeat.Match(Command!));
                 for (int i = 0; i < repeats; i++)

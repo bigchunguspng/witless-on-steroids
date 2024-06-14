@@ -132,6 +132,8 @@ namespace Witlesss.Commands.Meme
     {
         ImageProcessor SetUp(int w, int h); // todo something
 
+        void Pass(WitlessContext context);
+
         Task ProcessPhoto(string fileID);
         Task ProcessStick(string fileID);
     }

@@ -9,6 +9,17 @@ public class CommandContext
 {
     private static readonly Regex _command = new(@"^\/\S+", RegexOptions.IgnoreCase);
 
+    protected CommandContext(CommandContext context)
+    {
+        Message = context.Message;
+        Chat = context.Chat;
+        Title = context.Title;
+        Text = context.Text;
+        Command = context.Command;
+        Args = context.Args;
+        IsForMe = context.IsForMe;
+    }
+
     public CommandContext(Message message)
     {
         Message = message;
@@ -25,7 +36,7 @@ public class CommandContext
             Command = lower.Replace(Config.BOT_USERNAME, "");
             IsForMe = !lower.Contains('@') || !lower.Contains("bot") || lower.Contains(Config.BOT_USERNAME.Remove(7));
 
-            Args = match.Length == Text.Length ? null : Text.Substring(match.Length);
+            Args = match.Length == Text.Length ? null : Text.Substring(match.Length + 1);
         }
         else
         {
@@ -49,12 +60,8 @@ public class CommandContext
     }*/
 }
 
-public class WitlessContext(Message message, Witless baka) : CommandContext(message)
+public class WitlessContext(CommandContext context, Witless baka) : CommandContext(context)
 {
-    public WitlessContext(CallbackQuery query, Witless baka) : this(query.Message, baka)
-    {
-    }
-
     public Witless Baka { get; set; } = baka;
 
     /*public (Witless baka, string? text, long chat, string title) Deconstruct()

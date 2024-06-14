@@ -73,7 +73,7 @@ namespace Witlesss.Commands
 
         public void DoGameStep(Message message, string data)
         {
-            Context = new WitlessContext(message, Bot.SussyBakas[message.Chat.Id]);
+            Context = new WitlessContext(new CommandContext(message), Bot.SussyBakas[message.Chat.Id]);
 
             var s = data.Split(" - ");
             var n = s[1].Split(':');

@@ -85,7 +85,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 {
                     var q = arg.Groups[1].Value;
 
-                    var sub = sub_.Match(Args!);
+                    var sub = sub_.Match(Args ?? "");
                     var s = sub.Success;
                     var subreddit = s ? sub.Groups[1].Value : null;
 

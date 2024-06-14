@@ -142,7 +142,7 @@ namespace Witlesss.Services.Internet
             do
             {
                 UpdateCache();
-                _post = ThisQueryCache.Posts.Dequeue();
+                _post = ThisQueryCache.Posts.Dequeue(); // todo fix bug on nullable Q
             }
             while (ThisQueryCache.HasEnoughPosts && ThisQueryCache.Posts.Count > 0 && Excluded.Contains(_post.Fullname));
         }

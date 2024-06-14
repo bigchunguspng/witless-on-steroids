@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -20,8 +21,6 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         private readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
         private readonly Regex _wtf = new(@"^\/w[^\ss_@]");
-
-        private static readonly Regex _ul = new(@"<ul.*ul>"), _li = new(@"<li.*?href=""(.*?)"".*?li>");
 
         private static readonly RedditTool Reddit = RedditTool.Instance;
 
@@ -150,22 +149,31 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         private static IEnumerable<InputMediaPhoto> AlbumFromGallery(PostData post)
         {
-            using var client = new WebClient();
-            string html = client.DownloadString(post.URL);
+            var process = StartGalleryDL(post.URL);
+            var urls = new List<string>();
+            for (var i = 0; i < 10; i++)
+            {
+                var line = process.StandardOutput.ReadLine();
+                if (line is null) break;
 
-            var list = _li.Matches(_ul.Match(html).Value);
+                urls.Add(line);
+            }
 
             var captioned = false;
-            return list.Select(GetInputMedia).Take(10);
+            return urls.Select(GetInputMedia);
 
-            InputMediaPhoto GetInputMedia(Match match)
+            InputMediaPhoto GetInputMedia(string url)
             {
-                var cap = captioned ? null : post.Title;
+                var caption = captioned ? null : post.Title;
                 captioned = true;
 
-                var url = match.Groups[1].Value.Replace("&amp;", "&");
-                return new InputMediaPhoto(new InputMedia(url)) { Caption = cap };
+                return new InputMediaPhoto(new InputMedia(url)) { Caption = caption };
             }
+        }
+
+        private static Process StartGalleryDL(string url)
+        {
+            return SystemHelpers.StartedReadableProcess("gallery-dl", $"{url} -g");
         }
 
         private void SendSingleFilePost(PostData post)

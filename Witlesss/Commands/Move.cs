@@ -5,13 +5,12 @@ namespace Witlesss.Commands
 {
     public class Move : SettingsCommand
     {
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
-            var a = Text.Split();
-            if (a.Length > 1)
+            if (Text is not null)
             {
-                string name = a[1];
-                string result = MoveDictionary(name);
+                var name = Text.Replace(' ', '-');
+                var result = MoveDictionary(name);
 
                 if (result == "*")
                 {
@@ -29,7 +28,7 @@ namespace Witlesss.Commands
             else Bot.SendMessage(Chat, MOVE_MANUAL);
         }
 
-        protected static string MoveDictionary(string name)
+        protected string MoveDictionary(string name)
         {
             Baka.Save();
 

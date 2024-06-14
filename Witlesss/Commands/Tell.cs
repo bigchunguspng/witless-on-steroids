@@ -1,8 +1,8 @@
 ﻿namespace Witlesss.Commands;
 
-public class Tell : Command
+public class Tell : SyncCommand
 {
-    public override void Run()
+    protected override void Run()
     {
         if (Message.From?.Id != Config.AdminID)
         {
@@ -10,17 +10,17 @@ public class Tell : Command
             return;
         }
 
-        var split = Text.Split(' ', 3);
-        if (split.Length < 3)
+        var args = Args?.Split(' ', 2);
+        if (args is null || args.Length < 2)
         {
             Bot.SendMessage(Chat, "<code>/tell [chat] [message]</code>");
             return;
         }
         
-        var chat = long.TryParse(split[1], out var x) ? x : 0;
+        var chat = long.TryParse(args[0], out var x) ? x : 0;
         if (chat != 0)
         {
-            var text = split[2];
+            var text = args[1];
             Bot.SendMessage(chat, text, preview: false);
             if (Bot.WitlessExist(chat)) Bot.SussyBakas[chat].Eat(text);
         }

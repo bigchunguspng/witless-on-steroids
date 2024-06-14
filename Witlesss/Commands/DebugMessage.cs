@@ -4,9 +4,9 @@ using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands
 {
-    public class DebugMessage : Command
+    public class DebugMessage : SyncCommand
     {
-        public override void Run()
+        protected override void Run()
         {
             if (Message.ReplyToMessage == null) return;
 

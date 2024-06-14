@@ -24,19 +24,19 @@ namespace Witlesss.Commands
         protected long Size;
         protected int Limit = int.MaxValue;
 
-        private Document _document;
+        private Document? _document;
 
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
             Baka.Save();
             Size = SizeInBytes(Baka.Path);
 
             GetWordsPerLineLimit();
 
-            var s = Text.Split();
+            var args = Args.SplitN();
             if (FileAttached("text/plain")) // TXT
             {
-                var path = UniquePath($@"{FUSE_HISTORY_FOLDER}\{_document.FileName}");
+                var path = UniquePath($@"{FUSE_HISTORY_FOLDER}\{_document!.FileName}");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 EatFromTxtFile(path);
@@ -44,7 +44,7 @@ namespace Witlesss.Commands
             }
             else if (FileAttached("application/json")) // JSON  /  ERROR >> JSON HIS GUIDE
             {
-                var path = UniquePath($@"{GetHistoryFolder()}\{_document.FileName}");
+                var path = UniquePath($@"{GetHistoryFolder()}\{_document!.FileName}");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 try
@@ -58,9 +58,9 @@ namespace Witlesss.Commands
                     Bot.SendMessage(Chat, GetJsonFormatExample());
                 }
             }
-            else if (s.Length > 2 && s[1] == "his") // JSON HIS
+            else if (args.Length > 1 && args[0] == "his") // JSON HIS
             {
-                var name = string.Join(' ', s.Skip(2));
+                var name = string.Join(' ', args.Skip(1));
                 var files = GetFiles(GetHistoryFolder(), $"{name}.json");
 
                 if (files.Length == 0)
@@ -78,10 +78,10 @@ namespace Witlesss.Commands
                     GoodEnding();
                 }
             }
-            else if (s.Length == 2) // DIC
+            else if (args.Length == 1) // DIC
             {
-                var arg = s[1];
-                
+                var arg = args[0];
+
                 if      (arg == "info") SendFuseList(Chat, 0, 25);
                 else if (arg == "his" ) SendFusionHistory(Chat, 0, 25);
                 else
@@ -96,10 +96,10 @@ namespace Witlesss.Commands
             return HasDocument(Message, type) || HasDocument(Message.ReplyToMessage, type);
         }
 
-        private bool HasDocument(Message message, string type)
+        private bool HasDocument(Message? message, string type)
         {
             var b = message is not null && message.Document?.MimeType == type;
-            if (b) _document = message.Document;
+            if (b) _document = message!.Document!;
 
             return b;
         }
@@ -171,7 +171,7 @@ namespace Witlesss.Commands
             string CallbackData(int p) => $"{key} - {p} {perPage}";
         }
 
-        protected static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup buttons)
+        protected static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup? buttons)
         {
             var b = messageId < 0;
             if (b) Bot.SendMessage(chat, text, buttons);
@@ -209,7 +209,7 @@ namespace Witlesss.Commands
             var fileExist = files is { Length: > 0 };
             if (chatExist || fileExist)
             {
-                var source = chatExist ? Bot.SussyBakas[chat].Words : new FileIO<WitlessDB>(files[0]).LoadData();
+                var source = chatExist ? Bot.SussyBakas[chat].Words : new FileIO<WitlessDB>(files![0]).LoadData();
                 new FusionCollab(Baka, source).Fuse();
                 GoodEnding();
             }
@@ -249,7 +249,7 @@ namespace Witlesss.Commands
 
         protected void GetWordsPerLineLimit()
         {
-            var match = Regex.Match(Text, @"^\/\S+(\d+)");
+            var match = Regex.Match(Command!, @"^\/\S+(\d+)");
             Limit = match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
         }
 

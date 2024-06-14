@@ -18,20 +18,23 @@ namespace Witlesss.Services.Internet
             _bot = bot;
         }
 
-        public void Download(string fileID, long chat, out string path, out MediaType type)
+        public async Task<(string path, MediaType type)> Download(string fileID, long chat)
         {
-            string shortID = ShortID(fileID);
-            string extension = ExtensionFromID(shortID);
-            type = MediaTypeFromID(shortID);
-            Witlesss.Memes.Sticker = extension == ".webm";
+            var shortID = ShortID(fileID);
+            var extension = ExtensionFromID(shortID);
+            var type = MediaTypeFromID(shortID);
 
-            if (_recent.Contains(shortID, out path) || _large.Contains(shortID, out path)) return;
+            Witlesss.Memes.Sticker = extension == ".webm"; // todo
+
+            if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
 
             path = UniquePath($@"{PICTURES_FOLDER}\{chat}\{shortID}{extension}");
 
-            DownloadFile(fileID, path, chat).Wait();
-            
+            await DownloadFile(fileID, path, chat);
+
             (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);
+
+            return (path, type);
         }
 
         public async Task DownloadFile(string fileId, string path, long chat = default)

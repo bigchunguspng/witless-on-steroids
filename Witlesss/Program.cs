@@ -7,7 +7,7 @@ namespace Witlesss
         private static void Main(string[] args)
         {
             Config.ReadFromFile();
-            Bot.LaunchInstance(args.Length > 0 ? new Skip() : new MainJunction());
+            Bot.LaunchInstance(args.Length > 0 ? new Skip() : new CommandRouter());
         }
     }
 }

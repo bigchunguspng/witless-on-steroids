@@ -1,18 +1,20 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing.Core
 {
-    public abstract class FileEditingCommand : Command
+    public abstract class FileEditingCommand : AsyncCommand
     {
-        protected string      FileID;
-        private   string PhotoFileID;
+        private bool _isPhoto;
 
-        protected virtual string Manual { get; } = DAMN_MANUAL;
+        protected string FileID = default!;
 
-        public override void Run()
+        protected virtual string Manual => DAMN_MANUAL; // todo replace other = with => since they are one time use
+
+        protected override async Task Run()
         {
-            if (ItHasSomethingToProcess()) Execute();
+            if (ItHasSomethingToProcess()) await Execute();
         }
 
         private bool ItHasSomethingToProcess()
@@ -25,15 +27,15 @@ namespace Witlesss.Commands.Editing.Core
             return false;
         }
 
-        protected abstract void Execute();
+        protected abstract Task Execute();
 
         protected virtual bool ChatIsBanned() => Bot.ThorRagnarok.ChatIsBanned(Chat);
 
         protected virtual void SendManual() => Bot.SendMessage(Chat, Manual);
 
-        private bool GetFileFrom(Message m)
+        private bool GetFileFrom(Message? message)
         {
-            return m is not null && MessageContainsFile(m);
+            return message is not null && MessageContainsFile(message);
         }
 
         protected virtual bool MessageContainsFile(Message m)
@@ -67,28 +69,52 @@ namespace Witlesss.Commands.Editing.Core
             else if (m.Document is not null && IsPicture(m.Document))     FileID = m.Document .FileId;
             else return false;
 
-            PhotoFileID = FileID;
+            _isPhoto = true;
 
             return true;
         }
         private static bool IsPicture(Document d) => d is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
         private static bool MightBeWav(Message m) => m.Document!.FileName!.EndsWith(".wav");
 
-
         protected void SendResult(string result, MediaType type)
         {
             using var stream = File.OpenRead(result);
-            if        (FileID == PhotoFileID) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
+            if                     (_isPhoto) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
             else if (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
             else if (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
             else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
             else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
         }
 
-        protected virtual string VideoFileName { get; } = "piece_fap_club.mp3";
-        protected virtual string AudioFileName { get; } = "piece_fap_club.mp4";
+        protected virtual string VideoFileName => "piece_fap_club.mp3";
+        protected virtual string AudioFileName => "piece_fap_club.mp4";
 
-        protected static string Sender => ValidFileName(GetSenderName(Message));
-        protected static string SongNameOr(string s) => Extension.SongNameOr(Message, s);
+        protected string Sender => ValidFileName(GetSenderName(Message));
+        protected string SongNameOr(string s) => Extension.SongNameOr(Message, s);
+
+        protected async Task<(string path, MediaType type, int waitMessage)> DownloadFileSuperCool()
+        {
+            if (FileID.StartsWith("http"))
+            {
+                var waitMessage = Bot.PingChat(Chat, PLS_WAIT_RESPONSE[Random.Next(5)]);
+
+                var task = new DownloadVideoTask(FileID, Context).RunAsync();
+                await Bot.RunSafelyAsync(task, Chat, waitMessage);
+
+                Bot.EditMessage(Chat, waitMessage, XDDD(Pick(PROCESSING_RESPONSE)));
+
+                return (await task, MediaType.Video, waitMessage);
+            }
+            else
+            {
+                var (path, type) = await Bot.Download(FileID, Chat);
+
+                var waitMessage = SizeInBytes(path) > 4_000_000
+                    ? Bot.PingChat(Chat, XDDD(Pick(PROCESSING_RESPONSE)))
+                    : -1;
+
+                return (path, type, waitMessage);
+            }
+        }
     }
 }

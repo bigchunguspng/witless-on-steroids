@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Witlesss.Commands.Editing
 {
     public class Sus : VideoCommand
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
             var argless = false;
-            var x = Cut.ParseArgs(Text.Split().Skip(1).ToArray());
+            var x = Cut.ParseArgs(Args?.Split());
             if (x.failed)
             {
-                if (Text.Contains(' '))
+                if (Args is not null)
                 {
                     Bot.SendMessage(Chat, SUS_MANUAL);
                     return;
@@ -19,11 +20,11 @@ namespace Witlesss.Commands.Editing
                 argless = true;
             }
 
-            Bot.Download(FileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(FileID, Chat);
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            var result = Memes.Sus(path, new CutSpan(x.start, x.length));
+            var result = await Memes.Sus(path, new CutSpan(x.start, x.length));
             SendResult(result, type);
             Log($"{Title} >> SUS [>_<]");
         }
@@ -31,6 +32,6 @@ namespace Witlesss.Commands.Editing
         protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");
         protected override string VideoFileName { get; } = "sus_fap_club.mp4";
 
-        string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
+        private string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
     }
 }

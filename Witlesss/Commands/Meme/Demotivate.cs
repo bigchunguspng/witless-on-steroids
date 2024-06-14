@@ -1,4 +1,7 @@
 ﻿using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Witlesss.Backrooms.SerialQueue;
+using Witlesss.MediaTools;
 using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands.Meme
@@ -11,9 +14,9 @@ namespace Witlesss.Commands.Meme
         protected override string Log_STICK(int x) => $"DEMOTIVATOR [{(x == 1 ? "#" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "DEMOTIVATOR [^] VID";
-        protected override string VideoName => $"piece_fap_club-d{(Memes.Mode == Square ? "g" : "v")}.mp4";
+        protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
 
-        protected override string Command => Memes.Mode == Square ? "/dg" : "/dv";
+        protected override string Command => _mode == Square ? "/dg" : "/dv";
 
         protected override string? DefaultOptions => Baka.Meme.OptionsG;
 
@@ -24,11 +27,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Демотиваторы💀");
-
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeDemotivator);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeStickerDemotivator);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoDemotivator);
+        protected override Task Run() => RunInternal("Демотиваторы💀");
 
         protected override void ParseOptions()
         {
@@ -53,12 +52,36 @@ namespace Witlesss.Commands.Meme
 
         public Demotivate SetUp(DgMode mode)
         {
-            SetMode(mode);
-
+            _mode = mode;
             return this;
         }
 
-        private static void SelectModeAuto(float w, float h) => SetMode(w / h > 1.6 ? Wide : Square);
-        private static void SetMode(DgMode mode = Square) => Memes.Mode = mode;
+        private static void SelectModeAuto(float w, float h) => _mode = w / h > 1.6 ? Wide : Square;
+
+        // LOGIC
+
+        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
+        private static readonly SerialTaskQueue _queue = new();
+        private static DemotivatorDrawer Drawer => _drawers[(int) _mode];
+        private static DgMode _mode;
+
+        protected override Task<string> MakeMemeImage(string path, DgText text)
+        {
+            return _queue.Enqueue(() => Drawer.MakeDemotivator(path, text));
+        }
+
+        protected override Task<string> MakeMemeStick(string path, DgText text, string extension)
+        {
+            //return MakeDemotivator(Convert(path, extension), text);
+            return MakeMemeImage(path, text);
+        }
+
+        protected override Task<string> MakeMemeVideo(string path, DgText text)
+        {
+            return _queue.Enqueue
+            (
+                () => new F_Combine(path, Drawer.MakeFrame(text)).Demo(Memes.Quality, Drawer).Output("-D")
+            );
+        }
     }
 }

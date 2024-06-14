@@ -1,17 +1,18 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.InputFiles;
 using static Witlesss.Memes;
 
 namespace Witlesss.Commands.Editing
 {
     public class ToAnimation : VideoCommand
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            Bot.Download(FileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(FileID, Chat);
             
-            if (type == MediaType.Round) path = CropVideoNote(path);
+            if (type == MediaType.Round) path = await CropVideoNote(path);
 
-            using var stream = File.OpenRead(RemoveAudio(path));
+            await using var stream = File.OpenRead(await RemoveAudio(path));
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
             Log($"{Title} >> GIF [~]");
         }

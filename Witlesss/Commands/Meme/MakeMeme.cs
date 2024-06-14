@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Witlesss.Backrooms.SerialQueue;
+using Witlesss.MediaTools;
 using static Witlesss.Backrooms.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
@@ -26,11 +29,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Мемы", OPTIONS + "/op_meme");
-
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeMeme);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeMemeFromSticker);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoMeme);
+        protected override Task Run() => RunInternal("Мемы", OPTIONS + "/op_meme");
 
         protected override void ParseOptions()
         {
@@ -99,13 +98,41 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex   _custom_bg = new(@"^\/meme\S*#([A-Za-z]+)#\S*",  RegexOptions.IgnoreCase);
         private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.IgnoreCase);
+
+        // LOGIC
+
+        private static readonly MemeGenerator _imgflip = new();
+        private static readonly SerialTaskQueue _queue = new();
+
+        protected override Task<string> MakeMemeImage(string path, DgText text)
+        {
+            return _queue.Enqueue(() => _imgflip.MakeMeme(path, text));
+        }
+
+        protected override Task<string> MakeMemeStick(string path, DgText text, string extension)
+        {
+            //return MakeMeme(Convert(path, extension), text);
+            return MakeMemeImage(path, text);
+        }
+
+        protected override Task<string> MakeMemeVideo(string path, DgText text)
+        {
+            return _queue.Enqueue(() =>
+            {
+                Memes.Sticker = false;
+                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
+                _imgflip.SetUp(size);
+
+                return new F_Combine(path, _imgflip.MakeCaption(text)).Meme(Memes.Quality, size).Output("-M");
+            });
+        }
     }
 
     public interface ImageProcessor
     {
-        ImageProcessor SetUp(int w, int h);
+        ImageProcessor SetUp(int w, int h); // todo something
 
-        void ProcessPhoto(string fileID);
-        void ProcessStick(string fileID);
+        Task ProcessPhoto(string fileID);
+        Task ProcessStick(string fileID);
     }
 }

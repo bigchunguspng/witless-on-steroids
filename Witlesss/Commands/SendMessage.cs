@@ -1,8 +1,8 @@
 ﻿namespace Witlesss.Commands;
 
-public class SendMessage : Command
+public class SendMessage : SyncCommand
 {
-    private string _text;
+    private string _text = default!;
 
     public SendMessage WithText(string text)
     {
@@ -10,7 +10,7 @@ public class SendMessage : Command
         return this;
     }
 
-    public override void Run() => Bot.SendMessage(Chat, _text);
+    protected override void Run() => Bot.SendMessage(Chat, _text);
 }
 
 //                    L I V E   G O K U   R E A C T I O N :

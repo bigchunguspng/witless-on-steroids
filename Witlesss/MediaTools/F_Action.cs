@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using FFMpegCore;
 
 namespace Witlesss.MediaTools
@@ -15,9 +16,9 @@ namespace Witlesss.MediaTools
         }
 
 
-        public string OutputAs(string path) => Cook(path);
+        public Task<string> OutputAs(string path) => Cook(path);
 
-        public string Output(string suffix, string extension = ".mp4")
+        public Task<string> Output(string suffix, string extension = ".mp4")
         {
             return Cook(GetOutputName(suffix, extension));
         }
@@ -27,7 +28,7 @@ namespace Witlesss.MediaTools
             return NameSource.RemoveExtension() + suffix + extension;
         }
 
-        public string Output_WEBM_safe(string suffix)
+        public Task<string> Output_WEBM_safe(string suffix)
         {
             var extension = Path.GetExtension(NameSource);
             if (extension == ".webm") extension = ".mp4";
@@ -36,13 +37,13 @@ namespace Witlesss.MediaTools
 
 
         protected abstract string NameSource { get; }
-        protected abstract string Cook(string output);
+        protected abstract Task<string> Cook(string output);
 
 
-        protected static void Run(FFMpegArgumentProcessor processor)
+        protected static Task Run(FFMpegArgumentProcessor processor)
         {
             LogArguments(processor);
-            processor.ProcessSynchronously();
+            return processor.ProcessAsynchronously();
         }
 
         private static void LogArguments(FFMpegArgumentProcessor a)

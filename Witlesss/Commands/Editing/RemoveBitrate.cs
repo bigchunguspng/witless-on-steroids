@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Witlesss.Commands.Editing
 {
@@ -6,13 +7,13 @@ namespace Witlesss.Commands.Editing
     {
         private int _value;
 
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            _value = Text.HasIntArgument(out var x) ? Math.Clamp(x, 0, 21) : 15;
+            _value = Context.HasIntArgument(out var x) ? Math.Clamp(x, 0, 21) : 15;
 
-            Bot.Download(FileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(FileID, Chat);
 
-            var result = Memes.RemoveBitrate(path, _value + 30); // 30 - 51
+            var result = await Memes.RemoveBitrate(path, _value + 30); // 30 - 51
             SendResult(result, type);
             Log($"{Title} >> DAMN [*]");
         }

@@ -104,8 +104,9 @@ namespace Witlesss
 
         private void ActivateLastChat()
         {
-            (_active, var title) = Command.LastChat;
-            Log($"ACTIVE CHAT >> {_active} ({title})");
+            var context = TelegramUpdateHandler.Router.Context;
+            _active = context.Chat;
+            Log($"ACTIVE CHAT >> {_active} ({context.Title})");
         }
 
         private        void ClearDics() => Bakas.ForEach(ClearDic);

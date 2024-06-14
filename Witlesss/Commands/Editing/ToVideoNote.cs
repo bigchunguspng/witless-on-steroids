@@ -1,14 +1,15 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing
 {
     public class ToVideoNote : VideoCommand
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            Bot.Download(FileID, Chat, out var path);
-            
-            using var stream = File.OpenRead(Memes.ToVideoNote(path));
+            var (path, _) = await Bot.Download(FileID, Chat);
+
+            await using var stream = File.OpenRead(await Memes.ToVideoNote(path));
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> NOTE (*)");
         }

@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Witlesss.Commands.Editing;
 using Witlesss.Commands.Meme;
 using MemeProcessors = System.Collections.Generic.Dictionary<Witlesss.XD.MemeType, Witlesss.Commands.Meme.ImageProcessor>;
 
 namespace Witlesss.Commands
 {
-    public class MainJunction : CallBackHandlingCommand
+    public class CommandRouter : CommandAndCallbackRouter
     {
         private readonly MakeMeme _meme = new();
         private readonly AddCaption _whenthe = new();
@@ -53,19 +52,15 @@ namespace Witlesss.Commands
         private readonly ToggleStickers _stickers = new();
         private readonly ToggleAdmins _admins = new();
         private readonly DeleteDictionary _delete = new();
-        private readonly WitlessMainJunction _witless;
+        private readonly WitlessCommandRouter _witless;
         private readonly MemeProcessors _mematics;
-        private readonly Stopwatch _watch = new();
 
-        private readonly CommandRegistry<Command> _simpleCommands;
-        private readonly CommandRegistry<WitlessCommand> _witlessCommands;
+        private readonly CommandRegistry<AnyCommand<CommandContext>> _simpleCommands;
+        private readonly CommandRegistry<AnyCommand<WitlessContext>> _witlessCommands;
 
-        private long _lastChat;
-        private int   _annoyed;
-
-        public MainJunction()
+        public CommandRouter()
         {
-            _witless = new WitlessMainJunction(this);
+            _witless = new WitlessCommandRouter(this);
             _mematics = new MemeProcessors
             {
                 { MemeType.Dg, _demotivate },
@@ -75,7 +70,7 @@ namespace Witlesss.Commands
                 { MemeType.Nuke, _fryer }
             };
 
-            _simpleCommands = new CommandRegistry<Command>()
+            _simpleCommands = new CommandRegistry<AnyCommand<CommandContext>>()
                 .Register("fast"   , () => _speed.SetMode(SpeedMode.Fast))
                 .Register("slow"   , () => _speed.SetMode(SpeedMode.Slow))
                 .Register("crop"   , () => _crop.UseDefaultMode())
@@ -98,14 +93,14 @@ namespace Witlesss.Commands
                 .Register("ff"     , () => _edit)
                 .Register("piece"  , () => _piece)
                 .Register("debug"  , () => _debug)
-                .Register("chat_id", () => _mail.WithText(Chat.ToString()))
+                .Register("chat_id", () => _mail.WithText(Context.Chat.ToString()))
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
                 .Register("spam"   , () => _spam)
                 .Register("tell"   , () => _tell)
                 .Build();
 
-            _witlessCommands = new CommandRegistry<WitlessCommand>()
+            _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
                 .Register("dp"      , () => _dp)
                 .Register("dg"      , () => _demotivate.SetUp(DgMode.Square))
                 .Register("dv"      , () => _demotivate.SetUp(DgMode.Wide))
@@ -129,79 +124,54 @@ namespace Witlesss.Commands
                 .Build();
         }
 
-        private static bool TextIsCommand(out string command)
-        {
-            command = TextWithoutBotUsername;
-            return Text.StartsWith('/');
-        }
-
         public override void Run()
         {
-            _watch.WriteTime();
-
-            if (Bot.WitlessExist(Chat))
+            if (Bot.WitlessExist(Context.Chat))
             {
+                _witless.Pass(Context.Message, Bot.SussyBakas[Context.Chat]);
                 _witless.Run();
             }
-            else if (Text is not null && TextIsCommand(out var command))
+            else if (Context.Command is not null)
             {
-                var success = DoSimpleCommands(command) || DoStartCommand(command);
+                var success = DoSimpleCommands() || DoStartCommand();
 
-                if (!success && (ChatIsPrivate || Text.Contains(Config.BOT_USERNAME)))
+                if (!success && (Context.ChatIsPrivate || Context.Command.Contains(Config.BOT_USERNAME)))
                 {
-                    Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                    Bot.SendMessage(Context.Chat, WITLESS_ONLY_COMAND);
                 }
             }
-
-            SuspectForLongHangs(_watch.GetElapsed());
         }
 
-        private void SuspectForLongHangs(TimeSpan time)
+        private bool DoSimpleCommands()
         {
-            var hang = time.Seconds > 5;
-            _annoyed = hang && _lastChat == Chat ? _annoyed + 1 : 1;
-            if (hang) Bot.ThorRagnarok.Suspect(Chat, time * _annoyed);
-            _lastChat = Chat;
-        }
-
-        private bool DoSimpleCommands(string command)
-        {
-            var func = _simpleCommands.Resolve(command);
+            var func = _simpleCommands.Resolve(Context.Command);
             if (func is null) return false;
 
-            func.Invoke().Run();
+            func.Invoke().Execute(Context);
             return true;
         }
 
-        private bool DoWitlessCommands(string command)
+        private bool DoWitlessCommands(Witless baka)
         {
-            var func = _witlessCommands.Resolve(command);
+            var func = _witlessCommands.Resolve(Context.Command);
             if (func is null) return true;
 
-            func.Invoke().Run();
+            func.Invoke().Execute(new WitlessContext(Context.Message, baka));
             return true;
         }
 
-        private static bool DoStartCommand(string command)
+        private bool DoStartCommand()
         {
-            var success = command == "/start" && Bot.SussyBakas.TryAdd(Chat, Witless.AverageBaka(Chat));
+            var success = Context.Command == "/start" && Bot.SussyBakas.TryAdd(Context.Chat, Witless.AverageBaka(Context.Chat));
             if (success)
             {
                 Bot.SaveChatList();
-                Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
-                Bot.SendMessage(Chat, START_RESPONSE);
-                Bot.ThorRagnarok.PullBanStatus(Chat);
+                Log($"{Context.Title} >> DIC CREATED >> {Context.Chat}", ConsoleColor.Magenta);
+                Bot.SendMessage(Context.Chat, START_RESPONSE);
+                Bot.ThorRagnarok.PullBanStatus(Context.Chat);
             }
             return success;
         }
-        
-        private static async void WitlessPoopAsync(WitlessMessageData message)
-        {
-            await Task.Delay(AssumedResponseTime(150, message.Text));
-            Bot.SendMessage(message.Chat, message.Baka.Generate());
-            Log($"{message.Title} >> FUNNY");
-        }
-
 
         public override void OnCallback(CallbackQuery query)
         {
@@ -233,61 +203,73 @@ namespace Witlesss.Commands
                 var message = query.Message;
                 message.From = query.From;
 
-                _delete.Pass(message);
-                _delete.DoGameStep(message.Chat.Id, data[1], message.MessageId);
+                _delete.DoGameStep(message, data[1]);
             }
         }
 
 
-        private class WitlessMainJunction : WitlessCommand
+        private class WitlessCommandRouter(CommandRouter parent) : AnyCommandRouter<WitlessContext>
         {
-            private readonly MainJunction _parent;
-
-            public WitlessMainJunction(MainJunction parent) => _parent = parent;
+            public void Pass(Message message, Witless baka)
+            {
+                Context = new WitlessContext(message, baka);
+            }
 
             public override void Run()
             {
-                SetBaka(Bot.SussyBakas[Chat]);
-
-                if (Text is not null)
+                if (Context.Text is not null)
                 {
-                    if (TextIsCommand(out var command))
+                    if (Context.Command is not null)
                     {
-                        if (_parent.DoSimpleCommands(command) || _parent.DoWitlessCommands(command)) return;
+                        if (parent.DoSimpleCommands() || parent.DoWitlessCommands(Context.Baka)) return;
                     }
                     else
                     {
-                        var text = Text.Clone().ToString();
-                        if (Baka.Eat(text, out var eaten)) Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                        if (Context.Baka.Eat(Context.Text, out var eaten)) Log($"{Context.Title} >> {eaten}", ConsoleColor.Blue);
                     }
                 }
                 
-                Baka.Count();
+                Context.Baka.Count();
                 
-                if (Message.Photo?[^1] is { } p && HaveToMeme())
+                if (Context.Message.Photo?[^1] is { } p && HaveToMeme())
                 {
                     GetMemeMaker(p.Width, p.Height).ProcessPhoto(p.FileId);
                 }
-                else if (Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
+                else if (Context.Message.Sticker is { IsVideo: false, IsAnimated: false } s && HaveToMemeSticker())
                 {
                     GetMemeMaker(s.Width, s.Height).ProcessStick(s.FileId);
                 }
-                else if (Baka.Ready() && !Baka.Banned) WitlessPoopAsync(SnapshotMessageData());
+                else if (Context.Baka.Ready() && !Context.Baka.Banned) WitlessPoopAsync(Context);
 
                 ImageProcessor GetMemeMaker(int w, int h) => SelectMemeMaker().SetUp(w, h);
-                ImageProcessor SelectMemeMaker() => _parent._mematics[Baka.Meme.Type];
+                ImageProcessor SelectMemeMaker() => parent._mematics[Context.Baka.Meme.Type];
 
-                bool HaveToMeme() => Extension.Random.Next(100) < Baka.Meme.Chance && !BroSpoilers();
-                bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
+                bool HaveToMeme() => Extension.Random.Next(100) < Context.Baka.Meme.Chance && !BroSpoilers();
+                bool HaveToMemeSticker() => Context.Baka.Meme.Stickers && HaveToMeme();
 
-                bool BroSpoilers() => Message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
+                bool BroSpoilers() => Context.Message.ContainsSpoilers();
+            }
+
+            private static async void WitlessPoopAsync(WitlessContext c)
+            {
+                await Task.Delay(AssumedResponseTime(150, c.Text));
+                Bot.SendMessage(c.Chat, c.Baka.Generate());
+                Log($"{c.Title} >> FUNNY");
+            }
+
+            private static int AssumedResponseTime(int initialTime, string? text)
+            {
+                return text is null ? initialTime : Math.Min(text.Length, 120) * 25;
             }
         }
     }
 
-    public class Skip : CallBackHandlingCommand
+    public class Skip : CommandAndCallbackRouter
     {
-        public override void Run() => Log($"{Title} >> {Text}", ConsoleColor.Gray);
+        public override void Run()
+        {
+            Log($"{Context.Title} >> {Context.Text}", ConsoleColor.Gray);
+        }
 
         public override void OnCallback(CallbackQuery query) => Log(query.Data ?? "-", ConsoleColor.Yellow);
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.MediaTools;
@@ -22,41 +23,41 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected abstract string? DefaultOptions { get; }
 
-        protected virtual bool CropVideoNotes { get; } = true;
+        protected virtual bool CropVideoNotes  { get; } = true;
+        protected virtual bool ConvertStickers { get; } = true;
 
-        protected void Run(string type, string? options = null)
+        protected async Task RunInternal(string type, string? options = null)
         {
             ImageSaver.PassQuality(Baka);
 
-            var x = Message.ReplyToMessage;
-            if (ProcessMessage(Message) || ProcessMessage(x)) return;
+            if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
             var message = string.Format(MEME_MANUAL, type);
             Bot.SendMessage(Chat, options is null ? message : $"{message}\n\n{options}");
         }
 
-        private bool ProcessMessage(Message? message)
+        private async Task<bool> ProcessMessage(Message? message)
         {
             if (message is null) return false;
 
-            if      (message.Photo     is not null)              ProcessPhoto(message.Photo[^1].FileId);
-            else if (message.Animation is not null)              ProcessVideo(message.Animation.FileId);
-            else if (message.Sticker   is { IsVideo: true })     ProcessVideo(message.Sticker  .FileId);
-            else if (message.Video     is not null)              ProcessVideo(message.Video    .FileId);
-            else if (message.VideoNote is not null)              ProcessVideo(message.VideoNote.FileId);
-            else if (message.Sticker   is { IsAnimated: false }) ProcessStick(message.Sticker  .FileId);
+            if      (message.Photo     is not null)              await ProcessPhoto(message.Photo[^1].FileId);
+            else if (message.Animation is not null)              await ProcessVideo(message.Animation.FileId);
+            else if (message.Sticker   is { IsVideo: true })     await ProcessVideo(message.Sticker  .FileId);
+            else if (message.Video     is not null)              await ProcessVideo(message.Video    .FileId);
+            else if (message.VideoNote is not null)              await ProcessVideo(message.VideoNote.FileId);
+            else if (message.Sticker   is { IsAnimated: false }) await ProcessStick(message.Sticker  .FileId);
             else return false;
 
             return true;
         }
 
-        public    abstract void ProcessPhoto(string fileID);
-        public    abstract void ProcessStick(string fileID);
-        protected abstract void ProcessVideo(string fileID);
+        protected abstract Task<string> MakeMemeImage(string path, T text);
+        protected abstract Task<string> MakeMemeStick(string path, T text, string extension);
+        protected abstract Task<string> MakeMemeVideo(string path, T text);
 
-        protected void DoPhoto(string fileID, Func<string, T, string> produce)
+        public async Task ProcessPhoto(string fileID)
         {
-            Bot.Download(fileID, Chat, out var path);
+            var (path, _) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
             ParseOptions();
@@ -65,15 +66,15 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             for (var i = 0; i < repeats; i++)
             {
                 var text = GetMemeText(txt);
-                using var stream = File.OpenRead(produce(path, text));
+                await using var stream = File.OpenRead(await MakeMemeImage(path, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_PHOTO(repeats)}");
         }
 
-        protected void DoStick(string fileID, Func<string, T, string, string> produce, bool convert = true)
+        public async Task ProcessStick(string fileID)
         {
-            Bot.Download(fileID, Chat, out var path);
+            var (path, _) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
             Memes.Sticker = true;
@@ -86,29 +87,29 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             for (var i = 0; i < repeats; i++)
             {
                 var text = GetMemeText(txt);
-                var result = produce(path, text, extension);
-                if (sticker && convert)
-                    result = new F_Process(result).Output("-stick", ".webp");
-                using var stream = File.OpenRead(result);
+                var result = await MakeMemeStick(path, text, extension);
+                if (sticker && ConvertStickers)
+                    result = await new F_Process(result).Output("-stick", ".webp");
+                await using var stream = File.OpenRead(result);
                 if (sticker) Bot.SendSticker(Chat, new InputOnlineFile(stream));
                 else         Bot.SendPhoto  (Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_STICK(repeats)}");
         }
 
-        protected void DoVideo(string fileID, Func<string, T, string> produce)
+        private async Task ProcessVideo(string fileID)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
             var sw = Helpers.GetStartedStopwatch();
-            Bot.Download(fileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
-            if (CropVideoNotes && type == MediaType.Round) path = Memes.CropVideoNote(path);
+            if (CropVideoNotes && type == MediaType.Round) path = await Memes.CropVideoNote(path);
 
             ParseOptions();
             var text = GetMemeText(GetProvidedText());
-            using var stream = File.OpenRead(produce(path, text));
+            await using var stream = File.OpenRead(await MakeMemeVideo(path, text));
             var note = type == MediaType.Round && !CropVideoNotes;
             if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
@@ -124,7 +125,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         {
             if (Text is null) return null;
 
-            return _cmd.IsMatch(Text) || ChatIsPrivate ? RemoveCommand(Text) : null;
+            return _cmd.IsMatch(Text) || Context.ChatIsPrivate ? RemoveCommand(Text) : null;
         }
 
         private MemeRequest GetRequestData()
@@ -179,7 +180,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         private string GetStickerExtension() => ConditionSatisfied(ops => ops.Contains('x')) ? ".jpg" : ".png";
     }
 
-    public abstract class MakeMemeCore_Static : WitlessCommand
+    public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
         protected static readonly char[] split_chars = [' ', '\n'];
         
@@ -194,9 +195,9 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         public string Dummy = dummy;
 
         /// <summary> <b>True</b> if both message text and default options are null. </summary>
-        public bool Empty = empty;
+        public readonly bool Empty = empty;
 
         /// <summary> Lowercase command text w/o bot username. </summary>
-        public string Command = command;
+        public readonly string Command = command;
     }
 }

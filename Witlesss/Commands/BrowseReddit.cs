@@ -13,10 +13,10 @@ using static Witlesss.XD.SortingMode;
 
 namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
-    public class BrowseReddit : Command
+    public class BrowseReddit : SyncCommand
     {
-        private readonly Regex _arg = new(@"^\/w\S*\s((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:.*)(?=\s-\S+))|(?:.*))");
-        private readonly Regex _sub = new(@"\s([a-z0-9_]+)");
+        private readonly Regex _arg = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:.*)(?=\s-\S+))|(?:.*))");
+        private readonly Regex _sub = new(@"([a-z0-9_]+)");
         private readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
         private readonly Regex _wtf = new(@"^\/w[^\ss_@]");
@@ -30,38 +30,37 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         // input: /wss subreddit
         // input: /ws [subreddit [-ops]]
         // input: /w search query [subreddit*] [-ops]   (ops: -h/-n/-t/-c/-ta/...)
-        public override void Run()
+        protected override void Run()
         {
-            var input = TextWithoutBotUsername;
+            //var input = TextWithoutBotUsername;
 
             if (Message.ReplyToMessage is { Text: { } t } message && IsCommand(t, "/w"))
             {
-                Pass(message);
+                Context = new CommandContext(message);
                 Run(); // RECURSIVE
             }
-            else if (_wtf.IsMatch(input))
+            else if (_wtf.IsMatch(Command!))
             {
                 Log("LAST QUERY");
                 SendPost(Reddit.GetLastOrRandomQuery(Chat));
             }
-            else if (input.StartsWith("/wss")) // subreddit
+            else if (Command!.StartsWith("/wss")) // subreddit
             {
-                if (input.Contains(' '))
+                if (Args is not null)
                 {
-                    var text = input.Split(' ', 2)[1];
-                    var subs = Reddit.FindSubreddits(text);
+                    var subs = Reddit.FindSubreddits(Args);
                     var b = subs.Count > 0;
 
-                    Bot.SendMessage(Chat, b ? SubredditList(text, subs) : "<b>*пусто*</b>");
+                    Bot.SendMessage(Chat, b ? SubredditList(Args, subs) : "<b>*пусто*</b>");
                 }
                 else
                 {
                     Bot.SendMessage(Chat, REDDIT_SUBS_MANUAL);
                 }
             }
-            else if (input.StartsWith("/ws")) // [subreddit [-ops]]
+            else if (Command!.StartsWith("/ws")) // [subreddit [-ops]]
             {
-                var sub = _sub.Match(input);
+                var sub = _sub.Match(Args ?? "");
                 if (sub.Success)
                 {
                     var subreddit = sub.Groups[1].Value;
@@ -81,12 +80,12 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
             else // /w search query [subreddit*] [-ops]
             {
-                var arg = _arg.Match(input);
+                var arg = _arg.Match(Args ?? "");
                 if (arg.Success)
                 {
                     var q = arg.Groups[1].Value;
 
-                    var sub = sub_.Match(input);
+                    var sub = sub_.Match(Args!);
                     var s = sub.Success;
                     var subreddit = s ? sub.Groups[1].Value : null;
 
@@ -96,7 +95,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var time = GetTime(options, TimeMatters(options[0]));
 
                     Log("SEARCH");
-                    SendPost(s ? new SsQuery(subreddit, q, sort, time) : new SrQuery(q, sort, time));
+                    SendPost(s ? new SsQuery(subreddit!, q, sort, time) : new SrQuery(q, sort, time));
                 }
                 else
                 {
@@ -109,7 +108,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
             string GetOptions(string alt)
             {
-                var ops = _ops.Match(input);
+                var ops = _ops.Match(Args ?? "");
                 return ops.Success ? ops.Value : alt;
             }
         }
@@ -130,7 +129,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         #region SENDING MEMES
 
-        private static void SendPost(RedditQuery query)
+        private void SendPost(RedditQuery query)
         {
             var post = GetPostOrBust(query);
             if (post == null) return;
@@ -147,7 +146,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }
 
-        private static void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));
+        private void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));
 
         private static IEnumerable<InputMediaPhoto> AlbumFromGallery(PostData post)
         {
@@ -169,7 +168,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
         }
 
-        private static void SendSingleFilePost(PostData post)
+        private void SendSingleFilePost(PostData post)
         {
             var g = post.URL.EndsWith(".gif");
             try
@@ -179,7 +178,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             catch
             {
                 var meme = DownloadMeme(post, g ? ".gif" : ".png");
-                var path = g ? Memes.CompressGIF(meme) : Memes.Compress(meme);
+                var path = g ? Memes.CompressGIF(meme).Result : Memes.Compress(meme).Result;
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));
@@ -192,7 +191,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
         }
 
-        private static PostData GetPostOrBust(RedditQuery query)
+        private PostData? GetPostOrBust(RedditQuery query)
         {
             try
             {
@@ -265,14 +264,15 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         #endregion
     }
 
-    public class GetRedditLink : Command
+    public class GetRedditLink : SyncCommand
     {
-        public override void Run()
+        protected override void Run()
         {
             if (Message.ReplyToMessage is { } message)
             {
-                Pass(message);
-                if (RedditTool.Instance.Recognize(Text) is { } post)
+                Context = new CommandContext(message);
+
+                if (Text is not null && RedditTool.Instance.Recognize(Text) is { } post)
                 {
                     Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>", preview: false);
                 }

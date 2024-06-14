@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands.Editing
@@ -14,15 +15,15 @@ namespace Witlesss.Commands.Editing
             return this;
         }
 
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            _speed = Text.HasDoubleArgument(out var x) ? _mode == Fast ? ClampFast(x) : ClampSlow(x) : 2D;
+            _speed = Context.HasDoubleArgument(out var x) ? _mode == Fast ? ClampFast(x) : ClampSlow(x) : 2D;
 
             if (_mode == Slow) _speed = 1 / _speed;
 
-            Bot.Download(FileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(FileID, Chat);
 
-            var result = Memes.ChangeSpeed(path, _speed);
+            var result = await Memes.ChangeSpeed(path, _speed);
             SendResult(result, type);
             Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 

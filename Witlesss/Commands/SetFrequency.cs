@@ -5,22 +5,26 @@ namespace Witlesss.Commands
 {
     public class SetFrequency : SettingsCommand
     {
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
-            if (Text.HasIntArgument(out int value))
+            if (Args is null)
+            {
+                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
+            }
+            else if (Context.HasIntArgument(out var value))
             {
                 Baka.Interval = value;
                 Bot.SaveChatList();
                 Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Interval));
                 Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
             }
-            else if (Text.Contains(' '))
+            else
             {
-                string command = null, result = null;
+                string? command = null, result = null;
                 var typeWasChanged = false;
                 var optionsWereChanged = false;
-                var args = Text.Split();
-                var w = args[1];
+                var args = Args.Split();
+                var w = args[0];
                 if      (Regex.IsMatch(w, @"^[MmМм]"))       Set(x => Baka.Meme.OptionsM = x, MemeType.Meme, "/meme");
                 else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))   Set(x => Baka.Meme.OptionsT = x, MemeType.Top, "/top");
                 else if (Regex.IsMatch(w, @"^[DdДд][GgГг]")) Set(x => Baka.Meme.OptionsG = x, MemeType.Dg, "/dg");
@@ -41,12 +45,12 @@ namespace Witlesss.Commands
                     Log($"{Title} >> MEMES OPTIONS");
                 }
 
-                void Set(Action<string> setOptions, MemeType type, string cmd)
+                void Set(Action<string?> setOptions, MemeType type, string cmd)
                 {
-                    if (args.Length > 2)
+                    if (args.Length > 1)
                     {
                         command = cmd;
-                        result = args[2] == "0" ? null : command + args[2];
+                        result = args[1] == "0" ? null : command + args[1];
                         setOptions(result);
                         result ??= command;
                         optionsWereChanged = true;
@@ -58,7 +62,6 @@ namespace Witlesss.Commands
                     }
                 }
             }
-            else Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
     }
 }

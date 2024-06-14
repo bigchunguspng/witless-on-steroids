@@ -84,7 +84,8 @@ namespace Witlesss
             }
             catch
             {
-                LogError($"{Command.LastChat.Title} >> NO TEXT!?");
+                //LogError($"{Command.LastChat.Title} >> NO TEXT!?");
+                LogError("NO TEXT!?");
                 var response = IsOneIn(3) ? null : DefaultTextProvider.GetRandomResponse();
                 return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
             }

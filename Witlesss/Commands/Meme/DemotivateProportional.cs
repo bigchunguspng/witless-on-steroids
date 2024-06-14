@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Witlesss.Backrooms.SerialQueue;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Meme
 {
@@ -24,11 +27,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Демотиваторы👌", DP_OPTIONS);
-
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeDemotivatorB);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeStickerDemotivatorB);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoDemotivatorB);
+        protected override Task Run() => RunInternal("Демотиваторы👌", DP_OPTIONS);
 
         protected override void ParseOptions()
         {
@@ -63,5 +62,38 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _caps    = new(@"^\/dp\S*up\S*",            RegexOptions.IgnoreCase);
         private static readonly Regex _colorXD = new(@"^\/dp\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
+
+        // LOGIC
+
+        private static readonly DynamicDemotivatorDrawer  _dp = new();
+        private static readonly SerialTaskQueue _queue = new();
+
+        protected override Task<string> MakeMemeImage(string path, string text)
+        {
+            return _queue.Enqueue(() => _dp.DrawDemotivator(path, text));
+        }
+
+        protected override Task<string> MakeMemeStick(string path, string text, string extension)
+        {
+            //return MakeDemotivatorB(Convert(path, extension), text);
+            return MakeMemeImage(path, text);
+        }
+
+        protected override Task<string> MakeMemeVideo(string path, string text)
+        {
+            return _queue.Enqueue(() =>
+            {
+                _dp.PassTextLength(text);
+
+                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
+                _dp.SetUp(size);
+                _dp.SetColor();
+
+                var frame = _dp.BakeFrame(text);
+                var full_size = SizeHelpers.GetImageSize_FFmpeg(frame).FitSize(720);
+
+                return new F_Combine(path, frame).D300(Memes.Quality, size, _dp.Location, full_size).Output("-Dp");
+            });
+        }
     }
 }

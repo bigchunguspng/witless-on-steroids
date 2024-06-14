@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using static Witlesss.Memes;
 
@@ -6,17 +7,17 @@ namespace Witlesss.Commands.Editing
 {
     public class ToSticker : FileEditingCommand
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            Bot.Download(FileID, Chat, out var path);
+            var (path, _) = await Bot.Download(FileID, Chat);
 
-            using var stream = File.OpenRead(Stickerize(path));
+            await using var stream = File.OpenRead(await Stickerize(path));
             Bot.SendSticker(Chat, new InputOnlineFile(stream));
-            if (Text[^1] is 's' or 'S') Bot.SendMessage(Chat, "@Stickers");
+            if (Command![^1] is 's' or 'S') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
 
-        protected override string Manual { get; } = STICK_MANUAL;
+        protected override string Manual => STICK_MANUAL;
 
         protected override bool MessageContainsFile(Message m) => GetPhotoFileID(m);
 

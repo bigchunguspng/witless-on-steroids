@@ -10,16 +10,16 @@ public class DownloadVideoTask
 {
     private bool YouTube;
     private readonly string ID;
-    private readonly MessageData Message;
+    private readonly CommandContext Context;
 
     private readonly Stopwatch Timer = new();
     
     private static readonly DownloadCache _cache = new(32);
 
-    public DownloadVideoTask(string id, MessageData data)
+    public DownloadVideoTask(string id, CommandContext context)
     {
         ID = id;
-        Message = data;
+        Context = context;
     }
 
     private string GetDownloadCommand(string url)
@@ -47,7 +47,7 @@ public class DownloadVideoTask
 
         await DownloadMusicTask.RunCMD(GetDownloadCommand(ID), directory);
 
-        Log($"{Message.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
+        Log($"{Context.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
 
         var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;
         _cache.Add(ID, result);

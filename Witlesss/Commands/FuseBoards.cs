@@ -13,8 +13,8 @@ namespace Witlesss.Commands
     public class FuseBoards : Fuse
     {
         private readonly BoardService _chan = new();
-        private List<BoardService.BoardGroup> _boards;
-        private FileInfo[] _files;
+        private List<BoardService.BoardGroup>? _boards;
+        private FileInfo[]? _files;
 
         private static readonly SyncronizedDictionary<long, string> _names = new();
 
@@ -24,30 +24,31 @@ namespace Witlesss.Commands
         // /boards info
         // /board a.b.c - Y-M-D.json
         // /board [thread/archive/archive link]
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
-            if (Text.StartsWith("/boards"))
+            if (Command!.StartsWith("/boards"))
             {
-                if (Text.EndsWith(" info")) SendSavedList(Chat, 0, 25);
-                else                        SendBoardList(Chat, 0,  2);
+                if (Text?.EndsWith(" info") == true) SendSavedList(Chat, 0, 25);
+                else                                 SendBoardList(Chat, 0,  2);
 
                 return;
             }
 
-            if (Text.Contains(' '))
+            if (Args is null)
+            {
+                Bot.SendMessage(Chat, BOARD_MANUAL);
+            }
+            else
             {
                 Baka.Save();
                 Size = SizeInBytes(Baka.Path);
 
                 GetWordsPerLineLimit();
-                
-                var args = Text.Split(' ', 2, RemoveEmptyEntries);
 
-                var url = args[1];
-
-                if (url.Contains(' ')) // FUSE WITH JSON FILE
+                var args = Args.SplitN();
+                if (args.Length > 1) // FUSE WITH JSON FILE
                 {
-                    var files = GetFiles(CHAN_FOLDER, $"{url}.json");
+                    var files = GetFiles(CHAN_FOLDER, $"{Args}.json");
                     if (files.Length > 0)
                     {
                         EatFromJsonFile(files[0]);
@@ -55,14 +56,15 @@ namespace Witlesss.Commands
                     }
                     else
                         Bot.SendMessage(Chat, FUSE_FAIL_BOARD);
-                    
+
                     return;
                 }
 
+                var url = args[0];
                 var uri = UrlOrBust(ref url);
 
                 var host = uri.Host;
-                var name = string.Join('.', url.Split(new[] { host }, None)[1].Split('/', RemoveEmptyEntries).Take(3));
+                var name = string.Join('.', url.Split([host], None)[1].Split('/', RemoveEmptyEntries).Take(3));
                 _names[Chat] = name;
 
                 if (url.EndsWith("/archive"))
@@ -86,8 +88,6 @@ namespace Witlesss.Commands
                     RespondAndStartEating(tasks);
                 }
             }
-            else
-                Bot.SendMessage(Chat, BOARD_MANUAL);
         }
 
         private Task<List<string>> GetDiscussionAsync(string url)
@@ -103,19 +103,19 @@ namespace Witlesss.Commands
             var text = string.Format(BOARD_START, tasks.Count, less_go);
             if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
             var message = Bot.PingChat(Chat, text);
-            Bot.RunSafelyAsync(EatBoardDiscussion(SnapshotMessageData(), tasks, Limit), Chat, message);
+            Bot.RunSafelyAsync(EatBoardDiscussion(Context, tasks, Limit), Chat, message);
         }
 
 
-        private static async Task EatBoardDiscussion(WitlessMessageData x, List<Task<List<string>>> tasks, int limit)
+        private static async Task EatBoardDiscussion(WitlessContext c, List<Task<List<string>>> tasks, int limit)
         {
             await Task.WhenAll(tasks);
 
-            var size = SizeInBytes(x.Baka.Path);
+            var size = SizeInBytes(c.Baka.Path);
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 
-            EatMany(lines, x.Baka, size, x.Chat, x.Title, limit);
+            EatMany(lines, c.Baka, size, c.Chat, c.Title, limit);
         }
 
         private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title, int limit)
@@ -163,7 +163,7 @@ namespace Witlesss.Commands
         public void SendSavedList(long chat, int page, int perPage, int messageId = -1)
         {
             var files = GetFilesInfo(CHAN_FOLDER);
-            if (_files is null || _files.Length != files.Length) _files = files;
+            if (_files is null || _files.Length != files.Length) _files = files; // todo i think we don't need _files
 
             var single = _files.Length <= perPage;
 

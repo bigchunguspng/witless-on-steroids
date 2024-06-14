@@ -44,7 +44,7 @@ namespace Witlesss
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableWebPagePreview: !preview);
             TrySend(task, chat, "message");
         }
-        public void SendMessage(long chat, string text, InlineKeyboardMarkup inline)
+        public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline)
         {
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, replyMarkup: inline);
             TrySend(task, chat, "message [+][-]");
@@ -110,7 +110,7 @@ namespace Witlesss
             var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
             TrySend(task, chat, "message", "edit");
         }
-        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup inline)
+        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline)
         {
             var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html, replyMarkup: inline);
             TrySend(task, chat, "message [+][-]", "edit");
@@ -150,7 +150,7 @@ namespace Witlesss
         
         public async Task RunSafelyAsync(Task task, long chat, int message)
         {
-            try
+            try // todo move it to async command class: message - field
             {
                 await task;
                 if (task.IsFaulted) throw new Exception(task.Exception?.Message);
@@ -195,14 +195,13 @@ namespace Witlesss
 
         private readonly TelegramFileDownloader _downloader;
 
-        public void Download(string fileID, long chat, out string path) => Download(fileID, chat, out path, out _);
-        public void Download(string fileID, long chat, out string path, out MediaType type)
+        public Task<(string path, MediaType type)> Download(string fileID, long chat)
         {
-            _downloader.Download(fileID, chat, out path, out type);
+            return _downloader.Download(fileID, chat);
         }
-        public async Task DownloadFile(string fileId, string path, long chat = default)
+        public Task DownloadFile(string fileID, string path, long chat = default)
         {
-            await _downloader.DownloadFile(fileId, path, chat);
+            return _downloader.DownloadFile(fileID, path, chat);
         }
 
 

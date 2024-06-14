@@ -5,20 +5,19 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Commands
 {
-    public class FuseRedditComments : Fuse
+    public class FuseRedditComments : Fuse // todo uninherit it from fuse and make it witless async
     {
-        private readonly Regex _que = new(@"^\/xd\S*\s((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
+        private readonly Regex _que = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
 
         // input: /xd [search query] [subreddit*] [-ops]
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
-            var input = TextWithoutBotUsername;
-
-            var que = _que.Match(input);
-            var sub = _sub.Match(input);
-            var ops = _ops.Match(input);
+            var args = Args ?? "";
+            var que = _que.Match(args);
+            var sub = _sub.Match(args);
+            var ops = _ops.Match(args);
 
             if (que.Success || sub.Success)
             {
@@ -49,7 +48,7 @@ namespace Witlesss.Commands
                 }
 
                 var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                Bot.RunSafelyAsync(EatComments(SnapshotMessageData(), query, Size, Limit), Chat, message);
+                Bot.RunSafelyAsync(EatComments(Context, query, Size, Limit), Chat, message);
             }
             else
             {
@@ -57,20 +56,20 @@ namespace Witlesss.Commands
             }
         }
 
-        private async Task EatComments(WitlessMessageData x, RedditQuery query, long size, int limit)
+        private async Task EatComments(WitlessContext c, RedditQuery query, long size, int limit)
         {
             var timer = new Stopwatch();
             var comments = await RedditTool.Instance.GetComments(query);
             Log($"COMMENTS FETCHED >> {timer.CheckElapsed()}");
 
-            EatAllLines(comments, x.Baka, limit, out var eated);
-            SaveChanges(x.Baka, x.Title);
+            EatAllLines(comments, c.Baka, limit, out var eated);
+            SaveChanges(c.Baka, c.Title);
 
-            var report = FUSION_SUCCESS_REPORT(x.Baka, size, x.Title);
+            var report = FUSION_SUCCESS_REPORT(c.Baka, size, c.Title);
             var subreddit = query is ScQuery sc ? sc.Subreddit : query is SsQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\n Его пополнили {eated} комментов с {subreddit}";
-            Bot.SendMessage(x.Chat, report + detais);
+            Bot.SendMessage(c.Chat, report + detais);
         }
     }
 }

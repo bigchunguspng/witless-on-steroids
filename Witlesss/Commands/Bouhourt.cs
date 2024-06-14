@@ -1,29 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static Witlesss.Copypaster;
 
 namespace Witlesss.Commands
 {
-    public class Bouhourt : WitlessCommand
+    public class Bouhourt : WitlessSyncCommand
     {
+        private readonly Regex _args = new(@"(\d)?(?:\s)?(.+)?");
         private readonly WitlessDB _baguette = new FileIO<WitlessDB>("BT.json").LoadData();
 
-        public override void Run()
+        protected override void Run()
         {
             var length = 3;
-            var lengthSpecified = false;
-            if (Text.HasIntArgument(out int value))
+            string? start = null;
+            if (Args is not null)
             {
-                length = System.Math.Clamp(value, 2, 16);
-                lengthSpecified = true;
-            }
-
-            string start = null;
-            var split = Text.Split(' ', lengthSpecified ? 3 : 2);
-            if (split.Length > (lengthSpecified ? 2 : 1))
-            {
-                start = split[^1].ToUpper();
-                length -= 1;
+                var match = _args.Match(Args);
+                if (match.Success)
+                {
+                    var g1 = match.Groups[1];
+                    var g2 = match.Groups[2];
+                    if (g1.Success && int.TryParse(g1.Value, out var x)) length = x;
+                    if (g2.Success)
+                    {
+                        start = g2.Value.ToUpper();
+                        length--;
+                    }
+                }
             }
 
             var lines = new List<string>(length);
@@ -49,7 +53,7 @@ namespace Witlesss.Commands
             void AddTextLine() => lines.Add(Baka.GenerateByWord(PullWord(word)).Trim('@').TrimStart());
         }
 
-        private static string PullWord(string word)
+        private string PullWord(string word)
         {
             string[] xs;
 

@@ -6,33 +6,35 @@ namespace Witlesss.Commands
     {
         private readonly Regex _repeat = new(@"^\/zz\S*([2-9])\S*");
 
-        public override void Run()
+        protected override void Run()
         {
-            if (Text.Contains(' '))
+            if (Args is null)
             {
-                var words = Text.Split();
-                var word = words[1];
+                Bot.SendMessage(Chat, ZZ_MANUAL);
+            }
+            else
+            {
+                var words = Args.Split();
+                var word = words[0];
                 var mode = GetMode(word);
-                if (words.Length > 2)
+                if (words.Length > 1)
                 {
-                    word = string.Join(' ', words[1..3]); // take first two words
+                    word = string.Join(' ', words[..2]); // take first two words
                 }
-                
+
                 word = word.ToLower();
 
-                var text = RemoveCommand(words[0]);
+                var text = Text!;
                 var ending = text[word.Length..];
-                var repeats = GetRepeats(_repeat.Match(Text));
+                var repeats = GetRepeats(_repeat.Match(Command!));
                 for (int i = 0; i < repeats; i++)
                 {
                     text = Baka.GenerateByLast(word.ToLower()) + ending;
                     Bot.SendMessage(Chat, text.ToLetterCase(mode));
                 }
 
-                LogXD(repeats, "FUNNY BY LAST WORD");
+                LogXD(Title, repeats, "FUNNY BY LAST WORD");
             }
-            else
-                Bot.SendMessage(Chat, ZZ_MANUAL);
         }
     }
 }

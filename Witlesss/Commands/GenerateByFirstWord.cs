@@ -2,37 +2,39 @@
 
 namespace Witlesss.Commands
 {
-    public class GenerateByFirstWord : WitlessCommand
+    public class GenerateByFirstWord : WitlessSyncCommand
     {
         private static readonly Regex _repeat = new(@"^\/a\S*([2-9])\S*");
 
-        public override void Run()
+        protected override void Run()
         {
-            if (Text.Contains(' '))
+            if (Args is null)
             {
-                var words = Text.Split();
+                Bot.SendMessage(Chat, A_MANUAL);
+            }
+            else
+            {
+                var words = Args.Split();
                 var word = words[^1];
-                var mode = GetMode(words[1]);
-                if (words.Length > 2)
+                var mode = GetMode(words[0]);
+                if (words.Length > 1)
                 {
                     word = string.Join(' ', words[^2..]); // take last two words
                 }
 
                 word = word.ToLower();
 
-                var text = RemoveCommand(words[0]);
+                var text = Text!;
                 var outset = text.Remove(text.Length - word.Length);
-                var repeats = GetRepeats(_repeat.Match(Text));
+                var repeats = GetRepeats(_repeat.Match(Command!));
                 for (int i = 0; i < repeats; i++)
                 {
                     text = outset + Baka.GenerateByWord(word);
                     Bot.SendMessage(Chat, text.ToLetterCase(mode));
                 }
 
-                LogXD(repeats, "FUNNY BY WORD");
+                LogXD(Title, repeats, "FUNNY BY WORD");
             }
-            else
-                Bot.SendMessage(Chat, A_MANUAL);
         }
 
         protected static LetterCaseMode GetMode (string s)
@@ -42,23 +44,16 @@ namespace Witlesss.Commands
             return                       LetterCaseMode.Sentence;
         }
 
-        protected static string RemoveCommand   (string s) => Text[(s.Length + 1)..];
-
-        protected static void LogXD(int repeats, string s)
+        protected static void LogXD(string title, int repeats, string s)
         {
-            var message = $"{Title} >> {s}";
+            var message = $"{title} >> {s}";
             if (repeats > 1) message += $" [{repeats}]";
             Log(message);
         }
 
         protected static int GetRepeats(Match match)
         {
-            var repeats = 1;
-            if (match.Success && int.TryParse(match.Groups[1].Value, out var x))
-            {
-                repeats = x;
-            }
-            return repeats;
+            return match.Success && int.TryParse(match.Groups[1].Value, out var x) ? x : 1;
         }
     }
 }

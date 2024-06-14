@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using Witlesss.Backrooms;
@@ -257,9 +258,9 @@ namespace Witlesss.MediaTools
 
         #region OTHER
 
-        public F_Action SliceRandom() => ApplyEffects(SliceRandomArgs);
+        public F_Action SliceRandom() => ApplyEffects(async o => await SliceRandomArgs(o));
 
-        private void SliceRandomArgs(FFMpAO o)
+        private async Task SliceRandomArgs(FFMpAO o)
         {
             var info = MediaInfo();
             var soundOnly = info.audio && !info.video;
@@ -299,13 +300,13 @@ namespace Witlesss.MediaTools
             }
 
             var onePiece = soundOnly || minutes <= 2 || minutes <= 5 && timecodes.Count <= 24;
-            if (onePiece) ApplyTrims(o, info, timecodes);
-            else    TrimPieceByPiece(o, info, timecodes, seconds);
+            if (onePiece)    ApplyTrims(o, info, timecodes);
+            else await TrimPieceByPiece(o, info, timecodes, seconds);
 
             if (info.video) o.FixPlayback();
         }
 
-        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
+        private async Task TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
         {
             var count = seconds > 300 ? (int)Math.Ceiling(seconds / 210) : 2;
             var parts = new string[count];
@@ -333,7 +334,7 @@ namespace Witlesss.MediaTools
 
                 codes[i] = ss;
                 takes[i] = window.Count;
-                parts[i] = new F_Process(_input).ApplyEffects(ops =>
+                parts[i] = await new F_Process(_input).ApplyEffects(ops =>
                 {
                     var builder = new StringBuilder("-c copy ");
                     if (index > 0)         builder.Append("-ss ").Append(Format(ss)).Append(' ');
@@ -348,7 +349,7 @@ namespace Witlesss.MediaTools
                 var take = takes[i];
                 var offset = takes.Take(i).Sum();
                 var start = codes[i];
-                parts[i] = new F_Process(parts[i]).ApplyEffects(ops =>
+                parts[i] = await new F_Process(parts[i]).ApplyEffects(ops =>
                 {
                     ApplyTrims(ops, info, timecodes, offset, take, start);
                 }).Output("-slices", Path.GetExtension(_input));

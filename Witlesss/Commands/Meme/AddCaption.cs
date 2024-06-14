@@ -1,4 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using Witlesss.Backrooms.SerialQueue;
+using Witlesss.MediaTools;
 using static Witlesss.Backrooms.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
@@ -24,11 +29,7 @@ namespace Witlesss.Commands.Meme
             return this;
         }
 
-        public override void Run() => Run("Подписанки", OPTIONS + "/op_top"); // 🔥🔥🔥✍️
-
-        public    override void ProcessPhoto(string fileID) => DoPhoto(fileID, Memes.MakeCaptionMeme);
-        public    override void ProcessStick(string fileID) => DoStick(fileID, Memes.MakeCaptionMemeFromSticker);
-        protected override void ProcessVideo(string fileID) => DoVideo(fileID, Memes.MakeVideoCaptionMeme);
+        protected override Task Run() => RunInternal("Подписанки", OPTIONS + "/op_top"); // 🔥🔥🔥✍️
 
         protected override void ParseOptions()
         {
@@ -75,5 +76,38 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",    RegexOptions.IgnoreCase);
         private static readonly Regex _fontMS  = new(@"^\/top\S*?(\d{1,3})(""ms)\S*",  RegexOptions.IgnoreCase);
+
+        // LOGIC
+
+        private static readonly IFunnyApp _ifunny = new();
+        private static readonly SerialTaskQueue _queue = new();
+        
+        protected override Task<string> MakeMemeImage(string path, string text)
+        {
+            return _queue.Enqueue(() => _ifunny.MakeCaptionMeme(path, text));
+        }
+
+        protected override Task<string> MakeMemeStick(string path, string text, string extension)
+        {
+            //return MakeCaptionMeme(Convert(path, extension), text);
+            return MakeMemeImage(path, text);
+        }
+
+        protected override Task<string> MakeMemeVideo(string path, string text)
+        {
+            return _queue.Enqueue(() =>
+            {
+                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize();
+                _ifunny.SetUp(size);
+
+                if  (IFunnyApp.UseGivenColor) _ifunny.SetCustomColors();
+                else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(Image.Load<Rgba32>(Memes.Snapshot(path)));
+                else                          _ifunny.SetDefaultColors();
+
+                return new F_Combine(path, _ifunny.BakeText(text))
+                    .When(Memes.Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
+                    .Output("-Top");
+            });
+        }
     }
 }

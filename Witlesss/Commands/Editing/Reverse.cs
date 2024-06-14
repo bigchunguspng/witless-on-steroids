@@ -1,12 +1,14 @@
-﻿namespace Witlesss.Commands.Editing
+﻿using System.Threading.Tasks;
+
+namespace Witlesss.Commands.Editing
 {
     public class Reverse : FileEditingCommand
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            Bot.Download(FileID, Chat, out var path, out var type);
+            var (path, type) = await Bot.Download(FileID, Chat);
             
-            SendResult(Memes.Reverse(path), type);
+            SendResult(await Memes.Reverse(path), type);
             Log($"{Title} >> REVERSED [<<]");
         }
         

@@ -1,27 +1,30 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 
 namespace Witlesss.Commands.Editing
 {
     public class Equalize : FileEditingCommand
     {
         // /eq [frequency, Hz] [gain, dB] [width, Hz]
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            if (Text.Contains(' '))
+            if (Args is null)
             {
-                var args = Text.Split(' ').Skip(1).Take(3).ToArray();
+                Bot.SendMessage(Chat, EQ_MANUAL);
+            }
+            else
+            {
+                var args = Args.Split(' ').Take(3).ToArray();
 
-                var f = double.TryParse(                  args[0],      out var v1) ? v1 : 100;
+                var f = double.TryParse(args[0], out var v1) ? v1 : 100;
                 var g = double.TryParse(args.Length > 1 ? args[1] : "", out var v2) ? v2 : 10;
                 var w = double.TryParse(args.Length > 2 ? args[2] : "", out var v3) ? v3 : 2000;
 
-                Bot.Download(FileID, Chat, out var path, out var type);
+                var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(Memes.EQ(path, new[] { f, g, w }), type);
+                SendResult(await Memes.EQ(path, [f, g, w]), type);
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
-            else
-                Bot.SendMessage(Chat, EQ_MANUAL);
         }
 
         protected override string AudioFileName => SongNameOr($"Bassboosted by {Sender}.mp3");

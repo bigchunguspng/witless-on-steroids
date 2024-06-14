@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -10,17 +11,20 @@ public class AdvancedEdit : FileEditingCommand
 {
     // /ffxd [options]      [extension]
     // /ffv  [videofilters] [extension]
-    protected override void Execute()
+    protected override async Task Execute()
     {
-        if (Text.Contains(' '))
+        if (Args is null)
         {
-            var args = Text.Split(' ');
+            SendManual();
+        }
+        else
+        {
+            var args = Args.Split(' ');
 
-            var cmd = RemoveBotMention(args[0]);
-            var vf = cmd.Contains('v');
-            var af = cmd.Contains('a');
+            var vf = Command!.Contains('v');
+            var af = Command .Contains('a');
 
-            var options = string.Join(' ', args.Skip(1).SkipLast(1));
+            var options = string.Join(' ', args.SkipLast(1));
             if (vf || af) options = $"-{(vf ? 'v' : 'a')}f \"{options}\"";
             var extension = args[^1];
 
@@ -29,13 +33,11 @@ public class AdvancedEdit : FileEditingCommand
                 if (Path.GetInvalidFileNameChars().Contains(c)) Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
             }
 
-            Bot.Download(FileID, Chat, out var path);
+            var (path, _) = await Bot.Download(FileID, Chat);
 
-            SendResult(Memes.Edit(path, options, extension), extension, g: cmd.Contains('g'));
+            SendResult(await Memes.Edit(path, options, extension), extension, g: Command.Contains('g'));
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
-        else
-            SendManual();
     }
 
     protected override void SendManual()
@@ -81,8 +83,8 @@ public class AdvancedEdit : FileEditingCommand
     private static readonly Regex _gif = new(@"^(gif|webm)$");
 
     private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
-    private readonly string[] DUDE = new[]
-    {
+    private readonly string[] DUDE =
+    [
         "CAACAgIAAxkBAAECZ1JlnXp-IZ7pQQ-65xXjPrf8xvLQnwACdDgAApAuAUsOAWZE2RxhujQE",
         "CAACAgIAAxkBAAECZ1ZlnXqSnVFOCQ-ZxiYnSDNOvjqSywAC1TUAAurH-EqrUrbGIyDdGDQE",
         "CAACAgIAAxkBAAECZ1plnXqxyEYT4UhvU9VSqpPLKURJzwACQjMAAnY7KEv2hp5tYChZ1TQE",
@@ -93,5 +95,5 @@ public class AdvancedEdit : FileEditingCommand
         "CAACAgIAAxkBAAECZ2xlnXtHd7bVPVqydpWCZwbq2e9dUAAC7QwAAtua-EmTOpxJHSiIcjQE",
         "CAACAgIAAxkBAAECZ3BlnXuokpG6KNRX4hVnbqNiQRtyqQACKScAAo8ZQEsx0p6zb98J0zQE",
         "CAACAgIAAxkBAAECZ3JlnXvncYpVXuvyAXe01aNWYOauJAACDiMAAsX-SUha8rwmJSbb0TQE"
-    };
+    ];
 }

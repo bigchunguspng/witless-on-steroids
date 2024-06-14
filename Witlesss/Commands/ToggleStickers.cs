@@ -2,7 +2,7 @@
 {
     public class ToggleStickers : SettingsCommand
     {
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
             Baka.Meme.Stickers = !Baka.Meme.Stickers;
             Bot.SaveChatList();

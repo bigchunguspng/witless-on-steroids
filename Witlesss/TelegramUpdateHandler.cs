@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using Witlesss.Commands;
 
 namespace Witlesss
 {
     public class TelegramUpdateHandler : IUpdateHandler
     {
-        private readonly CallBackHandlingCommand _command;
+        public TelegramUpdateHandler(CommandAndCallbackRouter router) => Router = router;
 
-        public TelegramUpdateHandler(CallBackHandlingCommand command) => _command = command;
+        public static CommandAndCallbackRouter Router { get; private set; } = default!;
 
         public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
@@ -35,12 +33,12 @@ namespace Witlesss
         {
             try
             {
-                _command.Pass(message);
-                _command.Run();
+                Router.Pass(message);
+                Router.Run();
             }
             catch (Exception e)
             {
-                LogError($"{Command.LastChat.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
+                LogError($"{Router.Context.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
 
                 if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(message.Chat.Id, e);
             }
@@ -52,7 +50,7 @@ namespace Witlesss
         {
             try
             {
-                _command.OnCallback(query);
+                Router.OnCallback(query);
             }
             catch (Exception e)
             {

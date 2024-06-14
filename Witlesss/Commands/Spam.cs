@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Commands;
 
-public class Spam : Command
+public class Spam : SyncCommand
 {
-    public override void Run()
+    protected override void Run()
     {
         if (Message.From?.Id != Config.AdminID)
         {
@@ -15,19 +15,19 @@ public class Spam : Command
             return;
         }
 
-        var split = Text.Split(' ', 3);
-        if (split.Length < 3)
+        var args = Args?.Split(' ', 2);
+        if (args is null || args.Length < 2)
         {
             Bot.SendMessage(Chat, "<code>/spam [min size] [message]</code>");
             return;
         }
 
-        var size = int.TryParse(split[1], out var x) ? x : 2_000_000;
+        var size = int.TryParse(args[0], out var x) ? x : 2_000_000;
 
-        Task.Run(() => SendSpam(size, split[2]));
+        Task.Run(() => SendSpam(size, args[2]));
     }
 
-    public static void SendSpam(int size = 2_000_000, string text = null)
+    public static void SendSpam(int size = 2_000_000, string? text = null)
     {
         try
         {

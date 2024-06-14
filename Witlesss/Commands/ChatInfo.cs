@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Witlesss.Commands
 {
-    public class ChatInfo : WitlessCommand
+    public class ChatInfo : WitlessSyncCommand
     {
-        public override void Run()
+        protected override void Run()
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
@@ -23,7 +24,7 @@ namespace Witlesss.Commands
             sb.Append("\nВес словаря: ").Append(FileSize(size)).Append(' ').Append(icon);
             sb.Append("\nИнтервал генерации: ").Append(Baka.Interval);
             sb.Append("\nКачество графики: ").Append(Baka.Meme.Quality).Append('%');
-            if (!ChatIsPrivate)
+            if (!Context.ChatIsPrivate)
                 sb.Append("\nМогут 🔩⚙️: ").Append(Baka.AdminsOnly ? "только админы 😎" : "все 🤠");
 
             sb.Append("\n\n<u>Авто-мемы:</u>");
@@ -31,27 +32,27 @@ namespace Witlesss.Commands
             sb.Append("\nВероятность: ").Append(Baka.Meme.Chance).Append('%');
             sb.Append("\nСтикеры: ").Append(Baka.Meme.Stickers ? "тоже 🍑" : "пропускаем");
 
-            var ops = false;
-            var ob = new StringBuilder("\n\n<u>Опции</u>:");
+            var anyOptions = false;
+            var optionsBuilder = new StringBuilder("\n\n<u>Опции</u>:");
             if (IsNotNull(Baka.Meme.OptionsM)) AppendOptions("meme", Baka.Meme.OptionsM[5..]);
             if (IsNotNull(Baka.Meme.OptionsT)) AppendOptions("top",  Baka.Meme.OptionsT[4..]);
             if (IsNotNull(Baka.Meme.OptionsD)) AppendOptions("dp",   Baka.Meme.OptionsD[3..]);
             if (IsNotNull(Baka.Meme.OptionsG)) AppendOptions("dg",   Baka.Meme.OptionsG[3..]);
             if (IsNotNull(Baka.Meme.OptionsN)) AppendOptions("nuke", Baka.Meme.OptionsN[5..]);
-            if (ops) sb.Append(ob);
+            if (anyOptions) sb.Append(optionsBuilder);
 
             Bot.SendMessage(Chat, sb.ToString());
 
-            bool IsNotNull(string s)
+            bool IsNotNull([NotNullWhen(true)] string? s)
             {
                 var ok = s is not null;
-                ops |= ok;
+                anyOptions |= ok;
                 return ok;
             }
 
             void AppendOptions(string cmd, string options)
             {
-                ob.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
+                optionsBuilder.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
             }
         }
 

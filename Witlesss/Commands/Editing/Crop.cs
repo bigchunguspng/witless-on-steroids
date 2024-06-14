@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Witlesss.Commands.Editing
 {
@@ -23,24 +24,23 @@ namespace Witlesss.Commands.Editing
             return this;
         }
 
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            var input = _isShakeMode ? "/crop " + Text : Text;
-            if (input.Contains(' '))
+            if (Args is not null || _isShakeMode)
             {
-                string[] log = null;
-                var args = input.Split(' ').Skip(1).ToArray();
+                string[]? log = null;
+                var args = Args?.Split(' ');
 
                 if (_isShakeMode)
                 {
-                    var crop   = 1 < args.Length ? args[1] : "0.95";
-                    var speed  = 2 < args.Length ? args[2] : "random(0)";
-                    var offset = 3 < args.Length ? args[3] : "random(0)";
+                    var crop   = args?.Length > 0 ? args[0] : "0.95";
+                    var speed  = args?.Length > 1 ? args[1] : "random(0)";
+                    var offset = args?.Length > 2 ? args[2] : "random(0)";
                     args = F_Shake(crop, speed, offset).Split();
-                    log  = new[] { crop, speed, offset };
+                    log  = [crop, speed, offset];
                 }
 
-                for (var i = 0; i < Math.Min(args.Length, 4); i++)
+                for (var i = 0; i < Math.Min(args!.Length, 4); i++)
                 {
                     var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
                     args[i] = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
@@ -48,9 +48,9 @@ namespace Witlesss.Commands.Editing
 
                 if (args.Length > 4) args = args.Take(4).ToArray();
 
-                Bot.Download(FileID, Chat, out var path, out var type);
+                var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(Memes.Crop(path, args), type);
+                SendResult(await Memes.Crop(path, args), type);
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else

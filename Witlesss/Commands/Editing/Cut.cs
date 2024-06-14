@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using static System.TimeSpan;
 
 #pragma warning disable CS4014
@@ -8,9 +9,10 @@ namespace Witlesss.Commands.Editing
 {
     public class Cut : Slice
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            var args = Text.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
+            var args = Args?.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
+            // todo move this to another command - /video
 
             var x = ParseArgs(args);
             if (x.failed)
@@ -21,11 +23,21 @@ namespace Witlesss.Commands.Editing
 
             var span = new CutSpan(x.start, x.length);
 
-            Bot.RunSafelyAsync(new CutAsync(SnapshotMessageData(), FileID, span).RunAsync(), Chat, -1);
+            var (path, type, waitMessage) = await DownloadFileSuperCool();
+
+            var result = await Memes.Cut(path, span);
+
+            Task.Run(() => Bot.DeleteMessage(Chat, waitMessage));
+
+            SendResult(result, type);
+            Log($"{Title} >> CUT [8K-]");
         }
 
-        public static (bool failed, TimeSpan start, TimeSpan length) ParseArgs(string[] s)
+        // todo move this and similar to arg parsing
+        public static (bool failed, TimeSpan start, TimeSpan length) ParseArgs(string[]? s)
         {
+            if (s is null) return (true, Zero, Zero);
+
             var len = s.Length;
             if     (len == 1 && s[0].IsTimeSpan(out var length)) return (false, Zero,  length);      // [++]----]
             if     (len >= 2 && s[0].IsTimeSpan(out var  start))
@@ -36,5 +48,8 @@ namespace Witlesss.Commands.Editing
             }
             else                                                 return (true,  Zero,  Zero);        // [-------]
         }
+
+        protected override string VideoFileName => "cut_fap_club.mp4";
+        protected override string AudioFileName => SongNameOr($"((({Sender}))).mp3");
     }
 }

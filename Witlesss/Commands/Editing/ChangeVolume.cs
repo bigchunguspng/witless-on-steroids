@@ -1,22 +1,26 @@
-﻿namespace Witlesss.Commands.Editing
+﻿using System.Threading.Tasks;
+
+namespace Witlesss.Commands.Editing
 {
     public class ChangeVolume : FileEditingCommand
     {
         private string _arg;
 
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            if (Text.Contains(' '))
+            if (Args is null)
             {
-                _arg = Text.Split(' ')[1];
-
-                Bot.Download(FileID, Chat, out var path, out var type);
-
-                SendResult(Memes.ChangeVolume(path, _arg), type);
-                Log($"{Title} >> VOLUME [{_arg}]");
+                Bot.SendMessage(Chat, VOLUME_MANUAL);
             }
             else
-                Bot.SendMessage(Chat, VOLUME_MANUAL);
+            {
+                _arg = Args.Split(' ', 2)[0];
+
+                var (path, type) = await Bot.Download(FileID, Chat);
+
+                SendResult(await Memes.ChangeVolume(path, _arg), type);
+                Log($"{Title} >> VOLUME [{_arg}]");
+            }
         }
 
         protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");

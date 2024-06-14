@@ -1,24 +1,25 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing;
 
 public class ToVoiceMessage : FileEditingCommand
 {
-    protected override void Execute()
+    protected override async Task Execute()
     {
-        Bot.Download(FileID, Chat, out var path);
+        var (path, _) = await Bot.Download(FileID, Chat);
 
         string result;
         try
         {
-            result = Memes.ToVoice(path);
+            result = await Memes.ToVoice(path);
         }
         catch
         {
             result = "voice.ogg";
         }
 
-        using var stream = File.OpenRead(result);
+        await using var stream = File.OpenRead(result);
         Bot.SendVoice(Chat, new InputOnlineFile(stream, "balls.ogg"));
         Log($"{Title} >> VOICE ~|||~");
     }

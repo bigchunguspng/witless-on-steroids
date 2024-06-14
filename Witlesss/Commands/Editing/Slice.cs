@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing;
 
@@ -6,9 +7,16 @@ namespace Witlesss.Commands.Editing;
 
 public class Slice : VideoCommand
 {
-    protected override void Execute()
+    protected override async Task Execute()
     {
-        Bot.RunSafelyAsync(new SliceAsync(SnapshotMessageData(), FileID).RunAsync(), Chat, -1);
+        var (path, type, waitMessage) = await DownloadFileSuperCool();
+
+        var result = await Memes.Slice(path);
+
+        Task.Run(() => Bot.DeleteMessage(Chat, waitMessage));
+
+        SendResult(result, type);
+        Log($"{Title} >> SLICED [~/~]");
     }
 
     protected override string Manual { get; } = SLICE_MANUAL;
@@ -29,4 +37,7 @@ public class Slice : VideoCommand
 
         return true;
     }
+
+    protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";
+    protected override string VideoFileName { get; } = "piece_fap_slice.mp4";
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -9,17 +10,15 @@ namespace Witlesss.Commands
 {
     public class DeleteDictionary : Move
     {
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
             Bot.SendMessage(Chat, TRACTOR_GAME_RULES, GetMinigameKeyboard());
         }
 
         private void DeleteTheDictionary()
         {
-            SetBaka(Bot.SussyBakas[Chat]);
-            
-            string name = ValidFileName(Title.Split()[0]);
-            string result = MoveDictionary(name);
+            var name = ValidFileName(Title.Replace(' ', '-'));
+            var result = MoveDictionary( name);
 
             if (result == "*") result = "*👊 никак*";
 
@@ -27,8 +26,7 @@ namespace Witlesss.Commands
             Bot.SaveChatList();
 
             Baka.DeleteForever();
-
-            DropBaka();
+            Baka.Unload();
 
             Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
             Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result));
@@ -56,7 +54,7 @@ namespace Witlesss.Commands
             return new InlineKeyboardMarkup(rows);
 
 
-            List<InlineKeyboardButton> Line() => new() { cell, cell, cell, cell };
+            List<InlineKeyboardButton> Line() => [cell, cell, cell, cell];
 
             void AddGameObjects(string obj, int count, bool data = true)
             {
@@ -73,15 +71,17 @@ namespace Witlesss.Commands
             }
         }
 
-        public void DoGameStep(long chat, string data, int message)
+        public void DoGameStep(Message message, string data)
         {
+            Context = new WitlessContext(message, Bot.SussyBakas[message.Chat.Id]);
+
             var s = data.Split(" - ");
             var n = s[1].Split(':');
             var o = s[0];
             var x = int.Parse(n[0]);
             var y = int.Parse(n[1]);
 
-            _game = _games[chat];
+            _game = _games[Chat];
 
             if (o == _tractor)
             {
@@ -107,7 +107,7 @@ namespace Witlesss.Commands
             else
                 return;
 
-            Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
+            Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
 
             var objects = _game.SelectMany(row => row.ToArray()).Select(cell => cell.Text).ToArray();
 
@@ -120,7 +120,7 @@ namespace Witlesss.Commands
                     var cell = GetCell(i, j);
                     if (cell == _boom || cell == _fire) SetCell(i, j, _default);
                 }
-                Bot.EditMessage(chat, message, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
+                Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
             }
 
             var noHousing = !objects.Contains(_house);
@@ -129,22 +129,22 @@ namespace Witlesss.Commands
             if (noHousing || noTractor)
             {
                 Task.Delay(1000).Wait();
-                _games.Remove(chat);
+                _games.Remove(Chat);
 
                 if (noHousing && noTractor)
                 {
-                    Bot.SendSticker(chat, new InputOnlineFile(GG));
-                    Bot.SendMessage(chat, "НИЧЬЯ");
+                    Bot.SendSticker(Chat, new InputOnlineFile(GG));
+                    Bot.SendMessage(Chat, "НИЧЬЯ");
                 }
                 else if (noTractor)
                 {
-                    Bot.SendSticker(chat, new InputOnlineFile(I_WIN));
-                    Bot.SendMessage(chat, "RIP 🤣😭😂👌");
+                    Bot.SendSticker(Chat, new InputOnlineFile(I_WIN));
+                    Bot.SendMessage(Chat, "RIP 🤣😭😂👌");
                 }
                 else
                 {
-                    Bot.SendSticker(chat, new InputOnlineFile(U_WIN));
-                    Bot.SendSticker(chat, new InputOnlineFile(D_100));
+                    Bot.SendSticker(Chat, new InputOnlineFile(U_WIN));
+                    Bot.SendSticker(Chat, new InputOnlineFile(D_100));
 
                     DeleteTheDictionary();
                 }
@@ -162,10 +162,12 @@ namespace Witlesss.Commands
         {
             _game[x][y] = button;
         }
+
         private void SetCell(int x, int y, string obj)
         {
             _game[x][y] = InlineKeyboardButton.WithCallbackData(obj);
         }
+
         private void Explode(int x, int y, int radius = 1, bool tnt = true)
         {
             SetCell(x, y, tnt ? _boom : _fire);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FFMpegCore;
 
 namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
@@ -38,9 +39,9 @@ namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
         
         protected override string NameSource => _input;
 
-        protected override string Cook(string output)
+        protected override async Task<string> Cook(string output)
         {
-            Run(FFMpegArguments.FromFileInput(_input).OutputToFile(output, addArguments: Action));
+            await Run(FFMpegArguments.FromFileInput(_input).OutputToFile(output, addArguments: Action));
             return output;
         }
     }

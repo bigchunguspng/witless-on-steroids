@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Commands;
 using Witlesss.MediaTools;
 using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
@@ -20,11 +19,11 @@ public class DownloadMusicTask
 
     private readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
 
-    private readonly string ID, PlaylistID, PlayListIndex;
-    private readonly string File;
+    private readonly string ID;
+    private readonly string? PlaylistID, PlayListIndex, Cover;
     private readonly int MessageToDelete;
     private readonly bool YouTube;
-    private readonly MessageData Message;
+    private readonly CommandContext Message;
 
     private readonly bool HighQuality, NameOnly, ExtractThumb, RemoveBrackets, Uploader, CropSquare, ArtAttached;
 
@@ -32,19 +31,29 @@ public class DownloadMusicTask
 
     private int Format;
     
-    public string Artist;
-    public string Title;
+    public string? Artist;
+    public string? Title;
 
     private Bot Bot => Bot.Instance;
 
-    public DownloadMusicTask(string id, string options, string file, int message, bool yt, string pl, MessageData data, int format = 251)
+    public DownloadMusicTask
+    (
+        string id,
+        string options,
+        string? coverFileId,
+        int message,
+        bool yt,
+        string? playlistId,
+        CommandContext context,
+        int format = 251
+    )
     {
         ID = id;
-        File = file;
+        Cover = coverFileId;
         MessageToDelete = message;
         YouTube = yt;
-        PlaylistID = pl;
-        Message = data;
+        PlaylistID = playlistId;
+        Message = context;
         Format = format;
         
         HighQuality    = options.Contains('q');
@@ -57,7 +66,7 @@ public class DownloadMusicTask
         PlayListIndex  = YouTube && PlaylistID is null ? null : Regex.Match(options, @"\d+").Value;
         if (PlayListIndex?.Length < 1) PlayListIndex = null;
 
-        ArtAttached = File is not null;
+        ArtAttached = Cover is not null;
         ExtractThumb = ExtractThumb && !ArtAttached;
     }
 
@@ -76,7 +85,7 @@ public class DownloadMusicTask
         return builder.ToString();
     }
 
-    private string GetVideoDownloadCommand(string url)
+    private string? GetVideoDownloadCommand(string url)
     {
         if (!ExtractThumb) return null;
         
@@ -93,7 +102,7 @@ public class DownloadMusicTask
         try
         {
             var url = YouTube
-                ? PlaylistID.Length > 0 && (ID.Length < 1 || PlayListIndex is not null)
+                ? PlaylistID?.Length > 0 && (ID.Length < 1 || PlayListIndex is not null)
                     ? _YT_list + PlaylistID
                     : _YT_video + ID
                 : ID;
@@ -111,8 +120,14 @@ public class DownloadMusicTask
 
             var thumb = $"{dir}/thumb.jpg";
 
-            var task_a =                RunCMD(cmd_a, dir);
-            var task_v = ExtractThumb ? RunCMD(cmd_v, dir) : ArtAttached ? Bot.DownloadFile(File, thumb, Message.Chat) : YouTube ? GetGoodYouTubeThumbnail() : Task.CompletedTask;
+            var task_a = RunCMD(cmd_a, dir);
+            var task_v = ExtractThumb
+                ? RunCMD(cmd_v!, dir)
+                : ArtAttached
+                    ? Bot.DownloadFile(Cover!, thumb, Message.Chat)
+                    : YouTube
+                        ? GetGoodYouTubeThumbnail()
+                        : Task.CompletedTask;
             await Task.WhenAll(task_a, task_v);
 
             Task GetGoodYouTubeThumbnail() => Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(ID, dir).Result);
@@ -130,17 +145,24 @@ public class DownloadMusicTask
             if (Title  is null && meta.Groups[2].Success) Title  = meta.Groups[2].Value;
 
             if (NameOnly) Artist = null;
-            if (RemoveBrackets) Title = Title.RemoveBrackets();
+            if (RemoveBrackets) Title = Title?.RemoveBrackets();
 
             var img = new F_Process(thumb_source);
-            var art = (ExtractThumb ? img.ExportThumbnail(CropSquare) : resize ? img.ResizeThumbnail(CropSquare) : img.CompressJpeg(2)).OutputAs($"{dir}/art.jpg");
-            var mp3 = new F_Combine(audio_file, art).AddTrackMetadata(Artist, Title);
+            var imgProcess = ExtractThumb
+                ? img.ExportThumbnail(CropSquare)
+                : resize
+                    ? img.ResizeThumbnail(CropSquare)
+                    : img.CompressJpeg(2);
+            var art = await imgProcess.OutputAs($"{dir}/art.jpg");
+            var mp3 = new F_Combine(audio_file, art).AddTrackMetadata(Artist, Title!);
             var jpg = new F_Process(art).CompressJpeg(7).OutputAs($"{dir}/jpg.jpg"); // telegram preview
+
+            Task.WhenAll(mp3, jpg);
 
             Task.Run(() => Bot.DeleteMessage(Message.Chat, MessageToDelete));
 
-            await using var stream = System.IO.File.OpenRead(mp3);
-            Bot.SendAudio(Message.Chat, new InputOnlineFile(stream, mp3), jpg);
+            await using var stream = File.OpenRead(mp3.Result);
+            Bot.SendAudio(Message.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
             Log($"{Message.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
         }
         catch

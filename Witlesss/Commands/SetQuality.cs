@@ -2,9 +2,9 @@
 {
     public class SetQuality : SettingsCommand
     {
-        protected override void ExecuteAuthorized()
+        protected override void RunAuthorized()
         {
-            if (Text.HasIntArgument(out int value))
+            if (Args is not null && Context.HasIntArgument(out var value))
             {
                 Baka.Meme.Quality = value;
                 Bot.SaveChatList();

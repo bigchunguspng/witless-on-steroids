@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using FFMpegCore;
 using SixLabors.ImageSharp;
 using Drawer = Witlesss.Services.Memes.DemotivatorDrawer;
@@ -62,14 +63,14 @@ namespace Witlesss.MediaTools
         }
 
 
-        public string AddTrackMetadata(string artist, string title)
+        public Task<string> AddTrackMetadata(string? artist, string title)
         {
             var name = $"{(artist is null ? "" : $"{artist} - ")}{title}";
             var path = $"{Path.GetDirectoryName(_video)}/{ValidFileName(name, '#')}.mp3";
             return ApplyEffects(o => MetadataArgs(o, artist, title)).OutputAs(path);
         }
 
-        private static void MetadataArgs(FFO o, string artist, string title)
+        private static void MetadataArgs(FFO o, string? artist, string title)
         {
             var sb = new StringBuilder();
             sb.Append("-map 0:0 -map 1:0 -c copy -id3v2_version 3 ");
@@ -84,9 +85,9 @@ namespace Witlesss.MediaTools
 
         protected override string NameSource => _video;
 
-        protected override string Cook(string output)
+        protected override async Task<string> Cook(string output)
         {
-            Run(FFMpegArguments.FromFileInput(_video).AddFileInput(_image).OutputToFile(output, addArguments: Action));
+            await Run(FFMpegArguments.FromFileInput(_video).AddFileInput(_image).OutputToFile(output, addArguments: Action));
             return output;
         }
     }

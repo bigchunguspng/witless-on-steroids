@@ -19,12 +19,6 @@ namespace Witlesss.XD
         
         public static readonly Random Random = new();
 
-        public static int AssumedResponseTime(int initialTime, string text)
-        {
-            if (text == null) return initialTime;
-            return Math.Min(text.Length, 120) * 25;
-        }
-
         public static bool IsOneIn         (int x) => Random.Next(x) == 0;
         public static bool IsFirstOf(int a, int b) => Random.Next(a + b) < a;
 

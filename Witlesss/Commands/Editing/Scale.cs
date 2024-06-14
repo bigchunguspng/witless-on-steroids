@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing
@@ -8,11 +9,15 @@ namespace Witlesss.Commands.Editing
     {
         private readonly Regex _number = new(@"^\d+(\.\d+)?$");
 
-        protected override void Execute()
+        protected override async Task Execute()
         {
-            if (Text.Contains(' '))
+            if (Args is null)
             {
-                var args = Text.Split(' ').Skip(1).Take(2).ToArray();
+                Bot.SendMessage(Chat, SCALE_MANUAL);
+            }
+            else
+            {
+                var args = Args.Split(' ').Take(2).ToArray();
 
                 MultiplyIfArgIsNumber(0, 'w');
                 MultiplyIfArgIsNumber(1, 'h');
@@ -33,7 +38,7 @@ namespace Witlesss.Commands.Editing
                     args[i] = h;
                 }
 
-                if (args.Length == 1) args = new[] { args[0], "-1" };
+                if (args.Length == 1) args = [args[0], "-1"];
 
                 for (var i = 0; i < args.Length; i++) // fixing oddness and large size
                 {
@@ -42,13 +47,11 @@ namespace Witlesss.Commands.Editing
                     args[i] = $"min({(w ? "1920" : "1080")},ceil(({args[i]})/2)*2)";
                 }
 
-                Bot.Download(FileID, Chat, out var path, out var type);
+                var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(Memes.Scale(path, args), type);
+                SendResult(await Memes.Scale(path, args), type);
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");
             }
-            else
-                Bot.SendMessage(Chat, SCALE_MANUAL);
         }
 
         protected override string VideoFileName { get; } = "scale_fap_club.mp4";

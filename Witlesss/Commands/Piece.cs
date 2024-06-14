@@ -3,15 +3,15 @@ using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
-    public class Piece : Command
+    public class Piece : SyncCommand
     {
         private readonly Regex _args = new(@"t.me\/[a-z0-9_]{5,32}\/\d+\s\S+");
         private readonly Regex _urls = new(@"t.me\/[a-z0-9_]{5,32}\/");
 
-        private string _url, _name;
+        private string _url = default!, _name = default!;
         private int _latest;
         
-        public override void Run()
+        protected override void Run()
         {
             if (WrongSyntax()) return;
 

@@ -77,7 +77,7 @@ namespace Witlesss.Services.Internet
             LastSent.Enqueue(post);
         }
 
-        public PostData Recognize(string title)
+        public PostData? Recognize(string title)
         {
             return LastSent.FirstOrDefault(x => x.Title == title);
         }
@@ -115,12 +115,12 @@ namespace Witlesss.Services.Internet
 
         #region PULLING POST
 
-        private PostData _post;
+        private PostData _post = default!;
 
         /// <summary> Upcoming posts by query. </summary>
         private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
 
-        private RedditQuery      ThisQuery;
+        private RedditQuery      ThisQuery = default!;
         private RedditQueryCache ThisQueryCache => Cache[ThisQuery];
 
         //
@@ -142,9 +142,9 @@ namespace Witlesss.Services.Internet
             do
             {
                 UpdateCache();
-                _post = ThisQueryCache.Posts.Dequeue(); // todo fix bug on nullable Q
+                _post = ThisQueryCache.Posts.Dequeue();
             }
-            while (ThisQueryCache.HasEnoughPosts && ThisQueryCache.Posts.Count > 0 && Excluded.Contains(_post.Fullname));
+            while (ThisQueryCache is { HasEnoughPosts: true, Posts.Count: > 0 } && Excluded.Contains(_post.Fullname));
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Witlesss.Services.Internet
         /// <summary>
         /// Gets the actual posts using <see cref="ThisQuery"/> and adds them to <see cref="ThisQueryCache"/>.
         /// </summary>
-        private void ScrollReddit(string after = null, int patience = 3)
+        private void ScrollReddit(string? after = null, int patience = 3)
         {
             var posts = ThisQuery.GetPosts(after);
             ThisQueryCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
@@ -205,9 +205,12 @@ namespace Witlesss.Services.Internet
         private List<PostData> GetOnlyImagePosts(ICollection<Post> posts)
         {
             var pinned = Math.Max(0, posts.Count - POST_LIMIT);
-            return posts.Skip(pinned).Where(IsImagePost).Select(p => new PostData(p as LinkPost)).ToList();
-
-            bool IsImagePost(Post p) => p is LinkPost post && _img.IsMatch(post.URL);
+            return posts
+                .Skip(pinned)
+                .OfType<LinkPost>()
+                .Where(post => _img.IsMatch(post.URL))
+                .Select(post => new PostData(post))
+                .ToList();
         }
 
         #endregion
@@ -218,7 +221,7 @@ namespace Witlesss.Services.Internet
         public Task<List<string>> GetComments(RedditQuery query, int count = POST_LIMIT) => Task.Run(() =>
         {
             var texts = new List<string>(count);
-            string after = null;
+            string? after = null;
             for (var i = 0; i < count; i += POST_LIMIT)
             {
                 after = ScrollForComments(query, texts, after);
@@ -227,7 +230,7 @@ namespace Witlesss.Services.Internet
             return texts;
         });
 
-        private string ScrollForComments(RedditQuery query, List<string> list, string after)
+        private string ScrollForComments(RedditQuery query, List<string> list, string? after)
         {
             var posts = query.GetPosts(after);
             foreach (var post    in posts)
@@ -250,7 +253,7 @@ namespace Witlesss.Services.Internet
 
         #region GETTING POSTS
 
-        public List<Post> GetPosts(ScQuery query, string after = null)
+        public List<Post> GetPosts(ScQuery query, string? after = null)
         {
             var sub = client.Subreddit(query.Subreddit).Posts;
             return query.Sort switch
@@ -263,13 +266,13 @@ namespace Witlesss.Services.Internet
             };
         }
 
-        public List<Post> SearchPosts(SsQuery s, string after = null)
+        public List<Post> SearchPosts(SsQuery s, string? after = null)
         {
             var subreddit = client.Subreddit(s.Subreddit);
             return subreddit.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
-        public List<Post> SearchPosts(SrQuery s, string after = null)
+        public List<Post> SearchPosts(SrQuery s, string? after = null)
         {
             return    client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
@@ -287,43 +290,34 @@ namespace Witlesss.Services.Internet
     }
 
 
-    public interface RedditQuery { List<Post> GetPosts(string after = null); }
+    public interface RedditQuery { List<Post> GetPosts(string? after = null); }
 
     /// <summary> Uses <b>searchbar</b> on a main page. </summary>
     public record SrQuery(string Q, string Sort, string Time) : RedditQuery
     {
-        public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
+        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
     /// <summary> Uses <b>searchbar</b> on a <b>subreddit</b>. </summary>
     public record SsQuery(string Subreddit, string Q, string Sort, string Time) : RedditQuery
     {
-        public List<Post> GetPosts(string after = null) => RedditTool.Instance.SearchPosts(this, after);
+        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
     }
 
     /// <summary> Opens subreddit and <b>scrolls</b> for some posts. </summary>
     public record ScQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
     {
-        public List<Post> GetPosts(string after = null) => RedditTool.Instance.GetPosts(this, after);
+        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.GetPosts(this, after);
     }
 
-    public class PostData
+    public class PostData(LinkPost post)
     {
-        private readonly string _permalink;
-        
-        public string Fullname  { get; }
-        public string URL       { get; } // .png .jpg .gif
-        public string Title     { get; }
-        public string Subreddit { get; }
-        public string Permalink { get => $"https://www.reddit.com{_permalink}"; private init => _permalink = value; }
+        public string Fullname  { get; } = post.Fullname;
+        public string URL       { get; } = post.URL; // .png .jpg .gif
+        public string Title     { get; } = post.Title;
+        public string Subreddit { get; } = post.Subreddit;
 
-        public PostData(LinkPost post)
-        {
-            Fullname  = post.Fullname;
-            URL       = post.URL;
-            Title     = post.Title;
-            Subreddit = post.Subreddit;
-            Permalink = post.Permalink;
-        }
+        private readonly string _permalink = post.Permalink;
+        public string Permalink => $"https://www.reddit.com{_permalink}";
     }
 }

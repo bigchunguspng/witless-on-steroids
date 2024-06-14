@@ -15,7 +15,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
     public class BrowseReddit : SyncCommand
     {
-        private readonly Regex _arg = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:.*)(?=\s-\S+))|(?:.*))");
+        private readonly Regex _arg = new(@"((?:(?:.+)(?=\s[a-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
         private readonly Regex _sub = new(@"([a-z0-9_]+)");
         private readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");

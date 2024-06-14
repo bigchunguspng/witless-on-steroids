@@ -178,15 +178,16 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         private void SendSingleFilePost(PostData post)
         {
-            var g = post.URL.EndsWith(".gif");
+            var gif = post.URL.EndsWith(".gif");
             try
             {
+                // todo fix bug: some gifs are sent as "fgsfds.gif.jpg" image document for no reason
                 SendPicOrAnimation(new InputOnlineFile(post.URL));
             }
             catch
             {
-                var meme = DownloadMeme(post, g ? ".gif" : ".png");
-                var path = g ? Memes.CompressGIF(meme).Result : Memes.Compress(meme).Result;
+                var meme = DownloadMeme(post, gif ? ".gif" : ".png");
+                var path = gif ? Memes.CompressGIF(meme).Result : Memes.Compress(meme).Result;
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));
@@ -194,8 +195,8 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
             void SendPicOrAnimation(InputOnlineFile file)
             {
-                if (g) Bot.SendAnimaXD(Chat, file, post.Title);
-                else   Bot.SendPhotoXD(Chat, file, post.Title);
+                if (gif) Bot.SendAnimaXD(Chat, file, post.Title);
+                else     Bot.SendPhotoXD(Chat, file, post.Title);
             }
         }
 

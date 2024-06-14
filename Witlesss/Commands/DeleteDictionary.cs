@@ -60,8 +60,8 @@ namespace Witlesss.Commands
             {
                 for (int i = 0; i < count;)
                 {
-                    var x = Extension.Random.Next(4);
-                    var y = Extension.Random.Next(4);
+                    var x = Random.Shared.Next(4);
+                    var y = Random.Shared.Next(4);
                     if (rows[x][y].Text == _default)
                     {
                         rows[x][y] = data ? GetCallbackButton(x, y, obj) : InlineKeyboardButton.WithCallbackData(obj);
@@ -85,8 +85,8 @@ namespace Witlesss.Commands
 
             if (o == _tractor)
             {
-                var move = Extension.Random.Next(2) == 0 ? 1 : -1;
-                var vert = Extension.Random.Next(2) == 0;
+                var move = Random.Shared.Next(2) == 0 ? 1 : -1;
+                var vert = Random.Shared.Next(2) == 0;
 
                 var tx = vert ? x : (x + move + 4) % 4;
                 var ty = vert ? (y + move + 4) % 4 : y;

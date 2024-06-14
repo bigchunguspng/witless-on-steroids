@@ -68,7 +68,7 @@ namespace Witlesss
             TrySend(task, chat, "video");
         }
 
-        public void SendAudio(long chat, InputOnlineFile audio, string art = null)
+        public void SendAudio(long chat, InputOnlineFile audio, string? art = null)
         {
             using var cover = File.OpenRead(art ?? Config.ArtLocation);
             var task = Client.SendAudioAsync(chat, audio, thumb: new InputMedia(cover, "xd"));

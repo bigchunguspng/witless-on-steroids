@@ -101,7 +101,7 @@ namespace Witlesss.Services.Internet
         }
 
         public ScQuery RandomSubredditQuery => new(RandomSubreddit);
-        private string RandomSubreddit => subreddits[Extension.Random.Next(subreddits.Length)];
+        private string RandomSubreddit => subreddits[Random.Shared.Next(subreddits.Length)];
 
         private readonly string[] subreddits = 
         {

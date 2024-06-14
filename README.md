@@ -12,7 +12,7 @@
 Can be used in **group chats** as well as in **DMs**. Text generation is based on an enchanced [Markov chain] algorithm. Text generation pack for your chat can be extended by sending messages and by fusing it with other chats packs, with reddit comments, and with [exported chat history]. Frequency of text generation can be changed.
 
 ### Initial setup ⚙️
-- Have **ffmpeg binaries** and **yt-dlp.exe** locations added to **Path**.
+- Have **ffmpeg binaries**, **yt-dlp.exe** and **gallery-dl.exe** locations added to **Path**.
 - Create in the working directory **config.txt** file (see example).
 - Create in the working directory **_Telegram-Arts\ASCII_** folder and drop there some _ASCII-arts.txt_.
 - Create in the working directory **_Telegram-Water_** folder and drop there at least one watermark for demotivators - a **.png** file with a name of two numbers - X and Y of top-left corner for placing the watermark onto the demotivator. Any extra words can be placed in the middle, e.g: **586 700.png**, **586 x 700.png**. For no watermarks simply put there 1x1px black square named **0 0.png**.

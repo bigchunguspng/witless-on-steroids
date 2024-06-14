@@ -10,6 +10,13 @@ public static class ArgumentParsing
         return arguments is null ? [] : arguments.Split([' ', '\n'], count);
     }
 
+    public static bool HasIntArgument(this string text, out int value)
+    {
+        value = 0;
+        var words = text.Split();
+        return words.Length > 1 && int.TryParse(words[1], out value);
+    }
+
     public static bool HasIntArgument(this CommandContext c, out int value)
     {
         value = 0;

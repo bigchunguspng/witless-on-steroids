@@ -7,7 +7,7 @@ using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services
 {
-    public class ExtraFonts
+    public class ExtraFonts // todo rename since it is the main font source now
     {
         private static readonly Dictionary<string, FontFamily> _families;
 
@@ -36,13 +36,9 @@ namespace Witlesss.Services
 
         public static List<FontFamily> FallbackFamilies { get; } =
         [
-            SystemFonts.Get("Segoe UI"),
-            SystemFonts.Get("Segoe UI Symbol"),
-            SystemFonts.Get("Arial"),
-            SystemFonts.Get("Tahoma"),
-            SystemFonts.Get("Times New Roman"),
-            SystemFonts.Get("Microsoft YaHei"),
             SystemFonts.Get("MS PGothic"),
+            SystemFonts.Get("Arial"),
+            SystemFonts.Get("Segoe UI Symbol"),
         ];
 
         public ExtraFonts(string cmd, params string[] exclude)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using WordChart = Witlesss.XD.SyncronizedDictionary<string, float>;
@@ -17,12 +18,12 @@ namespace Witlesss
 
         public WitlessDB Words { get; set; } = new();
 
-        public bool Eat(string text, out string eaten)
+        public bool Eat(string text, out string? eaten)
         {
-            eaten = null;
-            
+            eaten = null!;
+
             if (TextIsUnacceptable(text)) return false;
-            
+
             var words = Tokenize(ReplaceLinks(text));
             int count = TokenCount();
             if (count < 14)
@@ -221,7 +222,7 @@ namespace Witlesss
             }
             return alt;
 
-            string RandomWord() => words[Extension.Random.Next(words.Count)];
+            string RandomWord() => words[Random.Shared.Next(words.Count)];
 
             bool WordHasKey(string x) => alt == END ? w.EndsWith(x, StringComparison.Ordinal) : w.StartsWith(x, StringComparison.Ordinal);
             bool KeyHasWord(string x) => alt == END ? x.EndsWith(w, StringComparison.Ordinal) : x.StartsWith(w, StringComparison.Ordinal);
@@ -289,7 +290,7 @@ namespace Witlesss
 
         public static string PickWord(WordChart words)
         {
-            float r = (float) Extension.Random.NextDouble() * words.Sum(chance => chance.Value);
+            float r = (float) Random.Shared.NextDouble() * words.Sum(chance => chance.Value);
 
             foreach (var chance in words)
             {

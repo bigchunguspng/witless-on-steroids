@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Witlesss.Backrooms.SerialQueue
 {
+    /// <summary>
+    /// https://github.com/gentlee/SerialQueue
+    /// </summary>
     public class SerialTaskQueue
     {
         SpinLock _spinLock = new(false);

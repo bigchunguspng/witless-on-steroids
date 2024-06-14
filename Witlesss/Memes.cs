@@ -2,9 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using FFMpegCore;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using Witlesss.Backrooms;
 using Witlesss.MediaTools;
 using static Witlesss.Backrooms.SizeHelpers;
 using static Witlesss.MediaTools.FF_Extensions;
@@ -15,15 +12,6 @@ namespace Witlesss
 {
     public static class Memes
     {
-        /*
-        private static readonly DemotivatorDrawer [] _drawers = { new(), new(1280) };
-        private static readonly MemeGenerator        _imgflip = new();
-        private static readonly IFunnyApp            _ifunny  = new();
-        private static readonly DynamicDemotivatorDrawer  _dp = new();
-
-        private static DemotivatorDrawer Drawer => _drawers[(int) Mode];
-        */
-
         public static int Quality => ImageSaver.Quality > 80 ? 0 : 51 - (int)(ImageSaver.Quality * 0.42); // 0 | 17 - 51
         public static int Qscale  => 31 + (int)(-0.29 * (int)ImageSaver.Quality); // 2 - 31
 
@@ -31,106 +19,6 @@ namespace Witlesss
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
         public static bool Sticker;
-        //public static DgMode Mode;
-
-
-        /*public static string MakeDemotivator(string path, DgText text)
-        {
-            return Drawer.MakeDemotivator(path, text);
-        }
-
-        public static string MakeStickerDemotivator(string path, DgText text, string extension)
-        {
-            return MakeDemotivator(Convert(path, extension), text);
-        }
-
-        public static string MakeVideoDemotivator(string path, DgText text)
-        {
-            return new F_Combine(path, Drawer.MakeFrame(text)).Demo(Quality, Drawer).Output("-D");
-        }
-
-
-        public static string MakeDemotivatorB(string path, string text)
-        {
-            return _dp.DrawDemotivator(path, text);
-        }
-
-        public static string MakeStickerDemotivatorB(string path, string text, string extension)
-        {
-            return MakeDemotivatorB(Convert(path, extension), text);
-        }
-
-        public static string MakeVideoDemotivatorB(string path, string text)
-        {
-            _dp.PassTextLength(text);
-
-            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
-            _dp.SetUp(size);
-            _dp.SetColor();
-
-            var frame = _dp.BakeFrame(text);
-            var full_size = GetImageSize_FFmpeg(frame).FitSize(720);
-
-            return new F_Combine(path, frame).D300(Quality, size, _dp.Location, full_size).Output("-Dp");
-        }
-
-
-        public static string MakeMeme(string path, DgText text)
-        {
-            return _imgflip.MakeMeme(path, text);
-        }
-
-        public static string MakeMemeFromSticker(string path, DgText text, string extension)
-        {
-            return MakeMeme(Convert(path, extension), text);
-        }
-
-        public static string MakeVideoMeme(string path, DgText text)
-        {
-            Sticker = false;
-            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
-            _imgflip.SetUp(size);
-
-            return new F_Combine(path, _imgflip.MakeCaption(text)).Meme(Quality, size).Output("-M");
-        }
-
-
-        public static string MakeCaptionMeme(string path, string text)
-        {
-            return _ifunny.MakeCaptionMeme(path, text);
-        }
-
-        public static string MakeCaptionMemeFromSticker(string path, string text, string extension)
-        {
-            return MakeCaptionMeme(Convert(path, extension), text);
-        }
-
-        public static string MakeVideoCaptionMeme(string path, string text)
-        {
-            var size = GetImageSize_FFmpeg(path).GrowSize();
-            _ifunny.SetUp(size);
-
-            if  (IFunnyApp.UseGivenColor) _ifunny.SetCustomColors();
-            else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(Image.Load<Rgba32>(Snapshot(path)));
-            else                          _ifunny.SetDefaultColors();
-
-            return new F_Combine(path, _ifunny.BakeText(text)).When(Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage).Output("-Top");
-        }
-
-
-        public static string DeepFryImage(string path, int _ = 0)
-        {
-            var extension = Sticker ? ".webp" : Path.GetExtension(path);
-            return new F_Process(path).DeepFry(Qscale).Output("-Nuked", extension);
-        }
-
-        public static string DeepFryStick(string path, int _ = 0, string extension = null) => DeepFryImage(path);
-
-        public static string DeepFryVideo(string path, int _ = 0)
-        {
-            var size = GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
-            return new F_Process(path).DeepFryVideo(size.Ok(), Quality).Output_WEBM_safe("-Nuked");
-        }*/
 
 
         private static async Task<string> Convert(string path, string extension)

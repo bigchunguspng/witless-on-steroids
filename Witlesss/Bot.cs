@@ -19,12 +19,12 @@ namespace Witlesss
 
         public static void LaunchInstance(CommandAndCallbackRouter command) => new Bot().Run(command);
 
-        public static Bot Instance;
+        public static Bot Instance = null!;
 
         private Bot()
         {
             Instance = this;
-            Config.SetBotUsername(Me.Username);
+            Config.SetBotUsername(Me.Username!);
 
             PlayStation8 = new ConsoleUI(this);
             ThorRagnarok = new BanHammer(this);

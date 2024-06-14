@@ -97,7 +97,7 @@ namespace Witlesss.Services.Memes
 
                 var sw = Helpers.GetStartedStopwatch();
                 options = GetDefaultTextOptions(size, y);
-                textSize = TextMeasuringHelpers.MeasureTextSize(text, options, out lines).CeilingInt();
+                textSize = TextMeasuring.MeasureTextSize(text, options, out lines).CeilingInt();
                 sw.Log("TextMeasuringHelpers.MeasureTextHeight");
                 go = textSize.Height > _captionArea.Height && size > 5 || WrapText == false && lines > maxLines;
                 size *= go ? lines > 2 ? 0.8f : 0.9f : 1;
@@ -139,9 +139,9 @@ namespace Witlesss.Services.Memes
 
         private SolidBrush RandomColor()
         {
-            var h = Extension.Random.Next(360);
-            var s = (byte)Extension.Random.Next(50, 100);
-            var l = (byte)Extension.Random.Next(50,  95);
+            var h =       Random.Shared.Next(360);
+            var s = (byte)Random.Shared.Next(50, 100);
+            var l = (byte)Random.Shared.Next(50,  95);
 
             var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
             return new SolidBrush(rgb.ToRgb24());

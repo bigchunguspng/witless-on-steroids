@@ -142,7 +142,7 @@ namespace Witlesss.Commands
 
         private bool DoStartCommand()
         {
-            var success = Context.Command == "/start" && Bot.SussyBakas.TryAdd(Context.Chat, Witless.AverageBaka(Context.Chat));
+            var success = Context.Command == "/start" && Bot.SussyBakas.TryAdd(Context.Chat, Witless.AverageBaka(Context));
             if (success)
             {
                 Bot.SaveChatList();
@@ -229,7 +229,7 @@ namespace Witlesss.Commands
                     return mematic;
                 }
 
-                bool HaveToMeme() => Extension.Random.Next(100) < Context.Baka.Meme.Chance && !BroSpoilers();
+                bool HaveToMeme() => Random.Shared.Next(100) < Context.Baka.Meme.Chance && !BroSpoilers();
                 bool HaveToMemeSticker() => Context.Baka.Meme.Stickers && HaveToMeme();
 
                 bool BroSpoilers() => Context.Message.ContainsSpoilers();

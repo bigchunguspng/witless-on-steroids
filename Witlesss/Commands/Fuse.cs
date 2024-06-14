@@ -280,7 +280,7 @@ namespace Witlesss.Commands
         private string GetJsonFormatExample()
         {
             var sb = new StringBuilder(ONLY_ARRAY_JSON);
-            var count = Extension.Random.Next(3, 7);
+            var count = Random.Shared.Next(3, 7);
             sb.Append("\n\n<code>[");
             for (var i = 0; i < count; i++)
             {

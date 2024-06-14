@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
-using Telegram.Bot.Types;
 using static Witlesss.XD.LetterCaseMode;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
@@ -17,47 +16,16 @@ namespace Witlesss.XD
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
         
-        public static readonly Random Random = new();
+        //public static readonly Random Random = new();
 
-        public static bool IsOneIn         (int x) => Random.Next(x) == 0;
-        public static bool IsFirstOf(int a, int b) => Random.Next(a + b) < a;
+        public static bool IsOneIn         (int x) => Random.Shared.Next(x) == 0;
+        public static bool IsFirstOf(int a, int b) => Random.Shared.Next(a + b) < a;
 
-        public static int    RandomInt   (int    min, int    max) => Random.Next(min, max + 1);
+        public static int    RandomInt   (int    min, int    max) => Random.Shared.Next(min, max + 1);
         public static double RandomDouble(double min, double max)
         {
             var k = 10_000d;
             return RandomInt((int)(min * k), (int)(max * k)) / k;
-        }
-
-        public static string ToRandomLetterCase(this string text) => ToLetterCase(text, RandomLetterCase());
-        public static string ToLetterCase(this string text, LetterCaseMode mode) => mode switch
-        {
-            Lower    => text.ToLower(),
-            Upper    => text.ToUpper(),
-            Sentence => char.ToUpper(text[0]) + text[1..].ToLower(),
-            _        => text
-        };
-
-        private static LetterCaseMode RandomLetterCase() => Random.Next(8) switch
-        {
-            < 5 => Lower,
-            < 7 => Sentence,
-            _   => Upper
-        };
-
-        public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
-
-        public static bool HasIntArgument(this string text, out int value)
-        {
-            value = 0;
-            var words = text.Split();
-            return words.Length > 1 && int.TryParse(words[1], out value);
-        }
-        public static bool HasDoubleArgument(this string text, out double value)
-        {
-            value = 0;
-            var words = text.Split();
-            return words.Length > 1 && double.TryParse(words[1].Replace('.', ','), out value);
         }
 
         public static bool IsTimeSpan(this string arg, out TimeSpan span)
@@ -81,23 +49,6 @@ namespace Witlesss.XD
         {
             return t.Minutes > 1 ? $"{t:m' MINS'}" : t.Minutes > 0 ? $@"{t:m' MIN 's\.fff's'}" : $@"{t:s\.fff's'}";
         }
-        
-        public  static string SongNameOr(Message m, string  s) => SongNameIn(m) ?? SongNameIn(m.ReplyToMessage) ?? s;
-        private static string SongNameIn(Message m) => m?.Audio?.FileName ?? m?.Document?.FileName;
-        
-        public static bool ChatIsPrivate(long chat) => chat > 0;
-        
-        public static string GetSenderName(Message m) => m.SenderChat?.Title ?? GetUserFullName(m);
-        public static string GetChatTitle (Message m) => (ChatIsPrivate(m.Chat.Id) ? GetUserFullName(m) : m.Chat.Title).Truncate(32);
-
-        public static string GetUserFullName(Message m)
-        {
-            string name = m.From?.FirstName;
-            string last = m.From?.LastName ?? "";
-            return last == "" ? name : name + " " + last;
-        }
-
-        public static string Quote(string s) => $@"""{s}""";
 
         public static string UniquePath(string path, bool extra = false)
         {
@@ -203,45 +154,45 @@ namespace Witlesss.XD
         }
 
         public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
-        public static T Pick<T>(T[] options) => options[Random.Next(options.Length)];
+        public static T Pick<T>(T[] options) => options[Random.Shared.Next(options.Length)];
 
         public static readonly string[] FILE_TOO_BIG_RESPONSE =
-        {
+        [
             "пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"
-        };
+        ];
         public static readonly string[] UNKNOWN_CHAT_RESPONSE =
-        {
+        [
             "ты кто?", "я тебя не знаю чувак 😤", "сними маску, я тебя не узнаю", "а ты кто 😲", "понасоздают каналов... 😒"
-        };
+        ];
         public static readonly string[] NOT_ADMIN_RESPONSE =
-        {
+        [
             "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
-        };
+        ];
         public static readonly string[] I_FORGOR_RESPONSE =
-        {
+        [
             "Сорян, не помню", "Сорян, не помню такого", "Забыл уже", "Не помню", "Я бы скинул, но уже потерял её"
-        };
+        ];
         public static readonly string[] PLS_WAIT_RESPONSE =
-        {
+        [
             "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "принял👌", "ваш заказ принят 🥸", "еду скачивать музон 🛒"
-        };
+        ];
         public static readonly string[] PROCESSING_RESPONSE =
-        {
+        [
             "идёт обработка...", "вжжжжж...", "брррррр..."
-        };
+        ];
 
         public static readonly string[] RANDOM_EMOJI =
-        {
+        [
             "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
             "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉", "🎻"
-        };
-        public static readonly string[] FAIL_EMOJI_1 = { "🤣", "😎", "🥰", "☺️", "💀", "😤", "😩" };
-        public static readonly string[] FAIL_EMOJI_2 = { "😵", "😧", "😨", "😰", "😮", "😲", "💀" };
+        ];
+        public static readonly string[] FAIL_EMOJI_1 = ["🤣", "😎", "🥰", "☺️", "💀", "😤", "😩"];
+        public static readonly string[] FAIL_EMOJI_2 = ["😵", "😧", "😨", "😰", "😮", "😲", "💀"];
 
         public static string GetRandomASCII()
         {
             var files = GetFiles(ASCII_FOLDER);
-            return File.ReadAllText(files[Random.Next(files.Length)]);
+            return File.ReadAllText(files[Random.Shared.Next(files.Length)]);
         }
 
         public static string FileSize(string path) => FileSize(SizeInBytes(path));
@@ -306,7 +257,7 @@ namespace Witlesss.XD
         public static T GetRandomMemeber<T>() where T : Enum
         {
             var values = Enum.GetValues(typeof(T));
-            return (T)values.GetValue(Random.Next(values.Length))!;
+            return (T)values.GetValue(Random.Shared.Next(values.Length))!;
         }
     }
 

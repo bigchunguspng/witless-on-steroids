@@ -165,7 +165,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var options = GetDefaultTextOptions(area.Width, area.Height);
             if (funny)
             {
-                var heightExpected = (int)TextMeasuringHelpers.MeasureTextSize(textM, options, out var linesExpected).Height;
+                var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
                 var parameters = new EmojiTool.Options(TextColor, EmojiSize);
                 var textLayer = _emojer.DrawEmojiText(text, options, parameters, out var linesActual);
 
@@ -260,7 +260,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             void MeasureString()
             {
                 var options = GetDefaultTextOptions(area.Width, area.Height);
-                measure = TextMeasuringHelpers.MeasureTextSize(text, options, out lines);
+                measure = TextMeasuring.MeasureTextSize(text, options, out lines);
             }
         }
 

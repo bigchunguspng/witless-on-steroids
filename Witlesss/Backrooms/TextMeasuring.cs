@@ -5,7 +5,7 @@ using SixLabors.ImageSharp;
 
 namespace Witlesss.Backrooms;
 
-public static class TextMeasuringHelpers
+public static class TextMeasuring
 {
     /// <returns>
     /// Index of last character before line break,

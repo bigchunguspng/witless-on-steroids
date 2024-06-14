@@ -5,12 +5,12 @@ namespace Witlesss // ReSharper disable InconsistentNaming
 {
     public static class Config
     {
-        public static string TelegramToken { get; private set; }
-        public static string RedditAppID   { get; private set; }
-        public static string RedditToken   { get; private set; }
-        public static string BOT_USERNAME  { get; private set; }
-        public static string ArtLocation   { get; private set; }
-        public static string Fonts         { get; private set; }
+        public static string TelegramToken { get; private set; } = default!;
+        public static string RedditAppID   { get; private set; } = default!;
+        public static string RedditToken   { get; private set; } = default!;
+        public static string BOT_USERNAME  { get; private set; } = default!;
+        public static string ArtLocation   { get; private set; } = default!;
+        public static string Fonts         { get; private set; } = default!;
         public static long   AdminID       { get; private set; }
 
         private const string path = "config.txt";

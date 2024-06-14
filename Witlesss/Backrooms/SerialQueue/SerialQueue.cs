@@ -3,6 +3,9 @@ using System.Threading;
 
 namespace Witlesss.Backrooms.SerialQueue
 {
+    /// <summary>
+    /// https://github.com/gentlee/SerialQueue
+    /// </summary>
     public class SerialQueue
     {
         class LinkedListNode

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
-using Witlesss.Commands;
 
 namespace Witlesss
 {
@@ -22,24 +22,24 @@ namespace Witlesss
             Saves.Interval = 10;
         }
 
-        public static Witless AverageBaka(long chat)
+        public static Witless AverageBaka(CommandContext context)
         {
-            var witless = new Witless(chat);
+            var witless = new Witless(context.Chat);
 
-            if (chat > 0) // DMs
+            if (context.ChatIsPrivate)
             {
                 witless.Interval = 1;
                 witless.Meme.Chance = 100;
                 witless.Meme.Stickers = true;
             }
-            witless.Meme.Type = (MemeType)Extension.Random.Next(4);
+            witless.Meme.Type = (MemeType)Random.Shared.Next(4);
 
             witless.Load();
             return witless;
         }
 
         [JsonProperty] public long Chat { get; set; }
-        [JsonProperty] public int Interval
+        [JsonProperty] public int Interval // todo -> frequency
         {
             get => Generation.Interval;
             set => Generation.Interval = value;
@@ -68,8 +68,8 @@ namespace Witlesss
             set => Baka.Words = value;
         }
 
-        public bool Eat(string text)                   => HasUnsavedStuff = Baka.Eat(text, out _);
-        public bool Eat(string text, out string eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
+        public bool Eat(string text)                    => HasUnsavedStuff = Baka.Eat(text, out _);
+        public bool Eat(string text, out string? eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
 
         public string Generate(string word = Copypaster.START) => TextOrBust(Baka.Generate, word);
 

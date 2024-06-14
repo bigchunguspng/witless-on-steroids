@@ -64,9 +64,9 @@ namespace Witlesss
             else if (_input == "/l" ) ActivateLastChat();
             else if (_input == "/b" ) Thor.  BanChat(_active);
             else if (_input == "/ub") Thor.UnbanChat(_active);
-            else if (_input.StartsWith("/sp") && _input.HasIntArgument(out int a)) Spam.SendSpam(a);
-            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out int b)) DeleteBySize(b);
-            else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out int c)) Thor.BanChat(_active, c);
+            else if (_input.StartsWith("/sp") && _input.HasIntArgument(out var a)) Spam.SendSpam(a);
+            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var b)) DeleteBySize(b);
+            else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out var c)) Thor.BanChat(_active, c);
         }
 
         private bool BotWannaSpeak() => Regex.IsMatch(_input, @"^\/[aw] ");
@@ -90,7 +90,7 @@ namespace Witlesss
             string text = _input.Split (' ', 2)[1];
             if (!Bot.WitlessExist(_active)) return;
 
-            if      (_input.StartsWith("/a ") && Active.Eat(text, out text)) // add
+            if      (_input.StartsWith("/a ") && Active.Eat(text, out text!)) // add
             {
                 Log($@"{_active} >> XD << ""{text}""", ConsoleColor.Yellow);
             }

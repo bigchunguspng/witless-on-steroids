@@ -122,7 +122,7 @@ namespace Witlesss.Services.Memes
             else*/
             {
                 //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
-                var lineBreak = TextMeasuringHelpers.DetectLineBreak(text, o.Options, o.Lines);
+                var lineBreak = TextMeasuring.DetectLineBreak(text, o.Options, o.Lines);
                 var noLineBreaks = lineBreak == -1;
                 var textToRender = noLineBreaks ? text : text[..lineBreak];
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -89,14 +90,14 @@ namespace Witlesss.Commands.Editing.Core
         protected virtual string VideoFileName => "piece_fap_club.mp3";
         protected virtual string AudioFileName => "piece_fap_club.mp4";
 
-        protected string Sender => ValidFileName(GetSenderName(Message));
-        protected string SongNameOr(string s) => Extension.SongNameOr(Message, s);
+        protected string Sender => ValidFileName(Message.GetSenderName());
+        protected string SongNameOr(string s) => Message.GetSongNameOr(s);
 
         protected async Task<(string path, MediaType type, int waitMessage)> DownloadFileSuperCool()
         {
             if (FileID.StartsWith("http"))
             {
-                var waitMessage = Bot.PingChat(Chat, PLS_WAIT_RESPONSE[Random.Next(5)]);
+                var waitMessage = Bot.PingChat(Chat, PLS_WAIT_RESPONSE[Random.Shared.Next(5)]);
 
                 var task = new DownloadVideoTask(FileID, Context).RunAsync();
                 await Bot.RunSafelyAsync(task, Chat, waitMessage);

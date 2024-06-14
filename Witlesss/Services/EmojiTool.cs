@@ -136,7 +136,7 @@ namespace Witlesss.Services
                     {
                         WrappingLength = width
                     }.WithDefaultAlignment();
-                    var ms = TextMeasuringHelpers.MeasureTextSize(text, optionsW, out var linesFilled);
+                    var ms = TextMeasuring.MeasureTextSize(text, optionsW, out var linesFilled);
                     var w = linesFilled > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
                     if (w < rest) DrawSingleLineText();
@@ -147,20 +147,20 @@ namespace Witlesss.Services
                         {
                             Origin = GetDrawingOffset(), WrappingLength = rest
                         }.WithDefaultAlignment();
-                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
-                        _ = TextMeasuringHelpers.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
+                        _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
+                        _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
                         var start = (int)(Math.Max(0.66f - x / (float)width, 0) * cw);
                         var space = text[start..cw].Contains(' ');
                         var index = text[..chars].LastIndexOf(' ');
                         var cr = index < 0;
                         var trim = space ? cr ? "" : text[..index] : text[..chars];
-                        ms = TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _);
+                        ms = TextMeasuring.MeasureTextSize(trim, optionsR, out _);
                         optionsR.WrappingLength = ms.Width + 0.05F; // safe space, fixes text being not rendered.
 #if DEBUG
                         canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, height)));
 #endif
                         canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, parameters.Color));
-                        MoveX((int)TextMeasuringHelpers.MeasureTextSize(trim, optionsR, out _).Width);
+                        MoveX((int)TextMeasuring.MeasureTextSize(trim, optionsR, out _).Width);
                         var next = space ? cr ? text : text[(index + 1)..] : text[chars..];
                         NewLine();
                         DrawText(next);

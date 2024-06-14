@@ -62,7 +62,7 @@ namespace Witlesss.Commands.Meme
             {
                 (a, b) = (Baka.Generate(), Baka.Generate());
 
-                var c = Extension.Random.Next(10);
+                var c = Random.Shared.Next(10);
                 if      (only_top_text)              b = "";
                 else if (c == 0 || only_bottom_text) a = ""; // 1/10 >> bottom only
                 else if (a.Length > 25) // upper text is too big

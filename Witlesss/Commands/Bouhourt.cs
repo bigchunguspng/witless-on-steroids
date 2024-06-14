@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static Witlesss.Copypaster;
@@ -62,7 +63,7 @@ namespace Witlesss.Commands
             else if (word.Contains  (' ') ) return word.Split()[0] + ' ' + Baka.GenerateByWord(PullWord(word.Split()[1]));
             else
                 return Baka.Words.ContainsKey(word) ? word : START;
-            return xs.Length > 0 ? xs.ElementAt(Random.Next(xs.Length)) : START;
+            return xs.Length > 0 ? xs.ElementAt(Random.Shared.Next(xs.Length)) : START;
         }
     }
 }

@@ -81,7 +81,7 @@ public class DownloadMusicTask
             builder.Append("--write-thumbnail ");
         builder.Append("-x --audio-format mp3 ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
-        builder.Append(Quote(url)).Append(" -o ").Append(Quote(output));
+        builder.Append(url.Quote()).Append(" -o ").Append(output.Quote());
         return builder.ToString();
     }
 
@@ -91,9 +91,9 @@ public class DownloadMusicTask
         
         var builder = new StringBuilder("/C yt-dlp --no-mtime ");
         var format = "bv*" + (YouTube ? "[height<=720][filesize<15M]" : "");
-        builder.Append("-f ").Append(Quote(format)).Append(" -k ");
+        builder.Append("-f ").Append(format.Quote()).Append(" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
-        builder.Append(Quote(url)).Append(" -o ").Append(Quote("video.%(ext)s"));
+        builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
     }
 

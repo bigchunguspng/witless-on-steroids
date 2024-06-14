@@ -178,7 +178,7 @@ public class IFunnyApp
         
         if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
         {
-            var ms = TextMeasuringHelpers.MeasureTextSize(text, GetDefaultTextOptions(), out _);
+            var ms = TextMeasuring.MeasureTextSize(text, GetDefaultTextOptions(), out _);
             if (ms.Width < _w * 0.9)
             {
                 var k = 0.9f * _w / ms.Width;
@@ -199,7 +199,7 @@ public class IFunnyApp
         {
             var options = GetDefaultTextOptions();
             options.WrappingLength = WrapText ? _textWidth : -1;
-            _measure = TextMeasuringHelpers.MeasureTextSize(text, options, out _);
+            _measure = TextMeasuring.MeasureTextSize(text, options, out _);
         }
 
         void SetCardHeightXD(float x)

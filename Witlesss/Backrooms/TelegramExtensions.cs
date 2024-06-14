@@ -6,6 +6,8 @@ namespace Witlesss.Backrooms;
 
 public static class TelegramExtensions
 {
+    private const string UNKNOWN = "[UNKNOWN]";
+
     public static string? GetTextOrCaption(this Message message)
     {
         return message.Caption ?? message.Text;
@@ -13,7 +15,7 @@ public static class TelegramExtensions
 
     public static string GetChatTitle(this Message message)
     {
-        var title = message.Chat.Title ?? message.From?.GetUserFullName() ?? "[UNKNOWN]";
+        var title = message.Chat.Title ?? message.From?.GetUserFullName() ?? UNKNOWN;
         return title.Truncate(32);
     }
 
@@ -45,5 +47,20 @@ public static class TelegramExtensions
         else return true;
 
         return false;
+    }
+
+    public static string GetSenderName(this Message message)
+    {
+        return message.SenderChat?.Title ?? message.From?.GetUserFullName() ?? UNKNOWN;
+    }
+
+    public static string GetSongNameOr(this Message message, string text)
+    {
+        return message.GetSongName() ?? message.ReplyToMessage.GetSongName() ?? text;
+    }
+
+    private static string? GetSongName(this Message? message)
+    {
+        return message?.Audio?.FileName ?? message?.Document?.FileName;
     }
 }

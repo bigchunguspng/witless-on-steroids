@@ -111,7 +111,7 @@ namespace Witlesss.Commands
                 _witless.Pass(Context, Bot.SussyBakas[Context.Chat]);
                 _witless.Run();
             }
-            else if (Context.Command is not null)
+            else if (Context is { Command: not null, IsForMe: true })
             {
                 var success = DoSimpleCommands() || DoStartCommand();
 
@@ -199,7 +199,7 @@ namespace Witlesss.Commands
             {
                 if (Context.Text is not null)
                 {
-                    if (Context.Command is not null)
+                    if (Context is { Command: not null, IsForMe: true })
                     {
                         if (parent.DoSimpleCommands() || parent.DoWitlessCommands(Context.Baka)) return;
                     }

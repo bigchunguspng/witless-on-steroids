@@ -122,34 +122,35 @@ public class IFunnyApp
         AdjustProportions(textM);
         AdjustTextPosition(text);
 
-        var cardHeight = funny ? _cardHeight * 2 : _cardHeight;
-        var image = new Image<Rgba32>(_w, cardHeight, Background);
+        var image = funny ? null : new Image<Rgba32>(_w, _cardHeight, Background);
 
-        //var area = new RectangleF(_marginLeft, _capsFix, _textWidth, cardHeight);
-
-        /*if (funny)
+        var options = GetDefaultTextOptions();
+        if (funny)
         {
-            var p = new TextParams(62, EmojiSize, _sans, TextColor, area, Format);
-            var h = (int)graphics.MeasureString(textM, _sans, area.Size, Format, out _, out var lines).Height;
-            var l = _emojer.DrawTextAndEmoji(graphics, text, emoji, p, InitialMargin(h), Spacing);
-            var d = _cardHeight - h;
-            SetCardHeight(h * l / lines + d);
+            var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
+            var parameters = new EmojiTool.Options(TextColor, EmojiSize);
+            var textLayer = _emojer.DrawEmojiText(text, options, parameters, out var linesActual);
 
-            graphics.CompositingMode = CompositingMode.SourceCopy;
-            graphics.FillRectangle(_transparent, 0, _cardHeight, _w, cardHeight - _cardHeight);
+            SetCardHeight(heightExpected * linesActual / linesExpected + _cardHeight - heightExpected);
+
+            var x = UseLeftAlignment ? _marginLeft : (_w - textLayer.Width) / 2F;
+            var y = (_cardHeight - textLayer.Height) / 2F + _textOffset;
+            var point = new Point(x.RoundInt(), y.RoundInt());
+            image = new Image<Rgba32>(_w, _cardHeight, Background); // todo better branching
+            image.Mutate(ctx => ctx.DrawImage(textLayer, point, opacity: 1));
         }
-        else*/
+        else
         {
             Console.WriteLine(FontSize);
-            image.Mutate(x => x.DrawText(GetDefaultTextOptions(), text, TextColor, pen: null));
+            image!.Mutate(x => x.DrawText(options, text, TextColor, pen: null));
         }
 
-        return image;
+        return image!;
     }
     
     private int InitialMargin(int h) => UseLeftAlignment && !_extraHigh ? _cardHeight - h : (_cardHeight - h) / 2;
     private int Spacing   => (int)(_font.Size * 1.6);
-    private int EmojiSize => (int)(_font.Size * 1.5);
+    private int EmojiSize => (int)(_font.Size * ExtraFonts.GetLineSpacing() * 1.2F);
 
     private void AdjustProportions(string text) // todo change the algorithm
     {

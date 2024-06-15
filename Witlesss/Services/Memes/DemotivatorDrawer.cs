@@ -20,7 +20,7 @@ namespace Witlesss.Services.Memes
         private readonly bool _square;
         private readonly RectangleF _frame;
         private readonly DgTextOptions _textA, _textB;
-        //private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
+        private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
 
 
         private readonly GraphicsOptions _anyGraphicsOptions = new();
@@ -116,9 +116,19 @@ namespace Witlesss.Services.Memes
 
         private void DrawText(Image image, string text, DgTextOptions o)
         {
-            /*var emoji = EmojiRegex.Matches(text);
-            if (emoji.Count > 0) _emojer.DrawTextAndEmoji(image, text, emoji, o);
-            else*/
+            var emoji = EmojiRegex.Matches(text);
+            if (emoji.Count > 0)
+            {
+                var options = new RichTextOptions(o.Options)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                var parameters = new EmojiTool.Options(o.Color, o.EmojiSize);
+                var textLayer = _emojer.DrawEmojiText(text, options, parameters, out _);
+                var point = new Point((_w - textLayer.Width) / 2, o.Options.Origin.Y.RoundInt());
+                image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
+            }
+            else
             {
                 //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
                 var lineBreak = TextMeasuring.DetectLineBreak(text, o.Options, o.Lines);
@@ -181,7 +191,7 @@ namespace Witlesss.Services.Memes
 
         private static readonly SolidBrush _heisenberg = new(SixLabors.ImageSharp.Color.White);
 
-        public static DgTextOptions LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w, 1.00F);
+        public static DgTextOptions LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w, 1.13F);
         public static DgTextOptions UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w, 1.36F);
         public static DgTextOptions LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w, 1.39F);
 

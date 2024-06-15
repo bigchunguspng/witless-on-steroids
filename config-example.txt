@@ -1,6 +1,4 @@
-tg-token             =  VALUE
-reddit-app-id        =  VALUE
-reddit-refresh-token =  VALUE
-album-art            = "PATH" (like "Telegram-Arts\art.jpg")
-   bold-font         = "PATH" (like "Telegram-Arts\futura-extra-black-condensed.otf")
-regular-font         = "PATH" (like "Telegram-Arts\Roboto-Regular.ttf")
+tg-token             = VALUE
+reddit-app-id        = VALUE
+reddit-refresh-token = VALUE
+admin-id  	         = VALUE

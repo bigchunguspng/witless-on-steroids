@@ -47,7 +47,7 @@ namespace Witlesss.Commands
         
         public static string UniqueExtraDBsPath(string name)
         {
-            return UniquePath($@"{EXTRA_DBS_FOLDER}\{name}.json", name is "info" or "his");
+            return UniquePath($@"{Paths.Dir_Fuse}\{name}.json", name is "info" or "his");
         }
     }
 }

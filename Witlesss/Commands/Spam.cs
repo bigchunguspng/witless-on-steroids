@@ -31,7 +31,7 @@ public class Spam : SyncCommand
     {
         try
         {
-            var message = text ?? File.ReadAllText("spam.txt");
+            var message = text ?? File.ReadAllText(Paths.File_Spam);
             var bakas = Bot.SussyBakas.Values.Where(x =>
             {
                 if (File.Exists(x.Path))

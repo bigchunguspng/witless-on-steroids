@@ -36,7 +36,7 @@ namespace Witlesss.Commands
             var args = Args.SplitN();
             if (FileAttached("text/plain")) // TXT
             {
-                var path = UniquePath($@"{FUSE_HISTORY_FOLDER}\{_document!.FileName}");
+                var path = UniquePath($@"{Paths.Dir_History}\{_document!.FileName}");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 EatFromTxtFile(path);
@@ -108,7 +108,7 @@ namespace Witlesss.Commands
 
         public void SendFuseList(long chat, int page, int perPage, int messageId = -1, bool fail = false)
         {
-            var directory = EXTRA_DBS_FOLDER;
+            var directory = Paths.Dir_Fuse;
             SendFilesList(ExtraDBs, directory, chat, page, perPage, messageId, fail);
         }
 
@@ -205,7 +205,7 @@ namespace Witlesss.Commands
             }
 
             var chatExist = argIsID && Bot.WitlessExist(chat);
-            var files = chatExist ? null : GetFiles(EXTRA_DBS_FOLDER, $"{arg}.json");
+            var files = chatExist ? null : GetFiles(Paths.Dir_Fuse, $"{arg}.json");
             var fileExist = files is { Length: > 0 };
             if (chatExist || fileExist)
             {
@@ -275,7 +275,7 @@ namespace Witlesss.Commands
         #endregion
 
 
-        private string GetHistoryFolder() => $@"{FUSE_HISTORY_FOLDER}\{Chat}";
+        private string GetHistoryFolder() => $@"{Paths.Dir_History}\{Chat}";
 
         private string GetJsonFormatExample()
         {

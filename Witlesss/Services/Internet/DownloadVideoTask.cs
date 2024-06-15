@@ -25,7 +25,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
-        var directory = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
+        var directory = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
         Directory.CreateDirectory(directory);
 
         if (_cache.Contains(id, out var path))

@@ -16,7 +16,7 @@ public class ToVoiceMessage : FileEditingCommand
         }
         catch
         {
-            result = "voice.ogg";
+            result = Paths.File_DefaultVoiceMessage;
         }
 
         await using var stream = File.OpenRead(result);

@@ -50,7 +50,7 @@ namespace Witlesss.Services.Internet
 
         /// <summary> Posts that were sent to users recently, so they are no longer relevant. </summary>
         private readonly        Queue<string>  Excluded;
-        private readonly FileIO<Queue<string>> ExcludedIO = new("reddit-posts.json");
+        private readonly FileIO<Queue<string>> ExcludedIO = new(Paths.File_RedditPosts);
 
         private void Exclude(string fullname)
         {

@@ -91,7 +91,7 @@ namespace Witlesss
             }
         }
 
-        public string Path => $@"{DBS_FOLDER}\{DB_FILE_PREFIX}-{Chat}.json";
+        public string Path => $@"{Paths.Dir_Chat}\{Paths.Prefix_Pack}-{Chat}.json";
 
         public void Count() => Generation.Count();
         public bool Ready() => Generation.Ready();
@@ -144,7 +144,7 @@ namespace Witlesss
         public void Backup()
         {
             Save();
-            var path = $@"{BACKUP_FOLDER}\{DateTime.Now:yyyy-MM-dd}\{DB_FILE_PREFIX}-{Chat}.json";
+            var path = $@"{Paths.Dir_Backup}\{DateTime.Now:yyyy-MM-dd}\{Paths.Prefix_Pack}-{Chat}.json";
             var file = new FileInfo(Path);
             file.CopyTo(UniquePath(path));
         }

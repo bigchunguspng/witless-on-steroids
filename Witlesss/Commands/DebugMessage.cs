@@ -12,8 +12,8 @@ namespace Witlesss.Commands
 
             var mess = Message.ReplyToMessage;
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
-            var path = $@"{TEMP_FOLDER}\{name}";
-            Directory.CreateDirectory(TEMP_FOLDER);
+            var path = $@"{Paths.Dir_Temp}\{name}";
+            Directory.CreateDirectory(Paths.Dir_Temp);
             new FileIO<Message>(path).SaveData(mess);
             using var stream = File.OpenRead(path);
             Bot.SendDocument(Chat, new InputOnlineFile(stream, name.Replace("--", "-")));

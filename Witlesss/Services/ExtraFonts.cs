@@ -17,7 +17,7 @@ namespace Witlesss.Services
 
         static ExtraFonts()
         {
-            var files = Directory.GetFiles(Config.Fonts);
+            var files = Directory.GetFiles(Paths.Dir_Fonts);
             var collection = new FontCollection();
             files.ForEach(file => collection.Add(file));
 

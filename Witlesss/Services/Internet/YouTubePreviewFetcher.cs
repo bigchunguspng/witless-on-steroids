@@ -10,7 +10,7 @@ namespace Witlesss.Services.Internet
     {
         public static Task<string> DownloadPreview(string id, string directory) => Task.Run(() =>
         {
-            string path = null;
+            string path = null!;
             var urls = new[]
             {
                 $"https://i1.ytimg.com/vi_webp/{id}/maxresdefault.webp",
@@ -28,7 +28,7 @@ namespace Witlesss.Services.Internet
                 }
                 catch
                 {
-                    if (i == 2) return Config.ArtLocation;
+                    if (i == 2) return Paths.File_DefaultAlbumCover;
                 }
             }
 

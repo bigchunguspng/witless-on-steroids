@@ -94,29 +94,14 @@
     <data name="LOG_FUSION_DONE" xml:space="preserve">
         <value>FUSION DONE</value>
     </data>
-    <data name="PICTURES_FOLDER" xml:space="preserve">
-        <value>Telegram-Pictures</value>
-    </data>
     <data name="LOG_CHATLIST_SAVED" xml:space="preserve">
         <value>CHATLIST SAVED</value>
-    </data>
-    <data name="EXTRA_DBS_FOLDER" xml:space="preserve">
-        <value>Telegram-ExtraDBs</value>
     </data>
     <data name="SET_FREQUENCY_RESPONSE" xml:space="preserve">
         <value>я буду отвечать на</value>
     </data>
     <data name="SET_P_RESPONSE" xml:space="preserve">
         <value>пикчи будут ставать мемами с вероятностью {0}%</value>
-    </data>
-    <data name="WATERMARKS_FOLDER" xml:space="preserve">
-        <value>Telegram-Water</value>
-    </data>
-    <data name="BACKUP_FOLDER" xml:space="preserve">
-        <value>Telegram-Backup</value>
-    </data>
-    <data name="DB_FILE_PREFIX" xml:space="preserve">
-        <value>Telegram-WitlessDB</value>
     </data>
     <data name="CHATLIST_FILENAME" xml:space="preserve">
         <value>Telegram-ChatsDB</value>
@@ -139,9 +124,6 @@
 
 Копия словаря сохранена как &lt;b&gt;"{0}"&lt;/b&gt;</value>
     </data>
-    <data name="DBS_FOLDER" xml:space="preserve">
-        <value>Telegram-WitlessDBs</value>
-    </data>
     <data name="A_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, начиная с него (если оно есть в словаре)</value>
     </data>
@@ -154,9 +136,6 @@
 • кружками 📹, голосовыми🎙
 
 Ответь командой на файл 🗞 или прикрепи его к команде ✍️</value>
-    </data>
-    <data name="TEMP_FOLDER" xml:space="preserve">
-        <value>Telegram-Temp</value>
     </data>
     <data name="SET_X_MANUAL" xml:space="preserve">
         <value>Если че правильно вот так:
@@ -208,12 +187,6 @@
 
 зареверсит 3-секундный фрагмент, начиная с 10-й секунды</value>
     </data>
-    <data name="FUSE_HISTORY_FOLDER" xml:space="preserve">
-        <value>Telegram-HistoryDBs</value>
-    </data>
-    <data name="COPIES_FOLDER" xml:space="preserve">
-        <value>Telegram-CopyDBs</value>
-    </data>
     <data name="STICKERS_RESPONSE" xml:space="preserve">
         <value>cтикеры {0}будут ставать мемами в случайном порядке</value>
     </data>
@@ -238,7 +211,7 @@ s   - save and exit
 +55 - select active chat
 
 /s  - save dics
-/sd - sync dics
+
 /sp - spam (min size)
 
 /db - delete blockers
@@ -255,9 +228,6 @@ s   - save and exit
 /l  - activate last chat
 /b  - ban active chat (hours)
 /ub - unban active chat</value>
-    </data>
-    <data name="EMOJI_FOLDER" xml:space="preserve">
-        <value>Emoji</value>
     </data>
     <data name="SET_Q_RESPONSE" xml:space="preserve">
         <value>качество картинок будет {0}%</value>
@@ -329,9 +299,6 @@ s   - save and exit
         <value>This is the certified {0} classic!
 =======
 {1} на связи!</value>
-    </data>
-    <data name="ASCII_FOLDER" xml:space="preserve">
-        <value>Telegram-Arts\ASCII</value>
     </data>
     <data name="FF_ERROR_REPORT" xml:space="preserve">
         <value>Ошибка произошла во время выполнения следующей команды:
@@ -494,9 +461,6 @@ s   - save and exit
     </data>
     <data name="MAY_TAKE_A_WHILE" xml:space="preserve">
         <value>(может занять до пары минут)</value>
-    </data>
-    <data name="CHAN_FOLDER" xml:space="preserve">
-        <value>Telegram-BoardDBs</value>
     </data>
     <data name="FUSE_FAIL_BOARD" xml:space="preserve">
         <value>К сожалению, я не нашёл сохранённых обсуждений с таким названием

@@ -248,7 +248,7 @@ namespace Witlesss.Services
                     {
                         repeat = false;
 
-                        var files = Directory.GetFiles(EMOJI_FOLDER, name + "*.png");
+                        var files = Directory.GetFiles(Paths.Dir_Emoji, name + "*.png");
                         if (files.Length == 1) file = files[0];
                         else if (files.Length > 1)
                         {

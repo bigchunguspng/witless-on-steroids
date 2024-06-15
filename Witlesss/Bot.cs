@@ -28,7 +28,7 @@ namespace Witlesss
             PlayStation8 = new ConsoleUI(this);
             ThorRagnarok = new BanHammer(this);
             
-            ChatsIO = new FileIO<ChatList>($@"{DBS_FOLDER}\{CHATLIST_FILENAME}.json");
+            ChatsIO = new FileIO<ChatList>(Paths.File_Chats);
             SussyBakas = ChatsIO.LoadData();
         }
 
@@ -56,11 +56,11 @@ namespace Witlesss
 
         private void LoadSomeBakas()
         {
-            var directory = new DirectoryInfo(DBS_FOLDER);
+            var directory = new DirectoryInfo(Paths.Dir_Chat);
             var selection = directory
-                .GetFiles(DB_FILE_PREFIX + "*.json")
+                .GetFiles(Paths.Prefix_Pack + "*.json")
                 .Where(x => x.LastWriteTime.HappenedWithinLast(TimeSpan.FromHours(2)) && x.Length < 4_000_000)
-                .Select(x => long.Parse(x.Name.Replace(DB_FILE_PREFIX + "-", "").Replace(".json", "")));
+                .Select(x => long.Parse(x.Name.Replace(Paths.Prefix_Pack + "-", "").Replace(".json", "")));
             foreach (var chat in selection) WitlessExist(chat); // <-- this loads the dictionary;
         }
 

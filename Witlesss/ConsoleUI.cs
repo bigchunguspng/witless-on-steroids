@@ -8,8 +8,8 @@ namespace Witlesss
 {
     public class ConsoleUI
     {
-        private long  _active;
-        private string _input;
+        private long   _active;
+        private string? _input;
 
         public ConsoleUI(Bot bot) => Bot = bot;
 
@@ -48,10 +48,11 @@ namespace Witlesss
 
         private void DoConsoleCommands()
         {
+            if (_input is null) return;
+
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) Bot.SaveBakas();
-            else if (_input == "/sd") SyncDics();
             else if (_input == "/sp") Spam.SendSpam();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
@@ -69,11 +70,11 @@ namespace Witlesss
             else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out var c)) Thor.BanChat(_active, c);
         }
 
-        private bool BotWannaSpeak() => Regex.IsMatch(_input, @"^\/[aw] ");
+        private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
 
         private void SetActiveChat()
         {
-            string shit = _input[1..];
+            string shit = _input![1..];
             foreach (long chat in SussyBakas.Keys)
             {
                 if (chat.ToString().EndsWith(shit))
@@ -87,7 +88,7 @@ namespace Witlesss
 
         private void BreakFourthWall()
         {
-            string text = _input.Split (' ', 2)[1];
+            string text = _input!.Split (' ', 2)[1];
             if (!Bot.WitlessExist(_active)) return;
 
             if      (_input.StartsWith("/a ") && Active.Eat(text, out text!)) // add
@@ -150,20 +151,6 @@ namespace Witlesss
             Bot.SaveChatList();
         }
 
-        private void SyncDics()
-        {
-            foreach (var witless in Bakas)
-            {
-                var path = $@"{COPIES_FOLDER}\{DB_FILE_PREFIX}-{witless.Chat}.json";
-                if (File.Exists(path) && Bot.WitlessExist(witless.Chat))
-                {
-                    new FusionCollab(witless, new FileIO<WitlessDB>(path).LoadData()).Fuse();
-                    Log($"{LOG_FUSION_DONE} << {witless.Chat}", ConsoleColor.Magenta);
-                    witless.SaveNoMatterWhat();
-                }
-            }
-        }
-        
         private void FixDBs() => Bakas.ForEach(FixDB);
         private void FixDB(Witless witless)
         {

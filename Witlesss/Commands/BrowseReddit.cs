@@ -235,7 +235,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         private static string DownloadMeme(PostData post, string extension)
         {
-            var name = UniquePath($@"{PICTURES_FOLDER}\{post.Fullname}{extension}");
+            var name = UniquePath($@"{Paths.Dir_Pics}\{post.Fullname}{extension}");
             using var web = new WebClient();
             web.DownloadFile(post.URL, name);
 

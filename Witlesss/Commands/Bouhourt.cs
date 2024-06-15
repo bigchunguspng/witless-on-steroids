@@ -9,7 +9,7 @@ namespace Witlesss.Commands
     public class Bouhourt : WitlessSyncCommand
     {
         private readonly Regex _args = new(@"(\d)?(?:\s)?(.+)?");
-        private readonly WitlessDB _baguette = new FileIO<WitlessDB>("BT.json").LoadData();
+        private readonly WitlessDB _baguette = new FileIO<WitlessDB>(Paths.File_Baguette).LoadData();
 
         protected override void Run()
         {

@@ -16,9 +16,9 @@ namespace Witlesss
         {
             Bot = bot;
 
-            BansIO =  new FileIO<Dictionary<long, DateTime>>($@"{DBS_FOLDER}\bans.json");
+            BansIO =  new FileIO<Dictionary<long, DateTime>>(Paths.File_Bans);
             BannedChats = BansIO.LoadData();
-            SussyChats = new();
+            SussyChats = new Dictionary<long, ChatBotUsage>();
         }
 
         private Bot Bot { get; }

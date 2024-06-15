@@ -78,24 +78,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-Arts\ASCII.
-        /// </summary>
-        internal static string ASCII_FOLDER {
-            get {
-                return ResourceManager.GetString("ASCII_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-Backup.
-        /// </summary>
-        internal static string BACKUP_FOLDER {
-            get {
-                return ResourceManager.GetString("BACKUP_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Этой командой можно скармливать мне треды с форча.
         ///
         ///&lt;b&gt;Синтаксис:&lt;/b&gt;
@@ -137,15 +119,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-BoardDBs.
-        /// </summary>
-        internal static string CHAN_FOLDER {
-            get {
-                return ResourceManager.GetString("CHAN_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Telegram-ChatsDB.
         /// </summary>
         internal static string CHATLIST_FILENAME {
@@ -161,7 +134,7 @@ namespace Witlesss.XD {
         ///+55 - select active chat
         ///
         /// /s  - save dics
-        /// /sd - sync dics
+        ///
         /// /sp - spam (min size)
         ///
         /// /db - delete blockers
@@ -182,15 +155,6 @@ namespace Witlesss.XD {
         internal static string CONSOLE_MANUAL {
             get {
                 return ResourceManager.GetString("CONSOLE_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-CopyDBs.
-        /// </summary>
-        internal static string COPIES_FOLDER {
-            get {
-                return ResourceManager.GetString("COPIES_FOLDER", resourceCulture);
             }
         }
         
@@ -260,24 +224,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-WitlessDB.
-        /// </summary>
-        internal static string DB_FILE_PREFIX {
-            get {
-                return ResourceManager.GetString("DB_FILE_PREFIX", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-WitlessDBs.
-        /// </summary>
-        internal static string DBS_FOLDER {
-            get {
-                return ResourceManager.GetString("DBS_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!
         ///
         ///Если хотите начать заново - пропишите /start@piece_fap_bot.
@@ -324,15 +270,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Emoji.
-        /// </summary>
-        internal static string EMOJI_FOLDER {
-            get {
-                return ResourceManager.GetString("EMOJI_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Эквалайзер&lt;/u&gt;&lt;/b&gt;
         ///
         ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/eq [частота,Hz] [сила,dB] [ширина,Hz]&lt;/code&gt;
@@ -352,15 +289,6 @@ namespace Witlesss.XD {
         internal static string EQ_MANUAL {
             get {
                 return ResourceManager.GetString("EQ_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-ExtraDBs.
-        /// </summary>
-        internal static string EXTRA_DBS_FOLDER {
-            get {
-                return ResourceManager.GetString("EXTRA_DBS_FOLDER", resourceCulture);
             }
         }
         
@@ -426,15 +354,6 @@ namespace Witlesss.XD {
         internal static string FUSE_HIS_ALL {
             get {
                 return ResourceManager.GetString("FUSE_HIS_ALL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-HistoryDBs.
-        /// </summary>
-        internal static string FUSE_HISTORY_FOLDER {
-            get {
-                return ResourceManager.GetString("FUSE_HISTORY_FOLDER", resourceCulture);
             }
         }
         
@@ -598,15 +517,6 @@ namespace Witlesss.XD {
         internal static string ONLY_ARRAY_JSON {
             get {
                 return ResourceManager.GetString("ONLY_ARRAY_JSON", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-Pictures.
-        /// </summary>
-        internal static string PICTURES_FOLDER {
-            get {
-                return ResourceManager.GetString("PICTURES_FOLDER", resourceCulture);
             }
         }
         
@@ -937,15 +847,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Telegram-Temp.
-        /// </summary>
-        internal static string TEMP_FOLDER {
-            get {
-                return ResourceManager.GetString("TEMP_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/top&lt;/code&gt;:
         ///
         ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
@@ -1009,15 +910,6 @@ namespace Witlesss.XD {
         internal static string VOLUME_MANUAL {
             get {
                 return ResourceManager.GetString("VOLUME_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Telegram-Water.
-        /// </summary>
-        internal static string WATERMARKS_FOLDER {
-            get {
-                return ResourceManager.GetString("WATERMARKS_FOLDER", resourceCulture);
             }
         }
         

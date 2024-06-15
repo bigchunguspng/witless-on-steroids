@@ -191,7 +191,7 @@ namespace Witlesss.XD
 
         public static string GetRandomASCII()
         {
-            var files = GetFiles(ASCII_FOLDER);
+            var files = GetFiles(Paths.Dir_ASCII);
             return File.ReadAllText(files[Random.Shared.Next(files.Length)]);
         }
 
@@ -226,8 +226,8 @@ namespace Witlesss.XD
 
         public static void ClearTempFiles()
         {
-            ClearDirectory(TEMP_FOLDER, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
-            ClearDirectory(FUSE_HISTORY_FOLDER, new EnumerationOptions() { RecurseSubdirectories = false});
+            ClearDirectory(Paths.Dir_Temp, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
+            ClearDirectory(Paths.Dir_History, new EnumerationOptions() { RecurseSubdirectories = false });
         }
 
         private static void ClearDirectory(string path, EnumerationOptions options)

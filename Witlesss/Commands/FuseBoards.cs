@@ -48,7 +48,7 @@ namespace Witlesss.Commands
                 var args = Args.SplitN();
                 if (args.Length > 1) // FUSE WITH JSON FILE
                 {
-                    var files = GetFiles(CHAN_FOLDER, $"{Args}.json");
+                    var files = GetFiles(Paths.Dir_Board, $"{Args}.json");
                     if (files.Length > 0)
                     {
                         EatFromJsonFile(files[0]);
@@ -123,8 +123,8 @@ namespace Witlesss.Commands
             EatAllLines(lines, baka, limit, out var eated);
             SaveChanges(baka, title);
 
-            Directory.CreateDirectory(CHAN_FOLDER);
-            var path = $@"{CHAN_FOLDER}\{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json";
+            Directory.CreateDirectory(Paths.Dir_Board);
+            var path = $@"{Paths.Dir_Board}\{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json";
             new FileIO<List<string>>(path).SaveData(lines);
             _names.Remove(chat);
 
@@ -162,7 +162,7 @@ namespace Witlesss.Commands
 
         public void SendSavedList(long chat, int page, int perPage, int messageId = -1)
         {
-            var files = GetFilesInfo(CHAN_FOLDER);
+            var files = GetFilesInfo(Paths.Dir_Board);
             if (_files is null || _files.Length != files.Length) _files = files; // todo i think we don't need _files
 
             var single = _files.Length <= perPage;

@@ -115,7 +115,7 @@ public class DownloadMusicTask
             var cmd_a = GetAudioDownloadCommand(url, output);
             var cmd_v = GetVideoDownloadCommand(url);
 
-            var dir = $"{TEMP_FOLDER}/{DateTime.Now.Ticks}";
+            var dir = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
             Directory.CreateDirectory(dir);
 
             var thumb = $"{dir}/thumb.jpg";

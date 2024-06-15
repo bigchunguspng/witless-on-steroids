@@ -5,7 +5,7 @@ namespace Witlesss.Services;
 
 public static class DefaultTextProvider
 {
-    private static readonly List<string>? _defaultTexts = new FileIO<List<string>>("default.json").LoadData();
+    private static readonly List<string>? _defaultTexts = new FileIO<List<string>>(Paths.File_DefaultTexts).LoadData();
 
     public static string? GetRandomResponse()
     {

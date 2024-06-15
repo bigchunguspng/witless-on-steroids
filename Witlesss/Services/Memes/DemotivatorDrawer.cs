@@ -43,7 +43,7 @@ namespace Witlesss.Services.Memes
         });
 
 
-        static DemotivatorDrawer() => LoadLogos(WATERMARKS_FOLDER);
+        static DemotivatorDrawer() => LoadLogos(Paths.Dir_Water);
 
         public DemotivatorDrawer(int width = 720, int height = 720)
         {

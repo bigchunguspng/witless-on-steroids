@@ -4,20 +4,10 @@ using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Core
 {
-    /*public abstract class BotNeighbour
-    {
-        protected static Bot Bot => Bot.Instance;
-    }
-
-    public abstract class AbstractCommand<TContext> where TContext : CommandContext
-    {
-        protected static Bot Bot => Bot.Instance;
-
-        public abstract void Run(TContext c);
-    }*/
-
     public abstract class AnyCommand<TContext> where TContext : CommandContext
     {
+        protected static Bot Bot => Bot.Instance;
+
         public TContext Context { get; protected set; } = default!;
 
         public Message Message  => Context.Message;
@@ -26,19 +16,19 @@ namespace Witlesss.Commands.Core
         public string? Text     => Context.Text;
         public string? Command  => Context.Command;
         public string? Args     => Context.Args;
-        public bool    IsForMe  => Context.IsForMe;
-
-        protected static Bot Bot => Bot.Instance;
 
         public abstract void Execute(TContext context);
     }
 
+    // SYNC
+
     /// <summary>
-    /// Can be reused.
+    /// Blocking command. Should be used for short simple actions!
+    /// The same instance can be used unlimited amount of times.
     /// </summary>
     public abstract class AnySyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext
     {
-        public override void Execute(TContext context)
+        public sealed override void Execute(TContext context)
         {
             Context = context;
             Run();
@@ -55,12 +45,15 @@ namespace Witlesss.Commands.Core
         public Witless Baka => Context.Baka;
     }
 
+    // ASYNC
+
     /// <summary>
-    /// Is one time use.
+    /// Non-blocking command. Should be used for time consuming actions!
+    /// A new instance should be created every time!
     /// </summary>
     public abstract class AnyAsyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext
     {
-        public override async void Execute(TContext context)
+        public sealed override async void Execute(TContext context)
         {
             Context = context;
             try
@@ -83,39 +76,10 @@ namespace Witlesss.Commands.Core
         public Witless Baka => Context.Baka;
     }
 
+    // ROUTING
 
-    /*
-    public abstract class Command : AbstractCommand<CommandContext>;
-
-    public abstract class WitlessCommand : AbstractCommand<WitlessContext>;
-    */
-
-    // command.Run(request); can be async
-    //  sync command -> new command(request).Run(); / command.Pass(request); command.Run();
-    // async command -> new command(request).Run();
-    
-    // Command
-    //   FileEditingCommand
-    //     VideoCommand
-    // WitlessCommand
-    //   SettingsCommand
-
-    public abstract class AnyCommandRouter<TContext> where TContext : CommandContext
+    public abstract class CommandAndCallbackRouter : SyncCommand
     {
-        protected static Bot Bot => Bot.Instance;
-
-        public TContext Context { get; protected set; } = default!;
-
-        public abstract void Run();
-    }
-
-    public abstract class CommandAndCallbackRouter : AnyCommandRouter<CommandContext>
-    {
-        public void Pass(Message message)
-        {
-            Context = new CommandContext(message);
-        }
-
-        public abstract void OnCallback(CallbackQuery query);
+        public abstract void OnCallback(CallbackQuery query); // todo something
     }
 }

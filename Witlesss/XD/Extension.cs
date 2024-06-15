@@ -15,11 +15,11 @@ namespace Witlesss.XD
         public  static readonly Regex PngJpg = new("(.png)|(.jpg)"), EmojiRegex = new (REGEX_EMOJI);
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
-        
-        //public static readonly Random Random = new();
 
         public static bool IsOneIn         (int x) => Random.Shared.Next(x) == 0;
         public static bool IsFirstOf(int a, int b) => Random.Shared.Next(a + b) < a;
+
+        public static bool Lucky(int chance, int max = 100) => Random.Shared.Next(max) < chance;
 
         public static int    RandomInt   (int    min, int    max) => Random.Shared.Next(min, max + 1);
         public static double RandomDouble(double min, double max)

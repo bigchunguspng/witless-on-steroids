@@ -35,7 +35,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
             if (Message.ReplyToMessage is { Text: { } t } message && IsCommand(t, "/w"))
             {
-                Context = new CommandContext(message);
+                Context = CommandContext.FromMessage(message);
                 Run(); // RECURSIVE
             }
             else if (_wtf.IsMatch(Command!))
@@ -279,7 +279,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         {
             if (Message.ReplyToMessage is { } message)
             {
-                Context = new CommandContext(message);
+                Context = CommandContext.FromMessage(message);
 
                 if (Text is not null && RedditTool.Instance.Recognize(Text) is { } post)
                 {

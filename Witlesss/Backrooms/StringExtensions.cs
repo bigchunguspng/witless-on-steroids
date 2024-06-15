@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Witlesss.Backrooms;
 
@@ -24,4 +25,8 @@ public static class StringExtensions
     public static string Quote(this string s) => $"\"{s}\"";
     
     public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
+
+    // REGEX
+
+    public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);
 }

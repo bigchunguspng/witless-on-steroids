@@ -33,8 +33,7 @@ namespace Witlesss
         {
             try
             {
-                Router.Pass(message);
-                Router.Run();
+                Router.Execute(CommandContext.FromMessage(message));
             }
             catch (Exception e)
             {

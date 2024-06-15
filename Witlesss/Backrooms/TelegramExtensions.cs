@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -31,7 +33,17 @@ public static class TelegramExtensions
         return message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
     }
 
-    public static bool SenderIsAdmin(this Message message)
+    // MEDIA
+
+    public static PhotoSize? GetPhoto       (this Message message) => message.Photo?[^1];
+    public static Sticker?   GetImageSticker(this Message message)
+    {
+        return message.Sticker is { IsVideo: false, IsAnimated: false } sticker ? sticker : null;
+    }
+
+    //
+
+    public static async Task<bool> SenderIsAdmin(this Message message)
     {
         var chat = message.Chat.Id;
         if (message.SenderChat is not null)
@@ -40,13 +52,21 @@ public static class TelegramExtensions
 
             Bot.Instance.SendMessage(chat, Pick(UNKNOWN_CHAT_RESPONSE));
         }
-        else if (message.From is not null && !Bot.Instance.UserIsAdmin(message.From, chat))
+        else if (await message.From.IsAdminInChat(chat) == false)
         {
             Bot.Instance.SendMessage(chat, Pick(NOT_ADMIN_RESPONSE));
         }
         else return true;
 
         return false;
+    }
+
+    public static async Task<bool> IsAdminInChat(this User? user, long chat)
+    {
+        if (user is null) return false;
+
+        var admins = await Bot.Instance.Client.GetChatAdministratorsAsync(chat);
+        return admins.Any(x => x.User.Id == user.Id);
     }
 
     public static string GetSenderName(this Message message)

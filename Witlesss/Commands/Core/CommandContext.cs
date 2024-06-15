@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -8,6 +7,21 @@ namespace Witlesss.Commands.Core;
 public class CommandContext
 {
     private static readonly Regex _command = new(@"^\/\S+", RegexOptions.IgnoreCase);
+    private static readonly string _botUsernameStart = Config.BOT_USERNAME.Remove(7);
+
+    public Message Message  { get; }
+    public long    Chat     { get; }
+    public string  Title    { get; }
+    public string? Text     { get; }
+    public string? Command  { get; }
+    public string? Args     { get; }
+    public bool    IsForMe  { get; }
+
+    public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
+
+    private readonly bool _noBotMentioned;
+    public bool BotMentioned => !_noBotMentioned;
+
 
     protected CommandContext(CommandContext context)
     {
@@ -18,25 +32,26 @@ public class CommandContext
         Command = context.Command;
         Args = context.Args;
         IsForMe = context.IsForMe;
-    }
 
-    public CommandContext(Message message)
+        _noBotMentioned = context._noBotMentioned;
+    }
+    
+    protected CommandContext(Message message)
     {
         Message = message;
         Chat = message.Chat.Id;
         Title = message.GetChatTitle();
-
         Text = message.GetTextOrCaption();
-        if (Text is null) return;
 
-        var match = _command.Match(Text);
-        if (match.Success)
+        var match = _command.MatchOrNull(Text);
+        if (match is { Success: true })
         {
             var lower = match.Value.ToLower();
             Command = lower.Replace(Config.BOT_USERNAME, "");
-            IsForMe = !lower.Contains('@') || !lower.Contains("bot") || lower.Contains(Config.BOT_USERNAME.Remove(7));
+            _noBotMentioned = !lower.Contains('@') || !lower.Contains("bot");
+            IsForMe = _noBotMentioned || lower.Contains(_botUsernameStart);
 
-            Args = match.Length == Text.Length ? null : Text.Substring(match.Length + 1);
+            Args = match.Length == Text!.Length ? null : Text.Substring(match.Length + 1);
         }
         else
         {
@@ -44,28 +59,16 @@ public class CommandContext
         }
     }
 
-    public Message Message  { get; set; }
-    public long    Chat     { get; set; }
-    public string  Title    { get; set; }
-    public string? Text     { get; set; }
-    public string? Command  { get; set; }
-    public string? Args     { get; set; }
-    public bool    IsForMe  { get; set; }
-
-    public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
-
-    /*public (string? text, long chat, string title) Deconstruct()
-    {
-        return (Text, Chat, Title);
-    }*/
+    public static CommandContext FromMessage(Message message) => new(message);
 }
 
-public class WitlessContext(CommandContext context, Witless baka) : CommandContext(context)
+public class WitlessContext : CommandContext
 {
-    public Witless Baka { get; set; } = baka;
+    public Witless Baka { get; }
 
-    /*public (Witless baka, string? text, long chat, string title) Deconstruct()
-    {
-        return (Baka, Text, Chat, Title);
-    }*/
+    private WitlessContext(CommandContext context, Witless baka) : base(context) => Baka = baka;
+    private WitlessContext(Message        message, Witless baka) : base(message) => Baka = baka;
+
+    public static WitlessContext From(CommandContext context, Witless baka) => new(context, baka);
+    public static WitlessContext FromMessage(Message message, Witless baka) => new(message, baka);
 }

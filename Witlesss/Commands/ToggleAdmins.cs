@@ -8,7 +8,7 @@
             {
                 Bot.SendMessage(Chat, GROUPS_ONLY_COMAND);
             }
-            else if (Message.SenderIsAdmin())
+            else if (Message.SenderIsAdmin().Result)
             {
                 Baka.AdminsOnly = !Baka.AdminsOnly;
                 Bot.SaveChatList();
@@ -22,7 +22,7 @@
     {
         private bool /* when the */ SenderIsSus() // !😳
         {
-            return Baka.AdminsOnly && !Message.SenderIsAdmin();
+            return Baka.AdminsOnly && !Message.SenderIsAdmin().Result;
         }
 
         protected override void Run()

@@ -204,14 +204,6 @@ namespace Witlesss
             return _downloader.DownloadFile(fileID, path, chat);
         }
 
-
-        public bool UserIsAdmin(User user, long chat)
-        {
-            var admins = Client.GetChatAdministratorsAsync(chat);
-            admins.Wait();
-            return admins.Result.Any(x => x.User.Id == user.Id);
-        }
-
         private static bool ChatCanBeRemoved(Exception e) => e.Message.Contains("Forbidden")      || 
                                                              e.Message.Contains("chat not found") ||
                                                              e.Message.Contains("rights to send");

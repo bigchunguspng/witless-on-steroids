@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -91,7 +90,7 @@ namespace Witlesss
             }
         }
 
-        public string Path => $@"{Paths.Dir_Chat}\{Paths.Prefix_Pack}-{Chat}.json";
+        public string Path => System.IO.Path.Combine(Paths.Dir_Chat, $"{Paths.Prefix_Pack}-{Chat}.json");
 
         public void Count() => Generation.Count();
         public bool Ready() => Generation.Ready();
@@ -136,7 +135,7 @@ namespace Witlesss
 
         public void Unload()
         {
-            Words = null;
+            Words = null!;
             Loaded = false;
             Log($"DIC UNLOAD << {Chat}", ConsoleColor.Yellow);
         }
@@ -144,7 +143,9 @@ namespace Witlesss
         public void Backup()
         {
             Save();
-            var path = $@"{Paths.Dir_Backup}\{DateTime.Now:yyyy-MM-dd}\{Paths.Prefix_Pack}-{Chat}.json";
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var name = $"{Paths.Prefix_Pack}-{Chat}.json";
+            var path = System.IO.Path.Combine(Paths.Dir_Backup, date, name);
             var file = new FileInfo(Path);
             file.CopyTo(UniquePath(path));
         }

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
-using static Witlesss.XD.LetterCaseMode;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Witlesss.XD
@@ -53,7 +52,7 @@ namespace Witlesss.XD
         public static string UniquePath(string path, bool extra = false)
         {
             var cd = true;
-            var directory = Path.GetDirectoryName(path);
+            var directory = Path.GetDirectoryName(path)!;
             var extension = Path.GetExtension(path);
 
             while (File.Exists(path) || extra)
@@ -71,7 +70,7 @@ namespace Witlesss.XD
                 else
                     name += "_0";
 
-                path = $@"{directory}\{name}{extension}";
+                path = Path.Combine(directory, $"{name}{extension}");
                 extra = false;
             }
             if (cd) Directory.CreateDirectory(directory);

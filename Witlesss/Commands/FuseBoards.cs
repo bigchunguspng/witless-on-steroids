@@ -124,7 +124,7 @@ namespace Witlesss.Commands
             SaveChanges(baka, title);
 
             Directory.CreateDirectory(Paths.Dir_Board);
-            var path = $@"{Paths.Dir_Board}\{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json";
+            var path = Path.Combine(Paths.Dir_Board, $"{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json");
             new FileIO<List<string>>(path).SaveData(lines);
             _names.Remove(chat);
 

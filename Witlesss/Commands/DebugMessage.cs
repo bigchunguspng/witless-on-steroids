@@ -12,7 +12,7 @@ namespace Witlesss.Commands
 
             var mess = Message.ReplyToMessage;
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
-            var path = $@"{Paths.Dir_Temp}\{name}";
+            var path = Path.Combine(Paths.Dir_Temp, name);
             Directory.CreateDirectory(Paths.Dir_Temp);
             new FileIO<Message>(path).SaveData(mess);
             using var stream = File.OpenRead(path);

@@ -28,7 +28,7 @@ namespace Witlesss.Services.Internet
 
             if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
 
-            path = UniquePath($@"{Paths.Dir_Pics}\{chat}\{shortID}{extension}");
+            path = UniquePath(Path.Combine(Paths.Dir_Pics, chat.ToString(), $"{shortID}{extension}"));
 
             await DownloadFile(fileID, path, chat);
 
@@ -39,7 +39,7 @@ namespace Witlesss.Services.Internet
 
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
-            Directory.CreateDirectory($@"{Paths.Dir_Pics}\{chat}");
+            Directory.CreateDirectory(Path.Combine(Paths.Dir_Pics, chat.ToString()));
             try
             {
                 var file = await _bot.Client.GetFileAsync(fileId);

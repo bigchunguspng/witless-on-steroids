@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -166,7 +166,7 @@ namespace Witlesss
         
         public void SendErrorDetails(long chat, Exception e)
         {
-            var path = UniquePath($@"{Paths.Dir_Temp}\error.txt");
+            var path = UniquePath(Path.Combine(Paths.Dir_Temp, "error.txt"));
             var args = F_Action.FFMpegCommand;
             var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), FixedErrorMessage(e.Message));
             File.WriteAllText(path, text);

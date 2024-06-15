@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WordChart = Witlesss.XD.SyncronizedDictionary<string, float>;
+using WordChart = System.Collections.Generic.Dictionary<string, float>;
 
 namespace Witlesss
 {

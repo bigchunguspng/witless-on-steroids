@@ -13,4 +13,4 @@ global using static Witlesss.Services.Technical.Logger;
 global using static Witlesss.XD.Texts;
 global using File = System.IO.File;
 global using ChatList  = Witlesss.XD.SyncronizedDictionary<  long, Witlesss.Witless>;
-global using WitlessDB = Witlesss.XD.SyncronizedDictionary<string, Witlesss.XD.SyncronizedDictionary<string, float>>;
+global using WitlessDB = Witlesss.XD.SyncronizedDictionary<string, System.Collections.Generic.Dictionary<string, float>>;

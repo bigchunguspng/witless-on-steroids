@@ -37,7 +37,6 @@ namespace Witlesss.Services
         public static List<FontFamily> FallbackFamilies { get; } =
         [
             SystemFonts.Get("MS PGothic"),
-            SystemFonts.Get("Arial"),
             SystemFonts.Get("Segoe UI Symbol"),
         ];
 

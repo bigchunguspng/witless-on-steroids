@@ -38,9 +38,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"{Router.Context.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
-
-                if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(message.Chat.Id, e);
+                HandleCommandException(e, Router.Context);
             }
 
             return Task.CompletedTask;
@@ -58,6 +56,13 @@ namespace Witlesss
             }
             
             return Task.CompletedTask;
+        }
+
+        public static void HandleCommandException(Exception e, CommandContext context)
+        {
+            LogError($"{context.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
+
+            if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(context.Chat, e);
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Witlesss.Commands.Core
             }
             catch (Exception e)
             {
-                LogError($"ASYNC COMMAND >> {e.Message}");
+                TelegramUpdateHandler.HandleCommandException(e, Context);
             }
         }
 

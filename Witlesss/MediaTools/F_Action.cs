@@ -54,10 +54,10 @@ namespace Witlesss.MediaTools
 #endif
         }
 
-        private static string _args;
+        private static string? _args;
         public  static string FFMpegCommand => _args is not null ? $"ffmpeg {_args}" : "Live FFMpeg reaction:";
 
 
-        public static VideoStream GetVideoStream(string path) => FFProbe.Analyse(path).PrimaryVideoStream;
+        public static VideoStream? GetVideoStream(string path) => FFProbe.Analyse(path).PrimaryVideoStream;
     }
 }

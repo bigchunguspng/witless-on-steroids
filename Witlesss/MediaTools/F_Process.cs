@@ -23,7 +23,7 @@ namespace Witlesss.MediaTools
         // -s WxH -an -vcodec libx264 -crf 30
         public F_Action ToAnimation() => ApplyEffects(o =>
         {
-            var v = GetVideoStream(_input);
+            var v = GetVideoStream(_input)!;
             var size = new Size(v.Width, v.Height).Ok().FitSize().ValidMp4Size().Ok();
             o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
@@ -64,7 +64,7 @@ namespace Witlesss.MediaTools
         public F_Action CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
         public F_Action CompressAnimation   () => ApplyEffects(o =>
         {
-            var v = GetVideoStream(_input);
+            var v = GetVideoStream(_input)!;
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
 

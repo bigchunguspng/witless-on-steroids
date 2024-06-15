@@ -5,7 +5,6 @@ using FFMpegCore;
 using SixLabors.ImageSharp;
 using Drawer = Witlesss.Services.Memes.DemotivatorDrawer;
 using FFO = FFMpegCore.FFMpegArgumentOptions;
-using FAP = FFMpegCore.FFMpegArgumentProcessor;
 
 namespace Witlesss.MediaTools
 {

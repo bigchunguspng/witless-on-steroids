@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace Witlesss.Commands
 {
+    /// <summary>
+    /// Post Id Easy Channel Exporter™? Maybe.
+    /// </summary>
     public class Piece : SyncCommand
     {
         private readonly Regex _args = new(@"t.me\/[a-z0-9_]{5,32}\/\d+\s\S+");

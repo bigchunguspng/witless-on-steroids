@@ -30,18 +30,7 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            /*DynamicDemotivatorDrawer.UseGivenColor    = !empty &&  _colorXD.IsMatch(dummy);
-
-            if (DynamicDemotivatorDrawer.UseGivenColor)
-            {
-                var c = _colorXD.Match(dummy).Groups[1].Value;
-                dummy = dummy.Replace(c, "");
-                if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
-                var b = Enum.IsDefined(typeof(KnownColor), c);
-                if (b) DynamicDemotivatorDrawer.   GivenColor = Color.FromName(c);
-                else   DynamicDemotivatorDrawer.UseGivenColor = false;
-            }*/
-
+            DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request, _colorXD);
             DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
             DynamicDemotivatorDrawer.CropEdges = OptionsParsing.CheckAndCut(Request, _crop);
         }
@@ -58,9 +47,9 @@ namespace Witlesss.Commands.Meme
             return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
-        private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*",            RegexOptions.IgnoreCase);
-        private static readonly Regex _caps    = new(@"^\/dp\S*up\S*",            RegexOptions.IgnoreCase);
-        private static readonly Regex _colorXD = new(@"^\/dp\S*#([A-Za-z]+)#\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _caps    = new(@"^\/dp\S*up\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _colorXD = new(@"^\/dp\S*#([a-z0-9_]+)#\S*", RegexOptions.IgnoreCase);
 
         // LOGIC
 

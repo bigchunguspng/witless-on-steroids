@@ -24,20 +24,28 @@ public static class OptionsParsing
         return match.Success;
     }
 
-    public static int GetInt(MemeRequest request, Regex regex, int @default)
+    public static string? GetValue(MemeRequest request, Regex regex)
     {
-        if (request.Empty) return @default;
+        if (request.Empty) return null;
 
         var match = regex.Match(request.Dummy);
-        if (match.Success == false) return @default;
+        if (match.Success == false) return null;
 
-        var value = int.Parse(match.Groups[1].Value);
+        var value = match.Groups[1].Value;
         for (var i = match.Groups.Count - 1; i > 0; i--)
         {
             CutCaptureOut(match.Groups[i], request);
         }
 
         return value;
+    }
+
+    public static int GetInt(MemeRequest request, Regex regex, int @default)
+    {
+        var value = GetValue(request, regex);
+        if (value is null) return @default;
+
+        return int.Parse(value);
     }
 
     public static void CutCaptureOut(Capture group, MemeRequest request)

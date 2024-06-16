@@ -6,18 +6,18 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Types;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 {
-
     public class DynamicDemotivatorDrawer
     {
-        //public static bool UseImpact, UseRoboto, UseBoldFont;
-        public static bool CropEdges, UseGivenColor;
-        public static Color GivenColor;
-        
+        public static CustomColorOption CustomColorOption;
+        public static bool CropEdges;
+
         private SolidBrush TextColor;
+        private SolidPen FramePen;
 
         private const int FM = 5;
 
@@ -31,7 +31,6 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         public  Point Location => _pic;
 
-        private readonly Pen White = new SolidPen(Color.White, 2);
         private readonly SolidBrush WhiteBrush = new(Color.White);
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
 
@@ -48,6 +47,12 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         };
 
         private readonly SolidPen _framePen = new(new PenOptions(Color.White, 1.5F)
+        {
+            JointStyle = JointStyle.Miter,
+            EndCapStyle = EndCapStyle.Polygon
+        });
+
+        private SolidPen GetSolidPen(Rgba32 color) => new(new PenOptions(color, 1.5F)
         {
             JointStyle = JointStyle.Miter,
             EndCapStyle = EndCapStyle.Polygon
@@ -137,7 +142,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var point = new Point((full_w - caption.Width) / 2, mg_top + img_h + FM);
             background.Mutate(x => x.DrawImage(caption, point, opacity: 1));
         
-            background.Mutate(x => x.Draw(_frameOptions, _framePen, _frame));
+            background.Mutate(x => x.Draw(_frameOptions, FramePen, _frame));
 
             return background;
         }
@@ -293,8 +298,9 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         public void SetColor()
         {
-            TextColor  = UseGivenColor ? new SolidBrush(GivenColor) : WhiteBrush;
-            //FrameColor = UseGivenColor ? new SolidPen(GivenColor, 2)     : White;
+            var color = CustomColorOption.GetColor();
+            TextColor = color is null ? WhiteBrush : new SolidBrush(color.Value);
+            FramePen  = color is null ? _framePen  :  GetSolidPen  (color.Value);
         }
     
         public void SetUp(Size size)

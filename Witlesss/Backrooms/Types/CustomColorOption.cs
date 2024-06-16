@@ -11,8 +11,8 @@ public struct CustomColorOption
 {
     private static readonly List<string> _colorNames;
 
-    public static bool UseCustomColor;
-    public static Rgba32 Color;
+    public bool IsActive;
+    public Rgba32 Color;
 
     static CustomColorOption()
     {
@@ -21,11 +21,11 @@ public struct CustomColorOption
             .Skip(1).Select(x => x.Name.ToLower()).ToList();
     }
 
-    public Rgba32? GetColor() => UseCustomColor ? Color : null;
+    public Rgba32? GetColor() => IsActive ? Color : null;
 
     public void CheckAndCut(MemeRequest request, Regex regex)
     {
-        UseCustomColor = false;
+        IsActive = false;
 
         var value = OptionsParsing.GetValue(request, regex);
         if (value is null) return;
@@ -40,6 +40,6 @@ public struct CustomColorOption
 
         var color = SpectreColor.FromInt32(index);
         Color = new Rgba32(color.R, color.G, color.B);
-        UseCustomColor = true;
+        IsActive = true;
     }
 }

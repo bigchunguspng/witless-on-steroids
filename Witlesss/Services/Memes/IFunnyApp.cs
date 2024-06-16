@@ -6,15 +6,16 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
-    public static bool UseGivenColor, PickColor, ForceCenter, BackInBlack, BlurImage;
-    public static Color   GivenColor;
+    public static bool PickColor, ForceCenter, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, FontSizeMultiplier = 10;
+    public static CustomColorOption CustomColorOption;
 
     private Rgba32 Background;
     private SolidBrush TextColor = default!;
@@ -277,9 +278,9 @@ public class IFunnyApp
 
     private void SetColor(Image<Rgba32> image)
     {
-        if  (UseGivenColor) SetCustomColors();
+        if (CustomColorOption.IsActive) SetCustomColors();
         else if (PickColor) SetSpecialColors(image);
-        else                SetDefaultColors();
+        else SetDefaultColors();
     }
 
     public void SetSpecialColors(Image<Rgba32> image)
@@ -289,7 +290,7 @@ public class IFunnyApp
     }
     public void SetCustomColors()
     {
-        Background = GivenColor;
+        Background = CustomColorOption.Color;
         TextColor  = ChooseTextColor(Background);
     }
     public void SetDefaultColors()
@@ -298,7 +299,7 @@ public class IFunnyApp
         TextColor  = _black;
     }
 
-    private SolidBrush ChooseTextColor(Rgba32 b) => b.R * 0.299f + b.G * 0.587f + b.B * 0.114f > 186 ? _black : _white;
+    private SolidBrush ChooseTextColor(Rgba32 b) => b.R * 0.4f + b.G * 0.5f + b.B * 0.1f > 100 ? _black : _white;
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {

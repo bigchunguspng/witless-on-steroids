@@ -6,6 +6,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Services.Memes
 {
@@ -13,8 +14,7 @@ namespace Witlesss.Services.Memes
     {
         public static bool WrapText = true, ColorText;
         public static int FontMultiplier = 10, ShadowOpacity = 100;
-        public static bool UseCustomBg;
-        public static Color   CustomBg;
+        public static CustomColorOption CustomColorOption;
 
         public static readonly ExtraFonts ExtraFonts = new("meme");
 
@@ -166,7 +166,7 @@ namespace Witlesss.Services.Memes
 
             if (Witlesss.Memes.Sticker /* && not transparent */)
             {
-                var color = UseCustomBg ? CustomBg : Color.Black;
+                var color = CustomColorOption.GetColor() ?? Color.Black;
                 var background = new Image<Rgba32>(image.Width, image.Height, color);
                 background.Mutate(x => x.DrawImage(image, opacity: 1));
                 image.Dispose();

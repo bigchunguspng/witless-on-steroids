@@ -145,9 +145,8 @@ namespace Witlesss
             Save();
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var name = $"{Paths.Prefix_Pack}-{Chat}.json";
-            var path = System.IO.Path.Combine(Paths.Dir_Backup, date, name);
             var file = new FileInfo(Path);
-            file.CopyTo(UniquePath(path));
+            file.CopyTo(UniquePath(System.IO.Path.Combine(Paths.Dir_Backup, date), name));
         }
 
         public void Delete()

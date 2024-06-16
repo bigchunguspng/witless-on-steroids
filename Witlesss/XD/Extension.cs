@@ -49,34 +49,36 @@ namespace Witlesss.XD
             return t.Minutes > 1 ? $"{t:m' MINS'}" : t.Minutes > 0 ? $@"{t:m' MIN 's\.fff's'}" : $@"{t:s\.fff's'}";
         }
 
-        public static string UniquePath(string path, bool extra = false)
+        public static string UniquePath(string path, bool extraCondition = false)
         {
-            var cd = true;
-            var directory = Path.GetDirectoryName(path)!;
-            var extension = Path.GetExtension(path);
-
-            while (File.Exists(path) || extra)
-            {
-                cd = false;
-                var name  = Path.GetFileNameWithoutExtension(path) ?? "";
-
-                int index = name.LastIndexOf('_');
-                if (index > 0 && int.TryParse(name.AsSpan(index).TrimStart('_'), out int number))
-                {
-                    index++;
-                    number++;
-                    name = name[..index] + number;
-                }
-                else
-                    name += "_0";
-
-                path = Path.Combine(directory, $"{name}{extension}");
-                extra = false;
-            }
-            if (cd) Directory.CreateDirectory(directory);
-            
-            return path;
+            return UniquePath(Path.GetDirectoryName(path), Path.GetFileName(path), extraCondition);
         }
+
+        public static string UniquePath(string? directory, string file, bool extraCondition = false)
+        {
+            // dir/file.txt
+            // dir/file_A8.txt
+            // dir/file_A8_62.txt
+
+            var path = directory is null ? file : Path.Combine(directory, file);
+
+            if (directory is not null) Directory.CreateDirectory(directory);
+
+            if (!File.Exists(path) && extraCondition is false) return path;
+
+            do
+            {
+                var index = path.LastIndexOf('.');
+                var part1 = path.Remove   (index); // directory/name
+                var part2 = path.Substring(index); // .txt
+
+                var xx = Random.Shared.Next(256).ToString("X2");
+                path = $"{part1}_{xx}{part2}";
+                if (!File.Exists(path)) return path;
+            }
+            while (true);
+        }
+
         public static string ValidFileName(string text, char x = '_')
         {
             var chars = Path.GetInvalidFileNameChars();

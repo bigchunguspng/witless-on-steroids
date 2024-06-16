@@ -36,7 +36,7 @@ namespace Witlesss.Commands
             var args = Args.SplitN();
             if (FileAttached("text/plain")) // TXT
             {
-                var path = UniquePath(Path.Combine(Paths.Dir_History, _document!.FileName ?? "fuse.txt"));
+                var path = UniquePath(Paths.Dir_History, _document!.FileName ?? "fuse.txt");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 EatFromTxtFile(path);
@@ -44,7 +44,7 @@ namespace Witlesss.Commands
             }
             else if (FileAttached("application/json")) // JSON  /  ERROR >> JSON HIS GUIDE
             {
-                var path = UniquePath(Path.Combine(GetHistoryFolder(),_document!.FileName ?? "fuse.json"));
+                var path = UniquePath(GetHistoryFolder(), _document!.FileName ?? "fuse.json");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
                 try
@@ -226,7 +226,7 @@ namespace Witlesss.Commands
             Directory.CreateDirectory(directory);
 
             var name = Path.GetFileNameWithoutExtension(path);
-            var save = UniquePath(Path.Combine(directory, $"{name}.json"));
+            var save = UniquePath(directory, $"{name}.json");
             new FileIO<List<string>>(save).SaveData(lines.ToList());
         }
 

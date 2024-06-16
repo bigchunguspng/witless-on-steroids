@@ -41,6 +41,6 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
 
         public static JpegEncoder GetJpegEncoder() => new() { Quality = Quality };
 
-        public static string GetTempPicName() => UniquePath(Path.Combine(Paths.Dir_Temp, $"x_{_temp++}.png"));
+        public static string GetTempPicName() => UniquePath(Paths.Dir_Temp, $"x_{_temp++}.png");
     }
 }

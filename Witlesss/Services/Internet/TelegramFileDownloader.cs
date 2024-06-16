@@ -28,7 +28,7 @@ namespace Witlesss.Services.Internet
 
             if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
 
-            path = UniquePath(Path.Combine(Paths.Dir_Pics, chat.ToString(), $"{shortID}{extension}"));
+            path = UniquePath(Path.Combine(Paths.Dir_Pics, chat.ToString()), $"{shortID}{extension}");
 
             await DownloadFile(fileID, path, chat);
 

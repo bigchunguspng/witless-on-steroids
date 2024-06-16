@@ -42,6 +42,8 @@ public static class OptionsParsing
 
     public static void CutCaptureOut(Capture group, MemeRequest request)
     {
+        if (group.Length == 0) return;
+
         var newLength = request.Dummy.Length - group.Length + 1;
 
         var source = request.Dummy.AsSpan();

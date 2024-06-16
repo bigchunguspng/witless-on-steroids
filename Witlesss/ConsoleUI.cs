@@ -6,12 +6,12 @@ using Witlesss.Commands;
 
 namespace Witlesss
 {
-    public class ConsoleUI(Bot bot)
+    public class ConsoleUI
     {
         private long   _active;
         private string? _input;
 
-        private Bot Bot { get; } = bot;
+        private Bot Bot => Bot.Instance;
 
         private BanHammer Thor => Bot.ThorRagnarok;
         private ChatList SussyBakas => ChatsDealer.SussyBakas;
@@ -103,7 +103,7 @@ namespace Witlesss
 
         private void ActivateLastChat()
         {
-            var context = TelegramUpdateHandler.Router.Context;
+            var context = Bot.Router.Context;
             _active = context.Chat;
             Log($"ACTIVE CHAT >> {_active} ({context.Title})");
         }

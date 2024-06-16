@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -9,14 +10,8 @@ namespace Witlesss.Services.Internet
 {
     public class TelegramFileDownloader
     {
-        private readonly BotCore _bot;
         private readonly DownloadCache _recent = new(32);
         private readonly DownloadCache  _large = new(32);
-
-        public TelegramFileDownloader(BotCore bot)
-        {
-            _bot = bot;
-        }
 
         public async Task<(string path, MediaType type)> Download(string fileID, long chat)
         {
@@ -42,14 +37,15 @@ namespace Witlesss.Services.Internet
             Directory.CreateDirectory(Path.Combine(Paths.Dir_Pics, chat.ToString()));
             try
             {
-                var file = await _bot.Client.GetFileAsync(fileId);
+                var file = await Bot.Instance.Client.GetFileAsync(fileId);
                 var stream = new FileStream(path, FileMode.Create);
-                _bot.Client.DownloadFileAsync(file.FilePath!, stream).Wait();
+                Bot.Instance.Client.DownloadFileAsync(file.FilePath!, stream).Wait();
                 await stream.DisposeAsync();
             }
             catch (Exception e)
             {
-                _bot.SendMessage(chat, e.Message.Contains("file is too big") ? Pick(FILE_TOO_BIG_RESPONSE) : XDDD(e.Message));
+                var message = e.Message.Contains("file is too big") ? Pick(FILE_TOO_BIG_RESPONSE) : XDDD(e.Message);
+                Bot.Instance.SendMessage(chat, message);
                 throw;
             }
         }
@@ -80,7 +76,7 @@ namespace Witlesss.Services.Internet
             _paths.Add(id, path);
         }
 
-        public bool Contains(string id, out string path)
+        public bool Contains(string id, [NotNullWhen(true)] out string? path)
         {
             return _paths.TryGetValue(id, out path);
         }

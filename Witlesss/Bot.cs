@@ -1,49 +1,57 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types;
 
 namespace Witlesss
 {
-    public class Bot : BotCore
+    public partial class Bot
     {
-        private readonly ConsoleUI PlayStation8;
-        public  readonly BanHammer ThorRagnarok;
+        public readonly BanHammer ThorRagnarok;
 
-        public static void LaunchInstance(CommandAndCallbackRouter command) => new Bot().Run(command);
+        public readonly TelegramBotClient Client;
+        public readonly User Me;
 
         public static Bot Instance = null!;
 
-        private Bot()
+        public static void LaunchInstance(CommandAndCallbackRouter command) => new Bot(command).Run();
+
+        private Bot(CommandAndCallbackRouter command)
         {
+            Client = new TelegramBotClient(Config.TelegramToken);
+            while (true)
+            {
+                try
+                {
+                    Me = Client.GetMeAsync().Result;
+                    break;
+                }
+                catch (Exception e)
+                {
+                    LogError("NO INTERNET? >> " + FixedErrorMessage(e.Message));
+                    Task.Delay(5000).Wait();
+                }
+            }
+
+            Router = command;
+
             Instance = this;
             Config.SetBotUsername(Me.Username!);
 
-            PlayStation8 = new ConsoleUI(this);
-            ThorRagnarok = new BanHammer(this);
+            ThorRagnarok = new BanHammer();
         }
 
-        private void Run(CommandAndCallbackRouter command)
+        private void Run()
         {
             ThorRagnarok.GiveBans();
 
             ClearTempFiles();
 
             ChatsDealer.LoadSomeBakas();
-            StartListening(command);
+            StartListening();
             ChatsDealer.StartAutoSaveLoop(minutes: 2);
 
-            PlayStation8.EnterConsoleLoop();
+            new ConsoleUI().EnterConsoleLoop();
         }
-
-        private void StartListening(CommandAndCallbackRouter command)
-        {
-            var updates = new[] { UpdateType.Message, UpdateType.EditedMessage, UpdateType.CallbackQuery };
-            var options = new ReceiverOptions { AllowedUpdates = updates };
-
-            Client.StartReceiving(new TelegramUpdateHandler(command), options);
-            Log(string.Format(BUENOS_DIAS, Config.BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
-        }
-
     }
 }

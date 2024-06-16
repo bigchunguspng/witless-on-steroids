@@ -103,9 +103,6 @@
     <data name="SET_P_RESPONSE" xml:space="preserve">
         <value>пикчи будут ставать мемами с вероятностью {0}%</value>
     </data>
-    <data name="CHATLIST_FILENAME" xml:space="preserve">
-        <value>Telegram-ChatsDB</value>
-    </data>
     <data name="FUSE_SUCCESS_RESPONSE" xml:space="preserve">
         <value>Cловарь беседы &lt;b&gt;{0}&lt;/b&gt; обновлён!
 Теперь он весит {1} (+{2})</value>

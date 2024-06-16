@@ -11,29 +11,8 @@ using Witlesss.MediaTools;
 
 namespace Witlesss
 {
-    public abstract class BotCore
+    public partial class Bot
     {
-        public readonly TelegramBotClient Client = new(Config.TelegramToken);
-        public readonly User Me;
-
-        protected BotCore()
-        {
-            while (true)
-            {
-                try
-                {
-                    Me = Client.GetMeAsync().Result;
-                    break;
-                }
-                catch (Exception e)
-                {
-                    LogError(e.Message);
-                    Task.Delay(5000).Wait();
-                }
-            }
-            _downloader = new TelegramFileDownloader(this);
-        }
-
         public void SendMessage(long chat, string text)
         {
             var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html);
@@ -159,7 +138,7 @@ namespace Witlesss
             {
                 LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
 
-                if (FFmpeg.IsMatch(e.Message)) Bot.Instance.SendErrorDetails(chat, e);
+                if (FFmpeg.IsMatch(e.Message)) SendErrorDetails(chat, e);
                 if (message > 0) EditMessage(chat, message, $"произошла ашыпка {Pick(FAIL_EMOJI_2)}");
             }
         }
@@ -192,20 +171,9 @@ namespace Witlesss
             }
         }
 
-
-        private readonly TelegramFileDownloader _downloader;
-
-        public Task<(string path, MediaType type)> Download(string fileID, long chat)
-        {
-            return _downloader.Download(fileID, chat);
-        }
-        public Task DownloadFile(string fileID, string path, long chat = default)
-        {
-            return _downloader.DownloadFile(fileID, path, chat);
-        }
-
-        private static bool ChatCanBeRemoved(Exception e) => e.Message.Contains("Forbidden")      || 
-                                                             e.Message.Contains("chat not found") ||
-                                                             e.Message.Contains("rights to send");
+        private static bool ChatCanBeRemoved(Exception e) =>
+            e.Message.Contains("Forbidden")
+         || e.Message.Contains("chat not found")
+         || e.Message.Contains("rights to send");
     }
 }

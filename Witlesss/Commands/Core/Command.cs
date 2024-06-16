@@ -62,7 +62,7 @@ namespace Witlesss.Commands.Core
             }
             catch (Exception e)
             {
-                TelegramUpdateHandler.HandleCommandException(e, Context);
+                Bot.HandleCommandException(e, Context);
             }
         }
 

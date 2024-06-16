@@ -12,16 +12,14 @@ namespace Witlesss
         private readonly        Dictionary<long, ChatBotUsage> SussyChats;
 
 
-        public BanHammer(Bot bot)
+        public BanHammer()
         {
-            Bot = bot;
-
             BansIO =  new FileIO<Dictionary<long, DateTime>>(Paths.File_Bans);
             BannedChats = BansIO.LoadData();
             SussyChats = new Dictionary<long, ChatBotUsage>();
         }
 
-        private Bot Bot { get; }
+        private Bot Bot => Bot.Instance;
 
         public void BanChat(long chat, double minutes = 30)
         {

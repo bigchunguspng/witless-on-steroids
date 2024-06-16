@@ -14,7 +14,7 @@ namespace Witlesss.Commands
             else if (Context.HasIntArgument(out var value))
             {
                 Baka.Interval = value;
-                Bot.SaveChatList();
+                ChatsDealer.SaveChatList();
                 Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Interval));
                 Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
             }
@@ -34,13 +34,13 @@ namespace Witlesss.Commands
 
                 if (typeWasChanged)
                 {
-                    Bot.SaveChatList();
+                    ChatsDealer.SaveChatList();
                     Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Meme.Type])));
                     Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
-                    Bot.SaveChatList();
+                    ChatsDealer.SaveChatList();
                     Bot.SendMessage(Chat, XDDD(string.Format(SET_MEME_OPS_RESPONSE, command, result)));
                     Log($"{Title} >> MEMES OPTIONS");
                 }

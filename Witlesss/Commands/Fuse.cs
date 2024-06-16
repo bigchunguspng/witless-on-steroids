@@ -204,17 +204,22 @@ namespace Witlesss.Commands
                 return;
             }
 
-            var chatExist = argIsID && Bot.WitlessExist(chat);
-            var files = chatExist ? null : GetFiles(Paths.Dir_Fuse, $"{arg}.json");
-            var fileExist = files is { Length: > 0 };
-            if (chatExist || fileExist)
+            if (argIsID && ChatsDealer.WitlessExist(chat, out var baka))
             {
-                var source = chatExist ? Bot.SussyBakas[chat].Words : new FileIO<WitlessDB>(files![0]).LoadData();
-                new FusionCollab(Baka, source).Fuse();
-                GoodEnding();
+                FuseWithWitlessDB(baka.Words);
+            }
+            else if (GetFiles(Paths.Dir_Fuse, $"{arg}.json") is { Length: > 0 } files)
+            {
+                FuseWithWitlessDB(new FileIO<WitlessDB>(files[0]).LoadData());
             }
             else if (argIsID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
             else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
+        }
+
+        private void FuseWithWitlessDB(WitlessDB source)
+        {
+            new FusionCollab(Baka, source).Fuse();
+            GoodEnding();
         }
 
         private void EatFromTxtFile(string path)

@@ -7,7 +7,7 @@
             if (Args is not null && Context.HasIntArgument(out var value))
             {
                 Baka.Meme.Chance = value;
-                Bot.SaveChatList();
+                ChatsDealer.SaveChatList();
                 Bot.SendMessage(Chat, XDDD(string.Format(SET_P_RESPONSE, Baka.Meme.Chance)));
                 Log($"{Title} >> MEME CHANCE >> {Baka.Meme.Chance}%");
             }

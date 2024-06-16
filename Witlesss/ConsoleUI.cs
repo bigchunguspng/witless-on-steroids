@@ -6,17 +6,15 @@ using Witlesss.Commands;
 
 namespace Witlesss
 {
-    public class ConsoleUI
+    public class ConsoleUI(Bot bot)
     {
         private long   _active;
         private string? _input;
 
-        public ConsoleUI(Bot bot) => Bot = bot;
-
-        private Bot Bot { get; }
+        private Bot Bot { get; } = bot;
 
         private BanHammer Thor => Bot.ThorRagnarok;
-        private ChatList SussyBakas => Bot.SussyBakas;
+        private ChatList SussyBakas => ChatsDealer.SussyBakas;
         private Witless Active => SussyBakas[_active];
 
         private IEnumerable<Witless> Bakas => SussyBakas.Values;
@@ -42,7 +40,7 @@ namespace Witlesss
                     Log(">:^< u/stupid >:^<", ConsoleColor.Yellow);
                 }
             } while (_input != "s");
-            Bot.SaveDics();
+            ChatsDealer.SaveBakasBeforeExit();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
@@ -52,7 +50,7 @@ namespace Witlesss
 
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) Bot.SaveBakas();
+            else if (_input == "/s" ) ChatsDealer.SaveBakas();
             else if (_input == "/sp") Spam.SendSpam();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
@@ -89,7 +87,7 @@ namespace Witlesss
         private void BreakFourthWall()
         {
             string text = _input!.Split (' ', 2)[1];
-            if (!Bot.WitlessExist(_active)) return;
+            if (!ChatsDealer.WitlessExist(_active)) return;
 
             if      (_input.StartsWith("/a ") && Active.Eat(text, out text!)) // add
             {
@@ -119,15 +117,15 @@ namespace Witlesss
 
         private void DeleteBlockers()
         {
-            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) Bot.RemoveChat(w.Chat);
-            Bot.SaveChatList();
+            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) ChatsDealer.RemoveChat(w.Chat);
+            ChatsDealer.SaveChatList();
         }
         private void DeleteBlocker()
         {
             if (DeleteBlocker(Active) == -1)
             {
-                Bot.RemoveChat(_active);
-                Bot.SaveChatList();
+                ChatsDealer.RemoveChat(_active);
+                ChatsDealer.SaveChatList();
             }
         }
         private int DeleteBlocker(Witless witless)
@@ -146,15 +144,15 @@ namespace Witlesss
                 if (SizeInBytes(witless.Path) > size) continue;
 
                 witless.Delete();
-                Bot.RemoveChat(witless.Chat);
+                ChatsDealer.RemoveChat(witless.Chat);
             }
-            Bot.SaveChatList();
+            ChatsDealer.SaveChatList();
         }
 
         private void FixDBs() => Bakas.ForEach(FixDB);
         private void FixDB(Witless witless)
         {
-            if (Bot.WitlessExist(witless.Chat))
+            if (ChatsDealer.WitlessExist(witless.Chat))
             {
                 witless.Baka.FixWitlessDB();
                 witless.SaveNoMatterWhat();

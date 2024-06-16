@@ -11,7 +11,7 @@
             else if (Message.SenderIsAdmin().Result)
             {
                 Baka.AdminsOnly = !Baka.AdminsOnly;
-                Bot.SaveChatList();
+                ChatsDealer.SaveChatList();
                 Bot.SendMessage(Chat, string.Format(ADMINS_RESPONSE, Baka.AdminsOnly ? "только админы 😎" : "все участники 😚"));
             }
         }

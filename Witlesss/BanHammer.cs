@@ -41,8 +41,8 @@ namespace Witlesss
         }
         private void SaveBanList() => BansIO.SaveData(BannedChats);
 
-        private bool  ChatIsBaka(long chat) => Bot.SussyBakas.ContainsKey(chat);
-        private Witless BakaFrom(long chat) => Bot.SussyBakas[chat];
+        private bool  ChatIsBaka(long chat) => ChatsDealer.SussyBakas.ContainsKey(chat);
+        private Witless BakaFrom(long chat) => ChatsDealer.SussyBakas[chat];
 
 
         public  void GiveBans() => BannedChats.Keys.Where(ChatIsBaka).ForEach(chat => BakaFrom(chat).Banned = true);
@@ -113,15 +113,9 @@ namespace Witlesss
         }
     }
 
-    public class ChatBotUsage
+    public class ChatBotUsage(TimeSpan hangingTime, DateTime forgiveDate)
     {
-        public ChatBotUsage(TimeSpan hangingTime, DateTime forgiveDate)
-        {
-            HangingTime = hangingTime;
-            ForgiveDate = forgiveDate;
-        }
-
-        public TimeSpan HangingTime { get; set; }
-        public DateTime ForgiveDate { get; set; }
+        public TimeSpan HangingTime { get; set; } = hangingTime;
+        public DateTime ForgiveDate { get; set; } = forgiveDate;
     }
 }

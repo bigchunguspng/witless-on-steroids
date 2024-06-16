@@ -7,7 +7,7 @@
             if (Args is not null && Context.HasIntArgument(out var value))
             {
                 Baka.Meme.Quality = value;
-                Bot.SaveChatList();
+                ChatsDealer.SaveChatList();
                 Bot.SendMessage(Chat, XDDD(string.Format(SET_Q_RESPONSE, Baka.Meme.Quality)));
                 Log($"{Title} >> JPG QUALITY >> {Baka.Meme.Quality}%");
             }

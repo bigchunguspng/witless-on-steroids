@@ -22,7 +22,7 @@ public class Tell : SyncCommand
         {
             var text = args[1];
             Bot.SendMessage(chat, text, preview: false);
-            if (Bot.WitlessExist(chat)) Bot.SussyBakas[chat].Eat(text);
+            if (ChatsDealer.WitlessExist(chat, out var baka)) baka.Eat(text);
         }
     }
 }

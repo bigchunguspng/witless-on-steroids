@@ -10,6 +10,7 @@ namespace Witlesss.Backrooms.Types;
 public struct CustomColorOption
 {
     private static readonly List<string> _colorNames;
+    private static readonly Regex _color = new(@"#([a-z0-9_]+)#"), _hex = new(@"^[0-9a-f]{6}$");
 
     public bool IsActive;
     public Rgba32 Color;
@@ -23,23 +24,26 @@ public struct CustomColorOption
 
     public Rgba32? GetColor() => IsActive ? Color : null;
 
-    public void CheckAndCut(MemeRequest request, Regex regex)
+    public void CheckAndCut(MemeRequest request, Regex? regex = null)
     {
         IsActive = false;
+
+        regex ??= _color;
 
         var value = OptionsParsing.GetValue(request, regex);
         if (value is null) return;
 
-        var index = _colorNames.IndexOf(value);
-        if (index == -1) index = _colorNames.IndexOf(value + "1");
-        if (index == -1)
+        var hexProvided = _hex.IsMatch(value) && Rgba32.TryParseHex(value, out Color);
+        if (hexProvided == false)
         {
-            // check for hex code
-            return;
+            var index = _colorNames.IndexOf(value);
+            if (index == -1) index = _colorNames.IndexOf(value + "1");
+            if (index == -1) return;
+
+            var color = SpectreColor.FromInt32(index);
+            Color = new Rgba32(color.R, color.G, color.B);
         }
 
-        var color = SpectreColor.FromInt32(index);
-        Color = new Rgba32(color.R, color.G, color.B);
         IsActive = true;
     }
 }

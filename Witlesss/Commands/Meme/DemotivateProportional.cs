@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request, _colorXD);
+            DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request);
             DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
             DynamicDemotivatorDrawer.CropEdges = OptionsParsing.CheckAndCut(Request, _crop);
         }
@@ -49,7 +49,6 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*", RegexOptions.IgnoreCase);
         private static readonly Regex _caps    = new(@"^\/dp\S*up\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex _colorXD = new(@"^\/dp\S*#([a-z0-9_]+)#\S*", RegexOptions.IgnoreCase);
 
         // LOGIC
 

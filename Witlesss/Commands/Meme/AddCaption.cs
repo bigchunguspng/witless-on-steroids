@@ -33,7 +33,7 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            IFunnyApp.CustomColorOption.CheckAndCut(Request, _colorXD);
+            IFunnyApp.CustomColorOption.CheckAndCut(Request);
 
             IFunnyApp.BackInBlack      =  CheckAndCut(Request, _blackBG);
             IFunnyApp.PickColor        =  CheckAndCut(Request, _colorPP);
@@ -68,7 +68,6 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _colorFC = new(@"^\/top\S*(fc)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _blackBG = new(@"^\/top\S*(bbg)\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex _colorXD = new(@"^\/top\S*#([a-z0-9_]+)#\S*",     RegexOptions.IgnoreCase);
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",    RegexOptions.IgnoreCase);
         private static readonly Regex _fontMS  = new(@"^\/top\S*?(\d{1,3})(""ms)\S*",  RegexOptions.IgnoreCase);

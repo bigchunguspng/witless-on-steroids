@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -65,9 +66,11 @@ public static class TextMeasuring
 
     public static SizeF MeasureTextSizeSingleLine(string text, TextOptions options, out int charsFitted)
     {
+        charsFitted = 0;
         var ops = new TextOptions(options).WithDefaultAlignment();
 
-        TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
+        var advances = MeasureCharacterAdvances(text, options);
+        if (advances.Length == 0) return SizeF.Empty;
 
         var width = 0F;
         charsFitted = text.Length;
@@ -88,6 +91,18 @@ public static class TextMeasuring
         return new SizeF(width, textHeight * ops.LineSpacing);
     }
 
+    private static ReadOnlySpan<GlyphBounds> MeasureCharacterAdvances(string text, TextOptions options)
+    {
+        try
+        {
+            TextMeasurer.TryMeasureCharacterAdvances(text, options, out var advances);
+            return advances;
+        }
+        catch
+        {
+            return [];
+        }
+    }
     // it's here for the future...
     /*public static List<TextMeasurement> GetTextGlyphBounds(string text, TextOptions options)
     {

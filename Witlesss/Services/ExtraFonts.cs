@@ -10,6 +10,7 @@ namespace Witlesss.Services
     public class ExtraFonts // todo rename since it is the main font source now
     {
         private static readonly Dictionary<string, FontFamily> _families;
+        private static readonly FontCollection _fallback;
 
         private readonly Regex _regex;
 
@@ -32,13 +33,22 @@ namespace Witlesss.Services
             {
                 _families.Add(familyCodes[i], families[i]);
             }
+
+            var fallback = Directory.GetFiles(Path.Combine(Paths.Dir_Fonts, "Fallback"));
+            _fallback = new FontCollection();
+            fallback.ForEach(file => _fallback.Add(file));
+
+            FallbackFamilies = _fallback.Families.ToList();
+            /*.Append(SystemFonts.Get("MS PGothic"))
+            .Append(SystemFonts.Get("Segoe UI Symbol"))
+            .ToList();*/
         }
 
-        public static List<FontFamily> FallbackFamilies { get; } =
+        public static List<FontFamily> FallbackFamilies { get; }/* =
         [
             SystemFonts.Get("MS PGothic"),
-            SystemFonts.Get("Segoe UI Symbol"),
-        ];
+            SystemFonts.Get("Segoe UI Symbol")
+        ];*/
 
         public ExtraFonts(string cmd, params string[] exclude)
         {

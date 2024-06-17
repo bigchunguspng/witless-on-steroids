@@ -161,11 +161,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
             var area = new RectangleF(0, 0, width, height);
 
-            var image = funny ? null : new Image<Rgba32>(width, height, Color.Black);
-
-#if DEBUG
-            image.Mutate(x => x.Clear(Color.Indigo));
-#endif
+            Image<Rgba32>? image;
 
             var options = GetDefaultTextOptions(area.Width, area.Height);
             if (funny)
@@ -180,12 +176,25 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
                 var size = new Size(width, txt_h);
                 var point = new Point((size - textLayer.Size) / 2);
-                image = new Image<Rgba32>(width, txt_h, Color.Black); // todo better branching
+                image = GetBackground();
                 image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
             }
-            else image!.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));
+            else
+            {
+                image = GetBackground();
+                image.Mutate(x => x.DrawText(_textOptions, options, text, TextColor, pen: null));
+            }
 
-            return image!;
+            return image;
+
+            Image<Rgba32> GetBackground()
+            {
+                var result = new Image<Rgba32>(width, txt_h, Color.Black);
+#if DEBUG
+                result.Mutate(x => x.Clear(Color.Indigo));
+#endif
+                return result;
+            }
         }
 
         private RichTextOptions GetDefaultTextOptions(float width, float height) => new(_font)

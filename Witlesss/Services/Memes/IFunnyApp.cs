@@ -123,7 +123,7 @@ public class IFunnyApp
         AdjustProportions(textM);
         AdjustTextPosition(text);
 
-        var image = funny ? null : new Image<Rgba32>(_w, _cardHeight, Background);
+        Image<Rgba32> image;
 
         var options = GetDefaultTextOptions();
         if (funny)
@@ -137,16 +137,19 @@ public class IFunnyApp
             var x = UseLeftAlignment ? _marginLeft : (_w - textLayer.Width) / 2F;
             var y = (_cardHeight - textLayer.Height) / 2F + _textOffset;
             var point = new Point(x.RoundInt(), y.RoundInt());
-            image = new Image<Rgba32>(_w, _cardHeight, Background); // todo better branching
+            image = GetBackground();
             image.Mutate(ctx => ctx.DrawImage(textLayer, point, opacity: 1));
         }
         else
         {
             Console.WriteLine(FontSize);
-            image!.Mutate(x => x.DrawText(options, text, TextColor, pen: null));
+            image = GetBackground();
+            image.Mutate(x => x.DrawText(options, text, TextColor, pen: null));
         }
 
-        return image!;
+        return image;
+        
+        Image<Rgba32> GetBackground() => new(_w, _cardHeight, Background);
     }
     
     private int InitialMargin(int h) => UseLeftAlignment && !_extraHigh ? _cardHeight - h : (_cardHeight - h) / 2;

@@ -73,7 +73,7 @@ namespace Witlesss.Services.Internet
                 _paths.Remove(key);
             }
             _keys.Enqueue(id);
-            _paths.Add(id, path);
+            _paths.TryAdd(id, path);
         }
 
         public bool Contains(string id, [NotNullWhen(true)] out string? path)

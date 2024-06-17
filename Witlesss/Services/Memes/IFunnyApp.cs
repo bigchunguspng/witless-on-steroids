@@ -302,7 +302,7 @@ public class IFunnyApp
         TextColor  = _black;
     }
 
-    private SolidBrush ChooseTextColor(Rgba32 b) => b.R * 0.4f + b.G * 0.5f + b.B * 0.1f > 100 ? _black : _white;
+    private SolidBrush ChooseTextColor(Rgba32 b) => b.Rgb.BlackTextIsBetter() ? _black : _white;
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {

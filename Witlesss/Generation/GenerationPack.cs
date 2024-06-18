@@ -87,6 +87,8 @@ public class TransitionTable // TransitionTable 4.70 MB (42.6K objects => )
         }
         else
         {
+            if (Transitions.Capacity == Transitions.Count)
+                Transitions.Capacity = Math.Max(Transitions.Capacity * 5 >> 2, 1);
             Transitions.Add(transition);
         }
 

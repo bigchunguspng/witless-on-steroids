@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SixLabors.ImageSharp;
 
 namespace Witlesss.Generation;
 
@@ -71,25 +72,24 @@ public class GenerationPack
     }
 }
 
-public class TransitionTable // TransitionTable 4.70 MB (42.6K objects => )
+public class TransitionTable() : List<Transition>(1) // TransitionTable 4.70 MB (42.6K objects => )
 {
-    public List<Transition> Transitions { get; } = new(1); // Transition[] 2.10 MB, List<Transition> 3.40 MB
+    //public List<Transition> Transitions { get; } = new(1); // Transition[] 2.10 MB, List<Transition> 3.40 MB
 
     public float TotalChance { get; private set; }
 
     public void Put(int id, float chance)
     {
-        var transition = new Transition(id, chance);
-        var index = Transitions.IndexOf(transition);
-        if (index > 0)
+        var index = FindIndex(x => x.WordID == id);
+        if (index < 0)
         {
-            Transitions[index].IncreaseChanceBy(chance);
+            if (Capacity == Count)
+                Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
+            Add(new Transition(id, chance));
         }
         else
         {
-            if (Transitions.Capacity == Transitions.Count)
-                Transitions.Capacity = Math.Max(Transitions.Capacity * 5 >> 2, 1);
-            Transitions.Add(transition);
+            this[index].IncreaseChanceBy(chance);
         }
 
         TotalChance = TotalChance.CombineRound(chance);

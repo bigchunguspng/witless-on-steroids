@@ -59,16 +59,18 @@ namespace Witlesss
             var ids = new LinkedList<int>();
             foreach (var word in words)
             {
-                ids.AddLast(DB.GetWordID(word));
+                if (word != LF) ids.AddLast(DB.GetWordID(word));
             }
 
             ids.AddFirst(GenerationPack.START);
             ids.AddLast(GenerationPack.END);
 
             // add transitions data
-            foreach (var id in ids)
+            var id = ids.First!;
+            while (id.Next != null)
             {
-                DB.GetTableByID(id).Put(id, weight);
+                DB.GetTableByID(id.Value).Put(id.Next.Value, weight);
+                id = id.Next;
             }
         }
 
@@ -313,7 +315,7 @@ namespace Witlesss
         {
             var r = Random.Shared.NextSingle() * words.TotalChance;
 
-            foreach (var transition in words.Transitions)
+            foreach (var transition in words)
             {
                 if (transition.Chance > r) return transition.WordID;
                 r -= transition.Chance;

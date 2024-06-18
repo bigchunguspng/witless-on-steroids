@@ -56,18 +56,18 @@ namespace Witlesss.Commands.Meme
             {
                 var (genA, genB) = (true, true);
 
-                var chance = Random.Shared.Next(10);
-                if      (only_top_text)                   genB = false;
-                else if (only_bottom_text || chance == 0) genA = false; // 1/10 >> bottom only
+                var chance = Random.Shared.Next(6);
+
+                if /**/ (chance == 0 || only_top_text)    genB = false;
+                else if (chance == 1 || only_bottom_text) genA = false;
 
                 a = genA ? Baka.Generate() : "";
                 b = genB ? Baka.Generate() : "";
 
-                if (genA && genB && a.Length > 25) // upper text is too big
+                if (genA && (genB ? a.Length > b.Length : a.Length > 64))
                 {
-                    (a, b) = chance > 5
-                        ? ("", a)  // 4/10 >> bottom only
-                        : (a, ""); // 5/10 >> top    only
+                    // bigger text (or big enough one) should be at the bottom
+                    (a, b) = (b, a);
                 }
             }
             else
@@ -84,6 +84,7 @@ namespace Witlesss.Commands.Meme
                     b = add_bottom_text ? Baka.Generate() : "";
                 }
             }
+
             return new DgText(AdjustCase(a), AdjustCase(b));
 
             string AdjustCase(string s) => capitalize ? s.ToLetterCase(LetterCaseMode.Upper) : s;

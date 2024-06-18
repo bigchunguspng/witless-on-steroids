@@ -43,33 +43,39 @@ namespace Witlesss.Commands.Meme
 
         protected override DgText GetMemeText(string? text)
         {
+            var generate = text.IsNullOrEmpty();
+            var capitalize = Check(Request, _caps) && (generate || _caps.IsMatch(Request.Command));
+
             var add_bottom_text  = Check(Request,  _add_bottom);
             var only_bottom_text = Check(Request, _only_bottom);
             var only_top_text    = Check(Request,    _top_only);
-            var matchCaps        = Check(Request,        _caps);
-
-            var gen = string.IsNullOrEmpty(text);
-            var caps = matchCaps && (gen || _caps.IsMatch(Request.Command));
 
             string a, b;
-            if (gen)
-            {
-                (a, b) = (Baka.Generate(), Baka.Generate());
 
-                var c = Random.Shared.Next(10);
-                if      (only_top_text)              b = "";
-                else if (c == 0 || only_bottom_text) a = ""; // 1/10 >> bottom only
-                else if (a.Length > 25) // upper text is too big
+            if (generate)
+            {
+                var (genA, genB) = (true, true);
+
+                var chance = Random.Shared.Next(10);
+                if      (only_top_text)                   genB = false;
+                else if (only_bottom_text || chance == 0) genA = false; // 1/10 >> bottom only
+
+                a = genA ? Baka.Generate() : "";
+                b = genB ? Baka.Generate() : "";
+
+                if (genA && genB && a.Length > 25) // upper text is too big
                 {
-                    if (c > 5) (a, b) = ("", a); // 4/10 >> bottom only
-                    else b = "";                 // 5/10 >> top    only
+                    (a, b) = chance > 5
+                        ? ("", a)  // 4/10 >> bottom only
+                        : (a, ""); // 5/10 >> top    only
                 }
             }
             else
             {
                 if (text!.Contains('\n'))
                 {
-                    var s = text.Split('\n', 2);
+                    var separator = text.Contains("\n\n") ? "\n\n" : "\n";
+                    var s = text.Split(separator, 2);
                     (a, b) = (s[0], s[1]);
                 }
                 else
@@ -80,7 +86,7 @@ namespace Witlesss.Commands.Meme
             }
             return new DgText(AdjustCase(a), AdjustCase(b));
 
-            string AdjustCase(string s) => caps ? s.ToLetterCase(LetterCaseMode.Upper) : s;
+            string AdjustCase(string s) => capitalize ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);

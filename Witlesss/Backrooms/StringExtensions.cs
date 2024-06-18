@@ -26,6 +26,8 @@ public static class StringExtensions
     
     public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
 
+    public static bool IsNullOrEmpty(this string? text) => string.IsNullOrEmpty(text);
+
     // REGEX
 
     public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);

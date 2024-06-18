@@ -61,6 +61,33 @@ namespace Witlesss
         public bool Banned, Loaded, HasUnsavedStuff;
 
         public Copypaster Baka { get; set; }
+        /*public WitlessDB Words
+        {
+            get => Baka.DB;
+            set => Baka.DB = value;
+        }
+
+        public bool Eat(string text)                    => HasUnsavedStuff = Baka.Eat(text, out _);
+        public bool Eat(string text, out string? eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
+
+        public string Generate() => TextOrBust(() => Baka.Generate());
+
+        public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));
+        public string GenerateByLast(string word) => TextOrBust(() => Baka.GenerateByLast(word));
+
+        private string TextOrBust(Func<string> generate)
+        {
+            try
+            {
+                return generate();
+            }
+            catch
+            {
+                LogError("NO TEXT!?");
+                var response = IsOneIn(3) ? null : DefaultTextProvider.GetRandomResponse();
+                return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
+            }
+        }*/
         public WitlessDB Words
         {
             get => Baka.Words;
@@ -83,7 +110,6 @@ namespace Witlesss
             }
             catch
             {
-                //LogError($"{Command.LastChat.Title} >> NO TEXT!?");
                 LogError("NO TEXT!?");
                 var response = IsOneIn(3) ? null : DefaultTextProvider.GetRandomResponse();
                 return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();

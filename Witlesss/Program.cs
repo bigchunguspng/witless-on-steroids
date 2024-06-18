@@ -48,6 +48,41 @@ namespace Witlesss
 
             Console.WriteLine(cp1.Words.Count);
             Console.WriteLine(cp2.DB.Vocabulary.Count);
+
+            Console.ReadKey();
+            while (true)
+            {
+                Console.ReadKey();
+                sw.Restart();
+                for (var i = 0; i < 50; i++)
+                {
+                    try
+                    {
+                        cp1.Generate(Copypaster.START);
+                    }
+                    catch
+                    {
+                        //
+                    }
+                    
+                }
+                sw.Log("cp1.gen");
+                
+                Console.ReadKey();
+                sw.Restart();
+                for (var i = 0; i < 50; i++)
+                {
+                    try
+                    {
+                        cp2.Generate();
+                    }
+                    catch
+                    {
+                        //
+                    }
+                }
+                sw.Log("cp2.gen");
+            }
             return;
             Config.ReadFromFile();
             Bot.LaunchInstance(args.Length > 0 ? new Skip() : new CommandRouter());

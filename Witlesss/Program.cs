@@ -50,15 +50,26 @@ namespace Witlesss
             Console.WriteLine(cp2.DB.Vocabulary.Count);
 
             Console.ReadKey();
+            sw.Restart();
+            new FileIO<WitlessDB>(@"D:\Desktop\db-1.json").SaveData(cp1.Words);
+            sw.Log("db-1.json");
+
+            Console.ReadKey();
+            sw.Restart();
+            new FileIO<GenerationPack>(@"D:\Desktop\db-2.json").SaveData(cp2.DB);
+            sw.Log("db-2.json");
+
             while (true)
             {
                 Console.ReadKey();
                 sw.Restart();
-                for (var i = 0; i < 50; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     try
                     {
-                        cp1.Generate(Copypaster.START);
+                        Console.Write(i);
+                        Console.Write(". ");
+                        Console.WriteLine(cp1.Generate(Copypaster.START));
                     }
                     catch
                     {
@@ -70,15 +81,17 @@ namespace Witlesss
                 
                 Console.ReadKey();
                 sw.Restart();
-                for (var i = 0; i < 50; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     try
                     {
-                        cp2.Generate();
+                        Console.Write(i);
+                        Console.Write(". ");
+                        Console.WriteLine(cp2.Generate());
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        //
+                        Console.WriteLine(e);
                     }
                 }
                 sw.Log("cp2.gen");
@@ -89,3 +102,14 @@ namespace Witlesss
         }
     }
 }
+
+/*
+
+"24635": [
+    "45": 0.6,
+    "17025": 1.0,
+    "38411": 1.0,
+    "410": 0.5,
+    "38869": 1.0
+],
+ */

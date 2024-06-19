@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Witlesss.Generation;
 
 namespace Witlesss.Services.Technical
 {
@@ -40,8 +41,9 @@ namespace Witlesss.Services.Technical
     {
         protected static readonly JsonSerializer Serializer = new()
         {
-            Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.Ignore
+            //Formatting = Formatting.Indented,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Converters = { new TransitionTableConverter() }
         };
     }
 }

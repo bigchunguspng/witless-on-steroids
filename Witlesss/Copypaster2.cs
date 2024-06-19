@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Witlesss.Generation;
 using WordChart = System.Collections.Generic.Dictionary<string, float>;
@@ -25,6 +26,7 @@ namespace Witlesss
         {
             eaten = null!;
 
+            if (string.IsNullOrWhiteSpace(text)) return false;
             if (TextIsUnacceptable(text)) return false;
 
             var words = Tokenize(ReplaceLinks(text));
@@ -67,10 +69,10 @@ namespace Witlesss
 
             // add transitions data
             var id = ids.First!;
-            while (id.Next != null)
+            while (id.Next is { } next)
             {
-                DB.GetTableByID(id.Value).Put(id.Next.Value, weight);
-                id = id.Next;
+                DB.GetTableByID(id.Value).Put(next.Value, weight);
+                id = next;
             }
         }
 
@@ -254,7 +256,8 @@ namespace Witlesss
 
             foreach (var id in ids)
             {
-                words.AddLast(DB.GetWordByID(id));
+                var word = DB.GetWordByID(id);
+                if (word is not null) words.AddLast(word);
             }
 
             return RenderText(words);
@@ -276,9 +279,18 @@ namespace Witlesss
             return CleanMess(tokens);*/
         }
 
-        private string RenderText(LinkedList<string> tokens)
+        private string RenderText(LinkedList<string> words)
         {
-            throw new NotImplementedException();
+            var sb = new StringBuilder();
+            var word = words.First!;
+            while (true)
+            {
+                sb.Append(word.Value.Equals("[R]") ? LINK : word.Value);
+                if (word.Next is null) return sb.ToString().ToRandomLetterCase();
+                else sb.Append(' ');
+
+                word = word.Next;
+            }
         }
 
         private string CleanMess(LinkedList<string> tokens)
@@ -317,6 +329,8 @@ namespace Witlesss
 
             foreach (var transition in words)
             {
+                // bug: [transition.Chance > r] is often not reached
+                // r -= may be not accurate
                 if (transition.Chance > r) return transition.WordID;
                 r -= transition.Chance;
             }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SixLabors.ImageSharp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Witlesss.Generation;
 
@@ -38,6 +39,8 @@ public class GenerationPack
 
     public int GetWordID(string word)
     {
+        if (word.Equals("[R]")) return REMOVED;
+
         var useIndex = Vocabulary.Count > 16;
         if (useIndex && Index is null)
         {
@@ -55,8 +58,10 @@ public class GenerationPack
         return id;
     }
 
-    public string GetWordByID(int id)
+    public string? GetWordByID(int id)
     {
+        if (id < 0) return id == REMOVED ? "[R]" : null;
+
         return Vocabulary[id];
     }
 
@@ -89,7 +94,9 @@ public class TransitionTable() : List<Transition>(1) // TransitionTable 4.70 MB 
         }
         else
         {
-            this[index].IncreaseChanceBy(chance);
+            var transition = this[index];
+            transition.IncreaseChanceBy(chance);
+            this[index] = transition;
         }
 
         TotalChance = TotalChance.CombineRound(chance);
@@ -102,6 +109,63 @@ public struct Transition(int wordID, float chance)
     public float Chance { get; private set; } = chance;
 
     public void IncreaseChanceBy(float value) => Chance = Chance.CombineRound(value);
+}
+
+public class TransitionConverter : JsonConverter<Transition>
+{
+    public override void WriteJson(JsonWriter writer, Transition value, JsonSerializer serializer)
+    {
+        writer.WriteStartObject();
+        writer.WritePropertyName(value.WordID.ToString());
+        writer.WriteValue(value.Chance);
+        writer.WriteEndObject();
+    }
+
+    public override Transition ReadJson
+    (
+        JsonReader reader, Type type, Transition value, bool hasValue, JsonSerializer serializer
+    )
+    {
+        var jo = JObject.Load(reader);
+        var property = jo.Properties().First();
+        var wordID = int.Parse(property.Name);
+        var chance = property.Value.ToObject<float>();
+        return new Transition(wordID, chance);
+    }
+}
+
+public class TransitionTableConverter : JsonConverter<TransitionTable>
+{
+    public override void WriteJson(JsonWriter writer, TransitionTable value, JsonSerializer serializer)
+    {
+        writer.WriteStartObject();
+
+        foreach (var transition in value)
+        {
+            writer.WritePropertyName(transition.WordID.ToString());
+            writer.WriteValue(transition.Chance);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    public override TransitionTable ReadJson
+    (
+        JsonReader reader, Type type, TransitionTable value, bool hasvalue, JsonSerializer serializer
+    )
+    {
+        var jo = JObject.Load(reader);
+        var transitions = new TransitionTable();
+
+        foreach (var property in jo.Properties())
+        {
+            var wordID = int.Parse(property.Name);
+            var chance = property.Value.ToObject<float>();
+            transitions.Add(new Transition(wordID, chance));
+        }
+
+        return transitions;
+    }
 }
 /*public interface ITransitionTable
 {

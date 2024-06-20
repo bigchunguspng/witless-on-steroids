@@ -34,7 +34,22 @@ public class GenerationPack
         }
     }
 
-    public int GetWordID(string word)
+    /// <returns>An ID of existing word or newly added one.</returns>
+    public int GetWordID_AddNew(string word)
+    {
+        var id = GetID_ByWord(word);
+        if (id == NO_WORD)
+        {
+            id = Vocabulary.Count;
+            Vocabulary.Add(word);
+            Index?.Add(word, id);
+        }
+
+        return id;
+    }
+
+    /// <returns>An ID of existing word or <see cref="NO_WORD"/> code.</returns>
+    public int GetID_ByWord(string word)
     {
         if (word.Equals("[R]")) return REMOVED;
 
@@ -44,15 +59,7 @@ public class GenerationPack
             IndexVocabulary();
         }
 
-        var id = useIndex ? Index!.GetValueOrDefault(word, -1) : Vocabulary.IndexOf(word);
-        if (id < 0) // ADD WORD
-        {
-            id = Vocabulary.Count;
-            Vocabulary.Add(word);
-            Index?.Add(word, id);
-        }
-
-        return id;
+        return useIndex ? Index!.GetValueOrDefault(word, NO_WORD) : Vocabulary.IndexOf(word);
     }
 
     public string? GetWordByID(int id)

@@ -34,7 +34,7 @@ namespace Witlesss
             {
                 cp1.Eat(line, out _);
             }
-            sw.Log("db1");
+            sw.Log("EAT: db1");
 
             Console.ReadKey();
             sw.Restart();
@@ -42,22 +42,35 @@ namespace Witlesss
             {
                 cp2.Eat(line, out _);
             }
-            sw.Log("db2");
+            sw.Log("EAT: db2");
 
             Console.ReadKey();
-
             Console.WriteLine(cp1.Words.Count);
             Console.WriteLine(cp2.DB.Vocabulary.Count);
 
             Console.ReadKey();
             sw.Restart();
             new FileIO<WitlessDB>(@"D:\Desktop\db-1.json").SaveData(cp1.Words);
-            sw.Log("db-1.json");
+            sw.Log("SAVE: db-1.json");
 
             Console.ReadKey();
             sw.Restart();
             new FileIO<GenerationPack>(@"D:\Desktop\db-2.json").SaveData(cp2.DB);
-            sw.Log("db-2.json");
+            sw.Log("SAVE: db-2.json");
+
+            Console.ReadKey();
+            sw.Restart();
+            var db1B = new FileIO<WitlessDB>(@"D:\Desktop\db-1.json").LoadData();
+            sw.Log("LOAD: db-1.json");
+
+            Console.ReadKey();
+            sw.Restart();
+            var db2B = new FileIO<GenerationPack>(@"D:\Desktop\db-2.json").LoadData();
+            sw.Log("LOAD: db-2.json");
+
+            Console.ReadKey();
+            Console.WriteLine(db1B.Count);
+            Console.WriteLine(db2B.Vocabulary.Count);
 
             while (true)
             {

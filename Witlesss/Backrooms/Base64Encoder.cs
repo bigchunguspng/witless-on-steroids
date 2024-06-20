@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Witlesss.Backrooms;
 
@@ -64,11 +63,11 @@ public static class Base64Encoder
     {
         var negative = value[0] == '-';
 
-        var span = new ReadOnlySpan<char>(value.ToArray()).Slice(negative ? 1 : 0);
+        var span = value.AsSpan(negative ? 1 : 0);
 
         var result = 0;
-
         var offset = (span.Length - 1) * 6;
+
         foreach (var c in span)
         {
             result = result | (BASE_64.IndexOf(c) << offset);

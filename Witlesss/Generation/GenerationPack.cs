@@ -74,11 +74,12 @@ public class GenerationPack
     }
 }
 
-public class TransitionTable() : List<Transition>(1) // TransitionTable 4.70 MB (42.6K objects => )
+public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
 {
-    //public List<Transition> Transitions { get; } = new(1); // Transition[] 2.10 MB, List<Transition> 3.40 MB
-
     public float TotalChance { get; private set; }
+
+    private void IncreaseTotalChanceBy(float value)
+        => TotalChance = TotalChance.CombineRound(value);
 
     public void Put(int id, float chance)
     {
@@ -94,9 +95,14 @@ public class TransitionTable() : List<Transition>(1) // TransitionTable 4.70 MB 
             var transition = this[index];
             transition.IncreaseChanceBy(chance);
             this[index] = transition;
+            IncreaseTotalChanceBy(chance);
         }
+    }
 
-        TotalChance = TotalChance.CombineRound(chance);
+    public new void Add(Transition transition)
+    {
+        base.Add(transition);
+        IncreaseTotalChanceBy(transition.Chance);
     }
 }
 

@@ -30,7 +30,7 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
 
     public override Dictionary<int, TransitionTable> ReadJson
     (
-        JsonReader reader, Type type, Dictionary<int, TransitionTable> value, bool hasvalue, JsonSerializer serializer
+        JsonReader reader, Type type, Dictionary<int, TransitionTable> value, bool hasValue, JsonSerializer serializer
     )
     {
         var jo = JObject.Load(reader);
@@ -40,10 +40,10 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
         {
             var tableID = Base64Encoder.ToInt(property.Name);
 
-            var transitions = new TransitionTable();
-            var transitionsJson = (JObject)property.Value;
+            var transitionsJo = (JObject)property.Value;
+            var transitions = new TransitionTable(transitionsJo.Count);
 
-            foreach (var transition in transitionsJson)
+            foreach (var transition in transitionsJo)
             {
                 var wordID = Base64Encoder.ToInt(transition.Key);
                 var chance = transition.Value.ToObject<float>();

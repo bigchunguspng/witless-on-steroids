@@ -7,11 +7,16 @@ namespace Witlesss.Generation;
 
 public class TransitionTableConverter : JsonConverter<Dictionary<int, TransitionTable>>
 {
-    public override void WriteJson(JsonWriter writer, Dictionary<int, TransitionTable> value, JsonSerializer serializer)
+    public override void WriteJson
+    (
+        JsonWriter writer,
+        Dictionary<int, TransitionTable> dictionary,
+        JsonSerializer serializer
+    )
     {
         writer.WriteStartObject();
 
-        foreach (var pair in value)
+        foreach (var pair in dictionary)
         {
             writer.WritePropertyName(Base64Encoder.ToString(pair.Key));
             writer.WriteStartObject();
@@ -30,27 +35,41 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
 
     public override Dictionary<int, TransitionTable> ReadJson
     (
-        JsonReader reader, Type type, Dictionary<int, TransitionTable> value, bool hasValue, JsonSerializer serializer
+        JsonReader reader, 
+        Type type, 
+        Dictionary<int, TransitionTable> dictionary, 
+        bool hasValue, 
+        JsonSerializer serializer
     )
     {
-        var jo = JObject.Load(reader);
-        var dictionary = new Dictionary<int, TransitionTable>(jo.Count);
+        var depth = 0;
 
-        foreach (var property in jo.Properties())
+        TransitionTable transitions = null!;
+
+        while (reader.Read())
         {
-            var tableID = Base64Encoder.ToInt(property.Name);
-
-            var transitionsJo = (JObject)property.Value;
-            var transitions = new TransitionTable(transitionsJo.Count);
-
-            foreach (var transition in transitionsJo)
+            if /**/ (reader.TokenType == JsonToken.StartObject) depth++;
+            else if (reader.TokenType == JsonToken.  EndObject) depth--;
+            else
             {
-                var wordID = Base64Encoder.ToInt(transition.Key);
-                var chance = transition.Value.ToObject<float>();
-                transitions.Add(new Transition(wordID, chance));
+                if (reader.TokenType == JsonToken.PropertyName && reader.ValueType == typeof(string))
+                {
+                    var id = Base64Encoder.ToInt((reader.Value as string)!);
+
+                    if (depth == 0) // keys
+                    {
+                        transitions = [];
+                        dictionary.Add(id, transitions);
+                    }
+                    else if (depth == 1) // values
+                    {
+                        var chance = (float)reader.ReadAsDouble()!;
+                        transitions.Add(new Transition(id, chance));
+                    }
+                }
             }
 
-            dictionary.Add(tableID, transitions);
+            if (depth < 0) return dictionary;
         }
 
         return dictionary;

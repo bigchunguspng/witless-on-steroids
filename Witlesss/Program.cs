@@ -9,6 +9,7 @@ namespace Witlesss
     {
         private static void Main(string[] args)
         {
+            var sw = Helpers.GetStartedStopwatch();
             var paths = new[]
             {
                 @"C:\piece_fap_bot\DB\Board\a - 2023-12-12 21.59.json",
@@ -18,7 +19,6 @@ namespace Witlesss
             };
             var data = new List<string>();
             
-            var sw = Helpers.GetStartedStopwatch();
             foreach (var path in paths)
             {
                 data.AddRange(new FileIO<List<string>>(path).LoadData());
@@ -63,14 +63,25 @@ namespace Witlesss
             var db1B = new FileIO<WitlessDB>(@"D:\Desktop\db-1.json").LoadData();
             sw.Log("LOAD: db-1.json");
 
+            /*
+            var lines = new FileIO<List<string>>(@"C:\piece_fap_bot\DB\Board\a.thread.259799634 - 2023-11-22 14-28.json").LoadData();
+            var cp = new Copypaster2();
+            foreach (var line in lines)
+            {
+                cp.Eat(line, out _);
+            }
+            new FileIO<GenerationPack>(@"D:\Desktop\db-2.json").SaveData(cp.DB);
+            */
+            
             Console.ReadKey();
             sw.Restart();
             var db2B = new FileIO<GenerationPack>(@"D:\Desktop\db-2.json").LoadData();
             sw.Log("LOAD: db-2.json");
 
             Console.ReadKey();
-            Console.WriteLine(db1B.Count);
+            //Console.WriteLine(db1B.Count);
             Console.WriteLine(db2B.Vocabulary.Count);
+            Console.WriteLine(db2B.Transitions.Count);
 
             while (true)
             {

@@ -15,8 +15,8 @@ namespace Witlesss
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
         private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
-        private static readonly Regex _urls = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)");
-        private static readonly Regex _unacceptable = new(@"^(?:\/|\.)|^(?:(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>))$");
+        private static readonly Regex _urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled);
+        private static readonly Regex _skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
 
         public GenerationPack DB { get; set; } = new();
 
@@ -28,7 +28,7 @@ namespace Witlesss
             eaten = null!;
 
             if (string.IsNullOrWhiteSpace(text)) return false; // todo remove since it impossible on telegram
-            if (_unacceptable.IsMatch(text)) return false;
+            if (_skip.IsMatch(text)) return false;
 
             var lines = Tokenize(text);
             foreach (var line in lines)
@@ -63,8 +63,8 @@ namespace Witlesss
             return tokens;
         }
 
-        private static readonly Regex _regexA = new(@"[\s\[\]]|[.'?]$");
-        private static readonly Regex _regexB = new(@"[\s\[\]]");
+        private static readonly Regex _regexA = new(@"[ \]]|[.!?]$", RegexOptions.Compiled);
+        private static readonly Regex _regexB = new(@"[ \]]",        RegexOptions.Compiled);
 
         private static void CombineTokensByLength(LinkedList<string> tokens, int length)
         {

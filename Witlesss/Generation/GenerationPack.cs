@@ -90,7 +90,7 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
 
     public void Put(int id, float chance)
     {
-        var index = FindIndex(x => x.WordID == id);
+        var index = FindIndexByID(id);
         if (index < 0)
         {
             if (Capacity == Count)
@@ -111,6 +111,18 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
         base.Add(transition);
         IncreaseTotalChanceBy(transition.Chance);
     }
+
+    private int FindIndexByID(int id)
+    {
+        var i = 0;
+        foreach (var transition in this)
+        {
+            if (transition.WordID == id) return i;
+            i++;
+        }
+
+        return -1;
+    }
 }
 
 public struct Transition(int wordID, float chance)
@@ -120,55 +132,3 @@ public struct Transition(int wordID, float chance)
 
     public void IncreaseChanceBy(float value) => Chance = Chance.CombineRound(value);
 }
-
-/*public interface ITransitionTable
-{
-    public IEnumerable<float> Weights { get; }
-
-    public float WeightSum { get; }
-
-    public int GetWordID(int index);
-
-    public void AddOrUpdate(int wordID, float weight);
-}
-
-public class DictionaryTransitionTable : Dictionary<int, float>, ITransitionTable
-{
-    public float WeightSum { get; private set; }
-    public IEnumerable<float> Weights => Values;
-
-    public void AddOrUpdate(int wordID, float weight)
-    {
-        if (!TryAdd(wordID, weight)) this[wordID] = this[wordID].CombineRound(weight);
-        WeightSum = WeightSum.CombineRound(weight);
-    }
-
-    public int GetWordID(int index) => this.ElementAt(index).Key;
-}
-
-public class ListTransitionTable : List<int>, ITransitionTable
-{
-    private readonly List<float> _weights = [];
-
-    public float WeightSum { get; private set; }
-
-    public IEnumerable<float> Weights => _weights;
-
-    public void AddOrUpdate(int wordID, float weight)
-    {
-        var index = IndexOf(wordID);
-        if (index > 0)
-        {
-            _weights[index] = _weights[wordID].CombineRound(weight);
-        }
-        else
-        {
-            Add(wordID);
-            _weights.Add(weight);
-        }
-
-        WeightSum = WeightSum.CombineRound(weight);
-    }
-
-    public int GetWordID(int index) => this[index];
-}*/

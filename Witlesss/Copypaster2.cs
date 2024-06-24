@@ -9,7 +9,8 @@ namespace Witlesss
 {
     public class Copypaster2
     {
-        public  const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
+        public  const string LINK = "[R]";
+        private const string LINK_Spaced = $" {LINK} ";
         private const string START = "[S]", END = "[E]";
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
         private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
@@ -29,134 +30,90 @@ namespace Witlesss
             if (string.IsNullOrWhiteSpace(text)) return false; // todo remove since it impossible on telegram
             if (_unacceptable.IsMatch(text)) return false;
 
-            var words = Tokenize(text);
-            var tokenCount = words.Length - words.Count(x => x == LINE_BREAK);
-            if (tokenCount < 14) EatInternal(words, GetChance(tokenCount));
-            if (tokenCount > 01) EatInternal(Advance(words));
+            var lines = Tokenize(text);
+            foreach (var line in lines)
+            {
+                EatInternal(Advance(line));
+            }
 
-            eaten = string.Join(' ', words.Select(x => x.Replace(' ', '_')));
+            eaten = ""; // string.Join(' ', lines.Select(x => x.Replace(' ', '_')));
             return true;
         }
 
-        // todo replace <a href="#p259804535" class="quotelink">>>259804535</a> with [R]
+        private static string[][] Tokenize(string text)
+        {
+            text = _urls.Replace(text.ToLower(), LINK_Spaced);
+            return text.Contains("\n\n")
+                ? text.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).Select(TokenizeLine).ToArray()
+                : [TokenizeLine(text)];
+        }
 
-        private static string[] Tokenize(string text)
-            => _urls.Replace(text.ToLower(), LINK_Spaced)
-                .Replace("\n", LINE_BREAK_Spaced).Trim()
+        private static string[] TokenizeLine(string text)
+            => text
+                .Trim([' ', '\n']).Replace("\n", LINE_BREAK_Spaced)
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        // tokenCount:  1 => 1.3  |  5 => 0.9  |  13 => 0.1
-        private float GetChance(int tokenCount) => MathF.Round(1.4F - 0.1F * tokenCount, 1);
-
-        private void EatInternal(string[] words, float weight = 1F)
+        private static LinkedList<string> Advance(string[] words)
         {
-            // update vocabulary
-            var ids = new LinkedList<int>();
-            foreach (var word in words)
-            {
-                // words: A, B, [R], [N], C
-                if (word != LINE_BREAK) ids.AddLast(DB.GetOrAddWord_ReturnID(word));
-            }
+            var tokens = new LinkedList<string>(words);
+            CombineTokensByLength(tokens, 1);
+            CombineTokensByLength(tokens, 2);
+            CombineTokensByLength(tokens, 3);
 
-            // update transitions
-            ids.AddFirst(GenerationPack.START);
-            ids.AddLast(GenerationPack.END);
+            return tokens;
+        }
 
-            var id = ids.First!;
-            while (id.Next is { } next)
+        private static readonly Regex _regexA = new(@"[\s\[\]]|[.'?]$");
+        private static readonly Regex _regexB = new(@"[\s\[\]]");
+
+        private static void CombineTokensByLength(LinkedList<string> tokens, int length)
+        {
+            var token = tokens.First!;
+            while (token.Next is { } next)
             {
-                // ids: -5, A, B, -8, C, -3
-                DB.GetTableByID(id.Value).Put(next.Value, weight);
-                id = next;
+                var a = token.Value;
+                var b = token.Next.Value;
+
+                if (!_regexA.IsMatch(a) && !_regexB.IsMatch(b) && a.Length == length)
+                {
+                    token.Value = $"{token.Value} {next.Value}";
+                    tokens.Remove(next);
+                }
+                if (token.Next is null) break;
+                token = token.Next;
             }
         }
 
-        private static string[] Advance(string[] words)
+        private void EatInternal(LinkedList<string> words)
         {
-            var tokens = new LinkedList<string>(words);
-
-            if (tokens.Contains(LINE_BREAK))
+            // update vocabulary
+            var tokens = new LinkedList<IConsumableToken>();
+            foreach (var word in words)
             {
-                var indexes = tokens.Select((t, i) => new {t, i}).Where(x => x.t == LINE_BREAK).Select(x => x.i).ToArray();
-                var list = new List<string[]>(indexes.Length + 1);
-                var toks = tokens.ToArray();
-                var a = 0;
-                foreach (int index in indexes)
+                // words: A, B, [R], [N], C
+                if (word == LINE_BREAK) continue;
+                if (word.Contains(' '))
                 {
-                    if (a == index)
-                    {
-                        a++;
-                        continue;
-                    }
-                    list.Add(toks[a..index]);
-                    a = index + 1;
+                    var index = word.IndexOf(' ');
+                    var id1 = DB.GetOrAddWord_ReturnID(word.Remove(index));
+                    var id2 = DB.GetOrAddWord_ReturnID(word.Substring(index + 1));
+                    var idC = DB.GetOrAddWord_ReturnID(word);
+                    tokens.AddLast(new CombinedToken(id1, id2, idC));
                 }
-                list.Add(toks[a..tokens.Count]);
-                tokens.Clear();
-                for (var i = 0; i < list.Count; i++)
-                {
-                    list[i] = Advance(list[i]);
-                    foreach (string token in list[i])
-                    {
-                        tokens.AddLast(token);
-                    }
-                }
-                return tokens.ToArray();
+                else
+                    tokens.AddLast(new SingleToken(DB.GetOrAddWord_ReturnID(word)));
             }
-            
-            UniteTokensToRight(1, 3, 20);
-            UniteTokensToRight(2, 2, 20);
-            UniteTokensToLeft (2, 2, 5);
-            UniteTokensToRight(3, 3, 4);
-            UniteTokensToRight(4, 2, 5);
 
-            return tokens.ToArray();
+            // update transitions
+            tokens.AddFirst(new SingleToken(GenerationPack.START));
+            tokens.AddLast (new SingleToken(GenerationPack.END));
 
-            IEnumerable<string> SmallWordsSkipLast (int length) => tokens.SkipLast(1).Where(x => UnitableToken(x, length)).Reverse();
-            IEnumerable<string> SmallWordsSkipFirst(int length) => tokens.Skip    (1).Where(x => UnitableToken(x, length)).Reverse();
-            
-            bool UnitableToken(string x, int length) => x.Length == length;
-            bool IsSimpleToken(string x) => !x.Contains(' ');
-
-            void UniteTokensToRight(int length, int min, int max)
+            var node = tokens.First!;
+            while (node.Next is { } next)
             {
-                var small = SmallWordsSkipLast(length).ToArray();
-                if (small.Length == 0) return;
-                    
-                foreach (string word in small)
-                {
-                    var x = tokens.Last;
-                    tokens.RemoveLast();
-                    var a = tokens.FindLast(word);
-                    tokens.AddLast(x!);
-                    var n = a?.Next;
-                    var l = n?.Value.Length;
-                    if (l >= min && l <= max && IsSimpleToken(n.Value))
-                    {
-                        a!.Value = a.Value + " " + n.Value;
-                        tokens.Remove(n);
-                    }
-                }
-            }
-            void UniteTokensToLeft (int length, int min, int max)
-            {
-                var small = SmallWordsSkipFirst(length).ToArray();
-                if (small.Length == 0) return;
-
-                foreach (string word in small)
-                {
-                    var x = tokens.First;
-                    tokens.RemoveFirst();
-                    var a = tokens.FindLast(word);
-                    tokens.AddFirst(x!);
-                    var p = a?.Previous;
-                    var l = p?.Value.Length;
-                    if (l >= min && l <= max && IsSimpleToken(p.Value))
-                    {
-                        a!.Value = p.Value + " " + a.Value;
-                        tokens.Remove(p);
-                    }
-                }
+                // ids: -5, A, B, -8, C, -3
+                node.Value.RememberTransition(DB, next.Value);
+                node = next;
             }
         }
 

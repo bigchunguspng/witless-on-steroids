@@ -1,43 +1,33 @@
-﻿using System;
+﻿using System.Linq;
+using Witlesss.Generation;
 
 namespace Witlesss.Services
 {
     public class FusionCollab
     {
-        private readonly WitlessDB _dictionary1, _dictionary2;
+        private readonly GenerationPack _packSource, _packTarget;
 
-        public FusionCollab(Witless witless, WitlessDB dictionary)
+        public FusionCollab(Witless witless, GenerationPack pack)
         {
             witless.Backup();
 
-            _dictionary1 = witless.Words;
-            _dictionary2 = dictionary;
+            _packSource = pack;
+            _packTarget = witless.Pack;
         }
-        
+
         public void Fuse()
         {
-            foreach (var word in _dictionary2) // word = "word1: {[w1:x1][w2:x2][...]}"
+            // update vocabulary
+            var ids = _packSource.Vocabulary.Select(word => _packTarget.GetOrAddWord_ReturnID(word)).ToList();
+
+            // update transitions
+            foreach (var id in ids)
             {
-                if (_dictionary1.ContainsKey(word.Key))
+                var tableTarget = _packTarget.GetTableByID(id);
+                var tableSource = _packSource.GetTableByID(id);
+                foreach (var transition in tableSource)
                 {
-                    foreach (var next in word.Value) // next = "word2: x"}"
-                    {
-                        if (_dictionary1[word.Key].ContainsKey(next.Key))
-                        {
-                            // pick x1 or x2
-                            _dictionary1[word.Key][next.Key] = Math.Max(_dictionary1[word.Key][next.Key], next.Value);
-                        }
-                        else
-                        {
-                            // add "word2: x" pair
-                            _dictionary1[word.Key].TryAdd(next.Key, next.Value);
-                        }
-                    }
-                }
-                else
-                {
-                    // add "word1: {[][][][][]}"
-                    _dictionary1.TryAdd(word.Key, word.Value);
+                    tableTarget.Put(ids[transition.WordID], transition.Chance);
                 }
             }
         }

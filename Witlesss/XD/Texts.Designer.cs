@@ -136,9 +136,6 @@ namespace Witlesss.XD {
         /// /oo - clear dics
         /// /Oo - clear active dic
         ///
-        /// /xx - fix DBs
-        /// /Xx - fix active chat DB
-        ///
         /// /l  - activate last chat
         /// /b  - ban active chat (hours)
         /// /ub - unban active chat.

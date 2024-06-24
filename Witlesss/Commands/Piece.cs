@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
+using Witlesss.Generation;
 
 namespace Witlesss.Commands
 {
@@ -22,7 +23,7 @@ namespace Witlesss.Commands
             for (int i = 1; i <= _latest; i++) cp.Eat(_url + i, out _);
 
             var path = Move.UniqueExtraDBsPath(_name);
-            new FileIO<WitlessDB>(path).SaveData(cp.Words);
+            new FileIO<GenerationPack>(path).SaveData(cp.DB);
 
             Bot.SendMessage(Chat, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
             Log($"{Title} >> THE ONE PIECE IS REAL!!!");

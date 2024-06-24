@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using Witlesss.Generation;
 
 namespace Witlesss
 {
@@ -16,7 +17,7 @@ namespace Witlesss
             
             Meme   = new MemeSettings();
             Baka   = new Copypaster();
-            FileIO = new FileIO<WitlessDB>(Path);
+            FileIO = new FileIO<GenerationPack>(Path);
 
             Saves.Interval = 10;
         }
@@ -53,7 +54,7 @@ namespace Witlesss
         }
         [JsonProperty] public MemeSettings Meme { get; set; }
 
-        private FileIO<WitlessDB> FileIO { get; }
+        private FileIO<GenerationPack> FileIO { get; }
 
         private Counter Saves      { get; } = new();
         private Counter Generation { get; } = new();
@@ -61,7 +62,8 @@ namespace Witlesss
         public bool Banned, Loaded, HasUnsavedStuff;
 
         public Copypaster Baka { get; set; }
-        /*public WitlessDB Words
+
+        public GenerationPack Pack
         {
             get => Baka.DB;
             set => Baka.DB = value;
@@ -75,38 +77,11 @@ namespace Witlesss
         public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));
         public string GenerateByLast(string word) => TextOrBust(() => Baka.GenerateByLast(word));
 
-        private string TextOrBust(Func<string> generate)
+        private string TextOrBust(Func<string> genetare)
         {
             try
             {
-                return generate();
-            }
-            catch
-            {
-                LogError("NO TEXT!?");
-                var response = IsOneIn(3) ? null : DefaultTextProvider.GetRandomResponse();
-                return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
-            }
-        }*/
-        public WitlessDB Words
-        {
-            get => Baka.Words;
-            set => Baka.Words = value;
-        }
-
-        public bool Eat(string text)                    => HasUnsavedStuff = Baka.Eat(text, out _);
-        public bool Eat(string text, out string? eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
-
-        public string Generate(string word = Copypaster.START) => TextOrBust(Baka.Generate, word);
-
-        public string GenerateByWord(string word) => TextOrBust(Baka.GenerateByWord, word);
-        public string GenerateByLast(string word) => TextOrBust(Baka.GenerateByLast, word);
-
-        private string TextOrBust(Func<string, string> genetare, string word)
-        {
-            try
-            {
-                return genetare(word);
+                return genetare();
             }
             catch
             {
@@ -141,7 +116,7 @@ namespace Witlesss
 
         public void SaveNoMatterWhat()
         {
-            lock (Words.Sync) FileIO.SaveData(Words);
+            lock (Baka) FileIO.SaveData(Pack);
             HasUnsavedStuff = false;
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
@@ -152,7 +127,7 @@ namespace Witlesss
         }
         public void Load()
         {
-            Words = FileIO.LoadData();
+            Pack = FileIO.LoadData();
             Loaded = true;
             Saves.Reset();
             HasUnsavedStuff = false;
@@ -161,7 +136,7 @@ namespace Witlesss
 
         public void Unload()
         {
-            Words = null!;
+            Pack = null!;
             Loaded = false;
             Log($"DIC UNLOAD << {Chat}", ConsoleColor.Yellow);
         }

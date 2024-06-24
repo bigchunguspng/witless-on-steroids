@@ -1,316 +1,314 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
-using WordChart = System.Collections.Generic.Dictionary<string, float>;
+using Witlesss.Generation;
 
 namespace Witlesss
 {
     public class Copypaster
     {
-        public  const string   START = "_start",      END = "_end";
-        private const string    LINK = "[ссылка удалена]", LINK_eng = "[deleted]", LINK_ua = "[видалено]";
-        private const string      LF = "_LF", LF_Spaced = $" {LF} ";
+        public const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
+        public const string START = "[S]", END = "[E]";
+        public const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
+        public const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
-        private static readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
-        private static readonly Regex _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
+        private static readonly Regex _urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled);
+        private static readonly Regex _skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
 
-        public WitlessDB Words { get; set; } = new();
+        public GenerationPack DB { get; set; } = new();
 
+
+        // CONSUMING TEXT
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text, out string? eaten)
         {
             eaten = null!;
 
-            if (TextIsUnacceptable(text)) return false;
+            if (string.IsNullOrWhiteSpace(text)) return false; // todo remove since it impossible on telegram
+            if (_skip.IsMatch(text)) return false;
 
-            var words = Tokenize(ReplaceLinks(text));
-            int count = TokenCount();
-            if (count < 14)
+            var lines = Tokenize(text);
+            foreach (var line in lines)
             {
-                float weight = MathF.Round(1.4F - 0.1F * count, 1); // 1 => 1.3  |  5 => 0.9  |  13 => 0.1
-                eaten = EatSimple(words, weight);
+                EatInternal(Advance(line));
             }
-            if (count > 1)
-            {
-                eaten = EatAdvanced(words);
-            }
+
+            eaten = ""; // string.Join(' ', lines.Select(x => x.Replace(' ', '_')));
             return true;
-
-            bool TextIsUnacceptable(string s) => _unacceptable.IsMatch(s);
-            string ReplaceLinks(string s) => _urls.Replace(s, LINK);
-            int TokenCount() => words.Length - words.Count(x => x == LF);
         }
 
-        private string EatAdvanced(string[] words)
+        private static string[][] Tokenize(string text)
         {
-            words = Advance(words);
-            EatSimple(words);
-            return string.Join(' ', words.Select(x => x.Replace(' ', '_')));
+            text = _urls.Replace(text.ToLower(), LINK_Spaced);
+            return text.Contains("\n\n")
+                ? text.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).Select(TokenizeLine).ToArray()
+                : [TokenizeLine(text)];
         }
-        private string EatSimple(string[] words, float weight = 1F)
-        {
-            var list = new LinkedList<string>(words);
 
-            list.AddFirst(START);
-            list.AddLast(END);
+        private static string[] TokenizeLine(string text)
+            => text
+                .Trim([' ', '\n']).Replace("\n", LINE_BREAK_Spaced)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            var node = list.First!;
-            while (node.Next != null)
-            {
-                var word = node.Value;
-                if (word != LF)
-                {
-                    if (!Words.ContainsKey(word)) Words.Add(word, new WordChart());
-
-                    var next = node.Next.Value;
-                    if (Words[word].ContainsKey(next))
-                        Words[word][next] = MathF.Round(Words[word][next] + weight, 1);
-                    else
-                        Words[word].Add(next, weight);
-                }
-                node = node.Next;
-            }
-            list.RemoveFirst();
-            list.RemoveLast();
-            return string.Join(' ', list);
-        }
-        private static string[] Advance(string[] words)
+        private static LinkedList<string> Advance(string[] words)
         {
             var tokens = new LinkedList<string>(words);
+            CombineTokensByLength(tokens, 1);
+            CombineTokensByLength(tokens, 2);
+            CombineTokensByLength(tokens, 3);
 
-            if (tokens.Contains(LF))
+            return tokens;
+        }
+
+        private static readonly Regex _regexA = new(@"[ \]]|[.!?]$", RegexOptions.Compiled);
+        private static readonly Regex _regexB = new(@"[ \]]",        RegexOptions.Compiled);
+
+        private static void CombineTokensByLength(LinkedList<string> tokens, int length)
+        {
+            var token = tokens.First!;
+            while (token.Next is { } next)
             {
-                var indexes = tokens.Select((t, i) => new {t, i}).Where(x => x.t == LF).Select(x => x.i).ToArray();
-                var list = new List<string[]>(indexes.Length + 1);
-                var toks = tokens.ToArray();
-                var a = 0;
-                foreach (int index in indexes)
-                {
-                    if (a == index)
-                    {
-                        a++;
-                        continue;
-                    }
-                    list.Add(toks[a..index]);
-                    a = index + 1;
-                }
-                list.Add(toks[a..tokens.Count]);
-                tokens.Clear();
-                for (var i = 0; i < list.Count; i++)
-                {
-                    list[i] = Advance(list[i]);
-                    foreach (string token in list[i])
-                    {
-                        tokens.AddLast(token);
-                    }
-                }
-                return tokens.ToArray();
-            }
-            
-            UniteTokensToRight(1, 3, 20);
-            UniteTokensToRight(2, 2, 20);
-            UniteTokensToLeft (2, 2, 5);
-            UniteTokensToRight(3, 3, 4);
-            UniteTokensToRight(4, 2, 5);
+                var a = token.Value;
+                var b = token.Next.Value;
 
-            return tokens.ToArray();
-
-            IEnumerable<string> SmallWordsSkipLast (int length) => tokens.SkipLast(1).Where(x => UnitableToken(x, length)).Reverse();
-            IEnumerable<string> SmallWordsSkipFirst(int length) => tokens.Skip    (1).Where(x => UnitableToken(x, length)).Reverse();
-            
-            bool UnitableToken(string x, int length) => x.Length == length;
-            bool IsSimpleToken(string x) => !x.Contains(' ');
-
-            void UniteTokensToRight(int length, int min, int max)
-            {
-                var small = SmallWordsSkipLast(length).ToArray();
-                if (small.Length == 0) return;
-                    
-                foreach (string word in small)
+                if (!_regexA.IsMatch(a) && !_regexB.IsMatch(b) && a.Length == length)
                 {
-                    var x = tokens.Last;
-                    tokens.RemoveLast();
-                    var a = tokens.FindLast(word);
-                    tokens.AddLast(x!);
-                    var n = a?.Next;
-                    var l = n?.Value.Length;
-                    if (l >= min && l <= max && IsSimpleToken(n.Value))
-                    {
-                        a!.Value = a.Value + " " + n.Value;
-                        tokens.Remove(n);
-                    }
+                    token.Value = $"{token.Value} {next.Value}";
+                    tokens.Remove(next);
                 }
-            }
-            void UniteTokensToLeft (int length, int min, int max)
-            {
-                var small = SmallWordsSkipFirst(length).ToArray();
-                if (small.Length == 0) return;
-
-                foreach (string word in small)
-                {
-                    var x = tokens.First;
-                    tokens.RemoveFirst();
-                    var a = tokens.FindLast(word);
-                    tokens.AddFirst(x!);
-                    var p = a?.Previous;
-                    var l = p?.Value.Length;
-                    if (l >= min && l <= max && IsSimpleToken(p.Value))
-                    {
-                        a!.Value = p.Value + " " + a.Value;
-                        tokens.Remove(p);
-                    }
-                }
+                if (token.Next is null) break;
+                token = token.Next;
             }
         }
-        private static string[] Tokenize(string s) => s.ToLower().Replace("\n", LF_Spaced).Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
+        private void EatInternal(LinkedList<string> words)
+        {
+            // update vocabulary
+            var tokens = new LinkedList<IConsumableToken>();
+            foreach (var word in words)
+            {
+                // words: A, B, [R], [N], C
+                if (word == LINE_BREAK) continue;
+                if (word.Contains(' '))
+                {
+                    var index = word.IndexOf(' ');
+                    var id1 = DB.GetOrAddWord_ReturnID(word.Remove(index));
+                    var id2 = DB.GetOrAddWord_ReturnID(word.Substring(index + 1));
+                    var idC = DB.GetOrAddWord_ReturnID(word);
+                    tokens.AddLast(new CombinedToken(id1, id2, idC));
+                }
+                else
+                    tokens.AddLast(new SingleToken(DB.GetOrAddWord_ReturnID(word)));
+            }
+
+            // update transitions
+            tokens.AddFirst(new SingleToken(GenerationPack.START));
+            tokens.AddLast (new SingleToken(GenerationPack.END));
+
+            var node = tokens.First!;
+            while (node.Next is { } next)
+            {
+                // ids: -5, A, B, -8, C, -3
+                node.Value.RememberTransition(DB, next.Value);
+                node = next;
+            }
+        }
+
+
+        // GENERATION
+
+        // Vocabulary: 0+
+
+        // A: table [B: Chance]
+        // A = [S], [R], 0+
+        // B = [E], [R], 0+
+
+        /// <param name="word">A user provided text, <b>\S+(\s\S+)?</b>.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByWord(string word)
         {
-            string match = FindMatch(word, START, out bool separated);
-            string result = Generate(match);
+            var id = FindExistingOrSimilarWordID(word, START, out var separated);
+            var result = Generate(id);
             if (separated) result = word.Split()[0] + " " + result;
             return result;
         }
+
+        /// <param name="word">A user provided text, <b>\S+(\s\S+)?</b>.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByLast(string word)
         {
-            string match = FindMatch(word, END, out bool separated);
-            string result = GenerateBackwards(match);
+            var id = FindExistingOrSimilarWordID(word, END, out var separated);
+            var result = GenerateBackwards(id);
             if (separated) result = result + " " + word.Split()[1];
             return result;
         }
 
-        private string FindMatch(string word, string alt, out bool separated)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public string Generate(int wordID = GenerationPack.START)
         {
-            if (Words.Count == 0) throw new Exception("бро так не генерят");
+            var ids = new LinkedList<int>();
 
+            ids.AddLast(wordID);
+
+            while (ids.Last!.Value != GenerationPack.END)
+            {
+                var table = DB.GetTableByID(ids.Last.Value);
+                ids.AddLast(PickWordID(table));
+            }
+
+            return RenderText(ids);
+        }
+
+        private string GenerateBackwards(int wordID)
+        {
+            var ids = new LinkedList<int>();
+
+            ids.AddFirst(wordID);
+
+            while (ids.First!.Value != GenerationPack.START)
+            {
+                var table = GetWordsBefore(ids.First.Value);
+                ids.AddFirst(PickWordID(table));
+            }
+
+            return RenderText(ids);
+        }
+
+        public static int PickWordID(TransitionTable words)
+        {
+            var r = Random.Shared.NextSingle() * words.TotalChance;
+
+            foreach (var transition in words)
+            {
+                if (transition.Chance > r) return transition.WordID;
+                r -= transition.Chance;
+            }
+
+            LogError("GenerationPack.PickWordID >> UNEXPECTED EXECUTION PATH");
+
+            return GenerationPack.END;
+        }
+
+        private string RenderText(LinkedList<int> ids)
+        {
+            var words = new LinkedList<string>();
+
+            foreach (var id in ids)
+            {
+                var word = DB.GetWordByID(id);
+                if (word is not null) words.AddLast(word);
+            }
+
+            return BuildText(words);
+        }
+
+        private string BuildText(LinkedList<string> words)
+        {
+            var hasURLs = false;
+            var sb = new StringBuilder();
+            var word = words.First!;
+            while (word is not null)
+            {
+                sb.Append(word.Value).Append(' ');
+
+                hasURLs |= word.Value.Equals(LINK);
+
+                word = word.Next;
+            }
+
+            var text = sb.ToString();
+            if (hasURLs)
+            {
+                var replacement = IsMostlyCyrillic(text) ? LooksLikeUkrainian(text) ? LINK_ua : LINK_ru : LINK_en;
+                text = text.Replace(LINK, replacement);
+            }
+            return text.ToRandomLetterCase();
+        }
+
+        /// <summary>
+        /// Finds all word ids, that has provided word id in their transitions
+        /// </summary>
+        private TransitionTable GetWordsBefore(int wordID)
+        {
+            var table = new TransitionTable();
+            foreach (var pair in DB.Transitions)
+            {
+                var index = pair.Value.FindIndex(x => x.WordID == wordID);
+                if (index > 0)
+                {
+                    table.Put(pair.Key, pair.Value[index].Chance);
+                }
+            }
+            return table;
+        }
+
+        private int FindExistingOrSimilarWordID(string word, string alt, out bool separated)
+        {
+            if (DB.Vocabulary.Count == 0) throw new Exception("бро так не генерят");
+
+            var backwards = alt == END;
             separated = false;
 
-            if (Words.ContainsKey(word)) return word;
+            var id = DB.GetID_ByWord(word);
+            if (id != GenerationPack.NO_WORD) return id;
+
+            // word is not a part of the vocabulary
 
             if (word.Contains(' '))
             {
-                word = alt == END ? word.Split()[0] : word.Split()[1];
+                word = word.Split()[backwards ? 0 : 1];
                 separated = true;
-                if (Words.ContainsKey(word)) return word;
+
+                id = DB.GetID_ByWord(word);
+                if (id != GenerationPack.NO_WORD) return id;
+
+                // word is not a part of the vocabulary + is separated by space;
             }
 
-            var w = word;
-            var words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> megalisba S lisba -> lisball
-            if (words.Count > 0) return RandomWord();
+            // E lisba -> megalisba S lisba -> lisball
+            if (HasWordsSimilarTo(word, backwards, out var words)) return RandomWordID(words);
 
-            if (word.Length > 2 && alt == END ? word.StartsWith("..") : word.EndsWith(".."))
+            if (word.Length > 2 && backwards ? word.StartsWith("..") : word.EndsWith(".."))
             {
-                w = word.Trim('.');
-                words = Words.Keys.Where(KeyHasWord).ToList(); // E ...ba -> booBA S lisb... -> LISBowski
-                if (words.Count > 0) return RandomWord();
+                // E ...ba -> booBA S lisb... -> LISBowski
+                if (HasWordsSimilarTo(word.Trim('.'), backwards, out words)) return RandomWordID(words); 
             }
             if (word.Length > 3)
             {
-                w = alt == END ? word[^3..] : word.Remove(3);
-                words = Words.Keys.Where(KeyHasWord).ToList(); // E lisba -> so_SBA S lisba -> LISik
-                if (words.Count > 0) return RandomWord();
+                // E lisba -> so_SBA S lisba -> LISik
+                var part = backwards ? word[^3..] : word.Remove(3);
+                if (HasWordsSimilarTo(part, backwards, out words)) return RandomWordID(words); 
             }
             if (word.Length > 1)
             {
-                w = word;
-                words = Words.Keys.Where(WordHasKey).ToList(); // E lisba -> a S lisba -> lisb
-                if (words.Count > 0)
+                // E lisba -> a S lisba -> lisb
+                if (HasWordsSimilarTo(word, backwards, out words, normalWay: false)) 
                 {
-                    return words.First(x => x.Length == words.Max(s => s.Length));
+                    return DB.GetID_ByWord(words.First(x => x.Length == words.Max(s => s.Length)));
                 }
             }
-            return alt;
 
-            string RandomWord() => words[Random.Shared.Next(words.Count)];
-
-            bool WordHasKey(string x) => alt == END ? w.EndsWith(x, StringComparison.Ordinal) : w.StartsWith(x, StringComparison.Ordinal);
-            bool KeyHasWord(string x) => alt == END ? x.EndsWith(w, StringComparison.Ordinal) : x.StartsWith(w, StringComparison.Ordinal);
+            return backwards ? GenerationPack.END : GenerationPack.START;
         }
 
-        public  string Generate(string word)
+        private bool HasWordsSimilarTo(string word, bool backwards, out List<string> words, bool normalWay = true)
         {
-            var tokens = new LinkedList<string>();
-
-            string current = word;
-            while (current != END)
-            {
-                tokens.AddLast(current);
-                current = PickWord(Words[current]);
-            }
-
-            if (tokens.First is { Value: START }) tokens.RemoveFirst();
+            words = DB.Vocabulary.Where(normalWay ? WordIsPartOfDBWord : DBWordIsPartOfWord).ToList();
+            return words.Count > 0;
             
-            return CleanMess(tokens);
-        }
-        private string GenerateBackwards(string word)
-        {
-            var tokens = new LinkedList<string>();
+            bool DBWordIsPartOfWord(string x) => backwards 
+                ? word.  EndsWith(x, StringComparison.Ordinal) 
+                : word.StartsWith(x, StringComparison.Ordinal);
 
-            string current = word;
-            while (current != START)
-            {
-                tokens.AddFirst(current);
-                current = PickWord(GetWordsBefore(current));
-            }
-
-            if (tokens.Last is { Value: END }) tokens.RemoveLast();
-            
-            return CleanMess(tokens);
+            bool WordIsPartOfDBWord(string x) => backwards 
+                ? x.  EndsWith(word, StringComparison.Ordinal) 
+                : x.StartsWith(word, StringComparison.Ordinal);
         }
 
-        private string CleanMess(LinkedList<string> tokens)
-        {
-            return LocalizeLinkRemovals(string.Join(' ', tokens)).ToRandomLetterCase();
-        }
-        private string LocalizeLinkRemovals(string text)
-        {
-            if (!text.Contains(LINK)) return text;
-
-            var temp = text.Replace(LINK, "_+-+_");
-
-            var cyr = IsMostlyCyrillic(temp);
-            var ukr = cyr && LooksLikeUkrainian(temp, out var sure) && sure;
-
-            return cyr && !ukr ? text : text.Replace(LINK, ukr ? LINK_ua : LINK_eng);
-        }
-
-        private WordChart GetWordsBefore(string word)
-        {
-            var words = new WordChart();
-            foreach (var bunch in Words)
-            {
-                if (bunch.Value.TryGetValue(word, out float x))
-                {
-                    if (!words.TryAdd(bunch.Key, x)) words[bunch.Key] += x;
-                }
-            }
-            return words;
-        }
-
-        public static string PickWord(WordChart words)
-        {
-            float r = (float) Random.Shared.NextDouble() * words.Sum(chance => chance.Value);
-
-            foreach (var chance in words)
-            {
-                if  (chance.Value > r) return chance.Key;
-                r -= chance.Value;
-            }
-
-            return END;
-        }
-        
-        public void FixWitlessDB()
-        {
-            foreach (var word in Words)
-            foreach (string next in word.Value.Keys)
-            {
-                if (!Words.ContainsKey(next))
-                {
-                    Words.Add(next, new WordChart());
-                    Words[next].Add(END, 1F);
-                }
-            }
-        }
+        private int RandomWordID(List<string> words) => DB.GetID_ByWord(words[Random.Shared.Next(words.Count)]);
     }
 }

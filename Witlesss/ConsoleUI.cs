@@ -58,8 +58,6 @@ namespace Witlesss
             else if (_input == "/cc") ClearTempFiles();
             else if (_input == "/oo") ClearDics();
             else if (_input == "/Oo") ClearDic(Active);
-            else if (_input == "/xx") FixDBs();
-            else if (_input == "/Xx") FixDB(Active);
             else if (_input == "/l" ) ActivateLastChat();
             else if (_input == "/b" ) Thor.  BanChat(_active);
             else if (_input == "/ub") Thor.UnbanChat(_active);
@@ -147,16 +145,6 @@ namespace Witlesss
                 ChatsDealer.RemoveChat(witless.Chat);
             }
             ChatsDealer.SaveChatList();
-        }
-
-        private void FixDBs() => Bakas.ForEach(FixDB);
-        private void FixDB(Witless witless)
-        {
-            if (ChatsDealer.WitlessExist(witless.Chat))
-            {
-                witless.Baka.FixWitlessDB();
-                witless.SaveNoMatterWhat();
-            }
         }
     }
 }

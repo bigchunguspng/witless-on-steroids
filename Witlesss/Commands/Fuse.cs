@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using Witlesss.Generation;
 
 namespace Witlesss.Commands
 {
@@ -206,17 +207,17 @@ namespace Witlesss.Commands
 
             if (argIsID && ChatsDealer.WitlessExist(chat, out var baka))
             {
-                FuseWithWitlessDB(baka.Words);
+                FuseWithWitlessDB(baka.Pack);
             }
             else if (GetFiles(Paths.Dir_Fuse, $"{arg}.json") is { Length: > 0 } files)
             {
-                FuseWithWitlessDB(new FileIO<WitlessDB>(files[0]).LoadData());
+                FuseWithWitlessDB(new FileIO<GenerationPack>(files[0]).LoadData());
             }
             else if (argIsID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
             else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
         }
 
-        private void FuseWithWitlessDB(WitlessDB source)
+        private void FuseWithWitlessDB(GenerationPack source)
         {
             new FusionCollab(Baka, source).Fuse();
             GoodEnding();

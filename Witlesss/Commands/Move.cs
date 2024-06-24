@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Witlesss.Generation;
 
 namespace Witlesss.Commands
 {
@@ -18,7 +19,7 @@ namespace Witlesss.Commands
                 }
                 else
                 {
-                    Baka.Words.Clear();
+                    Baka.Pack = new GenerationPack();
                     Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
                     Baka.SaveNoMatterWhat();
 

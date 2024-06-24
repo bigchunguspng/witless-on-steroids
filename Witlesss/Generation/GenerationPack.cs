@@ -14,14 +14,12 @@ public class GenerationPack
     /// A list of unique words (and word pairs).
     /// </summary>
     public readonly List<string> Vocabulary = [];
-    //public Dictionary<string, int> Vocabulary;
 
     /// <summary>
     /// A data structure that represents all possible transitions
     /// for each word by it's index in the <see cref="Vocabulary"/>.
     /// </summary>
     public readonly Dictionary<int, TransitionTable> Transitions = new();
-    // should be changed from list to dic on 16 elements list.Count == 16
 
     private Dictionary<string, int>? Index;
 
@@ -64,7 +62,7 @@ public class GenerationPack
 
     public string? GetWordByID(int id)
     {
-        if (id < 0) return id == REMOVED ? Copypaster2.LINK : null;
+        if (id < 0) return id == REMOVED ? Copypaster.LINK : null;
 
         return Vocabulary[id];
     }

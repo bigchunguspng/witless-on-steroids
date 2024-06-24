@@ -9,10 +9,9 @@ namespace Witlesss
 {
     public class Copypaster2
     {
-        private const string START = "[S]", END = "[E]";
-        private const string LINK = "[R]";
-        private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
+        private const string START = "[S]", END = "[E]", LINK = "[R]";
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
+        private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
         private static readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
         private static readonly Regex _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
@@ -159,6 +158,12 @@ namespace Witlesss
 
         // GENERATION
 
+        // Vocabulary: 0+
+        
+        // A: table [B: Chance]
+        // A = [S], [R], 0+
+        // B = [E], [R], 0+
+
         /// <param name="word">A user provided text, <b>\S+(\s\S+)?</b>.</param>
         public string GenerateByWord(string word)
         {
@@ -177,73 +182,6 @@ namespace Witlesss
             return result;
         }
 
-        private int FindExistingOrSimilarWordID(string word, string alt, out bool separated)
-        {
-            if (DB.Vocabulary.Count == 0) throw new Exception("бро так не генерят");
-
-            var backwards = alt == END;
-            separated = false;
-
-            var id = DB.GetID_ByWord(word);
-            if (id != GenerationPack.NO_WORD) return id;
-
-            // word is not a part of the vocabulary
-
-            if (word.Contains(' '))
-            {
-                word = word.Split()[backwards ? 0 : 1];
-                separated = true;
-
-                id = DB.GetID_ByWord(word);
-                if (id != GenerationPack.NO_WORD) return id;
-
-                // word is not a part of the vocabulary + is separated by space;
-            }
-
-            var w = word;
-            List<string> words;
-            if (GotEnoughWords()) return RandomWordID(); // E lisba -> megalisba S lisba -> lisball
-
-            if (word.Length > 2 && backwards ? word.StartsWith("..") : word.EndsWith(".."))
-            {
-                w = word.Trim('.');
-                if (GotEnoughWords()) return RandomWordID(); // E ...ba -> booBA S lisb... -> LISBowski
-            }
-            if (word.Length > 3)
-            {
-                w = backwards ? word[^3..] : word.Remove(3);
-                if (GotEnoughWords()) return RandomWordID(); // E lisba -> so_SBA S lisba -> LISik
-            }
-            if (word.Length > 1)
-            {
-                w = word;
-                if (GotEnoughWords(normalWay: false)) // E lisba -> a S lisba -> lisb
-                {
-                    return DB.GetID_ByWord(words.First(x => x.Length == words.Max(s => s.Length)));
-                }
-            }
-
-            return backwards ? GenerationPack.END : GenerationPack.START;
-
-            // ==
-
-            int RandomWordID() => DB.GetID_ByWord(words[Random.Shared.Next(words.Count)]);
-
-            bool GotEnoughWords(bool normalWay = true)
-            {
-                words = DB.Vocabulary.Where(normalWay ? WordIsPartOfDBWord : DBWordIsPartOfWord).ToList();
-                return words.Count > 0;
-            }
-
-            bool DBWordIsPartOfWord(string x) => backwards 
-                ? w.  EndsWith(x, StringComparison.Ordinal) 
-                : w.StartsWith(x, StringComparison.Ordinal);
-
-            bool WordIsPartOfDBWord(string x) => backwards 
-                ? x.  EndsWith(w, StringComparison.Ordinal) 
-                : x.StartsWith(w, StringComparison.Ordinal);
-        }
-
         public string Generate(int wordID = GenerationPack.START)
         {
             var ids = new LinkedList<int>();
@@ -252,10 +190,11 @@ namespace Witlesss
 
             while (ids.Last!.Value != GenerationPack.END)
             {
-                ids.AddLast(PickWord(DB.GetTableByID(ids.Last.Value)));
+                var table = DB.GetTableByID(ids.Last.Value);
+                ids.AddLast(PickWordID(table));
             }
 
-            if (ids.First is { Value: GenerationPack.START }) ids.RemoveFirst();
+            if (ids.First!.Value == GenerationPack.START) ids.RemoveFirst();
 
             return RenderText(ids);
         }
@@ -268,12 +207,28 @@ namespace Witlesss
 
             while (ids.First!.Value != GenerationPack.START)
             {
-                ids.AddFirst(PickWord(GetWordsBefore(ids.First.Value)));
+                var table = GetWordsBefore(ids.First.Value);
+                ids.AddFirst(PickWordID(table));
             }
 
-            if (ids.Last is { Value: GenerationPack.END }) ids.RemoveLast();
+            if (ids.Last!.Value == GenerationPack.END) ids.RemoveLast();
 
             return RenderText(ids);
+        }
+
+        public static int PickWordID(TransitionTable words)
+        {
+            var r = Random.Shared.NextSingle() * words.TotalChance;
+
+            foreach (var transition in words)
+            {
+                if (transition.Chance > r) return transition.WordID;
+                r -= transition.Chance;
+            }
+
+            LogError("GenerationPack.PickWordID >> UNEXPECTED EXECUTION PATH");
+
+            return GenerationPack.END;
         }
 
         private string RenderText(LinkedList<int> ids)
@@ -303,6 +258,7 @@ namespace Witlesss
             }
         }
 
+
         /*private string CleanMess(LinkedList<string> tokens)
         {
             return LocalizeLinkRemovals(string.Join(' ', tokens)).ToRandomLetterCase();
@@ -318,6 +274,7 @@ namespace Witlesss
 
             return cyr && !ukr ? text : text.Replace(LINK, ukr ? LINK_ua : LINK_eng);
         }*/
+
 
         /// <summary>
         /// Finds all word ids, that has provided word id in their transitions
@@ -336,19 +293,69 @@ namespace Witlesss
             return table;
         }
 
-        public static int PickWord(TransitionTable words)
+        private int FindExistingOrSimilarWordID(string word, string alt, out bool separated)
         {
-            var r = Random.Shared.NextSingle() * words.TotalChance;
+            if (DB.Vocabulary.Count == 0) throw new Exception("бро так не генерят");
 
-            foreach (var transition in words)
+            var backwards = alt == END;
+            separated = false;
+
+            var id = DB.GetID_ByWord(word);
+            if (id != GenerationPack.NO_WORD) return id;
+
+            // word is not a part of the vocabulary
+
+            if (word.Contains(' '))
             {
-                // bug: [transition.Chance > r] is often not reached
-                // r -= may be not accurate
-                if (transition.Chance > r) return transition.WordID;
-                r -= transition.Chance;
+                word = word.Split()[backwards ? 0 : 1];
+                separated = true;
+
+                id = DB.GetID_ByWord(word);
+                if (id != GenerationPack.NO_WORD) return id;
+
+                // word is not a part of the vocabulary + is separated by space;
             }
 
-            return GenerationPack.END;
+            // E lisba -> megalisba S lisba -> lisball
+            if (HasWordsSimilarTo(word, backwards, out var words)) return RandomWordID(words);
+
+            if (word.Length > 2 && backwards ? word.StartsWith("..") : word.EndsWith(".."))
+            {
+                // E ...ba -> booBA S lisb... -> LISBowski
+                if (HasWordsSimilarTo(word.Trim('.'), backwards, out words)) return RandomWordID(words); 
+            }
+            if (word.Length > 3)
+            {
+                // E lisba -> so_SBA S lisba -> LISik
+                var part = backwards ? word[^3..] : word.Remove(3);
+                if (HasWordsSimilarTo(part, backwards, out words)) return RandomWordID(words); 
+            }
+            if (word.Length > 1)
+            {
+                // E lisba -> a S lisba -> lisb
+                if (HasWordsSimilarTo(word, backwards, out words, normalWay: false)) 
+                {
+                    return DB.GetID_ByWord(words.First(x => x.Length == words.Max(s => s.Length)));
+                }
+            }
+
+            return backwards ? GenerationPack.END : GenerationPack.START;
         }
+
+        private bool HasWordsSimilarTo(string word, bool backwards, out List<string> words, bool normalWay = true)
+        {
+            words = DB.Vocabulary.Where(normalWay ? WordIsPartOfDBWord : DBWordIsPartOfWord).ToList();
+            return words.Count > 0;
+            
+            bool DBWordIsPartOfWord(string x) => backwards 
+                ? word.  EndsWith(x, StringComparison.Ordinal) 
+                : word.StartsWith(x, StringComparison.Ordinal);
+
+            bool WordIsPartOfDBWord(string x) => backwards 
+                ? x.  EndsWith(word, StringComparison.Ordinal) 
+                : x.StartsWith(word, StringComparison.Ordinal);
+        }
+
+        private int RandomWordID(List<string> words) => DB.GetID_ByWord(words[Random.Shared.Next(words.Count)]);
     }
 }

@@ -35,7 +35,7 @@ public class GenerationPack
     }
 
     /// <returns>An ID of existing word or newly added one.</returns>
-    public int GetWordID_AddNew(string word)
+    public int GetOrAddWord_ReturnID(string word)
     {
         var id = GetID_ByWord(word);
         if (id == NO_WORD)
@@ -64,7 +64,7 @@ public class GenerationPack
 
     public string? GetWordByID(int id)
     {
-        if (id < 0) return id == REMOVED ? "[R]" : null;
+        if (id < 0) return id == REMOVED ? Copypaster2.LINK : null;
 
         return Vocabulary[id];
     }

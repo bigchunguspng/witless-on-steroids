@@ -9,12 +9,13 @@ namespace Witlesss
 {
     public class Copypaster2
     {
-        private const string START = "[S]", END = "[E]", LINK = "[R]";
+        public  const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
+        private const string START = "[S]", END = "[E]";
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
         private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
-        private static readonly Regex _urls = new(@"\S+(:[\/\\])\S+");
-        private static readonly Regex _unacceptable = new(@"^(\/|\.)|^(\S+(:[\/\\])\S+)$");
+        private static readonly Regex _urls = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)");
+        private static readonly Regex _unacceptable = new(@"^(?:\/|\.)|^(?:(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>))$");
 
         public GenerationPack DB { get; set; } = new();
 
@@ -37,9 +38,11 @@ namespace Witlesss
             return true;
         }
 
+        // todo replace <a href="#p259804535" class="quotelink">>>259804535</a> with [R]
+
         private static string[] Tokenize(string text)
-            => _urls.Replace(text, LINK)
-                .ToLower().Replace("\n", LINE_BREAK_Spaced).Trim()
+            => _urls.Replace(text.ToLower(), LINK_Spaced)
+                .Replace("\n", LINE_BREAK_Spaced).Trim()
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
         // tokenCount:  1 => 1.3  |  5 => 0.9  |  13 => 0.1
@@ -51,7 +54,8 @@ namespace Witlesss
             var ids = new LinkedList<int>();
             foreach (var word in words)
             {
-                if (word != LINE_BREAK) ids.AddLast(DB.GetWordID_AddNew(word));
+                // words: A, B, [R], [N], C
+                if (word != LINE_BREAK) ids.AddLast(DB.GetOrAddWord_ReturnID(word));
             }
 
             // update transitions
@@ -61,6 +65,7 @@ namespace Witlesss
             var id = ids.First!;
             while (id.Next is { } next)
             {
+                // ids: -5, A, B, -8, C, -3
                 DB.GetTableByID(id.Value).Put(next.Value, weight);
                 id = next;
             }
@@ -159,7 +164,7 @@ namespace Witlesss
         // GENERATION
 
         // Vocabulary: 0+
-        
+
         // A: table [B: Chance]
         // A = [S], [R], 0+
         // B = [E], [R], 0+
@@ -194,8 +199,6 @@ namespace Witlesss
                 ids.AddLast(PickWordID(table));
             }
 
-            if (ids.First!.Value == GenerationPack.START) ids.RemoveFirst();
-
             return RenderText(ids);
         }
 
@@ -210,8 +213,6 @@ namespace Witlesss
                 var table = GetWordsBefore(ids.First.Value);
                 ids.AddFirst(PickWordID(table));
             }
-
-            if (ids.Last!.Value == GenerationPack.END) ids.RemoveLast();
 
             return RenderText(ids);
         }
@@ -246,35 +247,26 @@ namespace Witlesss
 
         private string BuildText(LinkedList<string> words)
         {
+            var hasURLs = false;
             var sb = new StringBuilder();
             var word = words.First!;
-            while (true)
+            while (word is not null)
             {
-                sb.Append(word.Value.Equals("[R]") ? LINK : word.Value);
-                if (word.Next is null) return sb.ToString().ToRandomLetterCase();
-                else sb.Append(' ');
+                sb.Append(word.Value).Append(' ');
+
+                hasURLs |= word.Value.Equals(LINK);
 
                 word = word.Next;
             }
+
+            var text = sb.ToString();
+            if (hasURLs)
+            {
+                var replacement = IsMostlyCyrillic(text) ? LooksLikeUkrainian(text) ? LINK_ua : LINK_ru : LINK_en;
+                text = text.Replace(LINK, replacement);
+            }
+            return text.ToRandomLetterCase();
         }
-
-
-        /*private string CleanMess(LinkedList<string> tokens)
-        {
-            return LocalizeLinkRemovals(string.Join(' ', tokens)).ToRandomLetterCase();
-        }
-        private string LocalizeLinkRemovals(string text)
-        {
-            if (!text.Contains(LINK)) return text;
-
-            var temp = text.Replace(LINK, "_+-+_");
-
-            var cyr = IsMostlyCyrillic(temp);
-            var ukr = cyr && LooksLikeUkrainian(temp, out var sure) && sure;
-
-            return cyr && !ukr ? text : text.Replace(LINK, ukr ? LINK_ua : LINK_eng);
-        }*/
-
 
         /// <summary>
         /// Finds all word ids, that has provided word id in their transitions

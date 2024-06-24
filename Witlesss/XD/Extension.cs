@@ -145,6 +145,16 @@ namespace Witlesss.XD
         private static readonly Regex _ukrM = new(@"[авдж]");
         private static readonly Regex _rusM = new(@"[еоть]");
 
+        public static bool LooksLikeUkrainian(string text)
+        {
+            var u = _ukrD.Matches(text).Count;
+            var r = _rusD.Matches(text).Count;
+
+            return u > 0 || r > 0
+                ? u > r
+                : _ukrM.Matches(text).Count >= _rusM.Matches(text).Count;
+        }
+
         public static bool LooksLikeUkrainian(string text, out bool sure)
         {
             var u = _ukrD.Matches(text).Count;

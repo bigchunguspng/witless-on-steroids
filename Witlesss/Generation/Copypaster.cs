@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using Witlesss.Generation;
 
-namespace Witlesss
+namespace Witlesss.Generation
 {
     public class Copypaster
     {
-        public const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
-        public const string START = "[S]", END = "[E]";
-        public const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
-        public const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
+        private const string START = "[S]", END = "[E]";
+        private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
+        private const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
+        private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
         private static readonly Regex _urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled);
         private static readonly Regex _skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
@@ -23,25 +22,31 @@ namespace Witlesss
 
         // CONSUMING TEXT
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public bool Eat(string text, out string? eaten)
+        public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
         {
-            eaten = null!;
+            eaten = null;
 
             if (string.IsNullOrWhiteSpace(text)) return false; // todo remove since it impossible on telegram
             if (_skip.IsMatch(text)) return false;
 
-            var lines = Tokenize(text);
-            foreach (var line in lines)
+            var lines = TokenizeMultiline(text);
+
+            eaten = new string[lines.Length];
+
+            for (var i = 0; i < lines.Length; i++)
             {
-                EatInternal(Advance(line));
+                var tokens = new LinkedList<string>(lines[i]);
+
+                CombineSomeTokens(tokens);
+                EatInternal(tokens);
+
+                eaten[i] = string.Join(' ', tokens.Select(word => word.Replace(' ', '_')));
             }
 
-            eaten = ""; // string.Join(' ', lines.Select(x => x.Replace(' ', '_')));
             return true;
         }
 
-        private static string[][] Tokenize(string text)
+        private static string[][] TokenizeMultiline(string text)
         {
             text = _urls.Replace(text.ToLower(), LINK_Spaced);
             return text.Contains("\n\n")
@@ -54,14 +59,11 @@ namespace Witlesss
                 .Trim([' ', '\n']).Replace("\n", LINE_BREAK_Spaced)
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        private static LinkedList<string> Advance(string[] words)
+        private static void CombineSomeTokens(LinkedList<string> tokens)
         {
-            var tokens = new LinkedList<string>(words);
             CombineTokensByLength(tokens, 1);
             CombineTokensByLength(tokens, 2);
             CombineTokensByLength(tokens, 3);
-
-            return tokens;
         }
 
         private static readonly Regex _regexA = new(@"[ \]]|[.!?]$", RegexOptions.Compiled);
@@ -118,6 +120,28 @@ namespace Witlesss
             }
         }
 
+        // FUSE
+
+        public void Fuse(GenerationPack source)
+        {
+            // update vocabulary
+            var ids = source.Vocabulary.Select(word => DB.GetOrAddWord_ReturnID(word)).ToList();
+
+            // update transitions
+            foreach (var sourceTable in source.Transitions)
+            {
+                var tableID = GetNewID(sourceTable.Key);
+                var targetTable = DB.GetTableByID(tableID);
+                foreach (var transition in sourceTable.Value)
+                {
+                    var wordID = GetNewID(transition.WordID);
+                    targetTable.PutMax(wordID, transition.Chance);
+                }
+            }
+
+            int GetNewID(int id) => id < 0 ? id : ids[id];
+        }
+
 
         // GENERATION
 
@@ -128,7 +152,6 @@ namespace Witlesss
         // B = [E], [R], 0+
 
         /// <param name="word">A user provided text, <b>\S+(\s\S+)?</b>.</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByWord(string word)
         {
             var id = FindExistingOrSimilarWordID(word, START, out var separated);
@@ -138,7 +161,6 @@ namespace Witlesss
         }
 
         /// <param name="word">A user provided text, <b>\S+(\s\S+)?</b>.</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByLast(string word)
         {
             var id = FindExistingOrSimilarWordID(word, END, out var separated);
@@ -147,7 +169,6 @@ namespace Witlesss
             return result;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate(int wordID = GenerationPack.START)
         {
             var ids = new LinkedList<int>();
@@ -172,25 +193,28 @@ namespace Witlesss
             while (ids.First!.Value != GenerationPack.START)
             {
                 var table = GetWordsBefore(ids.First.Value);
-                ids.AddFirst(PickWordID(table));
+                ids.AddFirst(PickWordID(table, fallback: GenerationPack.START));
             }
 
             return RenderText(ids);
         }
 
-        public static int PickWordID(TransitionTable words)
+        private static int PickWordID(TransitionTable words, int fallback = GenerationPack.END)
         {
             var r = Random.Shared.NextSingle() * words.TotalChance;
 
-            foreach (var transition in words)
+            if (r > 0F)
             {
-                if (transition.Chance > r) return transition.WordID;
-                r -= transition.Chance;
+                foreach (var transition in words)
+                {
+                    if (transition.Chance > r) return transition.WordID;
+                    r -= transition.Chance;
+                }
+
+                LogError("GenerationPack.PickWordID >> UNEXPECTED EXECUTION PATH");
             }
 
-            LogError("GenerationPack.PickWordID >> UNEXPECTED EXECUTION PATH");
-
-            return GenerationPack.END;
+            return fallback;
         }
 
         private string RenderText(LinkedList<int> ids)
@@ -203,7 +227,7 @@ namespace Witlesss
                 if (word is not null) words.AddLast(word);
             }
 
-            return BuildText(words);
+            return words.Count > 0 ? BuildText(words) : throw new Exception("Text wasn't generated");
         }
 
         private string BuildText(LinkedList<string> words)

@@ -77,7 +77,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             }
             else if (Baka.Eat(Text, out var eaten))
             {
-                Log($"{Title} >> {eaten}", ConsoleColor.Blue);
+                foreach (var line in eaten) Log($"{Title} >> {line}", ConsoleColor.Blue);
             }
         }
 

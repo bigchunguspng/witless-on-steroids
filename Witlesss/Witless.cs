@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Witlesss.Generation;
 
@@ -69,19 +71,28 @@ namespace Witlesss
             set => Baka.DB = value;
         }
 
-        public bool Eat(string text)                    => HasUnsavedStuff = Baka.Eat(text, out _);
-        public bool Eat(string text, out string? eaten) => HasUnsavedStuff = Baka.Eat(text, out eaten);
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public bool Eat(string text)
+            => HasUnsavedStuff = Baka.Eat(text, out _);
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
+            => HasUnsavedStuff = Baka.Eat(text, out eaten);
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate() => TextOrBust(() => Baka.Generate());
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByLast(string word) => TextOrBust(() => Baka.GenerateByLast(word));
 
-        private string TextOrBust(Func<string> genetare)
+        private string TextOrBust(Func<string> generate)
         {
             try
             {
-                return genetare();
+                return generate();
             }
             catch
             {
@@ -114,9 +125,10 @@ namespace Witlesss
             if (HasUnsavedStuff) SaveNoMatterWhat();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void SaveNoMatterWhat()
         {
-            lock (Baka) FileIO.SaveData(Pack);
+            FileIO.SaveData(Pack);
             HasUnsavedStuff = false;
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
@@ -139,6 +151,12 @@ namespace Witlesss
             Pack = null!;
             Loaded = false;
             Log($"DIC UNLOAD << {Chat}", ConsoleColor.Yellow);
+        }
+
+        public void Fuse(GenerationPack pack)
+        {
+            Backup();
+            Baka.Fuse(pack);
         }
 
         public void Backup()

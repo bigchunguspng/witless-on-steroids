@@ -87,15 +87,15 @@ namespace Witlesss
             string text = _input!.Split (' ', 2)[1];
             if (!ChatsDealer.WitlessExist(_active)) return;
 
-            if      (_input.StartsWith("/a ") && Active.Eat(text, out text!)) // add
+            if      (_input.StartsWith("/a ") && Active.Eat(text, out var eaten)) // add
             {
-                Log($@"{_active} >> XD << ""{text}""", ConsoleColor.Yellow);
+                foreach (var line in eaten) Log($"{_active} << {line}", ConsoleColor.Yellow);
             }
-            else if (_input.StartsWith("/w "))                               // write
+            else if (_input.StartsWith("/w "))                                  // write
             {
                 Bot.SendMessage(_active, text);
                 Active.Eat(text);
-                Log($@"{_active} >> {text}", ConsoleColor.Yellow);
+                Log($"{_active} >> {text}", ConsoleColor.Yellow);
             }
         }
 

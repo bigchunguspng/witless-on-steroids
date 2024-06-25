@@ -219,7 +219,7 @@ namespace Witlesss.Commands
 
         private void FuseWithWitlessDB(GenerationPack source)
         {
-            new FusionCollab(Baka, source).Fuse();
+            Baka.Fuse(source);
             GoodEnding();
         }
 

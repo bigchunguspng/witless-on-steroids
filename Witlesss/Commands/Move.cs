@@ -8,44 +8,42 @@ namespace Witlesss.Commands
     {
         protected override void RunAuthorized()
         {
-            if (Text is not null)
+            var name = ValidFileName((Args ?? Title).Replace(' ', '-'), '-');
+
+            var result = MoveDictionary(name);
+            if (result == "*")
             {
-                var name = Text.Replace(' ', '-');
-                var result = MoveDictionary(name);
-
-                if (result == "*")
-                {
-                    Bot.SendMessage(Chat, "Сударь, ваш словарь пуст 🫥");
-                }
-                else
-                {
-                    Baka.Pack = new GenerationPack();
-                    Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
-                    Baka.SaveNoMatterWhat();
-
-                    Bot.SendMessage(Chat, string.Format(MOVING_DONE, result));
-                }
+                Bot.SendMessage(Chat, "Сударь, ваш словарь пуст 🫥");
             }
-            else Bot.SendMessage(Chat, MOVE_MANUAL);
+            else
+            {
+                Baka.Pack = new GenerationPack();
+                Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
+                Baka.SaveNoMatterWhat();
+
+                Bot.SendMessage(Chat, string.Format(MOVING_DONE, result));
+            }
+
+            // todo explain manual in result report
+            // else Bot.SendMessage(Chat, MOVE_MANUAL);
         }
 
         protected string MoveDictionary(string name)
         {
             Baka.Save();
 
-            if (SizeInBytes(Baka.Path) > 2)
-            {
-                string path = UniqueExtraDBsPath(name);
+            if (Baka.Baka.DB.Vocabulary.Count == 0)
+                return "*"; // can't be in file name
 
-                File.Copy(Baka.Path, path);
-                
-                string result = Path.GetFileNameWithoutExtension(path);
-                Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
-                return result;
-            }
-            return "*"; // can't be in file name
+            var path = UniqueExtraDBsPath(name);
+
+            File.Copy(Baka.Path, path);
+
+            var result = Path.GetFileNameWithoutExtension(path);
+            Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);
+            return result;
         }
-        
+
         public static string UniqueExtraDBsPath(string name)
         {
             return UniquePath(Paths.Dir_Fuse, $"{name}.json", name is "info" or "his");

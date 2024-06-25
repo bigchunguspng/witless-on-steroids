@@ -8,7 +8,10 @@ namespace Witlesss.Generation;
 /// </summary>
 public class GenerationPack
 {
-    public const int START = -5, END = -3, REMOVED = -8, NO_WORD = -1;
+    private const string s_REMOVED = "[R]";
+    private const int REMOVED = -8;
+
+    public const int START = -5, END = -3, NO_WORD = -1;
 
     /// <summary>
     /// A list of unique words (and word pairs).
@@ -49,7 +52,7 @@ public class GenerationPack
     /// <returns>An ID of existing word or <see cref="NO_WORD"/> code.</returns>
     public int GetID_ByWord(string word)
     {
-        if (word.Equals("[R]")) return REMOVED;
+        if (word.Equals(s_REMOVED)) return REMOVED;
 
         var useIndex = Vocabulary.Count > 16;
         if (useIndex && Index is null)
@@ -62,7 +65,7 @@ public class GenerationPack
 
     public string? GetWordByID(int id)
     {
-        if (id < 0) return id == REMOVED ? Copypaster.LINK : null;
+        if (id < 0) return id == REMOVED ? s_REMOVED : null;
 
         return Vocabulary[id];
     }
@@ -88,14 +91,8 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
 
     public void Put(int id, float chance)
     {
-        var index = FindIndexByID(id);
-        if (index < 0)
-        {
-            if (Capacity == Count)
-                Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
-            Add(new Transition(id, chance));
-        }
-        else
+        var index = GetIndexOrAdd(id, chance);
+        if (index >= 0)
         {
             var transition = this[index];
             transition.IncreaseChanceBy(chance);
@@ -104,11 +101,40 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
         }
     }
 
+    public void PutMax(int id, float chance)
+    {
+        var index = GetIndexOrAdd(id, chance);
+        if (index >= 0)
+        {
+            var transition = this[index];
+            var max = Math.Max(transition.Chance, chance);
+            transition.SetChanceTo(max, out var difference);
+            this[index] = transition;
+            IncreaseTotalChanceBy(difference);
+        }
+    }
+
+    private int GetIndexOrAdd(int id, float chance)
+    {
+        var index = FindIndexByID(id);
+        if (index < 0)
+        {
+            if (Capacity == Count) IncreaseCapacity();
+            Add(new Transition(id, chance));
+        }
+
+        return index;
+    }
+
     public new void Add(Transition transition)
     {
         base.Add(transition);
         IncreaseTotalChanceBy(transition.Chance);
     }
+
+    // High % of tables contain only 1 element, so their capacity
+    // should be increased slowly to avoid wasting lots of space
+    private void IncreaseCapacity() => Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1); // * 1.25  OR  + 1
 
     private int FindIndexByID(int id)
     {
@@ -129,4 +155,10 @@ public struct Transition(int wordID, float chance)
     public float Chance { get; private set; } = chance;
 
     public void IncreaseChanceBy(float value) => Chance = Chance.CombineRound(value);
+
+    public void SetChanceTo(float value, out float difference)
+    {
+        difference = value - Chance;
+        Chance = value;
+    }
 }

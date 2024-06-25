@@ -41,13 +41,13 @@ namespace Witlesss.Commands
                 if (typeWasChanged)
                 {
                     ChatsDealer.SaveChatList();
-                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Meme.Type])));
+                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Meme.Type]).XDDD());
                     Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
                     ChatsDealer.SaveChatList();
-                    Bot.SendMessage(Chat, XDDD(string.Format(SET_MEME_OPS_RESPONSE, command, result)));
+                    Bot.SendMessage(Chat, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
                     Log($"{Title} >> MEMES OPTIONS");
                 }
 

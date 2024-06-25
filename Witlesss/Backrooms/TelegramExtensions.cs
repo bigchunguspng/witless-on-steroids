@@ -50,11 +50,11 @@ public static class TelegramExtensions
         {
             if (message.SenderChat.Id == chat) return true;
 
-            Bot.Instance.SendMessage(chat, Pick(UNKNOWN_CHAT_RESPONSE));
+            Bot.Instance.SendMessage(chat, Responses.UNKNOWN_CHAT.PickAny());
         }
         else if (await message.From.IsAdminInChat(chat) == false)
         {
-            Bot.Instance.SendMessage(chat, Pick(NOT_ADMIN_RESPONSE));
+            Bot.Instance.SendMessage(chat, Responses.NOT_ADMIN.PickAny());
         }
         else return true;
 

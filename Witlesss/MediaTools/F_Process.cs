@@ -101,7 +101,7 @@ namespace Witlesss.MediaTools
                 if (zeroes == 3) // if threshold = 1000
                 {
                     var values = new[] { 1, 10, 25, 50 };
-                    sb.Append(":tolerance=").Append(Pick(values));
+                    sb.Append(":tolerance=").Append(values.PickAny());
                 }
                 sb.Append(',');
             }

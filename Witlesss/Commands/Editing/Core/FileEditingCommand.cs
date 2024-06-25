@@ -97,12 +97,12 @@ namespace Witlesss.Commands.Editing.Core
         {
             if (FileID.StartsWith("http"))
             {
-                var waitMessage = Bot.PingChat(Chat, PLS_WAIT_RESPONSE[Random.Shared.Next(5)]);
+                var waitMessage = Bot.PingChat(Chat, Responses.PLS_WAIT[Random.Shared.Next(5)]);
 
                 var task = new DownloadVideoTask(FileID, Context).RunAsync();
                 await Bot.RunSafelyAsync(task, Chat, waitMessage);
 
-                Bot.EditMessage(Chat, waitMessage, XDDD(Pick(PROCESSING_RESPONSE)));
+                Bot.EditMessage(Chat, waitMessage, Responses.PROCESSING.PickAny().XDDD());
 
                 return (await task, MediaType.Video, waitMessage);
             }
@@ -111,7 +111,7 @@ namespace Witlesss.Commands.Editing.Core
                 var (path, type) = await Bot.Download(FileID, Chat);
 
                 var waitMessage = SizeInBytes(path) > 4_000_000
-                    ? Bot.PingChat(Chat, XDDD(Pick(PROCESSING_RESPONSE)))
+                    ? Bot.PingChat(Chat, Responses.PROCESSING.PickAny().XDDD())
                     : -1;
 
                 return (path, type, waitMessage);

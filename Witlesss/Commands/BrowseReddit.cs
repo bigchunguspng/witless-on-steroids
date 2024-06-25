@@ -285,7 +285,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, $"{Pick(I_FORGOR_RESPONSE)} {Pick(FAIL_EMOJI_1)}");
+                    Bot.SendMessage(Chat, $"{Responses.I_FORGOR.PickAny()} {Responses.FAIL_EMOJI_1.PickAny()}");
                 }
             }
             else Bot.SendMessage(Chat,  string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));

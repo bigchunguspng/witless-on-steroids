@@ -42,7 +42,7 @@ public class AdvancedEdit : FileEditingCommand
 
     protected override void SendManual()
     {
-        Bot.SendSticker(Chat, new InputOnlineFile(Pick(DUDE)));
+        Bot.SendSticker(Chat, new InputOnlineFile(DUDE.PickAny()));
     }
 
     protected override bool MessageContainsFile(Message m)

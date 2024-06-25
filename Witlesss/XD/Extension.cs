@@ -116,7 +116,7 @@ namespace Witlesss.XD
 
         public static string SET_FREQUENCY_RESPONSE(int n)
         {
-            var a = XDDD(Texts.SET_FREQUENCY_RESPONSE);
+            var a = Texts.SET_FREQUENCY_RESPONSE.XDDD();
             var oe = ED(n, "ое", "ые", "ые");
             var  e = ED(n,  "е",  "я",  "й");
             return $"{a} кажд{oe} {(n == 1 ? "ваше" : n)} сообщени{e}";
@@ -153,57 +153,6 @@ namespace Witlesss.XD
             return u > 0 || r > 0
                 ? u > r
                 : _ukrM.Matches(text).Count >= _rusM.Matches(text).Count;
-        }
-
-        public static bool LooksLikeUkrainian(string text, out bool sure)
-        {
-            var u = _ukrD.Matches(text).Count;
-            var r = _rusD.Matches(text).Count;
-
-            sure = u > 0 || text.Length > 80;
-            return u == r ? _ukrM.Matches(text).Count > _rusM.Matches(text).Count : u > r;
-        }
-
-        public static string XDDD(string s) => $"{Pick(RANDOM_EMOJI)} {s}";
-        public static T Pick<T>(T[] options) => options[Random.Shared.Next(options.Length)];
-
-        public static readonly string[] FILE_TOO_BIG_RESPONSE =
-        [
-            "пук-среньк...", "много весит 🥺", "тяжёлая штука 🤔", "ого, какой большой 😯", "какой тяжёлый 😩"
-        ];
-        public static readonly string[] UNKNOWN_CHAT_RESPONSE =
-        [
-            "ты кто?", "я тебя не знаю чувак 😤", "сними маску, я тебя не узнаю", "а ты кто 😲", "понасоздают каналов... 😒"
-        ];
-        public static readonly string[] NOT_ADMIN_RESPONSE =
-        [
-            "ты не админ 😎", "ты не админ чувак 😒", "попроси админа", "у тебя нет админки 😎", "будет админка - приходи"
-        ];
-        public static readonly string[] I_FORGOR_RESPONSE =
-        [
-            "Сорян, не помню", "Сорян, не помню такого", "Забыл уже", "Не помню", "Я бы скинул, но уже потерял её"
-        ];
-        public static readonly string[] PLS_WAIT_RESPONSE =
-        [
-            "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "принял👌", "ваш заказ принят 🥸", "еду скачивать музон 🛒"
-        ];
-        public static readonly string[] PROCESSING_RESPONSE =
-        [
-            "идёт обработка...", "вжжжжж...", "брррррр..."
-        ];
-
-        public static readonly string[] RANDOM_EMOJI =
-        [
-            "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
-            "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉", "🎻"
-        ];
-        public static readonly string[] FAIL_EMOJI_1 = ["🤣", "😎", "🥰", "☺️", "💀", "😤", "😩"];
-        public static readonly string[] FAIL_EMOJI_2 = ["😵", "😧", "😨", "😰", "😮", "😲", "💀"];
-
-        public static string GetRandomASCII()
-        {
-            var files = GetFiles(Paths.Dir_ASCII);
-            return File.ReadAllText(files[Random.Shared.Next(files.Length)]);
         }
 
         public static string FileSize(string path) => FileSize(SizeInBytes(path));

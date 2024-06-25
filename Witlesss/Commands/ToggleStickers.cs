@@ -6,7 +6,7 @@
         {
             Baka.Meme.Stickers = !Baka.Meme.Stickers;
             ChatsDealer.SaveChatList();
-            Bot.SendMessage(Chat, XDDD(string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ")));
+            Bot.SendMessage(Chat, string.Format(STICKERS_RESPONSE, Baka.Meme.Stickers ? "" : "<b>НЕ</b> ").XDDD());
         }
     }
 }

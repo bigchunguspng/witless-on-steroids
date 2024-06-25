@@ -62,9 +62,10 @@ namespace Witlesss
         private string U_ARE_BANNED_LOL(long chat)
         {
             var sb = new StringBuilder();
-            sb.Append(Pick(FAIL_EMOJI_1)).Append(" Ваш чат был временно забанен ").Append(Pick(FAIL_EMOJI_1));
+            sb.Append(Responses.FAIL_EMOJI_1.PickAny()).Append(" Ваш чат был временно забанен ");
+            sb.Append(Responses.FAIL_EMOJI_1.PickAny());
             sb.Append("\n\n");
-            sb.Append(Pick(RANDOM_EMOJI)).Append(" Эта команда станет доступной через ");
+            sb.Append(Responses.RANDOM_EMOJI.PickAny()).Append(" Эта команда станет доступной через ");
             sb.Append(TimeLeft(BannedChats[chat]));
             return sb.ToString();
         }

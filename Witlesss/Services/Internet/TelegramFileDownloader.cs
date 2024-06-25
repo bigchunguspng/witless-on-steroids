@@ -44,7 +44,7 @@ namespace Witlesss.Services.Internet
             }
             catch (Exception e)
             {
-                var message = e.Message.Contains("file is too big") ? Pick(FILE_TOO_BIG_RESPONSE) : XDDD(e.Message);
+                var message = e.Message.Contains("file is too big") ? Responses.FILE_TOO_BIG.PickAny() : e.Message.XDDD();
                 Bot.Instance.SendMessage(chat, message);
                 throw;
             }

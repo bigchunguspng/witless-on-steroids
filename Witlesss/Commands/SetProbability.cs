@@ -8,7 +8,7 @@
             {
                 Baka.Meme.Chance = value;
                 ChatsDealer.SaveChatList();
-                Bot.SendMessage(Chat, XDDD(string.Format(SET_P_RESPONSE, Baka.Meme.Chance)));
+                Bot.SendMessage(Chat, string.Format(SET_P_RESPONSE, Baka.Meme.Chance).XDDD());
                 Log($"{Title} >> MEME CHANCE >> {Baka.Meme.Chance}%");
             }
             else

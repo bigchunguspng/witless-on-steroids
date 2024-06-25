@@ -38,7 +38,7 @@ namespace Witlesss.Commands
                 var ops = _ops.Match(Command!);
                 var options = ops.Success ? ops.Groups[1].Value.ToLower() : "";
 
-                var message = Bot.PingChat(Chat, Pick(PLS_WAIT_RESPONSE));
+                var message = Bot.PingChat(Chat, Responses.PLS_WAIT.PickAny());
 
                 var task = new DownloadMusicTask(id, options, cover, message, yt, pl, Context)
                 {

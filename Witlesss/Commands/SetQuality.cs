@@ -8,7 +8,7 @@
             {
                 Baka.Meme.Quality = value;
                 ChatsDealer.SaveChatList();
-                Bot.SendMessage(Chat, XDDD(string.Format(SET_Q_RESPONSE, Baka.Meme.Quality)));
+                Bot.SendMessage(Chat, string.Format(SET_Q_RESPONSE, Baka.Meme.Quality).XDDD());
                 Log($"{Title} >> JPG QUALITY >> {Baka.Meme.Quality}%");
             }
             else

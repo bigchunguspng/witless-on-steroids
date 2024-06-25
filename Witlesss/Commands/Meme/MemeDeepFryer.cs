@@ -18,7 +18,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string Command { get; } = "/nuke";
 
-        protected override string? DefaultOptions => Baka.Meme.OptionsN;
+        protected override string? DefaultOptions => Baka.Meme.Options?.Nuke;
 
         public ImageProcessor SetUp(int w, int h) // Needs more nuking!
         {

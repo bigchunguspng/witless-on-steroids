@@ -18,7 +18,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string Command => _mode == Square ? "/dg" : "/dv";
 
-        protected override string? DefaultOptions => Baka.Meme.OptionsG;
+        protected override string? DefaultOptions => Baka.Meme.Options?.Dg;
 
         public ImageProcessor SetUp(int w, int h)
         {

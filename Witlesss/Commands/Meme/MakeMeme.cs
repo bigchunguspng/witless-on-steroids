@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string Command { get; } = "/meme";
 
-        protected override string? DefaultOptions => Baka.Meme.OptionsM;
+        protected override string? DefaultOptions => Baka.Meme.Options?.Meme;
 
         public ImageProcessor SetUp(int w, int h)
         {

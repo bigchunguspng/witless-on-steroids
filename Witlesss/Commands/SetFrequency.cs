@@ -5,6 +5,12 @@ namespace Witlesss.Commands
 {
     public class SetFrequency : SettingsCommand
     {
+        private readonly Regex _m = new(@"^[MmМм]");
+        private readonly Regex _t = new(@"^[TtCcТтСс]");
+        private readonly Regex _g = new(@"^[DdДд][GgГг]");
+        private readonly Regex _d = new(@"^[DdДд]");
+        private readonly Regex _n = new(@"^[NnНнJjЖж]");
+
         protected override void RunAuthorized()
         {
             if (Args is null)
@@ -25,11 +31,11 @@ namespace Witlesss.Commands
                 var optionsWereChanged = false;
                 var args = Args.Split();
                 var w = args[0];
-                if      (Regex.IsMatch(w, @"^[MmМм]"))       Set(x => Baka.Meme.OptionsM = x, MemeType.Meme, "/meme");
-                else if (Regex.IsMatch(w, @"^[TtCcТтСс]"))   Set(x => Baka.Meme.OptionsT = x, MemeType.Top, "/top");
-                else if (Regex.IsMatch(w, @"^[DdДд][GgГг]")) Set(x => Baka.Meme.OptionsG = x, MemeType.Dg, "/dg");
-                else if (Regex.IsMatch(w, @"^[DdДд]"))       Set(x => Baka.Meme.OptionsD = x, MemeType.Dp, "/dp");
-                else if (Regex.IsMatch(w, @"^[NnНнJjЖж]"))   Set(x => Baka.Meme.OptionsN = x, MemeType.Nuke, "/nuke");
+                if      (_m.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
+                else if (_t.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Top  = x, MemeType.Top,  "/top");
+                else if (_g.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Dg   = x, MemeType.Dg,   "/dg");
+                else if (_d.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Dp   = x, MemeType.Dp,   "/dp");
+                else if (_n.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
                 if (typeWasChanged)

@@ -200,10 +200,18 @@ namespace Witlesss
         [JsonProperty] public MemeType Type { get; set; }
         [JsonProperty] public bool Stickers { get; set; }
 
-        [JsonProperty] public string? OptionsM { get; set; }
-        [JsonProperty] public string? OptionsT { get; set; }
-        [JsonProperty] public string? OptionsD { get; set; }
-        [JsonProperty] public string? OptionsG { get; set; }
-        [JsonProperty] public string? OptionsN { get; set; }
+        [JsonProperty] public MemeOptions? Options { get; set; }
+
+        public MemeOptions GetMemeOptions() => Options ??= new MemeOptions();
+    }
+
+    // todo load from json as null if empty
+    public class MemeOptions
+    {
+        [JsonProperty] public string? Meme { get; set; }
+        [JsonProperty] public string? Top  { get; set; }
+        [JsonProperty] public string? Dp   { get; set; }
+        [JsonProperty] public string? Dg   { get; set; }
+        [JsonProperty] public string? Nuke { get; set; }
     }
 }

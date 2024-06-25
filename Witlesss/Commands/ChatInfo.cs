@@ -32,28 +32,35 @@ namespace Witlesss.Commands
             sb.Append("\nВероятность: ").Append(Baka.Meme.Chance).Append('%');
             sb.Append("\nСтикеры: ").Append(Baka.Meme.Stickers ? "тоже 🍑" : "пропускаем");
 
-            var anyOptions = false;
-            var optionsBuilder = new StringBuilder("\n\n<u>Опции</u>:");
-            if (IsNotNull(Baka.Meme.OptionsM)) AppendOptions("meme", Baka.Meme.OptionsM[5..]);
-            if (IsNotNull(Baka.Meme.OptionsT)) AppendOptions("top",  Baka.Meme.OptionsT[4..]);
-            if (IsNotNull(Baka.Meme.OptionsD)) AppendOptions("dp",   Baka.Meme.OptionsD[3..]);
-            if (IsNotNull(Baka.Meme.OptionsG)) AppendOptions("dg",   Baka.Meme.OptionsG[3..]);
-            if (IsNotNull(Baka.Meme.OptionsN)) AppendOptions("nuke", Baka.Meme.OptionsN[5..]);
-            if (anyOptions) sb.Append(optionsBuilder);
+            if (Baka.Meme.Options is not null)
+            {
+                var anyOptions = false;
+                var optionsBuilder = new StringBuilder("\n\n<u>Опции</u>:");
+
+                if (IsNotNull(Baka.Meme.Options.Meme)) AppendOptions("meme", Baka.Meme.Options.Meme[5..]);
+                if (IsNotNull(Baka.Meme.Options.Top )) AppendOptions("top",  Baka.Meme.Options.Top [4..]);
+                if (IsNotNull(Baka.Meme.Options.Dp  )) AppendOptions("dp",   Baka.Meme.Options.Dp  [3..]);
+                if (IsNotNull(Baka.Meme.Options.Dg  )) AppendOptions("dg",   Baka.Meme.Options.Dg  [3..]);
+                if (IsNotNull(Baka.Meme.Options.Nuke)) AppendOptions("nuke", Baka.Meme.Options.Nuke[5..]);
+
+                if (anyOptions) sb.Append(optionsBuilder);
+
+                // ==
+
+                bool IsNotNull([NotNullWhen(true)] string? s)
+                {
+                    var ok = s is not null;
+                    anyOptions |= ok;
+                    return ok;
+                }
+
+                void AppendOptions(string cmd, string options)
+                {
+                    optionsBuilder.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
+                }
+            }
 
             Bot.SendMessage(Chat, sb.ToString());
-
-            bool IsNotNull([NotNullWhen(true)] string? s)
-            {
-                var ok = s is not null;
-                anyOptions |= ok;
-                return ok;
-            }
-
-            void AppendOptions(string cmd, string options)
-            {
-                optionsBuilder.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
-            }
         }
 
         public static readonly Dictionary<MemeType, string> Types = new()

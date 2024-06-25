@@ -20,7 +20,7 @@ namespace Witlesss.Commands.Meme
 
         protected override string Command { get; } = "/top";
 
-        protected override string? DefaultOptions => Baka.Meme.OptionsT;
+        protected override string? DefaultOptions => Baka.Meme.Options?.Top;
 
         public ImageProcessor SetUp(int w, int h)
         {

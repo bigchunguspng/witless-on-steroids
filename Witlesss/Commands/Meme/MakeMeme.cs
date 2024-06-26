@@ -18,15 +18,10 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName { get; } = "piece_fap_club-meme.mp4";
 
         protected override string Command { get; } = "/meme";
+        protected override string Suffix  { get; } = "-Meme";
 
         protected override string? DefaultOptions => Baka.Meme.Options?.Meme;
 
-        public ImageProcessor SetUp(int w, int h)
-        {
-            ImageSaver.PassQuality(Baka);
-
-            return this;
-        }
 
         protected override Task Run() => RunInternal("Мемы", OPTIONS + "/op_meme");
 
@@ -104,34 +99,32 @@ namespace Witlesss.Commands.Meme
         private static readonly MemeGenerator _imgflip = new();
         private static readonly SerialTaskQueue _queue = new();
 
-        protected override Task<string> MakeMemeImage(string path, DgText text)
+        protected override Task<string> MakeMemeImage(MemeFileRequest request, DgText text)
         {
-            return _queue.Enqueue(() => _imgflip.MakeMeme(path, text));
+            return _queue.Enqueue(() => _imgflip.MakeMeme(request, text));
         }
 
-        protected override Task<string> MakeMemeStick(string path, DgText text, string extension)
+        protected override async Task<string> MakeMemeStick(MemeFileRequest request, DgText text)
         {
-            //return MakeMeme(Convert(path, extension), text);
-            return MakeMemeImage(path, text);
+            if (request.ConvertSticker)
+                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+            return await MakeMemeImage(request, text);
         }
 
-        protected override Task<string> MakeMemeVideo(string path, DgText text)
+        protected override Task<string> MakeMemeVideo(MemeFileRequest request, DgText text)
         {
             return _queue.Enqueue(() =>
             {
-                Memes.Sticker = false;
-                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
+                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
                 _imgflip.SetUp(size);
 
-                return new F_Combine(path, _imgflip.MakeCaption(text)).Meme(Memes.Quality, size).Output("-M");
+                return new F_Combine(request.SourcePath, _imgflip.MakeCaption(text)).Meme(GetCRF(), size).Output(Suffix);
             });
         }
     }
 
     public interface ImageProcessor
     {
-        ImageProcessor SetUp(int w, int h); // todo something
-
         void Pass(WitlessContext context);
 
         Task ProcessPhoto(string fileID);

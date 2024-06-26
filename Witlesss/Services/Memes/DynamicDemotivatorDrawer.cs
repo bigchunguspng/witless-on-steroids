@@ -7,17 +7,19 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Types;
+using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 {
     public class DynamicDemotivatorDrawer
     {
+        // OPTIONS
+
         public static CustomColorOption CustomColorOption;
         public static bool CropEdges;
 
-        private SolidBrush TextColor;
-        private SolidPen FramePen;
+        // SIZE
 
         private const int FM = 5;
 
@@ -31,10 +33,13 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         public  Point Location => _pic;
 
+        // DATA
+
+        private SolidBrush TextColor;
+        private SolidPen FramePen;
+
         private readonly SolidBrush WhiteBrush = new(Color.White);
         private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
-
-        // /
 
         private readonly DrawingOptions _textOptions = new()
         {
@@ -58,10 +63,13 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             EndCapStyle = EndCapStyle.Polygon
         });
 
+        // FONTS
+
+        private Font _font;
+
         public  static readonly ExtraFonts ExtraFonts = new("dp");
         private static FontFamily FontFamily => ExtraFonts.GetFontFamily("tm");
         private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
-        private Font _font;
 
         private void ResizeFont(float size) => _font = new Font(FontFamily, Math.Max(MinFontSize, size), FontStyle);
         private void SetFontSizeToDefault() => ResizeFont(StartingFontSize);
@@ -72,23 +80,23 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         private float StartingFontSize => img_w * (text_is_short ? 0.2f : 0.135f);
         private float MinFontSize => Math.Max(img_w * 0.04f, 16);
 
-        // /
+        // LOGIC
 
         public string BakeFrame(string text) => ImageSaver.SaveImageTemp(MakeFrame(DrawText(text)));
 
-        public string DrawDemotivator(string path, string text)
+        public string DrawDemotivator(MemeFileRequest request, string text)
         {
             PassTextLength(text);
 
-            var (size, info) = GetImageSize(path);
+            var (size, info) = GetImageSize(request.SourcePath);
             SetUp(size);
 
-            var image = GetImage(path, size, info);
+            var image = GetImage(request.SourcePath, size, info);
             var funny = DrawText(text);
 
             var frame = MakeFrame(funny);
 
-            return ImageSaver.SaveImage(PasteImage(frame, image), PngJpg.Replace(path, "-Dg.jpg"));
+            return ImageSaver.SaveImage(PasteImage(frame, image), request.TargetPath, request.Quality);
         }
     
         private Image PasteImage(Image background, Image image)

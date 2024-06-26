@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Commands.Meme;
 using Random = System.Random;
 
 namespace Witlesss.Services.Memes
@@ -89,9 +90,9 @@ namespace Witlesss.Services.Memes
         // LOGIC
         // todo find all memory leaks
 
-        public string MakeDemotivator(string path, DgText text)
+        public string MakeDemotivator(MemeFileRequest request, DgText text)
         {
-            return Helpers.MeasureTime(() => PasteImage(DrawFrame(text), path), nameof(MakeDemotivator));
+            return Helpers.MeasureTime(() => PasteImage(DrawFrame(text), request), nameof(MakeDemotivator));
         }
 
         public string MakeFrame(DgText text) => ImageSaver.SaveImageTemp(DrawFrame(text));
@@ -139,15 +140,15 @@ namespace Witlesss.Services.Memes
             }
         }
 
-        private string PasteImage(Image background, string imagePath)
+        private string PasteImage(Image background, MemeFileRequest request)
         {
-            using var image = Image.Load(imagePath);
+            using var image = Image.Load(request.SourcePath);
 
             image.Mutate(x => x.Resize(ImagePlacement.Size));
 
             background.Mutate(x => x.DrawImage(image, ImagePlacement.Location, _anyGraphicsOptions));
 
-            return ImageSaver.SaveImage(background, PngJpg.Replace(imagePath, "-D.jpg"));
+            return ImageSaver.SaveImage(background, request.TargetPath, request.Quality);
         }
 
         // LOGOS (WATERMARKS)

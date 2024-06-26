@@ -12,16 +12,11 @@ namespace Witlesss
 {
     public static class Memes
     {
-        public static int Quality => ImageSaver.Quality > 80 ? 0 : 51 - (int)(ImageSaver.Quality * 0.42); // 0 | 17 - 51
-        public static int Qscale  => 31 + (int)(-0.29 * (int)ImageSaver.Quality); // 2 - 31
-
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
-        public static bool Sticker;
 
-
-        private static async Task<string> Convert(string path, string extension)
+        public static async Task<string> Convert(string path, string extension)
         {
             var ffmpeg = new F_Process(path);
             var name = ffmpeg.GetOutputName("-W", extension);

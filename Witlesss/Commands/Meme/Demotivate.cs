@@ -17,15 +17,10 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
 
         protected override string Command => _mode == Square ? "/dg" : "/dv";
+        protected override string Suffix  => _mode == Square ? "-Dg" : "-Dv";
 
         protected override string? DefaultOptions => Baka.Meme.Options?.Dg;
 
-        public ImageProcessor SetUp(int w, int h)
-        {
-            ImageSaver.PassQuality(Baka);
-            SelectModeAuto(w, h);
-            return this;
-        }
 
         protected override Task Run() => RunInternal("Демотиваторы💀");
 
@@ -50,37 +45,39 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *", RegexOptions.IgnoreCase);
 
-        public Demotivate SetUp(DgMode mode)
+        public Demotivate SetMode(DgMode mode)
         {
             _mode = mode;
             return this;
         }
 
-        private static void SelectModeAuto(float w, float h) => _mode = w / h > 1.6 ? Wide : Square;
+        public void SelectMode(float w, float h) => _mode = w / h > 1.6 ? Wide : Square;
 
         // LOGIC
 
-        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
         private static readonly SerialTaskQueue _queue = new();
-        private static DemotivatorDrawer Drawer => _drawers[(int) _mode];
-        private static DgMode _mode;
+        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
 
-        protected override Task<string> MakeMemeImage(string path, DgText text)
+        private DgMode _mode;
+        private DemotivatorDrawer Drawer => _drawers[(int) _mode];
+
+        protected override Task<string> MakeMemeImage(MemeFileRequest request, DgText text)
         {
-            return _queue.Enqueue(() => Drawer.MakeDemotivator(path, text));
+            return _queue.Enqueue(() => Drawer.MakeDemotivator(request, text));
         }
 
-        protected override Task<string> MakeMemeStick(string path, DgText text, string extension)
+        protected override async Task<string> MakeMemeStick(MemeFileRequest request, DgText text)
         {
-            //return MakeDemotivator(Convert(path, extension), text);
-            return MakeMemeImage(path, text);
+            if (request.ConvertSticker)
+                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+            return await MakeMemeImage(request, text);
         }
 
-        protected override Task<string> MakeMemeVideo(string path, DgText text)
+        protected override Task<string> MakeMemeVideo(MemeFileRequest request, DgText text)
         {
             return _queue.Enqueue
             (
-                () => new F_Combine(path, Drawer.MakeFrame(text)).Demo(Memes.Quality, Drawer).Output("-D")
+                () => new F_Combine(request.SourcePath, Drawer.MakeFrame(text)).Demo(GetCRF(), Drawer).Output(Suffix)
             );
         }
     }

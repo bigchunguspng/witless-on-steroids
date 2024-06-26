@@ -7,26 +7,46 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Types;
+using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services.Memes
 {
+    public abstract class MemeGeneratorCore<T>
+    {
+        public abstract void SetUp(Size size);
+        public abstract string MakeMeme(string path, T text);
+        public abstract string MakeCaption(DgText text);
+    }
+
     public class MemeGenerator
     {
+        // OPTIONS
+
         public static bool WrapText = true, ColorText;
         public static int FontMultiplier = 10, ShadowOpacity = 100;
         public static CustomColorOption CustomColorOption;
 
-        public static readonly ExtraFonts ExtraFonts = new("meme");
+        // SIZE
 
         private int _w, _h, _margin, _centerX;
         private Size _captionArea;
+
+        // FONT
+
+        public static readonly ExtraFonts ExtraFonts = new("meme");
+
         private float _startingFontSize;
+
+        // DATA
+
         private readonly SolidBrush _white = new(Color.White);
 
         private readonly DrawingOptions _textDrawingOptions = new()
         {
             GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 16 }
         };
+
+        // LOGIC
 
         public void SetUp(Size size)
         {
@@ -40,17 +60,17 @@ namespace Witlesss.Services.Memes
             _startingFontSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
         }
 
-        public string MakeMeme(string path, DgText text)
+        public string MakeMeme(MemeFileRequest request, DgText text)
         {
             var sw = Helpers.GetStartedStopwatch();
-            var (size, info) = GetImageSize(path);
+            var (size, info) = GetImageSize(request.SourcePath);
             SetUp(size);
 
-            var image = GetImage(path, size, info);
+            var image = GetImage(request, size, info);
             var caption = DrawCaption(text);
             var meme = Combine(image, caption);
 
-            var result = ImageSaver.SaveImage(meme, PngJpg.Replace(path, "-M.jpg"));
+            var result = ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
             sw.Log("MakeMeme");
             return result;
         }
@@ -156,15 +176,15 @@ namespace Witlesss.Services.Memes
             return (info.Size.EnureIsWideEnough(), info);
         }
 
-        private Image<Rgba32> GetImage(string path, Size size, ImageInfo info)
+        private Image<Rgba32> GetImage(MemeFileRequest request, Size size, ImageInfo info)
         {
-            var image = Image.Load<Rgba32>(path);
+            var image = Image.Load<Rgba32>(request.SourcePath);
             if (size != info.Size)
             {
                 image.Mutate(x => x.Resize(size));
             }
 
-            if (Witlesss.Memes.Sticker /* && not transparent */)
+            if (request.Type == MemeSourceType.Sticker /* && not transparent */)
             {
                 var color = CustomColorOption.GetColor() ?? Color.Black;
                 var background = new Image<Rgba32>(image.Width, image.Height, color);

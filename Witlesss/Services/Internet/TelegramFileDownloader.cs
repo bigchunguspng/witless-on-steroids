@@ -13,18 +13,20 @@ namespace Witlesss.Services.Internet
         private readonly DownloadCache _recent = new(32);
         private readonly DownloadCache  _large = new(32);
 
+        /// <summary>
+        /// Downloads a file to the <b>Pics</b> directory.
+        /// Grabs recent and large files from cache.
+        /// To be used with media files attached to commands.
+        /// </summary>
         public async Task<(string path, MediaType type)> Download(string fileID, long chat)
         {
             var shortID = ShortID(fileID);
             var extension = ExtensionFromID(shortID);
             var type = MediaTypeFromID(shortID);
 
-            Witlesss.Memes.Sticker = extension == ".webm"; // todo
-
             if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
 
             path = UniquePath(Path.Combine(Paths.Dir_Pics, chat.ToString()), $"{shortID}{extension}");
-
             await DownloadFile(fileID, path, chat);
 
             (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);
@@ -32,9 +34,12 @@ namespace Witlesss.Services.Internet
             return (path, type);
         }
 
+        /// <summary>
+        /// Downloads a file or send a message if the exception is thrown.
+        /// Make sure provided path is unique and directory is created.
+        /// </summary>
         public async Task DownloadFile(string fileId, string path, long chat = default)
         {
-            Directory.CreateDirectory(Path.Combine(Paths.Dir_Pics, chat.ToString()));
             try
             {
                 var file = await Bot.Instance.Client.GetFileAsync(fileId);
@@ -44,7 +49,9 @@ namespace Witlesss.Services.Internet
             }
             catch (Exception e)
             {
-                var message = e.Message.Contains("file is too big") ? Responses.FILE_TOO_BIG.PickAny() : e.Message.XDDD();
+                var message = e.Message.Contains("file is too big") 
+                    ? Responses.FILE_TOO_BIG.PickAny() 
+                    : e.Message.XDDD();
                 Bot.Instance.SendMessage(chat, message);
                 throw;
             }

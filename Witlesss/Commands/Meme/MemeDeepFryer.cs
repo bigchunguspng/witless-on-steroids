@@ -17,21 +17,16 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName { get; } = "nuke_fap_club.mp4";
 
         protected override string Command { get; } = "/nuke";
+        protected override string Suffix  { get; } = "-Nuked";
 
         protected override string? DefaultOptions => Baka.Meme.Options?.Nuke;
 
-        public ImageProcessor SetUp(int w, int h) // Needs more nuking!
-        {
-            ImageSaver.PassQuality(Baka);
-
-            return this;
-        }
 
         protected override Task Run() => RunInternal("Ядерные отходы");
 
         protected override void ParseOptions() { }
 
-        protected override int GetMemeText(string? text) => 0;
+        protected override int GetMemeText(string? text) => 0; // Needs more nuking!
 
         protected override bool CropVideoNotes  { get; } = false;
         protected override bool ConvertStickers { get; } = false;
@@ -40,21 +35,20 @@ namespace Witlesss.Commands.Meme
 
         private static readonly SerialTaskQueue _nukeQueue = new();
 
-        protected override async Task<string> MakeMemeImage(string path, int text)
+        protected override async Task<string> MakeMemeImage(MemeFileRequest request, int text)
         {
-            var extension = Memes.Sticker ? ".webp" : Path.GetExtension(path);
-            return await new F_Process(path).DeepFry(Memes.Qscale).Output("-Nuked", extension);
+            return await new F_Process(request.SourcePath).DeepFry(GetQscale()).OutputAs(request.TargetPath);
         }
 
-        protected override Task<string> MakeMemeStick(string path, int text, string extension)
+        protected override Task<string> MakeMemeStick(MemeFileRequest request, int text)
         {
-            return MakeMemeImage(path, text);
+            return MakeMemeImage(request, text);
         }
 
-        protected override async Task<string> MakeMemeVideo(string path, int text)
+        protected override async Task<string> MakeMemeVideo(MemeFileRequest request, int text)
         {
-            var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
-            return await new F_Process(path).DeepFryVideo(size.Ok(), Memes.Quality).Output_WEBM_safe("-Nuked");
+            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            return await new F_Process(request.SourcePath).DeepFryVideo(size.Ok(), GetCRF()).Output_WEBM_safe(Suffix);
         }
     }
 }

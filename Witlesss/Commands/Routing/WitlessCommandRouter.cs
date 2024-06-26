@@ -44,8 +44,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
             .Register("dp"      , () => new DemotivateProportional())
-            .Register("dg"      , () => new Demotivate().SetUp(DgMode.Square))
-            .Register("dv"      , () => new Demotivate().SetUp(DgMode.Wide))
+            .Register("dg"      , () => new Demotivate().SetMode(DgMode.Square))
+            .Register("dv"      , () => new Demotivate().SetMode(DgMode.Wide))
             .Register("meme"    , () => new MakeMeme())
             .Register("top"     , () => new AddCaption())
             .Register("nuke"    , () => new MemeDeepFryer())
@@ -100,7 +100,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             var mematic = _mematics[Baka.Meme.Type].Invoke();
             mematic.Pass(Context);
-            return mematic.SetUp(w, h);
+            if (mematic is Demotivate dg) dg.SelectMode(w, h);
+            return mematic;
         }
 
         bool HaveToMeme       () => Lucky(Baka.Meme.Chance) && !Message.ContainsSpoilers();

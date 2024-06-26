@@ -20,11 +20,33 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract string VideoName { get; }
 
         protected abstract string Command { get; }
+        protected abstract string Suffix  { get; }
 
         protected abstract string? DefaultOptions { get; }
 
         protected virtual bool CropVideoNotes  { get; } = true;
         protected virtual bool ConvertStickers { get; } = true;
+
+        /// <summary>
+        /// Constant Rate Factor (for MP4 compresion).<br/>
+        /// 0 - lossless, 23 - default, 51 - worst possible.
+        /// </summary>
+        protected int GetCRF()
+        {
+            var quality = Baka.Meme.Quality; // 0 - 100
+            return quality > 80
+                ? 0
+                : 51 - (int)(0.42 * quality); // 17 - 51
+        }
+
+        /// <summary>
+        /// Quality of JPEG image or MP3 audio.<br/>
+        /// 1 - highest, 2-3 - default (JPEG), 31 - lowest.
+        /// </summary>
+        protected int GetQscale()
+        {
+            return 31 - (int)(0.29 * Baka.Meme.Quality); // 2 - 31
+        }
 
         public void Pass(WitlessContext context)
         {
@@ -33,8 +55,6 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected async Task RunInternal(string type, string? options = null)
         {
-            ImageSaver.PassQuality(Baka);
-
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
             var message = string.Format(MEME_MANUAL, type);
@@ -56,9 +76,9 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return true;
         }
 
-        protected abstract Task<string> MakeMemeImage(string path, T text);
-        protected abstract Task<string> MakeMemeStick(string path, T text, string extension);
-        protected abstract Task<string> MakeMemeVideo(string path, T text);
+        protected abstract Task<string> MakeMemeImage(MemeFileRequest request, T text);
+        protected abstract Task<string> MakeMemeStick(MemeFileRequest request, T text);
+        protected abstract Task<string> MakeMemeVideo(MemeFileRequest request, T text);
 
         public async Task ProcessPhoto(string fileID)
         {
@@ -68,10 +88,14 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             ParseOptions();
             var repeats = GetRepeatCount();
             var txt = GetProvidedText();
+            var request = new MemeFileRequest(path, Suffix + ".jpg", Baka.Meme.Quality)
+            {
+                Type = MemeSourceType.Image
+            };
             for (var i = 0; i < repeats; i++)
             {
                 var text = GetMemeText(txt);
-                await using var stream = File.OpenRead(await MakeMemeImage(path, text));
+                await using var stream = File.OpenRead(await MakeMemeImage(request, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
             Log($"{Title} >> {Log_PHOTO(repeats)}");
@@ -82,17 +106,20 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             var (path, _) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
-            Memes.Sticker = true;
-
             ParseOptions();
             var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
-            var extension = GetStickerExtension();
             var txt = GetProvidedText();
+            var request = new MemeFileRequest(path, Suffix + (sticker ? ".webp" : ".jpg"), Baka.Meme.Quality)
+            {
+                Type = MemeSourceType.Sticker,
+                ExportAsSticker = sticker,
+                ConvertSticker = ConvertStickerToJpeg()
+            };
             for (var i = 0; i < repeats; i++)
             {
                 var text = GetMemeText(txt);
-                var result = await MakeMemeStick(path, text, extension);
+                var result = await MakeMemeStick(request, text);
                 if (sticker && ConvertStickers)
                     result = await new F_Process(result).Output("-stick", ".webp");
                 await using var stream = File.OpenRead(result);
@@ -114,7 +141,11 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             ParseOptions();
             var text = GetMemeText(GetProvidedText());
-            await using var stream = File.OpenRead(await MakeMemeVideo(path, text));
+            var request = new MemeFileRequest(path, Suffix + ".mp4", Baka.Meme.Quality)
+            {
+                Type = MemeSourceType.Video
+            };
+            await using var stream = File.OpenRead(await MakeMemeVideo(request, text));
             var note = type == MediaType.Round && !CropVideoNotes;
             if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
@@ -182,7 +213,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         private string RemoveCommand(string text) => _cmd.Replace(text, "");
 
-        private string GetStickerExtension() => ConditionSatisfied(ops => ops.Contains('x')) ? ".jpg" : ".png";
+        private bool ConvertStickerToJpeg() => ConditionSatisfied(ops => ops.Contains('x'));
     }
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
@@ -204,5 +235,22 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         /// <summary> Lowercase command text w/o bot username. </summary>
         public readonly string Command = command;
+    }
+
+    public class MemeFileRequest(string path, string oututEnding, int quality)
+    {
+        public string SourcePath { get; set; } = path;
+        public string TargetPath { get; } = path.ReplaceExtension(oututEnding);
+
+        public int Quality { get; set; } = quality;
+
+        public MemeSourceType  Type { get; init; }
+        public bool ExportAsSticker { get; init; }
+        public bool  ConvertSticker { get; init; }
+    }
+
+    public enum MemeSourceType
+    {
+        Image, Sticker, Video
     }
 }

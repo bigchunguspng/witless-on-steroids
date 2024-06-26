@@ -16,15 +16,10 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName { get; } = "piece_fap_club-dp.mp4";
         
         protected override string Command { get; } = "/dp";
+        protected override string Suffix  { get; } = "-Dp";
 
         protected override string? DefaultOptions => Baka.Meme.Options?.Dp;
 
-        public ImageProcessor SetUp(int w, int h)
-        {
-            ImageSaver.PassQuality(Baka);
-            
-            return this;
-        }
 
         protected override Task Run() => RunInternal("Демотиваторы👌", DP_OPTIONS);
 
@@ -55,31 +50,32 @@ namespace Witlesss.Commands.Meme
         private static readonly DynamicDemotivatorDrawer  _dp = new();
         private static readonly SerialTaskQueue _queue = new();
 
-        protected override Task<string> MakeMemeImage(string path, string text)
+        protected override Task<string> MakeMemeImage(MemeFileRequest request, string text)
         {
-            return _queue.Enqueue(() => _dp.DrawDemotivator(path, text));
+            return _queue.Enqueue(() => _dp.DrawDemotivator(request, text));
         }
 
-        protected override Task<string> MakeMemeStick(string path, string text, string extension)
+        protected override async Task<string> MakeMemeStick(MemeFileRequest request, string text)
         {
-            //return MakeDemotivatorB(Convert(path, extension), text);
-            return MakeMemeImage(path, text);
+            if (request.ConvertSticker)
+                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+            return await MakeMemeImage(request, text);
         }
 
-        protected override Task<string> MakeMemeVideo(string path, string text)
+        protected override Task<string> MakeMemeVideo(MemeFileRequest request, string text)
         {
             return _queue.Enqueue(() =>
             {
                 _dp.PassTextLength(text);
 
-                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize().ValidMp4Size();
+                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
                 _dp.SetUp(size);
                 _dp.SetColor();
 
                 var frame = _dp.BakeFrame(text);
                 var full_size = SizeHelpers.GetImageSize_FFmpeg(frame).FitSize(720);
 
-                return new F_Combine(path, frame).D300(Memes.Quality, size, _dp.Location, full_size).Output("-Dp");
+                return new F_Combine(request.SourcePath, frame).D300(GetCRF(), size, _dp.Location, full_size).Output(Suffix);
             });
         }
     }

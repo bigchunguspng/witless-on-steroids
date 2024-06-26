@@ -19,15 +19,10 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
 
         protected override string Command { get; } = "/top";
+        protected override string Suffix  { get; } = "-Top";
 
         protected override string? DefaultOptions => Baka.Meme.Options?.Top;
 
-        public ImageProcessor SetUp(int w, int h)
-        {
-            ImageSaver.PassQuality(Baka);
-
-            return this;
-        }
 
         protected override Task Run() => RunInternal("Подписанки", OPTIONS + "/op_top"); // 🔥🔥🔥✍️
 
@@ -77,31 +72,35 @@ namespace Witlesss.Commands.Meme
         private static readonly IFunnyApp _ifunny = new();
         private static readonly SerialTaskQueue _queue = new();
         
-        protected override Task<string> MakeMemeImage(string path, string text)
+        protected override Task<string> MakeMemeImage(MemeFileRequest request, string text)
         {
-            return _queue.Enqueue(() => _ifunny.MakeCaptionMeme(path, text));
+            return _queue.Enqueue(() => _ifunny.MakeCaptionMeme(request, text));
         }
 
-        protected override Task<string> MakeMemeStick(string path, string text, string extension)
+        protected override async Task<string> MakeMemeStick(MemeFileRequest request, string text)
         {
-            //return MakeCaptionMeme(Convert(path, extension), text);
-            return MakeMemeImage(path, text);
+            if (request.ConvertSticker)
+                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+            return await MakeMemeImage(request, text);
         }
 
-        protected override Task<string> MakeMemeVideo(string path, string text)
+        protected override Task<string> MakeMemeVideo(MemeFileRequest request, string text)
         {
             return _queue.Enqueue(() =>
             {
-                var size = SizeHelpers.GetImageSize_FFmpeg(path).GrowSize();
+                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize();
                 _ifunny.SetUp(size);
 
-                if      (IFunnyApp.CustomColorOption.IsActive) _ifunny.SetCustomColors();
-                else if (IFunnyApp.PickColor) _ifunny.SetSpecialColors(Image.Load<Rgba32>(Memes.Snapshot(path)));
-                else                          _ifunny.SetDefaultColors();
+                if (IFunnyApp.CustomColorOption.IsActive)
+                    _ifunny.SetCustomColors();
+                else if (IFunnyApp.PickColor)
+                    _ifunny.SetSpecialColors(Image.Load<Rgba32>(Memes.Snapshot(request.SourcePath)));
+                else
+                    _ifunny.SetDefaultColors();
 
-                return new F_Combine(path, _ifunny.BakeText(text))
-                    .When(Memes.Quality, size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
-                    .Output("-Top");
+                return new F_Combine(request.SourcePath, _ifunny.BakeText(text))
+                    .When(GetCRF(), size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
+                    .Output(Suffix);
             });
         }
     }

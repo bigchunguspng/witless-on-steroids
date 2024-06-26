@@ -28,6 +28,11 @@ public static class StringExtensions
 
     public static bool IsNullOrEmpty(this string? text) => string.IsNullOrEmpty(text);
 
+    public static string ReplaceExtension(this string path, string newExtension)
+    {
+        return Regex.Replace(path, @"\.\S+$", newExtension);
+    }
+
     // REGEX
 
     public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);

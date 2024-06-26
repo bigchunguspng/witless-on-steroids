@@ -1,5 +1,4 @@
-﻿using System.IO;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Global
@@ -8,23 +7,10 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
     {
         private static int _temp;
 
-        public static int Quality { get; private set; }
-
-        static ImageSaver()
-        {
-            Quality = 75;
-        }
-
-        public static void PassQuality(Witless witless) => PassQuality(witless.Meme.Quality);
-        public static void PassQuality(int value)
-        {
-            Quality = value;
-        }
-
-        public static string SaveImage(Image image, string path)
+        public static string SaveImage(Image image, string path, int quality)
         {
             path = UniquePath(path);
-            image.SaveAsJpeg(path, GetJpegEncoder());
+            image.SaveAsJpeg(path, GetJpegEncoder(quality));
             image.Dispose();
 
             return path;
@@ -39,7 +25,7 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
             return path;
         }
 
-        public static JpegEncoder GetJpegEncoder() => new() { Quality = Quality };
+        public static JpegEncoder GetJpegEncoder(int quality) => new() { Quality = quality };
 
         public static string GetTempPicName() => UniquePath(Paths.Dir_Temp, $"x_{_temp++}.png");
     }

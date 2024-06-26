@@ -7,24 +7,32 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Types;
+using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
 public class IFunnyApp
 {
+    // OPTIONS
+
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool PickColor, ForceCenter, BackInBlack, BlurImage;
     public static int CropPercent = 100, MinFontSize = 10, FontSizeMultiplier = 10;
     public static CustomColorOption CustomColorOption;
 
+    // DATA
+
     private Rgba32 Background;
     private SolidBrush TextColor = default!;
     private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
-    private static readonly SolidBrush _transparent = new(Color.Transparent);
+
+    // ...
 
     private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
     public  static readonly ExtraFonts ExtraFonts = new("top");
     private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
+
+    // SIZE
 
     private int _w, _h; // <-- of the image
     private int _cardHeight, _fullHeight, _cropOffset, _textWidth;
@@ -33,10 +41,12 @@ public class IFunnyApp
     private bool _extraHigh;
     private SizeF _measure;
 
-    public static float FontSize => MathF.Round(_font.Size, 2);
-
     public Point     Location => new(0, _cardHeight);
     public Rectangle Cropping => new(0, _cropOffset, _w, _h);
+
+    // FONT
+
+    public static float FontSize => MathF.Round(_font.Size, 2);
 
     private static Font _font = default!;
     private static FontFamily FontFamily => ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
@@ -54,6 +64,8 @@ public class IFunnyApp
     private void SetFontToDefault() => ResizeFont(StartingFontSize());
     private void DecreaseFontSize() => ResizeFont(_font.Size * 0.8f);
 
+
+    // LOGIC
 
     public void SetUp(Size size)
     {
@@ -87,25 +99,25 @@ public class IFunnyApp
     }
 
 
-    public string MakeCaptionMeme(string path, string text)
+    public string MakeCaptionMeme(MemeFileRequest request, string text)
     {
-        var (size, info) = GetImageSize(path);
+        var (size, info) = GetImageSize(request.SourcePath);
         SetUp(size);
 
-        var image = GetImage(path, size, info);
+        var image = GetImage(request.SourcePath, size, info);
 
         var funny = DrawText(text);
 
-        var meme = Combine(image, funny);
+        var meme = Combine(image, funny, sticker: request.Type == MemeSourceType.Sticker);
 
-        return ImageSaver.SaveImage(meme, PngJpg.Replace(path, "-Top.jpg"));
+        return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
     }
 
-    private Image Combine(Image source, Image caption)
+    private Image Combine(Image source, Image caption, bool sticker = false)
     {
         var meme = new Image<Rgba32>(_w, _fullHeight);
 
-        if (Witlesss.Memes.Sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
+        if (sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
 
         meme.Mutate(x => x.DrawImage(source, new Point(0, _cardHeight - _cropOffset), opacity: 1));
         meme.Mutate(x => x.DrawImage(caption, new Point(0, 0), opacity: 1));

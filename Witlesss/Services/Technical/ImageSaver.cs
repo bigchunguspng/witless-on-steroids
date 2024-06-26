@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using System;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Global
@@ -25,7 +26,7 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
             return path;
         }
 
-        public static JpegEncoder GetJpegEncoder(int quality) => new() { Quality = quality };
+        public static JpegEncoder GetJpegEncoder(int quality) => new() { Quality = Math.Clamp(quality, 1, 100) };
 
         public static string GetTempPicName() => UniquePath(Paths.Dir_Temp, $"x_{_temp++}.png");
     }

@@ -11,13 +11,6 @@ using Witlesss.Commands.Meme;
 
 namespace Witlesss.Services.Memes
 {
-    public abstract class MemeGeneratorCore<T>
-    {
-        public abstract void SetUp(Size size);
-        public abstract string MakeMeme(string path, T text);
-        public abstract string MakeCaption(DgText text);
-    }
-
     public class MemeGenerator
     {
         // OPTIONS

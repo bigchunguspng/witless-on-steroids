@@ -99,8 +99,8 @@ namespace Witlesss.Commands.Meme
                     _ifunny.SetDefaultColors();
 
                 return new F_Combine(request.SourcePath, _ifunny.BakeText(text))
-                    .When(GetCRF(), size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
-                    .Output(Suffix);
+                    .When(request.GetCRF(), size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
+                    .OutputAs(request.TargetPath);
             });
         }
     }

@@ -118,7 +118,9 @@ namespace Witlesss.Commands.Meme
                 var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
                 _imgflip.SetUp(size);
 
-                return new F_Combine(request.SourcePath, _imgflip.MakeCaption(text)).Meme(GetCRF(), size).Output(Suffix);
+                return new F_Combine(request.SourcePath, _imgflip.MakeCaption(text))
+                    .Meme(request.GetCRF(), size)
+                    .OutputAs(request.TargetPath);
             });
         }
     }

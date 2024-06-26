@@ -66,16 +66,12 @@ namespace Witlesss.Commands.Meme
         {
             return _queue.Enqueue(() =>
             {
-                _dp.PassTextLength(text);
-
-                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
-                _dp.SetUp(size);
-                _dp.SetColor();
-
-                var frame = _dp.BakeFrame(text);
+                var frame = _dp.MakeVideoDemotivatorFrame(request, text);
                 var full_size = SizeHelpers.GetImageSize_FFmpeg(frame).FitSize(720);
 
-                return new F_Combine(request.SourcePath, frame).D300(GetCRF(), size, _dp.Location, full_size).Output(Suffix);
+                return new F_Combine(request.SourcePath, frame)
+                    .D300(request.GetCRF(), _dp.ImageSize, _dp.Location, full_size)
+                    .OutputAs(request.TargetPath);
             });
         }
     }

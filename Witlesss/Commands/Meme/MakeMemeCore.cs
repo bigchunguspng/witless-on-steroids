@@ -27,26 +27,6 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected virtual bool CropVideoNotes  { get; } = true;
         protected virtual bool ConvertStickers { get; } = true;
 
-        /// <summary>
-        /// Constant Rate Factor (for MP4 compresion).<br/>
-        /// 0 - lossless, 23 - default, 51 - worst possible.
-        /// </summary>
-        protected int GetCRF()
-        {
-            var quality = Baka.Meme.Quality; // 0 - 100
-            return quality > 80
-                ? 0
-                : 51 - (int)(0.42 * quality); // 17 - 51
-        }
-
-        /// <summary>
-        /// Quality of JPEG image or MP3 audio.<br/>
-        /// 1 - highest, 2-3 - default (JPEG), 31 - lowest.
-        /// </summary>
-        protected int GetQscale()
-        {
-            return 31 - (int)(0.29 * Baka.Meme.Quality); // 2 - 31
-        }
 
         public void Pass(WitlessContext context)
         {
@@ -242,11 +222,31 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         public string SourcePath { get; set; } = path;
         public string TargetPath { get; } = path.ReplaceExtension(oututEnding);
 
-        public int Quality { get; set; } = quality;
+        public int Quality { get; set; } = quality; // 0 - 100
 
         public MemeSourceType  Type { get; init; }
         public bool ExportAsSticker { get; init; }
         public bool  ConvertSticker { get; init; }
+
+        /// <summary>
+        /// Constant Rate Factor (for MP4 compresion).<br/>
+        /// 0 - lossless, 23 - default, 51 - worst possible.
+        /// </summary>
+        public int GetCRF()
+        {
+            return Quality > 80
+                ? 0
+                : 51 - (int)(0.42 * Quality); // 17 - 51
+        }
+
+        /// <summary>
+        /// Quality of JPEG image or MP3 audio.<br/>
+        /// 1 - highest, 2-3 - default (JPEG), 31 - lowest.
+        /// </summary>
+        public int GetQscale()
+        {
+            return 31 - (int)(0.29 * Quality); // 2 - 31
+        }
     }
 
     public enum MemeSourceType

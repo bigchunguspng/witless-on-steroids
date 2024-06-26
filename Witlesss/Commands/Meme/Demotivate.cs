@@ -77,7 +77,9 @@ namespace Witlesss.Commands.Meme
         {
             return _queue.Enqueue
             (
-                () => new F_Combine(request.SourcePath, Drawer.MakeFrame(text)).Demo(GetCRF(), Drawer).Output(Suffix)
+                () => new F_Combine(request.SourcePath, Drawer.MakeFrame(text))
+                    .Demo(request.GetCRF(), Drawer)
+                    .OutputAs(request.TargetPath)
             );
         }
     }

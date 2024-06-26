@@ -31,7 +31,8 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         private Point _pic;
         private RectangleF _frame;
 
-        public  Point Location => _pic;
+        public Point Location => _pic;
+        public Size ImageSize => new(img_w, img_h);
 
         // DATA
 
@@ -82,8 +83,6 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 
         // LOGIC
 
-        public string BakeFrame(string text) => ImageSaver.SaveImageTemp(MakeFrame(DrawText(text)));
-
         public string DrawDemotivator(MemeFileRequest request, string text)
         {
             PassTextLength(text);
@@ -95,10 +94,24 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             var funny = DrawText(text);
 
             var frame = MakeFrame(funny);
+            var result = PasteImage(frame, image);
 
-            return ImageSaver.SaveImage(PasteImage(frame, image), request.TargetPath, request.Quality);
+            return ImageSaver.SaveImage(result, request.TargetPath, request.Quality);
         }
-    
+
+        public string MakeVideoDemotivatorFrame(MemeFileRequest request, string text)
+        {
+            PassTextLength(text);
+
+            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            SetUp(size);
+            SetColor();
+
+            var frame = MakeFrame(DrawText(text));
+
+            return ImageSaver.SaveImageTemp(frame);
+        }
+
         private Image PasteImage(Image background, Image image)
         {
             background.Mutate(x => x.DrawImage(image, _pic, opacity: 1));

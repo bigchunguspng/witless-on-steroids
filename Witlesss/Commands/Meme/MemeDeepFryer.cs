@@ -37,7 +37,9 @@ namespace Witlesss.Commands.Meme
 
         protected override async Task<string> MakeMemeImage(MemeFileRequest request, int text)
         {
-            return await new F_Process(request.SourcePath).DeepFry(GetQscale()).OutputAs(request.TargetPath);
+            return await new F_Process(request.SourcePath)
+                .DeepFry(request.GetQscale())
+                .OutputAs(request.TargetPath);
         }
 
         protected override Task<string> MakeMemeStick(MemeFileRequest request, int text)
@@ -48,7 +50,9 @@ namespace Witlesss.Commands.Meme
         protected override async Task<string> MakeMemeVideo(MemeFileRequest request, int text)
         {
             var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
-            return await new F_Process(request.SourcePath).DeepFryVideo(size.Ok(), GetCRF()).Output_WEBM_safe(Suffix);
+            return await new F_Process(request.SourcePath)
+                .DeepFryVideo(size.Ok(), request.GetCRF())
+                .OutputAs(request.TargetPath);
         }
     }
 }

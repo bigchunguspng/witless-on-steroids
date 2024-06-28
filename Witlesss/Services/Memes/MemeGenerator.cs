@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using ColorHelper;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -8,10 +9,11 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Types;
 using Witlesss.Commands.Meme;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes
 {
-    public class MemeGenerator
+    public partial class MemeGenerator : IMemeGenerator<DgText>
     {
         // OPTIONS
 
@@ -41,7 +43,31 @@ namespace Witlesss.Services.Memes
 
         // LOGIC
 
-        public void SetUp(Size size)
+        public string GenerateMeme(MemeFileRequest request, DgText text)
+        {
+            var (size, info) = GetImageSize(request.SourcePath);
+            SetUp(size);
+
+            using var image = GetImage(request, size, info);
+            using var caption = DrawCaption(text);
+            using var meme = Combine(image, caption);
+
+            return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
+        }
+
+        public Task<string> GenerateVideoMeme(MemeFileRequest request, DgText text)
+        {
+            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            SetUp(size);
+
+            using var caption = DrawCaption(text);
+            var captionAsFile = ImageSaver.SaveImageTemp(caption);
+            return new F_Combine(request.SourcePath, captionAsFile)
+                .Meme(request.GetCRF(), size)
+                .OutputAs(request.TargetPath);
+        }
+
+        private void SetUp(Size size)
         {
             _w = size.Width;
             _h = size.Height;
@@ -52,23 +78,6 @@ namespace Witlesss.Services.Memes
             var minSide = (int)Math.Min(_w, 1.5 * _h);
             _startingFontSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
         }
-
-        public string MakeMeme(MemeFileRequest request, DgText text)
-        {
-            var sw = Helpers.GetStartedStopwatch();
-            var (size, info) = GetImageSize(request.SourcePath);
-            SetUp(size);
-
-            var image = GetImage(request, size, info);
-            var caption = DrawCaption(text);
-            var meme = Combine(image, caption);
-
-            var result = ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
-            sw.Log("MakeMeme");
-            return result;
-        }
-
-        public string MakeCaption(DgText text) => ImageSaver.SaveImageTemp(DrawCaption(text));
 
         private Image<Rgba32> DrawCaption(DgText text)
         {
@@ -126,7 +135,7 @@ namespace Witlesss.Services.Memes
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)
         {
-            image.Mutate(x => x.DrawImage(caption, opacity: 1));
+            image.Mutate(x => x.DrawImage(caption));
             return image;
         }
 
@@ -177,98 +186,17 @@ namespace Witlesss.Services.Memes
                 image.Mutate(x => x.Resize(size));
             }
 
-            if (request.Type == MemeSourceType.Sticker /* && not transparent */)
+            if (request.IsSticker /* && not send as sticker ? */)
             {
                 var color = CustomColorOption.GetColor() ?? Color.Black;
                 var background = new Image<Rgba32>(image.Width, image.Height, color);
-                background.Mutate(x => x.DrawImage(image, opacity: 1));
+                background.Mutate(x => x.DrawImage(image));
                 image.Dispose();
                 return background;
             }
 
             //image.Mutate(x => x.Dither(new OrderedDither((uint)d)));
             return image;
-        }
-
-
-        // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
-
-        private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom, float avgTextHeight)
-        {
-            var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
-
-            var nokia = GetFontFamily().Name.Contains("Nokia");
-
-            var w = avgTextHeight / (nokia ? 12D : 15D);
-            var w2 = (int)Math.Ceiling(w) + 2;
-
-            var opacity = ShadowOpacity / 100F;
-            var maxOpacity = (255 * opacity).RoundInt().ClampByte();
-
-            Func<int, int, double, double> getShadowOpacity = nokia ? SquareShadow : RoundShadow;
-
-            var sw = Helpers.GetStartedStopwatch();
-
-            if (top.HasValue)
-            {
-                var x = (_w - top.Value.Width) / 2;
-                ShadowImagePart(new Rectangle(new Point(x, 0), top.Value));
-            }
-
-            if (bottom.HasValue)
-            {
-                var x = (_w - bottom.Value.Width) / 2;
-                var y =  _h - bottom.Value.Height;
-                ShadowImagePart(new Rectangle(new Point(x, y), bottom.Value));
-            }
-
-            sw.Log("DrawShadow");
-            shadowRealm.Mutate(x => x.DrawImage(image, opacity: 1));
-            image.Dispose();
-            return shadowRealm;
-
-            void ShadowImagePart(Rectangle rectangle)
-            {
-                for (var y = rectangle.Y; y < rectangle.Bottom; y++)
-                for (var x = rectangle.X; x < rectangle.Right; x++)
-                {
-                    var textA = image[x, y].A;
-                    if (textA == 0) continue;
-
-                    for (var ky = y - w2; ky <= y + w2; ky++)
-                    for (var kx = x - w2; kx <= x + w2; kx++)
-                    {
-                        var sx = kx - x;
-                        var sy = ky - y;
-
-                        var outsideImage = kx < 0 || kx >= image.Width || ky < 0 || ky >= image.Height;
-                        if (outsideImage) continue;
-
-                        var shadowA = shadowRealm[kx, ky].A;
-                        if (shadowA == maxOpacity) continue;
-
-                        var shadowOpacity = opacity * getShadowOpacity(sx, sy, w);
-                        if (shadowOpacity == 0) continue;
-
-                        var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
-                        shadowRealm[kx, ky] = new Rgba32(0, 0, 0, a);
-                    }
-                }
-            }
-        }
-
-        private double RoundShadow(int kx, int ky, double w)
-        {
-            var r = Math.Sqrt(kx * kx + ky * ky);
-            return Math.Clamp(1 - 2 * (r - w), 0, 1);
-        }
-
-        private double SquareShadow(int kx, int ky, double w)
-        {
-            var x = Math.Abs(kx);
-            var y = Math.Abs(ky);
-            var b = x > 0 && x < w && y > 0 && y < w;
-            return b ? 1 : 0;
         }
     }
 }

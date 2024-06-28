@@ -2,8 +2,11 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
@@ -55,10 +58,6 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             return true;
         }
-
-        protected abstract Task<string> MakeMemeImage(MemeFileRequest request, T text);
-        protected abstract Task<string> MakeMemeStick(MemeFileRequest request, T text);
-        protected abstract Task<string> MakeMemeVideo(MemeFileRequest request, T text);
 
         public async Task ProcessPhoto(string fileID)
         {
@@ -135,6 +134,29 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected abstract void ParseOptions();
         protected abstract T GetMemeText(string? text);
+
+
+        // MEME GENERATION
+
+        protected abstract IMemeGenerator<T> MemeMaker { get; }
+        protected abstract SerialTaskQueue   Queue     { get; }
+
+        protected virtual Task<string> MakeMemeImage(MemeFileRequest request, T text)
+        {
+            return Queue.Enqueue(() => MemeMaker.GenerateMeme(request, text));
+        }
+
+        protected virtual async Task<string> MakeMemeStick(MemeFileRequest request, T text)
+        {
+            if (request.ConvertSticker)
+                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+            return await MakeMemeImage(request, text);
+        }
+
+        protected virtual Task<string> MakeMemeVideo(MemeFileRequest request, T text)
+        {
+            return Queue.Enqueue(() => MemeMaker.GenerateVideoMeme(request, text));
+        }
 
 
         private string? GetProvidedText()
@@ -228,6 +250,8 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         public bool ExportAsSticker { get; init; }
         public bool  ConvertSticker { get; init; }
 
+        public bool IsSticker => Type == MemeSourceType.Sticker;
+
         /// <summary>
         /// Constant Rate Factor (for MP4 compresion).<br/>
         /// 0 - lossless, 23 - default, 51 - worst possible.
@@ -246,6 +270,11 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         public int GetQscale()
         {
             return 31 - (int)(0.29 * Quality); // 2 - 31
+        }
+
+        public Image<Rgba32> GetVideoSnapshot()
+        {
+            return Image.Load<Rgba32>(Memes.Snapshot(SourcePath));
         }
     }
 

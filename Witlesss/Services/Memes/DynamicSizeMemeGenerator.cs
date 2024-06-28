@@ -5,13 +5,22 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes;
 
-public abstract class MemeGeneratorCore<T>
+public interface IMemeGenerator<in T>
+{
+    string GenerateMeme(MemeFileRequest request, T text);
+    Task<string> GenerateVideoMeme(MemeFileRequest request, T text);
+}
+
+public abstract class DynamicSizeMemeGenerator<T> : IMemeGenerator<T>
 {
     public string GenerateMeme(MemeFileRequest request, T text)
     {
         var size = GetImageSize(request.SourcePath);
 
-        var captionLayer = SetUpAndDrawCaptionLayer(size, text);
+        SetUp(size);
+
+        var textLayer = DrawTextLayer(text);
+        var captionLayer = DrawCaptionLayer(textLayer);
         var result = Combine(request.SourcePath, captionLayer);
 
         return ImageSaver.SaveImage(result, request.TargetPath, request.Quality);
@@ -21,18 +30,27 @@ public abstract class MemeGeneratorCore<T>
     {
         var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath);
 
-        var captionLayer = SetUpAndDrawCaptionLayer(size, text);
+        SetUp(size);
+
+        var textLayer = DrawTextLayer(text);
+        var captionLayer = DrawCaptionLayer(textLayer);
         var caption = ImageSaver.SaveImageTemp(captionLayer);
 
         return MakeVideoMeme(request, caption).OutputAs(request.TargetPath);
     }
 
-    private Image SetUpAndDrawCaptionLayer(Size size, T text)
+    /*private Image SetUpAndDrawCaptionLayer(Size size, T text)
     {
         SetUp(size);
 
+        /*if (TextLayerDependsOnColor)
+        {
+            Image.Load(Memes.Snapshot(request.SourcePath))
+        }#1#
         return DrawCaptionLayer(DrawTextLayer(text));
-    }
+    }*/
+
+    public abstract bool TextLayerDependsOnColor { get; }
 
     /// <summary>
     /// Calibrates the source image size,

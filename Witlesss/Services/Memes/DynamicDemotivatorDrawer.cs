@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
@@ -12,7 +13,7 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
 {
-    public class DynamicDemotivatorDrawer
+    public class DynamicDemotivatorDrawer : IMemeGenerator<string>
     {
         // OPTIONS
 
@@ -76,30 +77,31 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         private void SetFontSizeToDefault() => ResizeFont(StartingFontSize);
 
         private bool text_is_short;
-        public  void PassTextLength(string text) => text_is_short = text.Length < 8;
+        private void PassTextLength(string text) => text_is_short = text.Length < 8;
 
         private float StartingFontSize => img_w * (text_is_short ? 0.2f : 0.135f);
         private float MinFontSize => Math.Max(img_w * 0.04f, 16);
 
         // LOGIC
 
-        public string DrawDemotivator(MemeFileRequest request, string text)
+        public string GenerateMeme(MemeFileRequest request, string text)
         {
             PassTextLength(text);
 
             var (size, info) = GetImageSize(request.SourcePath);
             SetUp(size);
+            SetColor();
 
-            var image = GetImage(request.SourcePath, size, info);
-            var funny = DrawText(text);
+            using var image = GetImage(request.SourcePath, size, info);
+            using var funny = DrawText(text);
+            using var frame = MakeFrame(funny);
 
-            var frame = MakeFrame(funny);
-            var result = PasteImage(frame, image);
+            InsertImage(frame, image);
 
-            return ImageSaver.SaveImage(result, request.TargetPath, request.Quality);
+            return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 
-        public string MakeVideoDemotivatorFrame(MemeFileRequest request, string text)
+        public Task<string> GenerateVideoMeme(MemeFileRequest request, string text)
         {
             PassTextLength(text);
 
@@ -107,24 +109,26 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             SetUp(size);
             SetColor();
 
-            var frame = MakeFrame(DrawText(text));
+            using var funny = DrawText(text);
+            using var frame = MakeFrame(funny);
+            var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
-            return ImageSaver.SaveImageTemp(frame);
+            var full_size = SizeHelpers.GetImageSize_FFmpeg(frameAsFile).FitSize(720);
+
+            return new F_Combine(request.SourcePath, frameAsFile)
+                .D300(request.GetCRF(), ImageSize, Location, full_size)
+                .OutputAs(request.TargetPath);
         }
 
-        private Image PasteImage(Image background, Image image)
+        private void InsertImage(Image background, Image image)
         {
-            background.Mutate(x => x.DrawImage(image, _pic, opacity: 1));
+            background.Mutate(x => x.DrawImage(image, _pic));
 
             var size = FitSize(background.Size, 1280);
             if (size != background.Size)
             {
                 background.Mutate(x => x.Resize(size));
             }
-
-            image.Dispose();
-
-            return background;
         }
 
         /// <summary> Makes a FRAME and adds TEXT</summary>
@@ -161,7 +165,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             }
 
             var point = new Point((full_w - caption.Width) / 2, mg_top + img_h + FM);
-            background.Mutate(x => x.DrawImage(caption, point, opacity: 1));
+            background.Mutate(x => x.DrawImage(caption, point));
         
             background.Mutate(x => x.Draw(_frameOptions, FramePen, _frame));
 
@@ -198,7 +202,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
                 var size = new Size(width, txt_h);
                 var point = new Point((size - textLayer.Size) / 2);
                 image = GetBackground();
-                image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
+                image.Mutate(x => x.DrawImage(textLayer, point));
             }
             else
             {
@@ -315,8 +319,6 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             {
                 image.Mutate(x => x.Resize(size));
             }
-
-            SetColor();
 
             return image;
         }

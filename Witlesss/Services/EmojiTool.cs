@@ -57,7 +57,7 @@ namespace Witlesss.Services
                     _ => 0
                 };
                 var point = new Point(x, offsetY.RoundInt());
-                canvas.Mutate(ctx => ctx.DrawImage(line, point, opacity: 1));
+                canvas.Mutate(ctx => ctx.DrawImage(line, point));
                 offsetY += height;
                 line.Dispose();
             }

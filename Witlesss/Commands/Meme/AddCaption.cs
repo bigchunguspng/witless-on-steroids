@@ -71,37 +71,8 @@ namespace Witlesss.Commands.Meme
 
         private static readonly IFunnyApp _ifunny = new();
         private static readonly SerialTaskQueue _queue = new();
-        
-        protected override Task<string> MakeMemeImage(MemeFileRequest request, string text)
-        {
-            return _queue.Enqueue(() => _ifunny.MakeCaptionMeme(request, text));
-        }
 
-        protected override async Task<string> MakeMemeStick(MemeFileRequest request, string text)
-        {
-            if (request.ConvertSticker)
-                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
-            return await MakeMemeImage(request, text);
-        }
-
-        protected override Task<string> MakeMemeVideo(MemeFileRequest request, string text)
-        {
-            return _queue.Enqueue(() =>
-            {
-                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize();
-                _ifunny.SetUp(size);
-
-                if (IFunnyApp.CustomColorOption.IsActive)
-                    _ifunny.SetCustomColors();
-                else if (IFunnyApp.PickColor)
-                    _ifunny.SetSpecialColors(Image.Load<Rgba32>(Memes.Snapshot(request.SourcePath)));
-                else
-                    _ifunny.SetDefaultColors();
-
-                return new F_Combine(request.SourcePath, _ifunny.BakeText(text))
-                    .When(request.GetCRF(), size, _ifunny.Cropping, _ifunny.Location, IFunnyApp.BlurImage)
-                    .OutputAs(request.TargetPath);
-            });
-        }
+        protected override IMemeGenerator<string> MemeMaker => _ifunny;
+        protected override SerialTaskQueue Queue => _queue;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
@@ -7,21 +8,22 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Commands.Meme;
+using Witlesss.MediaTools;
 using Random = System.Random;
 
 namespace Witlesss.Services.Memes
 {
-    public class DemotivatorDrawer
+    public class DemotivatorDrawer : IMemeGenerator<DgText>
     {
         public static bool AddLogo;
 
         private static readonly List<Logo> Logos = [];
+        private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
 
         private readonly int _w, _h;
         private readonly bool _square;
         private readonly RectangleF _frame;
         private readonly DgTextOptions _textA, _textB;
-        private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
 
 
         private readonly GraphicsOptions _anyGraphicsOptions = new();
@@ -88,14 +90,23 @@ namespace Witlesss.Services.Memes
         public Rectangle ImagePlacement { get; }
 
         // LOGIC
-        // todo find all memory leaks
 
-        public string MakeDemotivator(MemeFileRequest request, DgText text)
+        public string GenerateMeme(MemeFileRequest request, DgText text)
         {
-            return Helpers.MeasureTime(() => PasteImage(DrawFrame(text), request), nameof(MakeDemotivator));
+            using var frame = DrawFrame(text);
+            InsertImage(frame, request);
+            return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 
-        public string MakeFrame(DgText text) => ImageSaver.SaveImageTemp(DrawFrame(text));
+        public Task<string> GenerateVideoMeme(MemeFileRequest request, DgText text)
+        {
+            using var frame = DrawFrame(text);
+            var frameAsFile = ImageSaver.SaveImageTemp(frame);
+            return new F_Combine(request.SourcePath, frameAsFile)
+                .Demo(request.GetCRF(), this)
+                .OutputAs(request.TargetPath);
+        }
+
 
         private Image DrawFrame(DgText text)
         {
@@ -115,6 +126,7 @@ namespace Witlesss.Services.Memes
             return background;
         }
 
+        // todo text margin + do only 1 bottom text line if text is generated
         private void DrawText(Image image, string text, DgTextOptions o)
         {
             var emoji = EmojiRegex.Matches(text);
@@ -127,7 +139,7 @@ namespace Witlesss.Services.Memes
                 var parameters = new EmojiTool.Options(o.Color, o.EmojiSize);
                 var textLayer = _emojer.DrawEmojiText(text, options, parameters, out _);
                 var point = new Point((_w - textLayer.Width) / 2, o.Options.Origin.Y.RoundInt());
-                image.Mutate(x => x.DrawImage(textLayer, point, opacity: 1));
+                image.Mutate(x => x.DrawImage(textLayer, point));
             }
             else
             {
@@ -140,15 +152,12 @@ namespace Witlesss.Services.Memes
             }
         }
 
-        private string PasteImage(Image background, MemeFileRequest request)
+        private void InsertImage(Image frame, MemeFileRequest request)
         {
             using var image = Image.Load(request.SourcePath);
 
             image.Mutate(x => x.Resize(ImagePlacement.Size));
-
-            background.Mutate(x => x.DrawImage(image, ImagePlacement.Location, _anyGraphicsOptions));
-
-            return ImageSaver.SaveImage(background, request.TargetPath, request.Quality);
+            frame.Mutate(x => x.DrawImage(image, ImagePlacement.Location, _anyGraphicsOptions));
         }
 
         // LOGOS (WATERMARKS)
@@ -172,19 +181,6 @@ namespace Witlesss.Services.Memes
     }
 
     public record Logo(Image Image, Point Point);
-
-    /*public interface TextParameters
-    {
-        int Lines           { get; }
-        int EmojiS          { get; }
-        Font Font           { get; }
-        SolidBrush Color    { get; }
-        RectangleF Layout   { get; }
-        RichTextOptions RTO { get; }
-        //StringFormat Format { get; }
-
-        public Size EmojiSize => new(EmojiS, EmojiS);
-    }*/
 
     public record DgTextOptions(RichTextOptions Options, int Lines, int EmojiSize)
     {

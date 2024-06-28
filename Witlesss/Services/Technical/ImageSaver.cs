@@ -17,11 +17,11 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
             return path;
         }
 
-        public static string SaveImageTemp(Image image)
+        public static string SaveImageTemp(Image? image)
         {
             var path = GetTempPicName();
             image.SaveAsPng(path);
-            image.Dispose();
+            image?.Dispose();
 
             return path;
         }

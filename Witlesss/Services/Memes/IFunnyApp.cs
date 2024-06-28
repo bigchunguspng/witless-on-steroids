@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -8,10 +9,11 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Types;
 using Witlesss.Commands.Meme;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
 
-public class IFunnyApp
+public partial class IFunnyApp : IMemeGenerator<string>
 {
     // OPTIONS
 
@@ -67,6 +69,35 @@ public class IFunnyApp
 
     // LOGIC
 
+    public string GenerateMeme(MemeFileRequest request, string text)
+    {
+        var (size, info) = GetImageSize(request.SourcePath);
+        SetUp(size);
+
+        using var image = GetImage(request.SourcePath, size, info);
+        SetColor(image);
+
+        using var card = DrawText(text);
+        using var meme = Combine(image, card, sticker: request.IsSticker);
+
+        return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
+    }
+
+    public Task<string> GenerateVideoMeme(MemeFileRequest request, string text)
+    {
+        var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize();
+        SetUp(size);
+        SetColor(PickColor ? request.GetVideoSnapshot() : null);
+
+        using var card = DrawText(text);
+        using var frame = Combine(null, card);
+        var frameAsFile = ImageSaver.SaveImageTemp(frame);
+
+        return new F_Combine(request.SourcePath, frameAsFile)
+            .When(request.GetCRF(), size, Cropping, Location, BlurImage)
+            .OutputAs(request.TargetPath);
+    }
+
     public void SetUp(Size size)
     {
         var crop = Math.Abs(CropPercent) / 100F;
@@ -98,34 +129,20 @@ public class IFunnyApp
         _fullHeight = _h + _cardHeight;
     }
 
-
-    public string MakeCaptionMeme(MemeFileRequest request, string text)
-    {
-        var (size, info) = GetImageSize(request.SourcePath);
-        SetUp(size);
-
-        var image = GetImage(request.SourcePath, size, info);
-
-        var funny = DrawText(text);
-
-        var meme = Combine(image, funny, sticker: request.Type == MemeSourceType.Sticker);
-
-        return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
-    }
-
-    private Image Combine(Image source, Image caption, bool sticker = false)
+    private Image Combine(Image? source, Image caption, bool sticker = false)
     {
         var meme = new Image<Rgba32>(_w, _fullHeight);
 
+        // todo if sticker and not send as sticker
         if (sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
 
-        meme.Mutate(x => x.DrawImage(source, new Point(0, _cardHeight - _cropOffset), opacity: 1));
-        meme.Mutate(x => x.DrawImage(caption, new Point(0, 0), opacity: 1));
+        if (source is not null)
+            meme.Mutate(x => x.DrawImage(source, new Point(0, _cardHeight - _cropOffset)));
+        meme.Mutate(x => x.DrawImage(caption, new Point(0, 0)));
 
         return meme;
     }
 
-    public string BakeText(string text) => ImageSaver.SaveImageTemp(Combine(new Image<Rgba32>(_w, _h), DrawText(text)));
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);
@@ -150,7 +167,7 @@ public class IFunnyApp
             var y = (_cardHeight - textLayer.Height) / 2F + _textOffset;
             var point = new Point(x.RoundInt(), y.RoundInt());
             image = GetBackground();
-            image.Mutate(ctx => ctx.DrawImage(textLayer, point, opacity: 1));
+            image.Mutate(ctx => ctx.DrawImage(textLayer, point));
         }
         else
         {
@@ -289,13 +306,13 @@ public class IFunnyApp
     }
 
 
-    // COLOR PICKING
+    // COLORS
 
-    private void SetColor(Image<Rgba32> image)
+    private void SetColor(Image<Rgba32>? image)
     {
-        if (CustomColorOption.IsActive) SetCustomColors();
-        else if (PickColor) SetSpecialColors(image);
-        else SetDefaultColors();
+        if      (CustomColorOption.IsActive) SetCustomColors();
+        else if (PickColor && image != null) SetSpecialColors(image);
+        else                                 SetDefaultColors();
     }
 
     public void SetSpecialColors(Image<Rgba32> image)
@@ -315,74 +332,4 @@ public class IFunnyApp
     }
 
     private SolidBrush ChooseTextColor(Rgba32 b) => b.Rgb.BlackTextIsBetter() ? _black : _white;
-
-    private Rgba32 PickColorFromImage(Image<Rgba32> image)
-    {
-        var xd = ForceCenter ? 2 : 0;
-
-        var colors = new Rgba32[7];
-        colors[0] = AverageColorOnOffset(                  0);
-        colors[1] = AverageColorOnOffset(image.Width * 1 / 8);
-        colors[2] = AverageColorOnOffset(image.Width * 2 / 8);
-        colors[3] = AverageColorOnOffset(image.Width * 4 / 8);
-        colors[4] = AverageColorOnOffset(image.Width * 3 / 8);
-        colors[5] = AverageColorOnOffset(image.Width * 7 / 8);
-        colors[6] = AverageColorOnOffset(image.Width     - 5);
-
-        var difference = new int[7 - xd * 2];
-        for (var i = 0; i < colors.Length - xd * 2; i++)
-        {
-            difference[i] = colors[xd..^xd].Select(c => Difference(colors[i + xd], c)).OrderBy(x => x).Take(3).Sum();
-        }
-
-        var min = difference.Min();
-
-        return min > 950 ? Average(colors[0], colors[^1]) : colors[difference.ToList().IndexOf(min) + xd];
-
-        Rgba32 AverageColorOnOffset(int x)
-        {
-            var avg = AverageColor(image, new Rectangle(x, _cropOffset, 5, 5));
-            return BackInBlack ? avg : PutOver(Color.White, avg);
-        }
-    }
-
-    private static Rgba32 AverageColor(Image<Rgba32> image, Rectangle area)
-    {
-        int a = 0, r = 0, g = 0, b = 0;
-        int w = area.Width, h = area.Height, s = w * h;
-        int maxX = area.X + w, maxY = area.Y + h;
-
-        for (var x = area.X; x < maxX; x++)
-        for (var y = area.Y; y < maxY; y++)
-        {
-            var p = image[x, y];
-            a += p.A;
-            r += p.R;
-            b += p.B;
-            g += p.G;
-        }
-
-        return new Rgba32((r / s).ClampByte(), (g / s).ClampByte(), (b / s).ClampByte(), (a / s).ClampByte());
-    }
-
-    private static int Difference(Rgba32 a, Rgba32 b)
-    {
-        return Math.Abs(a.R - b.R) + Math.Abs(a.G - b.G) + Math.Abs(a.B - b.B);
-    }
-
-    private static Rgba32 Average(Rgba32 a, Rgba32 b)
-    {
-        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
-
-        byte Calc(byte x, byte y) => ((x + y) / 2).ClampByte();
-    }
-
-    private static Rgba32 PutOver(Rgba32 a, Rgba32 b)
-    {
-        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
-
-        byte Calc(byte x, byte y) => (x * (255 - b.A) / 255 + y * b.A / 255).ClampByte(); // lerp
-    }
 }
-
-//public record TextParams(int Lines, int EmojiS, Font Font, SolidBrush Color, RectangleF Layout, StringFormat Format) : TextParameters;

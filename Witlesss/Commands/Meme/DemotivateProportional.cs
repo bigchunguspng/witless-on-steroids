@@ -37,42 +37,20 @@ namespace Witlesss.Commands.Meme
             var gen = string.IsNullOrEmpty(text);
             var caps = matchCaps && (gen || _caps.IsMatch(Request.Command)); // command, not chat defaults
 
-            var txt = gen ? Baka.Generate() : text;
+            var txt = gen ? Baka.Generate() : text!;
 
             return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
         }
 
-        private static readonly Regex _crop    = new(@"^\/dp\S*cp\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex _caps    = new(@"^\/dp\S*up\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _crop = new(@"^\/dp\S*cp\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _caps = new(@"^\/dp\S*up\S*", RegexOptions.IgnoreCase);
 
         // LOGIC
 
         private static readonly DynamicDemotivatorDrawer  _dp = new();
         private static readonly SerialTaskQueue _queue = new();
 
-        protected override Task<string> MakeMemeImage(MemeFileRequest request, string text)
-        {
-            return _queue.Enqueue(() => _dp.DrawDemotivator(request, text));
-        }
-
-        protected override async Task<string> MakeMemeStick(MemeFileRequest request, string text)
-        {
-            if (request.ConvertSticker)
-                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
-            return await MakeMemeImage(request, text);
-        }
-
-        protected override Task<string> MakeMemeVideo(MemeFileRequest request, string text)
-        {
-            return _queue.Enqueue(() =>
-            {
-                var frame = _dp.MakeVideoDemotivatorFrame(request, text);
-                var full_size = SizeHelpers.GetImageSize_FFmpeg(frame).FitSize(720);
-
-                return new F_Combine(request.SourcePath, frame)
-                    .D300(request.GetCRF(), _dp.ImageSize, _dp.Location, full_size)
-                    .OutputAs(request.TargetPath);
-            });
-        }
+        protected override IMemeGenerator<string> MemeMaker => _dp;
+        protected override SerialTaskQueue Queue => _queue;
     }
 }

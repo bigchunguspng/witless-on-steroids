@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
-using Witlesss.MediaTools;
 using static Witlesss.Backrooms.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
@@ -99,30 +98,8 @@ namespace Witlesss.Commands.Meme
         private static readonly MemeGenerator _imgflip = new();
         private static readonly SerialTaskQueue _queue = new();
 
-        protected override Task<string> MakeMemeImage(MemeFileRequest request, DgText text)
-        {
-            return _queue.Enqueue(() => _imgflip.MakeMeme(request, text));
-        }
-
-        protected override async Task<string> MakeMemeStick(MemeFileRequest request, DgText text)
-        {
-            if (request.ConvertSticker)
-                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
-            return await MakeMemeImage(request, text);
-        }
-
-        protected override Task<string> MakeMemeVideo(MemeFileRequest request, DgText text)
-        {
-            return _queue.Enqueue(() =>
-            {
-                var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
-                _imgflip.SetUp(size);
-
-                return new F_Combine(request.SourcePath, _imgflip.MakeCaption(text))
-                    .Meme(request.GetCRF(), size)
-                    .OutputAs(request.TargetPath);
-            });
-        }
+        protected override IMemeGenerator<DgText> MemeMaker => _imgflip;
+        protected override SerialTaskQueue Queue => _queue;
     }
 
     public interface ImageProcessor

@@ -55,32 +55,15 @@ namespace Witlesss.Commands.Meme
 
         // LOGIC
 
-        private static readonly SerialTaskQueue _queue = new();
-        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
-
         private DgMode _mode;
-        private DemotivatorDrawer Drawer => _drawers[(int) _mode];
 
-        protected override Task<string> MakeMemeImage(MemeFileRequest request, DgText text)
-        {
-            return _queue.Enqueue(() => Drawer.MakeDemotivator(request, text));
-        }
+        private static readonly SerialTaskQueue _queue = new();
+        private static readonly DemotivatorDrawer[] _drawers =
+        [
+            new DemotivatorDrawer(), new DemotivatorDrawer(1280)
+        ];
 
-        protected override async Task<string> MakeMemeStick(MemeFileRequest request, DgText text)
-        {
-            if (request.ConvertSticker)
-                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
-            return await MakeMemeImage(request, text);
-        }
-
-        protected override Task<string> MakeMemeVideo(MemeFileRequest request, DgText text)
-        {
-            return _queue.Enqueue
-            (
-                () => new F_Combine(request.SourcePath, Drawer.MakeFrame(text))
-                    .Demo(request.GetCRF(), Drawer)
-                    .OutputAs(request.TargetPath)
-            );
-        }
+        protected override IMemeGenerator<DgText> MemeMaker => _drawers[(int) _mode];
+        protected override SerialTaskQueue Queue => _queue;
     }
 }

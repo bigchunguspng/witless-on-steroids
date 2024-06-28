@@ -7,13 +7,15 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
+using Witlesss.Memes.Shared;
 using Random = System.Random;
 
-namespace Witlesss.Services.Memes
+namespace Witlesss.Memes
 {
-    public class DemotivatorDrawer : IMemeGenerator<DgText>
+    public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
         public static bool AddLogo;
 
@@ -91,14 +93,14 @@ namespace Witlesss.Services.Memes
 
         // LOGIC
 
-        public string GenerateMeme(MemeFileRequest request, DgText text)
+        public string GenerateMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             InsertImage(frame, request);
             return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 
-        public Task<string> GenerateVideoMeme(MemeFileRequest request, DgText text)
+        public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
@@ -108,7 +110,7 @@ namespace Witlesss.Services.Memes
         }
 
 
-        private Image DrawFrame(DgText text)
+        private Image DrawFrame(TextPair text)
         {
             var background = new Image<Rgb24>(_w, _h, Color.Black);
 

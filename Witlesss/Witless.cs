@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Witlesss.Generation;
+using Witlesss.Generation.Pack;
 
 namespace Witlesss
 {

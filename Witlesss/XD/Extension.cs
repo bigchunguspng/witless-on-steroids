@@ -11,7 +11,7 @@ namespace Witlesss.XD
     public static class Extension
     {
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
-        public  static readonly Regex PngJpg = new("(.png)|(.jpg)"), EmojiRegex = new (REGEX_EMOJI);
+        public  static readonly Regex EmojiRegex = new (REGEX_EMOJI);
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
 

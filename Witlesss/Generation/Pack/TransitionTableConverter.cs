@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Witlesss.Backrooms.Helpers;
 
-namespace Witlesss.Generation;
+namespace Witlesss.Generation.Pack;
 
 public class TransitionTableConverter : JsonConverter<Dictionary<int, TransitionTable>>
 {

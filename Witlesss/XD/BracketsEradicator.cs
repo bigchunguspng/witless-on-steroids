@@ -8,6 +8,9 @@ namespace Witlesss.XD
         private static readonly Regex _spaces   = new(@"\s+");
         private static readonly MatchEvaluator _evaluator = ReplaceBrackets;
 
+        /// <summary>
+        /// Gets rid of () and [] brackets and text inside them.
+        /// </summary>
         public static string RemoveBrackets(this string text)
         {
             while (_brackets.IsMatch(text))

@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing;
 
@@ -35,7 +36,7 @@ public class AdvancedEdit : FileEditingCommand
 
             var (path, _) = await Bot.Download(FileID, Chat);
 
-            SendResult(await Memes.Edit(path, options, extension), extension, g: Command.Contains('g'));
+            SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: Command.Contains('g'));
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
     }

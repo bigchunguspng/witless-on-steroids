@@ -1,10 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using Witlesss.Backrooms.SerialQueue;
-using Witlesss.MediaTools;
-using static Witlesss.Backrooms.OptionsParsing;
+using Witlesss.Memes;
+using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {

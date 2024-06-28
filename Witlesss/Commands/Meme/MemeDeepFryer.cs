@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
+using Witlesss.Memes;
 
 namespace Witlesss.Commands.Meme
 {
@@ -50,7 +51,7 @@ namespace Witlesss.Commands.Meme
 
         public Task<string> GenerateVideoMeme(MemeFileRequest request, int text)
         {
-            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
 
             return new F_Process(request.SourcePath)
                 .DeepFryVideo(size.Ok(), request.GetCRF())

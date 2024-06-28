@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -49,7 +50,7 @@ namespace Witlesss.Commands.Editing
 
                 var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(await Memes.Scale(path, args), type);
+                SendResult(await FFMpegXD.Scale(path, args), type);
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");
             }
         }

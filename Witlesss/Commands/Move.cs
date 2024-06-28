@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Witlesss.Generation;
+using Witlesss.Generation.Pack;
 
 namespace Witlesss.Commands
 {

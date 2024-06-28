@@ -1,7 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
-using Witlesss.MediaTools;
+using Witlesss.Memes;
 
 namespace Witlesss.Commands.Meme
 {

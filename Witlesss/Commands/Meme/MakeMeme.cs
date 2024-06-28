@@ -2,11 +2,13 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
-using static Witlesss.Backrooms.OptionsParsing;
+using Witlesss.MediaTools;
+using Witlesss.Memes;
+using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class MakeMeme : MakeMemeCore<DgText>, ImageProcessor
+    public class MakeMeme : MakeMemeCore<TextPair>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*) *", RegexOptions.IgnoreCase);
 
@@ -35,7 +37,7 @@ namespace Witlesss.Commands.Meme
             MemeGenerator.ColorText      =       CheckAndCut(Request, _colorText);
         }
 
-        protected override DgText GetMemeText(string? text)
+        protected override TextPair GetMemeText(string? text)
         {
             var generate = text.IsNullOrEmpty();
             var capitalize = Check(Request, _caps) && (generate || _caps.IsMatch(Request.Command));
@@ -79,7 +81,7 @@ namespace Witlesss.Commands.Meme
                 }
             }
 
-            return new DgText(AdjustCase(a), AdjustCase(b));
+            return new TextPair(AdjustCase(a), AdjustCase(b));
 
             string AdjustCase(string s) => capitalize ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
@@ -98,7 +100,7 @@ namespace Witlesss.Commands.Meme
         private static readonly MemeGenerator _imgflip = new();
         private static readonly SerialTaskQueue _queue = new();
 
-        protected override IMemeGenerator<DgText> MemeMaker => _imgflip;
+        protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
         protected override SerialTaskQueue Queue => _queue;
     }
 

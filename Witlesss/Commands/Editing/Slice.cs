@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing;
 
@@ -11,7 +12,7 @@ public class Slice : VideoCommand
     {
         var (path, type, waitMessage) = await DownloadFileSuperCool();
 
-        var result = await Memes.Slice(path);
+        var result = await FFMpegXD.Slice(path);
 
         Task.Run(() => Bot.DeleteMessage(Chat, waitMessage));
 

@@ -85,6 +85,7 @@ namespace Witlesss
             return sb.ToString().Trim();
         }
 
+        // todo remove since all blocking commands are async now
         public void Suspect(long chat, TimeSpan time)
         {
             if (SussyChats.TryGetValue(chat, out var x))

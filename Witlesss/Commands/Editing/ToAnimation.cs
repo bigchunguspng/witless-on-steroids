@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
-using static Witlesss.Memes;
+using static Witlesss.MediaTools.FFMpegXD;
 
 namespace Witlesss.Commands.Editing
 {

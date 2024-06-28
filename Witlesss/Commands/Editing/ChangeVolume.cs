@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -18,7 +19,7 @@ namespace Witlesss.Commands.Editing
 
                 var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(await Memes.ChangeVolume(path, _arg), type);
+                SendResult(await FFMpegXD.ChangeVolume(path, _arg), type);
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
         }

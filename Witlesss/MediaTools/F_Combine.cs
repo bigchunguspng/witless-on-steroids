@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FFMpegCore;
 using SixLabors.ImageSharp;
-using Drawer = Witlesss.Services.Memes.DemotivatorDrawer;
+using Drawer = Witlesss.Memes.DemotivatorDrawer;
 using FFO = FFMpegCore.FFMpegArgumentOptions;
 
 namespace Witlesss.MediaTools

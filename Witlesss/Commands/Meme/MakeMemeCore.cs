@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
+using Witlesss.Memes;
 
 namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 {
@@ -116,7 +117,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             var (path, type) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
-            if (CropVideoNotes && type == MediaType.Round) path = await Memes.CropVideoNote(path);
+            if (CropVideoNotes && type == MediaType.Round) path = await FFMpegXD.CropVideoNote(path);
 
             ParseOptions();
             var text = GetMemeText(GetProvidedText());
@@ -149,7 +150,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected virtual async Task<string> MakeMemeStick(MemeFileRequest request, T text)
         {
             if (request.ConvertSticker)
-                request.SourcePath = await Memes.Convert(request.SourcePath, ".jpg");
+                request.SourcePath = await FFMpegXD.Convert(request.SourcePath, ".jpg");
             return await MakeMemeImage(request, text);
         }
 
@@ -274,7 +275,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         public Image<Rgba32> GetVideoSnapshot()
         {
-            return Image.Load<Rgba32>(Memes.Snapshot(SourcePath));
+            return Image.Load<Rgba32>(FFMpegXD.Snapshot(SourcePath));
         }
     }
 

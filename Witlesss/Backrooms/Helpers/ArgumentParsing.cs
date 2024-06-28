@@ -1,4 +1,4 @@
-﻿namespace Witlesss.Backrooms;
+﻿namespace Witlesss.Backrooms.Helpers;
 
 public static class ArgumentParsing
 {

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -8,7 +9,7 @@ namespace Witlesss.Commands.Editing
         {
             var (path, type) = await Bot.Download(FileID, Chat);
             
-            SendResult(await Memes.Reverse(path), type);
+            SendResult(await FFMpegXD.Reverse(path), type);
             Log($"{Title} >> REVERSED [<<]");
         }
         

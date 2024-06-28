@@ -7,13 +7,14 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Types;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
+using Witlesss.Memes.Shared;
 
-namespace Witlesss.Services.Memes
+namespace Witlesss.Memes
 {
-    public partial class MemeGenerator : IMemeGenerator<DgText>
+    public partial class MemeGenerator : IMemeGenerator<TextPair>
     {
         // OPTIONS
 
@@ -43,7 +44,7 @@ namespace Witlesss.Services.Memes
 
         // LOGIC
 
-        public string GenerateMeme(MemeFileRequest request, DgText text)
+        public string GenerateMeme(MemeFileRequest request, TextPair text)
         {
             var (size, info) = GetImageSize(request.SourcePath);
             SetUp(size);
@@ -55,9 +56,9 @@ namespace Witlesss.Services.Memes
             return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
         }
 
-        public Task<string> GenerateVideoMeme(MemeFileRequest request, DgText text)
+        public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
-            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
             SetUp(size);
 
             using var caption = DrawCaption(text);
@@ -79,7 +80,7 @@ namespace Witlesss.Services.Memes
             _startingFontSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
         }
 
-        private Image<Rgba32> DrawCaption(DgText text)
+        private Image<Rgba32> DrawCaption(TextPair text)
         {
             var canvas = new Image<Rgba32>(_w, _h);
 

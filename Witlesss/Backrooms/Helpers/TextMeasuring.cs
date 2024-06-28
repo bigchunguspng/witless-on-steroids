@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Numerics;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 
-namespace Witlesss.Backrooms;
+namespace Witlesss.Backrooms.Helpers;
 
 public static class TextMeasuring
 {

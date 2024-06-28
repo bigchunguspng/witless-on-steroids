@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Witlesss.MediaTools;
 using static System.TimeSpan;
 
 #pragma warning disable CS4014
@@ -25,7 +26,7 @@ namespace Witlesss.Commands.Editing
 
             var (path, type, waitMessage) = await DownloadFileSuperCool();
 
-            var result = await Memes.Cut(path, span);
+            var result = await FFMpegXD.Cut(path, span);
 
             Task.Run(() => Bot.DeleteMessage(Chat, waitMessage));
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Witlesss.Services;
+namespace Witlesss.Generation;
 
 public static class DefaultTextProvider
 {

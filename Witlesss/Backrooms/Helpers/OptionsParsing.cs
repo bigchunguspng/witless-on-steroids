@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using Witlesss.Commands.Meme;
 
-namespace Witlesss.Backrooms;
+namespace Witlesss.Backrooms.Helpers;
 
 public static class OptionsParsing
 {

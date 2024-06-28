@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Witlesss.Generation.Pack;
+using Witlesss.Generation.Tokens;
 
 namespace Witlesss.Generation
 {
@@ -101,7 +103,7 @@ namespace Witlesss.Generation
                     var id1 = DB.GetOrAddWord_ReturnID(word.Remove(index));
                     var id2 = DB.GetOrAddWord_ReturnID(word.Substring(index + 1));
                     var idC = DB.GetOrAddWord_ReturnID(word);
-                    tokens.AddLast(new CombinedToken(id1, id2, idC));
+                    tokens.AddLast(new DoubleToken(id1, id2, idC));
                 }
                 else
                     tokens.AddLast(new SingleToken(DB.GetOrAddWord_ReturnID(word)));

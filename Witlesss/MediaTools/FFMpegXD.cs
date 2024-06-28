@@ -2,15 +2,13 @@
 using System.IO;
 using System.Threading.Tasks;
 using FFMpegCore;
-using Witlesss.MediaTools;
-using static Witlesss.Backrooms.SizeHelpers;
 using static Witlesss.MediaTools.FF_Extensions;
 using Rectangle = System.Drawing.Rectangle;
 using Size = System.Drawing.Size;
 
-namespace Witlesss
+namespace Witlesss.MediaTools
 {
-    public static class Memes
+    public static class FFMpegXD
     {
         public static readonly Size      VideoNoteSize = new(384, 384);
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
@@ -36,11 +34,11 @@ namespace Witlesss
             var video = extension == ".mp4" || extension == ".webm";
             if (video)
             {
-                var size = GetImageSize_FFmpeg(path);
+                var size = GetPictureSize(path);
                 var fits = size.FitSize(720).ValidMp4Size();
                 if (size != fits)
                 {
-                    path = await Scale(path, new[] { fits.Width.ToString(), fits.Height.ToString() });
+                    path = await Scale(path, [fits.Width.ToString(), fits.Height.ToString()]);
                 }
             }
             return await new F_Process(path).SliceRandom().Output("-slices", video ? ".mp4" : ".mp3");
@@ -55,8 +53,8 @@ namespace Witlesss
         public static Task<string> Reverse       (string path) => new F_Process(path).Reverse().Output_WEBM_safe("-Reverse");
 
         public static Task<string> RemoveAudio   (string path) => new F_Process(path).ToAnimation().Output("-silent");
-        public static Task<string> Stickerize    (string path) => new F_Process(path).ToSticker(GetImageSize_FFmpeg(path).Normalize().Ok()).Output("-stick", ".webp");
-        public static Task<string> Compress      (string path) => new F_Process(path).CompressImage(GetImageSize_FFmpeg(path).FitSize(2560).Ok()).Output("-small", ".jpg");
+        public static Task<string> Stickerize    (string path) => new F_Process(path).ToSticker(GetPictureSize(path).Normalize().Ok()).Output("-stick", ".webp");
+        public static Task<string> Compress      (string path) => new F_Process(path).CompressImage(GetPictureSize(path).FitSize(2560).Ok()).Output("-small", ".jpg");
         public static Task<string> CompressGIF   (string path) => new F_Process(path).CompressAnimation().Output("-small");
         public static Task<string> CropVideoNote (string path) => new F_Process(path).CropVideoNote().Output("-crop");
         public static Task<string> Crop          (string path, string[] args) => new F_Process(path).CropVideo (args).Output("-crop");
@@ -70,7 +68,7 @@ namespace Witlesss
         public static Task<string> ToVoice       (string path) => new F_Process(path).ToVoiceMessage().Output("-voice", ".ogg");
         public static Task<string> ToVideoNote   (string path)
         {
-            var s = GetImageSize_FFmpeg(path);
+            var s = GetPictureSize(path);
             var d = ToEven(Math.Min(s.Width, s.Height));
             var x = (s.Width  - d) / 2;
             var y = (s.Height - d) / 2;
@@ -84,9 +82,15 @@ namespace Witlesss
             FFMpeg.Snapshot(path, temp);
             return temp;
         }
+
+        public static SixLabors.ImageSharp.Size GetPictureSize(string path)
+        {
+            var v = F_Action.GetVideoStream(path)!;
+            return new SixLabors.ImageSharp.Size(v.Width, v.Height);
+        }
     }
-    
-    public record DgText(string A, string B);
-    
+
+    public record TextPair(string A, string B);
+
     public record CutSpan(TimeSpan Start, TimeSpan Length);
 }

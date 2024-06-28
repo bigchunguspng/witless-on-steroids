@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -9,7 +10,7 @@ namespace Witlesss.Commands.Editing
         {
             var (path, _) = await Bot.Download(FileID, Chat);
 
-            await using var stream = File.OpenRead(await Memes.ToVideoNote(path));
+            await using var stream = File.OpenRead(await FFMpegXD.ToVideoNote(path));
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> NOTE (*)");
         }

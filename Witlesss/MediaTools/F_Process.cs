@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
-using static Witlesss.Memes;
+using static Witlesss.MediaTools.FFMpegXD;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
 namespace Witlesss.MediaTools

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Witlesss.Backrooms;
+namespace Witlesss.Backrooms.Helpers;
 
 public static class SystemHelpers
 {

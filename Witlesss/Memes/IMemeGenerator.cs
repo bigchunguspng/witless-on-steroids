@@ -3,7 +3,7 @@ using SixLabors.ImageSharp;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 
-namespace Witlesss.Services.Memes;
+namespace Witlesss.Memes;
 
 public interface IMemeGenerator<in T>
 {
@@ -28,7 +28,7 @@ public abstract class DynamicSizeMemeGenerator<T> : IMemeGenerator<T>
 
     public Task<string> GenerateVideoMeme(MemeFileRequest request, T text)
     {
-        var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath);
+        var size = FFMpegXD.GetPictureSize(request.SourcePath);
 
         SetUp(size);
 

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -50,7 +51,7 @@ namespace Witlesss.Commands.Editing
 
                 var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(await Memes.Crop(path, args), type);
+                SendResult(await FFMpegXD.Crop(path, args), type);
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Witlesss.Services;
+namespace Witlesss.Commands.Routing;
 
 public class CommandRegistry<T>
 {

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -13,7 +15,7 @@ namespace Witlesss.Commands.Editing
 
             var (path, type) = await Bot.Download(FileID, Chat);
 
-            var result = await Memes.RemoveBitrate(path, _value + 30); // 30 - 51
+            var result = await FFMpegXD.RemoveBitrate(path, _value + 30); // 30 - 51
             SendResult(result, type);
             Log($"{Title} >> DAMN [*]");
         }

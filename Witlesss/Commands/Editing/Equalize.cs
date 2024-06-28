@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -22,7 +23,7 @@ namespace Witlesss.Commands.Editing
 
                 var (path, type) = await Bot.Download(FileID, Chat);
 
-                SendResult(await Memes.EQ(path, [f, g, w]), type);
+                SendResult(await FFMpegXD.EQ(path, [f, g, w]), type);
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
         }

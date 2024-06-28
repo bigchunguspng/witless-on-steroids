@@ -1,9 +1,8 @@
 ﻿using SixLabors.ImageSharp;
-using Witlesss.MediaTools;
 
 namespace Witlesss.Backrooms;
 
-public static class SizeHelpers
+public static class SizeExtensions
 {
     public static Size GrowSize(this Size size, int minSemiperimeter = 400)
     {
@@ -41,17 +40,10 @@ public static class SizeHelpers
         return new Size(width, height.RoundInt());
     }
 
-    public static Size GetImageSize_FFmpeg(string path)
-    {
-        var v = F_Action.GetVideoStream(path)!;
-        return new Size(v.Width, v.Height);
-    }
-
     public static double AspectRatio(this Size size) => size.Width / (double)size.Height;
 
-    public static bool SizeIsMp4Invalid(int w, int h) => ((w | h) & 1) == 1;
+    //public static bool SizeIsMp4Invalid(int w, int h) => ((w | h) & 1) == 1;
 
-    public static Size ValidMp4Size(int w, int h) => new(w.ToEven(), h.ToEven());
     public static Size ValidMp4Size(this Size size) => new(size.Width.ToEven(), size.Height.ToEven());
 
     public static Size CeilingInt(this SizeF size) => new(size.Width.CeilingInt(), size.Height.CeilingInt());

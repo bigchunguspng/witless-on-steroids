@@ -1,4 +1,6 @@
-﻿namespace Witlesss.Commands
+﻿using Witlesss.Backrooms.Helpers;
+
+namespace Witlesss.Commands
 {
     public class SetQuality : SettingsCommand
     {

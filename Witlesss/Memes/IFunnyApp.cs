@@ -7,11 +7,12 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Types;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
+using Witlesss.Memes.Shared;
 
-namespace Witlesss.Services.Memes; // ReSharper disable InconsistentNaming
+namespace Witlesss.Memes; // ReSharper disable InconsistentNaming
 
 public partial class IFunnyApp : IMemeGenerator<string>
 {
@@ -85,7 +86,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     public Task<string> GenerateVideoMeme(MemeFileRequest request, string text)
     {
-        var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize();
+        var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize();
         SetUp(size);
         SetColor(PickColor ? request.GetVideoSnapshot() : null);
 

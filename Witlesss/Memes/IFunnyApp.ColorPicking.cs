@@ -3,7 +3,7 @@ using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace Witlesss.Services.Memes;
+namespace Witlesss.Memes;
 
 public partial class IFunnyApp
 {

@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.Backrooms.Helpers;
+using Witlesss.MediaTools;
 using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
@@ -185,7 +187,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             catch
             {
                 var meme = DownloadMeme(post, gif ? ".gif" : ".png");
-                var path = gif ? Memes.CompressGIF(meme).Result : Memes.Compress(meme).Result;
+                var path = gif ? FFMpegXD.CompressGIF(meme).Result : FFMpegXD.Compress(meme).Result;
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));

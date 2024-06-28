@@ -7,11 +7,12 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Types;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
+using Witlesss.Memes.Shared;
 
-namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
+namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 {
     public class DynamicDemotivatorDrawer : IMemeGenerator<string>
     {
@@ -105,7 +106,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
         {
             PassTextLength(text);
 
-            var size = SizeHelpers.GetImageSize_FFmpeg(request.SourcePath).GrowSize().ValidMp4Size();
+            var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
             SetUp(size);
             SetColor();
 
@@ -113,7 +114,7 @@ namespace Witlesss.Services.Memes // ReSharper disable InconsistentNaming
             using var frame = MakeFrame(funny);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
-            var full_size = SizeHelpers.GetImageSize_FFmpeg(frameAsFile).FitSize(720);
+            var full_size = FFMpegXD.GetPictureSize(frameAsFile).FitSize(720);
 
             return new F_Combine(request.SourcePath, frameAsFile)
                 .D300(request.GetCRF(), ImageSize, Location, full_size)

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Witlesss.Backrooms;
+namespace Witlesss.Backrooms.Helpers;
 
 /// <summary>
 /// Converts <see cref="int"/> into <see cref="string"/> and back using base 64 number system.

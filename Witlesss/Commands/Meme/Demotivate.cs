@@ -1,12 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
+using Witlesss.Memes;
 using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands.Meme
 {
-    public class Demotivate : MakeMemeCore<DgText>, ImageProcessor
+    public class Demotivate : MakeMemeCore<TextPair>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase);
 
@@ -29,7 +31,7 @@ namespace Witlesss.Commands.Meme
             DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);
         }
 
-        protected override DgText GetMemeText(string? text)
+        protected override TextPair GetMemeText(string? text)
         {
             string a, b = Baka.Generate();
             if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
@@ -40,7 +42,7 @@ namespace Witlesss.Commands.Meme
                 a = s[0];
                 if (s.Length > 1) b = s[1];
             }
-            return new DgText(a, b);
+            return new TextPair(a, b);
         }
 
         private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *", RegexOptions.IgnoreCase);
@@ -63,7 +65,7 @@ namespace Witlesss.Commands.Meme
             new DemotivatorDrawer(), new DemotivatorDrawer(1280)
         ];
 
-        protected override IMemeGenerator<DgText> MemeMaker => _drawers[(int) _mode];
+        protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int) _mode];
         protected override SerialTaskQueue Queue => _queue;
     }
 }

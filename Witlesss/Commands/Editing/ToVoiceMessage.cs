@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing;
 
@@ -12,7 +13,7 @@ public class ToVoiceMessage : FileEditingCommand
         string result;
         try
         {
-            result = await Memes.ToVoice(path);
+            result = await FFMpegXD.ToVoice(path);
         }
         catch
         {

@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.PixelFormats;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using SpectreColor = Spectre.Console.Color;
 
-namespace Witlesss.Backrooms.Types;
+namespace Witlesss.Memes.Shared;
 
 public struct CustomColorOption
 {

@@ -3,9 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 
-namespace Witlesss.Services
+namespace Witlesss.Memes.Shared
 {
     public class ExtraFonts // todo rename since it is the main font source now
     {

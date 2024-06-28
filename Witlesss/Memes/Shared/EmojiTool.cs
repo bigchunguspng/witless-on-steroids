@@ -10,8 +10,9 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Helpers;
 
-namespace Witlesss.Services
+namespace Witlesss.Memes.Shared
 {
     public class EmojiTool
     {

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
+using Witlesss.MediaTools;
 using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands.Editing
@@ -23,7 +25,7 @@ namespace Witlesss.Commands.Editing
 
             var (path, type) = await Bot.Download(FileID, Chat);
 
-            var result = await Memes.ChangeSpeed(path, _speed);
+            var result = await FFMpegXD.ChangeSpeed(path, _speed);
             SendResult(result, type);
             Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 

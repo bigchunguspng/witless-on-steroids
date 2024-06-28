@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
@@ -23,7 +24,7 @@ namespace Witlesss.Commands.Editing
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            var result = await Memes.Sus(path, new CutSpan(x.start, x.length));
+            var result = await FFMpegXD.Sus(path, new CutSpan(x.start, x.length));
             SendResult(result, type);
             Log($"{Title} >> SUS [>_<]");
         }

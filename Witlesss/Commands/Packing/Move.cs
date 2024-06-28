@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
+using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     public class Move : SettingsCommand
     {

@@ -1,4 +1,4 @@
-﻿namespace Witlesss.Commands
+﻿namespace Witlesss.Commands.Settings
 {
     public class ToggleStickers : SettingsCommand
     {

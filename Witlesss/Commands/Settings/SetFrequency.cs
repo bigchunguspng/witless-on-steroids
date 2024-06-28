@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using Witlesss.Backrooms.Helpers;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Settings
 {
     public class SetFrequency : SettingsCommand
     {

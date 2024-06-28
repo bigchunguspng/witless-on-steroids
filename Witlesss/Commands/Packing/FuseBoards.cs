@@ -9,7 +9,7 @@ using static System.StringSplitOptions;
 
 #pragma warning disable CS4014
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     public class FuseBoards : Fuse
     {

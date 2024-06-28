@@ -27,6 +27,9 @@ public static class TextMeasuring
         return -1;
     }
 
+    // advances - no position,  full size
+    // bounds   -    position, glyph size
+
     public static SizeF MeasureTextSize(string text, TextOptions options, out int linesFilled)
     {
         linesFilled = 0;

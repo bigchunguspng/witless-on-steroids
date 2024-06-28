@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 #pragma warning disable CS4014
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     public class FuseRedditComments : Fuse // todo uninherit it from fuse and make it witless async
     {

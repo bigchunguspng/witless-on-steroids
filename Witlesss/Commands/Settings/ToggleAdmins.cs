@@ -1,4 +1,4 @@
-﻿namespace Witlesss.Commands
+﻿namespace Witlesss.Commands.Settings
 {
     public class ToggleAdmins : WitlessSyncCommand
     {
@@ -15,23 +15,5 @@
                 Bot.SendMessage(Chat, string.Format(ADMINS_RESPONSE, Baka.AdminsOnly ? "только админы 😎" : "все участники 😚"));
             }
         }
-    }
-
-    /// <summary> Use this class for commands that <b>can be</b> restricted to admins only. </summary>
-    public abstract class SettingsCommand : WitlessSyncCommand
-    {
-        private bool /* when the */ SenderIsSus() // !😳
-        {
-            return Baka.AdminsOnly && !Message.SenderIsAdmin().Result;
-        }
-
-        protected override void Run()
-        {
-            if (SenderIsSus()) return;
-
-            RunAuthorized();
-        }
-
-        protected abstract void RunAuthorized();
     }
 }

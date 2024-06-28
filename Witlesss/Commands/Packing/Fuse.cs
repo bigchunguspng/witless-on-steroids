@@ -7,9 +7,10 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using Witlesss.Backrooms.Helpers;
+using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     // FUSE modes:
     

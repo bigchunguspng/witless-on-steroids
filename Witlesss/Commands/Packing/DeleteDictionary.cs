@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     public class DeleteDictionary : Move
     {

@@ -109,7 +109,13 @@ public static class TextMeasuring
         }
     }
 
-    public static List<WordMeasurement> MeasureTextSuperCool(string text, TextOptions options, bool cloneOptions = true)
+    /// <summary>
+    /// Replace all emoji in the text with "👌" before calling this method!
+    /// </summary>
+    public static List<TextChunk> MeasureTextSuperCool
+    (
+        string text, TextOptions options, float emojiSize, int start = 0, bool cloneOptions = true
+    )
     {
         if (string.IsNullOrEmpty(text))
             return [];
@@ -120,124 +126,88 @@ public static class TextMeasuring
             : options;
 
         if (text.Contains('\n'))
-            return MeasureTextSuperCoolMultiline(text, ops);
+            return MeasureTextSuperCoolMultiline(text, ops, emojiSize);
 
 
         TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
 
-        var list = new List<WordMeasurement>();
+        var list = new List<TextChunk>();
 
         var type = CharType.Text;
-        var start = 0;
         var length = 0;
         var width = 0F;
 
         foreach (var advance in advances)
         {
-            Append(advance, advance.Codepoint.Value == 0x20 ? CharType.Spaces : CharType.Text);
+            var chunkType = advance.Codepoint.Value switch
+            {
+                0x20    => CharType.Spaces,
+                0x1F44C => CharType.Emoji,
+                _       => CharType.Text
+            };
+            Append(advance, chunkType);
         }
 
-        list.Add(new WordMeasurement(start, length, width, type));
+        list.Add(new TextChunk(start, length, width, type));
 
         return list;
 
         // ==
 
-        void Append(GlyphBounds advance, CharType ofType)
+        void Append(GlyphBounds advance, CharType chunkType)
         {
-            if (type != ofType)
+            if (type != chunkType || type == CharType.Emoji)
             {
-                list.Add(new WordMeasurement(start, length, width, type));
-                type = ofType;
+                list.Add(new TextChunk(start, length, width, type));
+                type = chunkType;
                 start += length;
                 length = 0;
                 width = 0F;
             }
 
-            length++;
-            width += advance.Bounds.Width;
+            length += advance.Codepoint.Utf16SequenceLength;
+            width += chunkType == CharType.Emoji
+                ? emojiSize
+                : advance.Bounds.Width;
         }
     }
 
-    private static List<WordMeasurement> MeasureTextSuperCoolMultiline(string text, TextOptions options)
+    private static List<TextChunk> MeasureTextSuperCoolMultiline
+    (
+        string text, TextOptions options, float emojiSize
+    )
     {
-        var list = new List<WordMeasurement>();
+        var list = new List<TextChunk>();
         var lines = text.Split('\n');
-        foreach (var line in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            list.AddRange(MeasureTextSuperCool(line, options, cloneOptions: false));
-            var last = list.Last();
-            list.Add(new WordMeasurement(last.Start + last.Length, 1, 0F, CharType.LineBreak));
+            list.AddRange(MeasureTextSuperCool(lines[i], options, emojiSize, GetStart(), cloneOptions: false));
+            if (i + 1 < lines.Length)
+            {
+                list.Add(new TextChunk(GetStart(), 1, 0F, CharType.LineBreak));
+            }
         }
 
-        list.RemoveAt(list.Count - 1);
         return list;
+
+        int GetStart() => list.LastOrDefault().GetNextChunkStart();
     }
-
-    // it's here for the future...
-    /*public static List<TextMeasurement> GetTextGlyphBounds(string text, TextOptions options)
-    {
-        var lines = text.Split('\n');
-        return lines.Select(line => GetLineGlyphBounds(line, options)).ToList();
-    }
-
-    public static TextMeasurement GetLineGlyphBounds(string text, TextOptions options)
-    {
-        var ops = new TextOptions(options);
-        TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
-
-        var result = new List<WordMeasurement>();
-        var start = 0;
-        var width = 0F;
-        for (var i = 0; i <= advances.Length; i++)
-        {
-            if (i == advances.Length)
-            {
-                result.Add(new WordMeasurement(text.Substring(start), width));
-                break;
-            }
-
-            var advance = advances[i];
-            var index = advance.StringIndex;
-            if (text[index] == ' ')
-            {
-                var length = index - start;
-                result.Add(new WordMeasurement(text.Substring(start, length), width));
-                start = index + 1;
-                width = 0F;
-
-                result.Add(new WordMeasurement(text[index].ToString(), advance.Bounds.Width));
-            }
-            else
-            {
-                width += advance.Bounds.Width;
-            }
-        }
-
-        return new TextMeasurement(result, advances[0].Bounds.Height);
-    }
-
-    public class TextMeasurement(List<WordMeasurement> words, float height)
-    {
-        public float MaxHeight { get; } = height;
-        public List<WordMeasurement> Words { get; } = words;
-    }
-
-    public record WordMeasurement(string Word, float Width);*/
 }
 
 [DebuggerDisplay("{Start} + {Length} : {Width} of {Type}")]
-public readonly struct WordMeasurement(int start, int length, float width, CharType type)
+public readonly struct TextChunk(int start, int length, float width, CharType type)
 {
     public int    Start  { get; } = start;
     public int    Length { get; } = length;
     public float  Width  { get; } = width;
     public CharType Type { get; } = type;
+
+    public int GetNextChunkStart() => Start + Length;
 }
 
 public enum CharType
 {
-    Text,       // can't be broken
+    Text,       // can't be broken (unless it's hella long)
     Emoji,      // can   be broken
     Spaces,     // can be used as a line break
     LineBreak   // mandatory        line break

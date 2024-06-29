@@ -1,4 +1,5 @@
-﻿using SixLabors.Fonts;
+﻿using System.Numerics;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -11,6 +12,14 @@ public static class DrawingExtensions
         options.TextAlignment = TextAlignment.Start;
         options.HorizontalAlignment = HorizontalAlignment.Left;
         options.VerticalAlignment = VerticalAlignment.Top;
+
+        return options;
+    }
+
+    public static T WithoutWrapping<T>(this T options) where T : TextOptions
+    {
+        options.WrappingLength = -1;
+        options.Origin = Vector2.Zero;
 
         return options;
     }

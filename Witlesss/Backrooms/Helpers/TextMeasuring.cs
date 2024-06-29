@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -27,8 +30,8 @@ public static class TextMeasuring
         return -1;
     }
 
-    // advances - no position,  full size
     // bounds   -    position, glyph size
+    // advances - no position,  full size
 
     public static SizeF MeasureTextSize(string text, TextOptions options, out int linesFilled)
     {
@@ -105,6 +108,72 @@ public static class TextMeasuring
             return [];
         }
     }
+
+    public static List<WordMeasurement> MeasureTextSuperCool(string text, TextOptions options, bool cloneOptions = true)
+    {
+        if (string.IsNullOrEmpty(text))
+            return [];
+
+
+        var ops = cloneOptions 
+            ? new TextOptions(options).WithDefaultAlignment().WithoutWrapping() 
+            : options;
+
+        if (text.Contains('\n'))
+            return MeasureTextSuperCoolMultiline(text, ops);
+
+
+        TextMeasurer.TryMeasureCharacterAdvances(text, ops, out var advances);
+
+        var list = new List<WordMeasurement>();
+
+        var type = CharType.Text;
+        var start = 0;
+        var length = 0;
+        var width = 0F;
+
+        foreach (var advance in advances)
+        {
+            Append(advance, advance.Codepoint.Value == 0x20 ? CharType.Spaces : CharType.Text);
+        }
+
+        list.Add(new WordMeasurement(start, length, width, type));
+
+        return list;
+
+        // ==
+
+        void Append(GlyphBounds advance, CharType ofType)
+        {
+            if (type != ofType)
+            {
+                list.Add(new WordMeasurement(start, length, width, type));
+                type = ofType;
+                start += length;
+                length = 0;
+                width = 0F;
+            }
+
+            length++;
+            width += advance.Bounds.Width;
+        }
+    }
+
+    private static List<WordMeasurement> MeasureTextSuperCoolMultiline(string text, TextOptions options)
+    {
+        var list = new List<WordMeasurement>();
+        var lines = text.Split('\n');
+        foreach (var line in lines)
+        {
+            list.AddRange(MeasureTextSuperCool(line, options, cloneOptions: false));
+            var last = list.Last();
+            list.Add(new WordMeasurement(last.Start + last.Length, 1, 0F, CharType.LineBreak));
+        }
+
+        list.RemoveAt(list.Count - 1);
+        return list;
+    }
+
     // it's here for the future...
     /*public static List<TextMeasurement> GetTextGlyphBounds(string text, TextOptions options)
     {
@@ -155,4 +224,21 @@ public static class TextMeasuring
     }
 
     public record WordMeasurement(string Word, float Width);*/
+}
+
+[DebuggerDisplay("{Start} + {Length} : {Width} of {Type}")]
+public readonly struct WordMeasurement(int start, int length, float width, CharType type)
+{
+    public int    Start  { get; } = start;
+    public int    Length { get; } = length;
+    public float  Width  { get; } = width;
+    public CharType Type { get; } = type;
+}
+
+public enum CharType
+{
+    Text,       // can't be broken
+    Emoji,      // can   be broken
+    Spaces,     // can be used as a line break
+    LineBreak   // mandatory        line break
 }

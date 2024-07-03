@@ -39,11 +39,9 @@ public partial class IFunnyApp : IMemeGenerator<string>
     // SIZE
 
     private int _w, _h; // <-- of the image
-    private int _cardHeight, _fullHeight, _cropOffset, _textWidth;
+    private int _cardHeight, _fullHeight, _cropOffset;
     private float _marginLeft;
     private float _textOffset;
-    //private bool _extraHigh; // <-- watahell?
-    private SizeF _measure;
 
     private Point     Location => new(0, _cardHeight);
     private Rectangle Cropping => new(0, _cropOffset, _w, _h);
@@ -57,16 +55,15 @@ public partial class IFunnyApp : IMemeGenerator<string>
     private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
 
 
+    private void SetFontToDefault() => ResizeFont(GetStartingFontSize());
+
     private void ResizeFont(float size) => _font = FontFamily.CreateFont(size, FontStyle);
 
-    private float StartingFontSize()
+    private float GetStartingFontSize()
     {
         var multiplier = FontSizeMultiplier / 10F;
         return Math.Max(Math.Max(48, _cardHeight / 3.75F) * multiplier, MinFontSize) * ExtraFonts.GetSizeMultiplier();
     }
-
-    private void SetFontToDefault() => ResizeFont(StartingFontSize());
-    private void DecreaseFontSize() => ResizeFont(_font.Size * 0.8f);
 
 
     // LOGIC
@@ -130,7 +127,6 @@ public partial class IFunnyApp : IMemeGenerator<string>
         SetCardHeight(cardHeight);
 
         _marginLeft = 0.025F * _w;
-        _textWidth = _w; // todo make it 0.98 * _w
 
         SetFontToDefault();
     }
@@ -187,7 +183,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
         if (funny)
         {
             var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
-            var parameters = new EmojiTool.Options(TextColor, EmojiSize);
+            var parameters = new EmojiTool.Options(TextColor, GetEmojiSize());
             var textLayer = _emojer.DrawEmojiText(textA, options, parameters, out var linesActual);
 
             SetCardHeight(heightExpected * linesActual / linesExpected + _cardHeight - heightExpected);
@@ -211,17 +207,14 @@ public partial class IFunnyApp : IMemeGenerator<string>
         
         Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
     }
-    
-    private int InitialMargin(int h) => /*UseLeftAlignment && !_extraHigh ? _cardHeight - h : */(_cardHeight - h) / 2;
-    private int EmojiSize => (int)(_font.Size * GetLineSpacing());
 
     private string AdjustProportions(string text) // GetTextToDraw / MakeTextFitCard
     {
         // return: text split by \n in right places (if needed)
         // side effects: font size and card height changed
 
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), EmojiSize);
-        
+        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
+
         var lineHeight = _font.Size * GetLineSpacing();
         var textWidthLimit = 0.9F * _w;
 
@@ -233,6 +226,16 @@ public partial class IFunnyApp : IMemeGenerator<string>
             if (maxLineWidth > textWidthLimit)
             {
                 k = textWidthLimit / maxLineWidth;
+            }
+
+            if (_font.Size * k < MinFontSize)
+            {
+                k = MinFontSize / _font.Size;
+
+                var widthLimit = textWidthLimit / k;
+                TextMeasuring.DistributeText(textChunks, widthLimit);
+
+                text = textChunks.FillWith(text);
             }
 
             var textHeight = lineHeight * text.GetLineCount();
@@ -278,7 +281,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
             }
 
             TextMeasuring.DistributeText(textChunks, lineCount); // lineCount: 2+
-            var distributedText = textChunks.FillWith(text);
+            text = textChunks.FillWith(text);
 
             var maxLineWidth = textChunks.GetMaxLineWidth();
             if (maxLineWidth * k > textWidthLimit)
@@ -294,7 +297,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
             ResizeFont(_font.Size * k);
 
-            return distributedText;
+            return text;
         }
 
         void SetCardHeightLol(float textHeight, float k)
@@ -304,60 +307,6 @@ public partial class IFunnyApp : IMemeGenerator<string>
             var extra = Math.Max(_font.Size * k * k2, min);
             SetCardHeight((textHeight * k + extra).CeilingInt());
         }
-    }
-
-    private void AdjustProportionsOld(string text) // todo change the algorithm
-    {
-        // increase card height only if text font is too small
-
-        if (UseLeftAlignment)
-        {
-            _marginLeft = Math.Max(_w / 40F, 5);
-            _textWidth = _w - (int)(2 * _marginLeft);
-        }
-
-        MeasureText();
-        while (_measure.Height > _cardHeight || _measure.Width > _textWidth) // fixes "text is too big"
-        {
-            DecreaseFontSize();
-            MeasureText();
-            if (WrapText && _font.Size < MinFontSize)
-            {
-                ResizeFont(MinFontSize);
-                MeasureText();
-                SetCardExtraHeight(_measure.Height + 15);
-                
-                break;
-            }
-        }
-        
-        if (text.Count(c => c == '\n') > 2) // fixes "text is too small"
-        {
-            var ms = TextMeasuring.MeasureTextSize(text, GetDefaultTextOptions(), out _);
-            if (ms.Width < _w * 0.9)
-            {
-                var k = 0.9f * _w / ms.Width;
-                ResizeFont(_font.Size * k);
-                _measure = _measure * k;
-
-                if (_measure.Height > _cardHeight) SetCardExtraHeight(_measure.Height + (_w - _measure.Width) / 2);
-            }
-        }
-        
-        if (ThinCard && _measure.Height < 0.95 * _cardHeight)
-        {
-            var extraHeight = UltraThinCard ? _font.Size * 0.1F : Math.Max(_font.Size, 8);
-            SetCardExtraHeight(_measure.Height + extraHeight);
-        }
-
-        void MeasureText()
-        {
-            var options = GetDefaultTextOptions();
-            options.WrappingLength = WrapText ? _textWidth : -1;
-            _measure = TextMeasuring.MeasureTextSize(text, options, out _);
-        }
-
-        void SetCardExtraHeight(float x) => SetCardHeight((int)x);
     }
 
     private void AdjustTextPosition(string s)
@@ -385,14 +334,17 @@ public partial class IFunnyApp : IMemeGenerator<string>
             : HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
         Origin = GetTextOrigin(),
-        WrappingLength = _textWidth,
+        WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
         WordBreaking = WordBreaking.Standard,
         KerningMode = KerningMode.Standard,
         FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
 
+    private int GetEmojiSize() => (int)(_font.Size * GetLineSpacing());
+
     private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
+
     private PointF GetTextOrigin()
     {
         var x = UseLeftAlignment ? _marginLeft : _w / 2F;

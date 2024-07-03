@@ -216,6 +216,51 @@ public static class TextMeasuring
     }
 
     // todo break words with > 25 chars
+    /// <summary>
+    /// Suitable for distributing multi-line text.
+    /// </summary>
+    public static void DistributeText(LinkedList<TextChunk> chunks, float widthLimit)
+    {
+        var currentLineWidth = 0F;
+
+        var chunk = chunks.First!;
+        while (chunk.Next is not null)
+        {
+            var limit = currentLineWidth + chunk.Value.Width;
+            if (chunk.Value.Type == CharType.LineBreak)
+            {
+                currentLineWidth = 0F;
+            }
+            else if (limit >= widthLimit)
+            {
+                var lineBreak = new TextChunk(0, 0, 0F, CharType.LineBreak);
+
+                if (chunk.Value.Type == CharType.Spaces)
+                {
+                    chunk.Value = lineBreak;
+                    currentLineWidth = 0F;
+                }
+                else
+                {
+                    if (chunk.Previous?.Value.Type == CharType.Spaces)
+                        chunk.Previous.Value = lineBreak;
+                    else
+                        chunks.AddBefore(chunk, lineBreak);
+                    currentLineWidth = chunk.Value.Width;
+                }
+            }
+            else
+            {
+                currentLineWidth = limit;
+            }
+
+            chunk = chunk.Next;
+        }
+    }
+
+    /// <summary>
+    /// Suitable for distributing single line text.
+    /// </summary>
     public static void DistributeText(LinkedList<TextChunk> chunks, int lines)
     {
         var widthTotal = chunks.Sum(x => x.Width);
@@ -259,6 +304,7 @@ public static class TextMeasuring
 
                 linesFilled++;
 
+                // fix "too many text on the last line"
                 if (lines > 2 && linesFilled == lines - 1)
                 {
                     averageLineWidth = 0F;

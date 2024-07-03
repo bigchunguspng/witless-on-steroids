@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -184,16 +183,15 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     private Image DrawTextFunny(string text, MatchCollection emoji)
     {
-        var pngsRaw = EmojiTool.GetEmojiPngs(emoji);
-        var pngs = new Queue<string>(pngsRaw.SelectMany(x => x));
+        var pngs = EmojiTool.GetEmojiPngs(emoji);
 
-        var textR = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngsRaw));
+        var textR = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
         AdjustTextPosition(textR);
 
         var options = GetDefaultTextOptions();
 
         var parameters = new EmojiTool.Options(TextColor, GetEmojiSize());
-        var textLayer = _emojer.DrawEmojiText(textR, options, parameters, pngs, out _);
+        var textLayer = _emojer.DrawEmojiText(textR, options, parameters, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
         image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));

@@ -232,9 +232,9 @@ namespace Witlesss.Memes.Shared
             return text;
         }
 
-        public static List<List<string>> GetEmojiPngs(IList<Match> matches)
+        public static EmojiPngList GetEmojiPngs(IList<Match> matches)
         {
-            var pngs = new List<List<string>>(matches.Count);
+            var pngs = new EmojiPngList(matches.Count);
 
             for (var n = 0; n < matches.Count; n++)
             {
@@ -293,5 +293,10 @@ namespace Witlesss.Memes.Shared
 
             return pngs;
         }
+    }
+
+    public class EmojiPngList(int count) : List<List<string>>(count)
+    {
+        public Queue<string> AsQueue() => new(this.SelectMany(x => x));
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -135,7 +134,7 @@ namespace Witlesss.Memes
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count > 0)
             {
-                var pngs = new Queue<string>(EmojiTool.GetEmojiPngs(emoji).SelectMany(x => x));
+                var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var options = new RichTextOptions(o.Options)
                 {
                     HorizontalAlignment = HorizontalAlignment.Center

@@ -129,7 +129,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
         SetCardHeight(cardHeight);
 
-        _marginLeft = 0;
+        _marginLeft = 0.025F * _w;
         _textWidth = _w; // todo make it 0.98 * _w
 
         SetFontToDefault();
@@ -223,16 +223,16 @@ public partial class IFunnyApp : IMemeGenerator<string>
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), EmojiSize);
         
         var lineHeight = _font.Size * GetLineSpacing();
-        var textWidth = 0.9F * _w;
+        var textWidthLimit = 0.9F * _w;
 
         if (text.Contains('\n') || !WrapText)
         {
             var k = 1F;
 
             var maxLineWidth = textChunks.GetMaxLineWidth();
-            if (maxLineWidth > textWidth)
+            if (maxLineWidth > textWidthLimit)
             {
-                k = textWidth / maxLineWidth;
+                k = textWidthLimit / maxLineWidth;
             }
 
             var textHeight = lineHeight * text.GetLineCount();
@@ -247,8 +247,8 @@ public partial class IFunnyApp : IMemeGenerator<string>
         }
         else
         {
-            var width = textChunks.Sum(x => x.Width);
-            if (width < textWidth)
+            var textWidth = textChunks.Sum(x => x.Width);
+            if (textWidth < textWidthLimit)
             {
                 if (ThinCard) SetCardHeightLol(lineHeight, 1F);
                 return text;
@@ -257,17 +257,22 @@ public partial class IFunnyApp : IMemeGenerator<string>
             var k = 1F;
 
             var maxWordWidth = textChunks.Where(x => x is { Type: CharType.Text, Length: <= 25 }).Max(x => x.Width);
-            if (maxWordWidth > textWidth)
+            if (maxWordWidth > textWidthLimit)
             {
-                k = textWidth / maxWordWidth;
+                k = textWidthLimit / maxWordWidth;
             }
+
+            var fontRatio = MinFontSize / _font.Size;
+            var lineH = fontRatio * lineHeight;
+            var lineC = fontRatio * textWidth / textWidthLimit;
+            var minRatio = textWidthLimit / (lineH * lineC);
 
             var lineCount = 2;
             while (true)
             {
-                var textRatio = (width / lineCount) / (lineHeight * lineCount);
-                var textTargetRatio = textWidth / (_cardHeight * Math.Min(lineCount, 4) / 6F);
-                if (textRatio < textTargetRatio) break;
+                var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
+                var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
+                if (textRatio < targetRatio) break;
 
                 lineCount++;
             }
@@ -276,9 +281,9 @@ public partial class IFunnyApp : IMemeGenerator<string>
             var distributedText = textChunks.FillWith(text);
 
             var maxLineWidth = textChunks.GetMaxLineWidth();
-            if (maxLineWidth * k > textWidth)
+            if (maxLineWidth * k > textWidthLimit)
             {
-                k = textWidth / maxLineWidth;
+                k = textWidthLimit / maxLineWidth;
             }
 
             var textHeight = lineHeight * lineCount;

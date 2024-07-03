@@ -15,4 +15,6 @@ public static class MathExtensions
     public static int ToEven(this int x) => x & ~1;
 
     public static float CombineRound(this float a, float b) => MathF.Round(a + b, 1);
+
+    public static float Gap(this int outer, int inner) => (outer - inner) / 2F;
 }

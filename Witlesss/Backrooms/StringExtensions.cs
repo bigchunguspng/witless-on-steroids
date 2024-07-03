@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Witlesss.Backrooms;
@@ -27,6 +28,8 @@ public static class StringExtensions
     public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
 
     public static bool IsNullOrEmpty(this string? text) => string.IsNullOrEmpty(text);
+
+    public static int GetLineCount(this string text) => 1 + text.Count(x => x == '\n');
 
     public static string ReplaceExtension(this string path, string newExtension)
     {

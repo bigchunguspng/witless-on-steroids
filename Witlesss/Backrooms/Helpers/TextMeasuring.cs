@@ -197,6 +197,25 @@ public static class TextMeasuring
         int GetStart() => list.LastOrDefault().GetNextChunkStart();
     }
 
+    public static float GetMaxLineWidth(this LinkedList<TextChunk> chunks)
+    {
+        var max = 0F;
+        var currentLineWidth = 0F;
+        foreach (var chunk in chunks)
+        {
+            if (chunk.Type == CharType.LineBreak)
+            {
+                max = Math.Max(max, currentLineWidth);
+                currentLineWidth = 0F;
+            }
+            else
+                currentLineWidth += chunk.Width;
+        }
+
+        return Math.Max(max, currentLineWidth);
+    }
+
+    // todo break words with > 25 chars
     public static void DistributeText(LinkedList<TextChunk> chunks, int lines)
     {
         var widthTotal = chunks.Sum(x => x.Width);

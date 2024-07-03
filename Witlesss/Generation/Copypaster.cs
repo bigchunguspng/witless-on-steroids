@@ -28,7 +28,6 @@ namespace Witlesss.Generation
         {
             eaten = null;
 
-            if (string.IsNullOrWhiteSpace(text)) return false; // todo remove since it impossible on telegram
             if (_skip.IsMatch(text)) return false;
 
             var lines = TokenizeMultiline(text);

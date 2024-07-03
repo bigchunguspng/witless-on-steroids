@@ -14,7 +14,7 @@ namespace Witlesss.Commands.Meme
         protected override string Log_STICK(int x) => $"WHENTHE [{(x == 1 ? "$" : x)}] STICKER";
 
         protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
-        protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize}.mp4";
+        protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSizeRounded}.mp4";
 
         protected override string Command { get; } = "/top";
         protected override string Suffix  { get; } = "-Top";
@@ -37,7 +37,7 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BlurImage        =  CheckAndCut(Request, _blur   );
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
 
-            IFunnyApp.CropPercent        = GetInt(Request, _crop,  100);
+            IFunnyApp.CropPercent        = GetInt(Request, _crop,    0);
             IFunnyApp.MinFontSize        = GetInt(Request, _fontMS, 10);
             IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 10);
 

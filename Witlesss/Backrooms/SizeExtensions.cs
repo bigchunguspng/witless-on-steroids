@@ -23,6 +23,26 @@ public static class SizeExtensions
         return tooBig ? size.Normalize(max) : size;
     }
 
+    public static Size FitSize(this Size size, Size max)
+    {
+        if (size.Width <= max.Width && size.Height <= max.Height) return size;
+
+        var ratio = size.AspectRatio();
+        return ratio > max.AspectRatio()
+            ? new Size(max.Width, (int)(max.Width / ratio))
+            : new Size((int)(max.Height * ratio), max.Height);
+    }
+
+    /*
+    public static Size Normalize(this Size size, Size limit, bool reduce = true)
+    {
+        (double w, double h) = limit;
+        var wide = size.Width > size.Height;
+        return reduce == wide
+            ? new Size(limit.Width, (int)(size.Height / (size.Width / lim)))
+            : new Size((int)(size.Width / (size.Height / lim)), limit);
+    }*/
+
     public static Size Normalize(this Size size, int limit = 512, bool reduce = true)
     {
         double lim = limit;

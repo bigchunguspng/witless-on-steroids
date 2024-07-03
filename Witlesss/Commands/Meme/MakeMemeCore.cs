@@ -144,7 +144,13 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected virtual Task<string> MakeMemeImage(MemeFileRequest request, T text)
         {
-            return Queue.Enqueue(() => MemeMaker.GenerateMeme(request, text));
+            return Queue.Enqueue(() =>
+            {
+                var sw = Helpers.GetStartedStopwatch();
+                var result = MemeMaker.GenerateMeme(request, text);
+                sw.Log(Command);
+                return result;
+            });
         }
 
         protected virtual async Task<string> MakeMemeStick(MemeFileRequest request, T text)

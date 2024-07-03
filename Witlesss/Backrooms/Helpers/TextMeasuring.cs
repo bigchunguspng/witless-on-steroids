@@ -268,8 +268,8 @@ public static class TextMeasuring
         var currentLineWidth = 0F;
         var linesFilled = 1;
 
-        var chunk = chunks.First!;
-        while (linesFilled < lines && chunk.Next is not null)
+        var chunk = chunks.First;
+        while (linesFilled < lines && chunk is not null)
         {
             var limit = currentLineWidth + chunk.Value.Width;
             if (limit >= averageLineWidth)
@@ -294,7 +294,7 @@ public static class TextMeasuring
                     }
                     else
                     {
-                        if (chunk.Next.Value.Type == CharType.Spaces)
+                        if (chunk.Next?.Value.Type == CharType.Spaces)
                             chunk.Next.Value = lineBreak;
                         else
                             chunks.AddAfter(chunk, lineBreak);

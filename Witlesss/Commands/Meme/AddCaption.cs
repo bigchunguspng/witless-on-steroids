@@ -38,8 +38,8 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
 
             IFunnyApp.CropPercent        = GetInt(Request, _crop,    0);
-            IFunnyApp.MinFontSize        = GetInt(Request, _fontMS, 10);
-            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 10);
+            IFunnyApp.MinFontSize        = GetInt(Request, _fontMS, 10, group: 2); // 10 px
+            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 10);           // 10 = 100%
 
             IFunnyApp.ExtraFonts.CheckAndCut(Request);
         }
@@ -53,6 +53,7 @@ namespace Witlesss.Commands.Meme
             return caption;
         }
 
+        private static readonly Regex _caps    = new(@"^\/top\S*(up)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _left    = new(@"^\/top\S*(la)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _blur    = new(@"^\/top\S*(blur)\S*", RegexOptions.IgnoreCase);
         private static readonly Regex _thin    = new(@"^\/top\S*m(m)\S*",   RegexOptions.IgnoreCase);
@@ -61,9 +62,9 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _colorFC = new(@"^\/top\S*(fc)\S*",   RegexOptions.IgnoreCase);
         private static readonly Regex _blackBG = new(@"^\/top\S*(bbg)\S*",  RegexOptions.IgnoreCase);
-        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",   RegexOptions.IgnoreCase);
-        private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",    RegexOptions.IgnoreCase);
-        private static readonly Regex _fontMS  = new(@"^\/top\S*?(\d{1,3})(""min)\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",     RegexOptions.IgnoreCase);
+        private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",      RegexOptions.IgnoreCase);
+        private static readonly Regex _fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
 
         // LOGIC
 

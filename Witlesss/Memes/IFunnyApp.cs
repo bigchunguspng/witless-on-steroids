@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -163,50 +164,50 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     private Image DrawText(string text)
     {
-        // text with random emojis
-        // all emojis replaced with 👌 for proper measurement
-        // text is broken with several \n's to be drawn like that
-        // all emojis replaced back | text is built again with og emojis:
-        
-        // text🔥 -> emoji matches -> text👌 -> chunks -> text\n👌 -> emoji matches 2 -> text\n🔥
-
         var emoji = EmojiRegex.Matches(text);
-        var funny = emoji.Count > 0;
-        var textM = funny ? EmojiTool.ReplaceEmoji(text, "👌") : text;
+        return emoji.Count == 0 
+            ? DrawTextSimple(text) 
+            : DrawTextFunny(text, emoji);
+    }
 
-        var textA = MakeTextFitCard(textM);
-        AdjustTextPosition(textA);
+    private Image DrawTextSimple(string text)
+    {
+        var textR = MakeTextFitCard(text);
+        AdjustTextPosition(textR);
 
-        Image<Rgba32> image;
+        Console.WriteLine(FontSizeRounded);
+
+        var image = CreateBackgroundCard();
+        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), textR, TextColor, pen: null));
+        return image;
+    }
+
+    private Image DrawTextFunny(string text, MatchCollection emoji)
+    {
+        var pngsRaw = EmojiTool.GetEmojiPngs(emoji);
+        var pngs = new Queue<string>(pngsRaw.SelectMany(x => x));
+
+        var textR = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngsRaw));
+        AdjustTextPosition(textR);
 
         var options = GetDefaultTextOptions();
-        if (funny)
-        {
-            var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
-            var parameters = new EmojiTool.Options(TextColor, GetEmojiSize());
-            var textLayer = _emojer.DrawEmojiText(textA, options, parameters, out var linesActual);
 
-            SetCardHeight(heightExpected * linesActual / linesExpected + _cardHeight - heightExpected);
+        var parameters = new EmojiTool.Options(TextColor, GetEmojiSize());
+        var textLayer = _emojer.DrawEmojiText(textR, options, parameters, pngs, out _);
 
-            var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
-            var y = _cardHeight.Gap(textLayer.Height) + _textOffset;
-            var point = new Point(x.RoundInt(), y.RoundInt());
-
-            image = CreateBackgroundCard();
-            image.Mutate(ctx => ctx.DrawImage(textLayer, point));
-        }
-        else
-        {
-            Console.WriteLine(FontSizeRounded);
-
-            image = CreateBackgroundCard();
-            image.Mutate(x => x.DrawText(options, textA, TextColor, pen: null));
-        }
-
+        var image = CreateBackgroundCard();
+        image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
         return image;
-        
-        Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
     }
+
+    private Point GetOriginFunny(Size textLayer)
+    {
+        var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
+        var y = _cardHeight.Gap(textLayer.Height) + _textOffset;
+        return new Point(x.RoundInt(), y.RoundInt());
+    }
+
+    private Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
 
     /// <summary>
     /// Does the following things if there is a need:

@@ -31,13 +31,16 @@ namespace Witlesss.Memes.Shared
 
         public record Options(SolidBrush Color, float EmojiSize, int MaxLines = -1);
 
-        public Image<Rgba32> DrawEmojiText(string text, RichTextOptions options, Options parameters, out int linesFilled)
+        public Image<Rgba32> DrawEmojiText
+        (
+            string text, RichTextOptions options, Options parameters, Queue<string> pngs, out int linesFilled
+        )
         {
             // RENDER EACH PARAGRAPH
 
             var paragraphs = text.Split('\n');
             var lines = paragraphs
-                .Select(paragraph => DrawEmojiTextParagraph(paragraph, options, parameters))
+                .Select(paragraph => DrawEmojiTextParagraph(paragraph, options, parameters, pngs))
                 .SelectMany(x => x).ToList();
             linesFilled = lines.Count;
 
@@ -66,7 +69,10 @@ namespace Witlesss.Memes.Shared
             return canvas;
         }
 
-        private List<Image<Rgba32>> DrawEmojiTextParagraph(string paragraph, RichTextOptions options, Options parameters)
+        private List<Image<Rgba32>> DrawEmojiTextParagraph
+        (
+            string paragraph, RichTextOptions options, Options parameters, Queue<string> pngs
+        )
         {
             var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
             var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
@@ -100,7 +106,7 @@ namespace Witlesss.Memes.Shared
                 var size = new Size(side, side);
                 var decoder = new DecoderOptions() { TargetSize = size }; // todo quality?
 
-                foreach (var emoji in sequence)
+                foreach (var _ in sequence)
                 {
                     if (side + x > width)
                     {
@@ -108,6 +114,7 @@ namespace Witlesss.Memes.Shared
                         else     NewLine();
                     }
 
+                    var emoji = pngs.Dequeue();
                     if (emoji.EndsWith(".png"))
                     {
                         var image = Image.Load<Rgba32>(decoder, emoji);
@@ -206,25 +213,28 @@ namespace Witlesss.Memes.Shared
         }
 
         public static string RemoveEmoji (string text) => ReplaceEmoji(text, "");
-        public static string ReplaceEmoji(string text, string nn)
+        public static string ReplaceEmoji
+        (
+            string text, string ok, MatchCollection? matches = null, List<List<string>>? pngs = null
+        )
         {
-            var matches = EmojiRegex.Matches(text);
+            matches ??= EmojiRegex.Matches(text);
             if (matches.Count == 0) return text;
 
-            var emoji = GetEmojiPngs(matches);
+            pngs ??= GetEmojiPngs(matches);
             var m = 0;
-            foreach (var cluster in emoji)
+            foreach (var cluster in pngs)
             {
-                var replaced = cluster.Select(xd => xd.EndsWith(".png") ? nn : xd);
+                var replaced = cluster.Select(xd => xd.EndsWith(".png") ? ok : xd);
                 text = text.Replace(matches[m++].Value, string.Join("", replaced));
             }
 
             return text;
         }
 
-        private static List<List<string>> GetEmojiPngs(IList<Match> matches)
+        public static List<List<string>> GetEmojiPngs(IList<Match> matches)
         {
-            var emoji = new List<List<string>>(matches.Count);
+            var pngs = new List<List<string>>(matches.Count);
 
             for (var n = 0; n < matches.Count; n++)
             {
@@ -237,13 +247,13 @@ namespace Witlesss.Memes.Shared
                     cluster.Add(c);
                 }
 
-                emoji.Add(new List<string>(cluster.Count));
+                pngs.Add(new List<string>(cluster.Count));
 
                 for (var i = 0; i < cluster.Count; i++)
                 {
                     var j = i;
                     var name = cluster[i];
-                    string file = null;
+                    string? file = null;
                     bool repeat;
                     do
                     {
@@ -265,7 +275,7 @@ namespace Witlesss.Memes.Shared
 
                     if (file != null)
                     {
-                        emoji[n].Add(file);
+                        pngs[n].Add(file);
                         var s = Path.GetFileNameWithoutExtension(file);
                         var split = s.Split('-');
                         for (var k = 1; k < split.Length && i + 1 < cluster.Count; k++)
@@ -276,12 +286,12 @@ namespace Witlesss.Memes.Shared
                     else
                     {
                         var character = char.ConvertFromUtf32(int.Parse(name, NumberStyles.HexNumber));
-                        if (Regex.IsMatch(character, @"[\u231a-\u303d]")) emoji[n].Add(character);
+                        if (Regex.IsMatch(character, @"[\u231a-\u303d]")) pngs[n].Add(character);
                     }
                 }
             }
 
-            return emoji;
+            return pngs;
         }
     }
 }

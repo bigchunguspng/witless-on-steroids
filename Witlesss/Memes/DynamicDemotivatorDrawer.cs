@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
@@ -192,9 +193,10 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             var options = GetDefaultTextOptions(area.Width, area.Height);
             if (funny)
             {
+                var pngs = new Queue<string>(EmojiTool.GetEmojiPngs(emoji).SelectMany(x => x));
                 var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
                 var parameters = new EmojiTool.Options(TextColor, EmojiSize);
-                var textLayer = _emojer.DrawEmojiText(text, options, parameters, out var linesActual);
+                var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs, out var linesActual);
 
                 txt_h = txt_h + (heightExpected * (linesActual / (float)linesExpected - 1)).RoundInt();
                 AdjustTotalSize();

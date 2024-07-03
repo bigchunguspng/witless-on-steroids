@@ -219,7 +219,7 @@ public static class TextMeasuring
     /// <summary>
     /// Suitable for distributing multi-line text.
     /// </summary>
-    public static void DistributeText(LinkedList<TextChunk> chunks, float widthLimit)
+    public static void RedistributeText(LinkedList<TextChunk> chunks, float widthLimit)
     {
         var currentLineWidth = 0F;
 
@@ -261,7 +261,7 @@ public static class TextMeasuring
     /// <summary>
     /// Suitable for distributing single line text.
     /// </summary>
-    public static void DistributeText(LinkedList<TextChunk> chunks, int lines)
+    public static void RedistributeText(LinkedList<TextChunk> chunks, int lines)
     {
         var widthTotal = chunks.Sum(x => x.Width);
         var averageLineWidth = widthTotal / lines;
@@ -329,7 +329,7 @@ public static class TextMeasuring
 
     public static string FillWith(this LinkedList<TextChunk> chunks, string text)
     {
-        var sb = new StringBuilder();
+        var sb = new StringBuilder((text.Length * 1.05F).RoundInt());
         foreach (var chunk in chunks)
         {
             var n = chunk.Type == CharType.LineBreak;

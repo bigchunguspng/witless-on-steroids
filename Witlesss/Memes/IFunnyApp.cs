@@ -174,7 +174,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
         var funny = emoji.Count > 0;
         var textM = funny ? EmojiTool.ReplaceEmoji(text, "👌") : text;
 
-        var textA = AdjustProportions(textM);
+        var textA = MakeTextFitCard(textM);
         AdjustTextPosition(textA);
 
         Image<Rgba32> image;
@@ -208,45 +208,36 @@ public partial class IFunnyApp : IMemeGenerator<string>
         Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
     }
 
-    private string AdjustProportions(string text) // GetTextToDraw / MakeTextFitCard
+    /// <summary>
+    /// Does the following things if there is a need:
+    /// <li>Changes font size and card height.</li>
+    /// <li>Redistributes the text.</li>
+    /// </summary>
+    private string MakeTextFitCard(string text)
     {
-        // return: text split by \n in right places (if needed)
-        // side effects: font size and card height changed
-
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
         var lineHeight = _font.Size * GetLineSpacing();
         var textWidthLimit = 0.9F * _w;
 
+        var k = 1F;
+        float textHeight;
+        var redistributed = false;
+
         if (text.Contains('\n') || !WrapText)
         {
-            var k = 1F;
-
-            var maxLineWidth = textChunks.GetMaxLineWidth();
-            if (maxLineWidth > textWidthLimit)
-            {
-                k = textWidthLimit / maxLineWidth;
-            }
+            EnsureLongestLineFits();
 
             if (_font.Size * k < MinFontSize)
             {
                 k = MinFontSize / _font.Size;
 
                 var widthLimit = textWidthLimit / k;
-                TextMeasuring.DistributeText(textChunks, widthLimit);
-
-                text = textChunks.FillWith(text);
+                TextMeasuring.RedistributeText(textChunks, widthLimit);
+                redistributed = true;
             }
 
-            var textHeight = lineHeight * text.GetLineCount();
-            if (textHeight * k > _cardHeight || ThinCard)
-            {
-                SetCardHeightLol(textHeight, k);
-            }
-
-            ResizeFont(_font.Size * k);
-
-            return text;
+            textHeight = lineHeight * text.GetLineCount();
         }
         else
         {
@@ -254,24 +245,15 @@ public partial class IFunnyApp : IMemeGenerator<string>
             if (textWidth < textWidthLimit)
             {
                 if (ThinCard) SetCardHeightLol(lineHeight, 1F);
-                return text;
+                return text; // OK - don't change anything!
             }
-
-            var k = 1F;
 
             var maxWordWidth = textChunks.Where(x => x is { Type: CharType.Text, Length: <= 25 }).Max(x => x.Width);
-            if (maxWordWidth > textWidthLimit)
-            {
-                k = textWidthLimit / maxWordWidth;
-            }
+            if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
 
-            var fontRatio = MinFontSize / _font.Size;
-            var lineH = fontRatio * lineHeight;
-            var lineC = fontRatio * textWidth / textWidthLimit;
-            var minRatio = textWidthLimit / (lineH * lineC);
-
+            var minRatio = GetMinTextRatio(textWidth);
             var lineCount = 2;
-            while (true)
+            while (true) // calculate line count
             {
                 var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
                 var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
@@ -280,33 +262,50 @@ public partial class IFunnyApp : IMemeGenerator<string>
                 lineCount++;
             }
 
-            TextMeasuring.DistributeText(textChunks, lineCount); // lineCount: 2+
-            text = textChunks.FillWith(text);
+            TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
+            redistributed = true;
 
+            EnsureLongestLineFits();
+
+            textHeight = lineHeight * lineCount;
+        }
+
+        if (ThinCard || textHeight * k > _cardHeight)
+        {
+            SetCardHeightLol(textHeight, k);
+        }
+
+        ResizeFont(_font.Size * k);
+
+        return redistributed ? textChunks.FillWith(text) : text;
+
+        //
+
+        void EnsureLongestLineFits()
+        {
             var maxLineWidth = textChunks.GetMaxLineWidth();
             if (maxLineWidth * k > textWidthLimit)
             {
                 k = textWidthLimit / maxLineWidth;
             }
-
-            var textHeight = lineHeight * lineCount;
-            if (textHeight * k > _cardHeight || ThinCard)
-            {
-                SetCardHeightLol(textHeight, k);
-            }
-
-            ResizeFont(_font.Size * k);
-
-            return text;
         }
 
-        void SetCardHeightLol(float textHeight, float k)
+        float GetMinTextRatio(float textWidth)
         {
-            var k2 = UltraThinCard ? 0.1F : 1F;
-            var min = UltraThinCard ? 8 : 16;
-            var extra = Math.Max(_font.Size * k * k2, min);
-            SetCardHeight((textHeight * k + extra).CeilingInt());
+            var fontRatio = MinFontSize / _font.Size;
+            var lineHeightK = fontRatio * lineHeight;
+            var textWidthK = fontRatio * textWidth;
+            var lineCountK = textWidthK / textWidthLimit;
+            return textWidthLimit / (lineHeightK * lineCountK);
         }
+    }
+
+    private void SetCardHeightLol(float textHeight, float k)
+    {
+        var k2 = UltraThinCard ? 0.1F : 1F;
+        var min = UltraThinCard ? 8 : 16;
+        var extra = Math.Max(_font.Size * k * k2, min);
+        SetCardHeight((textHeight * k + extra).CeilingInt());
     }
 
     private void AdjustTextPosition(string s)

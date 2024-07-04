@@ -45,7 +45,7 @@ namespace Witlesss.Commands.Meme
             return new TextPair(a, b);
         }
 
-        private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *", RegexOptions.IgnoreCase);
+        private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *");
 
         public Demotivate SetMode(DgMode mode)
         {

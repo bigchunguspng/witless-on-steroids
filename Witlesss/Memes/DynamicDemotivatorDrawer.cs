@@ -19,7 +19,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         // OPTIONS
 
         public static CustomColorOption CustomColorOption;
-        public static bool CropEdges;
+        public static bool CropEdges, WrapText;
 
         // SIZE
 

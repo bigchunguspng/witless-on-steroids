@@ -17,4 +17,6 @@ public static class MathExtensions
     public static float CombineRound(this float a, float b) => MathF.Round(a + b, 1);
 
     public static float Gap(this int outer, int inner) => (outer - inner) / 2F;
+
+    public static int Clamp(this int x, int min, int max) => Math.Clamp(x, min, max);
 }

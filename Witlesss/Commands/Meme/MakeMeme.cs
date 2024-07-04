@@ -29,18 +29,20 @@ namespace Witlesss.Commands.Meme
         protected override void ParseOptions()
         {
             MemeGenerator.CustomColorOption.CheckAndCut(Request);
-            MemeGenerator.ExtraFonts.CheckAndCut(Request);
 
-            MemeGenerator.FontMultiplier =            GetInt(Request, _fontSM, 10);
-            MemeGenerator.ShadowOpacity  = Math.Clamp(GetInt(Request, _shadow, 100), 0, 100);
-            MemeGenerator.WrapText       =      !CheckAndCut(Request, _nowrap);
-            MemeGenerator.ColorText      =       CheckAndCut(Request, _colorText);
+            MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 10);
+            MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);
+
+            MemeGenerator.WrapText  = !CheckAndCut(Request, _nowrap);
+            MemeGenerator.ColorText =  CheckAndCut(Request, _colorText);
+
+            MemeGenerator.ExtraFonts.CheckAndCut(Request);
         }
 
         protected override TextPair GetMemeText(string? text)
         {
             var generate = text.IsNullOrEmpty();
-            var capitalize = Check(Request, _caps) && (generate || _caps.IsMatch(Request.Command));
+            var capitalize = CheckCaps(Request, _caps, generate);
 
             var add_bottom_text  = Check(Request,  _add_bottom);
             var only_bottom_text = Check(Request, _only_bottom);
@@ -86,14 +88,12 @@ namespace Witlesss.Commands.Meme
             string AdjustCase(string s) => capitalize ? s.ToLetterCase(LetterCaseMode.Upper) : s;
         }
 
-        private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex        _caps = new(@"^\/meme\S*(u)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _nowrap = new(@"^\/meme\S*(w)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.IgnoreCase);
+        private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*");
+        private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*");
+        private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*");
+        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*");
+        private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
+        private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");
 
         // LOGIC
 

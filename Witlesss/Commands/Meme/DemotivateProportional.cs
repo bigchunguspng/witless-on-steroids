@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Memes;
+using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
@@ -27,24 +27,24 @@ namespace Witlesss.Commands.Meme
         protected override void ParseOptions()
         {
             DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request);
+
+            DynamicDemotivatorDrawer.WrapText  = !CheckAndCut(Request, _nowrap);
+            DynamicDemotivatorDrawer.CropEdges =  CheckAndCut(Request, _crop);
+
             DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
-            DynamicDemotivatorDrawer.CropEdges = OptionsParsing.CheckAndCut(Request, _crop);
         }
 
         protected override string GetMemeText(string? text)
         {
-            var matchCaps = OptionsParsing.Check(Request, _caps);
+            var generate = string.IsNullOrEmpty(text);
+            var capitalize = CheckCaps(Request, _caps, generate);
 
-            var gen = string.IsNullOrEmpty(text);
-            var caps = matchCaps && (gen || _caps.IsMatch(Request.Command)); // command, not chat defaults
+            var caption = generate ? Baka.Generate() : text!;
 
-            var txt = gen ? Baka.Generate() : text!;
-
-            return caps ? txt.ToLetterCase(LetterCaseMode.Upper) : txt;
+            return capitalize ? caption.ToLetterCase(LetterCaseMode.Upper) : caption;
         }
 
-        private static readonly Regex _crop = new(@"^\/dp\S*cp\S*", RegexOptions.IgnoreCase);
-        private static readonly Regex _caps = new(@"^\/dp\S*up\S*", RegexOptions.IgnoreCase);
+        private static readonly Regex _crop = new(@"^\/dp\S*(cp)\S*");
 
         // LOGIC
 

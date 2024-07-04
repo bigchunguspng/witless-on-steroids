@@ -16,7 +16,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
     {
         protected MemeRequest Request = default!;
 
-        protected abstract Regex _cmd { get; }
+        protected abstract Regex _cmd { get; } // todo
 
         protected abstract string Log_PHOTO ( int x);
         protected abstract string Log_STICK ( int x);
@@ -228,8 +228,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
         protected static readonly char[] split_chars = [' ', '\n'];
-        
-        protected static readonly Regex _repeat = new(@"[2-9]", RegexOptions.IgnoreCase);
+
+        protected static readonly Regex _repeat = new(@"[2-9]");
+        protected static readonly Regex   _caps = new(@"\S*(up)\S*");
+        protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
 
         protected const string OPTIONS = "ℹ️ Список опций: ";
     }

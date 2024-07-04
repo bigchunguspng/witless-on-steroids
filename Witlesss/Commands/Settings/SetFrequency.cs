@@ -6,11 +6,11 @@ namespace Witlesss.Commands.Settings
 {
     public class SetFrequency : SettingsCommand
     {
-        private readonly Regex _m = new(@"^[MmМм]");
-        private readonly Regex _t = new(@"^[TtCcТтСс]");
-        private readonly Regex _g = new(@"^[DdДд][GgГг]");
-        private readonly Regex _d = new(@"^[DdДд]");
-        private readonly Regex _n = new(@"^[NnНнJjЖж]");
+        private readonly Regex _m = new(@"^[mм]");
+        private readonly Regex _t = new(@"^[tcтс]");
+        private readonly Regex _g = new(@"^[dд][gг]");
+        private readonly Regex _d = new(@"^[dд]");
+        private readonly Regex _n = new(@"^[nнjж]");
 
         protected override void RunAuthorized()
         {
@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Settings
                 string? command = null, result = null;
                 var typeWasChanged = false;
                 var optionsWereChanged = false;
-                var args = Args.Split();
+                var args = Args.ToLower().Split();
                 var w = args[0];
                 if      (_m.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
                 else if (_t.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Top  = x, MemeType.Top,  "/top");

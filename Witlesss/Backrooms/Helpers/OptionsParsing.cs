@@ -68,13 +68,11 @@ public static class OptionsParsing
         request.Dummy = new string(destination);
     }
 
-    /*public static void ParseColorOption(Regex regex, ref string dummy, ref Color colorProperty, ref bool useColorProperty)
+    /// <summary>
+    /// Use UPPERCASE if text is generated or option provided via commnand (ignore default options).
+    /// </summary>
+    public static bool CheckCaps(MemeRequest request, Regex caps, bool generate)
     {
-        var c = regex.Match(dummy).Groups[1].Value;
-        dummy = dummy.Replace(c, "");
-        if (c == c.ToLower() || c == c.ToUpper()) c = c.ToLetterCase(LetterCaseMode.Sentence);
-        var b = Enum.IsDefined(typeof(KnownColor), c);
-        if (b) colorProperty = Color.FromName(c);
-        else useColorProperty = false;
-    }*/
+        return Check(request, caps) && (generate || caps.IsMatch(request.Command));
+    }
 }

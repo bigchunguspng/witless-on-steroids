@@ -22,9 +22,9 @@
         <value>ВИРУСНАЯ БАЗА ОБНОВЛЕНА!</value>
     </data>
     <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
-        <value>&lt;b&gt;&lt;u&gt;Интервал отправки текста&lt;/u&gt;&lt;/b&gt;:
+        <value>&lt;b&gt;&lt;u&gt;Вероятность отправки текста&lt;/u&gt;&lt;/b&gt;:
 
-/set@piece_fap_bot 3 (число сообщений)
+/speech@piece_fap_bot 3 (число, %)
 
 &lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
 
@@ -40,11 +40,11 @@
 
 &lt;code&gt;/set [буква] [опции]&lt;/code&gt;
 
-&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot D rgimbbcpup...&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot Dg x=5n...&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot N =3...&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot M wwsd#lime#…&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot T largmmww15"…&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot D cpupbb-i…&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot Dg x=5n…&lt;/code&gt;
+&lt;code&gt;/set@piece_fap_bot N =3…&lt;/code&gt;
 
 &lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить
 
@@ -98,7 +98,7 @@
         <value>CHATLIST SAVED</value>
     </data>
     <data name="SET_FREQUENCY_RESPONSE" xml:space="preserve">
-        <value>я буду отвечать на</value>
+        <value>я буду отвечать с вероятностью {0}%</value>
     </data>
     <data name="SET_P_RESPONSE" xml:space="preserve">
         <value>пикчи будут ставать мемами с вероятностью {0}%</value>

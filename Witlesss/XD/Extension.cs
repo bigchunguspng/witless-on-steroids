@@ -114,14 +114,6 @@ namespace Witlesss.XD
             {"Aw", MediaType.Audio}, {"BQ", MediaType.Audio}, {"CQ", MediaType.Audio}, {"Ag", MediaType.Video}
         };
 
-        public static string SET_FREQUENCY_RESPONSE(int n)
-        {
-            var a = Texts.SET_FREQUENCY_RESPONSE.XDDD();
-            var oe = ED(n, "ое", "ые", "ые");
-            var  e = ED(n,  "е",  "я",  "й");
-            return $"{a} кажд{oe} {(n == 1 ? "ваше" : n)} сообщени{e}";
-        }
-
         public static string HOURS_ED(int hours) => ED(hours, "", "а", "ов");
         public static string  MINS_ED(int  mins) => ED(mins, "у", "ы", "");
 

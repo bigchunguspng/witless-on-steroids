@@ -2,7 +2,7 @@
 
 namespace Witlesss.Commands.Settings
 {
-    public class SetProbability : SettingsCommand
+    public class SetPics : SettingsCommand
     {
         protected override void RunAuthorized()
         {

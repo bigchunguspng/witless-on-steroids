@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Commands.Settings
 {
-    public class SetFrequency : SettingsCommand
+    public class SetMemeType : SettingsCommand
     {
         private readonly Regex _m = new(@"^[mм]");
         private readonly Regex _t = new(@"^[tcтс]");
@@ -14,28 +13,17 @@ namespace Witlesss.Commands.Settings
 
         protected override void RunAuthorized()
         {
-            if (Args is null)
-            {
-                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
-            }
-            else if (Context.HasIntArgument(out var value))
-            {
-                Baka.Speech = value.ClampByte();
-                ChatsDealer.SaveChatList();
-                Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Speech));
-                Log($"{Title} >> SPEECH >> {Baka.Speech}");
-            }
-            else
+            if (Args is not null)
             {
                 string? command = null, result = null;
                 var typeWasChanged = false;
                 var optionsWereChanged = false;
                 var args = Args.ToLower().Split();
                 var w = args[0];
-                if      (_m.IsMatch(w)) Set(x => Baka.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
-                else if (_t.IsMatch(w)) Set(x => Baka.GetMemeOptions().Top  = x, MemeType.Top,  "/top");
-                else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg   = x, MemeType.Dg,   "/dg");
-                else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp   = x, MemeType.Dp,   "/dp");
+                if (_m.IsMatch(w)) Set(x => Baka.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
+                else if (_t.IsMatch(w)) Set(x => Baka.GetMemeOptions().Top = x, MemeType.Top, "/top");
+                else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg = x, MemeType.Dg, "/dg");
+                else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp = x, MemeType.Dp, "/dp");
                 else if (_n.IsMatch(w)) Set(x => Baka.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
@@ -69,6 +57,8 @@ namespace Witlesss.Commands.Settings
                     }
                 }
             }
+            else
+                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
         }
     }
 }

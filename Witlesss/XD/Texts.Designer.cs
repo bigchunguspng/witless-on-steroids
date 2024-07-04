@@ -637,9 +637,9 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Интервал отправки текста&lt;/u&gt;&lt;/b&gt;:
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Вероятность отправки текста&lt;/u&gt;&lt;/b&gt;:
         ///
-        /// /set@piece_fap_bot 3 (число сообщений)
+        /// /speech@piece_fap_bot 3 (число, %)
         ///
         ///&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
         ///
@@ -655,9 +655,9 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set [буква] [опции]&lt;/code&gt;
         ///
-        ///&lt;code&gt;/set@piece_fap_bot M wsd#Bg#...&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot T largmmwwss16...&lt;/code&gt;
-        ///&lt;code&gt;/set@piece [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;/set@piece_fap_bot M wwsd#lime#…&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fap_bot T largmmww15&quot;…&lt;/code&gt;
+        ///&lt;code&gt;/set@piece_fa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -666,7 +666,7 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to я буду отвечать на.
+        ///   Looks up a localized string similar to я буду отвечать с вероятностью {0}%.
         /// </summary>
         internal static string SET_FREQUENCY_RESPONSE {
             get {

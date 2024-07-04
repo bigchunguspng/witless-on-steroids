@@ -18,8 +18,9 @@ public class WitlessCommandRouter : WitlessSyncCommand
     private readonly Fuse _fuse = new();
     private readonly FuseBoards _boards = new();
     private readonly FuseRedditComments _comments = new();
-    private readonly SetFrequency _frequency = new();
-    private readonly SetProbability _probability = new();
+    private readonly SetMemeType _set = new();
+    private readonly SetSpeech _speech = new();
+    private readonly SetPics _pics = new();
     private readonly SetQuality _quality = new();
     private readonly ToggleStickers _stickers = new();
     private readonly ToggleAdmins _admins = new();
@@ -54,9 +55,10 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("a"       , () => _generate)
             .Register("zz"      , () => _generateB)
             .Register("b"       , () => _bouhourt)
-            .Register("set"     , () => _frequency)
+            .Register("set"     , () => _set)
+            .Register("speech"  , () => _speech)
             .Register("quality" , () => _quality)
-            .Register("pics"    , () => _probability)
+            .Register("pics"    , () => _pics)
             .Register("stickers", () => _stickers)
             .Register("chat"    , () => _chat)
             .Register("fuse"    , () => _fuse)

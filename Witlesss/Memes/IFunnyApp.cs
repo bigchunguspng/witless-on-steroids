@@ -77,7 +77,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     private void SetUp()
     {
-        var crop = 100F - Math.Abs(CropPercent) / 100F;
+        var crop = (100F - Math.Abs(CropPercent)) / 100F;
 
         _w =  _sourceSizeAdjusted.Width;
         _h = (_sourceSizeAdjusted.Height * crop).RoundInt().ToEven();

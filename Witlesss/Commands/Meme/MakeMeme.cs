@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command { get; } = "/meme";
         protected override string Suffix  { get; } = "-Meme";
 
-        protected override string? DefaultOptions => Baka.Meme.Options?.Meme;
+        protected override string? DefaultOptions => Baka.Options?.Meme;
 
 
         protected override Task Run() => RunInternal("Мемы", OPTIONS + "/op_meme");

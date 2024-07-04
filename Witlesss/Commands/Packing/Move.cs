@@ -18,9 +18,9 @@ namespace Witlesss.Commands.Packing
             }
             else
             {
-                Baka.Pack = new GenerationPack();
+                Baka.Baka.DB = new GenerationPack();
                 Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
-                Baka.SaveNoMatterWhat();
+                Baka.Save();
 
                 Bot.SendMessage(Chat, string.Format(MOVING_DONE, result));
             }
@@ -31,14 +31,14 @@ namespace Witlesss.Commands.Packing
 
         protected string MoveDictionary(string name)
         {
-            Baka.Save();
+            Baka.SaveChanges();
 
             if (Baka.Baka.DB.Vocabulary.Count == 0)
                 return "*"; // can't be in file name
 
             var path = UniqueExtraDBsPath(name);
 
-            File.Copy(Baka.Path, path);
+            File.Copy(Baka.FilePath, path);
 
             var result = Path.GetFileNameWithoutExtension(path);
             Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);

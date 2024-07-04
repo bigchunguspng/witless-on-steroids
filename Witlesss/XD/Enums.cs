@@ -23,5 +23,5 @@
         Round  // video note
     }
 
-    public enum MemeType  { Dg, Meme, Top, Dp, Nuke }
+    public enum MemeType : byte { Dg, Meme, Top, Dp, Nuke }
 }

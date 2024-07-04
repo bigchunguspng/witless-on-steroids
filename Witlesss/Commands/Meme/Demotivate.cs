@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command => _mode == Square ? "/dg" : "/dv";
         protected override string Suffix  => _mode == Square ? "-Dg" : "-Dv";
 
-        protected override string? DefaultOptions => Baka.Meme.Options?.Dg;
+        protected override string? DefaultOptions => Baka.Options?.Dg;
 
 
         protected override Task Run() => RunInternal("Демотиваторы💀");

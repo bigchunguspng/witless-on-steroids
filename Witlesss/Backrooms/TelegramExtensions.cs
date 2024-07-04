@@ -83,4 +83,6 @@ public static class TelegramExtensions
     {
         return message?.Audio?.FileName ?? message?.Document?.FileName;
     }
+
+    public static bool ChatIsNotPrivate(this long chatId) => chatId < 0;
 }

@@ -26,7 +26,6 @@ namespace Witlesss.Commands.Packing
             ChatsDealer.SaveChatList();
 
             Baka.DeleteForever();
-            Baka.Unload();
 
             Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
             Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result));

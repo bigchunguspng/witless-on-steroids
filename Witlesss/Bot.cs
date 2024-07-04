@@ -47,7 +47,6 @@ namespace Witlesss
 
             ClearTempFiles();
 
-            ChatsDealer.LoadSomeBakas();
             StartListening();
             ChatsDealer.StartAutoSaveLoop(minutes: 2);
 

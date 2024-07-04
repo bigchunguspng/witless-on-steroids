@@ -68,7 +68,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             ParseOptions();
             var repeats = GetRepeatCount();
             var txt = GetProvidedText();
-            var request = new MemeFileRequest(path, Suffix + ".jpg", Baka.Meme.Quality)
+            var request = new MemeFileRequest(path, Suffix + ".jpg", Baka.Quality)
             {
                 Type = MemeSourceType.Image
             };
@@ -90,7 +90,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
             var txt = GetProvidedText();
-            var request = new MemeFileRequest(path, Suffix + (sticker ? ".webp" : ".jpg"), Baka.Meme.Quality)
+            var request = new MemeFileRequest(path, Suffix + (sticker ? ".webp" : ".jpg"), Baka.Quality)
             {
                 Type = MemeSourceType.Sticker,
                 ExportAsSticker = sticker,
@@ -121,7 +121,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             ParseOptions();
             var text = GetMemeText(GetProvidedText());
-            var request = new MemeFileRequest(path, Suffix + ".mp4", Baka.Meme.Quality)
+            var request = new MemeFileRequest(path, Suffix + ".mp4", Baka.Quality)
             {
                 Type = MemeSourceType.Video
             };

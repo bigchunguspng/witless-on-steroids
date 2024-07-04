@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command { get; } = "/nuke";
         protected override string Suffix  { get; } = "-Nuked";
 
-        protected override string? DefaultOptions => Baka.Meme.Options?.Nuke;
+        protected override string? DefaultOptions => Baka.Options?.Nuke;
 
 
         protected override Task Run() => RunInternal("Ядерные отходы");

@@ -21,8 +21,8 @@ namespace Witlesss.Commands.Packing
 
             if (que.Success || sub.Success)
             {
-                Baka.Save();
-                Size = SizeInBytes(Baka.Path);
+                Baka.SaveChanges();
+                Size = SizeInBytes(Baka.FilePath);
 
                 GetWordsPerLineLimit();
 

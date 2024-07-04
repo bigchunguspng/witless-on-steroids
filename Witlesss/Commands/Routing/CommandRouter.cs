@@ -80,7 +80,7 @@ namespace Witlesss.Commands.Routing
 
         private bool HandleStartCommand()
         {
-            var success = Command == "/start" && ChatsDealer.SussyBakas.TryAdd(Chat, Witless.AverageBaka(Context));
+            var success = Command == "/start" && ChatsDealer.SussyBakas.TryAdd(Chat, Witless.GetAverageBaka(Context));
             if (success)
             {
                 ChatsDealer.SaveChatList();

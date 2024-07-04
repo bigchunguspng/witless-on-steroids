@@ -34,9 +34,9 @@ public class Spam : SyncCommand
             var message = text ?? File.ReadAllText(Paths.File_Spam);
             var bakas = ChatsDealer.SussyBakas.Values.Where(x =>
             {
-                if (File.Exists(x.Path))
+                if (File.Exists(x.FilePath))
                 {
-                    var file = new FileInfo(x.Path);
+                    var file = new FileInfo(x.FilePath);
                     return file.Length > size && file.LastWriteTime.HappenedWithinLast(TimeSpan.FromDays(28));
                 }
                 return false;

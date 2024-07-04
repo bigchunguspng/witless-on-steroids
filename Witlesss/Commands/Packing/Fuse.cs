@@ -31,8 +31,8 @@ namespace Witlesss.Commands.Packing
 
         protected override void RunAuthorized()
         {
-            Baka.Save();
-            Size = SizeInBytes(Baka.Path);
+            Baka.SaveChanges();
+            Size = SizeInBytes(Baka.FilePath);
 
             GetWordsPerLineLimit();
 
@@ -150,7 +150,7 @@ namespace Witlesss.Commands.Packing
             sb.Append("<b>").Append(data.Available).Append(":</b>");
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]");
             sb.Append("\n").Append(JsonList(files, page, perPage));
-            sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.Path));
+            sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.FilePath));
             if (!empty) sb.Append(data.Optional);
             if (!oneshot) sb.Append(USE_ARROWS);
 
@@ -209,7 +209,7 @@ namespace Witlesss.Commands.Packing
 
             if (argIsID && ChatsDealer.WitlessExist(chat, out var baka))
             {
-                FuseWithWitlessDB(baka.Pack);
+                FuseWithWitlessDB(baka.Baka.DB);
             }
             else if (GetFiles(Paths.Dir_Fuse, $"{arg}.json") is { Length: > 0 } files)
             {
@@ -270,12 +270,12 @@ namespace Witlesss.Commands.Packing
         protected static void SaveChanges(Witless baka, string title)
         {
             Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
-            baka.SaveNoMatterWhat();
+            baka.Save();
         }
 
         protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, string title)
         {
-            var newSize = SizeInBytes(baka.Path);
+            var newSize = SizeInBytes(baka.FilePath);
             var difference = newSize - size;
             return string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), FileSize(difference));
         }

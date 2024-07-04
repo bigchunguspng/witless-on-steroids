@@ -10,7 +10,7 @@ namespace Witlesss.Commands
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
-            var size = SizeInBytes(Baka.Path);
+            var size = SizeInBytes(Baka.FilePath);
             var icon = size switch
             {
                 <      2_000 => "🗒",
@@ -21,27 +21,28 @@ namespace Witlesss.Commands
                 _            => "📚"
             };
 
+            // todo print Baka.Baka.DB.Vocabulary.Count too
             sb.Append("\nВес словаря: ").Append(FileSize(size)).Append(' ').Append(icon);
-            sb.Append("\nИнтервал генерации: ").Append(Baka.Interval);
-            sb.Append("\nКачество графики: ").Append(Baka.Meme.Quality).Append('%');
+            sb.Append("\nИнтервал генерации: ").Append(Baka.Speech);
+            sb.Append("\nКачество графики: ").Append(Baka.Quality).Append('%');
             if (!Context.ChatIsPrivate)
                 sb.Append("\nМогут 🔩⚙️: ").Append(Baka.AdminsOnly ? "только админы 😎" : "все 🤠");
 
             sb.Append("\n\n<u>Авто-мемы:</u>");
-            sb.Append("\nТип: ").Append(Types[Baka.Meme.Type]);
-            sb.Append("\nВероятность: ").Append(Baka.Meme.Chance).Append('%');
-            sb.Append("\nСтикеры: ").Append(Baka.Meme.Stickers ? "тоже 🍑" : "пропускаем");
+            sb.Append("\nТип: ").Append(Types[Baka.Type]);
+            sb.Append("\nВероятность: ").Append(Baka.Pics).Append('%');
+            sb.Append("\nСтикеры: ").Append(Baka.Stickers ? "тоже 🍑" : "пропускаем");
 
-            if (Baka.Meme.Options is not null)
+            if (Baka.Options is not null)
             {
                 var anyOptions = false;
                 var optionsBuilder = new StringBuilder("\n\n<u>Опции</u>:");
 
-                if (IsNotNull(Baka.Meme.Options.Meme)) AppendOptions("meme", Baka.Meme.Options.Meme[5..]);
-                if (IsNotNull(Baka.Meme.Options.Top )) AppendOptions("top",  Baka.Meme.Options.Top [4..]);
-                if (IsNotNull(Baka.Meme.Options.Dp  )) AppendOptions("dp",   Baka.Meme.Options.Dp  [3..]);
-                if (IsNotNull(Baka.Meme.Options.Dg  )) AppendOptions("dg",   Baka.Meme.Options.Dg  [3..]);
-                if (IsNotNull(Baka.Meme.Options.Nuke)) AppendOptions("nuke", Baka.Meme.Options.Nuke[5..]);
+                if (IsNotNull(Baka.Options.Meme)) AppendOptions("meme", Baka.Options.Meme[5..]);
+                if (IsNotNull(Baka.Options.Top )) AppendOptions("top",  Baka.Options.Top [4..]);
+                if (IsNotNull(Baka.Options.Dp  )) AppendOptions("dp",   Baka.Options.Dp  [3..]);
+                if (IsNotNull(Baka.Options.Dg  )) AppendOptions("dg",   Baka.Options.Dg  [3..]);
+                if (IsNotNull(Baka.Options.Nuke)) AppendOptions("nuke", Baka.Options.Nuke[5..]);
 
                 if (anyOptions) sb.Append(optionsBuilder);
 

@@ -83,8 +83,6 @@ public class WitlessCommandRouter : WitlessSyncCommand
             }
         }
 
-        Baka.Count();
-
         if (Message.GetPhoto() is { } photo && HaveToMeme())
         {
             GetMemeMaker(photo.Width, photo.Height).ProcessPhoto(photo.FileId);
@@ -93,21 +91,21 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             GetMemeMaker(sticker.Width, sticker.Height).ProcessStick(sticker.FileId);
         }
-        else if (Baka.Ready() && !Baka.Banned)
+        else if (Lucky(Baka.Speech))
         {
             new PoopText().Execute(Context);
         }
 
         ImageProcessor GetMemeMaker(int w, int h) // todo don't pass size to everything jbc /dg needs it
         {
-            var mematic = _mematics[Baka.Meme.Type].Invoke();
+            var mematic = _mematics[Baka.Type].Invoke();
             mematic.Pass(Context);
             if (mematic is Demotivate dg) dg.SelectMode(w, h);
             return mematic;
         }
 
-        bool HaveToMeme       () => Lucky(Baka.Meme.Chance) && !Message.ContainsSpoilers();
-        bool HaveToMemeSticker() => Baka.Meme.Stickers && HaveToMeme();
+        bool HaveToMeme       () => Lucky(Baka.Pics) && !Message.ContainsSpoilers();
+        bool HaveToMemeSticker() => Baka.Stickers && HaveToMeme();
     }
 
     private void HandleWitlessCommands(Witless baka)

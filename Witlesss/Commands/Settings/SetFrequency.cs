@@ -20,10 +20,10 @@ namespace Witlesss.Commands.Settings
             }
             else if (Context.HasIntArgument(out var value))
             {
-                Baka.Interval = value;
+                Baka.Speech = value.ClampByte();
                 ChatsDealer.SaveChatList();
-                Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Interval));
-                Log($"{Title} >> FUNNY INTERVAL >> {Baka.Interval}");
+                Bot.SendMessage(Chat, SET_FREQUENCY_RESPONSE(Baka.Speech));
+                Log($"{Title} >> SPEECH >> {Baka.Speech}");
             }
             else
             {
@@ -32,18 +32,18 @@ namespace Witlesss.Commands.Settings
                 var optionsWereChanged = false;
                 var args = Args.ToLower().Split();
                 var w = args[0];
-                if      (_m.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
-                else if (_t.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Top  = x, MemeType.Top,  "/top");
-                else if (_g.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Dg   = x, MemeType.Dg,   "/dg");
-                else if (_d.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Dp   = x, MemeType.Dp,   "/dp");
-                else if (_n.IsMatch(w)) Set(x => Baka.Meme.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
+                if      (_m.IsMatch(w)) Set(x => Baka.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
+                else if (_t.IsMatch(w)) Set(x => Baka.GetMemeOptions().Top  = x, MemeType.Top,  "/top");
+                else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg   = x, MemeType.Dg,   "/dg");
+                else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp   = x, MemeType.Dp,   "/dp");
+                else if (_n.IsMatch(w)) Set(x => Baka.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
 
                 if (typeWasChanged)
                 {
                     ChatsDealer.SaveChatList();
-                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Meme.Type]).XDDD());
-                    Log($"{Title} >> MEMES TYPE >> {Baka.Meme.Type.ToString()[0]}");
+                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Type]).XDDD());
+                    Log($"{Title} >> MEMES TYPE >> {Baka.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
@@ -64,7 +64,7 @@ namespace Witlesss.Commands.Settings
                     }
                     else
                     {
-                        Baka.Meme.Type = type;
+                        Baka.Type = type;
                         typeWasChanged = true;
                     }
                 }

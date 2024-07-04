@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
+using Witlesss.Backrooms.Types;
 using Witlesss.Generation;
 using Witlesss.Generation.Pack;
 
@@ -11,74 +12,102 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private bool _admins;
+        private const byte MAX_SAVES_SKIP_BEFORE_UNLOAD = 1;
 
-        public Witless(long chat, int interval = 7)
+        public Witless(long chat, byte speech = 15, byte pics = 20, byte jpg = 75)
         {
             Chat = chat;
-            Interval = interval;
-            
-            Meme   = new MemeSettings();
-            Baka   = new Copypaster();
-            FileIO = new FileIO<GenerationPack>(Path);
+            Speech = speech;
+            Pics = pics;
+            Quality = jpg;
 
-            Saves.Interval = 10;
+            FileIO = new FileIO<GenerationPack>(GetPath());
         }
 
-        public static Witless AverageBaka(CommandContext context)
+        public static Witless GetAverageBaka(CommandContext context)
         {
-            var witless = new Witless(context.Chat);
+            var witless = new Witless(context.Chat)
+            {
+                Type = (MemeType)Random.Shared.Next(4)
+            };
 
             if (context.ChatIsPrivate)
             {
-                witless.Interval = 1;
-                witless.Meme.Chance = 100;
-                witless.Meme.Stickers = true;
+                witless.Speech = 100;
+                witless.Pics = 100;
+                witless.Stickers = true;
             }
-            witless.Meme.Type = (MemeType)Random.Shared.Next(4);
 
-            witless.Load();
             return witless;
         }
 
-        [JsonProperty] public long Chat { get; set; }
-        [JsonProperty] public int Interval // todo -> frequency
-        {
-            get => Generation.Interval;
-            set => Generation.Interval = value;
-        }
-        [JsonProperty] public bool AdminsOnly
-        {
-            get => _admins;
-            set
-            {
-                if (Chat < 0) _admins = value;
-            }
-        }
-        [JsonProperty] public MemeSettings Meme { get; set; }
+
+        // FILE
 
         private FileIO<GenerationPack> FileIO { get; }
 
-        private Counter Saves      { get; } = new();
-        private Counter Generation { get; } = new();
+        public string FilePath => FileIO.Path;
 
-        public bool Banned, Loaded, HasUnsavedStuff;
+        public string GetPath() => Path.Combine(Paths.Dir_Chat, $"{Paths.Prefix_Pack}-{Chat}.json");
 
-        public Copypaster Baka { get; set; }
+        // BAKA
 
-        public GenerationPack Pack
+        private Copypaster? _baka;
+
+        public Copypaster Baka
         {
-            get => Baka.DB;
-            set => Baka.DB = value;
+            get
+            {
+                if (!Loaded) Load();
+                return _baka!;
+            }
+            set => _baka = value;
         }
+
+        // STATE
+
+        private bool Loaded => _baka is not null;
+
+        private bool Dirty  { get => _flags[6]; set => _flags[6] = value; }
+        public  bool Banned { get => _flags[7]; set => _flags[7] = value; }
+
+
+        // DATA
+
+        [JsonProperty] public long Chat { get; set; }
+
+        private ByteFlags _flags;
+        private byte _savesSkipped;
+        private byte _speech, _pics, _quality;
+
+        [JsonProperty] public bool AdminsOnly
+        {
+            get => _flags[0];
+            set => _flags[0] = Chat.ChatIsNotPrivate() && value;
+        }
+
+        [JsonProperty] public byte Speech  { get => _speech;  set => _speech  = value.Clamp100(); }
+        [JsonProperty] public byte Pics    { get => _pics;    set => _pics    = value.Clamp100(); }
+        [JsonProperty] public byte Quality { get => _quality; set => _quality = value.Clamp100(); }
+
+        [JsonProperty] public MemeType Type { get; set; }
+
+        [JsonProperty] public bool Stickers { get => _flags[1]; set => _flags[1] = value; }
+
+        [JsonProperty] public MemeOptions? Options { get; set; }
+
+        public MemeOptions GetMemeOptions() => Options ??= new MemeOptions();
+
+
+        // EAT / GENERATE
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text)
-            => HasUnsavedStuff = Baka.Eat(text, out _);
+            => Dirty = Baka.Eat(text, out _);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
-            => HasUnsavedStuff = Baka.Eat(text, out eaten);
+            => Dirty = Baka.Eat(text, out eaten);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate() => TextOrBust(() => Baka.Generate());
@@ -103,56 +132,55 @@ namespace Witlesss
             }
         }
 
-        public string Path => System.IO.Path.Combine(Paths.Dir_Chat, $"{Paths.Prefix_Pack}-{Chat}.json");
 
-        public void Count() => Generation.Count();
-        public bool Ready() => Generation.Ready();
+        // SAVE / LOAD
 
-        public void SaveAndCount()
+        public void SaveChangesOrUnloadInactive()
         {
-            if (HasUnsavedStuff)
-            {
-                SaveNoMatterWhat();
-                Saves.Reset();
-            }
-            else if (Loaded)
-            {
-                Saves.Count();
-                if (Saves.Ready()) Unload();
-            }
+            if (!Loaded) return;
+            if (Dirty) Save();
+            else if (EnoughSavesSkipped()) Unload();
         }
-        public void Save()
+
+        public void SaveChanges()
         {
-            if (HasUnsavedStuff) SaveNoMatterWhat();
+            if (Loaded && Dirty) Save();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void SaveNoMatterWhat()
+        public void Save()
         {
-            FileIO.SaveData(Pack);
-            HasUnsavedStuff = false;
+            FileIO.SaveData(Baka.DB);
+            ResetState();
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
 
-        public void LoadUnlessLoaded()
+        private void Load()
         {
-            if (!Loaded) Load();
-        }
-        public void Load()
-        {
-            Pack = FileIO.LoadData();
-            Loaded = true;
-            Saves.Reset();
-            HasUnsavedStuff = false;
+            Baka = new Copypaster { DB = FileIO.LoadData() };
+            ResetState();
             Log($"DIC LOADED >> {Chat}", ConsoleColor.Magenta);
         }
 
-        public void Unload()
+        private void Unload()
         {
-            Pack = null!;
-            Loaded = false;
+            _baka = null;
             Log($"DIC UNLOAD << {Chat}", ConsoleColor.Yellow);
         }
+
+        private void ResetState()
+        {
+            Dirty = false;
+            _savesSkipped = 0;
+        }
+
+        private bool EnoughSavesSkipped()
+        {
+            _savesSkipped = ((_savesSkipped + 1) % MAX_SAVES_SKIP_BEFORE_UNLOAD).ClampByte();
+            return _savesSkipped == 0;
+        }
+
+        // FUSE / DELETE
 
         public void Fuse(GenerationPack pack)
         {
@@ -160,54 +188,29 @@ namespace Witlesss
             Baka.Fuse(pack);
         }
 
-        public void Backup()
-        {
-            Save();
-            var date = DateTime.Now.ToString("yyyy-MM-dd");
-            var name = $"{Paths.Prefix_Pack}-{Chat}.json";
-            var file = new FileInfo(Path);
-            file.CopyTo(UniquePath(System.IO.Path.Combine(Paths.Dir_Backup, date), name));
-        }
-
-        public void Delete()
+        public void BackupAndDelete()
         {
             Backup();
             DeleteForever();
         }
 
-        public void DeleteForever() => File.Delete(Path);
+        public void DeleteForever()
+        {
+            Unload();
+            File.Delete(FilePath);
+        }
+
+        private void Backup()
+        {
+            SaveChanges();
+            var date = DateTime.Now.ToString("yyyy-MM-dd");
+            var name = $"{Paths.Prefix_Pack}-{Chat}.json";
+            var file = new FileInfo(FilePath);
+            file.CopyTo(UniquePath(Path.Combine(Paths.Dir_Backup, date), name));
+        }
     }
 
-    public class MemeSettings
-    {
-        private int _quality, _chance;
-
-        public MemeSettings(int pics = 20, int jpg = 75)
-        {
-            Chance = pics;
-            Quality = jpg;
-        }
-        
-        [JsonProperty] public int Chance
-        {
-            get => _chance;
-            set => _chance = Math.Clamp(value, 0, 100);
-        }
-        [JsonProperty] public int Quality
-        {
-            get => _quality;
-            set => _quality = Math.Clamp(value, 0, 100);
-        }
-        [JsonProperty] public MemeType Type { get; set; }
-        [JsonProperty] public bool Stickers { get; set; }
-
-        [JsonProperty] public MemeOptions? Options { get; set; }
-
-        public MemeOptions GetMemeOptions() => Options ??= new MemeOptions();
-    }
-
-    // todo load from json as null if empty
-    public class MemeOptions
+    public class MemeOptions // todo load from json as null if empty
     {
         [JsonProperty] public string? Meme { get; set; }
         [JsonProperty] public string? Top  { get; set; }

@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command { get; } = "/dp";
         protected override string Suffix  { get; } = "-Dp";
 
-        protected override string? DefaultOptions => Baka.Meme.Options?.Dp;
+        protected override string? DefaultOptions => Baka.Options?.Dp;
 
 
         protected override Task Run() => RunInternal("Демотиваторы👌", DP_OPTIONS);

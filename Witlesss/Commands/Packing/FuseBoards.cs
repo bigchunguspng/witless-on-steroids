@@ -41,8 +41,8 @@ namespace Witlesss.Commands.Packing
             }
             else
             {
-                Baka.Save();
-                Size = SizeInBytes(Baka.Path);
+                Baka.SaveChanges();
+                Size = SizeInBytes(Baka.FilePath);
 
                 GetWordsPerLineLimit();
 
@@ -112,7 +112,7 @@ namespace Witlesss.Commands.Packing
         {
             await Task.WhenAll(tasks);
 
-            var size = SizeInBytes(c.Baka.Path);
+            var size = SizeInBytes(c.Baka.FilePath);
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 

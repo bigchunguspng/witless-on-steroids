@@ -110,8 +110,7 @@ namespace Witlesss
         private        void ClearDics() => Bakas.ForEach(ClearDic);
         private static void ClearDic(Witless witless)
         {
-            witless.Delete();
-            witless.Load();
+            witless.BackupAndDelete();
         }
 
         private void DeleteBlockers()
@@ -130,7 +129,7 @@ namespace Witlesss
         private int DeleteBlocker(Witless witless)
         {
             var x = Bot.PingChat(witless.Chat, notify: false);
-            if (x == -1) witless.Delete();
+            if (x == -1) witless.BackupAndDelete();
             else Bot.Client.DeleteMessageAsync(witless.Chat, x);
 
             return x;
@@ -140,9 +139,9 @@ namespace Witlesss
         {
             foreach (var witless in Bakas)
             {
-                if (SizeInBytes(witless.Path) > size) continue;
+                if (SizeInBytes(witless.FilePath) > size) continue;
 
-                witless.Delete();
+                witless.BackupAndDelete();
                 ChatsDealer.RemoveChat(witless.Chat);
             }
             ChatsDealer.SaveChatList();

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
@@ -16,6 +13,8 @@ namespace Witlesss.Memes; // ReSharper disable InconsistentNaming
 
 public partial class IFunnyApp : IMemeGenerator<string>
 {
+    private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
+
     // OPTIONS
 
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
@@ -24,19 +23,9 @@ public partial class IFunnyApp : IMemeGenerator<string>
     public static int MinFontSize = 10, FontSizeMultiplier = 10;
     public static CustomColorOption CustomColorOption;
 
-    // DATA
-
-    private Rgba32 Background;
-    private SolidBrush TextColor = default!;
-    private static readonly SolidBrush _white = new(Color.White), _black = new(Color.Black);
-
-    // ...
-
-    private readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
-    public  static readonly ExtraFonts ExtraFonts = new("top");
-    private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
-
     // SIZE
+
+    private Size _sourceSizeOG, _sourceSizeAdjusted;
 
     private int _w, _h; // <-- of the image
     private int _cardHeight, _fullHeight, _cropOffset;
@@ -46,29 +35,8 @@ public partial class IFunnyApp : IMemeGenerator<string>
     private Point     Location => new(0, _cardHeight);
     private Rectangle Cropping => new(0, _cropOffset, _w, _h);
 
-    // FONT
-
-    public static float FontSizeRounded => MathF.Round(_font.Size, 2);
-
-    private static Font _font = default!;
-    private static FontFamily FontFamily => ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
-    private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
-
-
-    private void SetFontToDefault() => ResizeFont(GetStartingFontSize());
-
-    private void ResizeFont(float size) => _font = FontFamily.CreateFont(size, FontStyle);
-
-    private float GetStartingFontSize()
-    {
-        var multiplier = FontSizeMultiplier / 10F;
-        return Math.Max(Math.Max(48, _cardHeight / 3.75F) * multiplier, MinFontSize) * ExtraFonts.GetSizeMultiplier();
-    }
-
 
     // LOGIC
-
-    private Size _sourceSizeOG, _sourceSizeAdjusted;
 
     public string GenerateMeme(MemeFileRequest request, string text)
     {
@@ -109,11 +77,12 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     private void SetUp()
     {
-        var crop = Math.Abs(CropPercent) / 100F;
+        var crop = 100F - Math.Abs(CropPercent) / 100F;
 
-        _w = _sourceSizeAdjusted.Width;
-        _h = (_sourceSizeAdjusted.Height * (1 - crop)).RoundInt().ToEven();
+        _w =  _sourceSizeAdjusted.Width;
+        _h = (_sourceSizeAdjusted.Height * crop).RoundInt().ToEven();
 
+        _marginLeft = 0.025F * _w;
         _cropOffset = _sourceSizeAdjusted.Height - _h;
         if (CropPercent < 0) _cropOffset = _cropOffset / 2;
 
@@ -126,9 +95,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
         SetCardHeight(cardHeight);
 
-        _marginLeft = 0.025F * _w;
-
-        SetFontToDefault();
+        SetUpFonts();
     }
 
     private void SetCardHeight(int x)
@@ -174,10 +141,8 @@ public partial class IFunnyApp : IMemeGenerator<string>
         var textR = MakeTextFitCard(text);
         AdjustTextPosition(textR);
 
-        Console.WriteLine(FontSizeRounded);
-
         var image = CreateBackgroundCard();
-        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), textR, TextColor, pen: null));
+        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), textR, TextBrush, pen: null));
         return image;
     }
 
@@ -190,7 +155,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
         var options = GetDefaultTextOptions();
 
-        var parameters = new EmojiTool.Options(TextColor, GetEmojiSize());
+        var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize());
         var textLayer = _emojer.DrawEmojiText(textR, options, parameters, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
@@ -198,184 +163,14 @@ public partial class IFunnyApp : IMemeGenerator<string>
         return image;
     }
 
+    private Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
+
+    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+
     private Point GetOriginFunny(Size textLayer)
     {
         var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
         var y = _cardHeight.Gap(textLayer.Height) + _textOffset;
         return new Point(x.RoundInt(), y.RoundInt());
     }
-
-    private Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
-
-    /// <summary>
-    /// Does the following things if there is a need:
-    /// <li>Changes font size and card height.</li>
-    /// <li>Redistributes the text.</li>
-    /// </summary>
-    private string MakeTextFitCard(string text)
-    {
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
-
-        var lineHeight = _font.Size * GetLineSpacing();
-        var textWidthLimit = 0.9F * _w;
-
-        var k = 1F;
-        float textHeight;
-        var redistributed = false;
-
-        if (text.Contains('\n') || !WrapText)
-        {
-            EnsureLongestLineFits();
-
-            if (_font.Size * k < MinFontSize)
-            {
-                k = MinFontSize / _font.Size;
-
-                var widthLimit = textWidthLimit / k;
-                TextMeasuring.RedistributeText(textChunks, widthLimit);
-                redistributed = true;
-            }
-
-            textHeight = lineHeight * text.GetLineCount();
-        }
-        else
-        {
-            var textWidth = textChunks.Sum(x => x.Width);
-            if (textWidth < textWidthLimit)
-            {
-                if (ThinCard) SetCardHeightLol(lineHeight, 1F);
-                return text; // OK - don't change anything!
-            }
-
-            var maxWordWidth = textChunks.Where(x => x is { Type: CharType.Text, Length: <= 25 }).Max(x => x.Width);
-            if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
-
-            var minRatio = GetMinTextRatio(textWidth);
-            var lineCount = 2;
-            while (true) // calculate line count
-            {
-                var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
-                if (textRatio < targetRatio) break;
-
-                lineCount++;
-            }
-
-            TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
-            redistributed = true;
-
-            EnsureLongestLineFits();
-
-            textHeight = lineHeight * lineCount;
-        }
-
-        if (ThinCard || textHeight * k > _cardHeight)
-        {
-            SetCardHeightLol(textHeight, k);
-        }
-
-        ResizeFont(_font.Size * k);
-
-        return redistributed ? textChunks.FillWith(text) : text;
-
-        //
-
-        void EnsureLongestLineFits()
-        {
-            var maxLineWidth = textChunks.GetMaxLineWidth();
-            if (maxLineWidth * k > textWidthLimit)
-            {
-                k = textWidthLimit / maxLineWidth;
-            }
-        }
-
-        float GetMinTextRatio(float textWidth)
-        {
-            var fontRatio = MinFontSize / _font.Size;
-            var lineHeightK = fontRatio * lineHeight;
-            var textWidthK = fontRatio * textWidth;
-            var lineCountK = textWidthK / textWidthLimit;
-            return textWidthLimit / (lineHeightK * lineCountK);
-        }
-    }
-
-    private void SetCardHeightLol(float textHeight, float k)
-    {
-        var k2 = UltraThinCard ? 0.1F : 1F;
-        var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(_font.Size * k * k2, min);
-        SetCardHeight((textHeight * k + extra).CeilingInt());
-    }
-
-    private void AdjustTextPosition(string s)
-    {
-        var offset = _font.Size * ExtraFonts.GetVerticalOffset();
-        var caps = TextIsUppercaseEnough(s) ? _font.Size * 0.103F : 0; // todo different for every font
-
-        _textOffset = offset;// offset + caps;
-    }
-
-    private bool TextIsUppercaseEnough(string s)
-    {
-        var caps  = CAPS.Matches(s).Count;
-        var emoji = EmojiRegex.Matches(s).Sum(m => m.Length);
-        return caps + 3 * emoji > s.Length / 5;
-    }
-
-    private RichTextOptions GetDefaultTextOptions() => new(_font)
-    {
-        TextAlignment = UseLeftAlignment
-            ? TextAlignment.Start
-            : TextAlignment.Center,
-        HorizontalAlignment = UseLeftAlignment
-            ? HorizontalAlignment.Left
-            : HorizontalAlignment.Center,
-        VerticalAlignment = VerticalAlignment.Center,
-        Origin = GetTextOrigin(),
-        WrappingLength = _w,
-        LineSpacing = GetLineSpacing(),
-        WordBreaking = WordBreaking.Standard,
-        KerningMode = KerningMode.Standard,
-        FallbackFontFamilies = ExtraFonts.FallbackFamilies,
-    };
-
-    private int GetEmojiSize() => (int)(_font.Size * GetLineSpacing());
-
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
-
-    private PointF GetTextOrigin()
-    {
-        var x = UseLeftAlignment ? _marginLeft : _w / 2F;
-        var y = _cardHeight / 2F + _textOffset;
-
-        return new PointF(x, y);
-    }
-
-
-    // COLORS
-
-    private void SetColor(Image<Rgba32>? image)
-    {
-        if      (CustomColorOption.IsActive) SetCustomColors();
-        else if (PickColor && image != null) SetSpecialColors(image);
-        else                                 SetDefaultColors();
-    }
-
-    private void SetSpecialColors(Image<Rgba32> image)
-    {
-        Background = PickColorFromImage(image);
-        TextColor  = ChooseTextColor(Background);
-    }
-    private void SetCustomColors()
-    {
-        Background = CustomColorOption.Color;
-        TextColor  = ChooseTextColor(Background);
-    }
-    private void SetDefaultColors()
-    {
-        Background = Color.White;
-        TextColor  = _black;
-    }
-
-    private SolidBrush ChooseTextColor(Rgba32 b) => b.Rgb.BlackTextIsBetter() ? _black : _white;
 }

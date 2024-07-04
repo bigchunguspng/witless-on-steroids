@@ -1,12 +1,30 @@
 ﻿using System;
 using System.Linq;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Memes;
 
 public partial class IFunnyApp
 {
+    private static readonly SolidBrush _white = new(Color.White);
+    private static readonly SolidBrush _black = new(Color.Black);
+
+    private Rgba32     Background;
+    private SolidBrush TextBrush = default!;
+
+    private void SetColor(Image<Rgba32>? image)
+    {
+        var custom = CustomColorOption.IsActive;
+        var pick = PickColor && image != null;
+
+        Background = custom ? CustomColorOption.Color
+                     : pick ? PickColorFromImage(image!)
+                            : Color.White;
+        TextBrush  = custom || pick && Background.Rgb.WhiteTextIsBetter() ? _white : _black;
+    }
+
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {
         var xd = ForceCenter ? 2 : 0;
@@ -63,15 +81,11 @@ public partial class IFunnyApp
 
     private static Rgba32 Average(Rgba32 a, Rgba32 b)
     {
-        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
-
-        byte Calc(byte x, byte y) => ((x + y) / 2).ClampByte();
+        return a.CombineWith(b, (x, y) => ((x + y) / 2).ClampByte());
     }
 
     private static Rgba32 PutOver(Rgba32 a, Rgba32 b)
     {
-        return new Rgba32(Calc(a.R, b.R), Calc(a.G, b.G), Calc(a.B, b.B));
-
-        byte Calc(byte x, byte y) => (x * (255 - b.A) / 255 + y * b.A / 255).ClampByte(); // lerp
+        return a.CombineWith(b, (x, y) => (x * (255 - b.A) / 255 + y * b.A / 255).ClampByte()); // lerp
     }
 }

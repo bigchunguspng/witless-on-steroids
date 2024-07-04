@@ -204,7 +204,7 @@ namespace Witlesss.Memes.Shared
 
             void RenderLine()
             {
-                canvas.Mutate(ctx => ctx.Crop(max, canvas.Height));
+                canvas.Mutate(ctx => ctx.Crop(Math.Max(max, 1), canvas.Height));
                 lines.Add(canvas);
             }
 

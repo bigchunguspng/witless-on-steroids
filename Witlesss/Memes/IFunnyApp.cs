@@ -40,7 +40,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     public string GenerateMeme(MemeFileRequest request, string text)
     {
-        _sourceSizeOG = GetImageSize(request.SourcePath);
+        _sourceSizeOG = Image.Identify(request.SourcePath).Size;
         _sourceSizeAdjusted = AdjustImageSize();
 
         SetUp();
@@ -70,8 +70,6 @@ public partial class IFunnyApp : IMemeGenerator<string>
             .When(request.GetCRF(), _sourceSizeAdjusted, Cropping, Location, BlurImage)
             .OutputAs(request.TargetPath);
     }
-
-    private Size GetImageSize(string path) => Image.Identify(path).Size;
 
     private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 1080));
 

@@ -54,7 +54,7 @@ public partial class IFunnyApp
         var k = 1F;
         float textHeight;
 
-        if (text.Contains('\n') || !WrapText)
+        if (text.Contains('\n') || !WrapText) // ww
         {
             EnsureLongestLineFits();
 
@@ -78,26 +78,31 @@ public partial class IFunnyApp
                 return text; // OK - don't change anything!
             }
 
-            var maxWordWidth = textChunks.Where(x => x is { Type: CharType.Text, Length: <= 25 }).Max(x => x.Width);
+            var maxWordWidth = textChunks.GetMaxWordWidth();
             if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
 
-            var minRatio = GetMinTextRatio(textWidth);
-            var lineCount = 2;
-            while (true) // calculate line count
+            if (textWidth * k > textWidthLimit)
             {
-                var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
-                if (textRatio < targetRatio) break;
+                var minRatio = GetMinTextRatio(textWidth);
+                var lineCount = 2;
+                while (true) // calculate line count
+                {
+                    var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
+                    var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
+                    if (textRatio < targetRatio) break;
 
-                lineCount++;
+                    lineCount++;
+                }
+
+                TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
+                text = textChunks.FillWith(text);
+
+                EnsureLongestLineFits();
+
+                textHeight = lineHeight * lineCount;
             }
-
-            TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
-            text = textChunks.FillWith(text);
-
-            EnsureLongestLineFits();
-
-            textHeight = lineHeight * lineCount;
+            else
+                textHeight = lineHeight;
         }
 
         if (ThinCard || textHeight * k > _cardHeight)
@@ -106,7 +111,6 @@ public partial class IFunnyApp
         }
 
         ResizeFont(FontSize * k);
-        Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
         return text;
 
@@ -146,6 +150,8 @@ public partial class IFunnyApp
         var caps = TextIsUppercaseEnough(s) ? FontSize * 0.103F : 0; // todo different for every font
 
         _textOffset = offset; // offset + caps;
+
+        Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
     }
 
     private bool TextIsUppercaseEnough(string s)

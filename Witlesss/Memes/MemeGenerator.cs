@@ -24,14 +24,10 @@ namespace Witlesss.Memes
 
         // SIZE
 
-        private int _w, _h, _margin, _centerX;
-        private Size _captionArea;
+        private Size _sourceSizeOG, _sourceSizeAdjusted;
 
-        // FONT
-
-        public static readonly ExtraFonts ExtraFonts = new("meme");
-
-        private float _startingFontSize;
+        private int _w, _h, _marginY, _marginX;
+        private Size _captionSize;
 
         // DATA
 
@@ -46,10 +42,12 @@ namespace Witlesss.Memes
 
         public string GenerateMeme(MemeFileRequest request, TextPair text)
         {
-            var (size, info) = GetImageSize(request.SourcePath);
-            SetUp(size);
+            _sourceSizeOG = Image.Identify(request.SourcePath).Size;
+            _sourceSizeAdjusted = AdjustImageSize();
 
-            using var image = GetImage(request, size, info);
+            SetUp();
+
+            using var image = GetImage(request);
             using var caption = DrawCaption(text);
             using var meme = Combine(image, caption);
 
@@ -58,80 +56,53 @@ namespace Witlesss.Memes
 
         public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
-            var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
-            SetUp(size);
+            _sourceSizeOG = FFMpegXD.GetPictureSize(request.SourcePath);
+            _sourceSizeAdjusted = AdjustImageSize().ValidMp4Size();
+
+            SetUp();
 
             using var caption = DrawCaption(text);
             var captionAsFile = ImageSaver.SaveImageTemp(caption);
             return new F_Combine(request.SourcePath, captionAsFile)
-                .Meme(request.GetCRF(), size)
+                .Meme(request.GetCRF(), _sourceSizeAdjusted)
                 .OutputAs(request.TargetPath);
         }
 
-        private void SetUp(Size size)
+        private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 1080));
+
+        private void SetUp()
         {
-            _w = size.Width;
-            _h = size.Height;
+            _w = _sourceSizeAdjusted.Width;
+            _h = _sourceSizeAdjusted.Height;
 
-            _centerX = _w / 2;
-            _margin = Math.Min(_h / 72, 10);
+            _marginX = Math.Max(_w / 20, 10);
+            _marginY = Math.Min(_h / 72, 10);
 
-            var minSide = (int)Math.Min(_w, 1.5 * _h);
-            _startingFontSize = Math.Max(minSide * FontMultiplier * ExtraFonts.GetSizeMultiplier() / 120, 12);
+            SetUpFonts();
         }
 
-        private Image<Rgba32> DrawCaption(TextPair text)
+        private Image<Rgba32> GetImage(MemeFileRequest request)
         {
-            var canvas = new Image<Rgba32>(_w, _h);
-
-            _captionArea = new Size(_w - 2 * _margin, _h / 3 - _margin);
-
-            var s1 = AddText(canvas, text.A, _startingFontSize,      _margin, out var lines1, out var height1);
-            var s2 = AddText(canvas, text.B, _startingFontSize, _h - _margin, out var lines2, out var height2);
-
-            var avgTextHeight = (height1 + height2) / (lines1 + lines2);
-            return ShadowOpacity > 0 ? DrawShadow(canvas, s1, s2, avgTextHeight) : canvas;
-        }
-
-        private Size? AddText
-        (
-            Image<Rgba32> background, string text,
-            float size, int y,
-            out int lines, out float textHeight
-        )
-        {
-            lines = 0;
-            textHeight = 0F;
-
-            if (string.IsNullOrEmpty(text)) return null;
-
-            text = EmojiTool.RemoveEmoji(text);
-            text = text.TrimStart('\n');
-
-            // adjust font size
-            var maxLines = text.Count(c => c == '\n') + 1;
-            var go = true;
-            var textSize = Size.Empty;
-            RichTextOptions options = null!;
-            while (go)
+            if (request.IsSticker /* && not send as sticker ? */)
             {
-                // todo replace with more efficient algorithm (or not, it takes ~ 1 millisecond per loop iter)
-                // ok, then replace with algorithm that gives more equal text distribution
+                var color = CustomColorOption.GetColor() ?? Color.Black;
+                var background = new Image<Rgba32>(_w, _h, color);
 
-                var sw = Helpers.GetStartedStopwatch();
-                options = GetDefaultTextOptions(size, y);
-                textSize = TextMeasuring.MeasureTextSize(text, options, out lines).CeilingInt();
-                sw.Log("TextMeasuringHelpers.MeasureTextHeight");
-                go = textSize.Height > _captionArea.Height && size > 5 || WrapText == false && lines > maxLines;
-                size *= go ? lines > 2 ? 0.8f : 0.9f : 1;
+                using var image = GetImageSimple(request.SourcePath);
+
+                background.Mutate(x => x.DrawImage(image));
+                return background;
             }
+            else
+                return GetImageSimple(request.SourcePath);
+        }
 
-            // write
-            background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
-
-            textHeight = textSize.Height;
-            var space = (textSize.Height / 2F / lines).RoundInt();
-            return new Size(Math.Min(_w, textSize.Width + 2 * space), textSize.Height + space);
+        private Image<Rgba32> GetImageSimple(string path)
+        {
+            var image = Image.Load<Rgba32>(path);
+            var resize = _sourceSizeOG != _sourceSizeAdjusted;
+            if (resize) image.Mutate(x => x.Resize(_sourceSizeAdjusted));
+            return image;
         }
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)
@@ -140,23 +111,36 @@ namespace Witlesss.Memes
             return image;
         }
 
-
-        // TEXT OPTIONS
-
-        private RichTextOptions GetDefaultTextOptions(float fontSize, int y) => new(GetFont(fontSize))
+        private Image<Rgba32> DrawCaption(TextPair text)
         {
-            TextAlignment = TextAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = y == _margin ? VerticalAlignment.Top : VerticalAlignment.Bottom,
-            Origin = new Point(_centerX, y),
-            WrappingLength = _captionArea.Width,
-            LineSpacing = ExtraFonts.GetLineSpacing(),
-            FallbackFontFamilies = ExtraFonts.FallbackFamilies
-        };
+            var canvas = new Image<Rgba32>(_w, _h);
 
-        private Font GetFont(float size) => ExtraFonts.GetFont("im", size);
+            _captionSize = new Size(_w - 2 * _marginX, _h / 3 - _marginY);
 
-        private FontFamily GetFontFamily() => ExtraFonts.GetFontFamily("im");
+            var tuple1 = AddText(canvas, text.A,      _marginY);
+            var tuple2 = AddText(canvas, text.B, _h - _marginY);
+
+            return ShadowOpacity > 0 ? DrawShadow(canvas, tuple1, tuple2) : canvas;
+        }
+
+        private (float height, float fontSize) AddText(Image<Rgba32> background, string text, int y)
+        {
+            if (string.IsNullOrEmpty(text)) return (0, 0);
+
+            text = EmojiTool.RemoveEmoji(text);
+            text = text.TrimStart('\n');
+
+            var textR = MakeTextFitCard(text);
+
+            Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+
+            var options = GetDefaultTextOptions(y);
+            background.Mutate(x => x.DrawText(_textDrawingOptions, options, textR, GetBrush(), pen: null));
+
+            return (FontSize * GetLineSpacing() * textR.GetLineCount(), FontSize);
+        }
+
+        private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
         private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
 
@@ -168,36 +152,6 @@ namespace Witlesss.Memes
 
             var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
             return new SolidBrush(rgb.ToRgb24());
-        }
-
-
-        // IMAGE
-
-        private (Size size, ImageInfo info) GetImageSize(string path)
-        {
-            var info = Image.Identify(path);
-            return (info.Size.EnureIsWideEnough(), info);
-        }
-
-        private Image<Rgba32> GetImage(MemeFileRequest request, Size size, ImageInfo info)
-        {
-            var image = Image.Load<Rgba32>(request.SourcePath);
-            if (size != info.Size)
-            {
-                image.Mutate(x => x.Resize(size));
-            }
-
-            if (request.IsSticker /* && not send as sticker ? */)
-            {
-                var color = CustomColorOption.GetColor() ?? Color.Black;
-                var background = new Image<Rgba32>(image.Width, image.Height, color);
-                background.Mutate(x => x.DrawImage(image));
-                image.Dispose();
-                return background;
-            }
-
-            //image.Mutate(x => x.Dither(new OrderedDither((uint)d)));
-            return image;
         }
     }
 }

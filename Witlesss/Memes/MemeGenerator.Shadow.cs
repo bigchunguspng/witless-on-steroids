@@ -7,14 +7,16 @@ namespace Witlesss.Memes;
 
 public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
 {
-    private Image<Rgba32> DrawShadow(Image<Rgba32> image, Size? top, Size? bottom, float avgTextHeight)
+    private Image<Rgba32> DrawShadow
+    (
+        Image<Rgba32> image, 
+        (float height, float fontSize) top, 
+        (float height, float fontSize) bottom
+    )
     {
         var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
 
-        var nokia = GetFontFamily().Name.Contains("Nokia");
-
-        var w = avgTextHeight / (nokia ? 12D : 15D);
-        var w2 = (int)Math.Ceiling(w) + 2;
+        var nokia = _fontFamily.Name.Contains("Nokia");
 
         var opacity = ShadowOpacity / 100F;
         var maxOpacity = (255 * opacity).RoundInt().ClampByte();
@@ -23,17 +25,16 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         var sw = Helpers.GetStartedStopwatch();
 
-        if (top.HasValue)
+        if (top.height > 0)
         {
-            var x = (_w - top.Value.Width) / 2;
-            ShadowImagePart(new Rectangle(new Point(x, 0), top.Value));
+            ShadowImagePart(top.fontSize, new Rectangle(0, 0, _w, top.height.RoundInt() + 2 * _marginY));
         }
 
-        if (bottom.HasValue)
+        if (bottom.height > 0)
         {
-            var x = (_w - bottom.Value.Width) / 2;
-            var y = _h - bottom.Value.Height;
-            ShadowImagePart(new Rectangle(new Point(x, y), bottom.Value));
+            var bottomHeightM2 = bottom.height.RoundInt() + 2 * _marginY;
+            var y = _h - bottomHeightM2;
+            ShadowImagePart(bottom.fontSize, new Rectangle(0, y, _w, bottomHeightM2));
         }
 
         sw.Log("DrawShadow");
@@ -44,8 +45,13 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         //
 
-        void ShadowImagePart(Rectangle rectangle)
+        void ShadowImagePart(float fontSize, Rectangle rectangle)
         {
+            var w = Math.Sqrt(fontSize) / (nokia ? 1.6F : 2F);
+            var w2 = (int)Math.Ceiling(w) + 2;
+
+            Log($"/meme >> shadow size: {w:F2} / {w2:F2} px", ConsoleColor.DarkYellow);
+
             for (var y = rectangle.Y; y < rectangle.Bottom; y++)
             for (var x = rectangle.X; x < rectangle.Right; x++)
             {

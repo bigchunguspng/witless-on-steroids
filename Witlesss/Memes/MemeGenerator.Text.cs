@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -19,7 +18,7 @@ public partial class MemeGenerator
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
 
-    public static float FontSize => _font.Size;
+    private static float FontSize => _font.Size;
 
     private void SetUpFonts()
     {
@@ -32,11 +31,11 @@ public partial class MemeGenerator
 
     private void ResizeFont(float size) => _font = _fontFamily.CreateFont(size, _fontStyle);
 
-    private float GetStartingFontSize() // todo change maybe
+    private float GetStartingFontSize()
     {
-        var minSide = (int)Math.Min(_w, 1.5 * _h);
+        var defaultFontSize = Math.Min(_w, 1.5F * _h) / 10F;
         var multiplier = FontMultiplier / 10F;
-        return Math.Max(minSide * multiplier * ExtraFonts.GetSizeMultiplier() / 10, 15);
+        return Math.Max(defaultFontSize * multiplier, 15) * ExtraFonts.GetSizeMultiplier();
     }
 
 
@@ -51,110 +50,54 @@ public partial class MemeGenerator
 
         var k = 1F;
 
-        if (WrapText)
+        var textWidth = textChunks.GetMaxLineWidth();
+        var textHeight = lineHeight * text.GetLineCount();
+        if (textWidth < textWidthLimit && textHeight < textHeightLimit)
         {
-            if (text.Contains('\n')) // custom text only, sometimes
-            {
-                var textLineCount = text.GetLineCount();
-                var textWidth = textChunks.GetMaxLineWidth();
-                var textHeight = lineHeight * textLineCount;
-                if (textWidth < textWidthLimit && textHeight < textHeightLimit)
-                {
-                    return text; // OK - don't change anything!
-                }
-
-                var textRatio = textWidth / textHeight;
-                var areaRatio = textWidthLimit / textHeightLimit;
-                k = textRatio > areaRatio ? textWidthLimit / textWidth : textHeightLimit / textHeight;
-
-                if (textRatio > areaRatio * 2.5F)
-                {
-                    var widths = textChunks.GetLineWidths();
-
-                    float min = 0F, max = 1F, widthLimit = textWidth;
-
-                    while (textRatio / areaRatio is < 0.95F or > 1.15F && max - min > 0.01F)
-                    {
-                        var avg = (min + max) / 2F;
-                        widthLimit = textWidth * avg;
-                        var lineCount = widths.Sum(x => Math.Max(1, (x / widthLimit).CeilingInt()));
-
-                        textHeight = lineHeight * lineCount;
-                        textRatio = widthLimit / textHeight;
-
-                        var tooWide = textRatio > areaRatio;
-                        if (tooWide) max = avg;
-                        else         min = avg;
-                    }
-
-                    TextMeasuring.RedistributeText(textChunks, widthLimit);
-                    text = textChunks.FillWith(text);
-
-                    var maxLineWidth = textChunks.GetMaxLineWidth();
-                    textHeight = lineHeight * (textChunks.Count(x => x.Type == CharType.LineBreak) + 1);
-                    textRatio = maxLineWidth / textHeight;
-                    k = textRatio > areaRatio ? textWidthLimit / maxLineWidth : textHeightLimit / textHeight;
-                }
-            }
-            else // generated / custom text, most cases
-            {
-                var textWidth = textChunks.Sum(x => x.Width);
-                var textHeight = lineHeight * text.GetLineCount();
-                if (textWidth < textWidthLimit && textHeight < textHeightLimit)
-                {
-                    return text; // OK - don't change anything!
-                }
-
-                var maxWordWidth = textChunks.GetMaxWordWidth();
-                if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
-
-                if (textWidth * k > textWidthLimit)
-                {
-                    var lineCount = 2;
-                    while (true) // calculate line count
-                    {
-                        var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                        var targetRatio = textWidthLimit / (textHeightLimit * Math.Min(lineCount, 4) / 6F);
-                        if (textRatio < targetRatio) break;
-
-                        lineCount++;
-                    }
-
-                    TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
-                    text = textChunks.FillWith(text);
-
-                    EnsureLongestLineFits();
-                }
-            }
+            return text; // OK - don't change anything!
         }
-        else // ww
-        {
-            var textWidth = textChunks.Sum(x => x.Width);
-            var textHeight = lineHeight * text.GetLineCount();
-            if (textWidth < textWidthLimit && textHeight < textHeightLimit)
-            {
-                return text; // OK - don't change anything!
-            }
 
+        if (text.Contains('\n') || !WrapText) // ww
+        {
             var textRatio = textWidth / textHeight;
             var areaRatio = textWidthLimit / textHeightLimit;
             k = textRatio > areaRatio ? textWidthLimit / textWidth : textHeightLimit / textHeight;
+            
+            // [if you wanna add code to prevent text being too small, here it goes]
+        }
+        else // generated / custom text, most cases
+        {
+            var maxWordWidth = textChunks.GetMaxWordWidth();
+            if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
+
+            if (textWidth * k > textWidthLimit)
+            {
+                var areaRatio = textWidthLimit / textHeightLimit;
+                var ratioFix = areaRatio <= 3 ? 0F : areaRatio <= 4 ? 0.5F : 1F; // fixes small text for wide pics
+                var lineCount = 2;
+                while (true) // calculate line count
+                {
+                    var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
+                    var targetRatio = textWidthLimit / (textHeightLimit * (Math.Min(lineCount, 4) + ratioFix) / 6F);
+                    if (textRatio < targetRatio) break;
+
+                    lineCount++;
+                }
+
+                textChunks.RedistributeText(lineCount); // lineCount: 2+
+                text = textChunks.FillWith(text);
+
+                var maxLineWidth = textChunks.GetMaxLineWidth();
+                if (maxLineWidth * k > textWidthLimit)
+                {
+                    k = textWidthLimit / maxLineWidth; // fit longest line
+                }
+            }
         }
 
         ResizeFont(FontSize * k);
 
         return text;
-
-        //
-
-        void EnsureLongestLineFits()
-        {
-            var maxLineWidth = textChunks.GetMaxLineWidth();
-            if (maxLineWidth * k > textWidthLimit)
-            {
-                k = textWidthLimit / maxLineWidth;
-            }
-        }
     }
 
     private RichTextOptions GetDefaultTextOptions(int y) => new(_font)

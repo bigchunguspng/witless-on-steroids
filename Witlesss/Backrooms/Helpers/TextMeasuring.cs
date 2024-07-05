@@ -237,7 +237,7 @@ public static class TextMeasuring
     /// <summary>
     /// Suitable for distributing multi-line text.
     /// </summary>
-    public static void RedistributeText(LinkedList<TextChunk> chunks, float widthLimit)
+    public static void RedistributeText(this LinkedList<TextChunk> chunks, float widthLimit)
     {
         var currentLineWidth = 0F;
 
@@ -279,7 +279,7 @@ public static class TextMeasuring
     /// <summary>
     /// Suitable for distributing single line text.
     /// </summary>
-    public static void RedistributeText(LinkedList<TextChunk> chunks, int lines)
+    public static void RedistributeText(this LinkedList<TextChunk> chunks, int lines)
     {
         var widthTotal = chunks.Sum(x => x.Width);
         var averageLineWidth = widthTotal / lines;

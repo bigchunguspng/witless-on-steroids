@@ -63,7 +63,7 @@ public partial class IFunnyApp
                 k = MinFontSize / FontSize;
 
                 var widthLimit = textWidthLimit / k;
-                TextMeasuring.RedistributeText(textChunks, widthLimit);
+                textChunks.RedistributeText(widthLimit);
                 text = textChunks.FillWith(text);
             }
 
@@ -94,7 +94,7 @@ public partial class IFunnyApp
                     lineCount++;
                 }
 
-                TextMeasuring.RedistributeText(textChunks, lineCount); // lineCount: 2+
+                textChunks.RedistributeText(lineCount); // lineCount: 2+
                 text = textChunks.FillWith(text);
 
                 EnsureLongestLineFits();

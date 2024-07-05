@@ -19,7 +19,6 @@ public static class TextMeasuring
     public static int DetectLineBreak(string text, TextOptions options, int lines)
     {
         TextMeasurer.TryMeasureCharacterBounds(text, options, out var bounds);
-        TextMeasurer.TryMeasureCharacterAdvances(text, options, out var advances);
         var line = 0;
         for (var i = 0; i < bounds.Length - 1; i++)
         {
@@ -283,8 +282,21 @@ public static class TextMeasuring
                 }
                 else
                 {
+                    var breakWord = chunk.Value.Length > 25;
                     var breakBefore = averageLineWidth - currentLineWidth < limit - averageLineWidth;
-                    if (breakBefore)
+                    if (breakWord)
+                    {
+                        var c = chunk.Value;
+                        var width1 = averageLineWidth - currentLineWidth;
+                        var length1 = (c.Length * width1 / c.Width).RoundInt();
+                        var start2 = c.Start + length1;
+                        var length2 = c.Length - length1;
+                        var width2 = c.Width - width1;
+                        chunk.Value = new TextChunk(c.Start, length1, width1, c.Type);
+                        chunks.AddAfter(chunk, new TextChunk(start2, length2, width2, c.Type));
+                        chunks.AddAfter(chunk, lineBreak);
+                    }
+                    else if (breakBefore)
                     {
                         if (chunk.Previous?.Value.Type == CharType.Spaces)
                             chunk.Previous.Value = lineBreak;
@@ -338,6 +350,13 @@ public static class TextMeasuring
         }
 
         return sb.ToString();
+    }
+
+    public static float GetMaxWordWidth(this LinkedList<TextChunk> chunks)
+    {
+        return chunks
+            .Where(x => x is { Type: CharType.Text, Length: <= 25 })
+            .OrderByDescending(x => x.Width).FirstOrDefault().Width;
     }
 }
 

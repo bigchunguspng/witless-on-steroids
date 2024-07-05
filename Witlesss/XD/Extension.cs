@@ -124,12 +124,12 @@ namespace Witlesss.XD
             else                                                 return one;
         }
 
-        private static readonly Regex _lat = new(@"[A-Za-z]+");
-        private static readonly Regex _cyr = new(@"[А-я]+");
+        private static readonly Regex _lat = new(@"[A-Za-z]");
+        private static readonly Regex _cyr = new(@"[Ѐ-ӿ]");
 
         public static bool IsMostlyCyrillic(string text)
         {
-            return _cyr.Matches(text).Count > _lat.Matches(text).Count;
+            return _cyr.Count(text) > _lat.Count(text);
         }
         
         private static readonly Regex _ukrD = new(@"[ієїґ]");
@@ -139,12 +139,12 @@ namespace Witlesss.XD
 
         public static bool LooksLikeUkrainian(string text)
         {
-            var u = _ukrD.Matches(text).Count;
-            var r = _rusD.Matches(text).Count;
+            var u = _ukrD.Count(text);
+            var r = _rusD.Count(text);
 
             return u > 0 || r > 0
                 ? u > r
-                : _ukrM.Matches(text).Count >= _rusM.Matches(text).Count;
+                : _ukrM.Count(text) >= _rusM.Count(text);
         }
 
         public static string FileSize(string path) => FileSize(SizeInBytes(path));

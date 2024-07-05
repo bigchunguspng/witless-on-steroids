@@ -29,14 +29,13 @@ namespace Witlesss.Commands.Meme
         protected override void ParseOptions()
         {
             MemeGenerator.CustomColorOption.CheckAndCut(Request);
+            MemeGenerator.ExtraFonts.CheckAndCut(Request);
 
             MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 10);
             MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);
 
             MemeGenerator.WrapText  = !CheckAndCut(Request, _nowrap);
             MemeGenerator.ColorText =  CheckAndCut(Request, _colorText);
-
-            MemeGenerator.ExtraFonts.CheckAndCut(Request);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -91,7 +90,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*");
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*");
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*");
-        private static readonly Regex   _colorText = new(@"^\/meme\S*(c)\S*");
+        private static readonly Regex   _colorText = new(@"^\/meme\S*(cс)\S*");
         private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");
 

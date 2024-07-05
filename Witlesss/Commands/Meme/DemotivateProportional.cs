@@ -27,11 +27,10 @@ namespace Witlesss.Commands.Meme
         protected override void ParseOptions()
         {
             DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request);
+            DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
 
             DynamicDemotivatorDrawer.WrapText  = !CheckAndCut(Request, _nowrap);
             DynamicDemotivatorDrawer.CropEdges =  CheckAndCut(Request, _crop);
-
-            DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
         }
 
         protected override string GetMemeText(string? text)

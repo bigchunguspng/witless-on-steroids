@@ -45,7 +45,7 @@ public static class ChatsDealer
         }
     }
 
-    public static void SaveBakas           () => ForEachChat(witless => witless.SaveChangesOrUnloadInactive());
+    public static void SaveBakas           () => ForEachChat(witless => witless.SaveChangesOrUnloadIfUseless());
     public static void SaveBakasBeforeExit () => ForEachChat(witless => witless.SaveChanges());
 
     private static void ForEachChat(Action<Witless> action)

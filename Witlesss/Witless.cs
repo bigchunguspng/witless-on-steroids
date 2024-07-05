@@ -12,7 +12,7 @@ namespace Witlesss
     [JsonObject(MemberSerialization.OptIn)]
     public class Witless
     {
-        private const byte MAX_SAVES_SKIP_BEFORE_UNLOAD = 1;
+        private const byte MAX_USELESSNESS_BEFORE_UNLOAD = 10;
 
         public Witless(long chat, byte speech = 15, byte pics = 20, byte jpg = 75)
         {
@@ -77,7 +77,7 @@ namespace Witlesss
         [JsonProperty] public long Chat { get; set; }
 
         private ByteFlags _flags;
-        private byte _savesSkipped;
+        private byte _uselessness;
         private byte _speech, _pics, _quality;
 
         [JsonProperty] public bool AdminsOnly
@@ -122,6 +122,7 @@ namespace Witlesss
         {
             try
             {
+                _uselessness = 0;
                 return generate();
             }
             catch
@@ -135,11 +136,13 @@ namespace Witlesss
 
         // SAVE / LOAD
 
-        public void SaveChangesOrUnloadInactive()
+        public void SaveChangesOrUnloadIfUseless()
         {
-            if (!Loaded) return;
-            if (Dirty) Save();
-            else if (EnoughSavesSkipped()) Unload();
+            if (Loaded)
+            {
+                if (Dirty) Save();
+                else if (IsUselessEnough()) Unload();
+            }
         }
 
         public void SaveChanges()
@@ -171,13 +174,15 @@ namespace Witlesss
         private void ResetState()
         {
             Dirty = false;
-            _savesSkipped = 0;
+            _uselessness = 0;
         }
 
-        private bool EnoughSavesSkipped()
+        private bool IsUselessEnough()
         {
-            _savesSkipped = ((_savesSkipped + 1) % MAX_SAVES_SKIP_BEFORE_UNLOAD).ClampByte();
-            return _savesSkipped == 0;
+            var limitReached = _uselessness + 1 >= MAX_USELESSNESS_BEFORE_UNLOAD;
+            if (limitReached)  _uselessness = 0;
+
+            return limitReached;
         }
 
         // FUSE / DELETE

@@ -212,7 +212,6 @@ namespace Witlesss.Memes.Shared
             Image<Rgba32> GetEmptyCanvas() => new(width, height);
         }
 
-        public static string RemoveEmoji (string text) => ReplaceEmoji(text, "");
         public static string ReplaceEmoji
         (
             string text, string ok, MatchCollection? matches = null, List<List<string>>? pngs = null

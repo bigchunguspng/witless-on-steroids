@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using ColorHelper;
-using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
@@ -16,6 +13,8 @@ namespace Witlesss.Memes
 {
     public partial class MemeGenerator : IMemeGenerator<TextPair>
     {
+        private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Meme };
+
         // OPTIONS
 
         public static bool WrapText = true, ColorText;
@@ -127,20 +126,43 @@ namespace Witlesss.Memes
         {
             if (string.IsNullOrEmpty(text)) return (0, 0);
 
-            text = EmojiTool.RemoveEmoji(text);
-            text = text.TrimStart('\n');
+            text = text.Trim('\n');
 
-            var textR = MakeTextFitCard(text);
+            var emoji = EmojiRegex.Matches(text);
+            if (emoji.Count == 0)
+            {
+                text = MakeTextFitCard(text);
 
-            Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+                Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-            var options = GetDefaultTextOptions(y);
-            background.Mutate(x => x.DrawText(_textDrawingOptions, options, textR, GetBrush(), pen: null));
+                var options = GetDefaultTextOptions(y);
+                background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
+            }
+            else
+            {
+                var pngs = EmojiTool.GetEmojiPngs(emoji);
 
-            return (FontSize * GetLineSpacing() * textR.GetLineCount(), FontSize);
+                text = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+
+                Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+
+                var options = GetDefaultTextOptions(y);
+                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize());
+                var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
+                background.Mutate(x => x.DrawImage(textLayer, GetOriginFunny(textLayer.Size, y)));
+            }
+
+            return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
         }
 
         private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+
+        private Point GetOriginFunny(Size textLayer, int margin)
+        {
+            var x = _w.Gap(textLayer.Width).RoundInt();
+            var y = margin == _marginY ? _marginY : margin - textLayer.Height;
+            return new Point(x, y);
+        }
 
         private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
 

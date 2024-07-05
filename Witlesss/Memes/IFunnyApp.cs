@@ -136,11 +136,11 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     private Image DrawTextSimple(string text)
     {
-        var textR = MakeTextFitCard(text);
-        AdjustTextPosition(textR);
+        text = MakeTextFitCard(text);
+        AdjustTextPosition(text);
 
         var image = CreateBackgroundCard();
-        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), textR, TextBrush, pen: null));
+        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), text, TextBrush, pen: null));
         return image;
     }
 
@@ -148,13 +148,13 @@ public partial class IFunnyApp : IMemeGenerator<string>
     {
         var pngs = EmojiTool.GetEmojiPngs(emoji);
 
-        var textR = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
-        AdjustTextPosition(textR);
+        text = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+        AdjustTextPosition(text);
 
         var options = GetDefaultTextOptions();
 
         var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize());
-        var textLayer = _emojer.DrawEmojiText(textR, options, parameters, pngs.AsQueue(), out _);
+        var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
         image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));

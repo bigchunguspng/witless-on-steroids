@@ -46,19 +46,57 @@ public partial class MemeGenerator
 
         var lineHeight = FontSize * GetLineSpacing();
 
-        var textWidthLimit = _captionSize.Width;
-        var textHeightLimit = _captionSize.Height;
+        var textWidthLimit = (float)_captionSize.Width;
+        var textHeightLimit = (float)_captionSize.Height;
 
         var k = 1F;
 
         if (WrapText)
         {
-            if (text.Contains('\n'))
+            if (text.Contains('\n')) // custom text only, sometimes
             {
-                // get closest to target text ratio by changing width in binary search way starting with 0.5*max.w
-                throw new NotImplementedException();
+                var textLineCount = text.GetLineCount();
+                var textWidth = textChunks.GetMaxLineWidth();
+                var textHeight = lineHeight * textLineCount;
+                if (textWidth < textWidthLimit && textHeight < textHeightLimit)
+                {
+                    return text; // OK - don't change anything!
+                }
+
+                var textRatio = textWidth / textHeight;
+                var areaRatio = textWidthLimit / textHeightLimit;
+                k = textRatio > areaRatio ? textWidthLimit / textWidth : textHeightLimit / textHeight;
+
+                if (textRatio > areaRatio * 2.5F)
+                {
+                    var widths = textChunks.GetLineWidths();
+
+                    float min = 0F, max = 1F, widthLimit = textWidth;
+
+                    while (textRatio / areaRatio is < 0.95F or > 1.15F && max - min > 0.01F)
+                    {
+                        var avg = (min + max) / 2F;
+                        widthLimit = textWidth * avg;
+                        var lineCount = widths.Sum(x => Math.Max(1, (x / widthLimit).CeilingInt()));
+
+                        textHeight = lineHeight * lineCount;
+                        textRatio = widthLimit / textHeight;
+
+                        var tooWide = textRatio > areaRatio;
+                        if (tooWide) max = avg;
+                        else         min = avg;
+                    }
+
+                    TextMeasuring.RedistributeText(textChunks, widthLimit);
+                    text = textChunks.FillWith(text);
+
+                    var maxLineWidth = textChunks.GetMaxLineWidth();
+                    textHeight = lineHeight * (textChunks.Count(x => x.Type == CharType.LineBreak) + 1);
+                    textRatio = maxLineWidth / textHeight;
+                    k = textRatio > areaRatio ? textWidthLimit / maxLineWidth : textHeightLimit / textHeight;
+                }
             }
-            else
+            else // generated / custom text, most cases
             {
                 var textWidth = textChunks.Sum(x => x.Width);
                 var textHeight = lineHeight * text.GetLineCount();
@@ -66,7 +104,7 @@ public partial class MemeGenerator
                 {
                     return text; // OK - don't change anything!
                 }
-                
+
                 var maxWordWidth = textChunks.GetMaxWordWidth();
                 if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
 

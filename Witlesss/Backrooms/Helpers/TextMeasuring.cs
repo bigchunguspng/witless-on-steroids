@@ -196,6 +196,25 @@ public static class TextMeasuring
         int GetStart() => list.LastOrDefault().GetNextChunkStart();
     }
 
+    public static List<float> GetLineWidths(this LinkedList<TextChunk> chunks)
+    {
+        var list = new List<float>();
+        var currentLineWidth = 0F;
+        foreach (var chunk in chunks)
+        {
+            if (chunk.Type == CharType.LineBreak)
+            {
+                list.Add(currentLineWidth);
+                currentLineWidth = 0F;
+            }
+            else
+                currentLineWidth += chunk.Width;
+        }
+
+        list.Add(currentLineWidth);
+        return list;
+    }
+
     public static float GetMaxLineWidth(this LinkedList<TextChunk> chunks)
     {
         var max = 0F;

@@ -26,6 +26,7 @@ namespace Witlesss.Memes
         private Size _sourceSizeOG, _sourceSizeAdjusted;
 
         private int _w, _h, _marginY, _marginX;
+        private float _offsetY;
         private Size _captionSize;
 
         // DATA
@@ -160,7 +161,7 @@ namespace Witlesss.Memes
         private Point GetOriginFunny(Size textLayer, int margin)
         {
             var x = _w.Gap(textLayer.Width).RoundInt();
-            var y = margin == _marginY ? _marginY : margin - textLayer.Height;
+            var y = ((margin == _marginY ? _marginY + 1.5F : margin - textLayer.Height) + _offsetY).RoundInt();
             return new Point(x, y);
         }
 

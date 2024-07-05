@@ -27,6 +27,8 @@ public partial class MemeGenerator
 
         _startingFontSize = GetStartingFontSize();
         ResizeFont(_startingFontSize);
+
+        _offsetY = FontSize * ExtraFonts.GetVerticalOffset();
     }
 
     private void ResizeFont(float size) => _font = _fontFamily.CreateFont(size, _fontStyle);
@@ -105,7 +107,7 @@ public partial class MemeGenerator
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
         VerticalAlignment = y == _marginY ? VerticalAlignment.Top : VerticalAlignment.Bottom,
-        Origin = new Point(_w / 2, y),
+        Origin = new PointF(_w / 2F, (y == _marginY ? _marginY * 1.5F : y) + _offsetY),
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
         FallbackFontFamilies = ExtraFonts.FallbackFamilies

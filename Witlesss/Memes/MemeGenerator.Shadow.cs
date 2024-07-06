@@ -54,6 +54,9 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
             Log($"/meme >> shadow size: {w:F2} / {w2:F2} px", ConsoleColor.DarkYellow);
 
+            var width  = image.Width;
+            var height = image.Height;
+
             for (var y = rectangle.Y; y < rectangle.Bottom; y++)
             for (var x = rectangle.X; x < rectangle.Right; x++)
             {
@@ -66,7 +69,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
                     var sx = kx - x;
                     var sy = ky - y;
 
-                    var outsideImage = kx < 0 || kx >= image.Width || ky < 0 || ky >= image.Height;
+                    var outsideImage = kx < 0 || kx >= width || ky < 0 || ky >= height;
                     if (outsideImage) continue;
 
                     var shadowA = shadowRealm[kx, ky].A;

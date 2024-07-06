@@ -196,24 +196,7 @@ public static class TextMeasuring
         int GetStart() => list.LastOrDefault().GetNextChunkStart();
     }
 
-    public static List<float> GetLineWidths(this LinkedList<TextChunk> chunks)
-    {
-        var list = new List<float>();
-        var currentLineWidth = 0F;
-        foreach (var chunk in chunks)
-        {
-            if (chunk.Type == CharType.LineBreak)
-            {
-                list.Add(currentLineWidth);
-                currentLineWidth = 0F;
-            }
-            else
-                currentLineWidth += chunk.Width;
-        }
-
-        list.Add(currentLineWidth);
-        return list;
-    }
+    // GET WIDTH
 
     public static float GetMaxLineWidth(this LinkedList<TextChunk> chunks)
     {
@@ -233,9 +216,17 @@ public static class TextMeasuring
         return Math.Max(max, currentLineWidth);
     }
 
-    // todo break words with > 25 chars
+    public static float GetMaxWordWidth(this LinkedList<TextChunk> chunks)
+    {
+        return chunks
+            .Where(x => x is { Type: CharType.Text, Length: <= 25 })
+            .OrderByDescending(x => x.Width).FirstOrDefault().Width;
+    }
+
+    // DISSTRIBUTE
+
     /// <summary>
-    /// Suitable for distributing multi-line text.
+    /// Use this with MULTI-LINE text.
     /// </summary>
     public static void RedistributeText(this LinkedList<TextChunk> chunks, float widthLimit)
     {
@@ -260,11 +251,9 @@ public static class TextMeasuring
                 }
                 else
                 {
-                    if (chunk.Previous?.Value.Type == CharType.Spaces)
-                        chunk.Previous.Value = lineBreak;
-                    else
-                        chunks.AddBefore(chunk, lineBreak);
-                    currentLineWidth = chunk.Value.Width;
+                    currentLineWidth = chunk.Value.Length > 25
+                        ? BreakLongWord(chunks, chunk, lineBreak, widthLimit, currentLineWidth)
+                        : BreakBefore(chunks, chunk, lineBreak);
                 }
             }
             else
@@ -277,7 +266,7 @@ public static class TextMeasuring
     }
 
     /// <summary>
-    /// Suitable for distributing single line text.
+    /// Use this with SINGLE LINE text.
     /// </summary>
     public static void RedistributeText(this LinkedList<TextChunk> chunks, int lines)
     {
@@ -301,36 +290,14 @@ public static class TextMeasuring
                 }
                 else
                 {
-                    var breakWord = chunk.Value.Length > 25;
                     var breakBefore = averageLineWidth - currentLineWidth < limit - averageLineWidth;
-                    if (breakWord)
-                    {
-                        var c = chunk.Value;
-                        var width1 = averageLineWidth - currentLineWidth;
-                        var length1 = (c.Length * width1 / c.Width).RoundInt();
-                        var start2 = c.Start + length1;
-                        var length2 = c.Length - length1;
-                        var width2 = c.Width - width1;
-                        chunk.Value = new TextChunk(c.Start, length1, width1, c.Type);
-                        chunks.AddAfter(chunk, new TextChunk(start2, length2, width2, c.Type));
-                        chunks.AddAfter(chunk, lineBreak);
-                    }
-                    else if (breakBefore)
-                    {
-                        if (chunk.Previous?.Value.Type == CharType.Spaces)
-                            chunk.Previous.Value = lineBreak;
-                        else
-                            chunks.AddBefore(chunk, lineBreak);
-                        currentLineWidth = chunk.Value.Width;
-                    }
-                    else
-                    {
-                        if (chunk.Next?.Value.Type == CharType.Spaces)
-                            chunk.Next.Value = lineBreak;
-                        else
-                            chunks.AddAfter(chunk, lineBreak);
-                        currentLineWidth = 0F;
-                    }
+                    currentLineWidth = chunk.Value.Length > 25
+                        ? BreakLongWord(chunks, chunk, lineBreak, averageLineWidth, currentLineWidth)
+                        : breakBefore
+                            ? BreakBefore(chunks, chunk, lineBreak)
+                            : BreakAfter (chunks, chunk, lineBreak);
+
+                    if (chunk.Next?.Value.Type == CharType.LineBreak) chunk = chunk.Next;
                 }
 
                 linesFilled++;
@@ -358,6 +325,59 @@ public static class TextMeasuring
         }
     }
 
+    // BREAKING
+
+    private static float BreakLongWord
+    (
+        LinkedList<TextChunk> chunks, LinkedListNode<TextChunk> chunk,
+        TextChunk lineBreak,
+        float widthLimit, float currentLineWidth
+    )
+    {
+        var c = chunk.Value;
+
+        var  width1 = widthLimit - currentLineWidth;
+        var length1 = (c.Length * width1 / c.Width).RoundInt(); // todo replace with more precice method
+        var  start2 = c.Start + length1;
+        var length2 = c.Length - length1;
+        var  width2 = c.Width - width1;
+
+        var part1 = new TextChunk(c.Start, length1, width1, c.Type);
+        var part2 = new TextChunk( start2, length2, width2, c.Type);
+
+        chunk.Value = lineBreak;
+        chunks.AddBefore(chunk, part1);
+        chunks.AddAfter (chunk, part2);
+
+        return 0F;
+    }
+
+    private static float BreakBefore
+    (
+        LinkedList<TextChunk> chunks, LinkedListNode<TextChunk> chunk, TextChunk lineBreak
+    )
+    {
+        if (chunk.Previous?.Value.Type == CharType.Spaces)
+            chunk.Previous.Value = lineBreak;
+        else
+            chunks.AddBefore(chunk, lineBreak);
+        return chunk.Value.Width;
+    }
+
+    private static float BreakAfter
+    (
+        LinkedList<TextChunk> chunks, LinkedListNode<TextChunk> chunk, TextChunk lineBreak
+    )
+    {
+        if (chunk.Next?.Value.Type == CharType.Spaces)
+            chunk.Next.Value = lineBreak;
+        else
+            chunks.AddAfter(chunk, lineBreak);
+        return 0F;
+    }
+
+    //
+
     public static string FillWith(this LinkedList<TextChunk> chunks, string text)
     {
         var sb = new StringBuilder((text.Length * 1.05F).RoundInt());
@@ -369,13 +389,6 @@ public static class TextMeasuring
         }
 
         return sb.ToString();
-    }
-
-    public static float GetMaxWordWidth(this LinkedList<TextChunk> chunks)
-    {
-        return chunks
-            .Where(x => x is { Type: CharType.Text, Length: <= 25 })
-            .OrderByDescending(x => x.Width).FirstOrDefault().Width;
     }
 }
 

@@ -74,8 +74,10 @@ public partial class MemeGenerator
 
             if (textWidth * k > textWidthLimit)
             {
+                // this fixes small text for wide pictures
                 var areaRatio = textWidthLimit / textHeightLimit;
-                var ratioFix = areaRatio <= 3 ? 0F : areaRatio <= 4 ? 0.5F : 1F; // fixes small text for wide pics
+                var ratioFix = areaRatio <= 3 ? 0F : areaRatio >= 5 ? 1F : 0.5F * (areaRatio - 3);
+
                 var lineCount = 2;
                 while (true) // calculate line count
                 {

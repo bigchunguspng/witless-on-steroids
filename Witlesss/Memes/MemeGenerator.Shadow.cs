@@ -27,14 +27,14 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         if (top.height > 0)
         {
-            ShadowImagePart(top.fontSize, new Rectangle(0, 0, _w, top.height.RoundInt() + 2 * _marginY));
+            ShadowImagePart(top.fontSize, new Rectangle(0, 0, _w, GetSafeShadowHeight(top.height)));
         }
 
         if (bottom.height > 0)
         {
-            var bottomHeightM2 = bottom.height.RoundInt() + 2 * _marginY;
-            var y = _h - bottomHeightM2;
-            ShadowImagePart(bottom.fontSize, new Rectangle(0, y, _w, bottomHeightM2));
+            var height = GetSafeShadowHeight(bottom.height);
+            var y = _h - height;
+            ShadowImagePart(bottom.fontSize, new Rectangle(0, y, _w, height));
         }
 
         sw.Log("DrawShadow");
@@ -44,6 +44,8 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
         return shadowRealm;
 
         //
+
+        int GetSafeShadowHeight(float height) => height.RoundInt() + 4 * _marginY;
 
         void ShadowImagePart(float fontSize, Rectangle rectangle)
         {

@@ -40,6 +40,10 @@ public static class TelegramExtensions
     {
         return message.Sticker is { IsVideo: false, IsAnimated: false } sticker ? sticker : null;
     }
+    public static Animation? GetAnimation   (this Message message)
+    {
+        return message.Animation is { FileSize: <= 320_000, Duration: <= 21 } anime ? anime : null;
+    }
 
     //
 

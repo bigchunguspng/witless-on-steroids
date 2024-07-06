@@ -109,7 +109,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             Log($"{Title} >> {Log_STICK(repeats)}");
         }
 
-        private async Task ProcessVideo(string fileID)
+        public async Task ProcessVideo(string fileID)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 

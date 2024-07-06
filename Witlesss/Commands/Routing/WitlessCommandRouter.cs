@@ -93,6 +93,10 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             GetMemeMaker(sticker.Width, sticker.Height).ProcessStick(sticker.FileId);
         }
+        else if (Message.GetAnimation() is { } anime && HaveToMemeSticker())
+        {
+            GetMemeMaker(anime.Width, anime.Height).ProcessVideo(anime.FileId);
+        }
         else if (Lucky(Baka.Speech))
         {
             new PoopText().Execute(Context);

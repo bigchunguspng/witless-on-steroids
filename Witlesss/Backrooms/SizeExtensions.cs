@@ -52,7 +52,7 @@ public static class SizeExtensions
             : new Size((int)(size.Width / (size.Height / lim)), limit);
     }
 
-    public static Size EnureIsWideEnough(this Size size, int width = 200)
+    public static Size EnureIsWideEnough(this Size size, int width = 240)
     {
         if (size.Width >= width) return size;
 

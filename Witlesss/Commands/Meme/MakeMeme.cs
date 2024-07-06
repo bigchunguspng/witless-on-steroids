@@ -109,5 +109,6 @@ namespace Witlesss.Commands.Meme
 
         Task ProcessPhoto(string fileID);
         Task ProcessStick(string fileID);
+        Task ProcessVideo(string fileID);
     }
 }

@@ -1,23 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Witlesss.Generation.Pack;
 
-public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
+public interface TransitionTable
 {
+    IEnumerable<Transition> AsIEnumerable { get; }
+
+    Transition this[int index] { get; }
+
+    int Count { get; }
+
+    float TotalChance { get; }
+
+    void Put   (int id, float chance);
+    void PutMax(int id, float chance);
+
+    void Add  (Transition transition);
+
+    int FindIndexByID(int id);
+}
+
+public class VastTransitionTable : List<Transition>, TransitionTable
+{
+    public IEnumerable<Transition> AsIEnumerable => this;
+
     public float TotalChance { get; private set; }
 
     private void IncreaseTotalChanceBy(float value)
         => TotalChance = TotalChance.CombineRound(value);
+
+    public VastTransitionTable() { }
+    public VastTransitionTable(IEnumerable<Transition> transitions) : base(transitions) { }
 
     public void Put(int id, float chance)
     {
         var index = GetIndexOrAdd(id, chance);
         if (index >= 0)
         {
-            var transition = this[index];
-            transition.IncreaseChanceBy(chance);
-            this[index] = transition;
+            this[index] = this[index].WithChanceIncreasedBy(chance);
             IncreaseTotalChanceBy(chance);
         }
     }
@@ -27,10 +49,7 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
         var index = GetIndexOrAdd(id, chance);
         if (index >= 0)
         {
-            var transition = this[index];
-            var max = Math.Max(transition.Chance, chance);
-            transition.SetChanceTo(max, out var difference);
-            this[index] = transition;
+            this[index] = this[index].WithMaxChance(chance, out var difference);
             IncreaseTotalChanceBy(difference);
         }
     }
@@ -55,10 +74,67 @@ public class TransitionTable(int capacity = 1) : List<Transition>(capacity)
     // 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 10 -> 12 -> 15 -> 18 -> 22 -> 27 -> 33 -> 41 -> 51 -> ...
     private void IncreaseCapacity() => Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
 
-    private int FindIndexByID(int id)
+    public int FindIndexByID(int id)
     {
         var i = 0;
         foreach (var transition in this)
+        {
+            if (transition.WordID == id) return i;
+            i++;
+        }
+
+        return -1;
+    }
+}
+
+public class TinyTransitionTable : TransitionTable
+{
+    private Transition[] _transitions = [];
+
+    public IEnumerable<Transition> AsIEnumerable => _transitions;
+
+    public Transition this[int index] => _transitions[index];
+
+    public int Count => _transitions.Length;
+
+    public float TotalChance => MathF.Round(_transitions.Sum(x => x.Chance), 1);
+
+    public void Put(int id, float chance)
+    {
+        var i = GetIndexOrAdd(id, chance);
+        if (i >= 0) _transitions[i] = _transitions[i].WithChanceIncreasedBy(chance);
+    }
+
+    public void PutMax(int id, float chance)
+    {
+        var i = GetIndexOrAdd(id, chance);
+        if (i >= 0) _transitions[i] = _transitions[i].WithMaxChance(chance, out _);
+    }
+
+    private int GetIndexOrAdd(int id, float chance)
+    {
+        var index = FindIndexByID(id);
+        if (index < 0) Add(new Transition(id, chance));
+
+        return index;
+    }
+
+    public void Add(Transition transition)
+    {
+        var old = _transitions;
+        _transitions = new Transition[old.Length + 1];
+        for (var i = 0; i < old.Length; i++)
+        {
+            _transitions[i] = old[i];
+        }
+
+        _transitions[^1] = transition;
+    }
+
+    public int FindIndexByID(int id)
+    {
+        var i = 0;
+        foreach (var transition in _transitions)
         {
             if (transition.WordID == id) return i;
             i++;

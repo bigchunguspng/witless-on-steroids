@@ -123,20 +123,20 @@ namespace Witlesss.Generation
 
         // FUSE
 
-        public void Fuse(GenerationPack source)
+        public void Fuse(GenerationPack other)
         {
             // update vocabulary
-            var ids = source.Vocabulary.Select(word => DB.GetOrAddWord_ReturnID(word)).ToList();
+            var ids = other.Vocabulary.Select(word => DB.GetOrAddWord_ReturnID(word)).ToList();
 
             // update transitions
-            foreach (var sourceTable in source.Transitions)
+            foreach (var otherTable in other.Transitions)
             {
-                var tableID = GetNewID(sourceTable.Key);
-                var targetTable = DB.GetTableByID(tableID);
-                foreach (var transition in sourceTable.Value)
+                var tableID = GetNewID(otherTable.Key);
+                var thisTable = DB.GetOrAddTable(tableID);
+                foreach (var transition in otherTable.Value.AsIEnumerable)
                 {
                     var wordID = GetNewID(transition.WordID);
-                    targetTable.PutMax(wordID, transition.Chance);
+                    thisTable.PutMax(wordID, transition.Chance);
                 }
             }
 
@@ -178,7 +178,7 @@ namespace Witlesss.Generation
 
             while (ids.Last!.Value != GenerationPack.END)
             {
-                var table = DB.GetTableByID(ids.Last.Value);
+                var table = DB.Transitions[ids.Last.Value];
                 ids.AddLast(PickWordID(table));
             }
 
@@ -200,13 +200,13 @@ namespace Witlesss.Generation
             return RenderText(ids);
         }
 
-        private static int PickWordID(TransitionTable words, int fallback = GenerationPack.END)
+        private static int PickWordID(TransitionTable table, int fallback = GenerationPack.END)
         {
-            var r = Random.Shared.NextSingle() * words.TotalChance;
+            var r = Random.Shared.NextSingle() * table.TotalChance;
 
             if (r > 0F)
             {
-                foreach (var transition in words)
+                foreach (var transition in table.AsIEnumerable)
                 {
                     if (transition.Chance > r) return transition.WordID;
                     r -= transition.Chance;
@@ -259,10 +259,10 @@ namespace Witlesss.Generation
         /// </summary>
         private TransitionTable GetWordsBefore(int wordID)
         {
-            var table = new TransitionTable();
+            var table = new VastTransitionTable();
             foreach (var pair in DB.Transitions)
             {
-                var index = pair.Value.FindIndex(x => x.WordID == wordID);
+                var index = pair.Value.FindIndexByID(wordID);
                 if (index > 0)
                 {
                     table.Put(pair.Key, pair.Value[index].Chance);

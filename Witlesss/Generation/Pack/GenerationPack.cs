@@ -69,11 +69,16 @@ public class GenerationPack
         return Vocabulary[id];
     }
 
-    public TransitionTable GetTableByID(int id)
+    public TransitionTable GetOrAddTable(int id)
     {
-        if (Transitions.TryGetValue(id, out var table) == false)
+        if (Transitions.TryGetValue(id, out var table) == false) // not fount
         {
-            table = new TransitionTable();
+            table = new TinyTransitionTable();
+            Transitions[id] = table;
+        }
+        else if (table.Count == 8 && table is TinyTransitionTable) // size treshold
+        {
+            table = new VastTransitionTable(table.AsIEnumerable);
             Transitions[id] = table;
         }
 

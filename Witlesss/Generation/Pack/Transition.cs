@@ -1,15 +1,21 @@
-﻿namespace Witlesss.Generation.Pack;
+﻿using System;
 
-public struct Transition(int wordID, float chance)
+namespace Witlesss.Generation.Pack;
+
+public readonly struct Transition(int wordID, float chance)
 {
-    public int   WordID { get; }              = wordID;
-    public float Chance { get; private set; } = chance;
+    public int   WordID { get; }               = wordID;
+    public float Chance { get; private init; } = chance;
 
-    public void IncreaseChanceBy(float value) => Chance = Chance.CombineRound(value);
-
-    public void SetChanceTo(float value, out float difference)
+    public Transition WithChanceIncreasedBy(float value)
     {
-        difference = value - Chance;
-        Chance = value;
+        return this with { Chance = Chance.CombineRound(value) };
+    }
+
+    public Transition WithMaxChance(float value, out float difference)
+    {
+        var max = Math.Max(Chance, value);
+        difference = max - Chance;
+        return this with { Chance = max };
     }
 }

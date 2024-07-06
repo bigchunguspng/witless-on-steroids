@@ -21,7 +21,7 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
             writer.WritePropertyName(Base64Encoder.ToString(pair.Key));
             writer.WriteStartObject();
 
-            foreach (var transition in pair.Value)
+            foreach (var transition in pair.Value.AsIEnumerable)
             {
                 writer.WritePropertyName(Base64Encoder.ToString(transition.WordID));
                 writer.WriteValue(transition.Chance);
@@ -42,9 +42,9 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
         JsonSerializer serializer
     )
     {
-        var depth = 0;
+        int depth = 0, id0 = 0;
 
-        TransitionTable transitions = null!;
+        TransitionTable table = null!;
 
         while (reader.Read())
         {
@@ -58,13 +58,20 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
 
                     if (depth == 0) // keys
                     {
-                        transitions = [];
-                        dictionary.Add(id, transitions);
+                        id0 = id;
+                        table = new TinyTransitionTable();
+                        dictionary.Add(id0, table);
                     }
                     else if (depth == 1) // values
                     {
+                        if (table.Count == 8 && table is TinyTransitionTable)
+                        {
+                            table = new VastTransitionTable(table.AsIEnumerable);
+                            dictionary[id0] = table;
+                        }
+
                         var chance = (float)reader.ReadAsDouble()!;
-                        transitions.Add(new Transition(id, chance));
+                        table.Add(new Transition(id, chance));
                     }
                 }
             }

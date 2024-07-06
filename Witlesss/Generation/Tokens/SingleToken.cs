@@ -11,7 +11,7 @@ public readonly struct SingleToken(int id) : IConsumableToken
 
     public void RememberTransition(GenerationPack db, IConsumableToken next)
     {
-        var table = db.GetTableByID(ID);
+        var table = db.GetOrAddTable(ID);
 
         if (next is SingleToken simple)
         {

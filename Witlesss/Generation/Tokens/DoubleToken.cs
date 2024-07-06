@@ -13,10 +13,10 @@ public readonly struct DoubleToken(int id1, int id2, int idC) : IConsumableToken
 
     public void RememberTransition(GenerationPack db, IConsumableToken next)
     {
-        db.GetTableByID(ID1).Put(ID2, 1F);
+        db.GetOrAddTable(ID1).Put(ID2, 1F);
 
-        var table2 = db.GetTableByID(ID2);
-        var tableC = db.GetTableByID(IDC);
+        var table2 = db.GetOrAddTable(ID2);
+        var tableC = db.GetOrAddTable(IDC);
 
         if (next is SingleToken simple)
         {

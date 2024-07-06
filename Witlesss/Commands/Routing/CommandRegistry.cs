@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Routing;
 
 public class CommandRegistry<T>
 {
-    private List<(string Command, Func<T> Function)> _lobby = [];
+    private                  List<(string Command, Func<T> Function)>  _lobby = [];
     private Dictionary<char, List<(string Command, Func<T> Function)>> _dictionary = new();
 
     public CommandRegistry<T> Register(string command, Func<T> function)
@@ -30,8 +30,7 @@ public class CommandRegistry<T>
     {
         if (command is null) return null;
 
-        var c = command[1];
-        if (_dictionary.TryGetValue(c, out var list))
+        if (_dictionary.TryGetValue(command[1], out var list))
         {
             return list.FirstOrDefault(x => command.StartsWith(x.Command)).Function;
         }

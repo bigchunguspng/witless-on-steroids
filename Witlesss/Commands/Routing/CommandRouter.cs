@@ -1,6 +1,8 @@
 ﻿using System;
 using Telegram.Bot.Types;
 using Witlesss.Commands.Editing;
+using Witlesss.Commands.Messaging;
+using Witlesss.Commands.Packing;
 
 namespace Witlesss.Commands.Routing
 {
@@ -40,9 +42,9 @@ namespace Witlesss.Commands.Routing
                 .Register("sex"    , () => new ToSticker())
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
+                .Register("ff"     , () => new AdvancedEdit())
                 .Register("w"      , () => _reddit)
                 .Register("link"   , () => _link)
-                .Register("ff"     , () => new AdvancedEdit())
                 .Register("piece"  , () => _piece)
                 .Register("debug"  , () => _debug)
                 .Register("chat_id", () => _mail.WithText(Context.Chat.ToString()))

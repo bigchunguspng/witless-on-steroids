@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Generation
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {

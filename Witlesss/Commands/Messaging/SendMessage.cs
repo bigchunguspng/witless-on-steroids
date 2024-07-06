@@ -1,4 +1,4 @@
-﻿namespace Witlesss.Commands;
+﻿namespace Witlesss.Commands.Messaging;
 
 public class SendMessage : SyncCommand
 {

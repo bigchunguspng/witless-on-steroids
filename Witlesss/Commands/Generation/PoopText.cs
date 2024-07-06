@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Witlesss.Commands;
+namespace Witlesss.Commands.Generation;
 
 public class PoopText : WitlessAsyncCommand
 {

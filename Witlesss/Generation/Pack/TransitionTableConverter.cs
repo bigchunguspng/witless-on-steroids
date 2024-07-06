@@ -35,10 +35,10 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
 
     public override Dictionary<int, TransitionTable> ReadJson
     (
-        JsonReader reader, 
-        Type type, 
-        Dictionary<int, TransitionTable> dictionary, 
-        bool hasValue, 
+        JsonReader reader,
+        Type type,
+        Dictionary<int, TransitionTable> dictionary,
+        bool hasValue,
         JsonSerializer serializer
     )
     {

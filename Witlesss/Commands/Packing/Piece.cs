@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
-using Witlesss.Commands.Packing;
 using Witlesss.Generation;
 using Witlesss.Generation.Pack;
 
-namespace Witlesss.Commands
+namespace Witlesss.Commands.Packing
 {
     /// <summary>
     /// Post Id Easy Channel Exporter™? Maybe.

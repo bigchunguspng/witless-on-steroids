@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Witlesss.Commands;
+namespace Witlesss.Commands.Messaging;
 
 public class Spam : SyncCommand
 {

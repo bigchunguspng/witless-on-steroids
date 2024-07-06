@@ -73,12 +73,12 @@ public class GenerationPack
     {
         if (Transitions.TryGetValue(id, out var table) == false) // not fount
         {
-            table = new TinyTransitionTable();
+            table = new TransitionTableSmall();
             Transitions[id] = table;
         }
-        else if (table.Count == 8 && table is TinyTransitionTable) // size treshold
+        else if (table.Count == 8 && table is TransitionTableSmall) // size treshold
         {
-            table = new VastTransitionTable(table.AsIEnumerable);
+            table = new TransitionTableLarge(table.AsIEnumerable);
             Transitions[id] = table;
         }
 

@@ -42,7 +42,7 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
         JsonSerializer serializer
     )
     {
-        int depth = 0, id0 = 0;
+        int depth = 0, id = 0;
 
         TransitionTable table = null!;
 
@@ -54,24 +54,23 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
             {
                 if (reader.TokenType == JsonToken.PropertyName && reader.ValueType == typeof(string))
                 {
-                    var id = Base64Encoder.ToInt((reader.Value as string)!);
-
                     if (depth == 0) // keys
                     {
-                        id0 = id;
-                        table = new TinyTransitionTable();
-                        dictionary.Add(id0, table);
+                        id = ReadID();
+                        table = new TransitionTableSmall();
+                        dictionary.Add(id, table);
                     }
                     else if (depth == 1) // values
                     {
-                        if (table.Count == 8 && table is TinyTransitionTable)
+                        if (table.Count == 8 && table is TransitionTableSmall)
                         {
-                            table = new VastTransitionTable(table.AsIEnumerable);
-                            dictionary[id0] = table;
+                            table = new TransitionTableLarge(table.AsIEnumerable);
+                            dictionary[id] = table;
                         }
 
+                        var wordID = ReadID();
                         var chance = (float)reader.ReadAsDouble()!;
-                        table.Add(new Transition(id, chance));
+                        table.Add(new Transition(wordID, chance));
                     }
                 }
             }
@@ -80,5 +79,7 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
         }
 
         return dictionary;
+
+        int ReadID() => Base64Encoder.ToInt((reader.Value as string)!);
     }
 }

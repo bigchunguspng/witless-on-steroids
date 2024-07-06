@@ -259,7 +259,7 @@ namespace Witlesss.Generation
         /// </summary>
         private TransitionTable GetWordsBefore(int wordID)
         {
-            var table = new VastTransitionTable();
+            var table = new TransitionTableLarge();
             foreach (var pair in DB.Transitions)
             {
                 var index = pair.Value.FindIndexByID(wordID);

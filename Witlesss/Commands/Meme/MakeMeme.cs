@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
@@ -55,13 +57,15 @@ namespace Witlesss.Commands.Meme
 
                 var chance = Random.Shared.Next(6);
 
-                if /**/ (chance == 0 || only_top_text)    genB = false;
-                else if (chance == 1 || only_bottom_text) genA = false;
+                if /**/ (only_bottom_text) genA = false;
+                else if (only_top_text)    genB = false;
+                else if (chance == 0)      genA = false;
+                else if (chance == 1)      genB = false;
 
                 a = genA ? Baka.Generate() : "";
                 b = genB ? Baka.Generate() : "";
 
-                if (genA && (genB ? a.Length > b.Length : a.Length > 64))
+                if (genA && !only_top_text && (genB ? a.Length > b.Length : a.Length > 64))
                 {
                     // bigger text (or big enough one) should be at the bottom
                     (a, b) = (b, a);
@@ -69,9 +73,11 @@ namespace Witlesss.Commands.Meme
             }
             else
             {
-                if (text!.Contains('\n'))
+                Debug.Assert(text != null);
+
+                var separator = TryGetSeparator(text);
+                if (separator is not null)
                 {
-                    var separator = text.Contains("\n\n") ? "\n\n" : "\n";
                     var s = text.Split(separator, 2);
                     (a, b) = (s[0], s[1]);
                 }
@@ -85,6 +91,13 @@ namespace Witlesss.Commands.Meme
             return new TextPair(AdjustCase(a), AdjustCase(b));
 
             string AdjustCase(string s) => capitalize ? s.ToLetterCase(LetterCaseMode.Upper) : s;
+        }
+
+        private static readonly string[] separators = ["\n\n\n\n", "\n\n\n", "\n\n", "\n"];
+
+        private static string? TryGetSeparator(string text)
+        {
+            return separators.FirstOrDefault(text.Contains);
         }
 
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*");

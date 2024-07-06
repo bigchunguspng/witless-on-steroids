@@ -9,12 +9,12 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 {
     private Image<Rgba32> DrawShadow
     (
-        Image<Rgba32> image, 
-        (float height, float fontSize) top, 
+        Image<Rgba32> textLayer,
+        (float height, float fontSize) top,
         (float height, float fontSize) bottom
     )
     {
-        var shadowRealm = new Image<Rgba32>(image.Width, image.Height);
+        var shadowRealm = new Image<Rgba32>(textLayer.Width, textLayer.Height);
 
         var nokia = _fontFamily.Name.Contains("Nokia");
 
@@ -39,8 +39,9 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         sw.Log("DrawShadow");
 
-        shadowRealm.Mutate(x => x.DrawImage(image));
-        image.Dispose();
+        shadowRealm.Mutate(x => x.DrawImage(textLayer));
+        textLayer.Dispose();
+
         return shadowRealm;
 
         //
@@ -54,28 +55,25 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
             Log($"/meme >> shadow size: {w:F2} / {w2:F2} px", ConsoleColor.DarkYellow);
 
-            var width  = image.Width;
-            var height = image.Height;
+            var width  = textLayer.Width;
+            var height = textLayer.Height;
 
             for (var y = rectangle.Y; y < rectangle.Bottom; y++)
             for (var x = rectangle.X; x < rectangle.Right; x++)
             {
-                var textA = image[x, y].A;
+                var textA = textLayer[x, y].A;
                 if (textA == 0) continue;
 
                 for (var ky = y - w2; ky <= y + w2; ky++)
                 for (var kx = x - w2; kx <= x + w2; kx++)
                 {
-                    var sx = kx - x;
-                    var sy = ky - y;
-
                     var outsideImage = kx < 0 || kx >= width || ky < 0 || ky >= height;
                     if (outsideImage) continue;
 
                     var shadowA = shadowRealm[kx, ky].A;
                     if (shadowA == maxOpacity) continue;
 
-                    var shadowOpacity = opacity * getShadowOpacity(sx, sy, w);
+                    var shadowOpacity = opacity * getShadowOpacity(kx - x, ky - y, w);
                     if (shadowOpacity == 0) continue;
 
                     var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();

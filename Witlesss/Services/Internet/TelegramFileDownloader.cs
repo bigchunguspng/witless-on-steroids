@@ -10,8 +10,8 @@ namespace Witlesss.Services.Internet
 {
     public class TelegramFileDownloader
     {
-        private readonly DownloadCache _recent = new(32);
-        private readonly DownloadCache  _large = new(32);
+        private readonly LimitedCache<string, string> _recent = new(32);
+        private readonly LimitedCache<string, string>  _large = new(32);
 
         /// <summary>
         /// Downloads a file to the <b>Pics</b> directory.
@@ -58,21 +58,21 @@ namespace Witlesss.Services.Internet
         }
     }
 
-    public class DownloadCache
+    public class LimitedCache<TKey, TValue> where TKey : notnull
     {
         private readonly int _limit;
 
-        private readonly Queue<string> _keys;
-        private readonly Dictionary<string, string> _paths;
+        private readonly Queue<TKey> _keys;
+        private readonly Dictionary<TKey, TValue> _paths;
 
-        public DownloadCache(int limit)
+        public LimitedCache(int limit)
         {
             _limit = limit;
-            _keys = new Queue<string>(_limit);
-            _paths = new Dictionary<string, string>(_limit);
+            _keys = new Queue<TKey>(_limit);
+            _paths = new Dictionary<TKey, TValue>(_limit);
         }
 
-        public void Add(string id, string path)
+        public void Add(TKey id, TValue value)
         {
             if (_keys.Count == _limit)
             {
@@ -80,12 +80,12 @@ namespace Witlesss.Services.Internet
                 _paths.Remove(key);
             }
             _keys.Enqueue(id);
-            _paths.TryAdd(id, path);
+            _paths.TryAdd(id, value);
         }
 
-        public bool Contains(string id, [NotNullWhen(true)] out string? path)
+        public bool Contains(TKey id, [NotNullWhen(true)] out TValue? value)
         {
-            return _paths.TryGetValue(id, out path);
+            return _paths.TryGetValue(id, out value);
         }
     }
 }

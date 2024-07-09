@@ -11,7 +11,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     private readonly Stopwatch Timer = new();
     
-    private static readonly DownloadCache _cache = new(32);
+    private static readonly LimitedCache<string, string> _cache = new(32);
 
     private string GetDownloadCommand(string url)
     {

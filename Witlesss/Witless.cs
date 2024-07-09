@@ -215,12 +215,14 @@ namespace Witlesss
         }
     }
 
-    public class MemeOptions // todo load from json as null if empty
+    public class MemeOptions
     {
         [JsonProperty] public string? Meme { get; set; }
         [JsonProperty] public string? Top  { get; set; }
         [JsonProperty] public string? Dp   { get; set; }
         [JsonProperty] public string? Dg   { get; set; }
         [JsonProperty] public string? Nuke { get; set; }
+
+        public bool IsEmpty() => Meme is null && Top is null && Dp is null && Dg is null && Nuke is null;
     }
 }

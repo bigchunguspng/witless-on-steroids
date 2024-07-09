@@ -47,6 +47,7 @@ namespace Witlesss.Commands.Settings
                         command = cmd;
                         result = args[1] == "0" ? null : command + args[1];
                         setOptions(result);
+                        if (result is null && (Baka.Options?.IsEmpty() ?? false)) Baka.Options = null;
                         result ??= command;
                         optionsWereChanged = true;
                     }

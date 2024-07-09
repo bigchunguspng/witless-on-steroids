@@ -1,15 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Witlesss.Generation.Pack;
 
-public class TransitionTableLarge : List<Transition>, TransitionTable
+public class TransitionTableLarge : TransitionTable
 {
-    public float TotalChance { get; private set; }
-    private void IncreaseTotalChanceBy(float value) => TotalChance = TotalChance.CombineRound(value);
+    private Transition[] _transitions;
 
-    public TransitionTableLarge() { }
-    public TransitionTableLarge(IEnumerable<Transition> transitions) : base(transitions) { }
+    private int Count { get; set; }
+    private int Capacity
+    {
+        get => _transitions.Length;
+        set
+        {
+            var original = _transitions;
+            _transitions = new Transition[value];
+            for (var i = 0; i < original.Length; i++)
+            {
+                _transitions[i] = original[i];
+            }
+        }
+    }
+
+    public float TotalChance { get; private set; }
+
+    private void IncreaseTotalChanceBy(float value)
+        => TotalChance = TotalChance.CombineRound(value);
+
+    public Transition this[int index]
+    {
+        get => _transitions[index];
+        set => _transitions[index] = value;
+    }
+
+    public TransitionTableLarge()
+    {
+        _transitions = new Transition[4];
+        Count = 0;
+    }
+
+    public TransitionTableLarge(IEnumerable<Transition> transitions)
+    {
+        _transitions = transitions.ToArray();
+        Count = _transitions.Length;
+    }
 
     public bool CanAccept(int id) => true;
 
@@ -33,11 +68,12 @@ public class TransitionTableLarge : List<Transition>, TransitionTable
         }
     }
 
-    public new void Add(Transition transition)
+    public void Add(Transition transition)
     {
-        if (Capacity == Count) IncreaseCapacity();
-        base.Add(transition);
+        if (Count >= Capacity) IncreaseCapacity();
+        _transitions[Count] = transition;
         IncreaseTotalChanceBy(transition.Chance);
+        Count++;
     }
 
     // ~50% of tables contain only 1 element, and ~95% - 8 or less. Consequences:
@@ -49,5 +85,5 @@ public class TransitionTableLarge : List<Transition>, TransitionTable
 
     private void IncreaseCapacity() => Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
 
-    public IEnumerable<Transition> AsIEnumerable() => this;
+    public IEnumerable<Transition> AsIEnumerable() => _transitions.TakeWhile(x => x.Chance > 0);
 }

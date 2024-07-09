@@ -21,7 +21,7 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
             writer.WritePropertyName(Base64Encoder.ToString(pair.Key));
             writer.WriteStartObject();
 
-            foreach (var transition in pair.Value.AsIEnumerable)
+            foreach (var transition in pair.Value.AsIEnumerable())
             {
                 writer.WritePropertyName(Base64Encoder.ToString(transition.WordID));
                 writer.WriteValue(transition.Chance);
@@ -50,28 +50,26 @@ public class TransitionTableConverter : JsonConverter<Dictionary<int, Transition
         {
             if /**/ (reader.TokenType == JsonToken.StartObject) depth++;
             else if (reader.TokenType == JsonToken.  EndObject) depth--;
-            else
+            else if (reader.TokenType == JsonToken.PropertyName && reader.ValueType == typeof(string))
             {
-                if (reader.TokenType == JsonToken.PropertyName && reader.ValueType == typeof(string))
+                if (depth == 0) // keys
                 {
-                    if (depth == 0) // keys
-                    {
-                        id = ReadID();
-                        table = new TransitionTableSmall();
-                        dictionary.Add(id, table);
-                    }
-                    else if (depth == 1) // values
-                    {
-                        if (table.Count == 8 && table is TransitionTableSmall)
-                        {
-                            table = new TransitionTableLarge(table.AsIEnumerable);
-                            dictionary[id] = table;
-                        }
+                    id = ReadID();
+                    table = new TransitionTableSingle();
+                    dictionary.Add(id, table);
+                }
+                else if (depth == 1) // values
+                {
+                    var wordID = ReadID();
+                    var chance = (float)reader.ReadAsDouble()!;
 
-                        var wordID = ReadID();
-                        var chance = (float)reader.ReadAsDouble()!;
-                        table.Add(new Transition(wordID, chance));
+                    if (!table.CanAccept(wordID))
+                    {
+                        TransitionTable.Upgrade(ref table);
+                        dictionary[id] = table;
                     }
+
+                    table.Add(new Transition(wordID, chance));
                 }
             }
 

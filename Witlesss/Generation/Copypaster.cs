@@ -132,11 +132,10 @@ namespace Witlesss.Generation
             foreach (var otherTable in other.Transitions)
             {
                 var tableID = GetNewID(otherTable.Key);
-                var thisTable = DB.GetOrAddTable(tableID);
-                foreach (var transition in otherTable.Value.AsIEnumerable)
+                foreach (var transition in otherTable.Value.AsIEnumerable())
                 {
                     var wordID = GetNewID(transition.WordID);
-                    thisTable.PutMax(wordID, transition.Chance);
+                    DB.GetOrAddTable(tableID).PutMax(wordID, transition.Chance);
                 }
             }
 
@@ -206,7 +205,7 @@ namespace Witlesss.Generation
 
             if (r > 0F)
             {
-                foreach (var transition in table.AsIEnumerable)
+                foreach (var transition in table.AsIEnumerable())
                 {
                     if (transition.Chance > r) return transition.WordID;
                     r -= transition.Chance;

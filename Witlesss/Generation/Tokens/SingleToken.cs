@@ -11,16 +11,14 @@ public readonly struct SingleToken(int id) : IConsumableToken
 
     public void RememberTransition(GenerationPack db, IConsumableToken next)
     {
-        var table = db.GetOrAddTable(ID);
-
         if (next is SingleToken simple)
         {
-            table.Put(simple.ID, 1F);
+            db.GetOrAddTable(ID).Put(simple.ID, 1F);
         }
         else if (next is DoubleToken combined)
         {
-            table.Put(combined.ID1, 0.1F);
-            table.Put(combined.IDC, 2.9F);
+            db.GetOrAddTable(ID).Put(combined.ID1, 0.1F);
+            db.GetOrAddTable(ID).Put(combined.IDC, 2.9F);
         }
     }
 }

@@ -71,16 +71,13 @@ public class GenerationPack
 
     public TransitionTable GetOrAddTable(int id)
     {
-        if (Transitions.TryGetValue(id, out var table) == false) // not fount
-        {
-            table = new TransitionTableSmall();
-            Transitions[id] = table;
-        }
-        else if (table.Count == 8 && table is TransitionTableSmall) // size treshold
-        {
-            table = new TransitionTableLarge(table.AsIEnumerable);
-            Transitions[id] = table;
-        }
+        var update = true;
+
+        if      (!Transitions.TryGetValue(id, out var table)) table = new TransitionTableSingle();
+        else if (!table.CanAccept(id))                        TransitionTable.Upgrade(ref table);
+        else
+            update = false;
+        if (update) Transitions[id] = table;
 
         return table;
     }

@@ -5,16 +5,13 @@ namespace Witlesss.Generation.Pack;
 
 public class TransitionTableLarge : List<Transition>, TransitionTable
 {
-    public IEnumerable<Transition> AsIEnumerable => this;
-
     public float TotalChance { get; private set; }
-
-    private void IncreaseTotalChanceBy(float value)
-        => TotalChance = TotalChance.CombineRound(value);
+    private void IncreaseTotalChanceBy(float value) => TotalChance = TotalChance.CombineRound(value);
 
     public TransitionTableLarge() { }
     public TransitionTableLarge(IEnumerable<Transition> transitions) : base(transitions) { }
 
+    public bool CanAccept(int id) => true;
 
     public void Put(int id, float chance)
     {
@@ -51,4 +48,6 @@ public class TransitionTableLarge : List<Transition>, TransitionTable
     // [1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8] -> [10 -> 12 -> 15 -> 18 -> 22 -> 27 -> 33 -> 41 -> 51 -> ...
 
     private void IncreaseCapacity() => Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
+
+    public IEnumerable<Transition> AsIEnumerable() => this;
 }

@@ -18,4 +18,6 @@ public readonly struct Transition(int wordID, float chance)
         difference = max - Chance;
         return this with { Chance = max };
     }
+
+    public static Transition Impossible => new(GenerationPack.NO_WORD, -1);
 }

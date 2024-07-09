@@ -15,20 +15,17 @@ public readonly struct DoubleToken(int id1, int id2, int idC) : IConsumableToken
     {
         db.GetOrAddTable(ID1).Put(ID2, 1F);
 
-        var table2 = db.GetOrAddTable(ID2);
-        var tableC = db.GetOrAddTable(IDC);
-
         if (next is SingleToken simple)
         {
-            table2.Put(simple.ID, 1F);
-            tableC.Put(simple.ID, 1F);
+            db.GetOrAddTable(ID2).Put(simple.ID, 1F);
+            db.GetOrAddTable(IDC).Put(simple.ID, 1F);
         }
         else if (next is DoubleToken combined)
         {
-            table2.Put(combined.ID1, 0.1F);
-            table2.Put(combined.IDC, 2.9F);
-            tableC.Put(combined.ID1, 0.1F);
-            tableC.Put(combined.IDC, 2.9F);
+            db.GetOrAddTable(ID2).Put(combined.ID1, 0.1F);
+            db.GetOrAddTable(ID2).Put(combined.IDC, 2.9F);
+            db.GetOrAddTable(IDC).Put(combined.ID1, 0.1F);
+            db.GetOrAddTable(IDC).Put(combined.IDC, 2.9F);
         }
     }
 }

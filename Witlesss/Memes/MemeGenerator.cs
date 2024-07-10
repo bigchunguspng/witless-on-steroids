@@ -51,7 +51,9 @@ namespace Witlesss.Memes
             using var caption = DrawCaption(text);
             using var meme = Combine(image, caption);
 
-            return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
+            return request.ExportAsSticker
+                ? ImageSaver.SaveImagePng(meme, request.TargetPath, request.Quality)
+                : ImageSaver.SaveImage   (meme, request.TargetPath, request.Quality);
         }
 
         public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
@@ -83,7 +85,7 @@ namespace Witlesss.Memes
 
         private Image<Rgba32> GetImage(MemeFileRequest request)
         {
-            if (request.IsSticker /* && not send as sticker ? */)
+            if (request is { IsSticker: true, ExportAsSticker: false })
             {
                 var color = CustomColorOption.GetColor() ?? Color.Black;
                 var background = new Image<Rgba32>(_w, _h, color);

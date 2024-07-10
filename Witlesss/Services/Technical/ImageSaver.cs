@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Global
 {
@@ -12,6 +14,26 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
         {
             path = UniquePath(path);
             image.SaveAsJpeg(path, GetJpegEncoder(quality));
+            image.Dispose();
+
+            return path;
+        }
+
+        public static string SaveImagePng(Image<Rgba32> image, string path, int quality)
+        {
+            if (quality <= 25)
+            {
+                var sw = Helpers.GetStartedStopwatch();
+                using var memory = new MemoryStream();
+                image.SaveAsJpeg(memory, GetJpegEncoder(quality));
+                memory.Position = 0;
+                var jpeg = Image.Load<Rgb24>(memory);
+                image.ApplyQuality(jpeg);
+                sw.Log("jpeg lol");
+            }
+
+            path = UniquePath(path);
+            image.SaveAsPng(path);
             image.Dispose();
 
             return path;

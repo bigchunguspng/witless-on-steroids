@@ -71,7 +71,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
             .OutputAs(request.TargetPath);
     }
 
-    private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 1080));
+    private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 720));
 
     private void SetUp()
     {

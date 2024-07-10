@@ -104,7 +104,11 @@ namespace Witlesss.Memes.Shared
             {
                 var side = parameters.EmojiSize.RoundInt();
                 var size = new Size(side, side);
-                var decoder = new DecoderOptions() { TargetSize = size }; // todo quality?
+                var decoder = new DecoderOptions
+                {
+                    TargetSize = size,
+                    Sampler = KnownResamplers.Lanczos2
+                };
 
                 foreach (var _ in sequence)
                 {

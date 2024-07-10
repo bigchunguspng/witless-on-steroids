@@ -147,9 +147,11 @@ public partial class IFunnyApp
     private void AdjustTextPosition(string s)
     {
         var offset = FontSize * ExtraFonts.GetVerticalOffset();
-        var caps = TextIsUppercaseEnough(s) ? FontSize * 0.103F : 0; // todo different for every font
+        var caps = ExtraFonts.FontIsMulticase() && TextIsUppercaseEnough(s)
+            ? FontSize * ExtraFonts.GetCapitalsOffset()
+            : 0;
 
-        _textOffset = offset; // offset + caps;
+        _textOffset = offset + caps;
 
         Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
     }

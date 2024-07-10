@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -14,11 +15,12 @@ namespace Witlesss.Commands.Editing
         {
             if (Args is null)
             {
+                // todo http://trac.ffmpeg.org/wiki/Scaling#Specifyingscalingalgorithm
                 Bot.SendMessage(Chat, SCALE_MANUAL);
             }
             else
             {
-                var args = Args.Split(' ').Take(2).ToArray();
+                var args = Args.Split(' ').ToArray();
 
                 MultiplyIfArgIsNumber(0, 'w');
                 MultiplyIfArgIsNumber(1, 'h');
@@ -32,7 +34,7 @@ namespace Witlesss.Commands.Editing
                     }
                 }
 
-                for (var i = 0; i < args.Length; i++)
+                for (var i = 0; i < Math.Min(args.Length, 2); i++)
                 {
                     var w = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
                     var h = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
@@ -41,12 +43,15 @@ namespace Witlesss.Commands.Editing
 
                 if (args.Length == 1) args = [args[0], "-1"];
 
-                for (var i = 0; i < args.Length; i++) // fixing oddness and large size
+                for (var i = 0; i < Math.Min(args.Length, 2); i++) // fixing oddness and large size
                 {
                     var w = i == 0;
                     if (args[i] == "-1") args[i] = w ? "iw*oh/ih" : "ih*ow/iw";
                     args[i] = $"min({(w ? "1920" : "1080")},ceil(({args[i]})/2)*2)";
                 }
+
+                if (args.Length == 3 && !args[2].StartsWith("flags="))
+                    args[2] = "flags=" + args[2];
 
                 var (path, type) = await Bot.Download(FileID, Chat);
 

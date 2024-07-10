@@ -21,9 +21,12 @@ namespace Witlesss.Commands
                 _            => "📚"
             };
 
-            // todo print Baka.Baka.DB.Vocabulary.Count too
             sb.Append("\nВес словаря: ").Append(FileSize(size)).Append(' ').Append(icon);
-            sb.Append("\nИнтервал генерации: ").Append(Baka.Speech);
+            if (Baka.Loaded)
+                sb
+                    .Append("\nСлов в запасе: ")
+                    .Append(BrowseReddit.FormatSubs(Baka.Baka.DB.Vocabulary.Count, "💨")).Append(' ');
+            sb.Append("\nВероятность ответа: ").Append(Baka.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Baka.Quality).Append('%');
             if (!Context.ChatIsPrivate)
                 sb.Append("\nМогут 🔩⚙️: ").Append(Baka.AdminsOnly ? "только админы 😎" : "все 🤠");

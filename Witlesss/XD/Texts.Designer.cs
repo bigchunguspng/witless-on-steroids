@@ -637,13 +637,9 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Вероятность отправки текста&lt;/u&gt;&lt;/b&gt;:
+        ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
         ///
-        /// /speech@piece_fap_bot 3 (число, %)
-        ///
-        ///&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
-        ///
-        /// /set@piece_fap_bot [буква]
+        ///&lt;code&gt;/set [буква]&lt;/code&gt;
         ///
         ///&lt;code&gt;M &lt;/code&gt; - мемы☝️
         ///&lt;code&gt;T &lt;/code&gt; - подписанки 💬
@@ -655,9 +651,13 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set [буква] [опции]&lt;/code&gt;
         ///
-        ///&lt;code&gt;/set@piece_fap_bot M wwsd#lime#…&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fap_bot T largmmww15&quot;…&lt;/code&gt;
-        ///&lt;code&gt;/set@piece_fa [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;/set M wwsd#lime#…&lt;/code&gt;
+        ///&lt;code&gt;/set T largmmww15&quot;…&lt;/code&gt;
+        ///&lt;code&gt;/set D cpupbb-i…&lt;/code&gt;
+        ///&lt;code&gt;/set Dg x=5n…&lt;/code&gt;
+        ///&lt;code&gt;/set N =3…&lt;/code&gt;
+        ///
+        ///&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить.
         /// </summary>
         internal static string SET_FREQUENCY_MANUAL {
             get {
@@ -666,7 +666,7 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to я буду отвечать с вероятностью {0}%.
+        ///   Looks up a localized string similar to я буду отвечать на {0}% сообщений.
         /// </summary>
         internal static string SET_FREQUENCY_RESPONSE {
             get {
@@ -708,7 +708,7 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to пикчи будут ставать мемами с вероятностью {0}%.
+        ///   Looks up a localized string similar to {0}% пикч будут ставать мемами.
         /// </summary>
         internal static string SET_P_RESPONSE {
             get {
@@ -722,17 +722,6 @@ namespace Witlesss.XD {
         internal static string SET_Q_RESPONSE {
             get {
                 return ResourceManager.GetString("SET_Q_RESPONSE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Если че правильно вот так:
-        ///
-        /// /{0}@piece_fap_bot 75.
-        /// </summary>
-        internal static string SET_X_MANUAL {
-            get {
-                return ResourceManager.GetString("SET_X_MANUAL", resourceCulture);
             }
         }
         

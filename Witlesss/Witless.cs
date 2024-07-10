@@ -66,7 +66,7 @@ namespace Witlesss
 
         // STATE
 
-        private bool Loaded => _baka is not null;
+        public  bool Loaded => _baka is not null;
 
         private bool Dirty  { get => _flags[6]; set => _flags[6] = value; }
         public  bool Banned { get => _flags[7]; set => _flags[7] = value; }

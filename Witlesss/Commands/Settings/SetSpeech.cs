@@ -14,6 +14,14 @@ public class SetSpeech : SettingsCommand
             Log($"{Title} >> SPEECH >> {Baka.Speech}");
         }
         else
-            Bot.SendMessage(Chat, string.Format(SET_X_MANUAL, "speech"));
+        {
+            var message =
+                $"""
+                 Вероятность ответа: {Baka.Speech}%
+
+                 Изменить: <code>/speech {RandomInt(0, 100)}</code>
+                 """;
+            Bot.SendMessage(Chat, message);
+        }
     }
 }

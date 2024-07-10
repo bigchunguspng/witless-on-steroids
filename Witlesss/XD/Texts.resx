@@ -22,13 +22,9 @@
         <value>ВИРУСНАЯ БАЗА ОБНОВЛЕНА!</value>
     </data>
     <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
-        <value>&lt;b&gt;&lt;u&gt;Вероятность отправки текста&lt;/u&gt;&lt;/b&gt;:
+        <value>&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
 
-/speech@piece_fap_bot 3 (число, %)
-
-&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
-
-/set@piece_fap_bot [буква]
+&lt;code&gt;/set [буква]&lt;/code&gt;
 
 &lt;code&gt;M &lt;/code&gt; - мемы☝️
 &lt;code&gt;T &lt;/code&gt; - подписанки 💬
@@ -40,21 +36,13 @@
 
 &lt;code&gt;/set [буква] [опции]&lt;/code&gt;
 
-&lt;code&gt;/set@piece_fap_bot M wwsd#lime#…&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot T largmmww15"…&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot D cpupbb-i…&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot Dg x=5n…&lt;/code&gt;
-&lt;code&gt;/set@piece_fap_bot N =3…&lt;/code&gt;
+&lt;code&gt;/set M wwsd#lime#…&lt;/code&gt;
+&lt;code&gt;/set T largmmww15"…&lt;/code&gt;
+&lt;code&gt;/set D cpupbb-i…&lt;/code&gt;
+&lt;code&gt;/set Dg x=5n…&lt;/code&gt;
+&lt;code&gt;/set N =3…&lt;/code&gt;
 
-&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить
-
-&lt;b&gt;&lt;u&gt;Частота появления мемов&lt;/u&gt;&lt;/b&gt;:
-
-/pics@piece_fap_bot 75 (число, %)
-
-&lt;b&gt;&lt;u&gt;Мемы из стикеров (вкл/выкл)&lt;/u&gt;&lt;/b&gt;:
-
-/stickers@piece_fap_bot</value>
+&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить</value>
     </data>
     <data name="FUSE_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнить ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
@@ -98,10 +86,10 @@
         <value>CHATLIST SAVED</value>
     </data>
     <data name="SET_FREQUENCY_RESPONSE" xml:space="preserve">
-        <value>я буду отвечать с вероятностью {0}%</value>
+        <value>я буду отвечать на {0}% сообщений</value>
     </data>
     <data name="SET_P_RESPONSE" xml:space="preserve">
-        <value>пикчи будут ставать мемами с вероятностью {0}%</value>
+        <value>{0}% пикч будут ставать мемами</value>
     </data>
     <data name="FUSE_SUCCESS_RESPONSE" xml:space="preserve">
         <value>Cловарь беседы &lt;b&gt;{0}&lt;/b&gt; обновлён!
@@ -133,11 +121,6 @@
 • кружками 📹, голосовыми🎙
 
 Ответь командой на файл 🗞 или прикрепи его к команде ✍️</value>
-    </data>
-    <data name="SET_X_MANUAL" xml:space="preserve">
-        <value>Если че правильно вот так:
-
-/{0}@piece_fap_bot 75</value>
     </data>
     <data name="ZZ_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>

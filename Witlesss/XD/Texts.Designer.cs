@@ -609,7 +609,7 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Масштабирование&lt;/u&gt;&lt;/b&gt;
         ///
-        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота&lt;/code&gt;
+        ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота флаги&lt;/code&gt;
         ///
         ///&lt;b&gt;Примеры:&lt;/b&gt;
         ///
@@ -620,7 +620,6 @@ namespace Witlesss.XD {
         ///↗️ Увеличить в 2️⃣ раза:
         ///&lt;code&gt;/scale 2&lt;/code&gt;
         ///&lt;code&gt;/scale w*2&lt;/code&gt;
-        ///&lt;code&gt;/scale -1 h*2&lt;/code&gt;
         ///
         ///↘️ Уменьшить в 2️⃣ раза:
         ///&lt;code&gt;/scale 0.5&lt;/code&gt;
@@ -628,7 +627,9 @@ namespace Witlesss.XD {
         ///
         ///По дефолту соотношение сторон сохраняется
         ///
-        ///&lt;b&gt;Более подробно &lt;a href=&apos;https://ffmpeg [rest of string was truncated]&quot;;.
+        ///&lt;b&gt;Использование флагов 🏁:&lt;/b&gt;
+        ///
+        ///&lt;code&gt;/scale 0.5 -1 bilinear [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SCALE_MANUAL {
             get {

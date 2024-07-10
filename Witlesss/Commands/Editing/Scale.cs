@@ -15,7 +15,6 @@ namespace Witlesss.Commands.Editing
         {
             if (Args is null)
             {
-                // todo http://trac.ffmpeg.org/wiki/Scaling#Specifyingscalingalgorithm
                 Bot.SendMessage(Chat, SCALE_MANUAL);
             }
             else

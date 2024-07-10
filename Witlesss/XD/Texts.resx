@@ -481,12 +481,12 @@ s   - save and exit
 &lt;code&gt;/crop 100 100 0 0&lt;/code&gt; 👈 с левого верхнего угла ↖️
 &lt;code&gt;/crop 100 100 w-100 h-100&lt;/code&gt; 👈 с правого нижнего угла ↘️
 
-&lt;b&gt;Более подробно &lt;a href='https://ffmpeg.org/ffmpeg-filters.html#crop'&gt;тут&lt;/a&gt;&lt;/b&gt;</value>
+📖 &lt;b&gt;&lt;a href='https://ffmpeg.org/ffmpeg-filters.html#crop'&gt;Справка ffmpeg/crop&lt;/a&gt;&lt;/b&gt;</value>
     </data>
     <data name="SCALE_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;&lt;u&gt;Масштабирование&lt;/u&gt;&lt;/b&gt;
 
-&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота&lt;/code&gt;
+&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота флаги&lt;/code&gt;
 
 &lt;b&gt;Примеры:&lt;/b&gt;
 
@@ -497,7 +497,6 @@ s   - save and exit
 ↗️ Увеличить в 2️⃣ раза:
 &lt;code&gt;/scale 2&lt;/code&gt;
 &lt;code&gt;/scale w*2&lt;/code&gt;
-&lt;code&gt;/scale -1 h*2&lt;/code&gt;
 
 ↘️ Уменьшить в 2️⃣ раза:
 &lt;code&gt;/scale 0.5&lt;/code&gt;
@@ -505,7 +504,15 @@ s   - save and exit
 
 По дефолту соотношение сторон сохраняется
 
-&lt;b&gt;Более подробно &lt;a href='https://ffmpeg.org/ffmpeg-filters.html#scale-1'&gt;тут&lt;/a&gt;&lt;/b&gt;</value>
+&lt;b&gt;Использование флагов 🏁:&lt;/b&gt;
+
+&lt;code&gt;/scale 0.5 -1 bilinear&lt;/code&gt;
+&lt;code&gt;/scale 0.5 -1 lanczos&lt;/code&gt;
+&lt;code&gt;/scale 0.5 -1 lanczos param0=8&lt;/code&gt;
+&lt;code&gt;/scale 0.5 -1 bicubic+accurate_rnd&lt;/code&gt;
+
+📖 &lt;b&gt;&lt;a href='https://ffmpeg.org/ffmpeg-filters.html#scale-1'&gt;Справка ffmpeg/scale&lt;/a&gt;&lt;/b&gt;
+📖 &lt;b&gt;&lt;a href='https://ffmpeg.org/ffmpeg-scaler.html#sws_005fflags'&gt;Список флагов&lt;/a&gt;&lt;/b&gt;</value>
     </data>
     <data name="EQ_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;&lt;u&gt;Эквалайзер&lt;/u&gt;&lt;/b&gt;

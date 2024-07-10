@@ -29,6 +29,12 @@ namespace Witlesss
             TrySend(task, chat, "message [+][-]");
         }
 
+        public void CopyMessage(long chat, long fromChat, int messageId)
+        {
+            var task = Client.CopyMessageAsync(chat, fromChat, messageId);
+            TrySend(task, chat, "message", "copy");
+        }
+
         public void SendPhoto(long chat, InputOnlineFile photo)
         {
             var task = Client.SendPhotoAsync(chat, photo);

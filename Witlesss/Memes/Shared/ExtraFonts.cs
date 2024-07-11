@@ -151,5 +151,19 @@ namespace Witlesss.Memes.Shared
                 _fontKey = _styleKey = null;
             }
         }
+
+        public static void Debug_GetFontData()
+        {
+            foreach (var pair in _families)
+            {
+                var bound1 = TextMeasurer.MeasureBounds("X", new TextOptions(pair.Value.CreateFont(48)));
+                var bound2 = TextMeasurer.MeasureBounds("x", new TextOptions(pair.Value.CreateFont(48)));
+                var relativeSize = bound1.Height / 34;
+                var size = 48 / relativeSize;
+                var offset = - bound1.Y / (size / relativeSize);
+                var caps = (bound1.Height - bound2.Height) / 2 / (size / relativeSize);
+                Log($"{pair.Key}\t{offset:F4}\t{relativeSize:F4}\t{caps:F4}");
+            }
+        }
     }
 }

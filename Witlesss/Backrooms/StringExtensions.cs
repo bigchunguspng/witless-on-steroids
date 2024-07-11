@@ -36,6 +36,15 @@ public static class StringExtensions
         return Regex.Replace(path, @"\.\S+$", newExtension);
     }
 
+    private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
+
+    public static bool IsUppercaseEnough(this string text)
+    {
+        var caps = CAPS.Matches(text).Count;
+        var emoji = EmojiRegex.Matches(text).Sum(m => m.Length);
+        return caps + 3 * emoji > text.Length / 5;
+    }
+
     // REGEX
 
     public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);

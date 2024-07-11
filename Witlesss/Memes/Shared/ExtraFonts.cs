@@ -94,9 +94,9 @@ namespace Witlesss.Memes.Shared
         public float GetLineSpacing() => GetRelativeSize();
         public float GetSizeMultiplier() => 1 / GetRelativeSize();
 
-        public  float GetVerticalOffset() => _fontKey is null ? 0F : _fontData[_fontKey].offset;
-        public  float GetCapitalsOffset() => _fontKey is null ? 0F : _fontData[_fontKey].caps;
-        private float GetRelativeSize  () => _fontKey is null ? 1F : _fontData[_fontKey].size;
+        public float GetVerticalOffset() => _fontKey is null ? 0F : _fontData[_fontKey].offset;
+        public float GetCapitalsOffset() => _fontKey is null ? 0F : _fontData[_fontKey].caps;
+        public float GetRelativeSize  () => _fontKey is null ? 1F : _fontData[_fontKey].size;
 
         private static readonly Dictionary<string, (float offset, float size, float caps)> _fontData = new()
         {
@@ -104,18 +104,18 @@ namespace Witlesss.Memes.Shared
             { "bb", (-0.0251F, 1.0024F, 0.0936F) },
             { "bc", (-0.0096F, 1.1238F, 0.0000F) },
             { "bl", (-0.0005F, 0.9388F, 0.0000F) },
-            { "cr", (-0.0528F, 0.9586F, 0.0935F) },
-            { "ft", (-0.1894F, 1.0064F, 0.1078F) },
-            { "go", (-0.2978F, 1.1209F, 0.1400F) },
-            { "im", (-0.1350F, 1.1160F, 0.0888F) },
+            { "cr", (-0.0528F, 0.9586F, 0.0947F) },
+            { "ft", (-0.1894F, 1.0064F, 0.1071F) },
+            { "go", (-0.2978F, 1.1209F, 0.1252F) },
+            { "im", (-0.1350F, 1.1160F, 0.0796F) },
             { "mc", ( 0.0793F, 1.0828F, 0.0000F) },
-            { "rg", (-0.1318F, 1.0037F, 0.0920F) },
-            { "sg", (-0.2090F, 0.9885F, 0.0978F) },
+            { "rg", (-0.1318F, 1.0037F, 0.0916F) },
+            { "sg", (-0.2090F, 0.9885F, 0.0989F) },
             { "st", (-0.0002F, 1.0165F, 0.0000F) },
-            { "tm", (-0.1346F, 0.9347F, 0.0939F) },
+            { "tm", (-0.1346F, 0.9347F, 0.1004F) },
             { "vb", (-0.0524F, 0.7793F, 0.0000F) },
-            { "vg", (-0.1007F, 0.8400F, 0.0747F) },
-            { "vn", (-0.1254F, 1.2353F, 0.1907F) },
+            { "vg", (-0.1007F, 0.8400F, 0.0894F) },
+            { "vn", (-0.1254F, 1.2353F, 0.1544F) },
             { "vp", (-0.0732F, 1.0836F, 0.0000F) },
         };
 

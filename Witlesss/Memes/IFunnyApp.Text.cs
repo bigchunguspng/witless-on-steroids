@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -11,7 +10,6 @@ namespace Witlesss.Memes;
 
 public partial class IFunnyApp
 {
-    private static readonly Regex CAPS = new(@"[A-ZА-Я0-9bdfhkltбф]");
     public  static readonly ExtraFonts ExtraFonts = new("top");
 
 
@@ -139,15 +137,15 @@ public partial class IFunnyApp
     {
         var k2 = UltraThinCard ? 0.1F : 1F;
         var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(FontSize * k * k2, min);
+        var extra = Math.Max(FontSize * k * k2, min) * ExtraFonts.GetRelativeSize();
         SetCardHeight((textHeight * k + extra).CeilingInt());
     }
 
 
     private void AdjustTextPosition(string s)
     {
-        var offset = FontSize * ExtraFonts.GetVerticalOffset();
-        var caps = ExtraFonts.FontIsMulticase() && TextIsUppercaseEnough(s)
+        var offset = FontSize * (0.0473F * ExtraFonts.GetRelativeSize() + ExtraFonts.GetVerticalOffset());
+        var caps = ExtraFonts.FontIsMulticase() && s.IsUppercaseEnough()
             ? FontSize * ExtraFonts.GetCapitalsOffset()
             : 0;
 
@@ -155,14 +153,6 @@ public partial class IFunnyApp
 
         Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
     }
-
-    private bool TextIsUppercaseEnough(string s)
-    {
-        var caps = CAPS.Matches(s).Count;
-        var emoji = EmojiRegex.Matches(s).Sum(m => m.Length);
-        return caps + 3 * emoji > s.Length / 5;
-    }
-
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)
     {

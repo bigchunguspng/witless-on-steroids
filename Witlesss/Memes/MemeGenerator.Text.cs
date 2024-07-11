@@ -44,7 +44,8 @@ public partial class MemeGenerator
 
     private string MakeTextFitCard(string text)
     {
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(_marginY), GetEmojiSize());
+        var options = GetDefaultTextOptions(PointF.Empty);
+        var textChunks = TextMeasuring.MeasureTextSuperCool(text, options, GetEmojiSize());
 
         var lineHeight = FontSize * GetLineSpacing();
 
@@ -105,16 +106,25 @@ public partial class MemeGenerator
         return text;
     }
 
-    private RichTextOptions GetDefaultTextOptions(int y) => new(_font)
+    private RichTextOptions GetDefaultTextOptions(PointF origin, bool top = true) => new(_font)
     {
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = y == _marginY ? VerticalAlignment.Top : VerticalAlignment.Bottom,
-        Origin = new PointF(_w / 2F, (y == _marginY ? _marginY * 1.5F : y) + _offsetY),
+        VerticalAlignment = top ? VerticalAlignment.Top : VerticalAlignment.Bottom,
+        Origin = origin,
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
         FallbackFontFamilies = ExtraFonts.FallbackFamilies
     };
 
     private float GetLineSpacing() => ExtraFonts.GetLineSpacing();
+
+    private PointF GetTextOrigin(string text, bool top)
+    {
+        var caps = ExtraFonts.FontIsMulticase() && text.IsUppercaseEnough()
+            ? FontSize * ExtraFonts.GetCapitalsOffset()
+            : 0;
+
+        return new PointF(_w / 2F, (top ? _marginY * 2F : _h - _marginY) + _offsetY + caps);
+    }
 }

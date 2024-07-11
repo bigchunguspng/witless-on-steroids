@@ -119,13 +119,13 @@ namespace Witlesss.Memes
 
             _captionSize = new Size(_w - 2 * _marginX, _h / 3 - _marginY);
 
-            var tuple1 = AddText(canvas, text.A,      _marginY);
-            var tuple2 = AddText(canvas, text.B, _h - _marginY);
+            var tuple1 = AddText(canvas, text.A, top: true);
+            var tuple2 = AddText(canvas, text.B, top: false);
 
             return ShadowOpacity > 0 ? DrawShadow(canvas, tuple1, tuple2) : canvas;
         }
 
-        private (float height, float fontSize) AddText(Image<Rgba32> background, string text, int y)
+        private (float height, float fontSize) AddText(Image<Rgba32> background, string text, bool top)
         {
             if (string.IsNullOrEmpty(text)) return (0, 0);
 
@@ -138,7 +138,7 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-                var options = GetDefaultTextOptions(y);
+                var options = GetDefaultTextOptions(GetTextOrigin(text, top), top);
                 background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
             }
             else
@@ -149,10 +149,11 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-                var options = GetDefaultTextOptions(y);
+                var options = GetDefaultTextOptions(GetTextOrigin(text, top), top);
                 var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize());
                 var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
-                background.Mutate(x => x.DrawImage(textLayer, GetOriginFunny(textLayer.Size, y)));
+                var y = top ? _marginY : _h - _marginY;
+                background.Mutate(x => x.DrawImage(textLayer, GetOriginFunny(textLayer.Size, y))); // todo check y
             }
 
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);

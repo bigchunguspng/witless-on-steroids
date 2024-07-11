@@ -11,21 +11,23 @@ public readonly struct DoubleToken(int id1, int id2, int idC) : IConsumableToken
     public int ID2 { get; } = id2; // 2nd word
     public int IDC { get; } = idC; // combination
 
-    public void RememberTransition(GenerationPack db, IConsumableToken next)
+    public void RememberTransition(GenerationPack db, IConsumableToken next, float chance)
     {
-        db.GetOrAddTable(ID1).Put(ID2, 1F);
+        db.GetOrAddTable(ID1).Put(ID2, chance);
 
         if (next is SingleToken simple)
         {
-            db.GetOrAddTable(ID2).Put(simple.ID, 1F);
-            db.GetOrAddTable(IDC).Put(simple.ID, 1F);
+            db.GetOrAddTable(ID2).Put(simple.ID, chance);
+            db.GetOrAddTable(IDC).Put(simple.ID, chance);
         }
         else if (next is DoubleToken combined)
         {
-            db.GetOrAddTable(ID2).Put(combined.ID1, 0.1F);
-            db.GetOrAddTable(ID2).Put(combined.IDC, 2.9F);
-            db.GetOrAddTable(IDC).Put(combined.ID1, 0.1F);
-            db.GetOrAddTable(IDC).Put(combined.IDC, 2.9F);
+            var (low, high) = IConsumableToken.SplitChance(chance);
+
+            db.GetOrAddTable(ID2).Put(combined.ID1, low);
+            db.GetOrAddTable(ID2).Put(combined.IDC, high);
+            db.GetOrAddTable(IDC).Put(combined.ID1, low);
+            db.GetOrAddTable(IDC).Put(combined.IDC, high);
         }
     }
 }

@@ -37,9 +37,10 @@ namespace Witlesss.Generation
             for (var i = 0; i < lines.Length; i++)
             {
                 var tokens = new LinkedList<string>(lines[i]);
+                var chance = Math.Max(0.3F, MathF.Round(2 - MathF.Log10(tokens.Count), 1));
 
                 CombineSomeTokens(tokens);
-                EatInternal(tokens);
+                EatInternal(tokens, chance);
 
                 eaten[i] = string.Join(' ', tokens.Select(word => word.Replace(' ', '_')));
             }
@@ -88,7 +89,7 @@ namespace Witlesss.Generation
             }
         }
 
-        private void EatInternal(LinkedList<string> words)
+        private void EatInternal(LinkedList<string> words, float chance)
         {
             // update vocabulary
             var tokens = new LinkedList<IConsumableToken>();
@@ -116,7 +117,7 @@ namespace Witlesss.Generation
             while (node.Next is { } next)
             {
                 // ids: -5, A, B, -8, C, -3
-                node.Value.RememberTransition(DB, next.Value);
+                node.Value.RememberTransition(DB, next.Value, chance);
                 node = next;
             }
         }

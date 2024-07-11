@@ -1,4 +1,5 @@
-﻿using Witlesss.Generation.Pack;
+﻿using System;
+using Witlesss.Generation.Pack;
 
 namespace Witlesss.Generation.Tokens;
 
@@ -9,21 +10,30 @@ public readonly struct SingleToken(int id) : IConsumableToken
 {
     public int ID { get; } = id;
 
-    public void RememberTransition(GenerationPack db, IConsumableToken next)
+    public void RememberTransition(GenerationPack db, IConsumableToken next, float chance)
     {
         if (next is SingleToken simple)
         {
-            db.GetOrAddTable(ID).Put(simple.ID, 1F);
+            db.GetOrAddTable(ID).Put(simple.ID, chance);
         }
         else if (next is DoubleToken combined)
         {
-            db.GetOrAddTable(ID).Put(combined.ID1, 0.1F);
-            db.GetOrAddTable(ID).Put(combined.IDC, 2.9F);
+            var (low, high) = IConsumableToken.SplitChance(chance);
+
+            db.GetOrAddTable(ID).Put(combined.ID1, low);
+            db.GetOrAddTable(ID).Put(combined.IDC, high);
         }
     }
 }
 
 public interface IConsumableToken
 {
-    void RememberTransition(GenerationPack db, IConsumableToken next);
+    void RememberTransition(GenerationPack db, IConsumableToken next, float chance);
+
+    public static (float low, float high) SplitChance(float chance)
+    {
+        var l = MathF.Round(chance * 0.2F, 1);
+        var h = MathF.Round(chance - l,    1);
+        return (l, h);
+    }
 }

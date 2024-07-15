@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
 using Witlesss.Memes;
@@ -18,7 +19,7 @@ namespace Witlesss.Commands.Meme
         protected override string VideoName { get; } = "nuke_fap_club.mp4";
 
         protected override string Command { get; } = "/nuke";
-        protected override string Suffix  { get; } = "-Nuked";
+        protected override string Suffix  { get; } = "-Nuked"; // Needs more nuking!
 
         protected override string? DefaultOptions => Baka.Options?.Nuke;
 
@@ -27,14 +28,14 @@ namespace Witlesss.Commands.Meme
 
         protected override bool ResultsAreRandom => true;
 
-        protected override void ParseOptions() { } // Needs more nuking!
-
-        protected override int GetMemeText(string? text)
+        protected override void ParseOptions()
         {
-            return text is not null && int.TryParse(text, out var value)
-                ? Math.Clamp(value, 1, 9)
-                : 1;
+            DukeNukem.Depth = OptionsParsing.GetInt(Request, _depth, 1).Clamp(1, 9);
         }
+
+        protected override int GetMemeText(string? text) => 0;
+
+        private static readonly Regex _depth = new(@"^\/nuke\S*?(\d{1,3})("")\S*");
 
         protected override bool CropVideoNotes  => false;
         protected override bool ConvertStickers => false;
@@ -50,11 +51,13 @@ namespace Witlesss.Commands.Meme
 
     public class DukeNukem : IMemeGenerator<int>
     {
-        public string GenerateMeme(MemeFileRequest request, int depth)
+        public static int Depth = 1;
+
+        public string GenerateMeme(MemeFileRequest request, int text)
         {
             var path = request.SourcePath;
 
-            for (var i = 0; i < depth; i++)
+            for (var i = 0; i < Depth; i++)
             {
                 path = new F_Process(path)
                     .DeepFry(request.GetQscale())
@@ -64,13 +67,13 @@ namespace Witlesss.Commands.Meme
             return path;
         }
 
-        public async Task<string> GenerateVideoMeme(MemeFileRequest request, int depth)
+        public async Task<string> GenerateVideoMeme(MemeFileRequest request, int text)
         {
             var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
 
             var path = request.SourcePath;
 
-            for (var i = 0; i < depth; i++)
+            for (var i = 0; i < Depth; i++)
             {
                 path = await new F_Process(path)
                     .DeepFryVideo(size.Ok(), request.GetCRF())

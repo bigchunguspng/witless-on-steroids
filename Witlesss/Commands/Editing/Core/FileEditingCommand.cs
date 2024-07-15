@@ -7,7 +7,7 @@ namespace Witlesss.Commands.Editing.Core
 {
     public abstract class FileEditingCommand : AsyncCommand
     {
-        private bool _isPhoto;
+        protected bool IsPhoto;
 
         protected string FileID = default!;
 
@@ -70,7 +70,7 @@ namespace Witlesss.Commands.Editing.Core
             else if (m.Document is not null && IsPicture(m.Document))     FileID = m.Document .FileId;
             else return false;
 
-            _isPhoto = true;
+            IsPhoto = true;
 
             return true;
         }
@@ -80,7 +80,7 @@ namespace Witlesss.Commands.Editing.Core
         protected void SendResult(string result, MediaType type)
         {
             using var stream = File.OpenRead(result);
-            if                     (_isPhoto) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
+            if                      (IsPhoto) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
             else if (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
             else if (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
             else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));

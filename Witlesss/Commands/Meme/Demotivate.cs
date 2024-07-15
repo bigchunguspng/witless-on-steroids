@@ -26,6 +26,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("Демотиваторы💀");
 
+        protected override bool ResultsAreRandom => DemotivatorDrawer.AddLogo;
+
         protected override void ParseOptions()
         {
             DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);

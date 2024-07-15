@@ -25,6 +25,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("Ядерные отходы");
 
+        protected override bool ResultsAreRandom => true;
+
         protected override void ParseOptions() { } // Needs more nuking!
 
         protected override int GetMemeText(string? text)
@@ -34,8 +36,8 @@ namespace Witlesss.Commands.Meme
                 : 1;
         }
 
-        protected override bool CropVideoNotes  { get; } = false;
-        protected override bool ConvertStickers { get; } = false;
+        protected override bool CropVideoNotes  => false;
+        protected override bool ConvertStickers => false;
 
         // LOGIC
 

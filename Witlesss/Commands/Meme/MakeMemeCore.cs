@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.SerialQueue;
@@ -28,9 +25,10 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
         protected abstract string? DefaultOptions { get; }
 
-        protected virtual bool CropVideoNotes  { get; } = true;
-        protected virtual bool ConvertStickers { get; } = true;
+        protected virtual bool CropVideoNotes  => true;
+        protected virtual bool ConvertStickers => true;
 
+        protected virtual bool ResultsAreRandom => false;
 
         public void Pass(WitlessContext context)
         {
@@ -60,6 +58,9 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return true;
         }
 
+
+        // PROCESS MEDIA
+
         public async Task ProcessPhoto(string fileID)
         {
             var (path, _) = await Bot.Download(fileID, Chat);
@@ -67,14 +68,13 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 
             ParseOptions();
             var repeats = GetRepeatCount();
-            var txt = GetProvidedText();
             var request = new MemeFileRequest(path, Suffix + ".jpg", Baka.Quality)
             {
                 Type = MemeSourceType.Image
             };
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(txt);
+                var text = GetMemeText(Args);
                 await using var stream = File.OpenRead(await MakeMemeImage(request, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
@@ -89,7 +89,6 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             ParseOptions();
             var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
-            var txt = GetProvidedText();
             var request = new MemeFileRequest(path, Suffix + (sticker ? ".webp" : ".jpg"), Baka.Quality)
             {
                 Type = MemeSourceType.Sticker,
@@ -98,7 +97,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             };
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(txt);
+                var text = GetMemeText(Args);
                 var result = await MakeMemeStick(request, text);
                 if (sticker && ConvertStickers)
                     result = await new F_Process(result).Output("-stick", ".webp");
@@ -120,7 +119,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             if (CropVideoNotes && type == MediaType.Round) path = await FFMpegXD.CropVideoNote(path);
 
             ParseOptions();
-            var text = GetMemeText(GetProvidedText());
+            var text = GetMemeText(Args);
             var request = new MemeFileRequest(path, Suffix + ".mp4", Baka.Quality)
             {
                 Type = MemeSourceType.Video
@@ -166,12 +165,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         }
 
 
-        private string? GetProvidedText()
-        {
-            if (Text is null) return null;
-
-            return _cmd.IsMatch(Text) || Context.ChatIsPrivate ? RemoveCommand(Text) : null;
-        }
+        // OTHER
 
         private MemeRequest GetRequestData()
         {
@@ -195,24 +189,11 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return new MemeRequest(dummy, empty, command);
         }
 
-        // todo still repeat if random options are used (watermarks, randoms colors, ...)
-        private bool HasToBeRepeated => ConditionSatisfied(options => _repeat.IsMatch(options) && NoTextProvided);
-        private bool SendAsSticker   => ConditionSatisfied(options => options.Contains('='));
-        private bool NoTextProvided  => Text is null || (Text.StartsWith('/') && !Text.Any(x => split_chars.Contains(x)));
-
-        private bool ConditionSatisfied(Predicate<string> condition)
-        {
-            if (Request.Empty) return false;
-
-            var match = _cmd.Match(Request.Dummy);
-            if (match.Success) return condition(match.Groups[1].Value);
-            return false;
-        }
-
         private int GetRepeatCount()
         {
             var repeats = 1;
-            if (HasToBeRepeated)
+            var hasToBeRepeated = (Args is null || ResultsAreRandom) && CheckOptionsFor(o => _repeat.IsMatch(o));
+            if (hasToBeRepeated)
             {
                 var match = _repeat.Match(Request.Dummy);
                 if (match.Success && int.TryParse(match.Value, out var x)) repeats = x;
@@ -220,9 +201,18 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             return repeats;
         }
 
-        private string RemoveCommand(string text) => _cmd.Replace(text, "");
+        private bool SendAsSticker => CheckOptionsFor(options => options.Contains('='));
 
-        private bool ConvertStickerToJpeg() => ConditionSatisfied(ops => ops.Contains('x'));
+        private bool ConvertStickerToJpeg() => CheckOptionsFor(options => options.Contains('x'));
+
+        private bool CheckOptionsFor(Predicate<string> condition)
+        {
+            if (Request.Empty) return false;
+
+            var match = _cmd.Match(Request.Dummy);
+            if (match.Success) return condition(match.Groups[1].Value);
+            return false;
+        }
     }
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
@@ -234,61 +224,5 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
 
         protected const string OPTIONS = "ℹ️ Список опций: ";
-    }
-
-    public class MemeRequest(string dummy, bool empty, string command)
-    {
-        /// <summary> A combination of command and default options. </summary>
-        public string Dummy = dummy;
-
-        /// <summary> <b>True</b> if both message text and default options are null. </summary>
-        public readonly bool Empty = empty;
-
-        /// <summary> Lowercase command text w/o bot username. </summary>
-        public readonly string Command = command;
-    }
-
-    public class MemeFileRequest(string path, string oututEnding, int quality)
-    {
-        public string SourcePath { get; set; } = path;
-        public string TargetPath { get; } = path.ReplaceExtension(oututEnding);
-
-        public int Quality { get; set; } = quality; // 0 - 100
-
-        public MemeSourceType  Type { get; init; }
-        public bool ExportAsSticker { get; init; }
-        public bool  ConvertSticker { get; init; }
-
-        public bool IsSticker => Type == MemeSourceType.Sticker;
-
-        /// <summary>
-        /// Constant Rate Factor (for MP4 compresion).<br/>
-        /// 0 - lossless, 23 - default, 51 - worst possible.
-        /// </summary>
-        public int GetCRF()
-        {
-            return Quality > 80
-                ? 0
-                : 51 - (int)(0.42 * Quality); // 17 - 51
-        }
-
-        /// <summary>
-        /// Quality of JPEG image or MP3 audio.<br/>
-        /// 1 - highest, 2-3 - default (JPEG), 31 - lowest.
-        /// </summary>
-        public int GetQscale()
-        {
-            return 31 - (int)(0.29 * Quality); // 2 - 31
-        }
-
-        public Image<Rgba32> GetVideoSnapshot()
-        {
-            return Image.Load<Rgba32>(FFMpegXD.Snapshot(SourcePath));
-        }
-    }
-
-    public enum MemeSourceType
-    {
-        Image, Sticker, Video
     }
 }

@@ -28,6 +28,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("Мемы", OPTIONS + "/op_meme");
 
+        protected override bool ResultsAreRandom => MemeGenerator.ColorText;
+
         protected override void ParseOptions()
         {
             MemeGenerator.CustomColorOption.CheckAndCut(Request);
@@ -103,7 +105,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*");
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*");
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*");
-        private static readonly Regex   _colorText = new(@"^\/meme\S*(cс)\S*");
+        private static readonly Regex   _colorText = new(@"^\/meme\S*(cc)\S*");
         private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");
 

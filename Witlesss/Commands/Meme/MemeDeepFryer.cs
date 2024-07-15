@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
@@ -24,9 +25,14 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("Ядерные отходы");
 
-        protected override void ParseOptions() { }
+        protected override void ParseOptions() { } // Needs more nuking!
 
-        protected override int GetMemeText(string? text) => 0; // Needs more nuking!
+        protected override int GetMemeText(string? text)
+        {
+            return text is not null && int.TryParse(text, out var value)
+                ? Math.Clamp(value, 1, 9)
+                : 1;
+        }
 
         protected override bool CropVideoNotes  { get; } = false;
         protected override bool ConvertStickers { get; } = false;
@@ -42,20 +48,34 @@ namespace Witlesss.Commands.Meme
 
     public class DukeNukem : IMemeGenerator<int>
     {
-        public string GenerateMeme(MemeFileRequest request, int text)
+        public string GenerateMeme(MemeFileRequest request, int depth)
         {
-            return new F_Process(request.SourcePath)
-                .DeepFry(request.GetQscale())
-                .OutputAs(request.TargetPath).Result;
+            var path = request.SourcePath;
+
+            for (var i = 0; i < depth; i++)
+            {
+                path = new F_Process(path)
+                    .DeepFry(request.GetQscale())
+                    .OutputAs(UniquePath(request.TargetPath)).Result;
+            }
+
+            return path;
         }
 
-        public Task<string> GenerateVideoMeme(MemeFileRequest request, int text)
+        public async Task<string> GenerateVideoMeme(MemeFileRequest request, int depth)
         {
             var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
 
-            return new F_Process(request.SourcePath)
-                .DeepFryVideo(size.Ok(), request.GetCRF())
-                .OutputAs(request.TargetPath);
+            var path = request.SourcePath;
+
+            for (var i = 0; i < depth; i++)
+            {
+                path = await new F_Process(path)
+                    .DeepFryVideo(size.Ok(), request.GetCRF())
+                    .OutputAs(UniquePath(request.TargetPath));
+            }
+
+            return path;
         }
     }
 }

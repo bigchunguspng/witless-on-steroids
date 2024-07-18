@@ -181,7 +181,10 @@ namespace Witlesss.XD
             ClearDirectory(Paths.Dir_Temp, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
             ClearDirectory(Paths.Dir_History, new EnumerationOptions() { RecurseSubdirectories = false });
 
-            foreach (var file in Directory.GetFiles(Paths.Dir_Fuse, "del*.json")) File.Delete(file);
+            if (Directory.Exists(Paths.Dir_Fuse))
+            {
+                foreach (var file in Directory.GetFiles(Paths.Dir_Fuse, "del*.json")) File.Delete(file);
+            }
         }
 
         private static void ClearDirectory(string path, EnumerationOptions options)

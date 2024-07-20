@@ -207,6 +207,8 @@ namespace Witlesss
 
         private void Backup()
         {
+            if (Baka.DB.Vocabulary.Count == 0) return;
+
             SaveChanges();
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var name = $"{Paths.Prefix_Pack}-{Chat}.json";

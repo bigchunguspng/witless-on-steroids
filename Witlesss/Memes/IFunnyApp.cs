@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ColorHelper;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
@@ -30,7 +32,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
     private int _w, _h; // <-- of the image
     private int _cardHeight, _fullHeight, _cropOffset;
     private float _marginLeft;
-    private float _textOffset;
+    private float _fontOffset, _caseOffset, _textOffset;
 
     private Point     Location => new(0, _cardHeight);
     private Rectangle Cropping => new(0, _cropOffset, _w, _h);
@@ -139,8 +141,13 @@ public partial class IFunnyApp : IMemeGenerator<string>
         text = MakeTextFitCard(text);
         AdjustTextPosition(text);
 
+        var options = GetDefaultTextOptions();
         var image = CreateBackgroundCard();
-        image.Mutate(x => x.DrawText(GetDefaultTextOptions(), text, TextBrush, pen: null));
+
+        //Debug_Line(image, options);
+        //Debug_Chars(image, options, text);
+
+        image.Mutate(x => x.DrawText(options, text, TextBrush, pen: null));
         return image;
     }
 
@@ -153,10 +160,14 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
         var options = GetDefaultTextOptions();
 
-        var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize());
+        var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
         var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
+
+        //Debug_Line(image, options);
+        //Debug_Chars(image, options, text);
+
         image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
         return image;
     }
@@ -168,7 +179,36 @@ public partial class IFunnyApp : IMemeGenerator<string>
     private Point GetOriginFunny(Size textLayer)
     {
         var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
-        var y = _cardHeight.Gap(textLayer.Height) + _textOffset;
+        var y = _cardHeight.Gap(textLayer.Height) + _caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());
+    }
+
+
+    // DEBUG
+
+    private void Debug_Line(Image<Rgba32> image, RichTextOptions options)
+    {
+        // font size showed in pixels (different for different fonts)
+        var rect1 = new RectangleF(0, options.Origin.Y - _textOffset - FontSize / 2F, _w, FontSize);
+        image.Mutate(ctx => ctx.Fill(new SolidBrush(Color.OrangeRed), rect1));
+
+        // actual font size (same for same pic*text)
+        var w = _w * 0.75F;
+        var x = _w.Gap(w.RoundInt());
+        var fs = FontSize * ExtraFonts.GetRelativeSize();
+        var rect2 = new RectangleF(x, options.Origin.Y - _textOffset - fs / 2F, w, fs);
+        image.Mutate(ctx => ctx.Fill(new SolidBrush(Color.Orange), rect2));
+    }
+
+    private void Debug_Chars(Image<Rgba32> image, RichTextOptions options, string text)
+    {
+        TextMeasurer.TryMeasureCharacterBounds(text, options, out var bounds);
+        foreach (var bound in bounds)
+        {
+            var color = ColorGenerator.GetLightRandomColor<RGB>().ToRgb24();
+            var b = bound.Bounds;
+            var rect = new RectangleF(b.X, b.Y, b.Width, b.Height);
+            image.Mutate(x => x.Fill(new SolidBrush(color), rect));
+        }
     }
 }

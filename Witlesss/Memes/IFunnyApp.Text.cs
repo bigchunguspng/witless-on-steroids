@@ -144,15 +144,20 @@ public partial class IFunnyApp
 
     private void AdjustTextPosition(string s)
     {
-        var offset = FontSize * (0.0473F * ExtraFonts.GetRelativeSize() + ExtraFonts.GetVerticalOffset());
-        var caps = ExtraFonts.FontIsMulticase() && s.IsUppercaseEnough()
-            ? FontSize * ExtraFonts.GetCapitalsOffset()
-            : 0;
-
-        _textOffset = offset + caps;
+        _fontOffset = GetFontDependentOffset();
+        _caseOffset = GetCaseDependentOffset(s);
+        _textOffset = _fontOffset - _caseOffset;
 
         Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
     }
+
+    private float GetFontDependentOffset() 
+        => FontSize * ExtraFonts.GetVerticalOffset();
+
+    private float GetCaseDependentOffset(string s)
+        => ExtraFonts.FontIsMulticase() && s.IsMostlyLowercase()
+            ? FontSize * ExtraFonts.GetSizeMultiplier() * ExtraFonts.GetCapitalsOffset()
+            : 0;
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)
     {

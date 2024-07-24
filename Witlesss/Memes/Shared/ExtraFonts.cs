@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme;
+using FontSpecificData = (float size, float marginT, float marginB, float offset, float caps);
 
 namespace Witlesss.Memes.Shared
 {
@@ -46,6 +48,8 @@ namespace Witlesss.Memes.Shared
             .Append(SystemFonts.Get("Segoe UI Symbol"))
             .ToList();*/
         }
+
+        public static IEnumerable<string> Keys => _families.Keys;
 
         public static List<FontFamily> FallbackFamilies { get; } = [];/* =
         [
@@ -98,25 +102,28 @@ namespace Witlesss.Memes.Shared
         public float GetCapitalsOffset() => _fontKey is null ? 0F : _fontData[_fontKey].caps;
         public float GetRelativeSize  () => _fontKey is null ? 1F : _fontData[_fontKey].size;
 
-        private static readonly Dictionary<string, (float offset, float size, float caps)> _fontData = new()
+        private static readonly Dictionary<string, FontSpecificData> _fontData = new()
         {
-            { "ap", (-0.0058F, 1.0230F, 0.0000F) },
-            { "bb", (-0.0251F, 1.0024F, 0.0936F) },
-            { "bc", (-0.0096F, 1.1238F, 0.0000F) },
-            { "bl", (-0.0005F, 0.9388F, 0.0000F) },
-            { "cr", (-0.0528F, 0.9586F, 0.0947F) },
-            { "ft", (-0.1894F, 1.0064F, 0.1071F) },
-            { "go", (-0.2978F, 1.1209F, 0.1252F) },
-            { "im", (-0.1350F, 1.1160F, 0.0796F) },
-            { "mc", ( 0.0793F, 1.0828F, 0.0000F) },
-            { "rg", (-0.1318F, 1.0037F, 0.0916F) },
-            { "sg", (-0.2090F, 0.9885F, 0.0989F) },
-            { "st", (-0.0002F, 1.0165F, 0.0000F) },
-            { "tm", (-0.1346F, 0.9347F, 0.1004F) },
-            { "vb", (-0.0524F, 0.7793F, 0.0000F) },
-            { "vg", (-0.1007F, 0.8400F, 0.0894F) },
-            { "vn", (-0.1254F, 1.2353F, 0.1544F) },
-            { "vp", (-0.0732F, 1.0836F, 0.0000F) },
+            //          size   marginT   marginB    offset     caps
+            { "ap", (1.0271F,  0.0801F,  0.1924F,  0.0562F, 0.0000F) },
+            { "bb", (1.0024F,  0.0250F,  0.2650F,  0.1200F, 0.0762F) },
+            { "bc", (1.1534F,  0.0580F,  0.1250F,  0.0335F, 0.0000F) },
+            { "bl", (0.9388F,  0.0890F,  0.2190F,  0.0650F, 0.0000F) },
+            { "cr", (0.9388F,  0.0585F,  0.2765F,  0.1090F, 0.1051F) },
+            { "ft", (1.0064F,  0.1870F,  0.1001F, -0.0435F, 0.1071F) },
+            { "go", (1.0955F,  0.2400F, -0.0160F, -0.1280F, 0.1139F) },
+            { "im", (1.1167F,  0.1079F,  0.1011F, -0.0034F, 0.0799F) },
+            { "mc", (1.0913F, -0.0210F,  0.2480F,  0.1345F, 0.0000F) },
+            { "rg", (1.0037F,  0.1309F,  0.1582F,  0.0137F, 0.0916F) },
+            { "sg", (0.9885F,  0.2139F,  0.0859F, -0.0640F, 0.0929F) },
+            { "st", (1.0165F,  0.0970F,  0.1830F,  0.0430F, 0.0000F) },
+            { "tm", (0.9347F,  0.1541F,  0.1838F,  0.0149F, 0.1004F) },
+            { "vb", (0.8093F,  0.3060F,  0.2550F, -0.0255F, 0.0000F) },
+            { "vg", (0.8273F,  0.1740F,  0.2400F,  0.0330F, 0.0811F) },
+            { "vn", (1.2353F, -0.0625F,  0.1875F,  0.1250F, 0.1544F) },
+            { "vp", (1.0712F,  0.1455F,  0.0957F, -0.0249F, 0.0000F) },
+
+            // NOTE: offset = (marginB - marginT) / 2
         };
 
         public bool FontIsMulticase() => _fontKey switch
@@ -154,15 +161,17 @@ namespace Witlesss.Memes.Shared
 
         public static void Debug_GetFontData()
         {
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             foreach (var pair in _families)
             {
-                var bound1 = TextMeasurer.MeasureBounds("X", new TextOptions(pair.Value.CreateFont(48)));
-                var bound2 = TextMeasurer.MeasureBounds("x", new TextOptions(pair.Value.CreateFont(48)));
+                var bound1 = TextMeasurer.MeasureBounds("И", new TextOptions(pair.Value.CreateFont(48)));
+                var bound2 = TextMeasurer.MeasureBounds("и", new TextOptions(pair.Value.CreateFont(48)));
+                var marginT =  00 + bound1.Top     / 48;
+                var marginB = (48 - bound1.Bottom) / 48;
+                var offset = (marginB - marginT) / 2F;
                 var relativeSize = bound1.Height / 34;
-                var size = 48 / relativeSize;
-                var offset = - bound1.Y / (size / relativeSize);
-                var caps = (bound1.Height - bound2.Height) / 2 / (size / relativeSize);
-                Log($"{pair.Key}\t{offset:F4}\t{relativeSize:F4}\t{caps:F4}");
+                var caps = (bound1.Height - bound2.Height) / 2 / (48 / relativeSize);
+                Log($"{{ \"{pair.Key}\", ({relativeSize:F4}F, {marginT:F4}F, {marginB:F4}F, {offset:F4}F, {caps:F4}F) }},");
             }
         }
     }

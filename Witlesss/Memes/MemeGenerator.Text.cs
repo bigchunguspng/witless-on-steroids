@@ -121,7 +121,7 @@ public partial class MemeGenerator
 
     private PointF GetTextOrigin(string text, bool top)
     {
-        var caps = ExtraFonts.FontIsMulticase() && text.IsUppercaseEnough()
+        var caps = ExtraFonts.FontIsMulticase() && text.IsMostlyLowercase()
             ? FontSize * ExtraFonts.GetCapitalsOffset()
             : 0;
 

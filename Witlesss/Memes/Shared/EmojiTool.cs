@@ -18,8 +18,10 @@ namespace Witlesss.Memes.Shared
     {
         public MemeType MemeType { get; init; }
 
-        private bool Dg  => MemeType == MemeType.Dg;
+        private bool Dg  => MemeType == MemeType.Dg; 
         private bool Top => MemeType == MemeType.Top;
+        // todo remove this stuff ↑
+        // it's task to draw given text, let meme specific code remove useless text or whatever this is for
 
         /*private static readonly StringFormat[] Formats = new[]
         {
@@ -29,32 +31,32 @@ namespace Witlesss.Memes.Shared
             new StringFormat(NoWrap) { Alignment = Near, Trimming = EllipsisCharacter }
         };*/
 
-        public record Options(SolidBrush Color, float EmojiSize, int MaxLines = -1);
+        public record Options(SolidBrush Color, float EmojiSize, float FontOffset = 0, int MaxLines = -1);
 
         public Image<Rgba32> DrawEmojiText
         (
-            string text, RichTextOptions options, Options parameters, Queue<string> pngs, out int linesFilled
+            string text, RichTextOptions rto, Options options, Queue<string> pngs, out int linesFilled
         )
         {
             // RENDER EACH PARAGRAPH
 
             var paragraphs = text.Split('\n');
             var lines = paragraphs
-                .Select(paragraph => DrawEmojiTextParagraph(paragraph, options, parameters, pngs))
+                .Select(paragraph => DrawEmojiTextParagraph(paragraph, rto, options, pngs))
                 .SelectMany(x => x).ToList();
             linesFilled = lines.Count;
 
             // COMBINE
 
-            var width = options.WrappingLength.CeilingInt();
-            var height = options.Font.Size * options.LineSpacing;
+            var width = rto.WrappingLength.CeilingInt();
+            var height = rto.Font.Size * rto.LineSpacing;
 
-            var canvas = new Image<Rgba32>(width, (lines.Count * height).RoundInt());
+            var canvas = new Image<Rgba32>(width, ((lines.Count + 0.5F) * height).RoundInt());
 
-            var offsetY = 0F;
+            var offsetY = 0.25F;
             foreach (var line in lines)
             {
-                var x = options.HorizontalAlignment switch
+                var x = rto.HorizontalAlignment switch
                 {
                     HorizontalAlignment.Center => (width - line.Width) / 2,
                     HorizontalAlignment.Right  =>  width - line.Width,
@@ -71,7 +73,7 @@ namespace Witlesss.Memes.Shared
 
         private List<Image<Rgba32>> DrawEmojiTextParagraph
         (
-            string paragraph, RichTextOptions options, Options parameters, Queue<string> pngs
+            string paragraph, RichTextOptions rto, Options options, Queue<string> pngs
         )
         {
             var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
@@ -79,8 +81,10 @@ namespace Witlesss.Memes.Shared
 
             var lines = new List<Image<Rgba32>>();
 
-            var width = options.WrappingLength.CeilingInt();
-            var height = (options.Font.Size * options.LineSpacing).CeilingInt();
+            var width = rto.WrappingLength.CeilingInt();
+            var height = rto.Font.Size * rto.LineSpacing;
+            var safeHeight = (1.5F * height).CeilingInt();
+            var margin = (0.25F * height).RoundInt();
 
             var canvas = GetEmptyCanvas();
 
@@ -102,7 +106,7 @@ namespace Witlesss.Memes.Shared
 
             void DrawEmoji(List<string> sequence)
             {
-                var side = parameters.EmojiSize.RoundInt();
+                var side = options.EmojiSize.RoundInt();
                 var size = new Size(side, side);
                 var decoder = new DecoderOptions
                 {
@@ -123,9 +127,9 @@ namespace Witlesss.Memes.Shared
                     {
                         var image = Image.Load<Rgba32>(decoder, emoji);
 #if DEBUG
-                        canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffset(), size)));
+                        canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
 #endif
-                        canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffset(), new GraphicsOptions()));
+                        canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffsetEmo(), new GraphicsOptions()));
                         MoveX(side);
                     }
                     else DrawText(emoji);
@@ -144,7 +148,7 @@ namespace Witlesss.Memes.Shared
                 {
                     //text = text.TrimEnd();
                     
-                    var optionsW = new RichTextOptions(options)
+                    var optionsW = new RichTextOptions(rto)
                     {
                         WrappingLength = width
                     }.WithDefaultAlignment();
@@ -155,9 +159,9 @@ namespace Witlesss.Memes.Shared
                     else if  (Dg) DrawSingleLineText();
                     else
                     {
-                        var optionsR = new RichTextOptions(options)
+                        var optionsR = new RichTextOptions(rto)
                         {
-                            Origin = GetDrawingOffset(), WrappingLength = rest
+                            Origin = GetDrawingOffsetTxt(), WrappingLength = rest
                         }.WithDefaultAlignment();
                         _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
                         _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
@@ -169,9 +173,9 @@ namespace Witlesss.Memes.Shared
                         ms = TextMeasuring.MeasureTextSize(trim, optionsR, out _);
                         optionsR.WrappingLength = ms.Width + 0.05F; // safe space, fixes text being not rendered.
 #if DEBUG
-                        canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, height)));
+                        canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, safeHeight)));
 #endif
-                        canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, parameters.Color));
+                        canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, options.Color));
                         MoveX((int)TextMeasuring.MeasureTextSize(trim, optionsR, out _).Width);
                         var next = space ? cr ? text : text[(index + 1)..] : text[chars..];
                         NewLine();
@@ -181,10 +185,10 @@ namespace Witlesss.Memes.Shared
                     void DrawSingleLineText()
                     {
 #if DEBUG
-                        canvas.Mutate(ctx => ctx.Fill(Color.Chocolate, new Rectangle(x, 0, w, height)));
+                        canvas.Mutate(ctx => ctx.Fill(Color.Chocolate, new Rectangle(x, 0, w, safeHeight)));
 #endif
-                        optionsW.Origin = GetDrawingOffset();
-                        canvas.Mutate(ctx => ctx.DrawText(optionsW, text, parameters.Color));
+                        optionsW.Origin = GetDrawingOffsetTxt();
+                        canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
                         MoveX(w);
                     }
                 }
@@ -212,8 +216,10 @@ namespace Witlesss.Memes.Shared
                 lines.Add(canvas);
             }
 
-            Point GetDrawingOffset() => new(x, 0);
-            Image<Rgba32> GetEmptyCanvas() => new(width, height);
+            Point GetDrawingOffsetEmo() => new(x, margin + 0);
+            Point GetDrawingOffsetTxt() => new(x, margin + options.FontOffset.RoundInt());
+
+            Image<Rgba32> GetEmptyCanvas() => new(width, safeHeight);
         }
 
         public static string ReplaceEmoji

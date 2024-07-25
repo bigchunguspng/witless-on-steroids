@@ -2,4 +2,5 @@
 .idea/
 obj/
 bin/
-Witlesss.sln.DotSettings.user
+out/
+*.sln.DotSettings.user

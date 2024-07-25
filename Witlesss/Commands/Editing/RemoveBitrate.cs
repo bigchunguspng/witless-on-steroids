@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Editing
             var directory = Path.GetDirectoryName(path);
             var name = Path.GetFileNameWithoutExtension(path);
             var output = UniquePath(directory, name + "-DAMN.jpg");
-            var exe = "imagemagick";
+            var exe = "magick";
             var args = $"convert \"{path}\" -compress JPEG -quality {22 - _value} \"{output}\""; // 1 - 22
             SystemHelpers.StartedReadableProcess(exe, args).WaitForExit();
             return output;

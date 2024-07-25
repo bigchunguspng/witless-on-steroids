@@ -21,7 +21,7 @@ namespace Witlesss.Memes.Shared
 
         static ExtraFonts()
         {
-            var files = Directory.GetFiles(Paths.Dir_Fonts);
+            var files = Directory.GetFiles(Paths.Dir_Fonts).OrderBy(x => x).ToArray();
             var collection = new FontCollection();
             files.ForEach(file => collection.Add(file));
 

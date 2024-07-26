@@ -28,7 +28,7 @@ public partial class MemeGenerator
         _startingFontSize = GetStartingFontSize();
         ResizeFont(_startingFontSize);
 
-        _offsetY = Math.Max(GetDefaultFontFize(), 15) * ExtraFonts.GetVerticalOffset();
+        _offsetY = Math.Max(GetDefaultFontFize(), 15) * ExtraFonts.GetFontDependentOffset();
     }
 
     private void ResizeFont(float size) => _font = _fontFamily.CreateFont(size, _fontStyle);

@@ -12,13 +12,16 @@ using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 using Random = System.Random;
+using Logo = (SixLabors.ImageSharp.Image Image, SixLabors.ImageSharp.Point Point);
 
 namespace Witlesss.Memes
 {
     public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
-        public static bool AddLogo;
+        public static bool AddLogo, SingleLine;
         public static bool BottomTextIsGenerated;
+
+        public static readonly ExtraFonts ExtraFontsA = new("d[vg]", "&"), ExtraFontsB = new("d[vg]", @"\*");
 
         private static readonly List<Logo> Logos = [];
         private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
@@ -26,8 +29,9 @@ namespace Witlesss.Memes
         private readonly int _w, _h;
         private readonly bool _square;
         private readonly RectangleF _frame;
-        private readonly DgTextOptions _textA, _textB;
 
+
+        private static readonly SolidBrush _heisenberg = new(Color.White);
 
         private readonly GraphicsOptions _anyGraphicsOptions = new();
 
@@ -77,17 +81,6 @@ namespace Witlesss.Memes
                 _w - 2 * marginS,
                 _h - marginT - marginB
             );
-
-            if (_square)
-            {
-                _textA = DgTextOptions.UpperText(_h - imageMarginB + 13, _w);
-                _textB = DgTextOptions.LowerText(_h - imageMarginB + 84, _w);
-            }
-            else
-            {
-                _textA = DgTextOptions.LargeText(_h - imageMarginB + 33, _w);
-                _textB = DgTextOptions.LowerText(_h, 0); // not used
-            }
         }
 
         public Rectangle ImagePlacement { get; }
@@ -123,35 +116,40 @@ namespace Witlesss.Memes
                 background.Mutate(x => x.DrawImage(logo.Image, logo.Point, _anyGraphicsOptions));
             }
 
-            DrawText(background, text.A, _textA, 1);
-            DrawText(background, text.B, _textB, BottomTextIsGenerated ? 1 : 2);
+            var typeA = _square
+                ? SingleLine
+                    ? TextType.Single
+                    : TextType.Upper
+                : TextType.Large;
+            DrawText(background, text.A, typeA, 1); // UPPER TEXT
+
+            if (_square && !SingleLine)
+                DrawText(background, text.B, TextType.Lower, BottomTextIsGenerated ? 1 : 2); // LOWER TEXT
 
             return background;
         }
 
         // todo text margin + do only 1 bottom text line if text is generated
-        private void DrawText(Image image, string text, DgTextOptions o, int lines)
+        private void DrawText(Image image, string text, TextType type, int lines)
         {
+            var options = GetTextOptions(type, text, out var fontOffset);
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count > 0)
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
-                var options = new RichTextOptions(o.Options)
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-                var parameters = new EmojiTool.Options(o.Color, o.EmojiSize);
+                var parameters = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
                 var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs, out _);
-                var point = new Point((_w - textLayer.Width) / 2, o.Options.Origin.Y.RoundInt());
+                var y = options.Origin.Y - (textLayer.Height / 2F);
+                var point = new Point((_w - textLayer.Width) / 2, y.RoundInt());
                 image.Mutate(x => x.DrawImage(textLayer, point));
             }
             else
             {
                 //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
-                var lineBreak = TextMeasuring.DetectLineBreak(text, o.Options, lines);
+                var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
                 var textToRender = lineBreak == -1 ? text : text[..lineBreak];
 
-                image.Mutate(x => x.DrawText(_textOptions, o.Options, textToRender, brush: o.Color, pen: null));
+                image.Mutate(x => x.DrawText(_textOptions, options, textToRender, brush: _heisenberg, pen: null));
             }
         }
 
@@ -162,6 +160,7 @@ namespace Witlesss.Memes
             image.Mutate(x => x.Resize(ImagePlacement.Size));
             frame.Mutate(x => x.DrawImage(image, ImagePlacement.Location, _anyGraphicsOptions));
         }
+
 
         // LOGOS (WATERMARKS)
 
@@ -176,48 +175,66 @@ namespace Witlesss.Memes
                 if (int.TryParse(coords[0], out var x) && int.TryParse(coords[^1], out var y))
                 {
                     var image = Image.Load(file.FullName);
-                    var logo = new Logo(image, new Point(x, y));
-                    Logos.Add(logo);
+                    Logos.Add((image, new Point(x, y)));
                 }
             }
         }
-    }
 
 
-    // CLASSES
+        // TEXT
 
-    public record Logo(Image Image, Point Point);
-
-    public record DgTextOptions(RichTextOptions Options, int EmojiSize)
-    {
-        public SolidBrush Color => _heisenberg;
-
-        private static readonly SolidBrush _heisenberg = new(SixLabors.ImageSharp.Color.White);
-
-        public static DgTextOptions LargeText(int m, int w) => Construct(LargeFont, 72, m, w, 1.13F);
-        public static DgTextOptions UpperText(int m, int w) => Construct(UpperFont, 54, m, w, 1.36F);
-        public static DgTextOptions LowerText(int m, int w) => Construct(LowerFont, 34, m, w, 1.39F);
-
-        private static Font LargeFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 64);
-        private static Font UpperFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 48);
-        private static Font LowerFont => new(SystemFonts.Get(DEMOTIVATOR_LOWER_FONT), 24);
-
-        private static DgTextOptions Construct
-        (
-            Font font, int emojiSize, int margin, int width, float lineSpacing
-        )
+        private RichTextOptions GetTextOptions(TextType type, string text, out float fontOffset)
         {
-            var options = new RichTextOptions(font)
+            var lower = type is TextType.Lower;
+            var extraFonts = lower ? ExtraFontsB : ExtraFontsA;
+            var family = extraFonts.GetFontFamily(lower ? "co" : "tm");
+            var style = extraFonts.GetFontStyle(family);
+
+            var baseFontSize = type switch
             {
-                Origin = new Point(0, margin),
-                WrappingLength = width,
-                LineSpacing = lineSpacing,
+                TextType.Lower => 26.4696F, // 24
+                TextType.Large => 59.8208F, // 64
+                _              => 44.8656F  // 48
+            };
+            var fontSize = baseFontSize * extraFonts.GetSizeMultiplier();
+
+            var offset = type switch
+            {
+                TextType.Upper => -25.15F,
+                TextType.Lower =>  31.50F,
+                _ => 0
+            };
+            var offsetFont = fontSize * extraFonts.GetFontDependentOffset();
+            var offsetCaps = fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
+            var y = 650 + offset + offsetFont - offsetCaps;
+
+            fontOffset = offsetFont;
+
+            return new RichTextOptions(family.CreateFont(fontSize, style))
+            {
                 TextAlignment = TextAlignment.Center,
-                WordBreaking = WordBreaking.Standard,
-                KerningMode = KerningMode.Standard,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Origin = new PointF(_w / 2F, y),
+                WrappingLength = _w,
+                LineSpacing = lower ? 1.39F : 1.2F,
                 FallbackFontFamilies = ExtraFonts.FallbackFamilies
             };
-            return new DgTextOptions(options, emojiSize);
+        }
+
+        private int GetEmojiSize(TextType type) => type switch
+        {
+            TextType.Lower => 34,
+            TextType.Large => 72,
+            _              => 54
+        };
+
+        private enum TextType
+        {
+            Upper,
+            Lower,
+            Single,
+            Large
         }
     }
 }

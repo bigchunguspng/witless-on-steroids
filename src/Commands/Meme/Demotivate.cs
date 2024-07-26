@@ -30,7 +30,10 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);
+            DemotivatorDrawer.ExtraFontsA.CheckAndCut(Request);
+            DemotivatorDrawer.ExtraFontsB.CheckAndCut(Request);
+            DemotivatorDrawer.SingleLine =  OptionsParsing.Check(Request, _one_line);
+            DemotivatorDrawer.AddLogo    = !OptionsParsing.Check(Request, _no_logo);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -38,14 +41,15 @@ namespace Witlesss.Commands.Meme
             DemotivatorDrawer.BottomTextIsGenerated = true;
 
             string a, b;
-            if (string.IsNullOrEmpty(text))
+            var generate = string.IsNullOrEmpty(text);
+            if (generate)
             {
                 a = Baka.Generate();
                 b = Baka.Generate().EnsureIsNotUppercase();
             }
             else
             {
-                if (text.Contains('\n'))
+                if (text!.Contains('\n'))
                 {
                     var split = text.Split('\n', 2);
                     a = split[0];
@@ -60,10 +64,14 @@ namespace Witlesss.Commands.Meme
                 }
             }
 
+            var capitalize = OptionsParsing.CheckCaps(Request, _caps, generate);
+            if (capitalize) a = a.ToLetterCase(LetterCaseMode.Upper);
+
             return new TextPair(a, b);
         }
 
-        private static readonly Regex _no_logo = new(@"^\/d[vg]\S*n\S* *");
+        private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*nn\S* *");
+        private static readonly Regex _one_line = new(@"^\/d[vg]\S*ll\S* *");
 
         public Demotivate SetMode(DgMode mode)
         {

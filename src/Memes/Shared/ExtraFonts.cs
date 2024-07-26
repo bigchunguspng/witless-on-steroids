@@ -57,10 +57,10 @@ namespace Witlesss.Memes.Shared
             SystemFonts.Get("Segoe UI Symbol")
         ];*/
 
-        public ExtraFonts(string cmd, params string[] exclude)
+        public ExtraFonts(string cmdRegex, string? x = null)
         {
-            var codes = string.Join('|', _families.Keys.Where(x => !exclude.Contains(x)));
-            _regex = new Regex($@"^\/{cmd}\S*({codes})(-[bi]{{1,2}})?\S*", RegexOptions.IgnoreCase);
+            var codes = string.Join('|', _families.Keys);
+            _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes})(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);
         }
 
         public Font GetFont(string @default, float size)
@@ -98,30 +98,38 @@ namespace Witlesss.Memes.Shared
         public float GetLineSpacing() => GetRelativeSize();
         public float GetSizeMultiplier() => 1 / GetRelativeSize();
 
-        public float GetVerticalOffset() => _fontKey is null ? 0F : _fontData[_fontKey].offset;
-        public float GetCapitalsOffset() => _fontKey is null ? 0F : _fontData[_fontKey].caps;
-        public float GetRelativeSize  () => _fontKey is null ? 1F : _fontData[_fontKey].size;
+        public float GetFontDependentOffset() => _fontKey is null ? 0F : GetFontSpecific(_fontKey).offset;
+        public float GetCapitalsOffset() => _fontKey is null ? 0F : GetFontSpecific(_fontKey).caps;
+        public float GetRelativeSize  () => _fontKey is null ? 1F : GetFontSpecific(_fontKey).size;
 
-        private static readonly Dictionary<string, FontSpecificData> _fontData = new()
+        public float GetCaseDependentOffset(string text)
+        {
+            var move = FontIsMulticase() && text.IsMostlyLowercase();
+            return move ? GetSizeMultiplier() * GetCapitalsOffset() : 0;
+        }
+
+        private static FontSpecificData GetFontSpecific(string key) => key switch
         {
             //          size   marginT   marginB    offset     caps
-            { "ap", (1.0271F,  0.0801F,  0.1924F,  0.0562F, 0.0000F) },
-            { "bb", (1.0024F,  0.0250F,  0.2650F,  0.1200F, 0.0762F) },
-            { "bc", (1.1534F,  0.0580F,  0.1250F,  0.0335F, 0.0000F) },
-            { "bl", (0.9388F,  0.0890F,  0.2190F,  0.0650F, 0.0000F) },
-            { "cr", (0.9388F,  0.0585F,  0.2765F,  0.1090F, 0.1051F) },
-            { "ft", (1.0064F,  0.1870F,  0.1001F, -0.0435F, 0.1071F) },
-            { "go", (1.0955F,  0.2400F, -0.0160F, -0.1280F, 0.1139F) },
-            { "im", (1.1167F,  0.1079F,  0.1011F, -0.0034F, 0.0799F) },
-            { "mc", (1.0913F, -0.0210F,  0.2480F,  0.1345F, 0.0000F) },
-            { "rg", (1.0037F,  0.1309F,  0.1582F,  0.0137F, 0.0916F) },
-            { "sg", (0.9885F,  0.2139F,  0.0859F, -0.0640F, 0.0929F) },
-            { "st", (1.0165F,  0.0970F,  0.1830F,  0.0430F, 0.0000F) },
-            { "tm", (0.9347F,  0.1541F,  0.1838F,  0.0149F, 0.1004F) },
-            { "vb", (0.8093F,  0.3060F,  0.2550F, -0.0255F, 0.0000F) },
-            { "vg", (0.8273F,  0.1740F,  0.2400F,  0.0330F, 0.0811F) },
-            { "vn", (1.2353F, -0.0625F,  0.1875F,  0.1250F, 0.1544F) },
-            { "vp", (1.0712F,  0.1455F,  0.0957F, -0.0249F, 0.0000F) },
+            "ap" => (1.0271F,  0.0801F,  0.1924F,  0.0562F, 0.0000F),
+            "bb" => (1.0024F,  0.0250F,  0.2650F,  0.1200F, 0.0762F),
+            "bc" => (1.1534F,  0.0580F,  0.1250F,  0.0335F, 0.0000F),
+            "bl" => (0.9388F,  0.0890F,  0.2190F,  0.0650F, 0.0000F),
+            "co" => (1.1029F,  0.1494F,  0.0693F, -0.0400F, 0.1325F),
+            "cr" => (0.9388F,  0.0585F,  0.2765F,  0.1090F, 0.1051F),
+            "ft" => (1.0064F,  0.1870F,  0.1001F, -0.0435F, 0.1071F),
+            "go" => (1.0955F,  0.2400F, -0.0160F, -0.1280F, 0.1139F),
+            "im" => (1.1167F,  0.1079F,  0.1011F, -0.0034F, 0.0799F),
+            "mc" => (1.0913F, -0.0210F,  0.2480F,  0.1345F, 0.0000F),
+            "rg" => (1.0037F,  0.1309F,  0.1582F,  0.0137F, 0.0916F),
+            "sg" => (0.9885F,  0.2139F,  0.0859F, -0.0640F, 0.0929F),
+            "st" => (1.0165F,  0.0970F,  0.1830F,  0.0430F, 0.0000F),
+            "tm" => (0.9347F,  0.1541F,  0.1838F,  0.0149F, 0.1004F), // ro
+            "vb" => (0.8093F,  0.3060F,  0.2550F, -0.0255F, 0.0000F),
+            "vg" => (0.8273F,  0.1740F,  0.2400F,  0.0330F, 0.0811F),
+            "vn" => (1.2353F, -0.0625F,  0.1875F,  0.1250F, 0.1544F),
+            "vp" => (1.0712F,  0.1455F,  0.0957F, -0.0249F, 0.0000F),
+            _    => (1.0000F,  0.1500F,  0.1500F,  0.0000F, 0.1000F),
 
             // NOTE: offset = (marginB - marginT) / 2
         };
@@ -171,7 +179,7 @@ namespace Witlesss.Memes.Shared
                 var offset = (marginB - marginT) / 2F;
                 var relativeSize = bound1.Height / 34;
                 var caps = (bound1.Height - bound2.Height) / 2 / (48 / relativeSize);
-                Log($"{{ \"{pair.Key}\", ({relativeSize:F4}F, {marginT:F4}F, {marginB:F4}F, {offset:F4}F, {caps:F4}F) }},");
+                Log($"\"{pair.Key}\" => ({relativeSize:F4}F, {marginT:F4}F, {marginB:F4}F, {offset:F4}F, {caps:F4}F),");
             }
         }
     }

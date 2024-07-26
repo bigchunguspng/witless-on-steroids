@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Witlesss.Services.Internet.Reddit;
 
 #pragma warning disable CS4014
 
@@ -37,14 +38,14 @@ namespace Witlesss.Commands.Packing
                     var sort = BrowseReddit.Sorts  [o[0]];
                     var time = BrowseReddit.GetTime(o, BrowseReddit.TimeMatters(o[0]));
 
-                    query = sub.Success ? new SsQuery(s, q, sort, time) : new SrQuery(q, sort, time);
+                    query = new SearchQuery(s, q, sort, time);
                 }
                 else
                 {
                     var sort = (SortingMode)o[0];
                     var time = BrowseReddit.GetTime(o, BrowseReddit.TimeMatters(sort));
 
-                    query = new ScQuery(s, sort, time);
+                    query = new ScrollQuery(s, sort, time);
                 }
 
                 var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
@@ -66,7 +67,7 @@ namespace Witlesss.Commands.Packing
             SaveChanges(c.Baka, c.Title);
 
             var report = FUSION_SUCCESS_REPORT(c.Baka, size, c.Title);
-            var subreddit = query is ScQuery sc ? sc.Subreddit : query is SsQuery ss ? ss.Subreddit : null;
+            var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\n Его пополнили {eated} комментов с {subreddit}";
             Bot.SendMessage(c.Chat, report + detais);

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -10,6 +9,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.MediaTools;
+using Witlesss.Services.Internet.Reddit;
 using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
@@ -73,7 +73,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var time = GetTime(options, TimeMatters(sort));
 
                     Log("SUBREDDIT");
-                    SendPost(new ScQuery(subreddit, sort, time));
+                    SendPost(new ScrollQuery(subreddit, sort, time));
                 }
                 else
                 {
@@ -97,7 +97,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var time = GetTime(options, TimeMatters(options[0]));
 
                     Log("SEARCH");
-                    SendPost(s ? new SsQuery(subreddit!, q, sort, time) : new SrQuery(q, sort, time));
+                    SendPost(new SearchQuery(subreddit, q, sort, time));
                 }
                 else
                 {

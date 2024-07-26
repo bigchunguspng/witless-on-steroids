@@ -5,35 +5,18 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Reddit;
 using Reddit.Controllers;
-using static Witlesss.Config;
 
 #pragma warning disable CS8524
 
-namespace Witlesss.Services.Internet
+namespace Witlesss.Services.Internet.Reddit
 {
-    /// <summary> Used to store upcoming posts for a single <see cref="RedditQuery"/>. </summary>
-    public class RedditQueryCache
-    {
-        /// <summary> DateTime by which the cache is relevant. </summary>
-        public DateTime RefreshDate;
-
-        /// <summary> True if posts in queue AIN'T the last ones for the query. </summary>
-        public bool HasEnoughPosts;
-
-        public readonly Queue<PostData> Posts = new(RedditTool.POST_LIMIT);
-
-        public RedditQueryCache() => UpdateRefreshDate();
-
-        public void UpdateRefreshDate() => RefreshDate = DateTime.Now + TimeSpan.FromHours(2);
-    }
-
     public class RedditTool
     {
         public const int POST_LIMIT = 32, KEEP_POSTS = 50;
 
         public static readonly RedditTool Instance = new();
 
-        private readonly RedditClient client = new(RedditAppID, RedditToken);
+        private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken);
 
         private readonly Regex _img = new(@"(\.png|\.jpg|\.gif)$|(reddit\.com\/gallery\/)");
 
@@ -100,15 +83,15 @@ namespace Witlesss.Services.Internet
             return LastQueries.TryGetValue(chat, out var query) ? query : RandomSubredditQuery;
         }
 
-        public ScQuery RandomSubredditQuery => new(RandomSubreddit);
+        public ScrollQuery RandomSubredditQuery => new(RandomSubreddit);
         private string RandomSubreddit => subreddits[Random.Shared.Next(subreddits.Length)];
 
-        private readonly string[] subreddits = 
-        {
+        private readonly string[] subreddits =
+        [
             "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
             "dankmemes", "memes", "funnymemes", "doodoofard", "21stcenturyhumour",
             "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe"
-        };
+        ];
 
         #endregion
 
@@ -253,8 +236,9 @@ namespace Witlesss.Services.Internet
 
         #region GETTING POSTS
 
-        public List<Post> GetPosts(ScQuery query, string? after = null)
+        public List<Post> GetPosts(ScrollQuery query, string? after = null)
         {
+             
             var sub = client.Subreddit(query.Subreddit).Posts;
             return query.Sort switch
             {
@@ -266,15 +250,13 @@ namespace Witlesss.Services.Internet
             };
         }
 
-        public List<Post> SearchPosts(SsQuery s, string? after = null)
+        public List<Post> SearchPosts(SearchQuery s, string? after = null)
         {
-            var subreddit = client.Subreddit(s.Subreddit);
-            return subreddit.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
-        }
+            if (s.Subreddit is null)
+                return client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
 
-        public List<Post> SearchPosts(SrQuery s, string? after = null)
-        {
-            return    client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
+            var subreddit = client.Subreddit(s.Subreddit);
+            return  subreddit.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
         }
 
         #endregion
@@ -287,37 +269,5 @@ namespace Witlesss.Services.Internet
         {
             return client.SearchSubreddits(search).Where(s => s.Subscribers > 0).ToList();
         }
-    }
-
-
-    public interface RedditQuery { List<Post> GetPosts(string? after = null); }
-
-    /// <summary> Uses <b>searchbar</b> on a main page. </summary>
-    public record SrQuery(string Q, string Sort, string Time) : RedditQuery
-    {
-        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
-    }
-
-    /// <summary> Uses <b>searchbar</b> on a <b>subreddit</b>. </summary>
-    public record SsQuery(string Subreddit, string Q, string Sort, string Time) : RedditQuery
-    {
-        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
-    }
-
-    /// <summary> Opens subreddit and <b>scrolls</b> for some posts. </summary>
-    public record ScQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
-    {
-        public List<Post> GetPosts(string? after = null) => RedditTool.Instance.GetPosts(this, after);
-    }
-
-    public class PostData(LinkPost post)
-    {
-        public string Fullname  { get; } = post.Fullname;
-        public string URL       { get; } = post.URL; // .png .jpg .gif
-        public string Title     { get; } = post.Title;
-        public string Subreddit { get; } = post.Subreddit;
-
-        private readonly string _permalink = post.Permalink;
-        public string Permalink => $"https://www.reddit.com{_permalink}";
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Witlesss;
@@ -11,8 +8,6 @@ public static class ChatsDealer
 {
     private static readonly FileIO<ChatList> ChatsIO;
     public  static readonly ChatList SussyBakas;
-
-    private static readonly Regex _pack = new($@"{Paths.Prefix_Pack}-(-?\d+).json");
 
     static ChatsDealer()
     {

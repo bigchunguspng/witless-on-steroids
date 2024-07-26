@@ -18,6 +18,7 @@ namespace Witlesss.Memes
     public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
         public static bool AddLogo;
+        public static bool BottomTextIsGenerated;
 
         private static readonly List<Logo> Logos = [];
         private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
@@ -122,14 +123,14 @@ namespace Witlesss.Memes
                 background.Mutate(x => x.DrawImage(logo.Image, logo.Point, _anyGraphicsOptions));
             }
 
-            DrawText(background, text.A, _textA);
-            DrawText(background, text.B, _textB);
+            DrawText(background, text.A, _textA, 1);
+            DrawText(background, text.B, _textB, BottomTextIsGenerated ? 1 : 2);
 
             return background;
         }
 
         // todo text margin + do only 1 bottom text line if text is generated
-        private void DrawText(Image image, string text, DgTextOptions o)
+        private void DrawText(Image image, string text, DgTextOptions o, int lines)
         {
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count > 0)
@@ -147,9 +148,8 @@ namespace Witlesss.Memes
             else
             {
                 //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
-                var lineBreak = TextMeasuring.DetectLineBreak(text, o.Options, o.Lines);
-                var noLineBreaks = lineBreak == -1;
-                var textToRender = noLineBreaks ? text : text[..lineBreak];
+                var lineBreak = TextMeasuring.DetectLineBreak(text, o.Options, lines);
+                var textToRender = lineBreak == -1 ? text : text[..lineBreak];
 
                 image.Mutate(x => x.DrawText(_textOptions, o.Options, textToRender, brush: o.Color, pen: null));
             }
@@ -183,17 +183,20 @@ namespace Witlesss.Memes
         }
     }
 
+
+    // CLASSES
+
     public record Logo(Image Image, Point Point);
 
-    public record DgTextOptions(RichTextOptions Options, int Lines, int EmojiSize)
+    public record DgTextOptions(RichTextOptions Options, int EmojiSize)
     {
         public SolidBrush Color => _heisenberg;
 
         private static readonly SolidBrush _heisenberg = new(SixLabors.ImageSharp.Color.White);
 
-        public static DgTextOptions LargeText(int m, int w) => Construct(LargeFont, 1, 72, m, w, 1.13F);
-        public static DgTextOptions UpperText(int m, int w) => Construct(UpperFont, 1, 54, m, w, 1.36F);
-        public static DgTextOptions LowerText(int m, int w) => Construct(LowerFont, 2, 34, m, w, 1.39F);
+        public static DgTextOptions LargeText(int m, int w) => Construct(LargeFont, 72, m, w, 1.13F);
+        public static DgTextOptions UpperText(int m, int w) => Construct(UpperFont, 54, m, w, 1.36F);
+        public static DgTextOptions LowerText(int m, int w) => Construct(LowerFont, 34, m, w, 1.39F);
 
         private static Font LargeFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 64);
         private static Font UpperFont => new(SystemFonts.Get(DEMOTIVATOR_UPPER_FONT), 48);
@@ -201,7 +204,7 @@ namespace Witlesss.Memes
 
         private static DgTextOptions Construct
         (
-            Font font, int lines, int emojiSize, int margin, int width, float lineSpacing
+            Font font, int emojiSize, int margin, int width, float lineSpacing
         )
         {
             var options = new RichTextOptions(font)
@@ -214,7 +217,7 @@ namespace Witlesss.Memes
                 KerningMode = KerningMode.Standard,
                 FallbackFontFamilies = ExtraFonts.FallbackFamilies
             };
-            return new DgTextOptions(options, lines, emojiSize);
+            return new DgTextOptions(options, emojiSize);
         }
     }
 }

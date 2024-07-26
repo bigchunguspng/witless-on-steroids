@@ -35,15 +35,31 @@ namespace Witlesss.Commands.Meme
 
         protected override TextPair GetMemeText(string? text)
         {
-            string a, b = Baka.Generate();
-            if (b.Length > 1) b = b[0] + b[1..].ToLower(); // lower text can't be UPPERCASE
-            if (string.IsNullOrEmpty(text)) a = Baka.Generate();
+            DemotivatorDrawer.BottomTextIsGenerated = true;
+
+            string a, b;
+            if (string.IsNullOrEmpty(text))
+            {
+                a = Baka.Generate();
+                b = Baka.Generate().EnsureIsNotUppercase();
+            }
             else
             {
-                var s = text.Split('\n', 2);
-                a = s[0];
-                if (s.Length > 1) b = s[1];
+                if (text.Contains('\n'))
+                {
+                    var split = text.Split('\n', 2);
+                    a = split[0];
+                    b = split[1];
+
+                    DemotivatorDrawer.BottomTextIsGenerated = false;
+                }
+                else
+                {
+                    a = text;
+                    b = Baka.Generate().EnsureIsNotUppercase();
+                }
             }
+
             return new TextPair(a, b);
         }
 

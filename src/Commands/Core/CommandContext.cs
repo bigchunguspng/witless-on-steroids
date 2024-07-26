@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -6,21 +7,23 @@ namespace Witlesss.Commands.Core;
 
 public class CommandContext
 {
-    private static readonly Regex _command = new(@"^\/\S+", RegexOptions.IgnoreCase);
+    private static readonly Regex _command = new(@"^\/\S+");
     private static readonly string _botUsernameStart = Bot.Username.Remove(7);
 
-    public Message Message  { get; }
-    public long    Chat     { get; }
-    public string  Title    { get; }
-    public string? Text     { get; }
-    public string? Command  { get; }
-    public string? Args     { get; }
-    public bool    IsForMe  { get; }
+    public Message Message      { get; }
+    public long    Chat         { get; }
+    public string  Title        { get; }
+    public string? Text         { get; }
+    /// <summary> Lowercase command with "/" symbol and bot username removed. </summary>
+    public string? Command      { get; }
+    /// <summary> All text excluding the command and the following " " or "\n". </summary>
+    public string? Args         { get; }
+    /// <summary> True if THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
+    public bool    IsForMe      { get; }
+    /// <summary> True if SOME bot was mentioned in the command explicitly. </summary>
+    public bool    BotMentioned { get; }
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
-
-    private readonly bool _noBotMentioned;
-    public bool BotMentioned => !_noBotMentioned;
 
 
     protected CommandContext(CommandContext context)
@@ -32,8 +35,7 @@ public class CommandContext
         Command = context.Command;
         Args = context.Args;
         IsForMe = context.IsForMe;
-
-        _noBotMentioned = context._noBotMentioned;
+        BotMentioned = context.BotMentioned;
     }
     
     protected CommandContext(Message message)
@@ -46,10 +48,12 @@ public class CommandContext
         var match = _command.MatchOrNull(Text);
         if (match is { Success: true })
         {
-            var lower = match.Value.ToLower();
-            Command = lower.Replace(Bot.Username, "");
-            _noBotMentioned = !lower.Contains('@') || !lower.Contains("bot");
-            IsForMe = _noBotMentioned || lower.Contains(_botUsernameStart);
+            var command = match.Value.ToLower();
+            Command = command.Replace(Bot.Username, "");
+            var indexA = command.IndexOf('@');
+            var indexB = command.LastIndexOf("bot", StringComparison.Ordinal);
+            BotMentioned = indexA > 0 && indexB > 0 && indexB > indexA;
+            IsForMe = !BotMentioned || command.Contains(_botUsernameStart);
 
             Args = match.Length == Text!.Length ? null : Text.Substring(match.Length + 1);
         }

@@ -7,7 +7,7 @@ namespace Witlesss.Commands.Core;
 public class CommandContext
 {
     private static readonly Regex _command = new(@"^\/\S+", RegexOptions.IgnoreCase);
-    private static readonly string _botUsernameStart = Config.BOT_USERNAME.Remove(7);
+    private static readonly string _botUsernameStart = Bot.Username.Remove(7);
 
     public Message Message  { get; }
     public long    Chat     { get; }
@@ -47,7 +47,7 @@ public class CommandContext
         if (match is { Success: true })
         {
             var lower = match.Value.ToLower();
-            Command = lower.Replace(Config.BOT_USERNAME, "");
+            Command = lower.Replace(Bot.Username, "");
             _noBotMentioned = !lower.Contains('@') || !lower.Contains("bot");
             IsForMe = _noBotMentioned || lower.Contains(_botUsernameStart);
 

@@ -25,7 +25,7 @@ public partial class Bot
         };
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
-        Log(string.Format(BUENOS_DIAS, Config.BOT_USERNAME, Me.FirstName), ConsoleColor.Yellow);
+        Log(string.Format(BUENOS_DIAS, Username, Me.FirstName), ConsoleColor.Yellow);
     }
 
     private Task HandleUpdate(ITelegramBotClient bot, Update update, CancellationToken token)

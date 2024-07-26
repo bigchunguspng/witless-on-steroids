@@ -8,7 +8,6 @@ namespace Witlesss // ReSharper disable InconsistentNaming
         public static string TelegramToken { get; private set; } = default!;
         public static string RedditAppID   { get; private set; } = default!;
         public static string RedditToken   { get; private set; } = default!;
-        public static string BOT_USERNAME  { get; private set; } = default!;
         public static long   AdminID       { get; private set; }
 
         public static void ReadFromFile()
@@ -31,8 +30,6 @@ namespace Witlesss // ReSharper disable InconsistentNaming
                 }
             }
         }
-
-        public static void SetBotUsername(string username) => BOT_USERNAME = $"@{username.ToLower()}";
 
         private static long GetLong(string s) => long.TryParse(s, out var result) ? result : 0;
     }

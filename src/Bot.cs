@@ -12,7 +12,9 @@ namespace Witlesss
         public readonly TelegramBotClient Client;
         public readonly User Me;
 
-        public static Bot Instance = null!;
+        /// <summary> Lowercase bot username with "@" symbol. </summary>
+        public static string Username { get; private set; } = null!;
+        public static Bot    Instance { get; private set; } = null!;
 
         public static void LaunchInstance(CommandAndCallbackRouter command) => new Bot(command).Run();
 
@@ -36,7 +38,7 @@ namespace Witlesss
             Router = command;
 
             Instance = this;
-            Config.SetBotUsername(Me.Username!);
+            Username = $"@{Me.Username!.ToLower()}";
 
             ThorRagnarok = new BanHammer();
         }

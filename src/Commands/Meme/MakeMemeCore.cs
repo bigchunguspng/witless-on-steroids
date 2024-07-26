@@ -171,7 +171,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         {
             var defaults = DefaultOptions;
             var dummy = string.Empty;
-            var command = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Config.BOT_USERNAME, "").ToLower();
+            var command = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Bot.Username, "").ToLower();
             var empty = Text is null && defaults is null;
 
             if (!empty)

@@ -98,9 +98,9 @@ namespace Witlesss.Memes.Shared
         public float GetLineSpacing() => GetRelativeSize();
         public float GetSizeMultiplier() => 1 / GetRelativeSize();
 
+        public float GetRelativeSize       () => _fontKey is null ? 1F : GetFontSpecific(_fontKey).size;
+        public float GetCapitalsOffset     () => _fontKey is null ? 0F : GetFontSpecific(_fontKey).caps;
         public float GetFontDependentOffset() => _fontKey is null ? 0F : GetFontSpecific(_fontKey).offset;
-        public float GetCapitalsOffset() => _fontKey is null ? 0F : GetFontSpecific(_fontKey).caps;
-        public float GetRelativeSize  () => _fontKey is null ? 1F : GetFontSpecific(_fontKey).size;
 
         public float GetCaseDependentOffset(string text)
         {
@@ -122,9 +122,9 @@ namespace Witlesss.Memes.Shared
             "im" => (1.1167F,  0.1079F,  0.1011F, -0.0034F, 0.0799F),
             "mc" => (1.0913F, -0.0210F,  0.2480F,  0.1345F, 0.0000F),
             "rg" => (1.0037F,  0.1309F,  0.1582F,  0.0137F, 0.0916F),
+            "ro" => (0.9347F,  0.1541F,  0.1838F,  0.0149F, 0.1004F),
             "sg" => (0.9885F,  0.2139F,  0.0859F, -0.0640F, 0.0929F),
             "st" => (1.0165F,  0.0970F,  0.1830F,  0.0430F, 0.0000F),
-            "tm" => (0.9347F,  0.1541F,  0.1838F,  0.0149F, 0.1004F), // ro
             "vb" => (0.8093F,  0.3060F,  0.2550F, -0.0255F, 0.0000F),
             "vg" => (0.8273F,  0.1740F,  0.2400F,  0.0330F, 0.0811F),
             "vn" => (1.2353F, -0.0625F,  0.1875F,  0.1250F, 0.1544F),

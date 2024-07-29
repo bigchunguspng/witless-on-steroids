@@ -71,7 +71,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         private Font _font;
 
         public  static readonly ExtraFonts ExtraFonts = new("dp");
-        private static FontFamily FontFamily => ExtraFonts.GetFontFamily("tm");
+        private static FontFamily FontFamily => ExtraFonts.GetFontFamily("ro");
         private static FontStyle  FontStyle  => ExtraFonts.GetFontStyle(FontFamily);
 
         private void ResizeFont(float size) => _font = new Font(FontFamily, Math.Max(MinFontSize, size), FontStyle);

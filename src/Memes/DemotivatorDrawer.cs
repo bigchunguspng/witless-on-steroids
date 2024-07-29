@@ -18,7 +18,7 @@ namespace Witlesss.Memes
 {
     public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
-        public static bool AddLogo, SingleLine;
+        public static bool SingleLine, AddLogo = true;
         public static bool BottomTextIsGenerated;
 
         public static readonly ExtraFonts ExtraFontsA = new("d[vg]", "&"), ExtraFontsB = new("d[vg]", @"\*");
@@ -116,36 +116,37 @@ namespace Witlesss.Memes
                 background.Mutate(x => x.DrawImage(logo.Image, logo.Point, _anyGraphicsOptions));
             }
 
+            // UPPER TEXT
             var typeA = _square
                 ? SingleLine
                     ? TextType.Single
                     : TextType.Upper
                 : TextType.Large;
-            DrawText(background, text.A, typeA, 1); // UPPER TEXT
+            DrawText(background, text.A, typeA, 1);
 
+            // LOWER TEXT
             if (_square && !SingleLine)
-                DrawText(background, text.B, TextType.Lower, BottomTextIsGenerated ? 1 : 2); // LOWER TEXT
+                DrawText(background, text.B, TextType.Lower, BottomTextIsGenerated ? 1 : 2);
 
             return background;
         }
 
-        // todo text margin + do only 1 bottom text line if text is generated
         private void DrawText(Image image, string text, TextType type, int lines)
         {
-            var options = GetTextOptions(type, text, out var fontOffset);
+            var options = GetTextOptions(type, text, out var offset, out var fontOffset, out var caseOffset);
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count > 0)
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var parameters = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
                 var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs, out _);
-                var y = options.Origin.Y - (textLayer.Height / 2F);
-                var point = new Point((_w - textLayer.Width) / 2, y.RoundInt());
-                image.Mutate(x => x.DrawImage(textLayer, point));
+                var x = _w.Gap(textLayer.Width);
+                var y = offset - textLayer.Height / 2F + caseOffset;
+                var point = new Point(x.RoundInt(), y.RoundInt());
+                image.Mutate(ctx => ctx.DrawImage(textLayer, point));
             }
             else
             {
-                //image.Mutate(x => x.Fill(p.EmojiS > 40 ? Color.Purple : Color.Aqua, p.Layout));
                 var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
                 var textToRender = lineBreak == -1 ? text : text[..lineBreak];
 
@@ -183,11 +184,15 @@ namespace Witlesss.Memes
 
         // TEXT
 
-        private RichTextOptions GetTextOptions(TextType type, string text, out float fontOffset)
+        private RichTextOptions GetTextOptions
+        (
+            TextType type, string text,
+            out float offset, out float fontOffset, out float caseOffset
+        )
         {
             var lower = type is TextType.Lower;
             var extraFonts = lower ? ExtraFontsB : ExtraFontsA;
-            var family = extraFonts.GetFontFamily(lower ? "co" : "tm");
+            var family = extraFonts.GetFontFamily(lower ? "co" : "ro");
             var style = extraFonts.GetFontStyle(family);
 
             var baseFontSize = type switch
@@ -198,17 +203,15 @@ namespace Witlesss.Memes
             };
             var fontSize = baseFontSize * extraFonts.GetSizeMultiplier();
 
-            var offset = type switch
+            offset = 650 + type switch
             {
                 TextType.Upper => -25.15F,
                 TextType.Lower =>  31.50F,
                 _ => 0
             };
-            var offsetFont = fontSize * extraFonts.GetFontDependentOffset();
-            var offsetCaps = fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
-            var y = 650 + offset + offsetFont - offsetCaps;
-
-            fontOffset = offsetFont;
+            fontOffset = fontSize * extraFonts.GetFontDependentOffset();
+            caseOffset = fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
+            var y = offset + fontOffset - caseOffset;
 
             return new RichTextOptions(family.CreateFont(fontSize, style))
             {
@@ -217,7 +220,7 @@ namespace Witlesss.Memes
                 VerticalAlignment = VerticalAlignment.Center,
                 Origin = new PointF(_w / 2F, y),
                 WrappingLength = _w,
-                LineSpacing = lower ? 1.39F : 1.2F,
+                LineSpacing = extraFonts.GetLineSpacing() * (lower ? 1.39F : 1.2F),
                 FallbackFontFamilies = ExtraFonts.FallbackFamilies
             };
         }

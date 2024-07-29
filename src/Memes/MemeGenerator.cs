@@ -13,8 +13,6 @@ namespace Witlesss.Memes
 {
     public partial class MemeGenerator : IMemeGenerator<TextPair>
     {
-        private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Meme };
-
         // OPTIONS
 
         public static bool WrapText = true, ColorText;
@@ -151,7 +149,7 @@ namespace Witlesss.Memes
 
                 var options = GetDefaultTextOptions(GetTextOrigin(text, top), top);
                 var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize());
-                var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
                 var y = top ? _marginY : _h - _marginY;
                 background.Mutate(x => x.DrawImage(textLayer, GetOriginFunny(textLayer.Size, y))); // todo check y
             }

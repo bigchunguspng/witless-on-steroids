@@ -24,7 +24,6 @@ namespace Witlesss.Memes
         public static readonly ExtraFonts ExtraFontsA = new("d[vg]", "&"), ExtraFontsB = new("d[vg]", @"\*");
 
         private static readonly List<Logo> Logos = [];
-        private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Dg };
 
         private readonly int _w, _h;
         private readonly bool _square;
@@ -139,7 +138,7 @@ namespace Witlesss.Memes
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var parameters = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
-                var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs, out _);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs, out _);
                 var x = _w.Gap(textLayer.Width);
                 var y = offset - textLayer.Height / 2F + caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());

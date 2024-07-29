@@ -15,8 +15,6 @@ namespace Witlesss.Memes; // ReSharper disable InconsistentNaming
 
 public partial class IFunnyApp : IMemeGenerator<string>
 {
-    private static readonly EmojiTool _emojer = new() { MemeType = MemeType.Top };
-
     // OPTIONS
 
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
@@ -161,7 +159,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
         var options = GetDefaultTextOptions();
 
         var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
-        var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
+        var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
 

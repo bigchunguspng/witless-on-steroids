@@ -42,7 +42,6 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         private SolidPen FramePen;
 
         private readonly SolidBrush WhiteBrush = new(Color.White);
-        private readonly EmojiTool _emojer = new() { MemeType = MemeType.Dp };
 
         private readonly DrawingOptions _textOptions = new()
         {
@@ -195,7 +194,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
                 var parameters = new EmojiTool.Options(TextColor, EmojiSize);
-                var textLayer = _emojer.DrawEmojiText(text, options, parameters, pngs, out var linesActual);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs, out var linesActual);
 
                 txt_h = txt_h + (heightExpected * (linesActual / (float)linesExpected - 1)).RoundInt();
                 AdjustTotalSize();

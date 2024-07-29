@@ -14,26 +14,11 @@ using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Memes.Shared
 {
-    public class EmojiTool
+    public static class EmojiTool
     {
-        public MemeType MemeType { get; init; }
-
-        private bool Dg  => MemeType == MemeType.Dg; 
-        private bool Top => MemeType == MemeType.Top;
-        // todo remove this stuff ↑
-        // it's task to draw given text, let meme specific code remove useless text or whatever this is for
-
-        /*private static readonly StringFormat[] Formats = new[]
-        {
-            new StringFormat(NoWrap) { Alignment = Near, Trimming = None },
-            new StringFormat(NoWrap) { Alignment = Near, Trimming = Character },
-            new StringFormat(      ) { Alignment = Near, Trimming = Character },
-            new StringFormat(NoWrap) { Alignment = Near, Trimming = EllipsisCharacter }
-        };*/
-
         public record Options(SolidBrush Color, float EmojiSize, float FontOffset = 0, int MaxLines = -1);
 
-        public Image<Rgba32> DrawEmojiText
+        public static Image<Rgba32> DrawEmojiText
         (
             string text, RichTextOptions rto, Options options, Queue<string> pngs, out int linesFilled
         )
@@ -71,7 +56,7 @@ namespace Witlesss.Memes.Shared
             return canvas;
         }
 
-        private List<Image<Rgba32>> DrawEmojiTextParagraph
+        private static List<Image<Rgba32>> DrawEmojiTextParagraph
         (
             string paragraph, RichTextOptions rto, Options options, Queue<string> pngs
         )
@@ -116,11 +101,7 @@ namespace Witlesss.Memes.Shared
 
                 foreach (var _ in sequence)
                 {
-                    if (side + x > width)
-                    {
-                        if (Dg) break;
-                        else     NewLine();
-                    }
+                    if (side + x > width) NewLine();
 
                     var emoji = pngs.Dequeue();
                     if (emoji.EndsWith(".png"))
@@ -156,7 +137,6 @@ namespace Witlesss.Memes.Shared
                     var w = linesFilled > 1 ? rest : (int) Math.Min(ms.Width, rest);
 
                     if (w < rest) DrawSingleLineText();
-                    else if  (Dg) DrawSingleLineText();
                     else
                     {
                         var optionsR = new RichTextOptions(rto)

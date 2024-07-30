@@ -71,6 +71,8 @@ namespace Witlesss.Memes.Shared
             var safeHeight = (1.5F * height).CeilingInt();
             var margin = (0.25F * height).RoundInt();
 
+            var pixelate = rto.Font.Family.Name.StartsWith("v_Nokia");
+
             var canvas = GetEmptyCanvas();
 
             int x = 0, max = 0;
@@ -107,6 +109,7 @@ namespace Witlesss.Memes.Shared
                     if (emoji.EndsWith(".png"))
                     {
                         var image = Image.Load<Rgba32>(decoder, emoji);
+                        if (pixelate) image.Mutate(ctx => ctx.Pixelate(side / 16));
 #if DEBUG
                         canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
 #endif

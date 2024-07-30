@@ -27,11 +27,13 @@ public partial class MemeGenerator
 
         _startingFontSize = GetStartingFontSize();
         ResizeFont(_startingFontSize);
-
-        _offsetY = Math.Max(GetDefaultFontFize(), 15) * ExtraFonts.GetFontDependentOffset();
     }
 
-    private void ResizeFont(float size) => _font = _fontFamily.CreateFont(size, _fontStyle);
+    private void ResizeFont(float size)
+    {
+        _font = _fontFamily.CreateFont(size, _fontStyle);
+        _fontOffset = FontSize * ExtraFonts.GetFontDependentOffset();
+    }
 
     private float GetDefaultFontFize () => Math.Min(_w, 1.5F * _h) / 10F;
 
@@ -119,12 +121,10 @@ public partial class MemeGenerator
 
     private float GetLineSpacing() => ExtraFonts.GetLineSpacing();
 
-    private PointF GetTextOrigin(string text, bool top)
+    private PointF GetTextOrigin(string text, bool top, out float caseOffset)
     {
-        var caps = ExtraFonts.FontIsMulticase() && text.IsMostlyLowercase()
-            ? FontSize * ExtraFonts.GetCapitalsOffset()
-            : 0;
-
-        return new PointF(_w / 2F, (top ? _marginY * 2F : _h - _marginY) + _offsetY + caps);
+        caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
+        var marginY = top ? _marginY : _h - _marginY;
+        return new PointF(_w / 2F, marginY + _fontOffset - caseOffset);
     }
 }

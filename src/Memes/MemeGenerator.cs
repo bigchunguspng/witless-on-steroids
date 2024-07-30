@@ -24,7 +24,7 @@ namespace Witlesss.Memes
         private Size _sourceSizeOG, _sourceSizeAdjusted;
 
         private int _w, _h, _marginY, _marginX;
-        private float _offsetY;
+        private float _fontOffset;
         private Size _captionSize;
 
         // DATA
@@ -35,6 +35,7 @@ namespace Witlesss.Memes
         {
             GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 16 }
         };
+
 
         // LOGIC
 
@@ -76,7 +77,7 @@ namespace Witlesss.Memes
             _h = _sourceSizeAdjusted.Height;
 
             _marginX = Math.Max(_w / 20, 10);
-            _marginY = Math.Min(_h / 72, 10);
+            _marginY = Math.Max(_h / 30, 10);
 
             SetUpFonts();
         }
@@ -129,6 +130,9 @@ namespace Witlesss.Memes
 
             text = text.Trim('\n');
 
+            var origin = GetTextOrigin(text, top, out var caseOffset);
+            var options = GetDefaultTextOptions(origin, top);
+
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count == 0)
             {
@@ -136,7 +140,6 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-                var options = GetDefaultTextOptions(GetTextOrigin(text, top), top);
                 background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
             }
             else
@@ -147,24 +150,20 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-                var options = GetDefaultTextOptions(GetTextOrigin(text, top), top);
-                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize());
+                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
-                var y = top ? _marginY : _h - _marginY;
-                background.Mutate(x => x.DrawImage(textLayer, GetOriginFunny(textLayer.Size, y))); // todo check y
+                var space = 0.25F * options.Font.Size * options.LineSpacing;
+                var marginY = top ? _marginY - space : _h - _marginY - textLayer.Height + space;
+                var x = _w.Gap(textLayer.Width);
+                var y = marginY - caseOffset;
+                var point = new Point(x.RoundInt(), y.RoundInt());
+                background.Mutate(x => x.DrawImage(textLayer, point));
             }
 
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
         }
 
         private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
-
-        private Point GetOriginFunny(Size textLayer, int margin)
-        {
-            var x = _w.Gap(textLayer.Width).RoundInt();
-            var y = ((margin == _marginY ? _marginY + 1.5F : margin - textLayer.Height) + _offsetY).RoundInt();
-            return new Point(x, y);
-        }
 
         private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
 

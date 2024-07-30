@@ -107,7 +107,7 @@ namespace Witlesss.Memes.Shared
                     if (emoji.EndsWith(".png"))
                     {
                         var image = Image.Load<Rgba32>(decoder, emoji);
-                        if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(side / 16));
+                        if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(Math.Max(side / 16, 2)));
 #if DEBUG
                         canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
 #endif

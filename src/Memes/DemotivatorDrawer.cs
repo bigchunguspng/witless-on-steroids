@@ -137,8 +137,8 @@ namespace Witlesss.Memes
             if (emoji.Count > 0)
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
-                var parameters = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs, out _);
+                var optionsE = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs, out _);
                 var x = _w.Gap(textLayer.Width);
                 var y = offset - textLayer.Height / 2F + caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());

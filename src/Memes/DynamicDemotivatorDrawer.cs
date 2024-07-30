@@ -193,8 +193,8 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var heightExpected = (int)TextMeasuring.MeasureTextSize(textM, options, out var linesExpected).Height;
-                var parameters = new EmojiTool.Options(TextColor, EmojiSize);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs, out var linesActual);
+                var optionsE = new EmojiTool.Options(TextColor, EmojiSize);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs, out var linesActual);
 
                 txt_h = txt_h + (heightExpected * (linesActual / (float)linesExpected - 1)).RoundInt();
                 AdjustTotalSize();

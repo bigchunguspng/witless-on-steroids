@@ -154,8 +154,8 @@ namespace Witlesss.Memes
                 var options = GetDefaultTextOptions(origin, top);
 
                 var pixelate = ExtraFonts.FontIsPixelated();
-                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
+                var optionsE = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs.AsQueue(), out _);
                 var space = 0.25F * options.Font.Size * options.LineSpacing;
                 var marginY = top ? _marginY - space : _h - _marginY - textLayer.Height + space;
                 var x = _w.Gap(textLayer.Width);

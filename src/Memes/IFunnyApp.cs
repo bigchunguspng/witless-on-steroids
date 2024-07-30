@@ -158,8 +158,8 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
         var options = GetDefaultTextOptions();
 
-        var parameters = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
-        var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
+        var optionsE = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
+        var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs.AsQueue(), out _);
 
         var image = CreateBackgroundCard();
 

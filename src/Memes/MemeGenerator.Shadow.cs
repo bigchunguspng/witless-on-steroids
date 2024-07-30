@@ -16,12 +16,12 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
     {
         var shadowRealm = new Image<Rgba32>(textLayer.Width, textLayer.Height);
 
-        var nokia = _fontFamily.Name.Contains("Nokia");
+        var pixelated = ExtraFonts.FontIsPixelated();
 
         var opacity = ShadowOpacity / 100F;
         var maxOpacity = (255 * opacity).RoundInt().ClampByte();
 
-        Func<int, int, double, double> getShadowOpacity = nokia ? SquareShadow : RoundShadow;
+        Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
 
         var sw = Helpers.GetStartedStopwatch();
 
@@ -50,7 +50,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         void ShadowImagePart(float fontSize, Rectangle rectangle)
         {
-            var w = Math.Sqrt(fontSize) / (nokia ? 1.6F : 2F);
+            var w = Math.Sqrt(fontSize) / (pixelated ? 1.6F : 2F);
             var w2 = (int)Math.Ceiling(w) + 2;
 
             Log($"/meme >> shadow size: {w:F2} / {w2:F2} px", ConsoleColor.DarkYellow);

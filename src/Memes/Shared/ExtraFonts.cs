@@ -146,6 +146,8 @@ namespace Witlesss.Memes.Shared
             _ => true,
         };
 
+        public bool FontIsPixelated() => _fontKey == "vn";
+
         public void CheckAndCut(MemeRequest request)
         {
             var match = _regex.Match(request.Dummy);

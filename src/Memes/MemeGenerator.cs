@@ -150,7 +150,8 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
-                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset);
+                var pixelate = ExtraFonts.FontIsPixelated();
+                var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
                 var space = 0.25F * options.Font.Size * options.LineSpacing;
                 var marginY = top ? _marginY - space : _h - _marginY - textLayer.Height + space;

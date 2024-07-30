@@ -130,15 +130,15 @@ namespace Witlesss.Memes
 
             text = text.Trim('\n');
 
-            var origin = GetTextOrigin(text, top, out var caseOffset);
-            var options = GetDefaultTextOptions(origin, top);
-
             var emoji = EmojiRegex.Matches(text);
             if (emoji.Count == 0)
             {
                 text = MakeTextFitCard(text);
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+
+                var origin = GetTextOrigin(text, top, out _);
+                var options = GetDefaultTextOptions(origin, top);
 
                 background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
             }
@@ -150,6 +150,9 @@ namespace Witlesss.Memes
 
                 Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
 
+                var origin = GetTextOrigin(text, top, out var caseOffset);
+                var options = GetDefaultTextOptions(origin, top);
+
                 var pixelate = ExtraFonts.FontIsPixelated();
                 var parameters = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, parameters, pngs.AsQueue(), out _);
@@ -158,7 +161,7 @@ namespace Witlesss.Memes
                 var x = _w.Gap(textLayer.Width);
                 var y = marginY - caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());
-                background.Mutate(x => x.DrawImage(textLayer, point));
+                background.Mutate(ctx => ctx.DrawImage(textLayer, point));
             }
 
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);

@@ -4,6 +4,7 @@ using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
 using Witlesss.Memes;
+using Witlesss.Memes.Shared;
 using static Witlesss.XD.DgMode;
 
 namespace Witlesss.Commands.Meme

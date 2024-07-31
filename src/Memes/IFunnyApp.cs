@@ -13,7 +13,7 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes; // ReSharper disable InconsistentNaming
 
-public partial class IFunnyApp : IMemeGenerator<string>
+public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
 {
     // OPTIONS
 
@@ -25,12 +25,9 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     // SIZE
 
-    private Size _sourceSizeOG, _sourceSizeAdjusted;
-
     private int _w, _h; // <-- of the image
     private int _cardHeight, _fullHeight, _cropOffset;
     private float _marginLeft;
-    private float _fontOffset, _caseOffset, _textOffset;
 
     private Point     Location => new(0, _cardHeight);
     private Rectangle Cropping => new(0, _cropOffset, _w, _h);
@@ -40,12 +37,11 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     public string GenerateMeme(MemeFileRequest request, string text)
     {
-        _sourceSizeOG = Image.Identify(request.SourcePath).Size;
-        _sourceSizeAdjusted = AdjustImageSize();
-
+        FetchImageSize(request);
         SetUp();
 
         using var image = GetImage(request.SourcePath);
+
         SetColor(image);
 
         using var card = DrawText(text);
@@ -56,9 +52,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
 
     public Task<string> GenerateVideoMeme(MemeFileRequest request, string text)
     {
-        _sourceSizeOG = FFMpegXD.GetPictureSize(request.SourcePath);
-        _sourceSizeAdjusted = AdjustImageSize().ValidMp4Size();
-
+        FetchVideoSize(request);
         SetUp();
         SetColor(PickColor ? request.GetVideoSnapshot() : null);
 
@@ -70,8 +64,6 @@ public partial class IFunnyApp : IMemeGenerator<string>
             .When(request.GetCRF(), _sourceSizeAdjusted, Cropping, Location, BlurImage)
             .OutputAs(request.TargetPath);
     }
-
-    private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 720));
 
     private void SetUp()
     {
@@ -102,21 +94,10 @@ public partial class IFunnyApp : IMemeGenerator<string>
         _fullHeight = _h + _cardHeight;
     }
 
-    private Image<Rgba32> GetImage(string path)
-    {
-        var image = Image.Load<Rgba32>(path);
-        var resize = _sourceSizeOG != _sourceSizeAdjusted;
-        if (resize)
-            image.Mutate(x => x.Resize(_sourceSizeAdjusted));
-
-        return image;
-    }
-
     private Image Combine(Image? source, Image caption, bool sticker = false)
     {
         var meme = new Image<Rgba32>(_w, _fullHeight);
 
-        // todo if sticker and not send as sticker
         if (sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
 
         if (source is not null)
@@ -126,18 +107,19 @@ public partial class IFunnyApp : IMemeGenerator<string>
         return meme;
     }
 
+
+    // DRAW TEXT
+
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);
-        return emoji.Count == 0 
-            ? DrawTextSimple(text) 
-            : DrawTextFunny(text, emoji);
+        return emoji.Count == 0 ? DrawTextSimple(text) : DrawTextFunny(text, emoji);
     }
 
     private Image DrawTextSimple(string text)
     {
         text = MakeTextFitCard(text);
-        AdjustTextPosition(text);
+        AdjustTextOffset(text);
 
         var options = GetDefaultTextOptions();
         var image = CreateBackgroundCard();
@@ -154,7 +136,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
         var pngs = EmojiTool.GetEmojiPngs(emoji);
 
         text = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
-        AdjustTextPosition(text);
+        AdjustTextOffset(text);
 
         var options = GetDefaultTextOptions();
 
@@ -177,7 +159,7 @@ public partial class IFunnyApp : IMemeGenerator<string>
     private Point GetOriginFunny(Size textLayer)
     {
         var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
-        var y = _cardHeight.Gap(textLayer.Height) + _caseOffset;
+        var y = _cardHeight.Gap(textLayer.Height) - _caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());
     }
 

@@ -11,7 +11,7 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes
 {
-    public partial class MemeGenerator : IMemeGenerator<TextPair>
+    public partial class MemeGenerator : MemeGeneratorBase, IMemeGenerator<TextPair>
     {
         // OPTIONS
 
@@ -20,8 +20,6 @@ namespace Witlesss.Memes
         public static CustomColorOption CustomColorOption;
 
         // SIZE
-
-        private Size _sourceSizeOG, _sourceSizeAdjusted;
 
         private int _w, _h, _marginY, _marginX;
         private float _fontOffset;
@@ -41,9 +39,7 @@ namespace Witlesss.Memes
 
         public string GenerateMeme(MemeFileRequest request, TextPair text)
         {
-            _sourceSizeOG = Image.Identify(request.SourcePath).Size;
-            _sourceSizeAdjusted = AdjustImageSize();
-
+            FetchImageSize(request);
             SetUp();
 
             using var image = GetImage(request);
@@ -57,9 +53,7 @@ namespace Witlesss.Memes
 
         public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
-            _sourceSizeOG = FFMpegXD.GetPictureSize(request.SourcePath);
-            _sourceSizeAdjusted = AdjustImageSize().ValidMp4Size();
-
+            FetchVideoSize(request);
             SetUp();
 
             using var caption = DrawCaption(text);
@@ -68,8 +62,6 @@ namespace Witlesss.Memes
                 .Meme(request.GetCRF(), _sourceSizeAdjusted)
                 .OutputAs(request.TargetPath);
         }
-
-        private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 1080));
 
         private void SetUp()
         {
@@ -89,21 +81,13 @@ namespace Witlesss.Memes
                 var color = CustomColorOption.GetColor() ?? Color.Black;
                 var background = new Image<Rgba32>(_w, _h, color);
 
-                using var image = GetImageSimple(request.SourcePath);
+                using var image = GetImage(request.SourcePath);
 
                 background.Mutate(x => x.DrawImage(image));
                 return background;
             }
             else
-                return GetImageSimple(request.SourcePath);
-        }
-
-        private Image<Rgba32> GetImageSimple(string path)
-        {
-            var image = Image.Load<Rgba32>(path);
-            var resize = _sourceSizeOG != _sourceSizeAdjusted;
-            if (resize) image.Mutate(x => x.Resize(_sourceSizeAdjusted));
-            return image;
+                return GetImage(request.SourcePath);
         }
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)

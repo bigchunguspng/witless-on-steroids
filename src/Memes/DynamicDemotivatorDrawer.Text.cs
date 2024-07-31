@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -8,9 +8,9 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes;
 
-public partial class IFunnyApp
+public partial class DynamicDemotivatorDrawer
 {
-    public static readonly ExtraFonts ExtraFonts = new("top");
+    public static readonly ExtraFonts ExtraFonts = new("dp");
 
     private static Font _font = default!;
     private static FontFamily _fontFamily;
@@ -20,7 +20,7 @@ public partial class IFunnyApp
 
     private void SetUpFonts()
     {
-        _fontFamily = ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
+        _fontFamily = ExtraFonts.GetFontFamily("sg");
         _fontStyle = ExtraFonts.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
@@ -30,26 +30,24 @@ public partial class IFunnyApp
 
     private float GetStartingFontSize()
     {
-        var defaultFontSize = Math.Max(48, _cardHeight / 3.75F);
-        var multiplier = FontSizeMultiplier / 10F;
-        return Math.Max(defaultFontSize * multiplier, MinFontSize) * ExtraFonts.GetSizeMultiplier();
+        var defaultFontSize = imageW * 0.1F;
+        //var multiplier = FontSizeMultiplier / 10F;
+        return Math.Max(defaultFontSize /* * multiplier*/, MinFontSize) * ExtraFonts.GetSizeMultiplier();
     }
 
 
-    /// <summary>
-    /// Does the following things if there is a need:
-    /// <li>Changes font size and card height.</li>
-    /// <li>Redistributes the text.</li>
-    /// </summary>
+    private float _textHeight;
+
+    // LOGIC
+
     private string MakeTextFitCard(string text)
     {
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
-        var lineHeight = FontSize * GetLineSpacing();
-        var textWidthLimit = 0.9F * _w;
+        var lineHeight = FontSize * ExtraFonts.GetRelativeSize() * GetLineSpacing();
+        var textWidthLimit = 1.1F * imageW;
 
         var k = 1F;
-        float textHeight;
 
         if (text.Contains('\n') || !WrapText) // ww OR custom breaks
         {
@@ -64,51 +62,56 @@ public partial class IFunnyApp
                 text = textChunks.FillWith(text);
             }
 
-            textHeight = lineHeight * text.GetLineCount();
+            _textHeight = lineHeight * text.GetLineCount();
         }
         else
         {
             var textWidth = textChunks.Sum(x => x.Width);
+            if (textWidth * 2F < imageW)
+            {
+                _textHeight = lineHeight * 2F;
+                ResizeFont(FontSize * 2F);
+                return text; // Make it bigger!
+            }
+
             if (textWidth < textWidthLimit)
             {
-                if (ThinCard) SetCardHeightLol(lineHeight, 1F);
+                _textHeight = lineHeight;
                 return text; // OK - don't change anything!
             }
 
-            var maxWordWidth = textChunks.GetMaxWordWidth();
+            var maxWordWidth = textChunks.GetMaxWordWidth() * k;
             if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
-            if (maxWordWidth / textWidth > 0.75F) // if biggest word makes > 75% of the caption
+            if (maxWordWidth / textWidth > 0.75F) // if the biggest word makes > 75% of the caption
             {
                 k = textWidthLimit / textWidth;
             }
 
+            var lineCount = 1;
+
             if (textWidth * k > textWidthLimit)
             {
                 var minRatio = GetMinTextRatio(textWidth);
-                var lineCount = 2;
                 while (true) // calculate line count
                 {
                     var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                    var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
+                    var targetRatio = Math.Min(minRatio, textWidthLimit / (imageH * Math.Min(lineCount, 8) / 8F));
+                    Log($"lineCount: {lineCount} min: {minRatio:F2} text: {textRatio:F2} target: {targetRatio:F2}", ConsoleColor.DarkCyan);
                     if (textRatio < targetRatio) break;
 
                     lineCount++;
                 }
 
-                textChunks.RedistributeText(lineCount); // lineCount: 2+
-                text = textChunks.FillWith(text);
+                if (lineCount > 1)
+                {
+                    textChunks.RedistributeText(lineCount);
+                    text = textChunks.FillWith(text);
+                }
 
                 EnsureLongestLineFits();
-
-                textHeight = lineHeight * lineCount;
             }
-            else
-                textHeight = lineHeight;
-        }
 
-        if (ThinCard || textHeight * k > _cardHeight)
-        {
-            SetCardHeightLol(textHeight, k);
+            _textHeight = k * lineHeight * lineCount;
         }
 
         ResizeFont(FontSize * k);
@@ -136,38 +139,28 @@ public partial class IFunnyApp
         }
     }
 
-    private void SetCardHeightLol(float textHeight, float k)
+    private RichTextOptions GetDefaultTextOptions(/*float width, float height*/) => new(_font)
     {
-        var k2 = UltraThinCard ? 0.1F : 1F;
-        var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(FontSize * k * k2, min) * ExtraFonts.GetRelativeSize();
-        SetCardHeight((textHeight * k + extra).CeilingInt());
-    }
-
-    private RichTextOptions GetDefaultTextOptions() => new(_font)
-    {
-        TextAlignment = UseLeftAlignment
-            ? TextAlignment.Start
-            : TextAlignment.Center,
-        HorizontalAlignment = UseLeftAlignment
-            ? HorizontalAlignment.Left
-            : HorizontalAlignment.Center,
+        TextAlignment = TextAlignment.Center,
+        HorizontalAlignment = HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
         Origin = GetTextOrigin(),
-        WrappingLength = _w,
+        //WrappingLength = width,
         LineSpacing = GetLineSpacing(),
         FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
 
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
-
     private PointF GetTextOrigin()
     {
-        var x = UseLeftAlignment ? _marginLeft : _w / 2F;
-        var y = _cardHeight / 2F + _textOffset;
-
+        var occupied = imageH + marginTop + FM;
+        var x = fullW / 2F;
+        var y = occupied + (fullH - occupied) / 2F + _textOffset;
         return new PointF(x, y);
     }
+
+    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
+
+    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
 
     // TEXT OFFSET
@@ -180,6 +173,6 @@ public partial class IFunnyApp
         _caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
-        Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+        Log($"/dp >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
     }
 }

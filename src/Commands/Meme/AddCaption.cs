@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Memes;
+using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme

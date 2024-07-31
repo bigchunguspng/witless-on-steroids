@@ -3,7 +3,7 @@ using SixLabors.ImageSharp;
 using Witlesss.Commands.Meme;
 using Witlesss.MediaTools;
 
-namespace Witlesss.Memes;
+namespace Witlesss.Memes.Shared;
 
 public interface IMemeGenerator<in T>
 {

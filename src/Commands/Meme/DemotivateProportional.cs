@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Memes;
+using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
@@ -36,10 +37,9 @@ namespace Witlesss.Commands.Meme
         protected override string GetMemeText(string? text)
         {
             var generate = string.IsNullOrEmpty(text);
-            var capitalize = CheckCaps(Request, _caps, generate);
-
             var caption = generate ? Baka.Generate() : text!;
 
+            var capitalize = CheckCaps(Request, _caps, generate) || generate && caption.Length <= 12;
             return capitalize ? caption.ToLetterCase(LetterCaseMode.Upper) : caption;
         }
 

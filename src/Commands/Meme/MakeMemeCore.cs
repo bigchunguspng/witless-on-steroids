@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
-using Witlesss.Memes;
+using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
 {

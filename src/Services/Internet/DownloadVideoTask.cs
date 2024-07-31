@@ -7,8 +7,6 @@ namespace Witlesss.Services.Internet;
 
 public class DownloadVideoTask(string id, CommandContext context)
 {
-    private bool YouTube;
-
     private readonly Stopwatch Timer = new();
     
     private static readonly LimitedCache<string, string> _cache = new(32);
@@ -16,7 +14,7 @@ public class DownloadVideoTask(string id, CommandContext context)
     private string GetDownloadCommand(string url)
     {
         var builder = new StringBuilder("/C yt-dlp --no-mtime ");
-        if (YouTube) builder.Append("-f 18 ");
+        builder.Append("-f \"bv*[height<=480]+ba/b[height<=480] / wv*+ba/w\" ");
         builder.Append("-k -I 1 ");
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
@@ -33,8 +31,6 @@ public class DownloadVideoTask(string id, CommandContext context)
             File.Copy(path, copy);
             return copy;
         }
-
-        YouTube = id.Contains("youtu");
 
         await DownloadMusicTask.RunCMD(GetDownloadCommand(id), directory);
 

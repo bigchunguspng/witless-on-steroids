@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing;
 
 #pragma warning disable CS4014
 
-public class Slice : VideoCommand
+public class Slice : FileEditingCommand
 {
     protected override async Task Execute()
     {

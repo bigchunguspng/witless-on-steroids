@@ -4,7 +4,7 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Sus : VideoCommand
+    public class Sus : FileEditingCommand
     {
         protected override async Task Execute()
         {
@@ -26,7 +26,7 @@ namespace Witlesss.Commands.Editing
 
             var result = await FFMpegXD.Sus(path, new CutSpan(x.start, x.length));
             SendResult(result, type);
-            Log($"{Title} >> SUS [>_<]");
+            Log($"{Title} >> SUS (>_<)");
         }
 
         protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");

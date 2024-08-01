@@ -34,7 +34,7 @@ namespace Witlesss
             if (context.ChatIsPrivate)
             {
                 witless.Speech = 100;
-                witless.Pics = 100;
+                witless.Pics = 150;
                 witless.Stickers = true;
             }
 
@@ -87,7 +87,7 @@ namespace Witlesss
         }
 
         [JsonProperty] public byte Speech  { get => _speech;  set => _speech  = value.Clamp100(); }
-        [JsonProperty] public byte Pics    { get => _pics;    set => _pics    = value.Clamp100(); }
+        [JsonProperty] public byte Pics    { get => _pics;    set => _pics    = value.Clamp(150); }
         [JsonProperty] public byte Quality { get => _quality; set => _quality = value.Clamp100(); }
 
         [JsonProperty] public MemeType Type { get; set; }

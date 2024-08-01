@@ -74,7 +74,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             };
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(Args);
+                var text = GetMemeText(GetTextBase());
                 await using var stream = File.OpenRead(await MakeMemeImage(request, text));
                 Bot.SendPhoto(Chat, new InputOnlineFile(stream));
             }
@@ -97,7 +97,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             };
             for (var i = 0; i < repeats; i++)
             {
-                var text = GetMemeText(Args);
+                var text = GetMemeText(GetTextBase());
                 var result = await MakeMemeStick(request, text);
                 if (sticker && ConvertStickers)
                     result = await new F_Process(result).Output("-stick", ".webp");
@@ -119,7 +119,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
             if (CropVideoNotes && type == MediaType.Round) path = await FFMpegXD.CropVideoNote(path);
 
             ParseOptions();
-            var text = GetMemeText(Args);
+            var text = GetMemeText(GetTextBase());
             var request = new MemeFileRequest(path, Suffix + ".mp4", Baka.Quality)
             {
                 Type = MemeSourceType.Video
@@ -135,6 +135,7 @@ namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
         protected abstract void ParseOptions();
         protected abstract T GetMemeText(string? text);
 
+        private string? GetTextBase() => Context.Command is not null || Baka.Pics > 100 ? Args : null;
 
         // MEME GENERATION
 

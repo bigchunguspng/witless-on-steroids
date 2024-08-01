@@ -173,7 +173,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
         private static Process StartGalleryDL(string url)
         {
-            return SystemHelpers.StartedReadableProcess("gallery-dl", $"{url} -g");
+            return SystemHelpers.StartReadableProcess("gallery-dl", $"{url} -g");
         }
 
         private void SendSingleFilePost(PostData post)

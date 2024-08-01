@@ -233,6 +233,10 @@ namespace Witlesss.MediaTools
         public F_Action ExportThumbnail (bool square) => ApplyEffects(o => ExportThumbnail(o, square));
         public F_Action ResizeThumbnail (bool square) => ApplyEffects(o => ResizeThumbnail(o, square));
         public F_Action CompressJpeg    (int  factor) => ApplyEffects(o => o.WithQscale(factor));
+        public F_Action MakeThumb       (int  factor)
+        {
+            return ApplyEffects(o => o.WithQscale(factor).Resize(GetPictureSize(_input).FitSize(320).Ok()));
+        }
 
         // -ss 1 -frames:v 1 -vf
         private static void ExportThumbnail(FFMpAO o, bool square)

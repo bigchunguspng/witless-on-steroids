@@ -144,10 +144,15 @@ namespace Witlesss
                 LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
 
                 if (FFmpeg.IsMatch(e.Message)) SendErrorDetails(chat, e);
-                if (message > 0) EditMessage(chat, message, $"произошла ашыпка {Responses.FAIL_EMOJI_2.PickAny()}");
+                if (message > 0) EditMessageOnError(chat, message);
             }
         }
-        
+
+        public void EditMessageOnError(long chat, int message)
+        {
+            EditMessage(chat, message, $"произошла ашыпка {Responses.FAIL_EMOJI_2.PickAny()}");
+        }
+
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath(Paths.Dir_Temp, "error.txt");

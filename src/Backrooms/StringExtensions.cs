@@ -28,6 +28,8 @@ public static class StringExtensions
         return s.Length > 1 && s.Skip(1).Any(char.IsUpper) ? s[0] + s[1..].ToLower() : s;
     }
 
+    public static string? NullOnEmpty(this string? s) => string.IsNullOrEmpty(s) ? null : s;
+
     public static string Quote(this string s) => $"\"{s}\"";
     
     public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;

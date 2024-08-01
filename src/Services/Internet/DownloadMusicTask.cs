@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.InputFiles;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.MediaTools;
 using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
@@ -12,86 +12,50 @@ using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
 namespace Witlesss.Services.Internet;
 
-public class DownloadMusicTask
+public class DownloadMusicTask(string id, bool youTube, CommandContext context, int messageToDelete)
 {
     private const string _YT_video = "https://youtu.be/";
     private const string _YT_list  = "https://www.youtube.com/playlist?list=";
 
-    private readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
+    private static readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
 
-    private readonly string ID;
-    private readonly string? PlaylistID, PlayListIndex, Cover;
-    private readonly int MessageToDelete;
-    private readonly bool YouTube;
-    private readonly CommandContext Message;
+    public required string? PlaylistID;
+    public required string? PlayListIndex;
+    public required string? Cover;
 
-    private readonly bool HighQuality, NameOnly, ExtractThumb, RemoveBrackets, Uploader, CropSquare, ArtAttached;
+    private bool ArtAttached => Cover is not null;
+
+    public required bool HighQuality;
+    public required bool NameOnly;
+    public required bool ExtractThumb;      // extract thumbnail from video (default: using YouTube one)
+    public required bool RemoveBrackets;
+    public required bool Uploader;          // artist is uploader
+    public required bool CropSquare;        // crop thumbnail to a square
 
     private readonly Stopwatch Timer = new();
 
-    private int Format;
-    
     public string? Artist;
     public string? Title;
 
     private Bot Bot => Bot.Instance;
 
-    public DownloadMusicTask
-    (
-        string id,
-        string options,
-        string? coverFileId,
-        int message,
-        bool yt,
-        string? playlistId,
-        CommandContext context,
-        int format = 251
-    )
+    private string GetAudioArgs(string url, string output)
     {
-        ID = id;
-        Cover = coverFileId;
-        MessageToDelete = message;
-        YouTube = yt;
-        PlaylistID = playlistId;
-        Message = context;
-        Format = format;
-        
-        HighQuality    = options.Contains('q');
-        NameOnly       = options.Contains('n');
-        ExtractThumb   = options.Contains('p'); // extract thumbnail from video (default: using YouTube one)
-        RemoveBrackets = options.Contains('c');
-        Uploader       = options.Contains('u'); // artist is uploader
-        CropSquare     = options.Contains('s'); // crop thumbnail to a square
-
-        PlayListIndex  = YouTube && PlaylistID is null ? null : Regex.Match(options, @"\d+").Value;
-        if (PlayListIndex?.Length < 1) PlayListIndex = null;
-
-        ArtAttached = Cover is not null;
-        ExtractThumb = ExtractThumb && !ArtAttached;
-    }
-
-    private string GetAudioDownloadCommand(string url, string output)
-    {
-        var builder = new StringBuilder("/C yt-dlp --no-mtime ");
+        var builder = new StringBuilder("--no-mtime --no-warnings ");
         if (HighQuality)
             builder.Append("--audio-quality 0 ");
-        if (YouTube)
-            builder.Append("-f ").Append(Format).Append(" -k ");
-        else if (!ExtractThumb && !ArtAttached)
+        if (!youTube && !ExtractThumb && !ArtAttached)
             builder.Append("--write-thumbnail ");
-        builder.Append("-x --audio-format mp3 ");
+        builder.Append("-f ba -k -x --audio-format mp3 ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(url.Quote()).Append(" -o ").Append(output.Quote());
         return builder.ToString();
     }
 
-    private string? GetVideoDownloadCommand(string url)
+    private string GetVideoArgs(string url)
     {
-        if (!ExtractThumb) return null;
-        
-        var builder = new StringBuilder("/C yt-dlp --no-mtime ");
-        var format = "bv*" + (YouTube ? "[height<=720][filesize<15M]" : "");
-        builder.Append("-f ").Append(format.Quote()).Append(" -k ");
+        var builder = new StringBuilder("--no-mtime --no-warnings");
+        builder.Append("-f \"bv*[height<=720]\" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
@@ -99,88 +63,83 @@ public class DownloadMusicTask
 
     public async Task RunAsync()
     {
-        try
-        {
-            var url = YouTube
-                ? PlaylistID?.Length > 0 && (ID.Length < 1 || PlayListIndex is not null)
-                    ? _YT_list + PlaylistID
-                    : _YT_video + ID
-                : ID;
+        // GET READY
 
-            var artist = Artist ?? (Uploader ? "%(uploader)s" : "%(artist)s");
-            var title  = Title  ??                              "%(title)s";
+        var url = youTube
+            ? PlaylistID?.Length > 0 && (id.Length < 1 || PlayListIndex is not null)
+                ? _YT_list + PlaylistID
+                : _YT_video + id
+            : id;
 
-            var output = $"{artist} - {title} xd.%(ext)s";
+        var artist = Artist ?? (Uploader ? "%(uploader)s" : "%(artist)s");
+        var title  = Title  ??                              "%(title)s";
 
-            var cmd_a = GetAudioDownloadCommand(url, output);
-            var cmd_v = GetVideoDownloadCommand(url);
+        var output = $"{artist} - {title} xd.%(ext)s";
 
-            var dir = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
-            Directory.CreateDirectory(dir);
+        var directory = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
+        var thumbPath = $"{directory}/thumb.jpg";
 
-            var thumb = $"{dir}/thumb.jpg";
+        Directory.CreateDirectory(directory);
 
-            var task_a = RunCMD(cmd_a, dir);
-            var task_v = ExtractThumb
-                ? RunCMD(cmd_v!, dir)
-                : ArtAttached
-                    ? Bot.DownloadFile(Cover!, thumb, Message.Chat)
-                    : YouTube
-                        ? GetGoodYouTubeThumbnail()
-                        : Task.CompletedTask;
-            await Task.WhenAll(task_a, task_v);
+        // DOWNLOAD AUDIO + THUMB SOURCE
 
-            Task GetGoodYouTubeThumbnail() => Task.Run(() => thumb = YouTubePreviewFetcher.DownloadPreview(ID, dir).Result);
+        var taskA = UseYT_DLP(GetAudioArgs(url, output), directory);
+        var taskV = ExtractThumb
+            ? UseYT_DLP(GetVideoArgs(url), directory)
+            : ArtAttached
+                ? Bot.DownloadFile(Cover!, thumbPath, context.Chat)
+                : youTube
+                    ? Task.Run(() => thumbPath = YouTubePreviewFetcher.DownloadPreview(id, directory).Result)
+                    : Task.CompletedTask;
+        await Task.WhenAll(taskA, taskV);
 
-            var resize = CropSquare || ArtAttached || thumb.Contains("maxres");
+        // GRAB FILES
 
-            var directory = new DirectoryInfo(dir);
-            var thumb_source = ExtractThumb ? GetFile("video.*") : YouTube || ArtAttached ? thumb : GetFile("*.jpg");
-            var audio_file = GetFile("*xd.mp3");
+        var directoryInfo = new DirectoryInfo(directory);
+        var audioFile = GetFile("*xd.mp3");
+        var thumbSource = ExtractThumb
+            ? GetFile("video.*")
+            : youTube || ArtAttached
+                ? thumbPath
+                : GetFile("*.jpg");
 
-            string GetFile(string pattern) => directory.GetFiles(pattern)[0].FullName;
+        string GetFile(string pattern) => directoryInfo.GetFiles(pattern)[0].FullName;
 
-            var meta = _name.Match(Path.GetFileName(audio_file));
-            if (Artist is null && meta.Groups[1].Success) Artist = meta.Groups[1].Value;
-            if (Title  is null && meta.Groups[2].Success) Title  = meta.Groups[2].Value;
+        // META INFORMATION
+        var meta = _name.Match(Path.GetFileName(audioFile));
+        if (Artist is null && meta.Groups[1].Success) Artist = meta.Groups[1].Value;
+        if (Title  is null && meta.Groups[2].Success) Title  = meta.Groups[2].Value;
 
-            if (NameOnly) Artist = null;
-            if (RemoveBrackets) Title = Title?.RemoveBrackets();
+        if (NameOnly) Artist = null;
+        if (RemoveBrackets) Title = Title?.RemoveBrackets();
 
-            var img = new F_Process(thumb_source);
-            var imgProcess = ExtractThumb
-                ? img.ExportThumbnail(CropSquare)
-                : resize
-                    ? img.ResizeThumbnail(CropSquare)
-                    : img.CompressJpeg(2);
-            var art = await imgProcess.OutputAs($"{dir}/art.jpg");
-            var mp3 = new F_Combine(audio_file, art).AddTrackMetadata(Artist, Title!);
-            var jpg = new F_Process(art).CompressJpeg(7).OutputAs($"{dir}/jpg.jpg"); // telegram preview
+        // COMBINE ALL TOGETHER
 
-            Task.WhenAll(mp3, jpg);
+        var resize = CropSquare || ArtAttached || thumbPath.Contains("maxres");
 
-            Task.Run(() => Bot.DeleteMessage(Message.Chat, MessageToDelete));
+        var img = new F_Process(thumbSource);
+        var imgProcess = ExtractThumb
+            ? img.ExportThumbnail(CropSquare)
+            : resize
+                ? img.ResizeThumbnail(CropSquare)
+                : img.CompressJpeg(2);
+        var art = await imgProcess.OutputAs($"{directory}/art.jpg");
+        var mp3 = new F_Combine(audioFile, art).AddTrackMetadata(Artist, Title!);
+        var jpg = new F_Process(art).MakeThumb(7).OutputAs($"{directory}/jpg.jpg"); // telegram preview
 
-            await using var stream = File.OpenRead(mp3.Result);
-            Bot.SendAudio(Message.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
-            Log($"{Message.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
-        }
-        catch
-        {
-            if (Format == 140) throw;
+        Task.WhenAll(mp3, jpg);
 
-            Format = 140;
-            RunAsync();
-        }
+        // SEND THE RESULT
+
+        Task.Run(() => Bot.DeleteMessage(context.Chat, messageToDelete));
+
+        await using var stream = File.OpenRead(mp3.Result);
+        Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
+        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
     }
 
-    public static async Task RunCMD(string cmd, string directory)
+    public static Task UseYT_DLP(string args, string directory)
     {
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo("cmd.exe", cmd) { WorkingDirectory = directory }
-        };
-        process.Start();
-        await process.WaitForExitAsync();
+        return SystemHelpers.StartProcess("yt-dlp", args, directory, redirect: false).WaitForExitAsync();
     }
 }

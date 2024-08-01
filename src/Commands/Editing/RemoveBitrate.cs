@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Editing
             var output = UniquePath(directory, name + "-DAMN.jpg");
             var exe = "magick";
             var args = $"\"{path}\" -compress JPEG -quality {22 - _value} \"{output}\""; // 1 - 22
-            SystemHelpers.StartedReadableProcess(exe, args).WaitForExit();
+            SystemHelpers.StartReadableProcess(exe, args).WaitForExit();
             return output;
         }
 

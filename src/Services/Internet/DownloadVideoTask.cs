@@ -13,9 +13,8 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     private string GetDownloadCommand(string url)
     {
-        var builder = new StringBuilder("/C yt-dlp --no-mtime ");
+        var builder = new StringBuilder("--no-mtime --no-warnings -k -I 1 ");
         builder.Append("-f \"bv*[height<=480]+ba/b[height<=480] / wv*+ba/w\" ");
-        builder.Append("-k -I 1 ");
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
     }
@@ -32,7 +31,7 @@ public class DownloadVideoTask(string id, CommandContext context)
             return copy;
         }
 
-        await DownloadMusicTask.RunCMD(GetDownloadCommand(id), directory);
+        await DownloadMusicTask.UseYT_DLP(GetDownloadCommand(id), directory);
 
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
 

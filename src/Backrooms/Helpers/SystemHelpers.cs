@@ -4,7 +4,12 @@ namespace Witlesss.Backrooms.Helpers;
 
 public static class SystemHelpers
 {
-    public static Process StartedReadableProcess(string exe, string args)
+    public static Process StartReadableProcess(string exe, string args, string directory = "")
+    {
+        return StartProcess(exe, args, directory, redirect: true);
+    }
+
+    public static Process StartProcess(string exe, string args, string directory = "", bool redirect = false)
     {
         var process = new Process
         {
@@ -12,7 +17,8 @@ public static class SystemHelpers
             {
                 FileName = exe,
                 Arguments = args,
-                RedirectStandardOutput = true
+                WorkingDirectory = directory,
+                RedirectStandardOutput = redirect,
             }
         };
         process.Start();

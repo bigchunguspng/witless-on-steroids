@@ -43,11 +43,11 @@ public static class StringExtensions
 
     //
 
-    private static readonly Regex CAPS = new(@"[A-ZЀ-Я0-9bdfhkltбф]"), EMOJI = new("👌");
+    private static readonly Regex LOWERCASE = new(@"[acegijm-su-zав-ух-џ]"); //, EMOJI = new("👌");
 
-    public static bool IsMostlyLowercase(this string text)
+    public static float GetLowercaseRatio(this string text)
     {
-        return CAPS.Count(text) + 3 * EMOJI.Count(text) <= text.Length / 5;
+        return Math.Clamp(LOWERCASE.Count(text) / (float)text.Length, 0F, 1F);
     }
 
     // REGEX

@@ -109,8 +109,7 @@ namespace Witlesss.Memes.Shared
 
         public float GetCaseDependentOffset(string text)
         {
-            var move = FontIsMulticase() && text.IsMostlyLowercase();
-            return move ? GetSizeMultiplier() * GetCapitalsOffset() : 0;
+            return FontIsMulticase() ? GetSizeMultiplier() * GetCapitalsOffset() * text.GetLowercaseRatio() : 0F;
         }
 
         private static FontSpecificData GetFontSpecific(string key) => key switch

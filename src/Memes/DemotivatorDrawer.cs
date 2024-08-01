@@ -25,7 +25,7 @@ namespace Witlesss.Memes
 
         private static readonly List<Logo> Logos = [];
 
-        private readonly int _w, _h;
+        private readonly int _w, _h, _textW;
         private readonly bool _square;
         private readonly RectangleF _frame;
 
@@ -59,6 +59,8 @@ namespace Witlesss.Memes
 
             _w = width;
             _h = height;
+
+            _textW = _w - (_square ? 40 : 100);
 
             var imageMarginT = 50;
             var imageMarginS = _square ? 50 : 144;
@@ -209,7 +211,9 @@ namespace Witlesss.Memes
                 _ => 0
             };
             fontOffset = fontSize * extraFonts.GetFontDependentOffset();
-            caseOffset = fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
+            caseOffset = _square && !SingleLine
+                ? 0
+                : fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
             var y = offset + fontOffset - caseOffset;
 
             return new RichTextOptions(family.CreateFont(fontSize, style))
@@ -218,7 +222,7 @@ namespace Witlesss.Memes
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 Origin = new PointF(_w / 2F, y),
-                WrappingLength = _w,
+                WrappingLength = _textW,
                 LineSpacing = extraFonts.GetLineSpacing() * (lower ? 1.39F : 1.2F),
                 FallbackFontFamilies = ExtraFonts.FallbackFamilies
             };

@@ -157,7 +157,7 @@ public partial class DynamicDemotivatorDrawer
 
     private PointF GetTextOrigin()
     {
-        var occupied = imageH + marginTop + FM;
+        var occupied = imageH + marginTop + FRAME_MARGIN;
         var x = fullW / 2F;
         var y = occupied + (fullH - occupied) / 2F + _textOffset;
         return new PointF(x, y);
@@ -165,7 +165,7 @@ public partial class DynamicDemotivatorDrawer
 
     private Point GetOriginFunny(Size size)
     {
-        var occupied = imageH + marginTop + FM;
+        var occupied = imageH + marginTop + FRAME_MARGIN;
         var x = fullW.Gap(size.Width);
         var y = occupied + (fullH - occupied) / 2F - size.Height / 2F - _caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());

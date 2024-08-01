@@ -21,7 +21,9 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
         // SIZE
 
-        private const int FM = 5;
+        private const int FRAME_MARGIN = 5;
+
+        private int _frameMargin, _frameWidth;
 
         private int TextWidth => (fullW + imageW) / 2;
 
@@ -29,37 +31,16 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         private double _ratio;
 
         private Point _picOrigin;
-        private RectangleF _frame;
 
         public Point Location => _picOrigin;
         public Size ImageSize => new(imageW, imageH);
 
         // DATA
 
-        private SolidBrush TextBrush;
-        private SolidPen FramePen;
+        private Rgb24 FrameColor;
+        private SolidBrush TextBrush = default!;
 
         private readonly SolidBrush WhiteBrush = new(Color.White);
-
-        private readonly DrawingOptions _textOptions = new()
-        {
-            GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 1 }
-        };
-
-        private readonly DrawingOptions _frameOptions = new()
-        {
-            GraphicsOptions = new GraphicsOptions { Antialias = false }
-        };
-
-        private readonly SolidPen _framePen = new(GetPenOptions(Color.White));
-
-        private SolidPen GetSolidPen(Rgba32 color) => new(GetPenOptions(color));
-
-        private static PenOptions GetPenOptions(Rgba32 color) => new(color, 1.5F)
-        {
-            JointStyle = JointStyle.Miter,
-            EndCapStyle = EndCapStyle.Polygon
-        };
 
         // LOGIC
 
@@ -123,7 +104,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
         private void SetUpFrameSize()
         {
-            var space = imageH / 30F;
+            var space = Math.Max(imageH / 30F, 4);
             var lineHeight = FontSize * GetLineSpacing();
             var textHeight = _textHeight + 0.5F * lineHeight;
             fullH = (imageH + textHeight + 4 * space).RoundInt().ToEven();
@@ -146,10 +127,10 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
                 ResizeFont(FontSize * k);
             }
 
-            var m = 5; // frame margin todo make it size dependent
+            _picOrigin = new Point((fullW - imageW) / 2, marginTop);
 
-            _picOrigin = new Point((fullW - imageW) / 2, marginTop + 1); //todo +1 ?
-            _frame = new RectangleF(_picOrigin.X - m - 0.5F, _picOrigin.Y - m - 0.5F, imageW + 2 * m, imageH + 2 * m);
+            _frameMargin = imageW + imageH > 800 ? 5 : 3;
+            _frameWidth  = imageW + imageH > 800 ? 3 : 2;
         }
 
         // DRAW
@@ -177,7 +158,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
                 background.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
             }
 
-            background.Mutate(x => x.Draw(_frameOptions, FramePen, _frame));
+            background.DrawFrame(new Rectangle(_picOrigin, _sourceSizeAdjusted), _frameWidth, _frameMargin, FrameColor);
 
             return background;
         }
@@ -201,8 +182,8 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         public void SetColor()
         {
             var color = CustomColorOption.GetColor();
+            FrameColor = color?.Rgb ?? Color.White;
             TextBrush = color is null ? WhiteBrush : new SolidBrush(color.Value);
-            FramePen  = color is null ? _framePen  :  GetSolidPen  (color.Value);
         }
 
         private void Debug_Text(Image image, RichTextOptions options)

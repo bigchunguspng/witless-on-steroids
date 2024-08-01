@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -33,6 +34,23 @@ public static class DrawingExtensions
     public static IImageProcessingContext DrawImage(this IImageProcessingContext source, Image foreground, Point point)
     {
         return source.DrawImage(foreground, point, opacity: 1);
+    }
+
+    public static void DrawFrame(this Image<Rgb24> image, Rectangle rectangle, int thickness, int margin, Rgb24 color)
+    {
+        var both = thickness + margin;
+        var w = rectangle.Width  + 2 * both;
+        var h = rectangle.Height + 2 * margin;
+        var y0 = rectangle.Y - both;
+        var x0 = rectangle.X - both;
+        var xR = rectangle.Right  + margin;
+        var yB = rectangle.Bottom + margin;
+        var yM = rectangle.Y - margin;
+
+        image.Mutate(x => x.Fill(color, new Rectangle(x0, y0, w, thickness)));
+        image.Mutate(x => x.Fill(color, new Rectangle(x0, yB, w, thickness)));
+        image.Mutate(x => x.Fill(color, new Rectangle(x0, yM, thickness, h)));
+        image.Mutate(x => x.Fill(color, new Rectangle(xR, yM, thickness, h)));
     }
 
     public static void ApplyQuality(this Image<Rgba32> png, Image<Rgb24> jpg)

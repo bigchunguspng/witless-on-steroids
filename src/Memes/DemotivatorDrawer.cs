@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -27,7 +26,6 @@ namespace Witlesss.Memes
 
         private readonly int _w, _h, _textW;
         private readonly bool _square;
-        private readonly RectangleF _frame;
 
 
         private static readonly SolidBrush _heisenberg = new(Color.White);
@@ -38,17 +36,6 @@ namespace Witlesss.Memes
         {
             GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 1 }
         };
-
-        private readonly DrawingOptions _frameOptions = new()
-        {
-            GraphicsOptions = new GraphicsOptions { Antialias = false }
-        };
-
-        private readonly SolidPen _framePen = new(new PenOptions(Color.White, 1.5F)
-        {
-            JointStyle = JointStyle.Miter,
-            EndCapStyle = EndCapStyle.Polygon
-        });
 
 
         static DemotivatorDrawer() => LoadLogos(Paths.Dir_Water);
@@ -69,19 +56,7 @@ namespace Witlesss.Memes
             var imageW = _w - imageMarginS * 2;
             var imageH = _h - imageMarginT - imageMarginB;
 
-            var space = 5;
-            var marginT = imageMarginT - space;
-            var marginS = imageMarginS - space;
-            var marginB = imageMarginB - space;
-
             ImagePlacement = new Rectangle(imageMarginS, imageMarginT, imageW, imageH);
-            _frame = new RectangleF
-            (
-                marginS - 0.5F,
-                marginT - 0.5F,
-                _w - 2 * marginS,
-                _h - marginT - marginB
-            );
         }
 
         public Rectangle ImagePlacement { get; }
@@ -109,7 +84,7 @@ namespace Witlesss.Memes
         {
             var background = new Image<Rgb24>(_w, _h, Color.Black);
 
-            background.Mutate(x => x.Draw(_frameOptions, _framePen, _frame));
+            background.DrawFrame(ImagePlacement, _square ? 2 : 3, _square ? 4 : 5, Color.White);
 
             if (_square && AddLogo)
             {

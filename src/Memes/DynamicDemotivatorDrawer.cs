@@ -70,7 +70,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             text = ArrangeText(text, out var emojiPngs);
 
-            SetUpFrameSize(text);
+            SetUpFrameSize();
 
             using var image = GetImage(request.SourcePath);
             using var frame = DrawFrame(text, emojiPngs);
@@ -87,7 +87,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             text = ArrangeText(text, out var emojiPngs);
 
-            SetUpFrameSize(text);
+            SetUpFrameSize();
 
             using var frame = DrawFrame(text, emojiPngs);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
@@ -115,26 +115,17 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         private string ArrangeText(string text, out EmojiPngList? pngs)
         {
             var emoji = EmojiRegex.Matches(text);
-            if (emoji.Count == 0)
-            {
-                pngs = null;
-                return MakeTextFitCard(text);
-            }
-            else
-            {
-                pngs = EmojiTool.GetEmojiPngs(emoji);
-                return MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
-            }
+            var plain = emoji.Count == 0;
+            pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
+            text = plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs);
+            return MakeTextFitCard(text);
         }
 
-        private void SetUpFrameSize(string text)
+        private void SetUpFrameSize()
         {
             var space = imageH / 30F;
-            var lines = text.GetLineCount();
-            Log(lines.ToString());
-            var lineHeight = FontSize * ExtraFonts.GetRelativeSize() * GetLineSpacing();
+            var lineHeight = FontSize * GetLineSpacing();
             var textHeight = _textHeight + 0.5F * lineHeight;
-            Log(_textHeight.ToString(), ConsoleColor.DarkGreen);
             fullH = (imageH + textHeight + 4 * space).RoundInt().ToEven();
             fullW = (fullH * _ratio).RoundInt().ToEven();
 
@@ -191,13 +182,6 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             return background;
         }
 
-        private Point GetOriginFunny(Size size)
-        {
-            var x = fullW.Gap(size.Width);
-            var y = (fullH - imageH - marginTop - 5).Gap(size.Height) - _caseOffset;
-            return new Point(x.RoundInt(), y.RoundInt());
-        }
-
         private void InsertImage(Image background, Image image)
         {
             background.Mutate(x => x.DrawImage(image, _picOrigin));
@@ -221,18 +205,6 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             FramePen  = color is null ? _framePen  :  GetSolidPen  (color.Value);
         }
 
-
-        /*/// <summary> CALL THIS after changing <see cref="textH"/> </summary>
-        private void AdjustTotalSize()
-        {
-            fullH = FF_Extensions.ToEven(marginTop + imageH + FM + textH);
-            fullW = FF_Extensions.ToEven((int)(fullH * _ratio));
-        }
-        private void AdjustImageFrame()
-        {
-            _picOrigin = new Point((fullW - imageW) / 2, marginTop + 1);
-            _frame = new RectangleF(_picOrigin.X - FM - 0.5F, _picOrigin.Y - FM - 0.5F, imageW + 2 * FM, imageH + 2 * FM);
-        }*/
         private void Debug_Text(Image image, RichTextOptions options)
         {
             var y = options.Origin.Y - _textHeight / 2F;

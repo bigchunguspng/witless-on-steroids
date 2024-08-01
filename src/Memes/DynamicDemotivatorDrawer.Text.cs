@@ -48,79 +48,80 @@ public partial class DynamicDemotivatorDrawer
         var textWidthLimit = 1.1F * imageW;
 
         var k = 1F;
+        var lineCount = 1;
 
-        if (text.Contains('\n') || !WrapText) // ww OR custom breaks
+        try
         {
-            EnsureLongestLineFits();
-
-            if (FontSize * k < MinFontSize)
+            if (text.Contains('\n') || !WrapText) // ww OR custom breaks
             {
-                k = MinFontSize / FontSize;
+                FitLongestLine();
 
-                var widthLimit = textWidthLimit / k;
-                textChunks.RedistributeText(widthLimit);
-                text = textChunks.FillWith(text);
-            }
-
-            _textHeight = lineHeight * text.GetLineCount();
-        }
-        else
-        {
-            var textWidth = textChunks.Sum(x => x.Width);
-            if (textWidth * 2F < imageW)
-            {
-                _textHeight = lineHeight * 2F;
-                ResizeFont(FontSize * 2F);
-                return text; // Make it bigger!
-            }
-
-            if (textWidth < textWidthLimit)
-            {
-                _textHeight = lineHeight;
-                return text; // OK - don't change anything!
-            }
-
-            var maxWordWidth = textChunks.GetMaxWordWidth() * k;
-            if (maxWordWidth > textWidthLimit) k = textWidthLimit / maxWordWidth;
-            if (maxWordWidth / textWidth > 0.75F) // if the biggest word makes > 75% of the caption
-            {
-                k = textWidthLimit / textWidth;
-            }
-
-            var lineCount = 1;
-
-            if (textWidth * k > textWidthLimit)
-            {
-                var minRatio = GetMinTextRatio(textWidth);
-                while (true) // calculate line count
+                if (FontSize * k < MinFontSize)
                 {
-                    var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                    var targetRatio = Math.Min(minRatio, textWidthLimit / (imageH * Math.Min(lineCount, 8) / 8F));
-                    Log($"lineCount: {lineCount} min: {minRatio:F2} text: {textRatio:F2} target: {targetRatio:F2}", ConsoleColor.DarkCyan);
-                    if (textRatio < targetRatio) break;
+                    k = MinFontSize / FontSize;
 
-                    lineCount++;
-                }
-
-                if (lineCount > 1)
-                {
-                    textChunks.RedistributeText(lineCount);
+                    var widthLimit = textWidthLimit / k;
+                    textChunks.RedistributeText(widthLimit);
                     text = textChunks.FillWith(text);
                 }
 
-                EnsureLongestLineFits();
+                lineCount = text.GetLineCount();
             }
+            else // le "most cases" branch
+            {
+                var textWidth = textChunks.Sum(x => x.Width);
+                if (textWidth * 2F < imageW)
+                {
+                    k = 2;
+                    return text; // Make it bigger!
+                }
 
-            _textHeight = k * lineHeight * lineCount;
+                if (textWidth < textWidthLimit)
+                {
+                    return text; // OK - don't change anything!
+                }
+
+                var maxWordWidth = textChunks.GetMaxWordWidth();
+                if (maxWordWidth > textWidthLimit)
+                {
+                    k = maxWordWidth / textWidth > 0.75F
+                        ? textWidthLimit / textWidth // fit all if the biggest word makes > 75% of the caption
+                        : textWidthLimit / maxWordWidth; // fit the biggest word
+                }
+
+                if (textWidth * k > textWidthLimit) // find the best line count
+                {
+                    var minRatio = GetMinTextRatio(textWidth);
+                    while (true)
+                    {
+                        var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
+                        var targetRatio = Math.Min(minRatio, textWidthLimit / (imageH * Math.Min(lineCount, 10) / 10F));
+                        if (textRatio < targetRatio) break;
+
+                        lineCount++;
+                    }
+
+                    if (lineCount > 1)
+                    {
+                        textChunks.RedistributeText(lineCount);
+                        text = textChunks.FillWith(text);
+                    }
+
+                    FitLongestLine();
+                }
+            }
         }
-
-        ResizeFont(FontSize * k);
+        finally
+        {
+            ResizeFont(FontSize * k);
+            _textHeight = k * lineHeight * lineCount * ExtraFonts.GetSizeMultiplier();
+        }
 
         return text;
 
         //
 
-        void EnsureLongestLineFits()
+        void FitLongestLine()
         {
             var maxLineWidth = textChunks.GetMaxLineWidth();
             if (maxLineWidth * k > textWidthLimit)
@@ -139,16 +140,20 @@ public partial class DynamicDemotivatorDrawer
         }
     }
 
-    private RichTextOptions GetDefaultTextOptions(/*float width, float height*/) => new(_font)
+    private RichTextOptions GetDefaultTextOptions() => new(_font)
     {
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
         Origin = GetTextOrigin(),
-        //WrappingLength = width,
+        WrappingLength = fullW,
         LineSpacing = GetLineSpacing(),
         FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
+
+    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+
+    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -158,9 +163,13 @@ public partial class DynamicDemotivatorDrawer
         return new PointF(x, y);
     }
 
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
-
-    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+    private Point GetOriginFunny(Size size)
+    {
+        var occupied = imageH + marginTop + FM;
+        var x = fullW.Gap(size.Width);
+        var y = occupied + (fullH - occupied) / 2F - size.Height / 2F - _caseOffset;
+        return new Point(x.RoundInt(), y.RoundInt());
+    }
 
 
     // TEXT OFFSET

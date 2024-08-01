@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -57,7 +58,11 @@ namespace Witlesss.Memes.Shared
             SystemFonts.Get("Segoe UI Symbol")
         ];*/
 
-        public ExtraFonts(string cmdRegex, string? x = null)
+        public ExtraFonts
+        (
+            [StringSyntax("Regex")] string cmdRegex,
+            [StringSyntax("Regex")] string? x = null
+        )
         {
             var codes = string.Join('|', _families.Keys);
             _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes})(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);

@@ -115,43 +115,31 @@ namespace Witlesss.Memes
             text = text.Trim('\n');
 
             var emoji = EmojiRegex.Matches(text);
-            if (emoji.Count == 0)
+            var plain = emoji.Count == 0;
+            
+            var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
+            text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+
+            var origin = GetTextOrigin(text, top, out var caseOffset);
+            var options = GetDefaultTextOptions(origin, top);
+
+            if (plain)
             {
-                text = MakeTextFitCard(text);
-
-                Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
-
-                var origin = GetTextOrigin(text, top, out _);
-                var options = GetDefaultTextOptions(origin, top);
-
                 background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
             }
             else
             {
-                var pngs = EmojiTool.GetEmojiPngs(emoji);
-
-                text = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
-
-                Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
-
-                var origin = GetTextOrigin(text, top, out var caseOffset);
-                var options = GetDefaultTextOptions(origin, top);
-
                 var pixelate = ExtraFonts.FontIsPixelated();
                 var optionsE = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs.AsQueue(), out _);
-                var space = 0.25F * options.Font.Size * options.LineSpacing;
-                var marginY = top ? _marginY - space : _h - _marginY - textLayer.Height + space;
-                var x = _w.Gap(textLayer.Width);
-                var y = marginY - caseOffset;
-                var point = new Point(x.RoundInt(), y.RoundInt());
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
+                var point = GetFunnyOrigin(textLayer.Size, options, top, caseOffset);
                 background.Mutate(ctx => ctx.DrawImage(textLayer, point));
             }
 
+            Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
         }
-
-        private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
         private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
 

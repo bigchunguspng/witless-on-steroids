@@ -134,7 +134,14 @@ namespace Witlesss.Memes
         {
             var options = GetTextOptions(type, text, out var offset, out var fontOffset, out var caseOffset);
             var emoji = EmojiRegex.Matches(text);
-            if (emoji.Count > 0)
+            if (emoji.Count == 0)
+            {
+                var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
+                var textToRender = lineBreak == -1 ? text : text[..lineBreak];
+
+                image.Mutate(x => x.DrawText(_textOptions, options, textToRender, brush: _heisenberg, pen: null));
+            }
+            else
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
                 var optionsE = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
@@ -143,13 +150,6 @@ namespace Witlesss.Memes
                 var y = offset - textLayer.Height / 2F + caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());
                 image.Mutate(ctx => ctx.DrawImage(textLayer, point));
-            }
-            else
-            {
-                var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
-                var textToRender = lineBreak == -1 ? text : text[..lineBreak];
-
-                image.Mutate(x => x.DrawText(_textOptions, options, textToRender, brush: _heisenberg, pen: null));
             }
         }
 

@@ -119,6 +119,8 @@ public partial class MemeGenerator
         FallbackFontFamilies = ExtraFonts.FallbackFamilies
     };
 
+    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+
     private float GetLineSpacing() => ExtraFonts.GetLineSpacing();
 
     private PointF GetTextOrigin(string text, bool top, out float caseOffset)
@@ -126,5 +128,14 @@ public partial class MemeGenerator
         caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
         var marginY = top ? _marginY : _h - _marginY;
         return new PointF(_w / 2F, marginY + _fontOffset - caseOffset);
+    }
+
+    private Point GetFunnyOrigin(Size size, RichTextOptions options, bool top, float caseOffset)
+    {
+        var space = 0.25F * options.Font.Size * options.LineSpacing;
+        var marginY = top ? _marginY - space : _h - _marginY - size.Height + space;
+        var x = _w.Gap(size.Width);
+        var y = marginY - caseOffset;
+        return new Point(x.RoundInt(), y.RoundInt());
     }
 }

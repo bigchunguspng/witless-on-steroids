@@ -113,54 +113,31 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
     private Image DrawText(string text)
     {
         var emoji = EmojiRegex.Matches(text);
-        return emoji.Count == 0 ? DrawTextSimple(text) : DrawTextFunny(text, emoji);
-    }
+        var plain = emoji.Count == 0;
 
-    private Image DrawTextSimple(string text)
-    {
-        text = MakeTextFitCard(text);
+        var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
+        text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+
         AdjustTextOffset(text);
 
+        var image = new Image<Rgba32>(_w, _cardHeight, Background);
         var options = GetDefaultTextOptions();
-        var image = CreateBackgroundCard();
 
         //Debug_Line(image, options);
         //Debug_Chars(image, options, text);
 
-        image.Mutate(x => x.DrawText(options, text, TextBrush, pen: null));
+        if (plain)
+        {
+            image.Mutate(x => x.DrawText(options, text, TextBrush, pen: null));
+        }
+        else
+        {
+            var optionsE = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
+            var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
+            image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
+        }
+
         return image;
-    }
-
-    private Image DrawTextFunny(string text, MatchCollection emoji)
-    {
-        var pngs = EmojiTool.GetEmojiPngs(emoji);
-
-        text = MakeTextFitCard(EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
-        AdjustTextOffset(text);
-
-        var options = GetDefaultTextOptions();
-
-        var optionsE = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
-        var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs.AsQueue(), out _);
-
-        var image = CreateBackgroundCard();
-
-        //Debug_Line(image, options);
-        //Debug_Chars(image, options, text);
-
-        image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
-        return image;
-    }
-
-    private Image<Rgba32> CreateBackgroundCard() => new(_w, _cardHeight, Background);
-
-    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
-
-    private Point GetOriginFunny(Size textLayer)
-    {
-        var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
-        var y = _cardHeight.Gap(textLayer.Height) - _caseOffset;
-        return new Point(x.RoundInt(), y.RoundInt());
     }
 
 

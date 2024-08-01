@@ -159,14 +159,22 @@ public partial class IFunnyApp
         FallbackFontFamilies = ExtraFonts.FallbackFamilies,
     };
 
+    private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
+
     private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
         var x = UseLeftAlignment ? _marginLeft : _w / 2F;
         var y = _cardHeight / 2F + _textOffset;
-
         return new PointF(x, y);
+    }
+
+    private Point GetOriginFunny(Size textLayer)
+    {
+        var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
+        var y = _cardHeight.Gap(textLayer.Height) - _caseOffset;
+        return new Point(x.RoundInt(), y.RoundInt());
     }
 
 

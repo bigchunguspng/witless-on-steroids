@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -16,7 +15,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
         // OPTIONS
 
         public static CustomColorOption CustomColorOption;
-        public static bool CropEdges, WrapText;
+        public static bool Minimalist, WrapText;
         public static float MinFontSize = 10;
 
         // SIZE
@@ -25,15 +24,10 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
         private int _frameMargin, _frameWidth;
 
-        private int TextWidth => (fullW + imageW) / 2;
-
         private int imageW, imageH, fullW, fullH, marginTop;
         private double _ratio;
 
-        private Point _picOrigin;
-
-        public Point Location => _picOrigin;
-        public Size ImageSize => new(imageW, imageH);
+        private Point _imageOrigin;
 
         // DATA
 
@@ -76,7 +70,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             var full_size = FFMpegXD.GetPictureSize(frameAsFile);//.FitSize(720);
 
             return new F_Combine(request.SourcePath, frameAsFile)
-                .D300(request.GetCRF(), ImageSize, Location, full_size)
+                .D300(request.GetCRF(), _sourceSizeAdjusted, _imageOrigin, full_size)
                 .OutputAs(request.TargetPath);
         }
 
@@ -86,6 +80,8 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             imageH = _sourceSizeAdjusted.Height;
 
             _ratio = _sourceSizeAdjusted.AspectRatio();
+
+            if (_ratio > 3) Minimalist = true;
 
             SetUpFonts();
             SetColor();
@@ -107,10 +103,11 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             var space = Math.Max(imageH / 30F, 4);
             var lineHeight = FontSize * GetLineSpacing();
             var textHeight = _textHeight + 0.5F * lineHeight;
-            fullH = (imageH + textHeight + 4 * space).RoundInt().ToEven();
-            fullW = (fullH * _ratio).RoundInt().ToEven();
+            var n = Minimalist ? 2 : 4;
+            fullH = (imageH + textHeight + n * space).RoundInt().ToEven();
+            fullW = Minimalist ? imageW : (fullH * _ratio).RoundInt().ToEven();
 
-            marginTop = (2 * space).RoundInt();
+            marginTop = Minimalist ? 0 : (2 * space).RoundInt();
 
             var size = new Size(fullW, fullH).FitSize(new Size(1280, 720));
             if (size.Width != fullW)
@@ -127,7 +124,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
                 ResizeFont(FontSize * k);
             }
 
-            _picOrigin = new Point((fullW - imageW) / 2, marginTop);
+            _imageOrigin = Minimalist ? Point.Empty : new Point((fullW - imageW) / 2, marginTop);
 
             _frameMargin = imageW + imageH > 800 ? 5 : 3;
             _frameWidth  = imageW + imageH > 800 ? 3 : 2;
@@ -158,14 +155,14 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
                 background.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
             }
 
-            background.DrawFrame(new Rectangle(_picOrigin, _sourceSizeAdjusted), _frameWidth, _frameMargin, FrameColor);
+            background.DrawFrame(new Rectangle(_imageOrigin, _sourceSizeAdjusted), _frameWidth, _frameMargin, FrameColor);
 
             return background;
         }
 
         private void InsertImage(Image background, Image image)
         {
-            background.Mutate(x => x.DrawImage(image, _picOrigin));
+            background.Mutate(x => x.DrawImage(image, _imageOrigin));
 
             var size = FitSize(background.Size, 1280);
             if (size != background.Size)

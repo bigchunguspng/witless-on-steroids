@@ -45,7 +45,7 @@ public partial class DynamicDemotivatorDrawer
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
         var lineHeight = FontSize * ExtraFonts.GetRelativeSize() * GetLineSpacing();
-        var textWidthLimit = 1.1F * imageW;
+        var textWidthLimit = (Minimalist ? 0.8F : 1.1F) * imageW;
 
         var k = 1F;
         var lineCount = 1;
@@ -70,7 +70,7 @@ public partial class DynamicDemotivatorDrawer
             else // le "most cases" branch
             {
                 var textWidth = textChunks.Sum(x => x.Width);
-                if (textWidth * 2F < imageW)
+                if (textWidth * 2F < imageW && !Minimalist)
                 {
                     k = 2;
                     return text; // Make it bigger!
@@ -92,10 +92,11 @@ public partial class DynamicDemotivatorDrawer
                 if (textWidth * k > textWidthLimit) // find the best line count
                 {
                     var minRatio = GetMinTextRatio(textWidth);
+                    var side = (imageW + 2 * imageH) / 3;
                     while (true)
                     {
                         var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                        var targetRatio = Math.Min(minRatio, textWidthLimit / (imageH * Math.Min(lineCount, 10) / 10F));
+                        var targetRatio = Math.Min(minRatio, textWidthLimit / (side * Math.Min(lineCount, 10) / 10F));
                         if (textRatio < targetRatio) break;
 
                         lineCount++;

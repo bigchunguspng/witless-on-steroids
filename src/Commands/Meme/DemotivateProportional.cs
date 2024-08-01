@@ -30,8 +30,8 @@ namespace Witlesss.Commands.Meme
             DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request);
             DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
 
-            DynamicDemotivatorDrawer.WrapText  = !CheckAndCut(Request, _nowrap);
-            DynamicDemotivatorDrawer.CropEdges =  CheckAndCut(Request, _crop);
+            DynamicDemotivatorDrawer.WrapText   = !CheckAndCut(Request, _nowrap);
+            DynamicDemotivatorDrawer.Minimalist =  CheckAndCut(Request, _small);
         }
 
         protected override string GetMemeText(string? text)
@@ -43,7 +43,7 @@ namespace Witlesss.Commands.Meme
             return capitalize ? caption.ToLetterCase(LetterCaseMode.Upper) : caption;
         }
 
-        private static readonly Regex _crop = new(@"^\/dp\S*(cp)\S*");
+        private static readonly Regex _small = new(@"^\/dp\S*(xx)\S*");
 
         // LOGIC
 

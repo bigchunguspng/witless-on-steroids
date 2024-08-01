@@ -100,7 +100,7 @@ namespace Witlesss.Commands.Editing.Core
                 var waitMessage = Bot.PingChat(Chat, Responses.PLS_WAIT[Random.Shared.Next(5)]);
 
                 var task = new DownloadVideoTask(FileID, Context).RunAsync();
-                await Bot.RunSafelyAsync(task, Chat, waitMessage);
+                await Bot.RunOrThrow(task, Chat, waitMessage);
 
                 Bot.EditMessage(Chat, waitMessage, Responses.PROCESSING.PickAny().XDDD());
 

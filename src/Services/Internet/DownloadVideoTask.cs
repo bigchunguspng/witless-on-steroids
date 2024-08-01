@@ -7,7 +7,7 @@ namespace Witlesss.Services.Internet;
 
 public class DownloadVideoTask(string id, CommandContext context)
 {
-    private readonly Stopwatch Timer = new();
+    private readonly Stopwatch Timer = new(); // todo -> sw
     
     private static readonly LimitedCache<string, string> _cache = new(32);
 
@@ -21,23 +21,21 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
-        var directory = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
+        var directory = Path.Combine(Paths.Dir_Temp, DateTime.Now.Ticks.ToString());
         Directory.CreateDirectory(directory);
 
         if (_cache.Contains(id, out var path))
         {
-            var copy = Path.Combine(directory, Path.GetFileName(path));
-            File.Copy(path, copy);
-            return copy;
+            var newPath = Path.Combine(directory, Path.GetFileName(path));
+            File.Copy(path, newPath);
+            return newPath;
         }
 
         await DownloadMusicTask.UseYT_DLP(GetDownloadCommand(id), directory);
-
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
 
         var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;
         _cache.Add(id, result);
-
         return result;
     }
 }

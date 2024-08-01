@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using Witlesss.MediaTools;
 using static System.TimeSpan;
 
-#pragma warning disable CS4014
-
 namespace Witlesss.Commands.Editing
 {
-    public class Cut : Slice
+    public class Cut : AudioVideoUrlCommand
     {
         protected override async Task Execute()
         {
@@ -28,7 +26,7 @@ namespace Witlesss.Commands.Editing
 
             var result = await FFMpegXD.Cut(path, span);
 
-            Task.Run(() => Bot.DeleteMessage(Chat, waitMessage));
+            Bot.DeleteMessageAsync(Chat, waitMessage);
 
             SendResult(result, type);
             Log($"{Title} >> CUT [8K-]");

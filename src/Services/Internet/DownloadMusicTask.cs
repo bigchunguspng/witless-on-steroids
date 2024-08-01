@@ -8,8 +8,6 @@ using Witlesss.Backrooms.Helpers;
 using Witlesss.MediaTools;
 using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
-#pragma warning disable CS4014
-
 namespace Witlesss.Services.Internet;
 
 public class DownloadMusicTask(string id, bool youTube, CommandContext context, int messageToDelete)
@@ -127,11 +125,11 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         var mp3 = new F_Combine(audioFile, art).AddTrackMetadata(Artist, Title!);
         var jpg = new F_Process(art).MakeThumb(7).OutputAs($"{directory}/jpg.jpg"); // telegram preview
 
-        Task.WhenAll(mp3, jpg);
+        await Task.WhenAll(mp3, jpg);
 
         // SEND THE RESULT
 
-        Task.Run(() => Bot.DeleteMessage(context.Chat, messageToDelete));
+        Bot.DeleteMessageAsync(context.Chat, messageToDelete);
 
         await using var stream = File.OpenRead(mp3.Result);
         Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);

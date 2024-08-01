@@ -100,6 +100,11 @@ namespace Witlesss
             TrySend(task, chat, "message [+][-]", "edit");
         }
 
+        public async void DeleteMessageAsync(long chat, int id)
+        {
+            await Task.Run(() => DeleteMessage(chat, id));
+        }
+
         public void DeleteMessage(long chat, int id)
         {
             if (id <= 0) return;
@@ -131,7 +136,20 @@ namespace Witlesss
             task.Wait();
             if (task.IsFaulted) throw new Exception();
         }
-        
+
+        public async Task RunOrThrow(Task task, long chat, int message)
+        {
+            try
+            {
+                await task;
+            }
+            catch
+            {
+                EditMessageOnError(chat, message);
+                throw;
+            }
+        }
+
         public async Task RunSafelyAsync(Task task, long chat, int message)
         {
             try // todo move it to async command class: message - field

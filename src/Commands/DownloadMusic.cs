@@ -59,15 +59,7 @@ public class DownloadMusic : AsyncCommand
                 Title  = title,
             };
 
-            try
-            {
-                await task.RunAsync();
-            }
-            catch
-            {
-                Bot.EditMessageOnError(Chat, message);
-                throw;
-            }
+            await Bot.RunOrThrow(task.RunAsync(), Chat, message);
         }
         else
             Bot.SendMessage(Chat, SONG_MANUAL, preview: false);

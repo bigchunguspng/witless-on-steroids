@@ -22,7 +22,7 @@ namespace Witlesss.Services.Internet
             {
                 try
                 {
-                    path = $"{directory}/{Path.GetFileName(urls[i])}";
+                    path = Path.Combine(directory, Path.GetFileName(urls[i]));
                     client.DownloadFile(urls[i], path);
                     break;
                 }

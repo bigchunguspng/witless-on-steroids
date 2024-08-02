@@ -39,7 +39,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private string GetAudioArgs(string url, string output)
     {
-        var builder = new StringBuilder("--no-mtime --no-warnings ");
+        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         if (HighQuality)
             builder.Append("--audio-quality 0 ");
         if (!youTube && !ExtractThumb && !ArtAttached)
@@ -52,7 +52,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private string GetVideoArgs(string url)
     {
-        var builder = new StringBuilder("--no-mtime --no-warnings");
+        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         builder.Append("-f \"bv*[height<=720]\" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
@@ -81,9 +81,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
-        var taskA = UseYT_DLP(GetAudioArgs(url, output), directory);
+        var taskA = YtDlp.Use(GetAudioArgs(url, output), directory);
         var taskV = ExtractThumb
-            ? UseYT_DLP(GetVideoArgs(url), directory)
+            ? YtDlp.Use(GetVideoArgs(url), directory)
             : ArtAttached
                 ? Bot.DownloadFile(Cover!, thumbPath, context.Chat)
                 : youTube
@@ -134,10 +134,5 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         await using var stream = File.OpenRead(mp3.Result);
         Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
         Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
-    }
-
-    public static Task UseYT_DLP(string args, string directory)
-    {
-        return SystemHelpers.StartProcess("yt-dlp", args, directory, redirect: false).WaitForExitAsync();
     }
 }

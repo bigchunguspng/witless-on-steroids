@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Services.Internet;
 
@@ -13,8 +14,8 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     private string GetDownloadCommand(string url)
     {
-        var builder = new StringBuilder("--no-mtime --no-warnings -k -I 1 ");
-        builder.Append("-f \"bv*[height<=480]+ba/b[height<=480] / wv*+ba/w\" ");
+        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
+        builder.Append("-k -I 1 -f bv*[height<=480]+ba/b[height<=480]/wv*+ba/w ");
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
     }
@@ -31,7 +32,7 @@ public class DownloadVideoTask(string id, CommandContext context)
             return newPath;
         }
 
-        await DownloadMusicTask.UseYT_DLP(GetDownloadCommand(id), directory);
+        await YtDlp.Use(GetDownloadCommand(id), directory);
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
 
         var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;

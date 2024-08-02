@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Witlesss.Backrooms.Helpers;
 
@@ -23,5 +24,15 @@ public static class SystemHelpers
         };
         process.Start();
         return process;
+    }
+}
+
+public static class YtDlp
+{
+    public const string DEFAULT_ARGS = "--no-mtime --no-warnings --cookies-from-browser firefox ";
+
+    public static Task Use(string args, string directory)
+    {
+        return SystemHelpers.StartProcess("yt-dlp", args, directory, redirect: false).WaitForExitAsync();
     }
 }

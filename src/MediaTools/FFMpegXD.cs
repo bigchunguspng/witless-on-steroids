@@ -31,7 +31,7 @@ namespace Witlesss.MediaTools
         public static async Task<string> Slice(string path)
         {
             var extension = Path.GetExtension(path);
-            var video = extension == ".mp4" || extension == ".webm";
+            var video = extension is ".mp4" or ".webm";
             if (video)
             {
                 var size = GetPictureSize(path);
@@ -41,6 +41,7 @@ namespace Witlesss.MediaTools
                     path = await Scale(path, [fits.Width.ToString(), fits.Height.ToString()]);
                 }
             }
+            
             return await new F_Process(path).SliceRandom().Output("-slices", video ? ".mp4" : ".mp3");
         }
 

@@ -261,12 +261,12 @@ namespace Witlesss.MediaTools
 
         #region OTHER
 
-        public F_Action SliceRandom() => ApplyEffects(async o => await SliceRandomArgs(o));
+        public F_Action SliceRandom() => ApplyEffects(SliceRandomArgs);
 
-        private async Task SliceRandomArgs(FFMpAO o)
+        private void SliceRandomArgs(FFMpAO o)
         {
             var info = MediaInfo();
-            var soundOnly = info.audio && !info.video;
+            var soundOnly = info is { audio: true, video: false };
             var seconds = info.video ? info.v.Duration.TotalSeconds : info.a.Duration.TotalSeconds;
             var minutes = seconds / 60;
 
@@ -304,12 +304,12 @@ namespace Witlesss.MediaTools
 
             var onePiece = soundOnly || minutes <= 2 || minutes <= 5 && timecodes.Count <= 24;
             if (onePiece)    ApplyTrims(o, info, timecodes);
-            else await TrimPieceByPiece(o, info, timecodes, seconds);
+            else       TrimPieceByPiece(o, info, timecodes, seconds);
 
             if (info.video) o.FixPlayback();
         }
 
-        private async Task TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
+        private void TrimPieceByPiece(FFMpAO o, MediaInfo info, List<TrimCode> timecodes, double seconds)
         {
             var count = seconds > 300 ? (int)Math.Ceiling(seconds / 210) : 2;
             var parts = new string[count];
@@ -337,14 +337,14 @@ namespace Witlesss.MediaTools
 
                 codes[i] = ss;
                 takes[i] = window.Count;
-                parts[i] = await new F_Process(_input).ApplyEffects(ops =>
+                parts[i] = new F_Process(_input).ApplyEffects(ops =>
                 {
                     var builder = new StringBuilder("-c copy ");
                     if (index > 0)         builder.Append("-ss ").Append(Format(ss)).Append(' ');
                     if (index + 1 < count) builder.Append("-to ").Append(Format(to));
 
                     ops.WithCustomArgument(builder.ToString());
-                }).Output($"-part-{i}", Path.GetExtension(_input));
+                }).Output($"-part-{i}", Path.GetExtension(_input)).Result;
             }
 
             for (var i = 0; i < count; i++) // slice each chunk
@@ -352,10 +352,10 @@ namespace Witlesss.MediaTools
                 var take = takes[i];
                 var offset = takes.Take(i).Sum();
                 var start = codes[i];
-                parts[i] = await new F_Process(parts[i]).ApplyEffects(ops =>
+                parts[i] = new F_Process(parts[i]).ApplyEffects(ops =>
                 {
                     ApplyTrims(ops, info, timecodes, offset, take, start);
-                }).Output("-slices", Path.GetExtension(_input));
+                }).Output("-slices", Path.GetExtension(_input)).Result;
 
                 Log($"PART {i + 1} >> DONE", ConsoleColor.Yellow);
             }
@@ -368,8 +368,8 @@ namespace Witlesss.MediaTools
             sb.Append("-filter_complex \"");
             for (var i = 1; i <= count; i++)
             {
-                if (info.video) sb.Append("[").Append(i).Append(":v]");
-                if (info.audio) sb.Append("[").Append(i).Append(":a]");
+                if (info.video) sb.Append('[').Append(i).Append(":v]");
+                if (info.audio) sb.Append('[').Append(i).Append(":a]");
             }
             AppendConcatenation(sb, count, info).Append('"');
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Witlesss.Backrooms.Helpers;
 using static System.StringSplitOptions;
 
@@ -19,7 +20,7 @@ namespace Witlesss.Commands.Packing
 
         private static readonly SyncronizedDictionary<long, string> _names = new();
 
-        private List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList("https://www.4chan.org/index.php");
+        private List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList("https://www.4chan.org");
 
         // /boards
         // /boards info
@@ -29,8 +30,8 @@ namespace Witlesss.Commands.Packing
         {
             if (Command!.StartsWith("/boards"))
             {
-                if (Text?.EndsWith(" info") == true) SendSavedList(Chat, 0, 25);
-                else                                 SendBoardList(Chat, 0,  2);
+                if (Text?.EndsWith(" info") == true) SendSavedList(new ListPagination(Chat));
+                else                                 SendBoardList(new ListPagination(Chat, PerPage: 2));
 
                 return;
             }
@@ -100,8 +101,8 @@ namespace Witlesss.Commands.Packing
 
         private void RespondAndStartEating(List<Task<List<string>>> tasks)
         {
-            var less_go = tasks.Count > 60 ? "Начинаю поглощение интернета 😈" : "頂きます！😋🍽";
-            var text = string.Format(BOARD_START, tasks.Count, less_go);
+            var ikuzo = tasks.Count > 60 ? "Начинаю поглощение интернета 😈" : "頂きます！😋🍽";
+            var text = string.Format(BOARD_START, tasks.Count, ikuzo);
             if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
             var message = Bot.PingChat(Chat, text);
             Bot.RunSafelyAsync(EatBoardDiscussion(Context, tasks, Limit), Chat, message);
@@ -135,8 +136,18 @@ namespace Witlesss.Commands.Packing
         }
 
 
-        public void SendBoardList(long chat, int page, int perPage, int messageId = -1)
+        public new void HandleCallback(CallbackQuery query, string[] data)
         {
+            var pagination = query.GetPagination(data);
+
+            if (data[0] == "b") SendBoardList(pagination);
+            else                SendSavedList(pagination);
+        }
+
+        private void SendBoardList(ListPagination pagination)
+        {
+            var (chat, messageId, page, perPage) = pagination;
+
             var boards = Boards.Skip(page * perPage).Take(perPage);
             var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
                 
@@ -161,8 +172,10 @@ namespace Witlesss.Commands.Packing
             SendOrEditMessage(chat, text, messageId, buttons);
         }
 
-        public void SendSavedList(long chat, int page, int perPage, int messageId = -1)
+        private void SendSavedList(ListPagination pagination)
         {
+            var (chat, messageId, page, perPage) = pagination;
+
             var files = GetFilesInfo(Paths.Dir_Board);
             if (_files is null || _files.Length != files.Length) _files = files; // todo i think we don't need _files
 

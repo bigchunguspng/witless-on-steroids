@@ -37,7 +37,7 @@ namespace Witlesss.Commands.Packing
             GetWordsPerLineLimit();
 
             var args = Args.SplitN();
-            if (FileAttached("text/plain")) // TXT
+            if (Message.ProvidesFile("text/plain", out _document)) // TXT
             {
                 var path = UniquePath(Paths.Dir_History, _document!.FileName ?? "fuse.txt");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
@@ -45,7 +45,7 @@ namespace Witlesss.Commands.Packing
                 EatFromTxtFile(path);
                 GoodEnding();
             }
-            else if (FileAttached("application/json")) // JSON  /  ERROR >> JSON HIS GUIDE
+            else if (Message.ProvidesFile("application/json", out _document)) // JSON  /  ERROR >> JSON HIS GUIDE
             {
                 var path = UniquePath(GetHistoryFolder(), _document!.FileName ?? "fuse.json");
                 Bot.DownloadFile(_document.FileId, path, Chat).Wait();
@@ -68,7 +68,7 @@ namespace Witlesss.Commands.Packing
 
                 if (files.Length == 0)
                 {
-                    SendFusionHistory(Chat, 0, 25, messageId: -1, fail: true);
+                    SendFusionHistory(new ListPagination(Chat), fail: true);
                 }
                 else if (name == "*")
                 {
@@ -85,8 +85,8 @@ namespace Witlesss.Commands.Packing
             {
                 var arg = args[0];
 
-                if      (arg == "info") SendFuseList(Chat, 0, 25);
-                else if (arg == "his" ) SendFusionHistory(Chat, 0, 25);
+                if      (arg == "info") SendFuseList     (new ListPagination(Chat));
+                else if (arg == "his" ) SendFusionHistory(new ListPagination(Chat));
                 else
                     FuseWitlessDB(arg);
             }
@@ -94,31 +94,26 @@ namespace Witlesss.Commands.Packing
         }
 
 
-        private bool FileAttached(string type)
-        {
-            return HasDocument(Message, type) || HasDocument(Message.ReplyToMessage, type);
-        }
-
-        private bool HasDocument(Message? message, string type)
-        {
-            var b = message is not null && message.Document?.MimeType == type;
-            if (b) _document = message!.Document!;
-
-            return b;
-        }
-
         #region LISTING
 
-        public void SendFuseList(long chat, int page, int perPage, int messageId = -1, bool fail = false)
+        public void HandleCallback(CallbackQuery query, string[] data)
         {
-            var directory = Paths.Dir_Fuse;
-            SendFilesList(ExtraDBs, directory, chat, page, perPage, messageId, fail);
+            var pagination = query.GetPagination(data);
+
+            if (data[0] == "fi") SendFuseList     (pagination);
+            else                 SendFusionHistory(pagination);
         }
 
-        public void SendFusionHistory(long chat, int page, int perPage, int messageId = -1, bool fail = false)
+        private void SendFuseList(ListPagination pagination, bool fail = false)
+        {
+            var directory = Paths.Dir_Fuse;
+            SendFilesList(ExtraDBs, directory, pagination, fail);
+        }
+
+        private void SendFusionHistory(ListPagination pagination, bool fail = false)
         {
             var directory = GetHistoryFolder();
-            SendFilesList(Historic, directory, chat, page, perPage, messageId, fail);
+            SendFilesList(Historic, directory, pagination, fail);
         }
 
         private record FusionListData(string Available, string Object, string Key, string Optional);
@@ -128,15 +123,11 @@ namespace Witlesss.Commands.Packing
 
         private void SendFilesList
         (
-            FusionListData data,
-            string directory,
-            long chat,
-            int page,
-            int perPage,
-            int messageId = -1,
-            bool fail = false
+            FusionListData data, string directory, ListPagination pagination, bool fail = false
         )
         {
+            var (chat, messageId, page, perPage) = pagination;
+
             var files = GetFilesInfo(directory);
             var oneshot = files.Length < perPage;
             var empty = files.Length == 0;
@@ -196,6 +187,7 @@ namespace Witlesss.Commands.Packing
 
         #endregion
 
+
         #region FUSION
 
         private void FuseWitlessDB(string arg)
@@ -216,7 +208,7 @@ namespace Witlesss.Commands.Packing
                 FuseWithWitlessDB(new FileIO<GenerationPack>(files[0]).LoadData());
             }
             else if (argIsID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
-            else SendFuseList(Chat, 0, 25, messageId: -1, fail: true);
+            else SendFuseList(new ListPagination(Chat), fail: true);
         }
 
         private void FuseWithWitlessDB(GenerationPack source)
@@ -299,4 +291,6 @@ namespace Witlesss.Commands.Packing
             return sb.ToString();
         }
     }
+
+    public record ListPagination(long Chat, int MessageId = -1, int Page = 0, int PerPage = 25);
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Telegram.Bot.Types;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Generation;
 using Witlesss.Commands.Meme;
 using Witlesss.Commands.Packing;
@@ -121,37 +121,17 @@ public class WitlessCommandRouter : WitlessSyncCommand
         func?.Invoke().Execute(WitlessContext.From(Context, baka));
     }
 
-    public void OnCallback(CallbackQuery query) // todo take this garbage apart
+    public void OnCallback(CallbackQuery query)
     {
         if (query.Data == null || query.Message == null) return;
 
-        var data = query.Data.Split(" - ", 2);
-        if (data[0].StartsWith('b'))
-        {
-            var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
-            var chat = query.Message.Chat.Id;
-
-            if (data[0] == "b")
-                _boards.SendBoardList(chat, numbers[0], numbers[1], query.Message.MessageId);
-            else
-                _boards.SendSavedList(chat, numbers[0], numbers[1], query.Message.MessageId);
-        }
-        else if (data[0].StartsWith('f'))
-        {
-            var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
-            var chat = query.Message.Chat.Id;
-
-            if (data[0] == "fi")
-                _fuse.SendFuseList     (chat, numbers[0], numbers[1], query.Message.MessageId);
-            else
-                _fuse.SendFusionHistory(chat, numbers[0], numbers[1], query.Message.MessageId);
-        }
+        var data = query.GetData();
+        if      (data[0].StartsWith('b')) _boards.HandleCallback(query, data);
+        else if (data[0].StartsWith('f')) _fuse  .HandleCallback(query, data);
         else if (data[0] == "del")
         {
-            var message = query.Message;
-            message.From = query.From;
-
-            _delete.DoGameStep(message, data[1]);
+            query.Message.From = query.From;
+            _delete.DoGameStep(query.Message, data[1]);
         }
     }
 }

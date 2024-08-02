@@ -45,6 +45,17 @@ public static class TelegramExtensions
         return message.Animation is { FileSize: <= 320_000, Duration: <= 21 } anime ? anime : null;
     }
 
+    public static bool ProvidesFile(this Message message, string type, out Document? document)
+    {
+        document = message.GetDocument(type) ?? message.ReplyToMessage.GetDocument(type);
+        return document is not null;
+    }
+
+    public static Document? GetDocument(this Message? message, string type)
+    {
+        return message?.Document?.MimeType == type ? message.Document : null;
+    }
+
     //
 
     public static async Task<bool> SenderIsAdmin(this Message message)

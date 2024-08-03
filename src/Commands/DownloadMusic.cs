@@ -19,7 +19,7 @@ public class DownloadMusic : AsyncCommand
     // input: /song[options] URL [artist - ][title]
     protected override async Task Run()
     {
-        var arguments = ArgsWithURL();
+        var arguments = GetArgsWithURL();
 
         var cover = GetPhotoFileID(Message) ?? GetPhotoFileID(Message.ReplyToMessage);
 
@@ -65,16 +65,18 @@ public class DownloadMusic : AsyncCommand
             Bot.SendMessage(Chat, SONG_MANUAL, preview: false);
     }
 
-    private string? ArgsWithURL()
+    private string? GetArgsWithURL()
     {
-        var urlProvided = Args is not null && _url.IsMatch(Args);
-        if (urlProvided) return Args;
+        var urlMatchThis = _url.MatchOrNull(Args);
+        if (urlMatchThis is { Success: true })
+            return Args;
 
-        var text = Message.ReplyToMessage?.GetTextOrCaption();
-        if (text is null) return Args;
+        var reply = Message.ReplyToMessage?.GetTextOrCaption();
+        var urlMatchReply = _url.MatchOrNull(reply);
+        if (urlMatchReply is { Success: true })
+            return Args is null ? urlMatchReply.Value : $"{urlMatchReply.Value} {Args}";
 
-        var match = _url.Match(text);
-        return match.Success ? Args is null ? match.Value : $"{match.Value} {Args}" : Args;
+        return Args;
     }
 
     private string? GetPhotoFileID(Message? message) => message?.Photo is { } p ? p[^1].FileId : null;

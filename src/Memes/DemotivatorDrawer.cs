@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
@@ -20,7 +21,10 @@ namespace Witlesss.Memes
         public static bool SingleLine, AddLogo = true;
         public static bool BottomTextIsGenerated;
 
-        public static readonly ExtraFonts ExtraFontsA = new("d[vg]", "&"), ExtraFontsB = new("d[vg]", @"\*");
+        public static readonly ExtraFonts ExtraFontsL = new("dv", "(?![-bi*])");
+        public static readonly ExtraFonts ExtraFontsS = new("dg", "(?![-bi*])");
+        public static readonly ExtraFonts ExtraFontsA = new("dg", "&");
+        public static readonly ExtraFonts ExtraFontsB = new("dg", @"\*");
 
         private static readonly List<Logo> Logos = [];
 
@@ -167,7 +171,13 @@ namespace Witlesss.Memes
         )
         {
             var lower = type is TextType.Lower;
-            var extraFonts = lower ? ExtraFontsB : ExtraFontsA;
+            var extraFonts = type switch
+            {
+                TextType.Lower => ExtraFontsB,
+                TextType.Upper => ExtraFontsA,
+                TextType.Large => ExtraFontsL,
+                _              => ExtraFontsS,
+            };
             var family = extraFonts.GetFontFamily(lower ? "co" : "ro");
             var style = extraFonts.GetFontStyle(family);
 

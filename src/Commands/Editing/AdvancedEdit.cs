@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -10,8 +11,8 @@ namespace Witlesss.Commands.Editing;
 
 public class AdvancedEdit : FileEditingCommand
 {
-    // /ffxd [options]      [extension]
-    // /ffv  [videofilters] [extension]
+    // /peg  [options]      [extension]
+    // /pegv [videofilters] [extension]
     protected override async Task Execute()
     {
         if (Args is null)
@@ -22,11 +23,17 @@ public class AdvancedEdit : FileEditingCommand
         {
             var args = Args.Split(' ');
 
-            var vf = Command!.Contains('v');
-            var af = Command .Contains('a');
+            var vf = OptionUsed('v');
+            var af = OptionUsed('a');
+            var fc = OptionUsed('c');
 
             var options = string.Join(' ', args.SkipLast(1));
-            if (vf || af) options = $"-{(vf ? 'v' : 'a')}f \"{options}\"";
+            if (vf || af || fc)
+            {
+                var filter = fc ? "filter_complex" : $"{(vf ? 'v' : 'a')}f";
+                options = $"-{filter} \"{options}\"";
+            }
+
             var extension = args[^1];
 
             foreach (var c in extension)
@@ -36,9 +43,14 @@ public class AdvancedEdit : FileEditingCommand
 
             var (path, _) = await Bot.Download(FileID, Chat);
 
-            SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: Command.Contains('g'));
+            SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: OptionUsed('g'));
             Log($"{Title} >> EDIT [{options}] [{extension}]");
         }
+    }
+
+    private bool OptionUsed(char option)
+    {
+        return Command!.Length > 4 && Command.AsSpan()[4..].Contains(option);
     }
 
     protected override void SendManual()
@@ -74,14 +86,14 @@ public class AdvancedEdit : FileEditingCommand
         else if (extension == "mp4")      Bot.SendVideo    (Chat, New_InputOnlineFile());
         else                              Bot.SendDocument (Chat, New_InputOnlineFile());
 
-        bool SendAsGIF() => _gif.IsMatch(extension) || extension == "mp4" && g;
+        bool SendAsGIF()      => _gif.IsMatch(extension) && g;
         bool SendAsDocument() => _pic.IsMatch(extension) && g;
 
         InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
     }
 
     private static readonly Regex _pic = new(@"^(png|jpe?g)$");
-    private static readonly Regex _gif = new(@"^(gif|webm)$");
+    private static readonly Regex _gif = new(@"^(gif|webm|mp4)$");
 
     private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
     private readonly string[] DUDE =

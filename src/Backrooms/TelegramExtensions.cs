@@ -56,6 +56,12 @@ public static class TelegramExtensions
         return message?.Document?.MimeType == type ? message.Document : null;
     }
 
+    public static MessageEntity? GetURL(this Message message)
+    {
+        return message.       Entities?.FirstOrDefault(x => x.Type == MessageEntityType.Url)
+            ?? message.CaptionEntities?.FirstOrDefault(x => x.Type == MessageEntityType.Url);
+    }
+
     //
 
     public static async Task<bool> SenderIsAdmin(this Message message)

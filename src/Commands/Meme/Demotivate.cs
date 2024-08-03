@@ -31,10 +31,23 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DemotivatorDrawer.ExtraFontsA.CheckAndCut(Request);
-            DemotivatorDrawer.ExtraFontsB.CheckAndCut(Request);
-            DemotivatorDrawer.SingleLine =  OptionsParsing.Check(Request, _one_line);
-            DemotivatorDrawer.AddLogo    = !OptionsParsing.Check(Request, _no_logo);
+            DemotivatorDrawer.SingleLine = OptionsParsing.CheckAndCut(Request, _one_line);
+
+            if (_mode == Wide)
+            {
+                DemotivatorDrawer.ExtraFontsL.CheckAndCut(Request);
+            }
+            else if (DemotivatorDrawer.SingleLine)
+            {
+                DemotivatorDrawer.ExtraFontsS.CheckAndCut(Request);
+            }
+            else
+            {
+                DemotivatorDrawer.ExtraFontsA.CheckAndCut(Request);
+                DemotivatorDrawer.ExtraFontsB.CheckAndCut(Request);
+            }
+
+            DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -71,8 +84,8 @@ namespace Witlesss.Commands.Meme
             return new TextPair(a, b);
         }
 
-        private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*nn\S* *");
-        private static readonly Regex _one_line = new(@"^\/d[vg]\S*ll\S* *");
+        private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*(nn)\S* *");
+        private static readonly Regex _one_line = new(@"^\/d[vg]\S*(ll)\S* *");
 
         public Demotivate SetMode(DgMode mode)
         {

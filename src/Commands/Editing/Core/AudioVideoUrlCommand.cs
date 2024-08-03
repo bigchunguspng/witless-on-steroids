@@ -13,13 +13,13 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
 
     private bool GetVideoURL(Message m)
     {
-        if (m.Text is null) return false;
+        var text = m.GetTextOrCaption();
+        if (text is null) return false;
 
-        var s = m.Text.Split();
-        if                      (s[0].StartsWith("http")) FileID = s[0];
-        else if (s.Length > 1 && s[1].StartsWith("http")) FileID = s[1];
-        else return false;
+        var entity = m.GetURL();
+        if (entity is null) return false;
 
+        FileID = text.Substring(entity.Offset, entity.Length);
         return true;
     }
 }

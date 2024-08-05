@@ -35,7 +35,7 @@ namespace Witlesss.Commands.Meme
 
         protected override int GetMemeText(string? text) => 0;
 
-        private static readonly Regex _depth = new(@"^\/nuke\S*?(\d{1,3})("")\S*");
+        private static readonly Regex _depth = new(@"^\/nuke\S*?(\d)("")\S*");
 
         protected override bool CropVideoNotes  => false;
         protected override bool ConvertStickers => false;

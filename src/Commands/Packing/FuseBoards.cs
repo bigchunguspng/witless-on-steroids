@@ -127,7 +127,7 @@ namespace Witlesss.Commands.Packing
 
             Directory.CreateDirectory(Paths.Dir_Board);
             var path = Path.Combine(Paths.Dir_Board, $"{_names[chat]} - {DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}.json");
-            new FileIO<List<string>>(path).SaveData(lines);
+            JsonIO.SaveData(lines, path);
             _names.Remove(chat);
 
             var report = FUSION_SUCCESS_REPORT(baka, size, title);

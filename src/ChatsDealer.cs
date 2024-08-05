@@ -6,13 +6,11 @@ namespace Witlesss;
 
 public static class ChatsDealer
 {
-    private static readonly FileIO<ChatList> ChatsIO;
     public  static readonly ChatList SussyBakas;
 
     static ChatsDealer()
     {
-        ChatsIO = new FileIO<ChatList>(Paths.File_Chats);
-        SussyBakas = ChatsIO.LoadData();
+        SussyBakas = JsonIO.LoadData<ChatList>(Paths.File_Chats);
     }
 
     public static bool WitlessExist(long chat, [NotNullWhen(true)] out Witless? baka)
@@ -27,7 +25,7 @@ public static class ChatsDealer
 
     public static void SaveChatList()
     {
-        ChatsIO.SaveData(SussyBakas);
+        JsonIO.SaveData(SussyBakas, Paths.File_Chats);
         Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
     }
 

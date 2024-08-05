@@ -205,7 +205,7 @@ namespace Witlesss.Commands.Packing
             }
             else if (GetFiles(Paths.Dir_Fuse, $"{arg}.json") is { Length: > 0 } files)
             {
-                FuseWithWitlessDB(new FileIO<GenerationPack>(files[0]).LoadData());
+                FuseWithWitlessDB(JsonIO.LoadData<GenerationPack>(files[0]));
             }
             else if (argIsID) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
             else SendFuseList(new ListPagination(Chat), fail: true);
@@ -227,23 +227,23 @@ namespace Witlesss.Commands.Packing
 
             var name = Path.GetFileNameWithoutExtension(path);
             var save = UniquePath(directory, $"{name}.json");
-            new FileIO<List<string>>(save).SaveData(lines.ToList());
+            JsonIO.SaveData(lines.ToList(), save);
         }
 
         protected void EatFromJsonFile(string path)
         {
-            var lines = new FileIO<List<string>>(path).LoadData();
+            var lines = JsonIO.LoadData<List<string>>(path);
             EatAllLines(lines);
         }
 
         private          void EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit, out _);
-        protected static void EatAllLines(IEnumerable<string> lines, Witless baka, int limit, out int eated)
+        protected static void EatAllLines(IEnumerable<string> lines, Witless baka, int limit, out int eaten)
         {
-            eated = 0;
+            eaten = 0;
             foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
                 if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
-                if (baka.Eat(line)) eated++;
+                if (baka.Eat(line)) eaten++;
             }
         }
 

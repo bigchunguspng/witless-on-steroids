@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Packing
             for (int i = 1; i <= _latest; i++) cp.Eat(_url + i, out _);
 
             var path = Move.UniqueExtraDBsPath(_name);
-            new FileIO<GenerationPack>(path).SaveData(cp.DB);
+            JsonIO.SaveData(cp.DB, path);
 
             Bot.SendMessage(Chat, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
             Log($"{Title} >> THE ONE PIECE IS REAL!!!");

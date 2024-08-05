@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands
@@ -14,7 +13,7 @@ namespace Witlesss.Commands
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
             var path = Path.Combine(Paths.Dir_Temp, name);
             Directory.CreateDirectory(Paths.Dir_Temp);
-            new FileIO<Message>(path).SaveData(mess);
+            JsonIO.SaveData(mess, path, indent: true);
             using var stream = File.OpenRead(path);
             Bot.SendDocument(Chat, new InputOnlineFile(stream, name.Replace("--", "-")));
         }

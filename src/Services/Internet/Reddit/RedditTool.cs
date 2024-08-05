@@ -22,7 +22,7 @@ namespace Witlesss.Services.Internet.Reddit
 
         private RedditTool()
         {
-            Excluded = ExcludedIO.LoadData();
+            Excluded = JsonIO.LoadData<Queue<string>>(Paths.File_RedditPosts);
             ConsoleUI.LoggedIntoReddit = true;
         }
 
@@ -32,8 +32,7 @@ namespace Witlesss.Services.Internet.Reddit
         private const int EXCLUDED_CAPACITY = 256;
 
         /// <summary> Posts that were sent to users recently, so they are no longer relevant. </summary>
-        private readonly        Queue<string>  Excluded;
-        private readonly FileIO<Queue<string>> ExcludedIO = new(Paths.File_RedditPosts);
+        private readonly Queue<string> Excluded;
 
         private void Exclude(string fullname)
         {
@@ -43,7 +42,7 @@ namespace Witlesss.Services.Internet.Reddit
 
         public void SaveExcluded()
         {
-            ExcludedIO.SaveData(Excluded);
+            JsonIO.SaveData(Excluded, Paths.File_RedditPosts);
         }
 
         #endregion

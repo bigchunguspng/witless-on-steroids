@@ -20,8 +20,6 @@ namespace Witlesss
             Speech = speech;
             Pics = pics;
             Quality = jpg;
-
-            FileIO = new FileIO<GenerationPack>(GetPath());
         }
 
         public static Witless GetAverageBaka(CommandContext context)
@@ -44,9 +42,7 @@ namespace Witlesss
 
         // FILE
 
-        private FileIO<GenerationPack> FileIO { get; }
-
-        public string FilePath => FileIO.Path;
+        public string FilePath => GetPath();
 
         public string GetPath() => Path.Combine(Paths.Dir_Chat, $"{Paths.Prefix_Pack}-{Chat}.json");
 
@@ -153,14 +149,14 @@ namespace Witlesss
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-            FileIO.SaveData(Baka.DB);
+            JsonIO.SaveData(Baka.DB, GetPath());
             ResetState();
             Log($"DIC SAVED << {Chat}", ConsoleColor.Green);
         }
 
         private void Load()
         {
-            Baka = new Copypaster { DB = FileIO.LoadData() };
+            Baka = new Copypaster { DB = JsonIO.LoadData<GenerationPack>(GetPath()) };
             ResetState();
             Log($"DIC LOADED >> {Chat}", ConsoleColor.Magenta);
         }

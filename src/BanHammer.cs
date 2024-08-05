@@ -7,15 +7,13 @@ namespace Witlesss
 {
     public class BanHammer
     {
-        private readonly FileIO<Dictionary<long, DateTime>>   BansIO;
-        private readonly        Dictionary<long, DateTime>    BannedChats;
-        private readonly        Dictionary<long, ChatBotUsage> SussyChats;
+        private readonly Dictionary<long, DateTime>    BannedChats;
+        private readonly Dictionary<long, ChatBotUsage> SussyChats;
 
 
         public BanHammer()
         {
-            BansIO =  new FileIO<Dictionary<long, DateTime>>(Paths.File_Bans);
-            BannedChats = BansIO.LoadData();
+            BannedChats = JsonIO.LoadData<Dictionary<long, DateTime>>(Paths.File_Bans);
             SussyChats = new Dictionary<long, ChatBotUsage>();
         }
 
@@ -37,7 +35,7 @@ namespace Witlesss
             SaveBanList();
             Log($"{chat} >> {(s ? "UNBANNED" : "WAS NOT BANNED")}", ConsoleColor.Magenta);
         }
-        private void SaveBanList() => BansIO.SaveData(BannedChats);
+        private void SaveBanList() => JsonIO.SaveData(BannedChats, Paths.File_Bans);
 
         private bool  ChatIsBaka(long chat) => ChatsDealer.SussyBakas.ContainsKey(chat);
         private Witless BakaFrom(long chat) => ChatsDealer.SussyBakas[chat];

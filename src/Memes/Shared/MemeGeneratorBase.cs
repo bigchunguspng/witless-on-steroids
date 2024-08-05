@@ -1,7 +1,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Memes.Shared; // ReSharper disable InconsistentNaming

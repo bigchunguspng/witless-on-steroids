@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.PixelFormats;
 using Witlesss.Backrooms.Helpers;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using SpectreColor = Spectre.Console.Color;
 
 namespace Witlesss.Memes.Shared;

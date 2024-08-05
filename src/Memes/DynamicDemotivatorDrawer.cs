@@ -4,7 +4,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 

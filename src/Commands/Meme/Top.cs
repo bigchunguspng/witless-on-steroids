@@ -1,24 +1,25 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class AddCaption : MakeMemeCore<string>, ImageProcessor
+    public class Top : MakeMemeCore<string>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/top(\S*) *", RegexOptions.IgnoreCase);
 
-        protected override string Log_PHOTO(int x) => $"WHENTHE [{(x == 1 ? "=" : x)}]";
-        protected override string Log_STICK(int x) => $"WHENTHE [{(x == 1 ? "$" : x)}] STICKER";
+        protected override string Log_PHOTO(int x) => $"TOP [{(x == 1 ? "=" : x)}]";
+        protected override string Log_STICK(int x) => $"TOP [{(x == 1 ? "$" : x)}] STICKER";
 
-        protected override string Log_VIDEO { get; } = "WHENTHE [%] VID";
+        protected override string Log_VIDEO => "TOP [%] VID";
         protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize:F2}.mp4";
 
-        protected override string Command { get; } = "/top";
-        protected override string Suffix  { get; } = "-Top";
+        protected override string Command => "/top";
+        protected override string Suffix  => "-Top";
 
         protected override string? DefaultOptions => Baka.Options?.Top;
 

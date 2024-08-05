@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
@@ -8,7 +7,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Backrooms.Helpers;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 using Random = System.Random;

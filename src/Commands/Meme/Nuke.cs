@@ -2,23 +2,24 @@
 using System.Threading.Tasks;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme
 {
-    public class MemeDeepFryer : MakeMemeCore<int>, ImageProcessor
+    public class Nuke : MakeMemeCore<int>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"NUKED [{(x == 1 ? "*" : x)}]";
         protected override string Log_STICK(int x) => $"NUKED [{(x == 1 ? "*" : x)}] STICKER";
 
-        protected override string Log_VIDEO { get; } = "NUKED [*] VID";
-        protected override string VideoName { get; } = "nuke_fap_club.mp4";
+        protected override string Log_VIDEO => "NUKED [*] VID";
+        protected override string VideoName => "nuke_fap_club.mp4";
 
-        protected override string Command { get; } = "/nuke";
-        protected override string Suffix  { get; } = "-Nuked"; // Needs more nuking!
+        protected override string Command => "/nuke";
+        protected override string Suffix  => "-Nuked"; // Needs more nuking!
 
         protected override string? DefaultOptions => Baka.Options?.Nuke;
 

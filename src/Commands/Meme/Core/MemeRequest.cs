@@ -1,4 +1,4 @@
-﻿namespace Witlesss.Commands.Meme;
+﻿namespace Witlesss.Commands.Meme.Core;
 
 public class MemeRequest(string dummy, bool empty, string command)
 {

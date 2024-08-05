@@ -7,7 +7,7 @@ using Witlesss.Backrooms.SerialQueue;
 using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 
-namespace Witlesss.Commands.Meme // ReSharper disable InconsistentNaming
+namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 {
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static
     {

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
@@ -16,7 +17,7 @@ namespace Witlesss.Commands.Meme
         protected override string Log_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
         protected override string Log_STICK(int x) => $"DEMOTIVATOR [{(x == 1 ? "#" : x)}] STICKER";
 
-        protected override string Log_VIDEO { get; } = "DEMOTIVATOR [^] VID";
+        protected override string Log_VIDEO => "DEMOTIVATOR [^] VID";
         protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
 
         protected override string Command => _mode == Square ? "/dg" : "/dv";

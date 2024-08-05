@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.MediaTools;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
@@ -18,11 +19,11 @@ namespace Witlesss.Commands.Meme
         protected override string Log_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
         protected override string Log_STICK(int x) => $"MEME [{(x == 1 ? "M" : x)}] STICKER";
 
-        protected override string Log_VIDEO { get; } = "MEME [M] VID";
-        protected override string VideoName { get; } = "piece_fap_club-meme.mp4";
+        protected override string Log_VIDEO => "MEME [M] VID";
+        protected override string VideoName => "piece_fap_club-meme.mp4";
 
-        protected override string Command { get; } = "/meme";
-        protected override string Suffix  { get; } = "-Meme";
+        protected override string Command => "/meme";
+        protected override string Suffix  => "-Meme";
 
         protected override string? DefaultOptions => Baka.Options?.Meme;
 

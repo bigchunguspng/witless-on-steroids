@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 
 namespace Witlesss.Backrooms.Helpers;
 

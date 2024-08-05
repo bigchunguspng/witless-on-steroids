@@ -41,18 +41,18 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             { MemeType.Dg,   () => new Demotivate() },
             { MemeType.Meme, () => new MakeMeme() },
-            { MemeType.Top,  () => new AddCaption() },
-            { MemeType.Dp,   () => new DemotivateProportional() },
-            { MemeType.Nuke, () => new MemeDeepFryer() }
+            { MemeType.Top,  () => new Top() },
+            { MemeType.Dp,   () => new Demotivate3000() },
+            { MemeType.Nuke, () => new Nuke() }
         };
 
         _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
-            .Register("dp"      , () => new DemotivateProportional())
+            .Register("dp"      , () => new Demotivate3000())
             .Register("dg"      , () => new Demotivate().SetMode(DgMode.Square))
             .Register("dv"      , () => new Demotivate().SetMode(DgMode.Wide))
             .Register("meme"    , () => new MakeMeme())
-            .Register("top"     , () => new AddCaption())
-            .Register("nuke"    , () => new MemeDeepFryer())
+            .Register("top"     , () => new Top())
+            .Register("nuke"    , () => new Nuke())
             .Register("a"       , () => _generate)
             .Register("zz"      , () => _generateB)
             .Register("b"       , () => _bouhourt)

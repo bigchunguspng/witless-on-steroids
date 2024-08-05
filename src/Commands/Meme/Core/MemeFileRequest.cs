@@ -2,12 +2,12 @@
 using SixLabors.ImageSharp.PixelFormats;
 using Witlesss.MediaTools;
 
-namespace Witlesss.Commands.Meme;
+namespace Witlesss.Commands.Meme.Core;
 
-public class MemeFileRequest(string path, string oututEnding, int quality)
+public class MemeFileRequest(string path, string outputEnding, int quality)
 {
     public string SourcePath { get; set; } = path;
-    public string TargetPath { get; } = path.ReplaceExtension(oututEnding);
+    public string TargetPath { get; } = path.ReplaceExtension(outputEnding);
 
     public int Quality { get; set; } = quality; // 0 - 100
 
@@ -18,7 +18,7 @@ public class MemeFileRequest(string path, string oututEnding, int quality)
     public bool IsSticker => Type == MemeSourceType.Sticker;
 
     /// <summary>
-    /// Constant Rate Factor (for MP4 compresion).<br/>
+    /// Constant Rate Factor (for MP4 compression).<br/>
     /// 0 - lossless, 23 - default, 51 - worst possible.
     /// </summary>
     public int GetCRF()

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SixLabors.Fonts;
 using Witlesss.Backrooms.Helpers;
-using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using FontSpecificData = (float size, float offset, float caps);
 
 namespace Witlesss.Memes.Shared

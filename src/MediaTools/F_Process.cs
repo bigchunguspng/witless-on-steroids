@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using static Witlesss.MediaTools.FFMpegXD;

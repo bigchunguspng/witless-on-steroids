@@ -1,24 +1,25 @@
 ﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class DemotivateProportional : MakeMemeCore<string>, ImageProcessor
+    public class Demotivate3000 : MakeMemeCore<string>, ImageProcessor
     {
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*) *", RegexOptions.IgnoreCase);
 
         protected override string Log_PHOTO(int x) => $"DEMOTIVATOR-B [{(x == 1 ? "_" : x)}]";
         protected override string Log_STICK(int x) => $"DEMOTIVATOR-B [{(x == 1 ? "#" : x)}] STICKER";
 
-        protected override string Log_VIDEO { get; } = "DEMOTIVATOR-B [^] VID";
-        protected override string VideoName { get; } = "piece_fap_club-dp.mp4";
+        protected override string Log_VIDEO => "DEMOTIVATOR-B [^] VID";
+        protected override string VideoName => "piece_fap_club-dp.mp4";
         
-        protected override string Command { get; } = "/dp";
-        protected override string Suffix  { get; } = "-Dp";
+        protected override string Command => "/dp";
+        protected override string Suffix  => "-Dp";
 
         protected override string? DefaultOptions => Baka.Options?.Dp;
 

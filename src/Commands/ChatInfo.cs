@@ -39,7 +39,7 @@ namespace Witlesss.Commands
             if (Baka.Options is not null)
             {
                 var anyOptions = false;
-                var optionsBuilder = new StringBuilder("\n\n<u>Опции</u>:");
+                var optionsBuilder = new StringBuilder("\n\n<u>Авто-опции</u>:");
 
                 if (IsNotNull(Baka.Options.Meme)) AppendOptions("meme", Baka.Options.Meme[5..]);
                 if (IsNotNull(Baka.Options.Top )) AppendOptions("top",  Baka.Options.Top [4..]);

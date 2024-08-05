@@ -152,12 +152,12 @@ namespace Witlesss.Commands.Packing
             var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
                 
             var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN BOARDS</b> 🍀🍀🍀");
-            sb.Append(" [PAGE: ").Append(page + 1).Append("/").Append(last + 1).Append("]");
+            sb.Append(" [PAGE: ").Append(page + 1).Append('/').Append(last + 1).Append(']');
             foreach (var group in boards)
             {
                 sb.Append($"\n\n<b><u>{group.Title}</u></b>");
                 if (group.IsNSFW) sb.Append(" (NSFW🥵)");
-                sb.Append("\n");
+                sb.Append('\n');
                 foreach (var board in group.Boards)
                 {
                     sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");

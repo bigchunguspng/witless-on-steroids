@@ -1,5 +1,6 @@
 ﻿using System;
 using Telegram.Bot.Types;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Editing;
 using Witlesss.Commands.Messaging;
 using Witlesss.Commands.Packing;
@@ -10,6 +11,7 @@ namespace Witlesss.Commands.Routing
     {
         private readonly Tell _tell = new();
         private readonly Spam _spam = new();
+        private readonly Help _help = new();
         private readonly SendMessage _mail = new();
         private readonly Piece _piece = new();
         private readonly DebugMessage _debug = new();
@@ -47,11 +49,12 @@ namespace Witlesss.Commands.Routing
                 .Register("link"   , () => _link)
                 .Register("piece"  , () => _piece)
                 .Register("debug"  , () => _debug)
-                .Register("chat_id", () => _mail.WithText(Context.Chat.ToString()))
+                .Register("chat_id", () => _mail.WithText($"<code>{Context.Chat}</code>"))
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
                 .Register("spam"   , () => _spam)
                 .Register("tell"   , () => _tell)
+                .Register("help"   , () => _help)
                 .Build();
         }
 
@@ -95,6 +98,11 @@ namespace Witlesss.Commands.Routing
 
         public override void OnCallback(CallbackQuery query)
         {
+            if (query.Data == null || query.Message == null) return;
+
+            var data = query.GetData();
+            if (data[0] == "man") _help.HandleCallback(query, data);
+
             _witlessRouter.OnCallback(query);
         }
     }

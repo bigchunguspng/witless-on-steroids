@@ -139,8 +139,8 @@ namespace Witlesss.Commands.Packing
                 sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
             }
             sb.Append("<b>").Append(data.Available).Append(":</b>");
-            if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append("/").Append(lastPage + 1).Append("]");
-            sb.Append("\n").Append(JsonList(files, page, perPage));
+            if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
+            sb.Append('\n').Append(JsonList(files, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.FilePath));
             if (!empty) sb.Append(data.Optional);
             if (!oneshot) sb.Append(USE_ARROWS);

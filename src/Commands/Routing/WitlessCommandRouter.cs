@@ -123,14 +123,12 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
     public void OnCallback(CallbackQuery query)
     {
-        if (query.Data == null || query.Message == null) return;
-
         var data = query.GetData();
         if      (data[0].StartsWith('b')) _boards.HandleCallback(query, data);
         else if (data[0].StartsWith('f')) _fuse  .HandleCallback(query, data);
         else if (data[0] == "del")
         {
-            query.Message.From = query.From;
+            query.Message!.From = query.From;
             _delete.DoGameStep(query.Message, data[1]);
         }
     }

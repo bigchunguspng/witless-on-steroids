@@ -19,12 +19,14 @@ namespace Witlesss
         }
         public void SendMessage(long chat, string text, bool preview)
         {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableWebPagePreview: !preview);
+            var task = Client.SendTextMessageAsync
+                (chat, text, ParseMode.Html, disableWebPagePreview: !preview);
             TrySend(task, chat, "message");
         }
-        public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline)
+        public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, replyMarkup: inline);
+            var task = Client.SendTextMessageAsync
+                (chat, text, ParseMode.Html, disableWebPagePreview: !preview, replyMarkup: inline);
             TrySend(task, chat, "message [+][-]");
         }
 
@@ -33,6 +35,8 @@ namespace Witlesss
             var task = Client.CopyMessageAsync(chat, fromChat, messageId);
             TrySend(task, chat, "message", "copy");
         }
+
+        // SEND MEDIA
 
         public void SendPhoto(long chat, InputOnlineFile photo)
         {
@@ -89,14 +93,18 @@ namespace Witlesss
             TrySend(task, chat, "album");
         }
 
+        // EDIT / DELETE
+
         public void EditMessage(long chat, int id, string text)
         {
-            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
+            var task = Client.EditMessageTextAsync
+                (chat, id, text, ParseMode.Html);
             TrySend(task, chat, "message", "edit");
         }
-        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline)
+        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
-            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html, replyMarkup: inline);
+            var task = Client.EditMessageTextAsync
+                (chat, id, text, ParseMode.Html, disableWebPagePreview: !preview, replyMarkup: inline);
             TrySend(task, chat, "message [+][-]", "edit");
         }
 
@@ -111,6 +119,7 @@ namespace Witlesss
             var task = Client.DeleteMessageAsync(chat, id);
             TrySend(task, chat, "message", "delete");
         }
+
 
         private static void TrySend(Task task, long chat, string what, string action = "send", int patience = 5)
         {

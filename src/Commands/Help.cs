@@ -1,6 +1,11 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using System;
+using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Commands;
 
@@ -8,48 +13,89 @@ public class Help : SyncCommand
 {
     // /help == /man
     // /help        -> main menu
-    // /help A B    -> page exist ? navigated to page : ^
-    // /help 0 3    -> ^
-    // man - 0 3    -> ^ (edit)
+    // /help ffmpeg -> page exist ? navigated to page : ^
+    // /help 44     -> ^
+    // /help_44     -> ^
+    // man - 44     -> ^ (ffmpeg)
     protected override void Run()
     {
-        var txt =
-            """
-            <u><b>MAN...</b></u> 📖📝
-
-            ✋ Техподдержка на связи 💯
-            """;
-        SendOrEditMessage(Chat, txt, -1, GetPaginationKeyboard());
-    }
-
-    protected static InlineKeyboardMarkup GetPaginationKeyboard()
-    {
-        var a1 = InlineKeyboardButton.WithCallbackData("Общее",   "1");
-        var a2 = InlineKeyboardButton.WithCallbackData("Текст",   "2");
-        var a3 = InlineKeyboardButton.WithCallbackData("Мемы",    "3");
-        var a4 = InlineKeyboardButton.WithCallbackData("Монтаж",  "4");
-        var a5 = InlineKeyboardButton.WithCallbackData("Reddit",  "5");
-        var a6 = InlineKeyboardButton.WithCallbackData("YouTube", "6");
-
-        var r1 = new List<InlineKeyboardButton> { a1, a4 };
-        var r2 = new List<InlineKeyboardButton> { a2, a5 };
-        var r3 = new List<InlineKeyboardButton> { a3, a6 };
-
-        var buttons = new List<List<InlineKeyboardButton>> { r1, r2, r3 };
-        return new InlineKeyboardMarkup(buttons);
-
-        //string CallbackData(int p) => $"{key} - {p} {perPage}";
-    }
-
-    protected static void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup? buttons)
-    {
-        var b = messageId < 0;
-        if (b) Bot.SendMessage(chat, text, buttons);
-        else Bot.EditMessage(chat, messageId, text, buttons);
+        var args = Args ?? (Command!.Contains('_') ? Command.Substring(Command.IndexOf('_') + 1) : "");
+        Bot.SendMessage(Chat, GetManualPage(args, out var address), GetKeyboard(address));
     }
 
     public void HandleCallback(CallbackQuery query, string[] data)
     {
-        throw new System.NotImplementedException();
+        var text = GetManualPage(data[1], out var address);
+        Bot.EditMessage(query.GetChatId(), query.GetMessageId(), text, GetKeyboard(address));
+    }
+
+    // number path / search query
+    private string GetManualPage(string path, out string address)
+    {
+        var options = new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive };
+        var file = Directory.GetFiles(Paths.Dir_Manual,   $"{path} *").FirstOrDefault()
+                ?? Directory.GetFiles(Paths.Dir_Manual, $"* *{path}*").FirstOrDefault()
+                ?? Directory.GetFiles(Paths.Dir_Manual,         "0 *", options).First();
+
+        var name = Path.GetFileNameWithoutExtension(file);
+
+        address = name.Remove(name.IndexOf(' '));
+
+        return BuildHeader(address).Append(File.ReadAllText(file)).ToString();
+    }
+
+    private StringBuilder BuildHeader(string address)
+    {
+        var paths = address
+            .Select((_, i) => address[..i].Length == 0 ? "0" : address[..i]).ToList();
+        if (address != "0") paths.Add(address);
+
+        var sb = new StringBuilder("📖 <u><b>");
+        for (var i = 0; i < paths.Count; i++)
+        {
+            var file = Directory.GetFiles(Paths.Dir_Manual, $"{paths[i]} *").First();
+            var name = Path.GetFileNameWithoutExtension(file);
+            sb.Append(name.AsSpan(name.IndexOf(' ') + 1));
+            if (i < paths.Count - 1) sb.Append(" » ");
+        }
+
+        return sb.Append("</b></u> #<code>").Append(address).Append("</code>\n\n");
+    }
+
+    private static InlineKeyboardMarkup GetKeyboard(string address)
+    {
+        var isMainPage = address == "0";
+        var files = Directory.GetFiles(Paths.Dir_Manual, isMainPage ? "? *" : $"{address}? *");
+        var buttons = files
+            .Select(Path.GetFileNameWithoutExtension)
+            .OfType<string>()
+            .Where(x => !(isMainPage && x.StartsWith('0')))
+            .Select(x =>
+            {
+                var split = x.Split(' ', 2);
+                return InlineKeyboardButton.WithCallbackData(split[1], CallbackData(split[0]));
+            })
+            .ToList();
+
+        var keyboard = new List<List<InlineKeyboardButton>>();
+        var odd = buttons.Count.IsOdd();
+        if (odd) keyboard.Add([buttons[0]]);
+
+        var rows = buttons.Count / 2;
+        var start = odd ? 1 : 0;
+        for (var i = 0; i < rows; i++)
+        {
+            keyboard.Add([buttons[start + i], buttons[start + i + rows]]);
+        }
+
+        if (!isMainPage)
+        {
+            var data = address.Length == 1 ? "0" : address[..^1];
+            var button = InlineKeyboardButton.WithCallbackData("Назад", CallbackData(data));
+            keyboard.Add([button]);
+        }
+        return new InlineKeyboardMarkup(keyboard);
+
+        string CallbackData(string code) => $"man - {code}";
     }
 }

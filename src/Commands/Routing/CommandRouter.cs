@@ -59,6 +59,7 @@ namespace Witlesss.Commands.Routing
                 .Register("spam"   , () => _spam)
                 .Register("tell"   , () => _tell)
                 .Register("help"   , () => _help)
+                .Register("man"    , () => _help)
                 .Build();
         }
 

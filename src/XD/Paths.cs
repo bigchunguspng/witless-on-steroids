@@ -35,6 +35,7 @@ namespace Witlesss.XD;
         ASCII/
         Emoji/
         Fonts/
+        Manual/
         Water/
         art.jpg
         voice.ogg
@@ -60,16 +61,17 @@ public static class Paths
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
 
-    public static string File_Chats { get; } = Path.Combine(Dir_Chat, "chats.json");
-    public static string File_Bans  { get; } = Path.Combine(Dir_Chat,  "bans.json");
-
     public static string File_DefaultTexts { get; } = Path.Combine(Dir_DB,  "default.json");
     public static string File_Baguette     { get; } = Path.Combine(Dir_DB, "baguette.json");
 
-    public static string Dir_ASCII { get; } = Path.Combine(Dir_Static, "ASCII");
-    public static string Dir_Emoji { get; } = Path.Combine(Dir_Static, "Emoji");
-    public static string Dir_Fonts { get; } = Path.Combine(Dir_Static, "Fonts");
-    public static string Dir_Water { get; } = Path.Combine(Dir_Static, "Water");
+    public static string File_Chats { get; } = Path.Combine(Dir_Chat, "chats.json");
+    public static string File_Bans  { get; } = Path.Combine(Dir_Chat,  "bans.json");
+
+    public static string Dir_ASCII  { get; } = Path.Combine(Dir_Static, "ASCII");
+    public static string Dir_Emoji  { get; } = Path.Combine(Dir_Static, "Emoji");
+    public static string Dir_Fonts  { get; } = Path.Combine(Dir_Static, "Fonts");
+    public static string Dir_Manual { get; } = Path.Combine(Dir_Static, "Manual");
+    public static string Dir_Water  { get; } = Path.Combine(Dir_Static, "Water");
 
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");

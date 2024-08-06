@@ -12,6 +12,9 @@ public static class CallbackDataParsing
     public static ListPagination GetPagination(this CallbackQuery query, string[] data)
     {
         var numbers = data[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
-        return new ListPagination(query.Message!.Chat.Id, query.Message.MessageId, numbers[0], numbers[1]);
+        return new ListPagination(query.GetChatId(), query.GetMessageId(), numbers[0], numbers[1]);
     }
+
+    public static long   GetChatId(this CallbackQuery query) => query.Message!.Chat.Id;
+    public static int GetMessageId(this CallbackQuery query) => query.Message!.MessageId;
 }

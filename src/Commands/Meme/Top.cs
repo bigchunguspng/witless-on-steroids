@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Top;
 
 
-        protected override Task Run() => RunInternal("Подписанки", OPTIONS + "/op_top"); // 🔥🔥🔥✍️
+        protected override Task Run() => RunInternal("подписанки", "top"); // 🔥🔥🔥✍️
 
         protected override void ParseOptions()
         {
@@ -38,11 +38,11 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.BlurImage        =  CheckAndCut(Request, _blur   );
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
             IFunnyApp.BackInBlack      =  CheckAndCut(Request, _blackBG);
+            IFunnyApp.ForceCenter      =  CheckAndCut(Request, _colorPC);
             IFunnyApp.PickColor        =  CheckAndCut(Request, _colorPP);
-            IFunnyApp.ForceCenter      =  CheckAndCut(Request, _colorFC);
             IFunnyApp.UseLeftAlignment =  CheckAndCut(Request, _left   );
-            IFunnyApp.ThinCard         =  CheckAndCut(Request, _thin   );
             IFunnyApp.UltraThinCard    =  CheckAndCut(Request, _thinner);
+            IFunnyApp.ThinCard         =  CheckAndCut(Request, _thin   );
         }
 
         protected override string GetMemeText(string? text)
@@ -59,10 +59,10 @@ namespace Witlesss.Commands.Meme
 
         private static readonly Regex _left    = new(@"^\/top\S*(la)\S*");
         private static readonly Regex _blur    = new(@"^\/top\S*(blur)\S*");
-        private static readonly Regex _thin    = new(@"^\/top\S*m(m)\S*");
-        private static readonly Regex _thinner = new(@"^\/top\S*(mm)\S*");
+        private static readonly Regex _thinner = new(@"^\/top\S*mm(!)\S*");
+        private static readonly Regex _thin    = new(@"^\/top\S*(mm)\S*");
         private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*");
-        private static readonly Regex _colorFC = new(@"^\/top\S*(fc)\S*");
+        private static readonly Regex _colorPC = new(@"^\/top\S*pp(!)\S*");
         private static readonly Regex _blackBG = new(@"^\/top\S*(ob)\S*");
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*");
         private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*");

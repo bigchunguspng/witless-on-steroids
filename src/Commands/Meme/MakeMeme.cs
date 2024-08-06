@@ -28,7 +28,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Meme;
 
 
-        protected override Task Run() => RunInternal("Мемы", OPTIONS + "/op_meme");
+        protected override Task Run() => RunInternal("мемы", "meme");
 
         protected override bool ResultsAreRandom => MemeGenerator.ColorText;
 

@@ -223,33 +223,28 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Comic Sans MS.
-        /// </summary>
-        internal static string DEMOTIVATOR_LOWER_FONT {
-            get {
-                return ResourceManager.GetString("DEMOTIVATOR_LOWER_FONT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Times New Roman.
-        /// </summary>
-        internal static string DEMOTIVATOR_UPPER_FONT {
-            get {
-                return ResourceManager.GetString("DEMOTIVATOR_UPPER_FONT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;Опции:&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/dg&lt;/code&gt;:
         ///
-        ///&lt;code&gt;rg&lt;/code&gt; - шрифт &lt;i&gt;Roboto&lt;/i&gt;
-        ///&lt;code&gt;im&lt;/code&gt; - шрифт &lt;i&gt;Impact&lt;/i&gt;
-        ///&lt;code&gt;tm&lt;/code&gt; - шрифт &lt;i&gt;Times New Roman&lt;/i&gt;
-        ///&lt;code&gt;bb&lt;/code&gt; - жирный шрифт
-        ///&lt;code&gt;up&lt;/code&gt; - верхний регистр
-        ///&lt;code&gt;cp&lt;/code&gt; - обрезать лишние края
-        ///&lt;code&gt;#color#&lt;/code&gt; - цвет текста и рамки.
+        ///&lt;code&gt;ll&lt;/code&gt; - в одну строку, без нижнего текста
+        ///&lt;code&gt;nn&lt;/code&gt; - без вотермарок
+        ///&lt;code&gt;__&amp;&lt;/code&gt; - шрифт верхнего текста
+        ///&lt;code&gt;__*&lt;/code&gt; - шрифт нижнего текста
+        ///
+        ///&lt;b&gt;Шрифты&lt;/b&gt;: /fonts.
+        /// </summary>
+        internal static string DG_OPTIONS {
+            get {
+                return ResourceManager.GetString("DG_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/dp&lt;/code&gt;:
+        ///
+        ///&lt;code&gt;#color#&lt;/code&gt; - цвет текста и рамки
+        ///&lt;code&gt;xx&lt;/code&gt; - без верхушки и боковушек
+        ///
+        ///&lt;b&gt;Шрифты&lt;/b&gt;: /fonts.
         /// </summary>
         internal static string DP_OPTIONS {
             get {
@@ -296,6 +291,28 @@ namespace Witlesss.XD {
         internal static string FF_ERROR_REPORT {
             get {
                 return ResourceManager.GetString("FF_ERROR_REPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📝 &lt;u&gt;&lt;b&gt;Шрифты:&lt;/b&gt;&lt;/u&gt;
+        ///
+        ///&lt;u&gt;&lt;b&gt;Обычные:&lt;/b&gt;&lt;/u&gt;
+        ///&lt;code&gt;im&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Impact&lt;/i&gt;&lt;/b&gt;
+        ///&lt;code&gt;rg&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Roboto&lt;/i&gt;&lt;/b&gt; ✨
+        ///&lt;code&gt;sg&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Segoe UI&lt;/i&gt;&lt;/b&gt; ✨
+        ///&lt;code&gt;ro&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Times New Roman&lt;/i&gt;&lt;/b&gt; ✨
+        ///&lt;code&gt;co&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Comic Sans MS&lt;/i&gt;&lt;/b&gt; ✨
+        ///&lt;code&gt;bb&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Bender&lt;/i&gt;&lt;/b&gt; ✨
+        ///&lt;code&gt;ft&lt;/code&gt; - &lt;b&gt;&lt;i&gt;Futura XBlkCn BT&lt;/i&gt;&lt;/b&gt;
+        ///
+        ///&lt;u&gt;&lt;b&gt;Тематические:&lt;/b&gt;&lt;/u&gt;
+        ///&lt;code&gt;ru&lt;/code&gt; - &lt;b&gt;&lt;i&gt;CyrillicOld&lt;/i&gt;&lt;/b&gt; - летописный
+        ///&lt;code&gt;go&lt;/code&gt; - &lt;b&gt;&lt;i&gt;CyrillicGoth&lt;/i&gt;&lt;/b&gt; - готиче [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FONTS_CHEAT_SHEET {
+            get {
+                return ResourceManager.GetString("FONTS_CHEAT_SHEET", resourceCulture);
             }
         }
         
@@ -433,14 +450,12 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;&lt;b&gt;{0} я делаю из&lt;/b&gt;&lt;/u&gt;:
+        ///   Looks up a localized string similar to Я могу делать &lt;u&gt;&lt;b&gt;{0}&lt;/b&gt;&lt;/u&gt; из картинок 📸 и видео 🎬
         ///
-        ///• картинок 📸, стикеров 🎟
-        ///• видео 🎬, гифок 📺
-        ///• видео-стикеров 🎥
-        ///• видео-сообщений 📹
+        ///Прикрепи файл к команде, либо ответь командой на файл.
         ///
-        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
+        ///📖 Справка: /man_3
+        ///ℹ️ Список опций: /op_{1}.
         /// </summary>
         internal static string MEME_MANUAL {
             get {
@@ -451,21 +466,15 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/meme&lt;/code&gt;:
         ///
-        ///&lt;code&gt;i&lt;/code&gt; - курсив
-        ///&lt;code&gt;c&lt;/code&gt; - цветной текст 🎨
-        ///&lt;code&gt;u&lt;/code&gt; - верхний регистр
         ///&lt;code&gt;t&lt;/code&gt; - только верхний текст
         ///&lt;code&gt;d&lt;/code&gt; - только нижний текст
         ///&lt;code&gt;s&lt;/code&gt; - добавлять нижний текст (к своему)
-        ///&lt;code&gt;w&lt;/code&gt; - не разрывать текст
-        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта
+        ///&lt;code&gt;100%&lt;/code&gt; - непрозрачность тени (0-100)
+        ///&lt;code&gt;10&quot;&lt;/code&gt; - стартовый размер шрифта (1-999)
         ///&lt;code&gt;#color#&lt;/code&gt; - цвет фона (стикеры)
+        ///&lt;code&gt;cc&lt;/code&gt; - текст случайных цветов 🎨
         ///
-        ///&lt;b&gt;Шрифты&lt;/b&gt;:
-        ///
-        ///&lt;code&gt;im&lt;/code&gt; - &lt;i&gt;Impact&lt;/i&gt;
-        ///&lt;code&gt;rg&lt;/code&gt; - &lt;i&gt;Roboto&lt;/i&gt;
-        ///&lt;code&gt;cb&lt;/code&gt; - &lt;i&gt;Creative Bl [rest of string was truncated]&quot;;.
+        ///&lt;b&gt;Шрифты&lt;/b&gt;: /fonts.
         /// </summary>
         internal static string MEME_OPTIONS {
             get {
@@ -496,6 +505,17 @@ namespace Witlesss.XD {
         internal static string MOVING_DONE {
             get {
                 return ResourceManager.GetString("MOVING_DONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/nuke&lt;/code&gt;:
+        ///
+        ///&lt;code&gt;N&quot;&lt;/code&gt; - кол-во проходов (1-9 📸, 1-3 🎬).
+        /// </summary>
+        internal static string NUKE_OPTIONS {
+            get {
+                return ResourceManager.GetString("NUKE_OPTIONS", resourceCulture);
             }
         }
         
@@ -827,17 +847,17 @@ namespace Witlesss.XD {
         /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/top&lt;/code&gt;:
         ///
-        ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
         ///&lt;code&gt;mm&lt;/code&gt; - тонкая плашка
-        ///&lt;code&gt;mmm&lt;/code&gt; - супер тонкая плашка
-        ///&lt;code&gt;ww&lt;/code&gt; - не разрывать текст
+        ///&lt;code&gt;mm!&lt;/code&gt; - супер тонкая плашка
+        ///&lt;code&gt;la&lt;/code&gt; - текст по левому краю
         ///&lt;code&gt;pp&lt;/code&gt; - авто-выбор цвета (края)
-        ///&lt;code&gt;ppfc&lt;/code&gt; - авто-выбор цвета (центр)
-        ///&lt;code&gt;bb&lt;/code&gt; - чёрный фон (для стикеров)
-        ///&lt;code&gt;80%&lt;/code&gt; - обрезать 20% сверху
-        ///&lt;code&gt;-80%&lt;/code&gt; - обрезать по 10% сверху и снизу
-        ///&lt;code&gt;ms128&lt;/code&gt; - минимальный размер шрифта
-        ///&lt;code&gt;ss128&lt;/code&gt; - стартовый размер шрифта [rest of string was truncated]&quot;;.
+        ///&lt;code&gt;pp!&lt;/code&gt; - авто-выбор цвета (центр)
+        ///&lt;code&gt;ob&lt;/code&gt; - чёрный задник (для стикеров)
+        ///&lt;code&gt;20%&lt;/code&gt; - обрезать 20% сверху (0-100)
+        ///&lt;code&gt;-20%&lt;/code&gt; - обрезать по 10% сверху и снизу
+        ///&lt;code&gt;10&quot;&lt;/code&gt; - стартовый размер шрифта (1-999)
+        ///&lt;code&gt;min5&quot;&lt;/code&gt; - мин. размер шрифта (1-999)
+        ///&lt;code&gt;blur&lt;/code&gt; - [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TOP_OPTIONS {
             get {

@@ -13,6 +13,7 @@ public static class MathExtensions
     public static byte ClampByte(this int x) => (byte)Math.Clamp(x, 0, 255);
     public static byte Clamp100(this byte x) => Math.Min(x, (byte)100);
     public static byte Clamp(this byte x, byte max) => Math.Min(x, max);
+    public static int  Clamp(this int  x, int  max) => Math.Min(x, max);
 
     public static int ToEven(this int x) => x & ~1;
 

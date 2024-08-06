@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Dp;
 
 
-        protected override Task Run() => RunInternal("Демотиваторы👌", DP_OPTIONS);
+        protected override Task Run() => RunInternal("демотиваторы👌", "dp");
 
         protected override void ParseOptions()
         {

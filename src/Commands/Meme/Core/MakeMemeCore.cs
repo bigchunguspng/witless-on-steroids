@@ -35,12 +35,11 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Context = context;
         }
 
-        protected async Task RunInternal(string type, string? options = null)
+        protected async Task RunInternal(string type, string? options)
         {
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
-            var message = string.Format(MEME_MANUAL, type);
-            Bot.SendMessage(Chat, options is null ? message : $"{message}\n\n{options}");
+            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, type, options));
         }
 
         private async Task<bool> ProcessMessage(Message? message)

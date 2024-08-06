@@ -24,18 +24,18 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Nuke;
 
 
-        protected override Task Run() => RunInternal("Ядерные отходы");
+        protected override Task Run() => RunInternal("ядерные отходы", "nuke");
 
         protected override bool ResultsAreRandom => true;
 
         protected override void ParseOptions()
         {
-            DukeNukem.Depth = OptionsParsing.GetInt(Request, _depth, 1).Clamp(1, 9);
+            DukeNukem.Depth = OptionsParsing.GetInt(Request, _depth, 1);
         }
 
         protected override int GetMemeText(string? text) => 0;
 
-        private static readonly Regex _depth = new(@"^\/nuke\S*?(\d)("")\S*");
+        private static readonly Regex _depth = new(@"^\/nuke\S*?([1-9])("")\S*");
 
         protected override bool CropVideoNotes  => false;
         protected override bool ConvertStickers => false;
@@ -73,7 +73,7 @@ namespace Witlesss.Commands.Meme
 
             var path = request.SourcePath;
 
-            for (var i = 0; i < Depth; i++)
+            for (var i = 0; i < Depth.Clamp(3); i++)
             {
                 path = await new F_Process(path)
                     .DeepFryVideo(size.Ok(), request.GetCRF())

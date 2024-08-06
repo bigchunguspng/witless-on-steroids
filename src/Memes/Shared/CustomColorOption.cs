@@ -11,7 +11,7 @@ namespace Witlesss.Memes.Shared;
 public struct CustomColorOption
 {
     private static readonly List<string> _colorNames;
-    private static readonly Regex _color = new(@"#([a-z0-9_]+)#"), _hex = new(@"^[0-9a-f]{6}$");
+    private static readonly Regex _color = new(@"#([a-z0-9_]+)#"), _hex = new(@"^[0-9a-f]{3}$|^[0-9a-f]{6}$");
 
     public bool IsActive;
     public Rgba32 Color;

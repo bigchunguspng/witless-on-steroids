@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -148,7 +147,7 @@ namespace Witlesss.Memes
 
         private static void LoadLogos(string path)
         {
-            var files = GetFilesInfo(path, SearchOption.AllDirectories);
+            var files = GetFilesInfo(path, recursive: true);
             foreach (var file in files)
             {
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');

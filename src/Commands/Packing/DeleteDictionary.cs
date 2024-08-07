@@ -18,7 +18,7 @@ namespace Witlesss.Commands.Packing
         private void DeleteTheDictionary()
         {
             var name = ValidFileName(Title.Replace(' ', '-'));
-            var result = MoveDictionary( name);
+            var result = MoveDictionary(name, Chat);
 
             if (result == "*") result = "*👊 никак*";
 
@@ -37,7 +37,7 @@ namespace Witlesss.Commands.Packing
 
         private readonly Dictionary<long, List<List<InlineKeyboardButton>>> _games = new();
 
-        private List<List<InlineKeyboardButton>> _game;
+        private List<List<InlineKeyboardButton>> _game = null!;
 
         private InlineKeyboardMarkup GetMinigameKeyboard()
         {
@@ -74,15 +74,17 @@ namespace Witlesss.Commands.Packing
         {
             Context = WitlessContext.FromMessage(message, ChatsDealer.SussyBakas[message.Chat.Id]);
 
-            var s = data.Split(" - ");
-            var n = s[1].Split(':');
-            var o = s[0];
-            var x = int.Parse(n[0]);
-            var y = int.Parse(n[1]);
+            var split = data.Split(" - ");
+            var num = split[1].Split(':');
+            var obj = split[0];
+            var x = int.Parse(num[0]);
+            var y = int.Parse(num[1]);
 
             _game = _games[Chat];
 
-            if (o == _tractor)
+            // GAME LOGIC
+
+            if (obj == _tractor)
             {
                 var move = Random.Shared.Next(2) == 0 ? 1 : -1;
                 var vert = Random.Shared.Next(2) == 0;
@@ -102,11 +104,13 @@ namespace Witlesss.Commands.Packing
                 else
                     return;
             }
-            else if (o == _tnt) Explode(x, y);
+            else if (obj == _tnt) Explode(x, y);
             else
                 return;
 
             Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
+
+            // EXPLOSION ANIMATION (IF ANY)
 
             var objects = _game.SelectMany(row => row.ToArray()).Select(cell => cell.Text).ToArray();
 
@@ -121,6 +125,8 @@ namespace Witlesss.Commands.Packing
                 }
                 Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
             }
+
+            // MATCH RESULTS
 
             var noHousing = !objects.Contains(_house);
             var noTractor = !objects.Contains(_tractor);

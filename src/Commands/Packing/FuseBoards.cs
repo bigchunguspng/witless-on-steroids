@@ -182,9 +182,9 @@ namespace Witlesss.Commands.Packing
             var single = _files.Length <= perPage;
 
             var lastPage = (int)Math.Ceiling(_files.Length / (double)perPage) - 1;
-            var sb = new StringBuilder("<b>Доступные доскиъ/трѣды:</b> ");
+            var sb = new StringBuilder("🍀 <b>Архив досокъ/трѣдовъ:</b> ");
             if (!single) sb.Append("📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
-            sb.Append('\n').Append(JsonList(_files, page, perPage));
+            sb.Append("\n\n").AppendJoin('\n', JsonList(_files, page, perPage));
             if (!single) sb.Append(USE_ARROWS);
 
             var text = sb.ToString();

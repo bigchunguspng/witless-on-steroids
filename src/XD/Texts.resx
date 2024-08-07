@@ -99,9 +99,9 @@
 /fuse@piece_fap_bot [имя]</value>
     </data>
     <data name="MOVING_DONE" xml:space="preserve">
-        <value>Словарь очищен! *пусто*
+        <value>♻️ Словарь очищен! *пусто* {0}
 
-Копия словаря сохранена как &lt;b&gt;"{0}"&lt;/b&gt;</value>
+Содержимое {1} как &lt;b&gt;"{2}"&lt;/b&gt;</value>
     </data>
     <data name="A_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, начиная с него (если оно есть в словаре)</value>
@@ -586,5 +586,15 @@ s   - save and exit
         <value>&lt;b&gt;Опции команды&lt;/b&gt; &lt;code&gt;/nuke&lt;/code&gt;:
 
 &lt;code&gt;N"&lt;/code&gt; - кол-во проходов (1-9 📸, 1-3 🎬)</value>
+    </data>
+    <data name="PUB_EX_NOT_FOUND" xml:space="preserve">
+        <value>{0} не могу найти словаря с таким названием((
+
+Пропишите &lt;code&gt;/fuse ! info&lt;/code&gt;, чтобы посмотреть весь список.</value>
+    </data>
+    <data name="PUB_EX_DONE" xml:space="preserve">
+        <value>Словарь &lt;b&gt;"{0}"&lt;/b&gt; опубликован!
+
+Проверить: &lt;code&gt;/fuse info&lt;/code&gt;</value>
     </data>
 </root>

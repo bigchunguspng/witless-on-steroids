@@ -164,17 +164,20 @@ namespace Witlesss.XD
         public static bool FileEmptyOrNotExist (string path) => !File.Exists(path) || SizeInBytes(path) == 0;
         public static void CreateFilePath      (string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 
-        public static FileInfo[] GetFilesInfo  (string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        public static FileInfo[] GetFilesInfo  (string path, bool recursive = false)
         {
             Directory.CreateDirectory(path);
-            return new  DirectoryInfo(path).GetFiles("*", searchOption);
+            return new  DirectoryInfo(path).GetFiles("*", recursive.ToSearchOption());
         }
         
-        public static string[]   GetFiles      (string path, string pattern = "*")
+        public static string[]   GetFiles      (string path, string pattern = "*", bool recursive = false)
         {
             Directory.CreateDirectory(path);
-            return Directory.GetFiles(path, pattern);
+            return Directory.GetFiles(path, pattern, recursive.ToSearchOption());
         }
+
+        private static SearchOption ToSearchOption(this bool recursive) 
+            => recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
         public static void ClearTempFiles()
         {
@@ -183,7 +186,8 @@ namespace Witlesss.XD
 
             if (Directory.Exists(Paths.Dir_Fuse))
             {
-                foreach (var file in Directory.GetFiles(Paths.Dir_Fuse, "del*.json")) File.Delete(file);
+                var files = Directory.GetFiles(Paths.Dir_Fuse, "del*.json", SearchOption.AllDirectories);
+                foreach (var file in files) File.Delete(file);
             }
         }
 

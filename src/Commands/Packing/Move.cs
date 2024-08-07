@@ -1,42 +1,71 @@
 ﻿using System;
 using System.IO;
+using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
 namespace Witlesss.Commands.Packing
 {
+    //      /move [name]    PRIVATE
+    //      /pub  [name]    PUBLIC
+    //      /_  ! [name]    PRIVATE -> PUBLIC
+
     public class Move : SettingsCommand
     {
+        private bool _public = true;
+
+        public Move WithMode(ExportMode mode)
+        {
+            _public = mode == ExportMode.Public;
+            return this;
+        }
+
         protected override void RunAuthorized()
         {
-            var name = ValidFileName((Args ?? Title).Replace(' ', '-'), '-');
-
-            var result = MoveDictionary(name);
-            if (result == "*")
+            var args = Args.SplitN(2);
+            var pubX = args.Length > 1 && args[0] == "!";
+            if (pubX) // publish a pack from private storage
             {
-                Bot.SendMessage(Chat, "Сударь, ваш словарь пуст 🫥");
+                var name = args[^1];
+                var file = Path.Combine(Paths.Dir_Fuse, Chat.ToString(), $"{name}.json");
+                if (File.Exists(file) == false)
+                {
+                    Bot.SendMessage(Chat, string.Format(PUB_EX_NOT_FOUND, Responses.FAIL_EMOJI_1.PickAny()));
+                    return;
+                }
+
+                File.Move(file, UniquePath(Paths.Dir_Fuse, $"{name}.json"));
+                Bot.SendMessage(Chat, string.Format(PUB_EX_DONE, name));
             }
             else
             {
-                Baka.Baka.DB = new GenerationPack();
-                Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
-                Baka.Save();
+                var name = ValidFileName((Args ?? Title).Replace(' ', '_'), '-');
 
-                Bot.SendMessage(Chat, string.Format(MOVING_DONE, result));
+                var newName = MoveDictionary(name, _public ? 0 : Chat);
+                if (newName == "*")
+                {
+                    Bot.SendMessage(Chat, "Ваш словарь пуст, сударь 🫥");
+                }
+                else
+                {
+                    Baka.Baka.DB = new GenerationPack();
+                    Log($"{Title} >> DIC CLEARED!", ConsoleColor.Magenta);
+                    Baka.Save();
+
+                    var result = _public ? "опубликовано" : "сохранено";
+                    Bot.SendMessage(Chat, string.Format(MOVING_DONE, Responses.EMPTY_EMOJI.PickAny(), result, newName));
+                }
             }
-
-            // todo explain manual in result report
-            // else Bot.SendMessage(Chat, MOVE_MANUAL);
         }
 
-        protected string MoveDictionary(string name)
+        protected string MoveDictionary(string name, long chat)
         {
             Baka.SaveChanges();
 
             if (Baka.Baka.DB.Vocabulary.Count == 0)
                 return "*"; // can't be in file name
 
-            var path = UniqueExtraDBsPath(name);
+            var path = GetUniqueExtraPackPath(name, chat);
 
             File.Copy(Baka.FilePath, path);
 
@@ -45,9 +74,15 @@ namespace Witlesss.Commands.Packing
             return result;
         }
 
-        public static string UniqueExtraDBsPath(string name)
+        public static string GetUniqueExtraPackPath(string name, long chat = 0)
         {
-            return UniquePath(Paths.Dir_Fuse, $"{name}.json", name is "info" or "his");
+            var path = chat == 0 ? Paths.Dir_Fuse : Path.Combine(Paths.Dir_Fuse, chat.ToString());
+            return UniquePath(path, $"{name}.json", name is "info" or "his");
         }
+    }
+
+    public enum ExportMode
+    {
+        Public, Private
     }
 }

@@ -20,6 +20,8 @@ namespace Witlesss.XD;
             bans.json
             pack--1001699898486.json [dic]
         Fuse/
+            -1001541923355/
+                private_3D_AF.json [dic]
             any-name-possible.json [dic]
         History/
             -1001541923355/

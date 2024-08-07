@@ -498,9 +498,9 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Словарь очищен! *пусто*
+        ///   Looks up a localized string similar to ♻️ Словарь очищен! *пусто* {0}
         ///
-        ///Копия словаря сохранена как &lt;b&gt;&quot;{0}&quot;&lt;/b&gt;.
+        ///Содержимое {1} как &lt;b&gt;&quot;{2}&quot;&lt;/b&gt;.
         /// </summary>
         internal static string MOVING_DONE {
             get {
@@ -555,6 +555,28 @@ namespace Witlesss.XD {
         internal static string PIECE_RESPONSE {
             get {
                 return ResourceManager.GetString("PIECE_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Словарь &lt;b&gt;&quot;{0}&quot;&lt;/b&gt; опубликован!
+        ///
+        ///Проверить: &lt;code&gt;/fuse info&lt;/code&gt;.
+        /// </summary>
+        internal static string PUB_EX_DONE {
+            get {
+                return ResourceManager.GetString("PUB_EX_DONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} не могу найти словаря с таким названием((
+        ///
+        ///Пропишите &lt;code&gt;/fuse ! info&lt;/code&gt;, чтобы посмотреть весь список..
+        /// </summary>
+        internal static string PUB_EX_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("PUB_EX_NOT_FOUND", resourceCulture);
             }
         }
         

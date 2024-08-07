@@ -34,8 +34,9 @@ public static class Responses
         "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
         "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉", "🎻"
     ];
-    public static readonly string[] FAIL_EMOJI_1 = ["🤣", "😎", "🥰", "☺️", "💀", "😤", "😩"];
+    public static readonly string[] FAIL_EMOJI_1 = ["😭", "😎", "😙", "☺️", "💀", "😤", "😩"];
     public static readonly string[] FAIL_EMOJI_2 = ["😵", "😧", "😨", "😰", "😮", "😲", "💀"];
+    public static readonly string[] EMPTY_EMOJI  = ["🐾", "💀", "👻", "💯", "💢", "🗑", "🍽"];
 
     public static T PickAny<T>(this T[] options) => options[Random.Shared.Next(options.Length)];
 

@@ -58,8 +58,10 @@ public class Help : SyncCommand
             sb.Append(name.AsSpan(name.IndexOf(' ') + 1));
             if (i < paths.Count - 1) sb.Append(" » ");
         }
+        sb.Append("</b></u>");
 
-        return sb.Append("</b></u> #<code>").Append(address).Append("</code>\n\n");
+        if (address != "0") sb.Append(" #<code>").Append(address).Append("</code>");
+        return sb.Append("\n\n");
     }
 
     private static InlineKeyboardMarkup GetKeyboard(string address)

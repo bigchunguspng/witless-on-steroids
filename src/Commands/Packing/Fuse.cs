@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Packing
     // HIS      - json          /fuse [xd.json] -> ERROR >> GUIDE
     //                          /fuse his       -> LIST
     //                          /fuse info      -> LIST
-    
+
     public class Fuse : SettingsCommand
     {
         protected long Size;
@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Packing
         protected override void RunAuthorized()
         {
             Baka.SaveChanges();
-            Size = SizeInBytes(Baka.FilePath);
+            Size = File.Exists(Baka.FilePath) ? SizeInBytes(Baka.FilePath) : 0;
 
             GetWordsPerLineLimit();
 
@@ -141,7 +141,11 @@ namespace Witlesss.Commands.Packing
             sb.Append("<b>").Append(data.Available).Append(":</b>");
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
             sb.Append('\n').Append(JsonList(files, page, perPage));
-            sb.Append("\n\nСловарь <b>этой беседы</b> весит ").Append(FileSize(Baka.FilePath));
+            sb.Append("\n\nСловарь <b>этой беседы</b> ");
+            if (File.Exists(Baka.FilePath))
+                sb.Append("весит ").Append(FileSize(Baka.FilePath));
+            else
+                sb.Append("пуст");
             if (!empty) sb.Append(data.Optional);
             if (!oneshot) sb.Append(USE_ARROWS);
 
@@ -281,13 +285,13 @@ namespace Witlesss.Commands.Packing
         {
             var sb = new StringBuilder(ONLY_ARRAY_JSON);
             var count = Random.Shared.Next(3, 7);
-            sb.Append("\n\n<code>[");
+            sb.Append("\n\n<pre>[");
             for (var i = 0; i < count; i++)
             {
                 sb.Append("\n    \"").Append(Baka.Generate()).Append("\"");
                 if (i < count - 1) sb.Append(",");
             }
-            sb.Append("\n]</code>");
+            sb.Append("\n]</pre>");
             return sb.ToString();
         }
     }

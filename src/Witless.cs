@@ -203,12 +203,14 @@ namespace Witlesss
 
         private void Backup()
         {
-            if (Baka.DB.Vocabulary.Count == 0) return;
+            if (Baka.DB.Vocabulary.Count == 0) return; // don't backup empty ones
 
             SaveChanges();
+            var file = new FileInfo(FilePath);
+            if (file.Length >= 10_000_000) return; // don't backup big ones
+
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var name = $"{Paths.Prefix_Pack}-{Chat}.json";
-            var file = new FileInfo(FilePath);
             file.CopyTo(UniquePath(Path.Combine(Paths.Dir_Backup, date), name));
         }
     }

@@ -233,24 +233,14 @@ namespace Witlesss.Generation
 
         private string BuildText(LinkedList<string> words)
         {
-            var hasURLs = false;
-            var sb = new StringBuilder();
-            var word = words.First!;
-            while (word is not null)
-            {
-                sb.Append(word.Value).Append(' ');
+            var text = new StringBuilder().AppendJoin(' ', words).ToString();
 
-                hasURLs |= word.Value.Equals(LINK);
-
-                word = word.Next;
-            }
-
-            var text = sb.ToString();
-            if (hasURLs)
+            if (words.Any(w => w.Equals(LINK)))
             {
                 var replacement = IsMostlyCyrillic(text) ? LooksLikeUkrainian(text) ? LINK_ua : LINK_ru : LINK_en;
                 text = text.Replace(LINK, replacement);
             }
+
             return text.ToRandomLetterCase();
         }
 

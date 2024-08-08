@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -38,12 +39,24 @@ public static class TelegramExtensions
     public static PhotoSize? GetPhoto       (this Message message) => message.Photo?[^1];
     public static Sticker?   GetImageSticker(this Message message)
     {
-        return message.Sticker is { IsVideo: false, IsAnimated: false } sticker ? sticker : null;
+        return message.HasImageSticker() ? message.Sticker : null;
     }
     public static Animation? GetAnimation   (this Message message)
     {
         return message.Animation is { FileSize: <= 320_000, Duration: <= 21 } anime ? anime : null;
     }
+
+    public static bool HasImageSticker
+        (this Message message) => message.Sticker is { IsVideo: false, IsAnimated: false };
+
+    public static bool HasVideoSticker
+        (this Message message) => message.Sticker is { IsVideo: true };
+
+    public static bool HasImageDocument
+        (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
+
+    public static bool HasAudioDocument
+        (this Message message) => message.Document?.MimeType?.StartsWith("audio") ?? false;
 
     public static bool ProvidesFile(this Message message, string type, out Document? document)
     {

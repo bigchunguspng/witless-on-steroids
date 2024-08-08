@@ -46,12 +46,13 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             if (message is null) return false;
 
-            if      (message.Photo     is not null)              await ProcessPhoto(message.Photo[^1].FileId);
-            else if (message.Animation is not null)              await ProcessVideo(message.Animation.FileId);
-            else if (message.Sticker   is { IsVideo: true })     await ProcessVideo(message.Sticker  .FileId);
-            else if (message.Video     is not null)              await ProcessVideo(message.Video    .FileId);
-            else if (message.VideoNote is not null)              await ProcessVideo(message.VideoNote.FileId);
-            else if (message.Sticker   is { IsAnimated: false }) await ProcessStick(message.Sticker  .FileId);
+            if      (message.Photo     is not null) await ProcessPhoto(message.Photo[^1].FileId);
+            else if (message.HasImageSticker    ()) await ProcessStick(message.Sticker !.FileId);
+            else if (message.Animation is not null) await ProcessVideo(message.Animation.FileId);
+            else if (message.HasVideoSticker    ()) await ProcessVideo(message.Sticker !.FileId);
+            else if (message.Video     is not null) await ProcessVideo(message.Video    .FileId);
+            else if (message.VideoNote is not null) await ProcessVideo(message.VideoNote.FileId);
+            else if (message.HasImageDocument   ()) await ProcessPhoto(message.Document!.FileId);
             else return false;
 
             return true;

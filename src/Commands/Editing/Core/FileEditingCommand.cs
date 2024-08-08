@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
@@ -54,10 +53,10 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetVideoFileID(Message m)
         {
-            if      (m.Video     is not null)          FileID = m.Video    .FileId;
-            else if (m.Animation is not null)          FileID = m.Animation.FileId;
-            else if (m.Sticker   is { IsVideo: true }) FileID = m.Sticker  .FileId;
-            else if (m.VideoNote is not null)          FileID = m.VideoNote.FileId;
+            if      (m.Video     is not null) FileID = m.Video    .FileId;
+            else if (m.Animation is not null) FileID = m.Animation.FileId;
+            else if (m.HasVideoSticker    ()) FileID = m.Sticker !.FileId;
+            else if (m.VideoNote is not null) FileID = m.VideoNote.FileId;
             else return false;
 
             return true;
@@ -65,9 +64,9 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetAudioFileID(Message m)
         {
-            if      (m.Audio     is not null)                  FileID = m.Audio   .FileId;
-            else if (m.Voice     is not null)                  FileID = m.Voice   .FileId;
-            else if (m.Document  is not null && MightBeWav(m)) FileID = m.Document.FileId;
+            if      (m.Audio     is not null) FileID = m.Audio    .FileId;
+            else if (m.Voice     is not null) FileID = m.Voice    .FileId;
+            else if (m.HasAudioDocument   ()) FileID = m.Document!.FileId;
             else return false;
 
             return true;
@@ -75,18 +74,15 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetPhotoFileID(Message m)
         {
-            if      (m.Photo    is not null)                              FileID = m.Photo[^1].FileId;
-            else if (m.Sticker  is { IsVideo: false, IsAnimated: false }) FileID = m.Sticker  .FileId;
-            else if (m.Document is not null && IsPicture(m.Document))     FileID = m.Document .FileId;
+            if      (m.Photo    is not null) FileID = m.Photo[^1].FileId;
+            else if (m.HasImageSticker   ()) FileID = m.Sticker !.FileId;
+            else if (m.HasImageDocument  ()) FileID = m.Document!.FileId;
             else return false;
 
             IsPhoto = true;
 
             return true;
         }
-
-        private static bool IsPicture(Document d) => d is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
-        private static bool MightBeWav(Message m) => m.Document!.FileName!.EndsWith(".wav");
 
         // SEND
 

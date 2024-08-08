@@ -25,7 +25,7 @@ namespace Witlesss.Commands.Settings
                 else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg = x, MemeType.Dg, "/dg");
                 else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp = x, MemeType.Dp, "/dp");
                 else if (_n.IsMatch(w)) Set(x => Baka.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
-                else Bot.SendMessage(Chat, SET_MEMES_MANUAL);
+                else Bot.SendMessage(Chat, SET_MEME_TYPE_MANUAL);
 
                 if (typeWasChanged)
                 {
@@ -59,7 +59,7 @@ namespace Witlesss.Commands.Settings
                 }
             }
             else
-                Bot.SendMessage(Chat, SET_FREQUENCY_MANUAL);
+                Bot.SendMessage(Chat, SET_MANUAL);
         }
     }
 }

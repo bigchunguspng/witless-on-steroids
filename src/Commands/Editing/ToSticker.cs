@@ -13,13 +13,13 @@ namespace Witlesss.Commands.Editing
 
             await using var stream = File.OpenRead(await Stickerize(path));
             Bot.SendSticker(Chat, new InputOnlineFile(stream));
-            if (Command![^1] is 's' or 'S') Bot.SendMessage(Chat, "@Stickers");
+            if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
 
-        protected override string Manual => STICK_MANUAL;
-
-        protected override bool MessageContainsFile(Message m) => GetPhotoFileID(m);
+        protected override string SuportedMedia => "📸";
+        protected override bool MessageContainsFile(Message m)
+            => GetPhotoFileID(m);
 
         protected override bool ChatIsBanned() => false;
     }

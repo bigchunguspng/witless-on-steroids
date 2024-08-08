@@ -8,6 +8,8 @@ namespace Witlesss.Commands.Editing
 {
     public class Cut : AudioVideoUrlCommand
     {
+        protected override string SyntaxManual => "/man_cut";
+
         protected override async Task Execute()
         {
             var args = Args?.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();

@@ -196,22 +196,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
-        ///
-        ///• видео 🎬, гифками 📺
-        ///• видео-стикерами 🎥
-        ///• музыкой 🎧, wav-файлами🥭
-        ///• кружками 📹, голосовыми🎙
-        ///
-        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
-        /// </summary>
-        internal static string DAMN_MANUAL {
-            get {
-                return ResourceManager.GetString("DAMN_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Поздравляю, чат &lt;b&gt;{0}&lt;/b&gt; был удалён из списка чатов, а словарь сохранён как &lt;b&gt;{1}&lt;/b&gt;!
         ///
         ///Если хотите начать заново - пропишите /start@piece_fap_bot.
@@ -249,6 +233,29 @@ namespace Witlesss.XD {
         internal static string DP_OPTIONS {
             get {
                 return ResourceManager.GetString("DP_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ❗️ Команда работает с {0}
+        ///
+        ///📖 Справка по обработке: /man_4.
+        /// </summary>
+        internal static string EDIT_MANUAL {
+            get {
+                return ResourceManager.GetString("EDIT_MANUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ❗️ Команда работает с {0}
+        ///
+        ///📖 Справка по обработке: /man_4
+        ///📖 Синтаксис команды: {1}.
+        /// </summary>
+        internal static string EDIT_MANUAL_SYN {
+            get {
+                return ResourceManager.GetString("EDIT_MANUAL_SYN", resourceCulture);
             }
         }
         
@@ -390,19 +397,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
-        ///
-        ///• видео 🎬, гифками 📺
-        ///• видео-сообщениями 📹
-        ///• видео-стикерами 🎥.
-        /// </summary>
-        internal static string G_MANUAL {
-            get {
-                return ResourceManager.GetString("G_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Эта команда только для бесед 🤓.
         /// </summary>
         internal static string GROUPS_ONLY_COMAND {
@@ -479,21 +473,6 @@ namespace Witlesss.XD {
         internal static string MEME_OPTIONS {
             get {
                 return ResourceManager.GetString("MEME_OPTIONS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Если вы хотите очистить словарь беседы, пропишите
-        ///
-        /// /move@piece_fap_bot [имя]
-        ///
-        ///Эта команда сохранит &lt;b&gt;копию словаря&lt;/b&gt; под указанным именем и очистит &lt;b&gt;сам словарь&lt;/b&gt;. Зная имя, вы можете в любой момент &lt;b&gt;влить&lt;/b&gt; сохранённую копию в словарь беседы, прописав
-        ///
-        /// /fuse@piece_fap_bot [имя].
-        /// </summary>
-        internal static string MOVE_MANUAL {
-            get {
-                return ResourceManager.GetString("MOVE_MANUAL", resourceCulture);
             }
         }
         
@@ -638,15 +617,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+.
-        /// </summary>
-        internal static string REGEX_EMOJI {
-            get {
-                return ResourceManager.GetString("REGEX_EMOJI", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Масштабирование&lt;/u&gt;&lt;/b&gt;
         ///
         ///&lt;b&gt;Синтаксис:&lt;/b&gt; &lt;code&gt;/scale ширина высота флаги&lt;/code&gt;
@@ -678,6 +648,15 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to я буду отвечать на {0}% сообщений.
+        /// </summary>
+        internal static string SET_FREQUENCY_RESPONSE {
+            get {
+                return ResourceManager.GetString("SET_FREQUENCY_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
         ///
         ///&lt;code&gt;/set [буква]&lt;/code&gt;
@@ -700,18 +679,9 @@ namespace Witlesss.XD {
         ///
         ///&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить.
         /// </summary>
-        internal static string SET_FREQUENCY_MANUAL {
+        internal static string SET_MANUAL {
             get {
-                return ResourceManager.GetString("SET_FREQUENCY_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to я буду отвечать на {0}% сообщений.
-        /// </summary>
-        internal static string SET_FREQUENCY_RESPONSE {
-            get {
-                return ResourceManager.GetString("SET_FREQUENCY_RESPONSE", resourceCulture);
+                return ResourceManager.GetString("SET_MANUAL", resourceCulture);
             }
         }
         
@@ -733,9 +703,9 @@ namespace Witlesss.XD {
         ///&lt;code&gt;/dg  &lt;/code&gt; ◾️🔐 &lt;code&gt;/set Dg&lt;/code&gt;
         ///&lt;code&gt;/nuke&lt;/code&gt; 🍕🍤 &lt;code&gt;/set N &lt;/code&gt;.
         /// </summary>
-        internal static string SET_MEMES_MANUAL {
+        internal static string SET_MEME_TYPE_MANUAL {
             get {
-                return ResourceManager.GetString("SET_MEMES_MANUAL", resourceCulture);
+                return ResourceManager.GetString("SET_MEME_TYPE_MANUAL", resourceCulture);
             }
         }
         
@@ -767,23 +737,6 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
-        ///
-        ///• видео 🎬, гифками 📺
-        ///• видео-стикерами 🎥
-        ///• музыкой 🎧, wav-файлами🥭
-        ///• кружками 📹, голосовыми🎙
-        ///• ссылками на видео📎
-        ///
-        ///Ответь командой на файл 🗞 или прикрепи его к команде ✍️.
-        /// </summary>
-        internal static string SLICE_MANUAL {
-            get {
-                return ResourceManager.GetString("SLICE_MANUAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;b&gt;&lt;u&gt;Как скачивать музыку с ютуба:&lt;/u&gt;&lt;/b&gt;
         ///
         ///Пишешь &lt;code&gt;/song *ссылка*&lt;/code&gt;, и ждешь...
@@ -811,18 +764,6 @@ namespace Witlesss.XD {
         internal static string START_RESPONSE {
             get {
                 return ResourceManager.GetString("START_RESPONSE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;u&gt;Команда работает с&lt;/u&gt;:
-        ///
-        ///• картинками 📸 и стикерами 🎟
-        ///• картинками 📸 без сжатия.
-        /// </summary>
-        internal static string STICK_MANUAL {
-            get {
-                return ResourceManager.GetString("STICK_MANUAL", resourceCulture);
             }
         }
         

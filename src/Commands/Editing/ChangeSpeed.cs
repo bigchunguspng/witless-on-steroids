@@ -6,7 +6,7 @@ using static Witlesss.XD.SpeedMode;
 
 namespace Witlesss.Commands.Editing
 {
-    public class ChangeSpeed : FileEditingCommand
+    public class ChangeSpeed : AudioVideoCommand
     {
         private double _speed;
         private SpeedMode _mode;

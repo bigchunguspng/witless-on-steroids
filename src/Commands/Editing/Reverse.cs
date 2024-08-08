@@ -3,7 +3,7 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Reverse : FileEditingCommand
+    public class Reverse : AudioVideoCommand
     {
         protected override async Task Execute()
         {

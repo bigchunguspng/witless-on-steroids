@@ -4,7 +4,7 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing;
 
-public class ToVoiceMessage : FileEditingCommand
+public class ToVoiceMessage : AudioVideoCommand
 {
     protected override async Task Execute()
     {

@@ -2,14 +2,15 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Scale : VideoCommand
+    public class Scale : VideoPhotoCommand
     {
         private readonly Regex _number = new(@"^\d+(\.\d+)?$");
+
+        protected override string SyntaxManual => "/man_scale";
 
         protected override async Task Execute()
         {
@@ -60,10 +61,5 @@ namespace Witlesss.Commands.Editing
         }
 
         protected override string VideoFileName { get; } = "scale_fap_club.mp4";
-
-        protected override bool MessageContainsFile(Message m)
-        {
-            return GetVideoFileID(m) || GetPhotoFileID(m);
-        }
     }
 }

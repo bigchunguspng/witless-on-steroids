@@ -3,9 +3,11 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class ChangeVolume : FileEditingCommand
+    public class ChangeVolume : AudioVideoCommand
     {
-        private string _arg;
+        private string _arg = null!;
+
+        protected override string SyntaxManual => "/man_vol";
 
         protected override async Task Execute()
         {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Telegram.Bot.Types;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class RemoveBitrate : FileEditingCommand
+    public class RemoveBitrate : AudioVideoPhotoCommand
     {
         private int _value;
 
@@ -38,10 +37,5 @@ namespace Witlesss.Commands.Editing
 
         protected override string AudioFileName => SongNameOr($"Damn, {Sender}.mp3");
         protected override string VideoFileName => $"piece_fap_club-{_value}.mp4";
-
-        protected override bool MessageContainsFile(Message m)
-        {
-            return GetVideoFileID(m) || GetAudioFileID(m) || GetPhotoFileID(m);
-        }
     }
 }

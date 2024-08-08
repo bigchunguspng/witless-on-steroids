@@ -6,7 +6,7 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Crop : Scale
+    public class Crop : VideoPhotoCommand // todo shake is only for video
     {
         private const string _crop  = "piece_fap_crop.mp4";
         private const string _shake = "shake_fap_club.mp4";
@@ -24,6 +24,8 @@ namespace Witlesss.Commands.Editing
             _isShakeMode = false;
             return this;
         }
+
+        protected override string SyntaxManual => "/man_crop";
 
         protected override async Task Execute()
         {

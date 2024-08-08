@@ -4,8 +4,10 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Equalize : FileEditingCommand
+    public class Equalize : AudioVideoCommand
     {
+        protected override string SyntaxManual => "/man_eq";
+
         // /eq [frequency, Hz] [gain, dB] [width, Hz]
         protected override async Task Execute()
         {

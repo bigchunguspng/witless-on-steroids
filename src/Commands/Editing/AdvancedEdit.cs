@@ -9,8 +9,10 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing;
 
-public class AdvancedEdit : FileEditingCommand
+public class AdvancedEdit : AudioVideoPhotoCommand
 {
+    protected override string SyntaxManual => "/man_44";
+
     // /peg  [options]      [extension]
     // /pegv [videofilters] [extension]
     protected override async Task Execute()
@@ -53,11 +55,6 @@ public class AdvancedEdit : FileEditingCommand
         return Command!.Length > 4 && Command.AsSpan()[4..].Contains(option);
     }
 
-    protected override void SendManual()
-    {
-        Bot.SendSticker(Chat, new InputOnlineFile(DUDE.PickAny()));
-    }
-
     protected override bool MessageContainsFile(Message m)
     {
         if      (m.Photo     is not null)              FileID = m.Photo[^1].FileId;
@@ -96,17 +93,4 @@ public class AdvancedEdit : FileEditingCommand
     private static readonly Regex _gif = new(@"^(gif|webm|mp4)$");
 
     private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
-    private readonly string[] DUDE =
-    [
-        "CAACAgIAAxkBAAECZ1JlnXp-IZ7pQQ-65xXjPrf8xvLQnwACdDgAApAuAUsOAWZE2RxhujQE",
-        "CAACAgIAAxkBAAECZ1ZlnXqSnVFOCQ-ZxiYnSDNOvjqSywAC1TUAAurH-EqrUrbGIyDdGDQE",
-        "CAACAgIAAxkBAAECZ1plnXqxyEYT4UhvU9VSqpPLKURJzwACQjMAAnY7KEv2hp5tYChZ1TQE",
-        "CAACAgIAAxkBAAECZ15lnXrCZtJt1AHSZoZqVC3dYdt8lwACgTYAAhXhKUvA8pcpkfVJDTQE",
-        "CAACAgIAAxkBAAECZ2JlnXrva00d_k9_MeOhaK9kCx9zCgACmAwAAo3W-Enqi3-VH6it3TQE",
-        "CAACAgIAAxkBAAECZ2hlnXsUKryvKUXxZAY4MOHloG9-gQACfRAAAjnXSUgzwFOJH8ykBjQE",
-        "CAACAgIAAxkBAAECZ2plnXsj1OQUBQtMrMkr5Bv8tPH5bwACRw0AApUa-ElKPI21HNHo4jQE",
-        "CAACAgIAAxkBAAECZ2xlnXtHd7bVPVqydpWCZwbq2e9dUAAC7QwAAtua-EmTOpxJHSiIcjQE",
-        "CAACAgIAAxkBAAECZ3BlnXuokpG6KNRX4hVnbqNiQRtyqQACKScAAo8ZQEsx0p6zb98J0zQE",
-        "CAACAgIAAxkBAAECZ3JlnXvncYpVXuvyAXe01aNWYOauJAACDiMAAsX-SUha8rwmJSbb0TQE"
-    ];
 }

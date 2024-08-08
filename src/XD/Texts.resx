@@ -21,7 +21,7 @@
     <data name="START_RESPONSE" xml:space="preserve">
         <value>ВИРУСНАЯ БАЗА ОБНОВЛЕНА!</value>
     </data>
-    <data name="SET_FREQUENCY_MANUAL" xml:space="preserve">
+    <data name="SET_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
 
 &lt;code&gt;/set [буква]&lt;/code&gt;
@@ -89,15 +89,6 @@
         <value>Cловарь беседы &lt;b&gt;{0}&lt;/b&gt; обновлён!
 Теперь он весит {1} (+{2})</value>
     </data>
-    <data name="MOVE_MANUAL" xml:space="preserve">
-        <value>Если вы хотите очистить словарь беседы, пропишите
-
-/move@piece_fap_bot [имя]
-
-Эта команда сохранит &lt;b&gt;копию словаря&lt;/b&gt; под указанным именем и очистит &lt;b&gt;сам словарь&lt;/b&gt;. Зная имя, вы можете в любой момент &lt;b&gt;влить&lt;/b&gt; сохранённую копию в словарь беседы, прописав
-
-/fuse@piece_fap_bot [имя]</value>
-    </data>
     <data name="MOVING_DONE" xml:space="preserve">
         <value>♻️ Словарь очищен! *пусто* {0}
 
@@ -105,16 +96,6 @@
     </data>
     <data name="A_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, начиная с него (если оно есть в словаре)</value>
-    </data>
-    <data name="DAMN_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
-
-• видео 🎬, гифками 📺
-• видео-стикерами 🎥
-• музыкой 🎧, wav-файлами🥭
-• кружками 📹, голосовыми🎙
-
-Ответь командой на файл 🗞 или прикрепи его к команде ✍️</value>
     </data>
     <data name="ZZ_MANUAL" xml:space="preserve">
         <value>Отправь эту команду вместе со словом, и я сгенерю чё-нибудь, заканчивая им (если оно есть в словаре)</value>
@@ -175,9 +156,6 @@
 
 Если хотите начать заново - пропишите /start@piece_fap_bot</value>
     </data>
-    <data name="REGEX_EMOJI" xml:space="preserve">
-        <value>((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+</value>
-    </data>
     <data name="CONSOLE_MANUAL" xml:space="preserve">
         <value>Console Commands:
 
@@ -208,19 +186,6 @@ s   - save and exit
 
 /start@piece_fap_bot</value>
     </data>
-    <data name="G_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
-
-• видео 🎬, гифками 📺
-• видео-сообщениями 📹
-• видео-стикерами 🎥</value>
-    </data>
-    <data name="STICK_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
-
-• картинками 📸 и стикерами 🎟
-• картинками 📸 без сжатия</value>
-    </data>
     <data name="MEME_MANUAL" xml:space="preserve">
         <value>Я могу делать &lt;u&gt;&lt;b&gt;{0}&lt;/b&gt;&lt;/u&gt; из картинок 📸 и видео 🎬
 
@@ -229,7 +194,7 @@ s   - save and exit
 📖 Справка: /man_3
 ℹ️ Список опций: /op_{1}</value>
     </data>
-    <data name="SET_MEMES_MANUAL" xml:space="preserve">
+    <data name="SET_MEME_TYPE_MANUAL" xml:space="preserve">
         <value>Выбрать тип авто-мемов:
 
 &lt;code&gt;/meme&lt;/code&gt; ☝️👇 &lt;code&gt;/set M &lt;/code&gt;
@@ -529,17 +494,6 @@ s   - save and exit
     <data name="ONLY_ARRAY_JSON" xml:space="preserve">
         <value>Годятся только &lt;b&gt;JSON&lt;/b&gt;-файлы, в виде &lt;b&gt;списка строк&lt;/b&gt;, например:</value>
     </data>
-    <data name="SLICE_MANUAL" xml:space="preserve">
-        <value>&lt;u&gt;Команда работает с&lt;/u&gt;:
-
-• видео 🎬, гифками 📺
-• видео-стикерами 🎥
-• музыкой 🎧, wav-файлами🥭
-• кружками 📹, голосовыми🎙
-• ссылками на видео📎
-
-Ответь командой на файл 🗞 или прикрепи его к команде ✍️</value>
-    </data>
     <data name="FONTS_CHEAT_SHEET" xml:space="preserve">
         <value>📝 &lt;u&gt;&lt;b&gt;Шрифты:&lt;/b&gt;&lt;/u&gt;
 
@@ -594,5 +548,16 @@ s   - save and exit
         <value>Словарь &lt;b&gt;"{0}"&lt;/b&gt; опубликован!
 
 Проверить: &lt;code&gt;/fuse info&lt;/code&gt;</value>
+    </data>
+    <data name="EDIT_MANUAL_SYN" xml:space="preserve">
+        <value>❗️ Команда работает с {0}
+
+📖 Справка по обработке: /man_4
+📖 Синтаксис команды: {1}</value>
+    </data>
+    <data name="EDIT_MANUAL" xml:space="preserve">
+        <value>❗️ Команда работает с {0}
+
+📖 Справка по обработке: /man_4</value>
     </data>
 </root>

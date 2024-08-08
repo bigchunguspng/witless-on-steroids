@@ -4,8 +4,10 @@ using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Editing
 {
-    public class Sus : FileEditingCommand
+    public class Sus : AudioVideoCommand
     {
+        protected override string SyntaxManual => "/man_cut";
+
         protected override async Task Execute()
         {
             var argless = false;

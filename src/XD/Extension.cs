@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;using System.Text.RegularExpressions;
@@ -10,8 +11,11 @@ namespace Witlesss.XD
 {
     public static class Extension
     {
+        [StringSyntax("Regex")] private const string EMOJI_REGEX
+            = @"((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+";
+
         private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
-        public  static readonly Regex EmojiRegex = new (REGEX_EMOJI);
+        public  static readonly Regex EmojiRegex = new (EMOJI_REGEX);
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
 

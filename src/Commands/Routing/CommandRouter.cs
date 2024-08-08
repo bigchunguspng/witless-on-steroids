@@ -59,6 +59,12 @@ namespace Witlesss.Commands.Routing
                 .Register("tell"   , () => _tell)
                 .Register("help"   , () => _help)
                 .Register("man"    , () => _help)
+                .Register("man_crop" , () => _mail.WithText(CROP_MANUAL))
+                .Register("man_scale", () => _mail.WithText(SCALE_MANUAL))
+                .Register("man_cut"  , () => _mail.WithText(CUT_MANUAL))
+                .Register("man_sus"  , () => _mail.WithText(SUS_MANUAL))
+                .Register("man_eq"   , () => _mail.WithText(EQ_MANUAL))
+                .Register("man_vol"  , () => _mail.WithText(VOLUME_MANUAL))
                 .Build();
         }
 

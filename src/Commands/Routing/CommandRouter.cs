@@ -13,7 +13,6 @@ namespace Witlesss.Commands.Routing
         private readonly Spam _spam = new();
         private readonly Help _help = new();
         private readonly SendMessage _mail = new();
-        private readonly Piece _piece = new();
         private readonly DebugMessage _debug = new();
         private readonly BrowseReddit _reddit = new();
         private readonly GetRedditLink _link = new();
@@ -45,9 +44,9 @@ namespace Witlesss.Commands.Routing
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
                 .Register("peg"    , () => new AdvancedEdit())
+                .Register("piece"  , () => new Piece())
                 .Register("w"      , () => _reddit)
                 .Register("link"   , () => _link)
-                .Register("piece"  , () => _piece)
                 .Register("debug"  , () => _debug)
                 .Register("chat_id", () => _mail.WithText($"<code>{Context.Chat}</code>"))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))

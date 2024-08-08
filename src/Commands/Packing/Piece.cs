@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Witlesss.Generation;
 using Witlesss.Generation.Pack;
 
@@ -8,7 +9,7 @@ namespace Witlesss.Commands.Packing
     /// <summary>
     /// Post Id Easy Channel Exporter™? Maybe.
     /// </summary>
-    public class Piece : SyncCommand
+    public class Piece : AsyncCommand
     {
         private readonly Regex _args = new(@"t.me\/[a-z0-9_]{5,32}\/\d+\s\S+");
         private readonly Regex _urls = new(@"t.me\/[a-z0-9_]{5,32}\/");
@@ -16,12 +17,15 @@ namespace Witlesss.Commands.Packing
         private string _url = default!, _name = default!;
         private int _latest;
         
-        protected override void Run()
+        protected override async Task Run()
         {
             if (WrongSyntax()) return;
 
             var cp = new Copypaster();
-            for (int i = 1; i <= _latest; i++) cp.Eat(_url + i, out _);
+            await Task.Run(() =>
+            {
+                for (var i = 1; i <= _latest; i++) cp.Eat(_url + i, out _);
+            });
 
             var path = Move.GetUniqueExtraPackPath(_name);
             JsonIO.SaveData(cp.DB, path);
@@ -43,7 +47,7 @@ namespace Witlesss.Commands.Packing
                 _latest = int.Parse(s[1].Split('/')[^1]);
             }
             else
-                Bot.SendMessage(Chat, PIECE_MANUAL);
+                Bot.SendMessage(Chat, PIECE_MANUAL, preview: false);
 
             return !ok;
         }

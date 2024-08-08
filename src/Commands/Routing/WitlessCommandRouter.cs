@@ -87,32 +87,29 @@ public class WitlessCommandRouter : WitlessSyncCommand
             }
         }
 
-        if (Message.GetPhoto() is { } photo && HaveToMeme())
-        {
-            GetMemeMaker(photo.Width, photo.Height).ProcessPhoto(photo.FileId);
-        }
-        else if (Message.GetImageSticker() is { } sticker && HaveToMemeSticker())
-        {
-            GetMemeMaker(sticker.Width, sticker.Height).ProcessStick(sticker.FileId);
-        }
-        else if (Message.GetAnimation() is { } anime && HaveToMemeSticker())
-        {
-            GetMemeMaker(anime.Width, anime.Height).ProcessVideo(anime.FileId);
-        }
-        else if (Lucky(Baka.Speech))
+        if      (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1.FileId);
+        else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2.FileId);
+        else if (Message.GetAnimation   () is { } f3 && HaveToMeme       ()) GetMemeMaker(f3).ProcessVideo(f3.FileId);
+        else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4.FileId);
+        else if (LuckyFor(Baka.Speech))
         {
             new PoopText().Execute(Context);
         }
 
-        ImageProcessor GetMemeMaker(int w, int h) // todo don't pass size to everything jbc /dg needs it
+        ImageProcessor GetMemeMaker(FileBase file)
         {
             var mematic = _mematics[Baka.Type].Invoke();
             mematic.Pass(Context);
-            if (mematic is Demotivate dg) dg.SelectMode(w, h);
+            if (mematic is Demotivate dg)
+            {
+                var (w, h) = file.TryGetSize();
+                dg.SelectMode(w, h);
+            }
+
             return mematic;
         }
 
-        bool HaveToMeme       () => Lucky(Baka.Pics) && !Message.ContainsSpoilers();
+        bool HaveToMeme       () => LuckyFor(Baka.Pics) && !Message.ContainsSpoilers();
         bool HaveToMemeSticker() => Baka.Stickers && HaveToMeme();
     }
 

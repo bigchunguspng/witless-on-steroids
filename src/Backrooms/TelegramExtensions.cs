@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -34,17 +33,26 @@ public static class TelegramExtensions
         return message.CaptionEntities is { } c && c.Any(x => x.Type == MessageEntityType.Spoiler);
     }
 
-    // MEDIA
+    // MEDIA GET
 
-    public static PhotoSize? GetPhoto       (this Message message) => message.Photo?[^1];
-    public static Sticker?   GetImageSticker(this Message message)
-    {
-        return message.HasImageSticker() ? message.Sticker : null;
-    }
-    public static Animation? GetAnimation   (this Message message)
-    {
-        return message.Animation is { FileSize: <= 320_000, Duration: <= 21 } anime ? anime : null;
-    }
+    public static PhotoSize? GetPhoto
+        (this Message message) => message.Photo?[^1];
+
+    public static   Sticker? GetImageSticker
+        (this Message message) => message.HasImageSticker() ? message.Sticker : null;
+
+    public static   Sticker? GetVideoSticker
+        (this Message message) => message.HasVideoSticker() ? message.Sticker : null;
+
+    public static Animation? GetAnimation
+        (this Message message) => message.Animation is { FileSize: <= 350_000, Duration: <= 30 } anime ? anime : null;
+
+    public static MessageEntity? GetURL
+        (this Message message) =>
+        message.       Entities?.FirstOrDefault(x => x.Type == MessageEntityType.Url)
+     ?? message.CaptionEntities?.FirstOrDefault(x => x.Type == MessageEntityType.Url);
+
+    // MEDIA HAS?
 
     public static bool HasImageSticker
         (this Message message) => message.Sticker is { IsVideo: false, IsAnimated: false };
@@ -58,6 +66,8 @@ public static class TelegramExtensions
     public static bool HasAudioDocument
         (this Message message) => message.Document?.MimeType?.StartsWith("audio") ?? false;
 
+    // MEDIA …
+
     public static bool ProvidesFile(this Message message, string type, out Document? document)
     {
         document = message.GetDocument(type) ?? message.ReplyToMessage.GetDocument(type);
@@ -67,12 +77,6 @@ public static class TelegramExtensions
     public static Document? GetDocument(this Message? message, string type)
     {
         return message?.Document?.MimeType == type ? message.Document : null;
-    }
-
-    public static MessageEntity? GetURL(this Message message)
-    {
-        return message.       Entities?.FirstOrDefault(x => x.Type == MessageEntityType.Url)
-            ?? message.CaptionEntities?.FirstOrDefault(x => x.Type == MessageEntityType.Url);
     }
 
     //
@@ -119,4 +123,14 @@ public static class TelegramExtensions
     }
 
     public static bool ChatIsNotPrivate(this long chatId) => chatId < 0;
+
+    public static (int width, int height) TryGetSize(this FileBase file)
+    {
+        if (file is PhotoSize             f1  ) return (f1.Width, f1.Height);
+        if (file is Sticker               f2  ) return (f2.Width, f2.Height);
+        if (file is Video                 f3  ) return (f3.Width, f3.Height);
+        if (file is Animation             f4  ) return (f4.Width, f4.Height);
+        if (file is Document { Thumb: { } f5 }) return (f5.Width, f5.Height);
+        return (0, 0);
+    }
 }

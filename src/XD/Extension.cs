@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Linq;using System.Text.RegularExpressions;
+using System.Linq;
+using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
@@ -22,7 +23,7 @@ namespace Witlesss.XD
         public static bool IsOneIn         (int x) => Random.Shared.Next(x) == 0;
         public static bool IsFirstOf(int a, int b) => Random.Shared.Next(a + b) < a;
 
-        public static bool Lucky(int chance, int max = 100) => Random.Shared.Next(max) < chance;
+        public static bool LuckyFor(int chance, int max = 100) => Random.Shared.Next(max) < chance;
 
         public static int    RandomInt   (int    min, int    max) => Random.Shared.Next(min, max + 1);
         public static double RandomDouble(double min, double max)

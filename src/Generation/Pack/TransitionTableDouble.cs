@@ -35,6 +35,6 @@ public class TransitionTableDouble(Transition transition) : TransitionTable // 3
     public IEnumerable<Transition> AsIEnumerable()
     {
         yield return _transition1;
-        yield return _transition2;
+        if (_transition2.IsPossible()) yield return _transition2;
     }
 }

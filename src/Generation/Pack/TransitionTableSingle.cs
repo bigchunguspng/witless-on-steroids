@@ -23,6 +23,6 @@ public class TransitionTableSingle : TransitionTable // 24B
 
     public IEnumerable<Transition> AsIEnumerable()
     {
-        yield return _transition;
+        if (_transition.IsPossible()) yield return _transition;
     }
 }

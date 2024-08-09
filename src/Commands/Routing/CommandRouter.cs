@@ -80,7 +80,7 @@ namespace Witlesss.Commands.Routing
 
                 if (success == false && (Context.ChatIsPrivate || Context.BotMentioned))
                 {
-                    Bot.SendMessage(Chat, WITLESS_ONLY_COMAND);
+                    Bot.SendMessage(Chat, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
                 }
             }
         }

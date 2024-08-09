@@ -19,8 +19,8 @@ namespace Witlesss.Memes
         public static bool SingleLine, AddLogo = true;
         public static bool BottomTextIsGenerated;
 
-        public static readonly ExtraFonts ExtraFontsL = new("dv", "(?![-bi*])");
-        public static readonly ExtraFonts ExtraFontsS = new("dg", "(?![-bi*])");
+        public static readonly ExtraFonts ExtraFontsL = new("d[vg]", "(?![-bi*])");
+        public static readonly ExtraFonts ExtraFontsS = new("dg",    "(?![-bi*])");
         public static readonly ExtraFonts ExtraFontsA = new("dg", "&");
         public static readonly ExtraFonts ExtraFontsB = new("dg", @"\*");
 

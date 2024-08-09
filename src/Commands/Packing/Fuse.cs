@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Packing
         protected override void RunAuthorized()
         {
             Baka.SaveChanges();
-            Size = File.Exists(Baka.FilePath) ? SizeInBytes(Baka.FilePath) : 0;
+            Size = SizeInBytes(Baka.FilePath);
 
             GetWordsPerLineLimit();
 
@@ -146,8 +146,9 @@ namespace Witlesss.Commands.Packing
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            if (File.Exists(Baka.FilePath))
-                sb.Append("весит ").Append(FileSize(Baka.FilePath));
+            var path = Baka.FilePath;
+            if (File.Exists(path))
+                sb.Append("весит ").Append(FileSize(path));
             else
                 sb.Append("пуст");
             if (!empty) sb.Append(data.Optional);

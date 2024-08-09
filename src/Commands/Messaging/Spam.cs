@@ -73,9 +73,10 @@ public class Spam : SyncCommand
     {
         return ChatsDealer.SussyBakas.Values.Where(x =>
         {
-            if (File.Exists(x.FilePath))
+            var path = x.FilePath;
+            if (File.Exists(path))
             {
-                var file = new FileInfo(x.FilePath);
+                var file = new FileInfo(path);
                 return file.Length > size && file.LastWriteTime.HappenedWithinLast(TimeSpan.FromDays(28));
             }
             return false;

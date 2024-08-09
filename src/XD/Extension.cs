@@ -165,7 +165,7 @@ namespace Witlesss.XD
             return match.Success ? match.Groups[1].Value : s;
         }
 
-        public static long SizeInBytes         (string path) => new FileInfo(path).Length;
+        public static long SizeInBytes         (string path) =>  File.Exists(path) ? new FileInfo(path).Length : 0;
         public static bool FileEmptyOrNotExist (string path) => !File.Exists(path) || SizeInBytes(path) == 0;
         public static void CreateFilePath      (string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Settings;
@@ -200,12 +201,14 @@ namespace Witlesss.Commands.Packing
 
         #region FUSION
 
+        private const string HOLY_MOLY = "CAACAgIAAxkBAAI062a2Yi7myiBzNob7ftdyivXXEdJjAAKYDAACjdb4SeqLf5UfqK3dNQQ";
+
         private void FuseWitlessDB(string arg)
         {
             var argIsChatId = long.TryParse(arg, out var chat);
             if (chat == Chat)
             {
-                Bot.SendMessage(Chat, FUSE_FAIL_SELF);
+                Bot.SendSticker(Chat, new InputOnlineFile(HOLY_MOLY));
                 return;
             }
 

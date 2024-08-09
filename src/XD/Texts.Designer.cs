@@ -350,18 +350,9 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ёкарный бабай)0.
-        /// </summary>
-        internal static string FUSE_FAIL_SELF {
-            get {
-                return ResourceManager.GetString("FUSE_FAIL_SELF", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 
         ///
-        ///&lt;code&gt;/fuse@piece_fap_club his *&lt;/code&gt; - скормить всё сразу.
+        ///&lt;code&gt;/fuse * *&lt;/code&gt; - скормить всё сразу.
         /// </summary>
         internal static string FUSE_HIS_ALL {
             get {
@@ -370,15 +361,20 @@ namespace Witlesss.XD {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;b&gt;&lt;i&gt;Kоманда /fuse позволяет быстро пополнить ваш словарь уже готовым материалом, а именно:&lt;/i&gt;&lt;/b&gt;
+        ///   Looks up a localized string similar to &lt;b&gt;Слияние / кормёжка&lt;/b&gt;
         ///
-        ///1. &lt;u&gt;Словарём другой беседы&lt;/u&gt;. Пропишите &lt;b&gt;в другой беседе&lt;/b&gt; &lt;code&gt;/chat_id@piece_fap_bot&lt;/code&gt;, скопируйте &lt;b&gt;полученное число&lt;/b&gt; и пропишите &lt;b&gt;здесь&lt;/b&gt; &lt;code&gt;/fuse [полученное число]&lt;/code&gt;
+        ///&lt;u&gt;Команда работает с:&lt;/u&gt;
+        ///🔑 айдишниками чатов
+        ///📦 именами словарей со склада
+        ///🗞 TXT и JSON-файлами
+        ///🗞 именами файлов со склада
         ///
-        ///Пример: &lt;code&gt;/fuse -1001541923355&lt;/code&gt;
+        ///&lt;u&gt;Списки:&lt;/u&gt;
+        ///&lt;code&gt;/fuse   info&lt;/code&gt; - публичный архив 📦
+        ///&lt;code&gt;/fuse ! info&lt;/code&gt; - приватный архив 📦
+        ///&lt;code&gt;/fuse * info&lt;/code&gt; - приватный архив 🗞
         ///
-        ///2. &lt;u&gt;Словарями&lt;/u&gt;, созданными командой /move. Список таковых можно получить прописав &lt;code&gt;/fuse info&lt;/code&gt;.
-        ///
-        ///Выбрав нужный, пропишите &lt;code&gt;/fuse [имя]&lt; [rest of string was truncated]&quot;;.
+        ///📖 Гайды: /man_22, /man_221, /man_222.
         /// </summary>
         internal static string FUSE_MANUAL {
             get {

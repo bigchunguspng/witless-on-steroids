@@ -56,6 +56,7 @@ namespace Witlesss.Commands.Editing.Core
             if      (m.Video     is not null) FileID = m.Video    .FileId;
             else if (m.Animation is not null) FileID = m.Animation.FileId;
             else if (m.HasVideoSticker    ()) FileID = m.Sticker !.FileId;
+          //else if (m.HasAnimeDocument   ()) FileID = m.Document!.FileId; // <-- todo uncomment after making better type detection
             else if (m.VideoNote is not null) FileID = m.VideoNote.FileId;
             else return false;
 

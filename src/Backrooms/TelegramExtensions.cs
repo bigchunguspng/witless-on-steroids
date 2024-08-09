@@ -63,6 +63,9 @@ public static class TelegramExtensions
     public static bool HasImageDocument
         (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
 
+    public static bool HasAnimeDocument
+        (this Message message) => message.Document is { MimeType: "image/gif", Thumb: not null };
+
     public static bool HasAudioDocument
         (this Message message) => message.Document?.MimeType?.StartsWith("audio") ?? false;
 

@@ -71,7 +71,7 @@ public partial class IFunnyApp
             var textWidth = textChunks.Sum(x => x.Width);
             if (textWidth < textWidthLimit)
             {
-                if (ThinCard) SetCardHeightThin(lineHeight, 1F);
+                if (ThinCard) SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
                 return text; // OK - don't change anything!
             }
 
@@ -106,10 +106,11 @@ public partial class IFunnyApp
                 textHeight = lineHeight;
         }
 
-        if (ThinCard || textHeight * k > _cardHeight)
-        {
-            SetCardHeightThin(textHeight, k);
-        }
+        var ratioT = textWidthLimit / textHeight;
+        var ratioC = _w / (float)_cardHeight;
+        var textIsTall = ratioC > ratioT;
+        var height = GetHeightWithPadding(textHeight, k);
+        if (ThinCard || textIsTall && height > _cardHeight) SetCardHeight(height);
 
         ResizeFont(FontSize * k);
 
@@ -136,12 +137,12 @@ public partial class IFunnyApp
         }
     }
 
-    private void SetCardHeightThin(float textHeight, float k)
+    private int GetHeightWithPadding(float textHeight, float k)
     {
         var k2 = UltraThinCard ? 0.1F : 1F;
         var min = UltraThinCard ? 8 : 16;
         var extra = Math.Max(FontSize * k * k2, min) * ExtraFonts.GetRelativeSize();
-        SetCardHeight((textHeight * k + extra).CeilingInt());
+        return (textHeight * k + extra).CeilingInt();
     }
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)

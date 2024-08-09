@@ -15,7 +15,7 @@ public class DownloadVideoTask(string id, CommandContext context)
     private string GetDownloadCommand(string url)
     {
         var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
-        builder.Append("-k -I 1 -f \"bv*[height<=480]+ba/b[height<=480]/wv*+ba/w\" --remux-video mp4");
+        builder.Append("-k -I 1 -f \"bv*[height<=480]+ba/b[height<=480]/wv*+ba/w\" --remux-video mp4 ");
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
     }

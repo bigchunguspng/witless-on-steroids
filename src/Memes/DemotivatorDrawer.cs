@@ -100,19 +100,20 @@ namespace Witlesss.Memes
                     ? TextType.Single
                     : TextType.Upper
                 : TextType.Large;
-            DrawText(background, text.A, typeA, 1);
+            DrawText(background, text.A, typeA);
 
             // LOWER TEXT
             if (_square && !SingleLine)
-                DrawText(background, text.B, TextType.Lower, BottomTextIsGenerated ? 1 : 2);
+                DrawText(background, text.B, TextType.Lower);
 
             return background;
         }
 
-        private void DrawText(Image image, string text, TextType type, int lines)
+        private void DrawText(Image image, string text, TextType type)
         {
             var options = GetTextOptions(type, text, out var offset, out var fontOffset, out var caseOffset);
             var emoji = EmojiRegex.Matches(text);
+            var lines = type != TextType.Lower || BottomTextIsGenerated ? 1 : emoji.Count > 0 ? -1 : 2;
             if (emoji.Count == 0)
             {
                 var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
@@ -123,7 +124,7 @@ namespace Witlesss.Memes
             else
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
-                var optionsE = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset);
+                var optionsE = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset, lines);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs, out _);
                 var x = _w.Gap(textLayer.Width);
                 var y = offset - textLayer.Height / 2F + caseOffset;

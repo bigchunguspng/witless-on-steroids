@@ -130,7 +130,7 @@ namespace Witlesss.Memes
             else
             {
                 var pixelate = ExtraFonts.FontIsPixelated();
-                var optionsE = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, pixelate);
+                var optionsE = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, Pixelate: pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
                 var point = GetFunnyOrigin(textLayer.Size, options, top, caseOffset);
                 background.Mutate(ctx => ctx.DrawImage(textLayer, point));

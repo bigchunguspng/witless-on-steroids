@@ -16,7 +16,14 @@ namespace Witlesss.Memes.Shared
 {
     public static class EmojiTool
     {
-        public record Options(SolidBrush Color, float EmojiSize, float FontOffset = 0, bool Pixelate = false);
+        public record Options
+        (
+            SolidBrush Color,
+            float EmojiSize,
+            float FontOffset = 0,
+            int MaxLines = -1,
+            bool Pixelate = false
+        );
 
         public static Image<Rgba32> DrawEmojiText
         (
@@ -25,10 +32,11 @@ namespace Witlesss.Memes.Shared
         {
             // RENDER EACH PARAGRAPH
 
+            var maxLines = options.MaxLines < 1 ? int.MaxValue : options.MaxLines;
             var paragraphs = text.Split('\n');
             var lines = paragraphs
                 .Select(paragraph => DrawEmojiTextParagraph(paragraph, rto, options, pngs))
-                .SelectMany(x => x).ToList();
+                .SelectMany(x => x).Take(maxLines).ToList();
             linesFilled = lines.Count;
 
             // COMBINE

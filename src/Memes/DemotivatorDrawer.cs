@@ -208,7 +208,7 @@ namespace Witlesss.Memes
                 Origin = new PointF(_w / 2F, y),
                 WrappingLength = _textW,
                 LineSpacing = extraFonts.GetLineSpacing() * (lower ? 1.39F : 1.2F),
-                FallbackFontFamilies = ExtraFonts.FallbackFamilies
+                FallbackFontFamilies = extraFonts.GetFallbackFamilies()
             };
         }
 

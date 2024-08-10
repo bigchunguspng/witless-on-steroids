@@ -116,7 +116,7 @@ public partial class MemeGenerator
         Origin = origin,
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.FallbackFamilies
+        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies()
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());

@@ -14,18 +14,18 @@ namespace Witlesss.XD;
             2024-03-14/
                 pack--4147302158.json [dic]
         Board/
-            a - 2023-12-22 02.41.json [list]
+            a - 2023-12-22 02.41.json [list]    <-- /boards NAME
         Chat/
             chats.json
             bans.json
-            pack--1001699898486.json [dic]
+            pack--1001699898486.json [dic]      <-- /fuse   ID
         Fuse/
             -1001541923355/
-                private_3D_AF.json [dic]
-            any-name-possible.json [dic]
+                private_3D_AF.json [dic]        <-- /fuse ! NAME
+            any-name-possible.json [dic]        <-- /fuse   NAME
         History/
             -1001541923355/
-                Тестировка-1705243895355.json [list]
+                KINGPIN-funny.json [list]       <-- /fuse * NAME
         default.json
         baguette.json
 
@@ -37,6 +37,7 @@ namespace Witlesss.XD;
         ASCII/
         Emoji/
         Fonts/
+            Fallback/
         Manual/
         Water/
         art.jpg
@@ -74,6 +75,8 @@ public static class Paths
     public static string Dir_Fonts  { get; } = Path.Combine(Dir_Static, "Fonts");
     public static string Dir_Manual { get; } = Path.Combine(Dir_Static, "Manual");
     public static string Dir_Water  { get; } = Path.Combine(Dir_Static, "Water");
+
+    public static string Dir_Fonts_Fallback  { get; } = Path.Combine(Dir_Fonts, "Fallback");
 
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");

@@ -14,7 +14,7 @@ namespace Witlesss.Memes.Shared
     public class ExtraFonts // todo rename since it is the main font source now
     {
         private static readonly Dictionary<string, FontFamily> _families;
-        //private static readonly FontCollection _fallback;
+        private static readonly IReadOnlyList<FontFamily> _fallbackDefault, _fallbackCo, _fallbackSg;
 
         private readonly Regex _regex;
 
@@ -38,25 +38,25 @@ namespace Witlesss.Memes.Shared
                 _families.Add(familyCodes[i], families[i]);
             }
 
-            /*
-            var fallback = Directory.GetFiles(Path.Combine(Paths.Dir_Fonts, "Fallback"));
-            _fallback = new FontCollection();
-            fallback.ForEach(file => _fallback.Add(file));
-
-            FallbackFamilies = _fallback.Families.ToList();
-            */
-            /*.Append(SystemFonts.Get("MS PGothic"))
-            .Append(SystemFonts.Get("Segoe UI Symbol"))
-            .ToList();*/
+            var fallback = new FontCollection();
+            Directory.GetFiles(Paths.Dir_Fonts_Fallback)
+                .OrderBy(x => x)
+                .ForEach(x => fallback.Add(x));
+            _fallbackDefault = fallback.Families.ToList();
+            _fallbackCo = new[] { _families["co"] }.Concat(_fallbackDefault).ToList();
+            _fallbackSg = new[] { _families["sg"] }.Concat(_fallbackDefault).ToList();
         }
 
         public static IEnumerable<string> Keys => _families.Keys;
 
-        public static List<FontFamily> FallbackFamilies { get; } = [];/* =
-        [
-            SystemFonts.Get("MS PGothic"),
-            SystemFonts.Get("Segoe UI Symbol")
-        ];*/
+        public IReadOnlyList<FontFamily> GetFallbackFamilies()
+        {
+            return FontIsFallback()
+                ? _fallbackDefault
+                : FallbackWithComicSans()
+                    ? _fallbackCo
+                    : _fallbackSg;
+        }
 
         public ExtraFonts
         (
@@ -146,6 +146,26 @@ namespace Witlesss.Memes.Shared
             "vb" => false,
             "vp" => false,
             _ => true,
+        };
+
+        public bool FontIsFallback() => _fontKey switch
+        {
+            "co" => true,
+            "sg" => true,
+            _    => false
+        };
+
+        public bool FallbackWithComicSans() => _fontKey switch
+        {
+            "bc" => true,
+            "bl" => true,
+            "go" => true,
+            "mc" => true,
+            "ro" => true,
+            "ru" => true,
+            "vb" => true,
+            "vg" => true,
+            _    => false
         };
 
         public bool FontIsPixelated() => _fontKey == "vn";

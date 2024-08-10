@@ -149,7 +149,7 @@ public partial class DynamicDemotivatorDrawer
         Origin = GetTextOrigin(),
         WrappingLength = fullW,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.FallbackFamilies,
+        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());

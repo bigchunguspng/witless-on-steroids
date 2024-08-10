@@ -157,7 +157,7 @@ public partial class IFunnyApp
         Origin = GetTextOrigin(),
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.FallbackFamilies,
+        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());

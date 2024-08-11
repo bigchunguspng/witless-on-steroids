@@ -24,27 +24,27 @@
 Будет не понятно - пиши /help</value>
     </data>
     <data name="SET_MANUAL" xml:space="preserve">
-        <value>&lt;b&gt;&lt;u&gt;Тип авто-мемов&lt;/u&gt;&lt;/b&gt;:
+        <value>&lt;u&gt;&lt;b&gt;Тип авто-мемов&lt;/b&gt;&lt;/u&gt;:
 
-&lt;code&gt;/set [буква]&lt;/code&gt;
+&lt;code&gt;/set [код]&lt;/code&gt;
+&lt;blockquote&gt;&lt;b&gt;Примеры&lt;/b&gt;:
+&lt;code&gt;/set M &lt;/code&gt; - мемы☝️
+&lt;code&gt;/set T &lt;/code&gt; - подписанки 💬
+&lt;code&gt;/set D &lt;/code&gt; - демотиваторы👌
+&lt;code&gt;/set Dg&lt;/code&gt; - демотиваторы💀
+&lt;code&gt;/set N &lt;/code&gt; - ядерный фритюр 🍤&lt;/blockquote&gt;
 
-&lt;code&gt;M &lt;/code&gt; - мемы☝️
-&lt;code&gt;T &lt;/code&gt; - подписанки 💬
-&lt;code&gt;D &lt;/code&gt; - демотиваторы👌
-&lt;code&gt;Dg&lt;/code&gt; - демотиваторы💀
-&lt;code&gt;N &lt;/code&gt; - ядерный фритюр 🍤
+&lt;u&gt;&lt;b&gt;Авто-опции&lt;/b&gt;&lt;/u&gt;:
 
-&lt;b&gt;&lt;u&gt;Опции в мемчиках по умолчанию&lt;/u&gt;&lt;/b&gt;:
+&lt;code&gt;/set [код] [опции]&lt;/code&gt;
+&lt;blockquote&gt;&lt;b&gt;Примеры&lt;/b&gt;:
+&lt;code&gt;/set M wwsd#lime#&lt;/code&gt;
+&lt;code&gt;/set T largmmww5"&lt;/code&gt;
+&lt;code&gt;/set D imup&lt;/code&gt;
+&lt;code&gt;/set Dg xllro-b&lt;/code&gt;
+&lt;code&gt;/set N =3&lt;/code&gt;&lt;/blockquote&gt;
 
-&lt;code&gt;/set [буква] [опции]&lt;/code&gt;
-
-&lt;code&gt;/set M wwsd#lime#…&lt;/code&gt;
-&lt;code&gt;/set T largmmww15"…&lt;/code&gt;
-&lt;code&gt;/set D cpupbb-i…&lt;/code&gt;
-&lt;code&gt;/set Dg x=5n…&lt;/code&gt;
-&lt;code&gt;/set N =3…&lt;/code&gt;
-
-&lt;code&gt;/set [буква] 0&lt;/code&gt; - сбросить</value>
+&lt;code&gt;/set [код] 0&lt;/code&gt; - сбросить</value>
     </data>
     <data name="FUSE_MANUAL" xml:space="preserve">
         <value>&lt;b&gt;Слияние / кормёжка&lt;/b&gt;

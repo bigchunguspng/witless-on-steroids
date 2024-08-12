@@ -17,7 +17,7 @@ public class ToVoiceMessage : AudioVideoCommand
         }
         catch
         {
-            result = Paths.File_DefaultVoiceMessage;
+            result = File_DefaultVoiceMessage;
         }
 
         await using var stream = File.OpenRead(result);

@@ -28,7 +28,7 @@ namespace Witlesss.Services.Internet
                 }
                 catch
                 {
-                    if (i == 2) return Paths.File_DefaultAlbumCover;
+                    if (i == 2) return File_DefaultAlbumCover;
                 }
             }
 

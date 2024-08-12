@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
 
-
 namespace Witlesss.Services.Internet
 {
     public class TelegramFileDownloader
@@ -26,7 +25,7 @@ namespace Witlesss.Services.Internet
 
             if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
 
-            path = UniquePath(Path.Combine(Paths.Dir_Pics, chat.ToString()), $"{shortID}{extension}");
+            path = UniquePath(Path.Combine(Dir_Pics, chat.ToString()), $"{shortID}{extension}");
             await DownloadFile(fileID, path, chat);
 
             (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);

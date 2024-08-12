@@ -260,7 +260,7 @@ namespace Witlesss.Memes.Shared
                     {
                         repeat = false;
 
-                        var files = Directory.GetFiles(Paths.Dir_Emoji, name + "*.png");
+                        var files = Directory.GetFiles(Dir_Emoji, name + "*.png");
                         if (files.Length == 1) file = files[0];
                         else if (files.Length > 1)
                         {

@@ -71,7 +71,7 @@ namespace Witlesss.Commands.Packing
 
         private void ProcessTxtFile()
         {
-            var path = UniquePath(Paths.Dir_History, _document!.FileName ?? "fuse.txt");
+            var path = UniquePath(Dir_History, _document!.FileName ?? "fuse.txt");
             Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
             EatFromTxtFile(path);
@@ -289,10 +289,10 @@ namespace Witlesss.Commands.Packing
         #endregion
 
 
-        private string GetHistoryFolder() => Path.Combine(Paths.Dir_History, Chat.ToString());
-        private string GetPrivateFolder() => Path.Combine(Paths.Dir_Fuse,    Chat.ToString());
+        private string GetHistoryFolder() => Path.Combine(Dir_History, Chat.ToString());
+        private string GetPrivateFolder() => Path.Combine(Dir_Fuse,    Chat.ToString());
 
-        private string GetFuseFolder(bool @private) => @private ? GetPrivateFolder() : Paths.Dir_Fuse;
+        private string GetFuseFolder(bool @private) => @private ? GetPrivateFolder() : Dir_Fuse;
 
         private string GetJsonFormatExample()
         {

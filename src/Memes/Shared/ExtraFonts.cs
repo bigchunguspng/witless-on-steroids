@@ -22,7 +22,7 @@ namespace Witlesss.Memes.Shared
 
         static ExtraFonts()
         {
-            var files = Directory.GetFiles(Paths.Dir_Fonts).OrderBy(x => x).ToArray();
+            var files = Directory.GetFiles(Dir_Fonts).OrderBy(x => x).ToArray();
             var collection = new FontCollection();
             files.ForEach(file => collection.Add(file));
 
@@ -39,7 +39,7 @@ namespace Witlesss.Memes.Shared
             }
 
             var fallback = new FontCollection();
-            Directory.GetFiles(Paths.Dir_Fonts_Fallback)
+            Directory.GetFiles(Dir_Fonts_Fallback)
                 .OrderBy(x => x)
                 .ForEach(x => fallback.Add(x));
             _fallbackDefault = fallback.Families.ToList();

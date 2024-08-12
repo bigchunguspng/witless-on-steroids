@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Witlesss.Generation;
-using Witlesss.Generation.Pack;
 
 namespace Witlesss.Commands.Packing
 {

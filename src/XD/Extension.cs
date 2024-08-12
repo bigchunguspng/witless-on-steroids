@@ -186,12 +186,12 @@ namespace Witlesss.XD
 
         public static void ClearTempFiles()
         {
-            ClearDirectory(Paths.Dir_Temp, new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
-            ClearDirectory(Paths.Dir_History, new EnumerationOptions() { RecurseSubdirectories = false });
+            ClearDirectory(Dir_Temp,    new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
+            ClearDirectory(Dir_History, new EnumerationOptions { RecurseSubdirectories = false });
 
-            if (Directory.Exists(Paths.Dir_Fuse))
+            if (Directory.Exists(Dir_Fuse))
             {
-                var files = Directory.GetFiles(Paths.Dir_Fuse, "del*.json", SearchOption.AllDirectories);
+                var files = Directory.GetFiles(Dir_Fuse, "del*.json", SearchOption.AllDirectories);
                 foreach (var file in files) File.Delete(file);
             }
         }

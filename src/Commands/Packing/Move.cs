@@ -27,14 +27,14 @@ namespace Witlesss.Commands.Packing
             if (pubX) // publish a pack from private storage
             {
                 var name = args[^1];
-                var file = Path.Combine(Paths.Dir_Fuse, Chat.ToString(), $"{name}.json");
+                var file = Path.Combine(Dir_Fuse, Chat.ToString(), $"{name}.json");
                 if (File.Exists(file) == false)
                 {
                     Bot.SendMessage(Chat, string.Format(PUB_EX_NOT_FOUND, Responses.FAIL_EMOJI_1.PickAny()));
                     return;
                 }
 
-                File.Move(file, UniquePath(Paths.Dir_Fuse, $"{name}.json"));
+                File.Move(file, UniquePath(Dir_Fuse, $"{name}.json"));
                 Bot.SendMessage(Chat, string.Format(PUB_EX_DONE, name));
             }
             else
@@ -76,7 +76,7 @@ namespace Witlesss.Commands.Packing
 
         public static string GetUniqueExtraPackPath(string name, long chat = 0)
         {
-            var path = chat == 0 ? Paths.Dir_Fuse : Path.Combine(Paths.Dir_Fuse, chat.ToString());
+            var path = chat == 0 ? Dir_Fuse : Path.Combine(Dir_Fuse, chat.ToString());
             return UniquePath(path, $"{name}.json", name is "info" or "his");
         }
     }

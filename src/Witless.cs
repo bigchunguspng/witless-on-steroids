@@ -44,7 +44,7 @@ namespace Witlesss
 
         public string FilePath => GetPath();
 
-        public string GetPath() => Path.Combine(Paths.Dir_Chat, $"{Paths.Prefix_Pack}-{Chat}.json");
+        public string GetPath() => Path.Combine(Dir_Chat, $"{Prefix_Pack}-{Chat}.json");
 
         // BAKA
 
@@ -210,8 +210,8 @@ namespace Witlesss
             if (file.Length >= 10_000_000) return; // don't backup big ones
 
             var date = DateTime.Now.ToString("yyyy-MM-dd");
-            var name = $"{Paths.Prefix_Pack}-{Chat}.json";
-            file.CopyTo(UniquePath(Path.Combine(Paths.Dir_Backup, date), name));
+            var name = $"{Prefix_Pack}-{Chat}.json";
+            file.CopyTo(UniquePath(Path.Combine(Dir_Backup, date), name));
         }
     }
 

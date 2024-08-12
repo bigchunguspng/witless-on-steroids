@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using System;
 using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Commands;
@@ -33,9 +33,9 @@ public class Help : SyncCommand
     private string GetManualPage(string path, out string address)
     {
         var options = new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive };
-        var file = Directory.GetFiles(Paths.Dir_Manual,   $"{path} *").FirstOrDefault()
-                ?? Directory.GetFiles(Paths.Dir_Manual, $"* *{path}*").FirstOrDefault()
-                ?? Directory.GetFiles(Paths.Dir_Manual,         "0 *", options).First();
+        var file = Directory.GetFiles(Dir_Manual,   $"{path} *").FirstOrDefault()
+                ?? Directory.GetFiles(Dir_Manual, $"* *{path}*").FirstOrDefault()
+                ?? Directory.GetFiles(Dir_Manual,         "0 *", options).First();
 
         var name = Path.GetFileNameWithoutExtension(file);
 
@@ -53,7 +53,7 @@ public class Help : SyncCommand
         var sb = new StringBuilder("📖 <u><b>");
         for (var i = 0; i < paths.Count; i++)
         {
-            var file = Directory.GetFiles(Paths.Dir_Manual, $"{paths[i]} *").First();
+            var file = Directory.GetFiles(Dir_Manual, $"{paths[i]} *").First();
             var name = Path.GetFileNameWithoutExtension(file);
             sb.Append(name.AsSpan(name.IndexOf(' ') + 1));
             if (i < paths.Count - 1) sb.Append(" » ");
@@ -67,7 +67,7 @@ public class Help : SyncCommand
     private static InlineKeyboardMarkup GetKeyboard(string address)
     {
         var isMainPage = address == "0";
-        var files = Directory.GetFiles(Paths.Dir_Manual, isMainPage ? "? *" : $"{address}? *");
+        var files = Directory.GetFiles(Dir_Manual, isMainPage ? "? *" : $"{address}? *");
         var buttons = files
             .Select(Path.GetFileNameWithoutExtension)
             .OfType<string>()

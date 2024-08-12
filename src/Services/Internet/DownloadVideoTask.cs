@@ -22,7 +22,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
-        var directory = Path.Combine(Paths.Dir_Temp, DateTime.Now.Ticks.ToString());
+        var directory = Path.Combine(Dir_Temp, DateTime.Now.Ticks.ToString());
         Directory.CreateDirectory(directory);
 
         if (_cache.Contains(id, out var path))

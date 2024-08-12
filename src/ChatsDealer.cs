@@ -10,7 +10,7 @@ public static class ChatsDealer
 
     static ChatsDealer()
     {
-        SussyBakas = JsonIO.LoadData<ChatList>(Paths.File_Chats);
+        SussyBakas = JsonIO.LoadData<ChatList>(File_Chats);
     }
 
     public static bool WitlessExist(long chat, [NotNullWhen(true)] out Witless? baka)
@@ -25,7 +25,7 @@ public static class ChatsDealer
 
     public static void SaveChatList()
     {
-        JsonIO.SaveData(SussyBakas, Paths.File_Chats);
+        JsonIO.SaveData(SussyBakas, File_Chats);
         Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
     }
 

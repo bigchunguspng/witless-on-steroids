@@ -42,7 +42,7 @@ namespace Witlesss.Commands.Packing
         private InlineKeyboardMarkup GetMinigameKeyboard()
         {
             var cell = InlineKeyboardButton.WithCallbackData(_default);
-            var rows = new List<List<InlineKeyboardButton>>() { Line(), Line(), Line(), Line() };
+            var rows = new List<List<InlineKeyboardButton>> { Line(), Line(), Line(), Line() };
 
             AddGameObjects(_house, 3, data: false);
             AddGameObjects(_tractor, 1);

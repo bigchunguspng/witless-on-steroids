@@ -22,7 +22,7 @@ namespace Witlesss.Services.Internet.Reddit
 
         private RedditTool()
         {
-            Excluded = JsonIO.LoadData<Queue<string>>(Paths.File_RedditPosts);
+            Excluded = JsonIO.LoadData<Queue<string>>(File_RedditPosts);
             ConsoleUI.LoggedIntoReddit = true;
         }
 
@@ -42,7 +42,7 @@ namespace Witlesss.Services.Internet.Reddit
 
         public void SaveExcluded()
         {
-            JsonIO.SaveData(Excluded, Paths.File_RedditPosts);
+            JsonIO.SaveData(Excluded, File_RedditPosts);
         }
 
         #endregion

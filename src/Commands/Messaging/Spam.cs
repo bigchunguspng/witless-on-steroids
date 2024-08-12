@@ -40,7 +40,7 @@ public class Spam : SyncCommand
     {
         try
         {
-            var message = text ?? File.ReadAllText(Paths.File_Spam);
+            var message = text ?? File.ReadAllText(File_Spam);
             foreach (var witless in GetBakas(size))
             {
                 Bot.SendMessage(witless.Chat, message, preview: false);

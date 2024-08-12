@@ -56,6 +56,6 @@ namespace Witlesss.MediaTools
 
         public  static int ToEven(int x) => x - x % 2;
 
-        private static readonly string[] _squareCropping = new[] { "'min(iw,ih)'", "'min(iw,ih)'" };
+        private static readonly string[] _squareCropping = ["'min(iw,ih)'", "'min(iw,ih)'"];
     }
 }

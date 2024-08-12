@@ -74,7 +74,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var output = $"{artist} - {title} xd.%(ext)s";
 
-        var directory = $"{Paths.Dir_Temp}/{DateTime.Now.Ticks}";
+        var directory = $"{Dir_Temp}/{DateTime.Now.Ticks}";
         var thumbPath = $"{directory}/thumb.jpg";
 
         Directory.CreateDirectory(directory);

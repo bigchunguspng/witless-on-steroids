@@ -58,7 +58,7 @@ namespace Witlesss
 
         public void SendAudio(long chat, InputOnlineFile audio, string? art = null)
         {
-            using var cover = File.OpenRead(art ?? Paths.File_DefaultAlbumCover);
+            using var cover = File.OpenRead(art ?? File_DefaultAlbumCover);
             var task = Client.SendAudioAsync(chat, audio, thumb: new InputMedia(cover, "xd"));
             TrySend(task, chat, "audio");
         }
@@ -182,7 +182,7 @@ namespace Witlesss
 
         public void SendErrorDetails(long chat, Exception e)
         {
-            var path = UniquePath(Paths.Dir_Temp, "error.txt");
+            var path = UniquePath(Dir_Temp, "error.txt");
             var args = F_Action.FFMpegCommand;
             var text = string.Format(FF_ERROR_REPORT, args, Responses.GetRandomASCII(), FixedErrorMessage(e.Message));
             File.WriteAllText(path, text);

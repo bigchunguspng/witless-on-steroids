@@ -40,7 +40,7 @@ namespace Witlesss.Memes
         };
 
 
-        static DemotivatorDrawer() => LoadLogos(Paths.Dir_Water);
+        static DemotivatorDrawer() => LoadLogos(Dir_Water);
 
         public DemotivatorDrawer(int width = 720, int height = 720)
         {

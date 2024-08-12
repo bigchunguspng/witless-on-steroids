@@ -186,7 +186,7 @@ public static class Texts
         """
         Я могу делать <u><b>{0}</b></u> из картинок 📸 и видео 🎬
 
-        Прикрепи файл к команде, либо ответь командой на файл.
+        ‼️ Прикрепи файл к команде, либо ответь командой на файл.
 
         📖 Справка: /man_3
         ℹ️ Список опций: /op_{1}
@@ -545,13 +545,6 @@ public static class Texts
         <code>bb</code> - <b><i>Bender</i></b> ✨
         <code>ft</code> - <b><i>Futura XBlkCn BT</i></b>
 
-        <u><b>Тематические:</b></u>
-        <code>ru</code> - <b><i>CyrillicOld</i></b> - летописный
-        <code>go</code> - <b><i>CyrillicGoth</i></b> - готический
-        <code>st</code> - <b><i>a_Stamper</i></b> 🔠 - трафаретный
-        <code>vn</code> - <b><i>v_NokiaCellphoneFC</i></b> - пиксельный
-        <code>vp</code> - <b><i>v_Pythia</i></b> - закос под греческий
-
         <u><b>Комиксные:</b></u>
         <code>ap</code> - <b><i>v_Armor Piercing 2.0 BB</i></b>
         <code>bc</code> - <b><i>v_CCBattleCry-Regular</i></b> 🔠
@@ -560,8 +553,18 @@ public static class Texts
         <code>vb</code> - <b><i>v_Billy The Flying Robot BB LC</i></b>
         <code>vg</code> - <b><i>v_GiantSizedSpectacular Std BB</i></b>
 
+        <u><b>Тематические:</b></u>
+        <code>ru</code> - <b><i>CyrillicOld</i></b> - летописный
+        <code>go</code> - <b><i>CyrillicGoth</i></b> - готический
+        <code>st</code> - <b><i>a_Stamper</i></b> 🔠 - трафаретный
+        <code>vn</code> - <b><i>v_NokiaCellphoneFC</i></b> - пиксельный
+        <code>vp</code> - <b><i>v_Pythia</i></b> - древнегреческий
+
         ✨ - поддержка стилей.
         🔠 - только верхний регистр.
+
+
+        📖 <u>Как использовать</u>: /man_33
         """;
 
     public const string DG_OPTIONS =

@@ -6,9 +6,9 @@ namespace Witlesss.Backrooms;
 
 public static class StringExtensions
 {
-    public static string ToRandomLetterCase(this string text) => ToLetterCase(text, RandomLetterCase());
+    public static string ToRandomLetterCase(this string text) => InLetterCase(text, GetRandomLetterCase());
 
-    public static string ToLetterCase(this string text, LetterCaseMode mode) => mode switch
+    public static string InLetterCase(this string text, LetterCaseMode mode) => mode switch
     {
         LetterCaseMode.Lower    => text.ToLower(),
         LetterCaseMode.Upper    => text.ToUpper(),
@@ -16,7 +16,7 @@ public static class StringExtensions
         _ => text
     };
 
-    private static LetterCaseMode RandomLetterCase() => Random.Shared.Next(8) switch
+    public static LetterCaseMode GetRandomLetterCase() => Random.Shared.Next(8) switch
     {
         < 5 => LetterCaseMode.Lower,
         < 7 => LetterCaseMode.Sentence,

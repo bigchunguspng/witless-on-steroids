@@ -41,7 +41,7 @@ namespace Witlesss.Commands.Meme
             var caption = generate ? Baka.Generate() : text!;
 
             var capitalize = CheckCaps(Request, _caps, generate) || generate && caption.Length <= 12;
-            return capitalize ? caption.ToLetterCase(LetterCaseMode.Upper) : caption;
+            return capitalize ? caption.InLetterCase(LetterCaseMode.Upper) : caption;
         }
 
         private static readonly Regex _small = new(@"^\/dp\S*(xx)\S*");

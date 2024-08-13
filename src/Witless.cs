@@ -106,7 +106,12 @@ namespace Witlesss
             => Dirty = Baka.Eat(text, out eaten);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public string Generate() => TextOrBust(() => Baka.Generate());
+        public string Generate
+            () => TextOrBust(() => Baka.Generate());
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public string GenerateBackwards
+            () => TextOrBust(() => Baka.GenerateBackwards());
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));

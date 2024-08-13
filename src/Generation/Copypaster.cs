@@ -185,8 +185,11 @@ namespace Witlesss.Generation
             return RenderText(ids);
         }
 
-        private string GenerateBackwards(int wordID)
+        public string GenerateBackwards(int wordID = GenerationPack.END)
         {
+            if (wordID == GenerationPack.END)
+                wordID = GetRandomLastWordID();
+
             var ids = new LinkedList<int>();
 
             ids.AddFirst(wordID);
@@ -198,6 +201,17 @@ namespace Witlesss.Generation
             }
 
             return RenderText(ids);
+        }
+
+        private int GetRandomLastWordID()
+        {
+            for (var i = 0; i < 12; i++)
+            {
+                var table = DB.Transitions.ElementAt(Random.Shared.Next(DB.Transitions.Count));
+                if (table.Value.AsIEnumerable().Any(x => x.WordID == GenerationPack.END)) return table.Key;
+            }
+
+            return -1;
         }
 
         private static int PickWordID(TransitionTable table, int fallback = GenerationPack.END)

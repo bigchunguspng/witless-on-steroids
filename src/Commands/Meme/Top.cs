@@ -54,7 +54,7 @@ namespace Witlesss.Commands.Meme
 
             IFunnyApp.PreferSegoe = IsMostlyCyrillic(caption);
 
-            return capitalize ? caption.ToLetterCase(LetterCaseMode.Upper) : caption;
+            return capitalize ? caption.InLetterCase(LetterCaseMode.Upper) : caption;
         }
 
         private static readonly Regex _left    = new(@"^\/top\S*(la)\S*");

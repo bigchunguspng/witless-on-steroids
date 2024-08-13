@@ -8,15 +8,12 @@ namespace Witlesss.Commands.Generation
 
         protected override void Run()
         {
-            if (Args is null)
+            string word = null!, opening = null!;
+            var byWord = Args != null;
+            if (byWord)
             {
-                Bot.SendMessage(Chat, A_MANUAL);
-            }
-            else
-            {
-                var words = Args.Split();
-                var word = words[^1];
-                var mode = GetMode(words[0]);
+                var words = Args!.Split();
+                word = words[^1];
                 if (words.Length > 1)
                 {
                     word = string.Join(' ', words[^2..]); // take last two words
@@ -24,24 +21,28 @@ namespace Witlesss.Commands.Generation
 
                 word = word.ToLower();
 
-                var text = Args!;
-                var outset = text.Remove(text.Length - word.Length);
-                var repeats = GetRepeats(_repeat.Match(Command!));
-                for (int i = 0; i < repeats; i++)
-                {
-                    text = outset + Baka.GenerateByWord(word);
-                    Bot.SendMessage(Chat, text.ToLetterCase(mode));
-                }
-
-                LogXD(Title, repeats, "FUNNY BY WORD");
+                opening = Args.Remove(Args.Length - word.Length);
             }
+
+            var up = Command!.Contains("up");
+            var repeats = GetRepeats(_repeat.Match(Command!));
+            for (var i = 0; i < repeats; i++)
+            {
+                var mode = up ? LetterCaseMode.Upper : GetMode(Args);
+                var message = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
+                Bot.SendMessage(Chat, message.InLetterCase(mode));
+            }
+
+            LogXD(Title, repeats, "FUNNY BY WORD");
         }
 
-        protected static LetterCaseMode GetMode (string s)
+        protected static LetterCaseMode GetMode(string? s)
         {
+            if (s is null)
+                return StringExtensions.GetRandomLetterCase();
             if (s == s.ToLower()) return LetterCaseMode.Lower;
             if (s == s.ToUpper()) return LetterCaseMode.Upper;
-            return                       LetterCaseMode.Sentence;
+            return StringExtensions.GetRandomLetterCase();
         }
 
         protected static void LogXD(string title, int repeats, string s)

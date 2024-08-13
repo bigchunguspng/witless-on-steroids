@@ -80,7 +80,7 @@ namespace Witlesss.Commands.Meme
             }
 
             var capitalize = OptionsParsing.CheckCaps(Request, _caps, generate);
-            if (capitalize) a = a.ToLetterCase(LetterCaseMode.Upper);
+            if (capitalize) a = a.InLetterCase(LetterCaseMode.Upper);
 
             return new TextPair(a, b);
         }

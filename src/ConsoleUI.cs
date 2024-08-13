@@ -53,19 +53,16 @@ namespace Witlesss
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) ChatsDealer.SaveBakas();
-            else if (_input == "/sp") Spam.SendSpam();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
             else if (_input == "/cc") ClearTempFiles();
-            else if (_input == "/oo") ClearDics();
-            else if (_input == "/Oo") ClearDic(Active);
+            else if (_input == "/cp") ClearDic(Active);
             else if (_input == "/l" ) ActivateLastChat();
             else if (_input == "/b" ) Thor.  BanChat(_active);
             else if (_input == "/ub") Thor.UnbanChat(_active);
-            else if (_input.StartsWith("/sp") && _input.HasIntArgument(out var a)) Spam.SendSpam(a);
-            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var b)) DeleteBySize(b);
-            else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out var c)) Thor.BanChat(_active, c);
+            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var a1)) DeleteBySize(a1);
+            else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out var a2)) Thor.BanChat(_active, a2);
         }
 
         private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
@@ -108,7 +105,6 @@ namespace Witlesss
             Log($"ACTIVE CHAT >> {_active} ({context.Title})");
         }
 
-        private        void ClearDics() => Bakas.ForEach(ClearDic);
         private static void ClearDic(Witless witless)
         {
             witless.BackupAndDelete();

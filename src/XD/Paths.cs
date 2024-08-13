@@ -45,7 +45,6 @@ namespace Witlesss.XD;
 
     config.txt
     reddit-posts.json
-    spam.txt
 */
 
 public static class Paths
@@ -55,7 +54,6 @@ public static class Paths
     public const string Prefix_Pack = "pack";
 
     public const string File_Config      = "config.txt";
-    public const string File_Spam        = "spam.txt";
     public const string File_RedditPosts = "reddit-posts.json";
 
     public static string Dir_Backup  { get; } = Path.Combine(Dir_DB, "Backup");

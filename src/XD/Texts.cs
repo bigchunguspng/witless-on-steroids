@@ -155,19 +155,17 @@ public static class Texts
         s   - save and exit
         +55 - select active chat
 
-        /s  - save dics
+        /s  - save packs
 
-        /sp - spam (min size)
+        /l  - activate last chat
 
         /db - delete blockers
         /DB - delete active if blocked
         /ds - delete by size (max size)
 
         /cc - clear temp files
-        /oo - clear dics
-        /Oo - clear active dic
+        /cp - clear active pack
 
-        /l  - activate last chat
         /b  - ban active chat (hours)
         /ub - unban active chat
         """;

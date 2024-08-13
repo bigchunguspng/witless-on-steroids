@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Witlesss.Commands.Messaging;
@@ -16,60 +17,54 @@ public class Spam : SyncCommand
             return;
         }
 
-        var args = Args?.Split(' ', 2);
         var messageId = Message.ReplyToMessage is { } reply ? reply.MessageId : -1;
 
-        var sizeProvided = args is not null && args.Length > 0;
-        var textProvided = args is not null && args!.Length >= 2;
+        var textProvided = Args is not null;
         var copyProvided = messageId >= 0;
 
-        if (!sizeProvided || !textProvided && !copyProvided)
+        if (!textProvided && !copyProvided)
         {
-            Bot.SendMessage(Chat, "<code>/spam [min size] [message]</code>");
+            Bot.SendMessage(Chat, "<code>/spam[g/aN/sB] [reply / message]</code>");
             return;
         }
 
-        var size = int.TryParse(args![0], out var x) ? x : 2_000_000;
+        var groupsOnly = Command!.Contains('g');
+
+        var size = 2_000_000;
+        var match1 = Regex.Match(Command, @"s(\d+)");
+        if (match1.Success) size = int.Parse(match1.Groups[1].Value);
+
+        var activeDays = 28;
+        var match2 = Regex.Match(Command, @"a(\d+)");
+        if (match2.Success) activeDays = int.Parse(match2.Groups[1].Value);
+
         var chat = Chat;
+        var text = Args!;
+        var bakas = GetBakas(size, groupsOnly, TimeSpan.FromDays(activeDays));
 
-        if (textProvided) Task.Run(() => SendSpam(size, args[2]));
-        else              Task.Run(() => CopySpam(size, chat, messageId));
+        if (textProvided) Task.Run(() => SendSpam(bakas, text));
+        else              Task.Run(() => CopySpam(bakas, chat, messageId));
     }
 
-    public static void SendSpam(int size = 2_000_000, string? text = null)
+    private static void SendSpam(IEnumerable<Witless> bakas, string text)
     {
-        try
+        foreach (var witless in bakas)
         {
-            var message = text ?? File.ReadAllText(File_Spam);
-            foreach (var witless in GetBakas(size))
-            {
-                Bot.SendMessage(witless.Chat, message, preview: false);
-                LogSpam(witless.Chat);
-            }
-        }
-        catch (Exception e)
-        {
-            LogFail(e);
+            Bot.SendMessage(witless.Chat, text, preview: false);
+            LogSpam(witless.Chat);
         }
     }
 
-    private static void CopySpam(int size, long chat, int messageId)
+    private static void CopySpam(IEnumerable<Witless> bakas, long chat, int messageId)
     {
-        try
+        foreach (var witless in bakas)
         {
-            foreach (var witless in GetBakas(size))
-            {
-                Bot.CopyMessage(witless.Chat, chat, messageId);
-                LogSpam(witless.Chat);
-            }
-        }
-        catch (Exception e)
-        {
-            LogFail(e);
+            Bot.CopyMessage(witless.Chat, chat, messageId);
+            LogSpam(witless.Chat);
         }
     }
 
-    private static IEnumerable<Witless> GetBakas(int size)
+    private static IEnumerable<Witless> GetBakas(int minSize, bool groupsOnly, TimeSpan lastActivity)
     {
         return ChatsDealer.SussyBakas.Values.Where(x =>
         {
@@ -77,12 +72,14 @@ public class Spam : SyncCommand
             if (File.Exists(path))
             {
                 var file = new FileInfo(path);
-                return file.Length > size && file.LastWriteTime.HappenedWithinLast(TimeSpan.FromDays(28));
+                return file.Length >= minSize
+                    && (!groupsOnly || x.Chat.ChatIsNotPrivate())
+                    && file.LastWriteTime.HappenedWithinLast(lastActivity);
             }
+
             return false;
         });
     }
 
     private static void LogSpam(long chat) => Log($"MAIL SENT << {chat}", ConsoleColor.Yellow);
-    private static void LogFail(Exception e) => LogError("SoRRY, CAN'T SPAM, BRO x_x " + e.Message);
 }

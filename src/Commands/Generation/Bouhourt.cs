@@ -46,7 +46,7 @@ namespace Witlesss.Commands.Generation
             }
 
             string result = string.Join("\n@\n", lines.Where(x => x != "")).Replace(" @ ", "\n@\n").ToUpper();
-            Bot.SendMessage(Chat, result);
+            Bot.SendMessage(Chat, result, preview: true);
             Log($"{Title} >> BUGURT #@#");
 
             void AddTextLine() => lines.Add(Baka.Generate()/*ByWord(PullWord(word))*/.Trim('@').TrimStart());

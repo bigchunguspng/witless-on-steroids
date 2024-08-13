@@ -66,7 +66,7 @@ namespace Witlesss.Commands.Packing
                 }
             }
             else if (_private || args.Length == 1) FuseWitlessDB(args[^1]);
-            else Bot.SendMessage(Chat, FUSE_MANUAL, preview: false);
+            else Bot.SendMessage(Chat, FUSE_MANUAL);
         }
 
         private void ProcessTxtFile()

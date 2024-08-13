@@ -77,7 +77,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, REDDIT_MANUAL, preview: false);
+                    Bot.SendMessage(Chat, REDDIT_MANUAL);
                 }
             }
             else // /w search query [subreddit*] [-ops]
@@ -283,7 +283,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
                 if (Text is not null && RedditTool.Instance.Recognize(Text) is { } post)
                 {
-                    Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>", preview: false);
+                    Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
                 }
                 else
                 {

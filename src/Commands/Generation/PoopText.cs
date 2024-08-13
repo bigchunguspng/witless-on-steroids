@@ -9,7 +9,7 @@ public class PoopText : WitlessAsyncCommand
     {
         await Task.Delay(GetRealisticResponseDelay(Text));
 
-        Bot.SendMessage(Chat, Baka.Generate());
+        Bot.SendMessage(Chat, Baka.Generate(), preview: true);
         Log($"{Title} >> FUNNY");
     }
 

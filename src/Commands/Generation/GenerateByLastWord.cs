@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Generation
             {
                 var mode = up ? LetterCaseMode.Upper : GetMode(Args);
                 var message = byWord ? Baka.GenerateByLast(word.ToLower()) + ending : Baka.GenerateBackwards();
-                Bot.SendMessage(Chat, message.InLetterCase(mode));
+                Bot.SendMessage(Chat, message.InLetterCase(mode), preview: true);
             }
 
             LogXD(Title, repeats, "FUNNY BY LAST WORD");

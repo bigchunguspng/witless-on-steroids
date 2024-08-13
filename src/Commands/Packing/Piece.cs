@@ -46,7 +46,7 @@ namespace Witlesss.Commands.Packing
                 _latest = int.Parse(s[1].Split('/')[^1]);
             }
             else
-                Bot.SendMessage(Chat, PIECE_MANUAL, preview: false);
+                Bot.SendMessage(Chat, PIECE_MANUAL);
 
             return !ok;
         }

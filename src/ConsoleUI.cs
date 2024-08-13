@@ -92,7 +92,7 @@ namespace Witlesss
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.SendMessage(_active, text);
+                Bot.SendMessage(_active, text, preview: true);
                 Active.Eat(text);
                 Log($"{_active} >> {text}", ConsoleColor.Yellow);
             }

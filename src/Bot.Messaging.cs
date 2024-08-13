@@ -12,12 +12,7 @@ namespace Witlesss
 {
     public partial class Bot
     {
-        public void SendMessage(long chat, string text)
-        {
-            var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html);
-            TrySend(task, chat, "message");
-        }
-        public void SendMessage(long chat, string text, bool preview)
+        public void SendMessage(long chat, string text, bool preview = false)
         {
             var task = Client.SendTextMessageAsync
                 (chat, text, ParseMode.Html, disableWebPagePreview: !preview);

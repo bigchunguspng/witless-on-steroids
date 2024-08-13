@@ -53,7 +53,7 @@ namespace Witlesss.Commands.Packing
             }
             else
             {
-                Bot.SendMessage(Chat, REDDIT_COMMENTS_MANUAL, preview: false);
+                Bot.SendMessage(Chat, REDDIT_COMMENTS_MANUAL);
             }
         }
 

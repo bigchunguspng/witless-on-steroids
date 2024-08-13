@@ -62,7 +62,7 @@ public class DownloadMusic : AsyncCommand
             await Bot.RunOrThrow(task.RunAsync(), Chat, message);
         }
         else
-            Bot.SendMessage(Chat, SONG_MANUAL, preview: false);
+            Bot.SendMessage(Chat, SONG_MANUAL);
     }
 
     private string? GetArgsWithURL()

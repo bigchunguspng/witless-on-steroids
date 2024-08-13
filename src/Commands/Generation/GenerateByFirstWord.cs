@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Generation
             {
                 var mode = up ? LetterCaseMode.Upper : GetMode(Args);
                 var message = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
-                Bot.SendMessage(Chat, message.InLetterCase(mode));
+                Bot.SendMessage(Chat, message.InLetterCase(mode), preview: true);
             }
 
             LogXD(Title, repeats, "FUNNY BY WORD");

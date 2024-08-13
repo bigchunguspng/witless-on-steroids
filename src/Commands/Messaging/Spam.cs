@@ -50,7 +50,7 @@ public class Spam : SyncCommand
     {
         foreach (var witless in bakas)
         {
-            Bot.SendMessage(witless.Chat, text, preview: false);
+            Bot.SendMessage(witless.Chat, text, preview: true);
             LogSpam(witless.Chat);
         }
     }

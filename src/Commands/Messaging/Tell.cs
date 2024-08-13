@@ -29,7 +29,7 @@ public class Tell : SyncCommand
             if (textProvided)
             {
                 var text = args[1];
-                Bot.SendMessage(chat, text, preview: false);
+                Bot.SendMessage(chat, text, preview: true);
                 if (ChatsDealer.WitlessExist(chat, out var baka)) baka.Eat(text);
             }
             else

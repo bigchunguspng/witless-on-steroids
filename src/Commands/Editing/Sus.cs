@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing
 {
     public class Sus : AudioVideoCommand
     {
-        protected override string SyntaxManual => "/man_cut";
+        protected override string SyntaxManual => "/man_sus";
 
         protected override async Task Execute()
         {

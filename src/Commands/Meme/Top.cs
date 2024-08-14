@@ -16,7 +16,7 @@ namespace Witlesss.Commands.Meme
         protected override string Log_STICK(int x) => $"TOP [{(x == 1 ? "$" : x)}] STICKER";
 
         protected override string Log_VIDEO => "TOP [%] VID";
-        protected override string VideoName => $"piece_fap_club-top-{IFunnyApp.FontSize:F2}.mp4";
+        protected override string VideoName => "piece_fap_club-top.mp4";
 
         protected override string Command => "/top";
         protected override string Suffix  => "-Top";

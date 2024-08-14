@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SixLabors.ImageSharp;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Witlesss.XD
@@ -15,7 +14,6 @@ namespace Witlesss.XD
         [StringSyntax("Regex")] private const string EMOJI_REGEX
             = @"((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+";
 
-        private static readonly Regex Column = new("[:;^Жж]"), Comma = new("[.юб]");
         public  static readonly Regex EmojiRegex = new (EMOJI_REGEX);
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
@@ -37,22 +35,6 @@ namespace Witlesss.XD
             return collection.ElementAt(System.Random.Shared.Next(collection.Count));
         }
 
-        public static bool IsTimeSpan(this string arg, out TimeSpan span)
-        {
-            span = TimeSpan.Zero;
-            arg = arg.TrimStart('-');
-
-            if (!Regex.IsMatch(arg, @"^(\d+[:;^Жж])?\d+([,.юб]\d+)?$")) return false;
-            
-            string s = Comma.Replace(Regex.Match(arg, @"\d+([,.юб]\d+)?$").Value, ",");
-            string m = Column.Replace(Regex.Match(arg, @"^\d+[:;^Жж]").Value, "");
-            
-            if (double.TryParse(s, out double seconds)) span  = TimeSpan.FromSeconds(seconds);
-            if (double.TryParse(m, out double minutes)) span += TimeSpan.FromMinutes(minutes);
-
-            return true;
-        }
-        
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
         public static string FormatTime(TimeSpan t)
         {
@@ -188,42 +170,6 @@ namespace Witlesss.XD
 
         private static SearchOption ToSearchOption(this bool recursive) 
             => recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-
-        public static void ClearTempFiles()
-        {
-            ClearDirectory(Dir_Temp,    new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3 });
-            ClearDirectory(Dir_History, new EnumerationOptions { RecurseSubdirectories = false });
-
-            if (Directory.Exists(Dir_Fuse))
-            {
-                var files = Directory.GetFiles(Dir_Fuse, "del*.json", SearchOption.AllDirectories);
-                foreach (var file in files) File.Delete(file);
-            }
-        }
-
-        private static void ClearDirectory(string path, EnumerationOptions options)
-        {
-            if (!Directory.Exists(path)) return;
-            try
-            {
-                var files = Directory.GetFiles(path, "*", options);
-
-                if (options.RecurseSubdirectories) Directory.Delete(path, true);
-                else
-                {
-                    foreach (var file in files) File.Delete(file);
-                }
-
-                Log($"DEL TEMP [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
-            }
-            catch (Exception e)
-            {
-                LogError($"CAN'T DEL TEMP [{path}] >> {e.Message}");
-            }
-        }
-
-        public static System.Drawing.Size Ok(this Size size) => new(size.Width, size.Height);
-        public static Size Ok(this System.Drawing.Size size) => new(size.Width, size.Height);
 
         public static T GetRandomMemeber<T>() where T : Enum
         {

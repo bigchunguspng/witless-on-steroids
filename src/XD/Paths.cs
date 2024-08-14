@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
@@ -78,4 +79,37 @@ public static class Paths
 
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");
+
+
+    public static void ClearTempFiles()
+    {
+        ClearDirectory(Dir_Temp,    "*",      new EnumerationOptions { RecurseSubdirectories = true  });
+        ClearDirectory(Dir_History, "*",      new EnumerationOptions { RecurseSubdirectories = false });
+        ClearDirectory(Dir_Fuse, "del*.json", new EnumerationOptions { RecurseSubdirectories = true  });
+
+        if (Directory.Exists(Dir_Fuse))
+        {
+            var files = Directory.GetFiles(Dir_Fuse, "del*.json", SearchOption.AllDirectories);
+            foreach (var file in files) File.Delete(file);
+        }
+
+        void ClearDirectory(string path, string pattern, EnumerationOptions options)
+        {
+            if (!Directory.Exists(path)) return;
+            var files = Directory.GetFiles(path, pattern, options);
+            if (files.Length == 0) return;
+            try
+            {
+                var onePunch = options.RecurseSubdirectories && pattern is "*";
+                if (onePunch) Directory.Delete(path, true);
+                else files.ForEach(File.Delete);
+
+                Log($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
+            }
+            catch (Exception e)
+            {
+                LogError($"CAN'T CLEAR [{path}] >> {e.Message}");
+            }
+        }
+    }
 }

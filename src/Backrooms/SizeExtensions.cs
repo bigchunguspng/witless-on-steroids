@@ -67,4 +67,7 @@ public static class SizeExtensions
     public static Size ValidMp4Size(this Size size) => new(size.Width.ToEven(), size.Height.ToEven());
 
     public static Size CeilingInt(this SizeF size) => new(size.Width.CeilingInt(), size.Height.CeilingInt());
+
+    public static System.Drawing.Size Ok(this Size size) => new(size.Width, size.Height);
+    public static Size Ok(this System.Drawing.Size size) => new(size.Width, size.Height);
 }

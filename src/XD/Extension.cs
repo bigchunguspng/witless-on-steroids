@@ -20,16 +20,21 @@ namespace Witlesss.XD
         public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
 
-        public static bool IsOneIn         (int x) => Random.Shared.Next(x) == 0;
-        public static bool IsFirstOf(int a, int b) => Random.Shared.Next(a + b) < a;
+        public static bool IsOneIn         (int x) => System.Random.Shared.Next(x) == 0;
+        public static bool IsFirstOf(int a, int b) => System.Random.Shared.Next(a + b) < a;
 
-        public static bool LuckyFor(int chance, int max = 100) => Random.Shared.Next(max) < chance;
+        public static bool LuckyFor(int chance, int max = 100) => System.Random.Shared.Next(max) < chance;
 
-        public static int    RandomInt   (int    min, int    max) => Random.Shared.Next(min, max + 1);
+        public static int    RandomInt   (int    min, int    max) => System.Random.Shared.Next(min, max + 1);
         public static double RandomDouble(double min, double max)
         {
             var k = 10_000d;
             return RandomInt((int)(min * k), (int)(max * k)) / k;
+        }
+
+        public static T Random<T>(this ICollection<T> collection)
+        {
+            return collection.ElementAt(System.Random.Shared.Next(collection.Count));
         }
 
         public static bool IsTimeSpan(this string arg, out TimeSpan span)
@@ -77,7 +82,7 @@ namespace Witlesss.XD
                 var part1 = path.Remove   (index); // directory/name
                 var part2 = path.Substring(index); // .txt
 
-                var xx = Random.Shared.Next(256).ToString("X2");
+                var xx = System.Random.Shared.Next(256).ToString("X2");
                 path = $"{part1}_{xx}{part2}";
                 if (!File.Exists(path)) return path;
             }
@@ -223,7 +228,7 @@ namespace Witlesss.XD
         public static T GetRandomMemeber<T>() where T : Enum
         {
             var values = Enum.GetValues(typeof(T));
-            return (T)values.GetValue(Random.Shared.Next(values.Length))!;
+            return (T)values.GetValue(System.Random.Shared.Next(values.Length))!;
         }
     }
 

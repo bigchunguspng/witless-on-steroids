@@ -64,7 +64,7 @@ namespace Witlesss.Memes.Shared
             [StringSyntax("Regex")] string? x = null
         )
         {
-            var codes = string.Join('|', _families.Keys);
+            var codes = string.Join('|', _families.Keys.Append(@"\^\^"));
             _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes})(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);
         }
 
@@ -76,7 +76,8 @@ namespace Witlesss.Memes.Shared
 
         public FontFamily GetFontFamily(string @default)
         {
-            return _families[_fontKey ??= @default];
+            _fontKey ??= @default;
+            return _families[_fontKey == "^^" ? _families.Keys.Random() : _fontKey];
         }
 
         public FontStyle GetFontStyle(FontFamily family)
@@ -86,7 +87,14 @@ namespace Witlesss.Memes.Shared
             var aR = available.Contains(FontStyle.Regular);
             var aI = available.Contains(FontStyle.Italic);
 
-            if (_styleKey is null) return aR ? FontStyle.Regular : FontStyle.Bold;
+            if (_styleKey is null)
+            {
+                return _fontKey is "^^"
+                    ? available.Random()
+                    : aR
+                        ? FontStyle.Regular
+                        : FontStyle.Bold;
+            }
 
             var b = _styleKey.Contains('b');
             var i = _styleKey.Contains('i');
@@ -112,13 +120,15 @@ namespace Witlesss.Memes.Shared
             return FontIsMulticase() ? GetSizeMultiplier() * GetCapitalsOffset() * text.GetLowercaseRatio() : 0F;
         }
 
-        private static FontSpecificData GetFontSpecific(string key) => key switch
+        private FontSpecificData GetFontSpecific(string key) => key switch
         {
             //          size    offset     caps
             "ap" => (1.0271F,  0.0562F, 0.0000F),
             "bb" => (1.0024F,  0.1200F, 0.0762F),
             "bc" => (1.1534F,  0.0335F, 0.0000F),
             "bl" => (0.9388F,  0.0650F, 0.0000F),
+            "co" when _styleKey is not null and not "-b"
+                 => (1.1029F,  0.1033F, 0.1325F),
             "co" => (1.1029F, -0.0400F, 0.1325F),
             "ft" => (1.0064F, -0.0435F, 0.1071F),
             "go" => (1.0955F, -0.1280F, 0.1139F),
@@ -136,7 +146,7 @@ namespace Witlesss.Memes.Shared
             _    => (1.0000F,  0.0000F, 0.1000F),
         };
 
-        public bool FontIsMulticase() => _fontKey switch
+        private bool FontIsMulticase() => _fontKey switch
         {
             "ap" => false,
             "bc" => false,
@@ -148,14 +158,14 @@ namespace Witlesss.Memes.Shared
             _ => true,
         };
 
-        public bool FontIsFallback() => _fontKey switch
+        private bool FontIsFallback() => _fontKey switch
         {
             "co" => true,
             "sg" => true,
             _    => false
         };
 
-        public bool FallbackWithComicSans() => _fontKey switch
+        private bool FallbackWithComicSans() => _fontKey switch
         {
             "bc" => true,
             "bl" => true,

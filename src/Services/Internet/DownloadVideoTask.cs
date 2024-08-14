@@ -6,6 +6,8 @@ using Witlesss.Backrooms.Helpers;
 
 namespace Witlesss.Services.Internet;
 
+// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video mp4 "URL" -o "video.%(ext)s"
+
 public class DownloadVideoTask(string id, CommandContext context)
 {
     private readonly Stopwatch Timer = new(); // todo -> sw
@@ -15,7 +17,10 @@ public class DownloadVideoTask(string id, CommandContext context)
     private string GetDownloadCommand(string url)
     {
         var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
-        builder.Append("-k -I 1 -f \"bv*[height<=480]+ba/b[height<=480]/wv*+ba/w\" --remux-video mp4 ");
+        var args = "-k -I 1 "
+                 + "-f \"bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w\" "
+                 + "--remux-video mp4 ";
+        builder.Append(args);
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
     }

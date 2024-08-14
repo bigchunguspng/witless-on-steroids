@@ -35,6 +35,12 @@ namespace Witlesss.MediaTools
         public F_Action Cut() => ApplyEffects(o =>
         {
             var i = MediaInfo();
+            if (i.info.Duration < _span.Length && _span.Start == TimeSpan.Zero)
+            {
+                o.WithCustomArgument("-c copy");
+                return;
+            }
+
             AddFixes(o, i);
 
             o.Seek(_span.Start);

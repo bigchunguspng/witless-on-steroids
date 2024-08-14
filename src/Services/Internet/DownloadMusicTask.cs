@@ -10,6 +10,9 @@ using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
 namespace Witlesss.Services.Internet;
 
+// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f ba -k -x --audio-format mp3 -I 1 "URL" -o "%(artist)s - %(title)s xd.%(ext)s"
+// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f "bv*[height<=720]" -k -I 1 "URL" -o "video.%(ext)s"
+
 public class DownloadMusicTask(string id, bool youTube, CommandContext context, int messageToDelete)
 {
     private const string _YT_video = "https://youtu.be/";

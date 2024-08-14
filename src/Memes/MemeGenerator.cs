@@ -125,6 +125,7 @@ namespace Witlesss.Memes
 
             if (plain)
             {
+                options.WrappingLength = -1;
                 background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
             }
             else

@@ -127,6 +127,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
 
         if (plain)
         {
+            options.WrappingLength = -1;
             image.Mutate(x => x.DrawText(options, text, TextBrush, pen: null));
         }
         else

@@ -145,6 +145,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 #if DEBUG
                 Debug_Text(background, options);
 #endif
+                options.WrappingLength = -1;
                 background.Mutate(x => x.DrawText(options, text, TextBrush, pen: null));
             }
             else

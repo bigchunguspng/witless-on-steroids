@@ -228,6 +228,26 @@ namespace Witlesss
         [JsonProperty] public string? Dg   { get; set; }
         [JsonProperty] public string? Nuke { get; set; }
 
+        public string? this [MemeType type]
+        {
+            get => type switch
+            {
+                MemeType.Meme => Meme,
+                MemeType.Top  => Top,
+                MemeType.Dg   => Dp,
+                MemeType.Dp   => Dg,
+                _             => Nuke,
+            };
+            set
+            {
+                if      (type is MemeType.Meme) Meme = value;
+                else if (type is MemeType.Top)  Top  = value;
+                else if (type is MemeType.Dp )  Dp   = value;
+                else if (type is MemeType.Dg )  Dg   = value;
+                else                            Nuke = value;
+            }
+        }
+
         public bool IsEmpty() => Meme is null && Top is null && Dp is null && Dg is null && Nuke is null;
     }
 }

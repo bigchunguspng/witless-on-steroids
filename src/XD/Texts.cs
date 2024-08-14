@@ -11,7 +11,7 @@ public static class Texts
 
     public const string SET_MANUAL =
         """
-        <u><b>Тип авто-мемов</b></u>:
+        ⚙️ <u><b>Тип авто-мемов</b></u>:
 
         <code>/set [код]</code>
         <blockquote><b>Примеры</b>:
@@ -21,7 +21,7 @@ public static class Texts
         <code>/set Dg</code> - демотиваторы💀
         <code>/set N </code> - ядерный фритюр 🍤</blockquote>
 
-        <u><b>Авто-опции</b></u>:
+        ⚙️ <u><b>Авто-опции</b></u>:
 
         <code>/set [код] [опции]</code>
         <blockquote><b>Примеры</b>:
@@ -31,7 +31,8 @@ public static class Texts
         <code>/set Dg xllro-b</code>
         <code>/set N =3</code></blockquote>
 
-        <code>/set [код] 0</code> - сбросить
+        <code>/set [код] ?</code> - узнать 👁
+        <code>/set [код] 0</code> - сбросить ❌
         """;
 
     public const string FUSE_MANUAL =
@@ -179,13 +180,15 @@ public static class Texts
 
     public const string SET_MEME_TYPE_MANUAL =
         """
-        Выбрать тип авто-мемов:
+        🤨 Чё за "{0}"?
 
-        <code>/meme</code> ☝️👇 <code>/set M </code>
-        <code>/top </code> 💬🔝 <code>/set T </code>
-        <code>/dp  </code> ◼️▪️ <code>/set D </code>
-        <code>/dg  </code> ◾️🔐 <code>/set Dg</code>
-        <code>/nuke</code> 🍕🍤 <code>/set N </code>
+        Выбери код из списка:
+
+        <code>M </code> → <b>/meme</b>
+        <code>T </code> → <b>/top</b>
+        <code>D </code> → <b>/dp</b>
+        <code>Dg</code> → <b>/dg</b>
+        <code>N </code> → <b>/nuke</b>
         """;
 
     public const string SET_MEMES_RESPONSE =

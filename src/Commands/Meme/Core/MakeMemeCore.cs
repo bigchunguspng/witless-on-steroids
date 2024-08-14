@@ -173,11 +173,13 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             var defaults = DefaultOptions;
             var dummy = string.Empty;
-            var command = Text is null ? "" : Text.Split(split_chars, 2)[0].Replace(Bot.Username, "").ToLower();
+            var command = Context.Command ?? "";
             var empty = Text is null && defaults is null;
 
             if (!empty)
             {
+                if (defaults is not null) defaults = Command + defaults;
+
                 var hasOptions = command.Length > Command.Length && command.StartsWith(Command);
                 var combine = hasOptions && defaults is not null && (command.Contains('+') || defaults.Contains('+'));
 
@@ -219,12 +221,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
-        protected static readonly char[] split_chars = [' ', '\n'];
-
         protected static readonly Regex _repeat = new(@"[2-9]");
         protected static readonly Regex   _caps = new(@"\S*(up)\S*");
         protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
-
-        protected const string OPTIONS = "ℹ️ Список опций: ";
     }
 }

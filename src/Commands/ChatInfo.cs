@@ -41,11 +41,11 @@ namespace Witlesss.Commands
                 var anyOptions = false;
                 var optionsBuilder = new StringBuilder("\n\n<u>Авто-опции</u>:");
 
-                if (IsNotNull(Baka.Options.Meme)) AppendOptions("meme", Baka.Options.Meme[5..]);
-                if (IsNotNull(Baka.Options.Top )) AppendOptions("top",  Baka.Options.Top [4..]);
-                if (IsNotNull(Baka.Options.Dp  )) AppendOptions("dp",   Baka.Options.Dp  [3..]);
-                if (IsNotNull(Baka.Options.Dg  )) AppendOptions("dg",   Baka.Options.Dg  [3..]);
-                if (IsNotNull(Baka.Options.Nuke)) AppendOptions("nuke", Baka.Options.Nuke[5..]);
+                if (IsNotNull(Baka.Options.Meme)) AppendOptions("meme", Baka.Options.Meme);
+                if (IsNotNull(Baka.Options.Top )) AppendOptions("top",  Baka.Options.Top );
+                if (IsNotNull(Baka.Options.Dp  )) AppendOptions("dp",   Baka.Options.Dp  );
+                if (IsNotNull(Baka.Options.Dg  )) AppendOptions("dg",   Baka.Options.Dg  );
+                if (IsNotNull(Baka.Options.Nuke)) AppendOptions("nuke", Baka.Options.Nuke);
 
                 if (anyOptions) sb.Append(optionsBuilder);
 

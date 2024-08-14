@@ -5,11 +5,11 @@ namespace Witlesss.Commands.Settings
 {
     public class SetMemeType : SettingsCommand
     {
-        private readonly Regex _m = new(@"^[mм]");
-        private readonly Regex _t = new(@"^[tcтс]");
-        private readonly Regex _g = new(@"^[dд][gг]");
-        private readonly Regex _d = new(@"^[dд]");
-        private readonly Regex _n = new(@"^[nнjж]");
+        private readonly Regex _m = new("^[mм]");
+        private readonly Regex _t = new("^[tт]");
+        private readonly Regex _g = new("^[dд][gг]");
+        private readonly Regex _d = new("^[dд]");
+        private readonly Regex _n = new("^[nн]");
 
         protected override void RunAuthorized()
         {
@@ -20,10 +20,10 @@ namespace Witlesss.Commands.Settings
                 var optionsWereChanged = false;
                 var args = Args.ToLower().Split();
                 var w = args[0];
-                if (_m.IsMatch(w)) Set(x => Baka.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
-                else if (_t.IsMatch(w)) Set(x => Baka.GetMemeOptions().Top = x, MemeType.Top, "/top");
-                else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg = x, MemeType.Dg, "/dg");
-                else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp = x, MemeType.Dp, "/dp");
+                if      (_m.IsMatch(w)) Set(x => Baka.GetMemeOptions().Meme = x, MemeType.Meme, "/meme");
+                else if (_t.IsMatch(w)) Set(x => Baka.GetMemeOptions().Top  = x, MemeType.Top,  "/top");
+                else if (_g.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dg   = x, MemeType.Dg,   "/dg");
+                else if (_d.IsMatch(w)) Set(x => Baka.GetMemeOptions().Dp   = x, MemeType.Dp,   "/dp");
                 else if (_n.IsMatch(w)) Set(x => Baka.GetMemeOptions().Nuke = x, MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Chat, SET_MEME_TYPE_MANUAL);
 
@@ -45,10 +45,10 @@ namespace Witlesss.Commands.Settings
                     if (args.Length > 1)
                     {
                         command = cmd;
-                        result = args[1] == "0" ? null : command + args[1];
+                        result = args[1] == "0" ? null : args[1];
                         setOptions(result);
                         if (result is null && (Baka.Options?.IsEmpty() ?? false)) Baka.Options = null;
-                        result ??= command;
+                        result = $"{cmd}{result}";
                         optionsWereChanged = true;
                     }
                     else

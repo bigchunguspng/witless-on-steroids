@@ -33,20 +33,26 @@ public static partial class Extensions
 
     // OTHER
 
-    public static string? NullOnEmpty(this string? s) => string.IsNullOrEmpty(s) ? null : s;
+    public static string? MakeNull_IfEmpty
+        (this string? text) => string.IsNullOrEmpty(text) ? null : text;
 
-    public static string Quote(this string s) => $"\"{s}\"";
-    
-    public static string Truncate(this string s, int length) => s.Length > length ? s[..(length - 1)] + "…" : s;
+    public static bool IsNullOrEmpty
+        (this string? text) => string.IsNullOrEmpty(text);
 
-    public static bool IsNullOrEmpty(this string? text) => string.IsNullOrEmpty(text);
+    public static string Quote
+        (this string text) => $"\"{text}\"";
 
-    public static int GetLineCount(this string text) => 1 + text.Count(x => x == '\n');
+    public static string Truncate
+        (this string text, int length) => text.Length > length ? text[..(length - 1)] + "…" : text;
 
-    public static string ReplaceExtension(this string path, string newExtension)
-    {
-        return Regex.Replace(path, @"\.\S+$", newExtension);
-    }
+    public static int GetLineCount
+        (this string text) => 1 + text.Count(x => x == '\n');
+
+    public static string RemoveExtension
+        (this string path) => path.Remove(path.LastIndexOf('.'));
+
+    public static string ReplaceExtension
+        (this string path, string newExtension) => Regex.Replace(path, @"\.\S+$", newExtension);
 
     // LANGUAGE DETECTION
 

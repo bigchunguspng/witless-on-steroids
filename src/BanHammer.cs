@@ -98,7 +98,7 @@ namespace Witlesss
                 x = new ChatBotUsage(time, DateTime.Now + TimeSpan.FromMinutes(5));
                 SussyChats.Add(chat, x);
             }
-            Log($@"{chat} >> {FormatTime(x.HangingTime)} by {x.ForgiveDate:T}", ConsoleColor.DarkGray);
+            Log($@"{chat} >> {x.HangingTime.ReadableTimeShort()} by {x.ForgiveDate:T}", ConsoleColor.DarkGray);
 
             if (x.HangingTime > TimeSpan.FromMinutes(2) && x.ForgiveDate > DateTime.Now)
             {

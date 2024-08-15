@@ -168,7 +168,7 @@ namespace Witlesss.MediaTools
             o.WithQscale(factor).WithCustomArgument(sb.ToString());
 
 
-            string RandomDouble(double min, double max) => FormatDouble(Extensions.RandomDouble(min, max));
+            string RandomDouble(double min, double max) => Extensions.RandomDouble(min, max).Format();
         }
 
         #endregion
@@ -408,7 +408,7 @@ namespace Witlesss.MediaTools
             return sb;
         }
         
-        private string Format(double x) => FormatDouble(Math.Round(x, 3));
+        private string Format(double x) => Math.Round(x, 3).Format();
 
         private record TrimCode(double A, double B);
 

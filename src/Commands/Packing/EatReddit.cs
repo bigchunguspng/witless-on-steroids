@@ -57,9 +57,9 @@ namespace Witlesss.Commands.Packing
 
         private async Task EatComments(WitlessContext c, RedditQuery query, long size, int limit)
         {
-            var timer = new Stopwatch();
+            var sw = GetStartedStopwatch();
             var comments = await RedditTool.Instance.GetComments(query);
-            Log($"COMMENTS FETCHED >> {timer.CheckElapsed()}");
+            Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
             EatAllLines(comments, c.Baka, limit, out var eated);
             SaveChanges(c.Baka, c.Title);

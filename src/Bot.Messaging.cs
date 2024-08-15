@@ -121,7 +121,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                var reason = FixedErrorMessage(e.Message);
+                var reason = e.GetFixedMessage();
                 LogError($"{chat} >> Can't {action} {what} --> " + reason);
                 if (reason.Contains("Server Error") && patience > 0)
                     TrySend(task, chat, what, action, patience - 1);
@@ -159,7 +159,7 @@ namespace Witlesss
             }
             catch (Exception e)
             {
-                LogError($"BRUH -> {FixedErrorMessage(e.Message)}");
+                LogError($"BRUH -> {e.GetFixedMessage()}");
 
                 if (FFmpeg.IsMatch(e.Message)) SendErrorDetails(chat, e);
                 if (message > 0) EditMessageOnError(chat, message);
@@ -175,7 +175,7 @@ namespace Witlesss
         {
             var path = UniquePath(Dir_Temp, "error.txt");
             var args = F_Action.FFMpegCommand;
-            var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), FixedErrorMessage(e.Message));
+            var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), e.GetFixedMessage());
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));

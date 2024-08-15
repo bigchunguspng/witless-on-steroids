@@ -65,7 +65,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            LogError($"Callback >> BRUH -> {FixedErrorMessage(e.Message)}");
+            LogError($"Callback >> BRUH -> {e.GetFixedMessage()}");
         }
 
         return Task.CompletedTask;
@@ -79,7 +79,7 @@ public partial class Bot
 
     public static void HandleCommandException(Exception e, CommandContext context)
     {
-        LogError($"{context.Title} >> BRUH -> {FixedErrorMessage(e.Message)}");
+        LogError($"{context.Title} >> BRUH -> {e.GetFixedMessage()}");
 
         if (FFmpeg.IsMatch(e.Message)) Instance.SendErrorDetails(context.Chat, e);
     }

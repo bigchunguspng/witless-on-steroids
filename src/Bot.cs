@@ -28,7 +28,7 @@ namespace Witlesss
                 }
                 catch (Exception e)
                 {
-                    LogError("NO INTERNET? >> " + FixedErrorMessage(e.Message));
+                    LogError("NO INTERNET? >> " + e.GetFixedMessage());
                     Task.Delay(5000).Wait();
                 }
             }

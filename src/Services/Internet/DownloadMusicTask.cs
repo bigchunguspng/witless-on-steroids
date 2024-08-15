@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Telegram.Bot.Types.InputFiles;
-using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
 namespace Witlesss.Services.Internet;
 
@@ -26,8 +25,6 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
     public required bool RemoveBrackets;
     public required bool Uploader;          // artist is uploader
     public required bool CropSquare;        // crop thumbnail to a square
-
-    private readonly Stopwatch Timer = new();
 
     public string? Artist;
     public string? Title;
@@ -58,6 +55,8 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     public async Task RunAsync()
     {
+        var sw = GetStartedStopwatch();
+
         // GET READY
 
         var url = youTube
@@ -130,6 +129,6 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         await using var stream = File.OpenRead(mp3.Result);
         Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
-        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Yellow);
+        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", ConsoleColor.Yellow);
     }
 }

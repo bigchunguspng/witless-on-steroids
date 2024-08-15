@@ -126,7 +126,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
 
-            Log($@"{Title} >> {Log_VIDEO} >> TIME: {FormatTime(sw.Elapsed)}");
+            Log($"{Title} >> {Log_VIDEO} >> TIME: {sw.ElapsedShort()}");
         }
 
         protected abstract void ParseOptions();

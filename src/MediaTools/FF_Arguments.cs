@@ -8,13 +8,13 @@ namespace Witlesss.MediaTools
     public record SpeedArgument(double Speed) : IVideoFilterArgument
     {
         public string Key   => "setpts";
-        public string Value => $"{FormatDouble(1 / Speed)}*PTS";
+        public string Value => $"{(1 / Speed).Format()}*PTS";
     }
 
     public record FpsArgument(double FPS) : IVideoFilterArgument
     {
         public string Key   => "fps";
-        public string Value => FormatDouble(FPS);
+        public string Value => FPS.Format();
     }
 
     public record CropArgument(Rectangle Crop) : IVideoFilterArgument
@@ -38,7 +38,7 @@ namespace Witlesss.MediaTools
     public record SampleRatioArgument(double Ratio) : IVideoFilterArgument
     {
         public string Key   => "setsar";
-        public string Value => FormatDouble(Ratio);
+        public string Value => Ratio.Format();
     }
 
     public class ReverseArgument : IVideoFilterArgument
@@ -55,7 +55,7 @@ namespace Witlesss.MediaTools
     public record AtempoArgument(double Atempo) : IAudioFilterArgument
     {
         public string Key   => "atempo";
-        public string Value => FormatDouble(Atempo);
+        public string Value => Atempo.Format();
     }
 
     public class AreverseArgument : IAudioFilterArgument

@@ -6,8 +6,6 @@ namespace Witlesss.Services.Internet;
 
 public class DownloadVideoTask(string id, CommandContext context)
 {
-    private readonly Stopwatch Timer = new(); // todo -> sw
-    
     private static readonly LimitedCache<string, string> _cache = new(32);
 
     private string GetDownloadCommand(string url)
@@ -23,6 +21,8 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
+        var sw = GetStartedStopwatch();
+
         var directory = Path.Combine(Dir_Temp, DateTime.Now.Ticks.ToString());
         Directory.CreateDirectory(directory);
 
@@ -34,7 +34,7 @@ public class DownloadVideoTask(string id, CommandContext context)
         }
 
         await YtDlp.Use(GetDownloadCommand(id), directory);
-        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {Timer.CheckElapsed()}", ConsoleColor.Blue);
+        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", ConsoleColor.Blue);
 
         var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;
         _cache.Add(id, result);

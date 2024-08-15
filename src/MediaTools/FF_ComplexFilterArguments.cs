@@ -18,7 +18,7 @@ namespace Witlesss.MediaTools
         private static string Scale    (Size s) => $"scale={s.Width}:{s.Height}";
         private static string Crop(Rectangle r) => $"crop={r.Width}:{r.Height}:{r.X}:{r.Y}";
         private static string Blur   (double b) => $"boxblur=1:{b}";
-        private static string FPS  (double fps) => $"fps={FormatDouble(fps)}";
+        private static string FPS  (double fps) => $"fps={fps.Format()}";
 
         private static string Trim  (CutSpan s) => $"{_a}trim=start='{TsFormat(s.Start)}':duration='{TsFormat(s.Length)}',{_a}{PTS}";
         private static string Split          () => $"{_a}split=2";

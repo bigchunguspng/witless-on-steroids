@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.MediaTools;
 using Stopwatch = Witlesss.Services.Technical.Stopwatch;
 
 namespace Witlesss.Services.Internet;
@@ -112,7 +106,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         if (Title  is null && meta.Groups[2].Success) Title  = meta.Groups[2].Value;
 
         if (NameOnly) Artist = null;
-        if (RemoveBrackets) Title = Title?.RemoveBrackets();
+        if (RemoveBrackets) Title = Title?.RemoveTextInBrackets();
 
         // COMBINE ALL TOGETHER
 

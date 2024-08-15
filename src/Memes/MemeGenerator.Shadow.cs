@@ -1,5 +1,4 @@
-﻿using System;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -23,7 +22,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
 
-        var sw = Helpers.GetStartedStopwatch();
+        var sw = GetStartedStopwatch();
 
         if (top.height > 0)
         {

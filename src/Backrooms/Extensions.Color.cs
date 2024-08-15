@@ -1,10 +1,9 @@
-﻿using System;
-using ColorHelper;
+﻿using ColorHelper;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Backrooms;
 
-public static class ColorExtensions
+public static partial class Extensions
 {
     public static Rgb24 ToRgb24(this RGB color) => new(color.R, color.G, color.B);
     public static RGB   ToRGB(this Rgb24 color) => new(color.R, color.G, color.B);

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Witlesss.Generation.Pack; // ReSharper disable ReplaceWithPrimaryConstructorParameter
+﻿namespace Witlesss.Generation.Pack; // ReSharper disable ReplaceWithPrimaryConstructorParameter
 
 public class TransitionTableDouble(Transition transition) : TransitionTable // 32B
 {

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Witlesss.Commands.Generation
+﻿namespace Witlesss.Commands.Generation
 {
     public class GenerateByFirstWord : WitlessSyncCommand
     {
@@ -28,7 +26,7 @@ namespace Witlesss.Commands.Generation
             var repeats = GetRepeats(_repeat.Match(Command!));
             for (var i = 0; i < repeats; i++)
             {
-                var mode = up ? LetterCaseMode.Upper : GetMode(Args);
+                var mode = up ? LetterCase.Upper : GetMode(Args);
                 var message = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
                 Bot.SendMessage(Chat, message.InLetterCase(mode), preview: true);
             }
@@ -36,13 +34,12 @@ namespace Witlesss.Commands.Generation
             LogXD(Title, repeats, "FUNNY BY WORD");
         }
 
-        protected static LetterCaseMode GetMode(string? s)
+        protected static LetterCase GetMode(string? s)
         {
-            if (s is null)
-                return StringExtensions.GetRandomLetterCase();
-            if (s == s.ToLower()) return LetterCaseMode.Lower;
-            if (s == s.ToUpper()) return LetterCaseMode.Upper;
-            return StringExtensions.GetRandomLetterCase();
+            if (s is null) return GetRandomLetterCase();
+            if (s == s.ToLower()) return LetterCase.Lower;
+            if (s == s.ToUpper()) return LetterCase.Upper;
+            return GetRandomLetterCase();
         }
 
         protected static void LogXD(string title, int repeats, string s)

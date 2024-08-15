@@ -1,6 +1,4 @@
-﻿using System;
-using Telegram.Bot.Types;
-using Witlesss.Backrooms.Helpers;
+﻿using Telegram.Bot.Types;
 using Witlesss.Commands.Editing;
 using Witlesss.Commands.Messaging;
 using Witlesss.Commands.Packing;
@@ -26,8 +24,8 @@ namespace Witlesss.Commands.Routing
             _witlessRouter = new WitlessCommandRouter(this);
 
             _simpleCommands = new CommandRegistry<AnyCommand<CommandContext>>()
-                .Register("fast"   , () => new ChangeSpeed().SetMode(SpeedMode.Fast))
-                .Register("slow"   , () => new ChangeSpeed().SetMode(SpeedMode.Slow))
+                .Register("fast"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Fast))
+                .Register("slow"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Slow))
                 .Register("crop"   , () => new Crop().UseDefaultMode())
                 .Register("shake"  , () => new Crop().UseShakeMode())
                 .Register("scale"  , () => new Scale())

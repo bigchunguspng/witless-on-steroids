@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
-using Witlesss.MediaTools;
 
 namespace Witlesss
 {
@@ -172,14 +168,14 @@ namespace Witlesss
 
         public void EditMessageOnError(long chat, int message)
         {
-            EditMessage(chat, message, $"произошла ашыпка {Responses.FAIL_EMOJI_2.PickAny()}");
+            EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");
         }
 
         public void SendErrorDetails(long chat, Exception e)
         {
             var path = UniquePath(Dir_Temp, "error.txt");
             var args = F_Action.FFMpegCommand;
-            var text = string.Format(FF_ERROR_REPORT, args, Responses.GetRandomASCII(), FixedErrorMessage(e.Message));
+            var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), FixedErrorMessage(e.Message));
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));

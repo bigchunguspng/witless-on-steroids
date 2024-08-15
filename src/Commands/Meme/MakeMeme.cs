@@ -1,11 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Commands.Meme.Core;
-using Witlesss.MediaTools;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
@@ -95,7 +90,7 @@ namespace Witlesss.Commands.Meme
 
             return new TextPair(AdjustCase(a), AdjustCase(b));
 
-            string AdjustCase(string s) => capitalize ? s.InLetterCase(LetterCaseMode.Upper) : s;
+            string AdjustCase(string s) => capitalize ? s.InLetterCase(LetterCase.Upper) : s;
         }
 
         private static readonly string[] separators = ["\n\n\n\n", "\n\n\n", "\n\n", "\n"];

@@ -1,12 +1,10 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.Services.Internet.Reddit;
+﻿using Witlesss.Services.Internet.Reddit;
 
 #pragma warning disable CS4014
 
 namespace Witlesss.Commands.Packing
 {
-    public class FuseRedditComments : Fuse // todo uninherit it from fuse and make it witless async
+    public class EatReddit : Fuse // todo uninherit it from fuse and make it witless async
     {
         private readonly Regex _que = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using ColorHelper;
+﻿using ColorHelper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Witlesss.Commands.Meme.Core;
-using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes

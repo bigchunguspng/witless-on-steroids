@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Witlesss.Services.Internet.Reddit;
 
 #pragma warning disable CS8524

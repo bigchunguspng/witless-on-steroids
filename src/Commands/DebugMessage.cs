@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands
 {

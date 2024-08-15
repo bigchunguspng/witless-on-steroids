@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
-namespace Witlesss.XD
+namespace Witlesss.Backrooms.Types
 {
     public class SyncronizedDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
     {

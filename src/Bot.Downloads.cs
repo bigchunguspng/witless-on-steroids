@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Witlesss;
+﻿namespace Witlesss;
 
 public partial class Bot
 {

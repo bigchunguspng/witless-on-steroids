@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Telegram.Bot.Types;
-using Witlesss.Backrooms.Helpers;
+﻿using Telegram.Bot.Types;
 using Witlesss.Commands.Generation;
 using Witlesss.Commands.Meme;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Commands.Packing;
 using Witlesss.Commands.Settings;
 
@@ -17,15 +15,15 @@ public class WitlessCommandRouter : WitlessSyncCommand
     private readonly Bouhourt _bouhourt = new();
     private readonly Move _move = new();
     private readonly Fuse _fuse = new();
-    private readonly FuseBoards _boards = new();
-    private readonly FuseRedditComments _comments = new();
-    private readonly SetMemeType _set = new();
+    private readonly EatBoards _boards = new();
+    private readonly EatReddit _comments = new();
+    private readonly Set _set = new();
     private readonly SetSpeech _speech = new();
     private readonly SetPics _pics = new();
     private readonly SetQuality _quality = new();
     private readonly ToggleStickers _stickers = new();
     private readonly ToggleAdmins _admins = new();
-    private readonly DeleteDictionary _delete = new();
+    private readonly Delete _delete = new();
 
     private readonly CommandRouter _parent;
 
@@ -48,8 +46,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
             .Register("dp"      , () => new Demotivate3000())
-            .Register("dg"      , () => new Demotivate().SetMode(DgMode.Square))
-            .Register("dv"      , () => new Demotivate().SetMode(DgMode.Wide))
+            .Register("dg"      , () => new Demotivate().SetMode(Demotivate.Mode.Square))
+            .Register("dv"      , () => new Demotivate().SetMode(Demotivate.Mode.Wide))
             .Register("meme"    , () => new MakeMeme())
             .Register("top"     , () => new Top())
             .Register("nuke"    , () => new Nuke())

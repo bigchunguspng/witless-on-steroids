@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Telegram.Bot.Types;
-using Witlesss.Backrooms.Helpers;
+using Witlesss.Backrooms.Types;
 using static System.StringSplitOptions;
 
 #pragma warning disable CS4014
 
 namespace Witlesss.Commands.Packing
 {
-    public class FuseBoards : Fuse
+    public class EatBoards : Fuse
     {
         private readonly BoardService _chan = new();
         private List<BoardService.BoardGroup>? _boards;

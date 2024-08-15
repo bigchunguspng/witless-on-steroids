@@ -1,6 +1,5 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Witlesss.MediaTools;
 
 namespace Witlesss.Commands.Meme.Core;
 

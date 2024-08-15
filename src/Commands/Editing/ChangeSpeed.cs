@@ -1,17 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.MediaTools;
-using static Witlesss.XD.SpeedMode;
+﻿using static Witlesss.Commands.Editing.ChangeSpeed.Mode;
 
 namespace Witlesss.Commands.Editing
 {
     public class ChangeSpeed : AudioVideoCommand
     {
         private double _speed;
-        private SpeedMode _mode;
+        private Mode _mode;
 
-        public ChangeSpeed SetMode(SpeedMode mode)
+        public ChangeSpeed SetMode(Mode mode)
         {
             _mode = mode;
             return this;
@@ -35,5 +31,10 @@ namespace Witlesss.Commands.Editing
 
         protected override string AudioFileName => SongNameOr($"Are you {Sender.Split()[0]} or something.mp3");
         protected override string VideoFileName => $"piece_fap_club-{_speed}.mp4";
+
+        public enum Mode
+        {
+            Fast, Slow
+        }
     }
 }

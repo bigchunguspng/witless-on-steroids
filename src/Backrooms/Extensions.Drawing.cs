@@ -7,7 +7,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Witlesss.Backrooms;
 
-public static class DrawingExtensions
+public static partial class Extensions
 {
     public static T WithDefaultAlignment<T>(this T options) where T : TextOptions
     {

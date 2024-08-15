@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Witlesss.Backrooms.Types;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Generation;
 using Witlesss.Generation.Pack;
 

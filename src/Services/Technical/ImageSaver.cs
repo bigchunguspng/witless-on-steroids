@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -23,7 +21,7 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
         {
             if (quality <= 25)
             {
-                var sw = Helpers.GetStartedStopwatch();
+                var sw = GetStartedStopwatch();
                 using var memory = new MemoryStream();
                 image.SaveAsJpeg(memory, GetJpegEncoder(quality));
                 memory.Position = 0;

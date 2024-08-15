@@ -1,11 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using SixLabors.Fonts;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme.Core;
 using FontSpecificData = (float size, float offset, float caps);
 
@@ -77,7 +72,7 @@ namespace Witlesss.Memes.Shared
         public FontFamily GetFontFamily(string @default)
         {
             _fontKey ??= @default;
-            return _families[_fontKey == "^^" ? _families.Keys.Random() : _fontKey];
+            return _families[_fontKey == "^^" ? _families.Keys.PickRandom() : _fontKey];
         }
 
         public FontStyle GetFontStyle(FontFamily family)
@@ -90,7 +85,7 @@ namespace Witlesss.Memes.Shared
             if (_styleKey is null)
             {
                 return _fontKey is "^^"
-                    ? available.Random()
+                    ? available.PickRandom()
                     : aR
                         ? FontStyle.Regular
                         : FontStyle.Bold;

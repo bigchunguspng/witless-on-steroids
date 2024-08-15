@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SixLabors.Fonts;
+﻿using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme.Core;
-using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 using Random = System.Random;
 using Logo = (SixLabors.ImageSharp.Image Image, SixLabors.ImageSharp.Point Point);

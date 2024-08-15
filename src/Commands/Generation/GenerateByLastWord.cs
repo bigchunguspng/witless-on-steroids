@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Witlesss.Commands.Generation
+﻿namespace Witlesss.Commands.Generation
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {
@@ -28,7 +26,7 @@ namespace Witlesss.Commands.Generation
             var repeats = GetRepeats(_repeat.Match(Command!));
             for (var i = 0; i < repeats; i++)
             {
-                var mode = up ? LetterCaseMode.Upper : GetMode(Args);
+                var mode = up ? LetterCase.Upper : GetMode(Args);
                 var message = byWord ? Baka.GenerateByLast(word.ToLower()) + ending : Baka.GenerateBackwards();
                 Bot.SendMessage(Chat, message.InLetterCase(mode), preview: true);
             }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Text.RegularExpressions;
 using Witlesss.Generation.Pack;
 using Witlesss.Generation.Tokens;
 
@@ -251,7 +247,7 @@ namespace Witlesss.Generation
 
             if (words.Any(w => w.Equals(LINK)))
             {
-                var replacement = IsMostlyCyrillic(text) ? LooksLikeUkrainian(text) ? LINK_ua : LINK_ru : LINK_en;
+                var replacement = text.IsMostlyCyrillic() ? text.LooksLikeUkrainian() ? LINK_ua : LINK_ru : LINK_en;
                 text = text.Replace(LINK, replacement);
             }
 

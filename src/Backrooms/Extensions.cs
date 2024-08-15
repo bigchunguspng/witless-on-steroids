@@ -1,38 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace Witlesss.XD
+namespace Witlesss.Backrooms
 {
-    public static class Extension
+    public static partial class Extensions
     {
         [StringSyntax("Regex")] private const string EMOJI_REGEX
             = @"((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+";
 
         public  static readonly Regex EmojiRegex = new (EMOJI_REGEX);
-        public  static readonly Regex FFmpeg = new(@"ffmpeg|ffprobe", RegexOptions.IgnoreCase);
+        public  static readonly Regex FFmpeg = new("ffmpeg|ffprobe", RegexOptions.IgnoreCase);
         private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
 
-        public static bool IsOneIn         (int x) => System.Random.Shared.Next(x) == 0;
-        public static bool IsFirstOf(int a, int b) => System.Random.Shared.Next(a + b) < a;
+        public static bool IsOneIn         (int x) => Random.Shared.Next(x) == 0;
+        public static bool IsFirstOf(int a, int b) => Random.Shared.Next(a + b) < a;
 
-        public static bool LuckyFor(int chance, int max = 100) => System.Random.Shared.Next(max) < chance;
+        public static bool LuckyFor(int chance, int max = 100) => Random.Shared.Next(max) < chance;
 
-        public static int    RandomInt   (int    min, int    max) => System.Random.Shared.Next(min, max + 1);
+        public static int    RandomInt   (int    min, int    max) => Random.Shared.Next(min, max + 1);
         public static double RandomDouble(double min, double max)
         {
             var k = 10_000d;
             return RandomInt((int)(min * k), (int)(max * k)) / k;
         }
 
-        public static T Random<T>(this ICollection<T> collection)
+        public static T PickRandom<T>(this ICollection<T> collection)
         {
-            return collection.ElementAt(System.Random.Shared.Next(collection.Count));
+            return collection.ElementAt(Random.Shared.Next(collection.Count));
         }
 
         public static string FormatDouble(double d) => d.ToString(CultureInfo.InvariantCulture);
@@ -64,7 +58,7 @@ namespace Witlesss.XD
                 var part1 = path.Remove   (index); // directory/name
                 var part2 = path.Substring(index); // .txt
 
-                var xx = System.Random.Shared.Next(256).ToString("X2");
+                var xx = Random.Shared.Next(256).ToString("X2");
                 path = $"{part1}_{xx}{part2}";
                 if (!File.Exists(path)) return path;
             }
@@ -116,29 +110,6 @@ namespace Witlesss.XD
             else                                                 return one;
         }
 
-        private static readonly Regex _lat = new(@"[A-Za-z]");
-        private static readonly Regex _cyr = new(@"[Ѐ-ӿ]");
-
-        public static bool IsMostlyCyrillic(string text)
-        {
-            return _cyr.Count(text) > _lat.Count(text);
-        }
-        
-        private static readonly Regex _ukrD = new(@"[ієїґ]");
-        private static readonly Regex _rusD = new(@"[ыэъё]");
-        private static readonly Regex _ukrM = new(@"[авдж]");
-        private static readonly Regex _rusM = new(@"[еоть]");
-
-        public static bool LooksLikeUkrainian(string text)
-        {
-            var u = _ukrD.Count(text);
-            var r = _rusD.Count(text);
-
-            return u > 0 || r > 0
-                ? u > r
-                : _ukrM.Count(text) >= _rusM.Count(text);
-        }
-
         public static string FileSize(string path) => FileSize(SizeInBytes(path));
         public static string FileSize(long  bytes)
         {
@@ -174,31 +145,7 @@ namespace Witlesss.XD
         public static T GetRandomMemeber<T>() where T : Enum
         {
             var values = Enum.GetValues(typeof(T));
-            return (T)values.GetValue(System.Random.Shared.Next(values.Length))!;
-        }
-    }
-
-    public static class Helpers
-    {
-        public static Stopwatch GetStartedStopwatch()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            return sw;
-        }
-
-        public static void Log(this Stopwatch sw, string message)
-        {
-            Logger.Log($"{sw.Elapsed.TotalSeconds:##0.00000}\t{message}");
-            sw.Restart();
-        }
-
-        public static T MeasureTime<T>(Func<T> func, string caption)
-        {
-            var sw = GetStartedStopwatch();
-            var result = func.Invoke();
-            sw.Log(caption);
-            return result;
+            return (T)values.GetValue(Random.Shared.Next(values.Length))!;
         }
     }
 }

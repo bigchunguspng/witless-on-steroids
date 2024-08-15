@@ -1,5 +1,4 @@
-﻿using System;
-using Witlesss.Generation.Pack;
+﻿using Witlesss.Generation.Pack;
 
 namespace Witlesss.Generation.Tokens;
 

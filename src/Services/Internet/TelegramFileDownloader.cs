@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
 
 namespace Witlesss.Services.Internet
@@ -49,7 +45,7 @@ namespace Witlesss.Services.Internet
             catch (Exception e)
             {
                 var message = e.Message.Contains("file is too big") 
-                    ? Responses.FILE_TOO_BIG.PickAny() 
+                    ? FILE_TOO_BIG.PickAny() 
                     : e.Message.XDDD();
                 Bot.Instance.SendMessage(chat, message);
                 throw;

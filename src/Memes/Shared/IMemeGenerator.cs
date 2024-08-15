@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Commands.Meme.Core;
 
 namespace Witlesss.Memes.Shared;
 

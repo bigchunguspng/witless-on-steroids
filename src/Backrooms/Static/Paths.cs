@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Witlesss.XD;
+namespace Witlesss.Backrooms.Static;
 
 /*
     Nobody:

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.Backrooms.SerialQueue;
+﻿using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
@@ -44,7 +42,7 @@ namespace Witlesss.Commands.Meme
             var caption = generate ? Baka.Generate() : text!;
 
             var capitalize = CheckCaps(Request, _caps, generate) || generate && caption.Length <= 12;
-            return capitalize ? caption.InLetterCase(LetterCaseMode.Upper) : caption;
+            return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }
 
         private static readonly Regex _small   = new(@"^\/dp\S*(xx)\S*");

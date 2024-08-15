@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Witlesss.Generation.Pack;
+﻿namespace Witlesss.Generation.Pack;
 
 public interface TransitionTable
 {

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace Witlesss.Commands.Messaging;
+﻿namespace Witlesss.Commands.Messaging;
 
 public class Spam : SyncCommand
 {

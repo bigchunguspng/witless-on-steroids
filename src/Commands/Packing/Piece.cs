@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.Generation;
+﻿using Witlesss.Generation;
 
 namespace Witlesss.Commands.Packing
 {

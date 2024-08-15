@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using FFMpegCore;
 using SixLabors.ImageSharp;
 using Drawer = Witlesss.Memes.DemotivatorDrawer;

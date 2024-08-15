@@ -1,6 +1,4 @@
-﻿using Witlesss.Backrooms.Helpers;
-
-namespace Witlesss.Commands.Settings;
+﻿namespace Witlesss.Commands.Settings;
 
 public class SetPics : SettingsCommand
 {

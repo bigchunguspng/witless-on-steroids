@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Commands.Meme.Core;
 using SpectreColor = Spectre.Console.Color;
 

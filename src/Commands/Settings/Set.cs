@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using Witlesss.Commands.Meme.Core;
 
 namespace Witlesss.Commands.Settings
 {
-    public class SetMemeType : SettingsCommand
+    public class Set : SettingsCommand
     {
         private readonly Regex _m = new("^[mм]");
         private readonly Regex _t = new("^[tт]");

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 
 #pragma warning disable CS4014
 
@@ -42,7 +39,7 @@ public class DownloadMusic : AsyncCommand
                 ? null
                 : Regex.Match(options, @"\d+").Value.NullOnEmpty();
 
-            var message = Bot.PingChat(Chat, Responses.PLS_WAIT.PickAny());
+            var message = Bot.PingChat(Chat, PLS_WAIT.PickAny());
 
             var task = new DownloadMusicTask(idOrUrl, youTube, Context, message)
             {

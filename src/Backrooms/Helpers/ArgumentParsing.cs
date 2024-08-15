@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-
-namespace Witlesss.Backrooms.Helpers;
+﻿namespace Witlesss.Backrooms.Helpers;
 
 public static class ArgumentParsing
 {

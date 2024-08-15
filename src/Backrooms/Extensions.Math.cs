@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace Witlesss.Backrooms;
 
-namespace Witlesss.Backrooms;
-
-public static class MathExtensions
+public static partial class Extensions
 {
     public static int RoundInt(this double x) => (int)Math.Round(x);
     public static int RoundInt(this float  x) => (int)Math.Round(x);

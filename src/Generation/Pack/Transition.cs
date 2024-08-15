@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Witlesss.Generation.Pack;
+﻿namespace Witlesss.Generation.Pack;
 
 public readonly struct Transition(int wordID, float chance)
 {

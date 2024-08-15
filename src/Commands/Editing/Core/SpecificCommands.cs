@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing.Core;
 
@@ -54,12 +52,12 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
     {
         if (FileID.StartsWith("http"))
         {
-            var waitMessage = Bot.PingChat(Chat, Responses.PLS_WAIT[Random.Shared.Next(5)]);
+            var waitMessage = Bot.PingChat(Chat, PLS_WAIT[Random.Shared.Next(5)]);
 
             var task = new DownloadVideoTask(FileID, Context).RunAsync();
             await Bot.RunOrThrow(task, Chat, waitMessage);
 
-            Bot.EditMessage(Chat, waitMessage, Responses.PROCESSING.PickAny().XDDD());
+            Bot.EditMessage(Chat, waitMessage, PROCESSING.PickAny().XDDD());
 
             return (await task, MediaType.Video, waitMessage);
         }
@@ -68,7 +66,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
             var (path, type) = await Bot.Download(FileID, Chat);
 
             var waitMessage = SizeInBytes(path) > 4_000_000
-                ? Bot.PingChat(Chat, Responses.PROCESSING.PickAny().XDDD())
+                ? Bot.PingChat(Chat, PROCESSING.PickAny().XDDD())
                 : -1;
 
             return (path, type, waitMessage);

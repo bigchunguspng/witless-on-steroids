@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
+﻿using System.Drawing;
 using System.Text;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
+using Witlesss.Backrooms;
 using static Witlesss.MediaTools.FFMpegXD;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
 
@@ -171,7 +168,7 @@ namespace Witlesss.MediaTools
             o.WithQscale(factor).WithCustomArgument(sb.ToString());
 
 
-            string RandomDouble(double min, double max) => FormatDouble(Extension.RandomDouble(min, max));
+            string RandomDouble(double min, double max) => FormatDouble(Extensions.RandomDouble(min, max));
         }
 
         #endregion

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Witlesss.Commands.Packing
 {
-    public class DeleteDictionary : Move
+    public class Delete : Move
     {
         protected override void RunAuthorized()
         {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Witlesss.Backrooms.Helpers;
+﻿using Newtonsoft.Json;
 
 namespace Witlesss.Generation.Pack;
 

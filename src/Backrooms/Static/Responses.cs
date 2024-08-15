@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Witlesss.XD;
+﻿namespace Witlesss.Backrooms.Static;
 
 public static class Responses
 {

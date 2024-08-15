@@ -1,10 +1,6 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.SerialQueue;
-using Witlesss.MediaTools;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
@@ -113,7 +109,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
-            var sw = Helpers.GetStartedStopwatch();
+            var sw = GetStartedStopwatch();
             var (path, type) = await Bot.Download(fileID, Chat);
             Request = GetRequestData();
 
@@ -147,7 +143,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             return Queue.Enqueue(() =>
             {
-                var sw = Helpers.GetStartedStopwatch();
+                var sw = GetStartedStopwatch();
                 var result = MemeMaker.GenerateMeme(request, text);
                 sw.Log(Command);
                 return result;

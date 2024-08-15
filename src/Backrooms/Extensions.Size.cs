@@ -2,7 +2,7 @@
 
 namespace Witlesss.Backrooms;
 
-public static class SizeExtensions
+public static partial class Extensions
 {
     public static Size GrowSize(this Size size, int minSemiperimeter = 400)
     {

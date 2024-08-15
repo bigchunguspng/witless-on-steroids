@@ -1,4 +1,4 @@
-namespace Witlesss.XD;
+namespace Witlesss.Backrooms.Static;
 
 public static class Texts
 {

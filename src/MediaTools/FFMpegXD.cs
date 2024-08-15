@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using FFMpegCore;
+﻿using FFMpegCore;
 using static Witlesss.MediaTools.FF_Extensions;
 using Rectangle = System.Drawing.Rectangle;
 using Size = System.Drawing.Size;

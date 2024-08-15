@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using Witlesss.Commands.Meme.Core;
 
 namespace Witlesss.Commands
 {

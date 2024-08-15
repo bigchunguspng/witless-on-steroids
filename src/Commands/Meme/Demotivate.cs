@@ -1,12 +1,8 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.Backrooms.SerialQueue;
+﻿using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Commands.Meme.Core;
-using Witlesss.MediaTools;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
-using static Witlesss.XD.DgMode;
+using static Witlesss.Commands.Meme.Demotivate.Mode;
 
 namespace Witlesss.Commands.Meme
 {
@@ -80,7 +76,7 @@ namespace Witlesss.Commands.Meme
             }
 
             var capitalize = OptionsParsing.CheckCaps(Request, _caps, generate);
-            if (capitalize) a = a.InLetterCase(LetterCaseMode.Upper);
+            if (capitalize) a = a.InLetterCase(LetterCase.Upper);
 
             return new TextPair(a, b);
         }
@@ -88,7 +84,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*(nn)\S* *");
         private static readonly Regex _one_line = new(@"^\/d[vg]\S*(ll)\S* *");
 
-        public Demotivate SetMode(DgMode mode)
+        public Demotivate SetMode(Mode mode)
         {
             _mode = mode;
             return this;
@@ -98,7 +94,7 @@ namespace Witlesss.Commands.Meme
 
         // LOGIC
 
-        private DgMode _mode;
+        private Mode _mode;
 
         private static readonly SerialTaskQueue _queue = new();
         private static readonly DemotivatorDrawer[] _drawers =
@@ -108,5 +104,10 @@ namespace Witlesss.Commands.Meme
 
         protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int) _mode];
         protected override SerialTaskQueue Queue => _queue;
+
+        public enum Mode
+        {
+            Square, Wide
+        }
     }
 }

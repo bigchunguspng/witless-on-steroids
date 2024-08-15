@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.MediaTools;
-
-namespace Witlesss.Commands.Editing
+﻿namespace Witlesss.Commands.Editing
 {
     public class Crop : VideoPhotoCommand // todo shake is only for video
     {

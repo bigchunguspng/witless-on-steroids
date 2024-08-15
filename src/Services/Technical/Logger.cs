@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Witlesss.Services.Technical
+﻿namespace Witlesss.Services.Technical
 {
     public static class Logger
     {

@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Witlesss.MediaTools;
-
-namespace Witlesss.Commands.Editing
+﻿namespace Witlesss.Commands.Editing
 {
     public class Equalize : AudioVideoCommand
     {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Reddit.Controllers;
 
 namespace Witlesss.Services.Internet.Reddit;
@@ -15,4 +14,13 @@ public record SearchQuery(string? Subreddit, string Q, string Sort, string Time)
 public record ScrollQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
 {
     public List<Post> GetPosts(string? after = null) => RedditTool.Instance.GetPosts(this, after);
+}
+
+public enum SortingMode
+{
+    Hot           = 'h',
+    New           = 'n',
+    Top           = 't',
+    Rising        = 'r',
+    Controversial = 'c'
 }

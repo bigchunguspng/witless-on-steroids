@@ -1,12 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace Witlesss.Backrooms;
 
-public static class TelegramExtensions
+public static partial class Extensions
 {
     private const string UNKNOWN = "[UNKNOWN]";
 
@@ -91,11 +89,11 @@ public static class TelegramExtensions
         {
             if (message.SenderChat.Id == chat) return true;
 
-            Bot.Instance.SendMessage(chat, Responses.UNKNOWN_CHAT.PickAny());
+            Bot.Instance.SendMessage(chat, UNKNOWN_CHAT.PickAny());
         }
         else if (await message.From.IsAdminInChat(chat) == false)
         {
-            Bot.Instance.SendMessage(chat, Responses.NOT_ADMIN.PickAny());
+            Bot.Instance.SendMessage(chat, NOT_ADMIN.PickAny());
         }
         else return true;
 

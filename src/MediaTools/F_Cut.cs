@@ -1,5 +1,4 @@
-﻿using System;
-using FFMpegCore;
+﻿using FFMpegCore;
 using static Witlesss.MediaTools.ComplexFilterArgs;
 
 namespace Witlesss.MediaTools

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing.Core

@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.Commands.Settings;
+﻿using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
 namespace Witlesss.Commands.Packing
@@ -30,7 +27,7 @@ namespace Witlesss.Commands.Packing
                 var file = Path.Combine(Dir_Fuse, Chat.ToString(), $"{name}.json");
                 if (File.Exists(file) == false)
                 {
-                    Bot.SendMessage(Chat, string.Format(PUB_EX_NOT_FOUND, Responses.FAIL_EMOJI_1.PickAny()));
+                    Bot.SendMessage(Chat, string.Format(PUB_EX_NOT_FOUND, FAIL_EMOJI_1.PickAny()));
                     return;
                 }
 
@@ -53,7 +50,7 @@ namespace Witlesss.Commands.Packing
                     Baka.Save();
 
                     var result = _public ? "опубликовано" : "сохранено";
-                    Bot.SendMessage(Chat, string.Format(MOVING_DONE, Responses.EMPTY_EMOJI.PickAny(), result, newName));
+                    Bot.SendMessage(Chat, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
                 }
             }
         }

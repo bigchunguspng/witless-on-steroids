@@ -1,10 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.MediaTools;
-
-namespace Witlesss.Commands.Editing
+﻿namespace Witlesss.Commands.Editing
 {
     public class RemoveBitrate : AudioVideoPhotoCommand
     {

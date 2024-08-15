@@ -1,9 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.Backrooms.SerialQueue;
+﻿using Witlesss.Backrooms.SerialQueue;
 using Witlesss.Commands.Meme.Core;
-using Witlesss.MediaTools;
+using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme
@@ -47,40 +44,5 @@ namespace Witlesss.Commands.Meme
 
         protected override IMemeGenerator<int> MemeMaker => _nukem;
         protected override SerialTaskQueue Queue => _queue;
-    }
-
-    public class DukeNukem : IMemeGenerator<int>
-    {
-        public static int Depth = 1;
-
-        public string GenerateMeme(MemeFileRequest request, int text)
-        {
-            var path = request.SourcePath;
-
-            for (var i = 0; i < Depth; i++)
-            {
-                path = new F_Process(path)
-                    .DeepFry(request.GetQscale())
-                    .OutputAs(UniquePath(request.TargetPath)).Result;
-            }
-
-            return path;
-        }
-
-        public async Task<string> GenerateVideoMeme(MemeFileRequest request, int text)
-        {
-            var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
-
-            var path = request.SourcePath;
-
-            for (var i = 0; i < Depth.Clamp(3); i++)
-            {
-                path = await new F_Process(path)
-                    .DeepFryVideo(size.Ok(), request.GetCRF())
-                    .OutputAs(UniquePath(request.TargetPath));
-            }
-
-            return path;
-        }
     }
 }

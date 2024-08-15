@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-
-namespace Witlesss // ReSharper disable InconsistentNaming
+﻿namespace Witlesss // ReSharper disable InconsistentNaming
 {
     public static class Config
     {

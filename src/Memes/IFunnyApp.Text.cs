@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using SixLabors.Fonts;
+﻿using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
-using Witlesss.Backrooms.Helpers;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes;

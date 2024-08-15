@@ -1,16 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Backrooms.Helpers;
-using Witlesss.MediaTools;
 using Witlesss.Services.Internet.Reddit;
-using static Witlesss.XD.SortingMode;
 
 #pragma warning disable CS8509
 #pragma warning disable SYSLIB0014
@@ -126,7 +120,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             { 'a', "all" }, { 'h', "hour" }, { 'd', "day" }, { 'w', "week" }, { 'm', "month" }, { 'y', "year" }
         };
         
-        public  static bool TimeMatters(SortingMode s) => s is Top or Controversial;
+        public  static bool TimeMatters(SortingMode s) => s is SortingMode.Top or SortingMode.Controversial;
         public  static bool TimeMatters(char        c) => c is not 'h' and not 'n';
 
         #region SENDING MEMES
@@ -287,7 +281,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, $"{Responses.I_FORGOR.PickAny()} {Responses.FAIL_EMOJI_1.PickAny()}");
+                    Bot.SendMessage(Chat, $"{I_FORGOR.PickAny()} {FAIL_EMOJI_1.PickAny()}");
                 }
             }
             else Bot.SendMessage(Chat,  string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));

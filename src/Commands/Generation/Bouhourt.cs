@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace Witlesss.Commands.Generation
+﻿namespace Witlesss.Commands.Generation
 {
     public class Bouhourt : WitlessSyncCommand
     {

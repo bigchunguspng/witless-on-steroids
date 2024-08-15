@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using FFMpegCore;
+﻿using FFMpegCore;
 
 namespace Witlesss.MediaTools // ReSharper disable InconsistentNaming
 {

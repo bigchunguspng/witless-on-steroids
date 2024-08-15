@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Telegram.Bot.Types.InputFiles;
-using Witlesss.MediaTools;
+﻿using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing
 {

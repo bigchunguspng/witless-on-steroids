@@ -16,7 +16,8 @@ public partial class IFunnyApp
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
 
-    public static float FontSize => _font.Size;
+    private static float _minFontSize;
+    private static float FontSize => _font.Size;
 
     private void SetUpFonts()
     {
@@ -31,8 +32,10 @@ public partial class IFunnyApp
     private float GetStartingFontSize()
     {
         var defaultFontSize = Math.Max(48, _cardHeight / 3.75F);
-        var multiplier = FontSizeMultiplier / 10F;
-        return Math.Max(defaultFontSize * multiplier, MinFontSize) * ExtraFonts.GetSizeMultiplier();
+        var multiplier = FontSizeMultiplier / 100F;
+        var multiplierM = MinSizeMultiplier / 100F;
+        _minFontSize = defaultFontSize * multiplierM;
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * ExtraFonts.GetSizeMultiplier();
     }
 
 
@@ -55,9 +58,9 @@ public partial class IFunnyApp
         {
             EnsureLongestLineFits();
 
-            if (FontSize * k < MinFontSize)
+            if (FontSize * k < _minFontSize)
             {
-                k = MinFontSize / FontSize;
+                k = _minFontSize / FontSize;
 
                 var widthLimit = textWidthLimit / k;
                 textChunks.RedistributeText(widthLimit);
@@ -129,7 +132,7 @@ public partial class IFunnyApp
 
         float GetMinTextRatio(float textWidth)
         {
-            var fontRatio = MinFontSize / FontSize;
+            var fontRatio = _minFontSize / FontSize;
             var lineHeightK = fontRatio * lineHeight;
             var textWidthK = fontRatio * textWidth;
             var lineCountK = textWidthK / textWidthLimit;
@@ -189,6 +192,6 @@ public partial class IFunnyApp
         _caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
-        Log($"/top >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+        Log($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}", ConsoleColor.DarkYellow);
     }
 }

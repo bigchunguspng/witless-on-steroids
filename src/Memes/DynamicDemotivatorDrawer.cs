@@ -14,9 +14,9 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
     {
         // OPTIONS
 
-        public static CustomColorOption CustomColorOption;
+        public static CustomColorOption CustomColor = new("#");
         public static bool Minimalist, WrapText;
-        public static float MinFontSize = 10;
+        public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
 
         // SIZE
 
@@ -46,8 +46,9 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             text = ArrangeText(text, out var emojiPngs);
 
             SetUpFrameSize();
-
             using var image = GetImage(request.SourcePath);
+
+            SetColor(image);
             using var frame = DrawFrame(text, emojiPngs);
 
             InsertImage(frame, image);
@@ -63,6 +64,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             text = ArrangeText(text, out var emojiPngs);
 
             SetUpFrameSize();
+            SetColor(CustomColor.ByCoords ? request.GetVideoSnapshot() : null);
 
             using var frame = DrawFrame(text, emojiPngs);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
@@ -84,7 +86,6 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             if (_ratio > 3) Minimalist = true;
 
             SetUpFonts();
-            SetColor();
         }
 
         // CALCULATE
@@ -175,11 +176,11 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
         // OTHER STUFF I GUESS
 
-        public static Size FitSize(Size size, int max = 720) => size.FitSize(max);
+        private static Size FitSize(Size size, int max = 720) => size.FitSize(max);
 
-        public void SetColor()
+        private void SetColor(Image<Rgba32>? image)
         {
-            var color = CustomColorOption.GetColor();
+            var color = CustomColor.GetColor(image);
             FrameColor = color?.Rgb ?? Color.White;
             TextBrush = color is null ? WhiteBrush : new SolidBrush(color.Value);
         }

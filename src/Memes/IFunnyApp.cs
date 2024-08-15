@@ -18,9 +18,9 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
 
     public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool PickColor, ForceCenter, BackInBlack, BlurImage;
-    public static int CropPercent = 0; // 0 - 100
-    public static int MinFontSize = 10, FontSizeMultiplier = 10;
-    public static CustomColorOption CustomColorOption;
+    public static int CropPercent = 0;
+    public static int MinSizeMultiplier = 10, FontSizeMultiplier = 100;
+    public static CustomColorOption CustomColor = new("#");
 
     // SIZE
 
@@ -53,7 +53,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
     {
         FetchVideoSize(request);
         SetUp();
-        SetColor(PickColor ? request.GetVideoSnapshot() : null);
+        SetColor(PickColor || CustomColor.ByCoords ? request.GetVideoSnapshot() : null);
 
         using var card = DrawText(text);
         using var frame = Combine(null, card);

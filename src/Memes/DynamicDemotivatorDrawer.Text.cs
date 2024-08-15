@@ -16,7 +16,8 @@ public partial class DynamicDemotivatorDrawer
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
 
-    public static float FontSize => _font.Size;
+    private static float _minFontSize;
+    private static float FontSize => _font.Size;
 
     private void SetUpFonts()
     {
@@ -31,8 +32,10 @@ public partial class DynamicDemotivatorDrawer
     private float GetStartingFontSize()
     {
         var defaultFontSize = imageW * 0.1F;
-        //var multiplier = FontSizeMultiplier / 10F;
-        return Math.Max(defaultFontSize /* * multiplier*/, MinFontSize) * ExtraFonts.GetSizeMultiplier();
+        var multiplier = FontSizeMultiplier / 100F;
+        var multiplierM = MinSizeMultiplier / 100F;
+        _minFontSize = defaultFontSize * multiplierM;
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * ExtraFonts.GetSizeMultiplier();
     }
 
 
@@ -56,9 +59,9 @@ public partial class DynamicDemotivatorDrawer
             {
                 FitLongestLine();
 
-                if (FontSize * k < MinFontSize)
+                if (FontSize * k < _minFontSize)
                 {
-                    k = MinFontSize / FontSize;
+                    k = _minFontSize / FontSize;
 
                     var widthLimit = textWidthLimit / k;
                     textChunks.RedistributeText(widthLimit);
@@ -93,9 +96,10 @@ public partial class DynamicDemotivatorDrawer
                 {
                     var minRatio = GetMinTextRatio(textWidth);
                     var side = (imageW + 2 * imageH) / 3;
+                    var multiplier = FontSizeMultiplier / 100;
                     while (true)
                     {
-                        var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
+                        var textRatio = (textWidth / lineCount) / (lineHeight * lineCount) * multiplier;
                         var targetRatio = Math.Min(minRatio, textWidthLimit / (side * Math.Min(lineCount, 10) / 10F));
                         if (textRatio < targetRatio) break;
 
@@ -133,7 +137,7 @@ public partial class DynamicDemotivatorDrawer
 
         float GetMinTextRatio(float textWidth)
         {
-            var fontRatio = MinFontSize / FontSize;
+            var fontRatio = _minFontSize / FontSize;
             var lineHeightK = fontRatio * lineHeight;
             var textWidthK = fontRatio * textWidth;
             var lineCountK = textWidthK / textWidthLimit;

@@ -15,9 +15,9 @@ namespace Witlesss.Memes
     {
         // OPTIONS
 
-        public static bool WrapText = true, ColorText;
-        public static int FontMultiplier = 10, ShadowOpacity = 100;
-        public static CustomColorOption CustomColorOption;
+        public static bool WrapText = true, RandomTextColor;
+        public static int FontMultiplier = 100, ShadowOpacity = 100;
+        public static CustomColorOption CustomColorBack = new("!"), CustomColorText = new("#");
 
         // SIZE
 
@@ -26,6 +26,8 @@ namespace Witlesss.Memes
         private Size _captionSize;
 
         // DATA
+
+        private SolidBrush _textBrush;
 
         private readonly SolidBrush _white = new(Color.White);
 
@@ -43,6 +45,8 @@ namespace Witlesss.Memes
             SetUp();
 
             using var image = GetImage(request);
+
+            SetCaptionColor(image);
             using var caption = DrawCaption(text);
             using var meme = Combine(image, caption);
 
@@ -55,6 +59,7 @@ namespace Witlesss.Memes
         {
             FetchVideoSize(request);
             SetUp();
+            SetCaptionColor(CustomColorText.ByCoords ? request.GetVideoSnapshot() : null);
 
             using var caption = DrawCaption(text);
             var captionAsFile = ImageSaver.SaveImageTemp(caption);
@@ -78,10 +83,10 @@ namespace Witlesss.Memes
         {
             if (request is { IsSticker: true, ExportAsSticker: false })
             {
-                var color = CustomColorOption.GetColor() ?? Color.Black;
-                var background = new Image<Rgba32>(_w, _h, color);
-
                 using var image = GetImage(request.SourcePath);
+
+                var color = CustomColorBack.GetColor(image) ?? Color.Black;
+                var background = new Image<Rgba32>(_w, _h, color);
 
                 background.Mutate(x => x.DrawImage(image));
                 return background;
@@ -126,12 +131,12 @@ namespace Witlesss.Memes
             if (plain)
             {
                 options.WrappingLength = -1;
-                background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, GetBrush(), pen: null));
+                background.Mutate(x => x.DrawText(_textDrawingOptions, options, text, _textBrush, pen: null));
             }
             else
             {
                 var pixelate = ExtraFonts.FontIsPixelated();
-                var optionsE = new EmojiTool.Options(GetBrush(), GetEmojiSize(), _fontOffset, Pixelate: pixelate);
+                var optionsE = new EmojiTool.Options(_textBrush, GetEmojiSize(), _fontOffset, Pixelate: pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
                 var point = GetFunnyOrigin(textLayer.Size, options, top, caseOffset);
                 background.Mutate(ctx => ctx.DrawImage(textLayer, point));
@@ -142,7 +147,13 @@ namespace Witlesss.Memes
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
         }
 
-        private SolidBrush GetBrush() => ColorText ? RandomColor() : _white;
+        private void SetCaptionColor(Image<Rgba32>? image)
+        {
+            var color = CustomColorText.GetColor(image);
+            _textBrush = color is not null 
+                ? new SolidBrush(color.Value) 
+                : RandomTextColor ? RandomColor() : _white;
+        }
 
         private SolidBrush RandomColor()
         {

@@ -28,8 +28,11 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DynamicDemotivatorDrawer.CustomColorOption.CheckAndCut(Request);
-            DynamicDemotivatorDrawer.ExtraFonts.CheckAndCut(Request);
+            DynamicDemotivatorDrawer.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+            DynamicDemotivatorDrawer.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+
+            DynamicDemotivatorDrawer.CustomColor.CheckAndCut(Request);
+            DynamicDemotivatorDrawer.ExtraFonts .CheckAndCut(Request);
 
             DynamicDemotivatorDrawer.WrapText   = !CheckAndCut(Request, _nowrap);
             DynamicDemotivatorDrawer.Minimalist =  CheckAndCut(Request, _small);
@@ -44,7 +47,9 @@ namespace Witlesss.Commands.Meme
             return capitalize ? caption.InLetterCase(LetterCaseMode.Upper) : caption;
         }
 
-        private static readonly Regex _small = new(@"^\/dp\S*(xx)\S*");
+        private static readonly Regex _small   = new(@"^\/dp\S*(xx)\S*");
+        private static readonly Regex _fontSM  = new(@"^\/dp\S*?(\d{1,3})("")\S*");
+        private static readonly Regex _fontMS  = new(@"^\/dp\S*?(min)(\d{1,3})("")\S*");
 
         // LOGIC
 

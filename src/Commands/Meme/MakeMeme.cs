@@ -30,18 +30,19 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("мемы", "meme");
 
-        protected override bool ResultsAreRandom => MemeGenerator.ColorText;
+        protected override bool ResultsAreRandom => MemeGenerator.RandomTextColor;
 
         protected override void ParseOptions()
         {
-            MemeGenerator.CustomColorOption.CheckAndCut(Request);
-            MemeGenerator.ExtraFonts.CheckAndCut(Request);
+            MemeGenerator.CustomColorBack.CheckAndCut(Request);
+            MemeGenerator.CustomColorText.CheckAndCut(Request);
+            MemeGenerator.ExtraFonts     .CheckAndCut(Request);
 
-            MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 10);
+            MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 100);
             MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);
 
             MemeGenerator.WrapText  = !CheckAndCut(Request, _nowrap);
-            MemeGenerator.ColorText =  CheckAndCut(Request, _colorText);
+            MemeGenerator.RandomTextColor =  CheckAndCut(Request, _colorText);
         }
 
         protected override TextPair GetMemeText(string? text)

@@ -39,7 +39,7 @@ public partial class MemeGenerator
 
     private float GetStartingFontSize()
     {
-        var multiplier = FontMultiplier / 10F;
+        var multiplier = FontMultiplier / 100F;
         return Math.Max(GetDefaultFontFize() * multiplier, 15) * ExtraFonts.GetSizeMultiplier();
     }
 

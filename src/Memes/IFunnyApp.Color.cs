@@ -16,12 +16,10 @@ public partial class IFunnyApp
 
     private void SetColor(Image<Rgba32>? image)
     {
-        var custom = CustomColorOption.IsActive;
+        var custom = CustomColor.IsActive;
         var pick = PickColor && image != null;
 
-        Background = custom ? CustomColorOption.Color
-                     : pick ? PickColorFromImage(image!)
-                            : Color.White;
+        Background = CustomColor.GetColor(image) ?? (pick ? PickColorFromImage(image!) : Color.White);
         TextBrush  = custom || pick && Background.Rgb.WhiteTextIsBetter() ? _white : _black;
     }
 

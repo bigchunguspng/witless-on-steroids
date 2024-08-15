@@ -28,12 +28,12 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            IFunnyApp.CustomColorOption.CheckAndCut(Request);
-            IFunnyApp.ExtraFonts.CheckAndCut(Request);
+            IFunnyApp.CustomColor.CheckAndCut(Request);
+            IFunnyApp.ExtraFonts .CheckAndCut(Request);
 
-            IFunnyApp.CropPercent        = GetInt(Request, _crop,    0);
-            IFunnyApp.MinFontSize        = GetInt(Request, _fontMS, 10, group: 2); // 10 px
-            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 10);           // 10 = 100%
+            IFunnyApp.CropPercent        = GetInt(Request, _crop,     0);
+            IFunnyApp.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
             IFunnyApp.BlurImage        =  CheckAndCut(Request, _blur   );
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );

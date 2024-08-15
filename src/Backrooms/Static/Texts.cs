@@ -14,7 +14,7 @@ public static class Texts
         ⚙️ <u><b>Тип авто-мемов</b></u>:
 
         <code>/set [код]</code>
-        <blockquote><b>Примеры</b>:
+        <blockquote><b>Варианты</b>:
         <code>/set M </code> - мемы☝️
         <code>/set T </code> - подписанки 💬
         <code>/set D </code> - демотиваторы👌
@@ -55,12 +55,6 @@ public static class Texts
 
     public const string FUSE_FAIL_CHAT =
         "К сожалению, у меня нет словаря этой беседы";
-
-    public const string LOG_FUSION_DONE =
-        "FUSION DONE";
-
-    public const string LOG_CHATLIST_SAVED =
-        "CHATLIST SAVED";
 
     public const string SET_FREQUENCY_RESPONSE =
         "я буду отвечать на {0}% сообщений";

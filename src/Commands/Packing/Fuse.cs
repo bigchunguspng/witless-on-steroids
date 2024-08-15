@@ -269,7 +269,7 @@ namespace Witlesss.Commands.Packing
 
         protected static void SaveChanges(Witless baka, string title)
         {
-            Log($"{title} >> {LOG_FUSION_DONE}", ConsoleColor.Magenta);
+            Log($"{title} >> FUSION DONE", ConsoleColor.Magenta);
             baka.Save();
         }
 

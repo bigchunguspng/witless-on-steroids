@@ -24,7 +24,7 @@ public static class ChatsDealer
     public static void SaveChatList()
     {
         JsonIO.SaveData(SussyBakas, File_Chats);
-        Log(LOG_CHATLIST_SAVED, ConsoleColor.Green);
+        Log("CHATLIST SAVED", ConsoleColor.Green);
     }
 
     public static async void StartAutoSaveLoop(int minutes)

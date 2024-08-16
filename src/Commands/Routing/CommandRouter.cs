@@ -42,6 +42,7 @@ namespace Witlesss.Commands.Routing
                 .Register("sex"    , () => new ToSticker())
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
+                .Register("load"   , () => new Load())
                 .Register("peg"    , () => new AdvancedEdit())
                 .Register("piece"  , () => new Piece())
                 .Register("w"      , () => _reddit)

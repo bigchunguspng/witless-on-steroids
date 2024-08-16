@@ -2,6 +2,8 @@
 
 public class Spam : SyncCommand
 {
+    private readonly Regex _days = new(@"a(\d+)"), _size = new(@"s(\d+)");
+
     protected override void Run()
     {
         if (Message.From?.Id != Config.AdminID)
@@ -23,17 +25,12 @@ public class Spam : SyncCommand
 
         var groupsOnly = Command!.Contains('g');
 
-        var size = 2_000_000;
-        var match1 = Regex.Match(Command, @"s(\d+)");
-        if (match1.Success) size = int.Parse(match1.Groups[1].Value);
-
-        var activeDays = 28;
-        var match2 = Regex.Match(Command, @"a(\d+)");
-        if (match2.Success) activeDays = int.Parse(match2.Groups[1].Value);
+        var size = _size.ExtractGroup(1, Command, int.Parse, 2_000_000);
+        var days = _days.ExtractGroup(1, Command, int.Parse, 28);
 
         var chat = Chat;
         var text = Args!;
-        var bakas = GetBakas(size, groupsOnly, TimeSpan.FromDays(activeDays));
+        var bakas = GetBakas(size, groupsOnly, TimeSpan.FromDays(days));
 
         if (textProvided) Task.Run(() => SendSpam(bakas, text));
         else              Task.Run(() => CopySpam(bakas, chat, messageId));

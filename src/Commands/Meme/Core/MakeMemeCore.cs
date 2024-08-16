@@ -193,11 +193,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             var repeats = 1;
             var hasToBeRepeated = (Args is null || ResultsAreRandom) && CheckOptionsFor(o => _repeat.IsMatch(o));
-            if (hasToBeRepeated)
-            {
-                var match = _repeat.Match(Request.Dummy);
-                if (match.Success && int.TryParse(match.Value, out var x)) repeats = x;
-            }
+            if (hasToBeRepeated) repeats = _repeat.ExtractGroup(0, Request.Dummy, int.Parse, repeats);
             return repeats;
         }
 
@@ -207,11 +203,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private bool CheckOptionsFor(Predicate<string> condition)
         {
-            if (Request.Empty) return false;
-
-            var match = _cmd.Match(Request.Dummy);
-            if (match.Success) return condition(match.Groups[1].Value);
-            return false;
+            return !Request.Empty && _cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
         }
     }
 

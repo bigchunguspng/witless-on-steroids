@@ -25,8 +25,8 @@ namespace Witlesss.Commands.Packing
 
                 GetWordsPerLineLimit();
 
-                var q = que.Success ? que.Groups[1].Value : null;
-                var s = sub.Success ? sub.Groups[1].Value : null;
+                var q = que.GroupOrNull(1);
+                var s = sub.GroupOrNull(1);
                 var o = ops.Success ? ops.Value : que.Success ? "ra" : "ha";
 
                 RedditQuery query;

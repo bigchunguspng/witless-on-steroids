@@ -81,9 +81,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 {
                     var q = arg.Groups[1].Value;
 
-                    var sub = sub_.Match(Args ?? "");
-                    var s = sub.Success;
-                    var subreddit = s ? sub.Groups[1].Value : null;
+                    var subreddit = sub_.ExtractGroup(1, Args ?? "", s => s);
 
                     var options = GetOptions("ra");
 
@@ -102,11 +100,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
             bool IsCommand(string a, string b) => a.ToLower().StartsWith(b);
 
-            string GetOptions(string alt)
-            {
-                var ops = _ops.Match(Args ?? "");
-                return ops.Success ? ops.Value : alt;
-            }
+            string GetOptions(string alt) => _ops.ExtractGroup(0, Args ?? "", s => s, alt)!;
         }
 
         public  static string GetTime(string o, bool b) => o.Length > 1 && b ? Times[o[1]] : Times['a'];

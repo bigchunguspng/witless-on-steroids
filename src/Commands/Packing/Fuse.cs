@@ -255,10 +255,11 @@ namespace Witlesss.Commands.Packing
             }
         }
 
+        private static readonly Regex _wordLimit = new(@"^\/\S+(\d+)");
+
         protected void GetWordsPerLineLimit()
         {
-            var match = Regex.Match(Command!, @"^\/\S+(\d+)");
-            Limit = match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
+            Limit = _wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
         }
 
         protected void GoodEnding()

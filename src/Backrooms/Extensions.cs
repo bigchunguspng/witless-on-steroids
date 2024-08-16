@@ -131,8 +131,7 @@ public static partial class Extensions
     public static string GetFixedMessage(this Exception e)
     {
         var message = e.Message;
-        var match = Errors.Match(message);
-        return match.Success ? match.Groups[1].Value : message;
+        return Errors.ExtractGroup(1, message, s => s, message)!;
     }
 
     // FILE

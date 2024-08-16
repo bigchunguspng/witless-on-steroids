@@ -102,4 +102,21 @@ public static partial class Extensions
     // REGEX
 
     public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);
+
+    public static string? GroupOrNull
+        (this Match match, int group) => match.Groups[group].Success ? match.Groups[group].Value : null;
+
+    public static T? ExtractGroup<T>
+        (this Regex regex, int group, string input, Func<string, T> convert, T? fallback = default)
+    {
+        var match = regex.Match(input);
+        return match.Success ? convert(match.Groups[group].Value) : fallback;
+    }
+
+    public static T? ExtractGroup<T>
+        (this Regex regex, int group, string input, Func<string, T> convert, T? fallback = default) where T : struct
+    {
+        var match = regex.Match(input);
+        return match.Success ? convert(match.Groups[group].Value) : fallback;
+    }
 }

@@ -24,16 +24,15 @@ public class DownloadMusic : AsyncCommand
         if (args.Success)
         {
             var url    = args.Groups[1].Value;
-            var artist = args.Groups[2].Success ? args.Groups[2].Value : null;
-            var title  = args.Groups[3].Success ? args.Groups[3].Value : null;
+            var artist = args.GroupOrNull(2);
+            var title  = args.GroupOrNull(3);
 
             var youTube = url.Contains("youtu");
             var idOrUrl    = youTube ? _id.Match(url).Groups[^1].Value : url;
             var playlistID = youTube ? _pl.Match(url).Groups[^1].Value : null;
             if (playlistID is null && idOrUrl.Length < 1) throw new Exception("no video or playlist id found");
 
-            var match = _ops.Match(Command!);
-            var options = match.Success ? match.Groups[1].Value.ToLower() : "";
+            var options = _ops.ExtractGroup(1, Command!, s => s.ToLower(), "");
 
             var playListIndex = youTube && playlistID is null
                 ? null

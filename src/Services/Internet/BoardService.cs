@@ -25,8 +25,7 @@ namespace Witlesss.Services.Internet
                 {
                     if (line.StartsWith("<a")) continue;
 
-                    var match = _quote.Match(line);
-                    var text = match.Success ? match.Groups[1].Value : line;
+                    var text = _quote.ExtractGroup(1, line, s => s, line)!;
 
                     yield return HttpUtility.HtmlDecode(text.Replace("<s>", "").Replace("</s>", ""));
                 }

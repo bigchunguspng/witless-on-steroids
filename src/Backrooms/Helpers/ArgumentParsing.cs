@@ -46,7 +46,7 @@ public static class ArgumentParsing
         if (match.Success == false) return false;
 
         var s = Regex.Replace(match.Groups[2].Value, "[.юб]", ",");
-        var m = match.Groups[1].Success ? match.Groups[1].Value : "0";
+        var m = match.GroupOrNull(1) ?? "0";
 
         if (double.TryParse(s, out var seconds)) span  = TimeSpan.FromSeconds(seconds);
         if (double.TryParse(m, out var minutes)) span += TimeSpan.FromMinutes(minutes);

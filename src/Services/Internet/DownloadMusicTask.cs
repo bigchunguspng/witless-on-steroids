@@ -101,8 +101,8 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // META INFORMATION
         var meta = _name.Match(Path.GetFileName(audioFile));
-        if (Artist is null && meta.Groups[1].Success) Artist = meta.Groups[1].Value;
-        if (Title  is null && meta.Groups[2].Success) Title  = meta.Groups[2].Value;
+        Artist ??= meta.GroupOrNull(1);
+        Title  ??= meta.GroupOrNull(2);
 
         if (NameOnly) Artist = null;
         if (RemoveBrackets) Title = Title?.RemoveTextInBrackets();

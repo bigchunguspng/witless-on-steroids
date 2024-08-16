@@ -23,7 +23,7 @@
             }
 
             var up = Command!.Contains("up");
-            var repeats = GetRepeats(_repeat.Match(Command!));
+            var repeats = _repeat.ExtractGroup(1, Command!, int.Parse, 1);
             for (var i = 0; i < repeats; i++)
             {
                 var mode = up ? LetterCase.Upper : GetMode(Args);

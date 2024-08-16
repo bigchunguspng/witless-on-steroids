@@ -24,6 +24,6 @@
         }
 
         protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");
-        protected override string VideoFileName => _arg.Length < 8 ? $"VOLUME-{ValidFileName(_arg)}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
+        protected override string VideoFileName => _arg.Length < 8 ? $"VOLUME-{_arg.ValidFileName()}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
     }
 }

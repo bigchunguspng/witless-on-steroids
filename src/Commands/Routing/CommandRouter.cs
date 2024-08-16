@@ -14,6 +14,7 @@ namespace Witlesss.Commands.Routing
         private readonly DebugMessage _debug = new();
         private readonly BrowseReddit _reddit = new();
         private readonly GetRedditLink _link = new();
+        private readonly AliasFFMpeg _apeg = new();
 
         private readonly WitlessCommandRouter _witlessRouter;
 
@@ -45,6 +46,7 @@ namespace Witlesss.Commands.Routing
                 .Register("piece"  , () => new Piece())
                 .Register("w"      , () => _reddit)
                 .Register("link"   , () => _link)
+                .Register("apeg"   , () => _apeg)
                 .Register("debug"  , () => _debug)
                 .Register("chat_id", () => _mail.WithText($"<code>{Context.Chat}</code>"))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
@@ -110,6 +112,7 @@ namespace Witlesss.Commands.Routing
 
             var data = query.GetData();
             if (data[0] == "man") _help.HandleCallback(query, data);
+            if (data[0] == "ap" ) _apeg.HandleCallback(query, data);
 
             _witlessRouter.OnCallback(query);
         }

@@ -72,7 +72,7 @@ namespace Witlesss.Memes.Shared
         public FontFamily GetFontFamily(string @default)
         {
             _fontKey ??= @default;
-            return _families[_fontKey == "^^" ? _families.Keys.PickRandom() : _fontKey];
+            return _families[_fontKey == "^^" ? _families.Keys.PickAny() : _fontKey];
         }
 
         public FontStyle GetFontStyle(FontFamily family)
@@ -85,7 +85,7 @@ namespace Witlesss.Memes.Shared
             if (_styleKey is null)
             {
                 return _fontKey is "^^"
-                    ? available.PickRandom()
+                    ? available.PickAny()
                     : aR
                         ? FontStyle.Regular
                         : FontStyle.Bold;

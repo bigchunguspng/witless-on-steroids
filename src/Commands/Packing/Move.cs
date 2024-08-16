@@ -36,7 +36,7 @@ namespace Witlesss.Commands.Packing
             }
             else
             {
-                var name = ValidFileName((Args ?? Title).Replace(' ', '_'), '-');
+                var name = (Args ?? Title).Replace(' ', '_').ValidFileName('-');
 
                 var newName = MoveDictionary(name, _public ? 0 : Chat);
                 if (newName == "*")

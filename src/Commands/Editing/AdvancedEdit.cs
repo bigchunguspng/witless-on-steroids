@@ -5,43 +5,81 @@ namespace Witlesss.Commands.Editing;
 
 public class AdvancedEdit : AudioVideoPhotoCommand
 {
+    private readonly Regex _alias = new(@"\$?([^\s\$]*)!");
+
     protected override string SyntaxManual => "/man_44";
 
     // /peg  [options]      [extension]
     // /pegv [videofilters] [extension]
+    // /pega [audiofilters] [extension]
+
+    // /peg     [code:0:5]! [extension] <-- ALIAS USAGE
+    // /peg […]$[code:0:5]! [extension] <-- ALIAS USAGE
+
     protected override async Task Execute()
     {
         if (Args is null)
         {
             SendManual();
+            return;
+        }
+
+        var args = Args!.SplitN();
+
+        // GET OPTIONS
+        var options = string.Join(' ', args.SkipLast(1));
+        if (options.Contains('!'))
+        {
+            // APPLY ALIASES
+            var matches = _alias.Matches(options);
+            foreach (var match in matches.OfType<Match>())
+            {
+                if (!ApplyAlias(match, ref options)) return;
+            }
+        }
+
+        // PROCESS OTHER OPTIONS
+        var vf = OptionUsed('v');
+        var af = OptionUsed('a');
+        var fc = OptionUsed('c');
+
+        if (vf || af || fc)
+        {
+            var filter = fc ? "filter_complex" : $"{(vf ? 'v' : 'a')}f";
+            options = $"-{filter} \"{options}\"";
+        }
+
+        // GET EXTENSION
+        var extension = args[^1];
+        if (Path.GetInvalidFileNameChars().Any(c => extension.Contains(c)))
+        {
+            Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
+            return;
+        }
+
+        var (path, _) = await Bot.Download(FileID, Chat);
+
+        SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: OptionUsed('g'));
+        Log($"{Title} >> EDIT [{options}] [{extension}]");
+    }
+
+    private bool ApplyAlias(Match match, ref string options)
+    {
+        var data = match.Groups[1].Value;
+        var args = data.Split(':');
+        var name = args[0];
+        var path = Path.Combine(Dir_Alias_Peg, $"{name}.txt");
+
+        var success = File.Exists(path);
+        if (success)
+        {
+            var content = File.ReadAllText(path);
+            options = options.Replace(match.Value, string.Format(content, args.Skip(1)));
         }
         else
-        {
-            var args = Args.Split(' ');
+            Bot.SendMessage(Chat, string.Format(PEG_ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));
 
-            var vf = OptionUsed('v');
-            var af = OptionUsed('a');
-            var fc = OptionUsed('c');
-
-            var options = string.Join(' ', args.SkipLast(1));
-            if (vf || af || fc)
-            {
-                var filter = fc ? "filter_complex" : $"{(vf ? 'v' : 'a')}f";
-                options = $"-{filter} \"{options}\"";
-            }
-
-            var extension = args[^1];
-
-            foreach (var c in extension)
-            {
-                if (Path.GetInvalidFileNameChars().Contains(c)) Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
-            }
-
-            var (path, _) = await Bot.Download(FileID, Chat);
-
-            SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: OptionUsed('g'));
-            Log($"{Title} >> EDIT [{options}] [{extension}]");
-        }
+        return success;
     }
 
     private bool OptionUsed(char option)

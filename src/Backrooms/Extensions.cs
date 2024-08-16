@@ -31,7 +31,7 @@ public static partial class Extensions
         return RandomInt((int)(min * k), (int)(max * k)) / k;
     }
 
-    public static T PickRandom<T>(this ICollection<T> collection)
+    public static T PickAny<T>(this ICollection<T> collection)
     {
         return collection.ElementAt(Random.Shared.Next(collection.Count));
     }
@@ -73,7 +73,7 @@ public static partial class Extensions
         while (true);
     }
 
-    public static string ValidFileName(string text, char x = '_')
+    public static string ValidFileName(this string text, char x = '_')
     {
         var chars = Path.GetInvalidFileNameChars();
         return chars.Aggregate(text, (current, c) => current.Replace(c, x));

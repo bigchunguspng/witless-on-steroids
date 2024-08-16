@@ -164,7 +164,7 @@ namespace Witlesss.Commands.Packing
             var text = sb.ToString();
             var buttons = GetPaginationKeyboard(page, perPage, last, "b");
 
-            SendOrEditMessage(chat, text, messageId, buttons);
+            Bot.SendOrEditMessage(chat, text, messageId, buttons);
         }
 
         private void SendSavedList(ListPagination pagination)
@@ -182,10 +182,8 @@ namespace Witlesss.Commands.Packing
             sb.Append("\n\n").AppendJoin('\n', JsonList(_files, page, perPage));
             if (!single) sb.Append(USE_ARROWS);
 
-            var text = sb.ToString();
-
-            if (single) Bot.SendMessage(chat, text);
-            else SendOrEditMessage(chat, text, messageId, GetPaginationKeyboard(page, perPage, lastPage, "bi"));
+            var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "bi");
+            Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
         }
 
 

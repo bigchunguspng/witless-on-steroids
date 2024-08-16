@@ -27,6 +27,12 @@ namespace Witlesss
             TrySend(task, chat, "message", "copy");
         }
 
+        public void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup? buttons)
+        {
+            if (messageId < 0) SendMessage(chat, /*      */ text, buttons);
+            else /*         */ EditMessage(chat, messageId, text, buttons);
+        }
+
         // SEND MEDIA
 
         public void SendPhoto(long chat, InputOnlineFile photo)

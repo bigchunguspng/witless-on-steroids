@@ -63,7 +63,7 @@ namespace Witlesss.MediaTools
         public Task<string> AddTrackMetadata(string? artist, string title)
         {
             var name = $"{(artist is null ? "" : $"{artist} - ")}{title}";
-            var path = $"{Path.GetDirectoryName(_video)}/{ValidFileName(name, '#')}.mp3";
+            var path = $"{Path.GetDirectoryName(_video)}/{name.ValidFileName('#')}.mp3";
             return ApplyEffects(o => MetadataArgs(o, artist, title)).OutputAs(path);
         }
 

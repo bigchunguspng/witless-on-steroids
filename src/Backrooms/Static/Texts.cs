@@ -601,4 +601,30 @@ public static class Texts
 
         📖 Справка по обработке: /man_4
         """;
+
+    public const string PEG_ALIAS_SYNTAX =
+        """
+        ✍️ <u>Создать ярлык (alias)</u>:
+        <code>/apeg [имя] [аргументы FFMpeg]</code>
+
+        👁 <u>Посмотреть список</u>:
+        <code>/apeg info</code>
+        """;
+
+    public const string PEG_ALIAS_EXIST_RESPONSE =
+        """
+        Код "<code>{0}</code>" уже используется для:
+        <blockquote>{1}</blockquote>
+        {2} Придумайте другой …✍️
+        """;
+
+    public const string PEG_ALIAS_SAVED_RESPONSE =
+        """
+        Ярлык "<code>{0}</code>" успешно сохранён 🥂
+        """;
+
+    public const string PEG_ALIAS_NOT_FOUND =
+        """
+        Не могу найти ярлык "<code>{0}</code>" {1}
+        """;
 }

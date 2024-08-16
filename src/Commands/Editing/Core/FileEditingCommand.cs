@@ -99,7 +99,7 @@ namespace Witlesss.Commands.Editing.Core
         protected virtual string VideoFileName => "piece_fap_club.mp3";
         protected virtual string AudioFileName => "piece_fap_club.mp4";
 
-        protected string Sender => ValidFileName(Message.GetSenderName());
+        protected string Sender => Message.GetSenderName().ValidFileName();
         protected string SongNameOr(string s) => Message.GetSongNameOr(s);
     }
 }

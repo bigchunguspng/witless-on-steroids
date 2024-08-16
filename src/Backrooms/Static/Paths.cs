@@ -8,6 +8,11 @@ namespace Witlesss.Backrooms.Static;
     Working directory structure:
 
     DB/
+        Alias/
+            Peg/
+                vintage.txt
+            Im/
+                bb.txt
         Backup/
             2024-03-14/
                 pack--4147302158.json [dic]
@@ -34,10 +39,12 @@ namespace Witlesss.Backrooms.Static;
     Static/
         ASCII/
         Emoji/
+            1f62d-1f467.png
         Fonts/
             Fallback/
         Manual/
         Water/
+            556 698.png
         art.jpg
         voice.ogg
 
@@ -54,6 +61,7 @@ public static class Paths
     public const string File_Config      = "config.txt";
     public const string File_RedditPosts = "reddit-posts.json";
 
+    public static string Dir_Alias   { get; } = Path.Combine(Dir_DB, "Alias");
     public static string Dir_Backup  { get; } = Path.Combine(Dir_DB, "Backup");
     public static string Dir_Board   { get; } = Path.Combine(Dir_DB, "Board");
     public static string Dir_Chat    { get; } = Path.Combine(Dir_DB, "Chat");
@@ -62,6 +70,9 @@ public static class Paths
 
     public static string File_DefaultTexts { get; } = Path.Combine(Dir_DB,  "default.json");
     public static string File_Baguette     { get; } = Path.Combine(Dir_DB, "baguette.json");
+
+    public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
+    public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");
 
     public static string File_Chats { get; } = Path.Combine(Dir_Chat, "chats.json");
     public static string File_Bans  { get; } = Path.Combine(Dir_Chat,  "bans.json");

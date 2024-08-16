@@ -13,7 +13,7 @@ namespace Witlesss.Commands.Packing
 
         private void DeleteTheDictionary()
         {
-            var name = ValidFileName(Title.Replace(' ', '-'));
+            var name = Title.Replace(' ', '-').ValidFileName();
             var result = MoveDictionary(name, Chat);
 
             if (result == "*") result = "*👊 никак*";

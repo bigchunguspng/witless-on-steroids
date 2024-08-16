@@ -74,7 +74,7 @@ public class AdvancedEdit : AudioVideoPhotoCommand
         if (success)
         {
             var content = File.ReadAllText(path);
-            options = options.Replace(match.Value, string.Format(content, args.Skip(1)));
+            options = options.Replace(match.Value, string.Format(content, args.Skip(1).ToArray()));
         }
         else
             Bot.SendMessage(Chat, string.Format(PEG_ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));

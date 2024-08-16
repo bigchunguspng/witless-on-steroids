@@ -8,10 +8,10 @@ namespace Witlesss
 {
     public partial class Bot
     {
-        public void SendMessage(long chat, string text, bool preview = false)
+        public void SendMessage(long chat, string text, bool preview = false, int? replyTo = null)
         {
             var task = Client.SendTextMessageAsync
-                (chat, text, ParseMode.Html, disableWebPagePreview: !preview);
+                (chat, text, ParseMode.Html, disableWebPagePreview: !preview, replyToMessageId: replyTo);
             TrySend(task, chat, "message");
         }
         public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline, bool preview = false)
@@ -21,9 +21,9 @@ namespace Witlesss
             TrySend(task, chat, "message [+][-]");
         }
 
-        public void CopyMessage(long chat, long fromChat, int messageId)
+        public void CopyMessage(long chat, long fromChat, int messageId, int? replyTo = null)
         {
-            var task = Client.CopyMessageAsync(chat, fromChat, messageId);
+            var task = Client.CopyMessageAsync(chat, fromChat, messageId, replyToMessageId: replyTo);
             TrySend(task, chat, "message", "copy");
         }
 

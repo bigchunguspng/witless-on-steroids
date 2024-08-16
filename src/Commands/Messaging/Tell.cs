@@ -2,6 +2,8 @@
 
 public class Tell : SyncCommand
 {
+    private readonly Regex _replyId = new(@"\d+");
+
     protected override void Run()
     {
         if (Message.From?.Id != Config.AdminID)
@@ -19,21 +21,21 @@ public class Tell : SyncCommand
 
         if (!chatProvided || !textProvided && !copyProvided)
         {
-            Bot.SendMessage(Chat, "<code>/tell [chat] [message]</code>");
+            Bot.SendMessage(Chat, "<code>/tell[replyTo] [chat] [message]</code>");
             return;
         }
         
         var chat = long.TryParse(args![0], out var x) ? x : 0;
         if (chat != 0)
         {
+            var replyTo = _replyId.ExtractGroup(0, Command!, int.Parse, null);
             if (textProvided)
             {
-                var text = args[1];
-                Bot.SendMessage(chat, text, preview: true);
-                if (ChatsDealer.WitlessExist(chat, out var baka)) baka.Eat(text);
+                Bot.SendMessage(chat, args[1], preview: true, replyTo);
+                if (ChatsDealer.WitlessExist(chat, out var baka)) baka.Eat(args[1]);
             }
             else
-                Bot.CopyMessage(chat, Chat, messageId);
+                Bot.CopyMessage(chat, Chat, messageId, replyTo);
         }
     }
 }

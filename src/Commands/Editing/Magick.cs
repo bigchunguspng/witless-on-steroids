@@ -61,7 +61,7 @@ public class Magick : PhotoCommand
 
     private bool OptionUsed(char option)
     {
-        return Command!.Length > 4 && Command.AsSpan()[3..].Contains(option);
+        return Command!.Length > 3 && Command.AsSpan()[3..].Contains(option);
     }
 
     private async Task<string> ProcessImage(string path, string options, string extension)

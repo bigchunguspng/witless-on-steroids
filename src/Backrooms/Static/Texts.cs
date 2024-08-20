@@ -608,23 +608,23 @@ public static class Texts
         📖 Справка по обработке: /man_4
         """;
 
-    public const string PEG_ALIAS_SYNTAX =
+    public const string ALIAS_SYNTAX =
         """
         ✍️ <u>Создать ярлык (alias)</u>:
-        <code>/apeg [имя] [аргументы FFMpeg]</code>
+        <code>/a{0} [имя] [аргументы {1}]</code>
 
         👁 <u>Посмотреть список</u>:
-        <code>/apeg info</code>
+        <code>/a{0} info</code>
         """;
 
-    public const string PEG_ALIAS_EXIST_RESPONSE =
+    public const string ALIAS_EXIST_RESPONSE =
         """
         Код "<code>{0}</code>" уже используется для:
         <blockquote>{1}</blockquote>
         {2} Придумайте другой …✍️
         """;
 
-    public const string PEG_ALIAS_SAVED_RESPONSE =
+    public const string ALIAS_SAVED_RESPONSE =
         """
         Ярлык "<code>{0}</code>" успешно сохранён 🥂
         """;

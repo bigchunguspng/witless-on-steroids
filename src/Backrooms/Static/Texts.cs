@@ -323,6 +323,7 @@ public static class Texts
         <code>min10"</code> - мин. размер шрифта (1-999)
 
         <b>Шрифты</b>: /fonts
+        <b>Общие опции</b>: /man_32
         """;
 
     public const string TOP_OPTIONS =
@@ -343,6 +344,7 @@ public static class Texts
         <code>#color#</code> - цвет плашки
 
         <b>Шрифты</b>: /fonts
+        <b>Общие опции</b>: /man_32
         """;
 
     public const string MEME_OPTIONS =
@@ -359,6 +361,7 @@ public static class Texts
         <code>cc</code> - текст случайного цвета 🎨
 
         <b>Шрифты</b>: /fonts
+        <b>Общие опции</b>: /man_32
         """;
 
     public const string BOARD_START =
@@ -564,6 +567,7 @@ public static class Texts
         <code>__*</code> - шрифт нижнего текста
 
         <b>Шрифты</b>: /fonts
+        <b>Общие опции</b>: /man_32
         """;
 
     public const string NUKE_OPTIONS =
@@ -571,6 +575,8 @@ public static class Texts
         <b>Опции команды</b> <code>/nuke</code>:
 
         <code>N"</code> - кол-во проходов (1-9 📸, 1-3 🎬)
+        
+        <b>Общие опции</b>: /man_32
         """;
 
     public const string PUB_EX_NOT_FOUND =

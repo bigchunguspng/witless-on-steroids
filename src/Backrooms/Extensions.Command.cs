@@ -1,3 +1,5 @@
+// ReSharper disable CoVariantArrayConversion
+
 namespace Witlesss.Backrooms;
 
 public partial class Extensions
@@ -17,7 +19,7 @@ public partial class Extensions
         if (success)
         {
             var content = File.ReadAllText(path);
-            options = options.Replace(match.Value, string.Format(content, args.Skip(1)));
+            options = options.Replace(match.Value, string.Format(content, args.Skip(1).ToArray()));
         }
         else
             Bot.Instance.SendMessage(context.Chat, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));

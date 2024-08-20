@@ -24,7 +24,15 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("демотиваторы💀", "dg");
 
-        protected override bool ResultsAreRandom => DemotivatorDrawer.AddLogo;
+        protected override bool ResultsAreRandom => DemotivatorDrawer.AddLogo || RandomFontIsUsed;
+
+        private bool RandomFontIsUsed
+            => _mode == Wide
+                ? DemotivatorDrawer.ExtraFontsL.UseRandom
+                : DemotivatorDrawer.SingleLine
+                    ? DemotivatorDrawer.ExtraFontsS.UseRandom
+                    : DemotivatorDrawer.ExtraFontsA.UseRandom
+                   || DemotivatorDrawer.ExtraFontsB.UseRandom;
 
         protected override void ParseOptions()
         {

@@ -25,7 +25,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("мемы", "meme");
 
-        protected override bool ResultsAreRandom => MemeGenerator.RandomTextColor;
+        protected override bool ResultsAreRandom
+            => MemeGenerator.RandomTextColor || MemeGenerator.ExtraFonts.UseRandom;
 
         protected override void ParseOptions()
         {

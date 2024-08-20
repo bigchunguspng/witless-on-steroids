@@ -24,6 +24,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("подписанки", "top"); // 🔥🔥🔥✍️
 
+        protected override bool ResultsAreRandom => IFunnyApp.ExtraFonts.UseRandom;
+
         protected override void ParseOptions()
         {
             IFunnyApp.CustomColor.CheckAndCut(Request);

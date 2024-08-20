@@ -24,6 +24,8 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("демотиваторы👌", "dp");
 
+        protected override bool ResultsAreRandom => DynamicDemotivatorDrawer.ExtraFonts.UseRandom;
+
         protected override void ParseOptions()
         {
             DynamicDemotivatorDrawer.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);

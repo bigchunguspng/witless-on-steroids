@@ -15,6 +15,8 @@ namespace Witlesss.Memes.Shared
 
         private string? _fontKey, _styleKey;
 
+        public bool UseRandom { get; private set; }
+
         static ExtraFonts()
         {
             var files = Directory.GetFiles(Dir_Fonts).OrderBy(x => x).ToArray();
@@ -59,20 +61,15 @@ namespace Witlesss.Memes.Shared
             [StringSyntax("Regex")] string? x = null
         )
         {
-            var codes = string.Join('|', _families.Keys.Append(@"\^\^"));
-            _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes})(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);
-        }
-
-        public Font GetFont(string @default, float size)
-        {
-            var family = GetFontFamily(@default);
-            return family.CreateFont(size, GetFontStyle(family));
+            var codes = string.Join('|', _families.Keys);
+            _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes}|\^\^)(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);
         }
 
         public FontFamily GetFontFamily(string @default)
         {
             _fontKey ??= @default;
-            return _families[_fontKey == "^^" ? _families.Keys.PickAny() : _fontKey];
+            if (UseRandom) _fontKey = _families.Keys.PickAny();
+            return _families[_fontKey];
         }
 
         public FontStyle GetFontStyle(FontFamily family)
@@ -84,7 +81,7 @@ namespace Witlesss.Memes.Shared
 
             if (_styleKey is null)
             {
-                return _fontKey is "^^"
+                return UseRandom
                     ? available.PickAny()
                     : aR
                         ? FontStyle.Regular
@@ -194,6 +191,8 @@ namespace Witlesss.Memes.Shared
             {
                 _fontKey = _styleKey = null;
             }
+
+            UseRandom = _fontKey is "^^";
         }
 
         public static void Debug_GetFontData()

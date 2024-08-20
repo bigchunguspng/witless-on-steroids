@@ -79,6 +79,11 @@ public static partial class Extensions
         return chars.Aggregate(text, (current, c) => current.Replace(c, x));
     }
 
+    public static bool FileNameIsInvalid(this string text)
+    {
+        return Path.GetInvalidFileNameChars().Any(text.Contains);
+    }
+
     // COMFIES
 
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)

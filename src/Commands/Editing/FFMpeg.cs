@@ -1,12 +1,12 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 
+// ReSharper disable InconsistentNaming
+
 namespace Witlesss.Commands.Editing;
 
-public class AdvancedEdit : AudioVideoPhotoCommand
+public class FFMpeg : AudioVideoPhotoCommand
 {
-    private readonly Regex _alias = new(@"\$?([^\s\$]*)!");
-
     protected override string SyntaxManual => "/man_44";
 
     // /peg  [options]      [extension]
@@ -31,10 +31,10 @@ public class AdvancedEdit : AudioVideoPhotoCommand
         if (options.Contains('!'))
         {
             // APPLY ALIASES
-            var matches = _alias.Matches(options);
+            var matches = AliasRegex.Matches(options);
             foreach (var match in matches.OfType<Match>())
             {
-                if (!ApplyAlias(match, ref options)) return;
+                if (!Context.ApplyAlias(match, ref options, Dir_Alias_Peg)) return;
             }
         }
 
@@ -51,7 +51,9 @@ public class AdvancedEdit : AudioVideoPhotoCommand
 
         // GET EXTENSION
         var extension = args[^1];
-        if (Path.GetInvalidFileNameChars().Any(c => extension.Contains(c)))
+        if (extension == ".") extension = "mp4"; // todo get file type corresponding extension
+
+        if (extension.FileNameIsInvalid())
         {
             Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
             return;
@@ -60,26 +62,7 @@ public class AdvancedEdit : AudioVideoPhotoCommand
         var (path, _) = await Bot.Download(FileID, Chat);
 
         SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: OptionUsed('g'));
-        Log($"{Title} >> EDIT [{options}] [{extension}]");
-    }
-
-    private bool ApplyAlias(Match match, ref string options)
-    {
-        var data = match.Groups[1].Value;
-        var args = data.Split(':');
-        var name = args[0];
-        var path = Path.Combine(Dir_Alias_Peg, $"{name}.txt");
-
-        var success = File.Exists(path);
-        if (success)
-        {
-            var content = File.ReadAllText(path);
-            options = options.Replace(match.Value, string.Format(content, args.Skip(1)));
-        }
-        else
-            Bot.SendMessage(Chat, string.Format(PEG_ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));
-
-        return success;
+        Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 
     private bool OptionUsed(char option)
@@ -123,6 +106,4 @@ public class AdvancedEdit : AudioVideoPhotoCommand
 
     private static readonly Regex _pic = new(@"^(png|jpe?g)$");
     private static readonly Regex _gif = new(@"^(gif|webm|mp4)$");
-
-    private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
 }

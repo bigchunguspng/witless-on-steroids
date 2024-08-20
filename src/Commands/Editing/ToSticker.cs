@@ -1,10 +1,9 @@
-﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types.InputFiles;
 using static Witlesss.MediaTools.FFMpegXD;
 
 namespace Witlesss.Commands.Editing
 {
-    public class ToSticker : FileEditingCommand
+    public class ToSticker : PhotoCommand
     {
         protected override async Task Execute()
         {
@@ -15,10 +14,6 @@ namespace Witlesss.Commands.Editing
             if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
-
-        protected override string SuportedMedia => "📸";
-        protected override bool MessageContainsFile(Message m)
-            => GetPhotoFileID(m);
 
         protected override bool ChatIsBanned() => false;
     }

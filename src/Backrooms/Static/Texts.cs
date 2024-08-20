@@ -629,7 +629,7 @@ public static class Texts
         Ярлык "<code>{0}</code>" успешно сохранён 🥂
         """;
 
-    public const string PEG_ALIAS_NOT_FOUND =
+    public const string ALIAS_NOT_FOUND =
         """
         Не могу найти ярлык "<code>{0}</code>" {1}
         """;

@@ -9,6 +9,13 @@ public abstract class VideoCommand : FileEditingCommand
         => GetVideoFileID(m);
 }
 
+public abstract class PhotoCommand : FileEditingCommand
+{
+    protected override string SuportedMedia => "📸";
+    protected override bool MessageContainsFile(Message m)
+        => GetPhotoFileID(m);
+}
+
 public abstract class AudioVideoPhotoCommand : FileEditingCommand
 {
     protected override string SuportedMedia => "🎬, 📸, 🎧";

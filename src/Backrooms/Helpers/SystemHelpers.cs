@@ -19,6 +19,7 @@ public static class SystemHelpers
                 Arguments = args,
                 WorkingDirectory = directory,
                 RedirectStandardOutput = redirect,
+                RedirectStandardError  = redirect,
             }
         };
         process.Start();

@@ -141,17 +141,33 @@ public static partial class Extensions
 
     // FILE
 
-    public static string FileSize(string path) => FileSize(SizeInBytes(path));
-
-    public static string FileSize(long bytes)
+    public static string ReadableFileSize(this long bytes)
     {
-        long kbs = bytes / 1024;
-        return kbs switch { < 1 => bytes + " байт", _ => kbs + " КБ" };
+        var kbs = bytes / 1024F;
+        var mbs = kbs   / 1024F;
+        return mbs >= 100
+            ? $"{mbs:F1} МБ"
+            : mbs >= 1
+                ? $"{mbs:F2} МБ"
+                : kbs >= 1
+                    ? $"{kbs:F0} КБ"
+                    : $"{bytes} байт";
     }
-    
-    public static long SizeInBytes(string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
-    public static bool FileEmptyOrNotExist(string path) => !File.Exists(path) || SizeInBytes(path) == 0;
-    public static void CreateFilePath(string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
+
+    public static string ReadableFileSize
+        (this string path) => path.FileSizeInBytes().ReadableFileSize();
+
+    public static long FileSizeInBytes
+        (this string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
+
+    public static bool FileIsEmptyOrNotExist
+        (this string path) => !File.Exists(path) || path.FileSizeInBytes() == 0;
+
+    public static bool IsNestedPath
+        (this string path) => path.Contains(Path.PathSeparator);
+
+    public static void CreateFilePath
+        (this string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
 
     public static FileInfo[] GetFilesInfo(string path, bool recursive = false)
     {

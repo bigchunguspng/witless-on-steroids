@@ -65,7 +65,9 @@ public static class Texts
     public const string FUSE_SUCCESS_RESPONSE =
         """
         Cловарь беседы <b>{0}</b> обновлён!
+
         Теперь он весит {1} (+{2})
+        Новых слов: {3}
         """;
 
     public const string MOVING_DONE =

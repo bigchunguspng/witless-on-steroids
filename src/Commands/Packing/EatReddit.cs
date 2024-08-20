@@ -20,9 +20,7 @@ namespace Witlesss.Commands.Packing
 
             if (que.Success || sub.Success)
             {
-                Baka.SaveChanges();
-                Size = SizeInBytes(Baka.FilePath);
-
+                MeasureDick();
                 GetWordsPerLineLimit();
 
                 var q = que.GroupOrNull(1);
@@ -61,10 +59,12 @@ namespace Witlesss.Commands.Packing
             var comments = await RedditTool.Instance.GetComments(query);
             Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
+            var count = c.Baka.Baka.DB.Vocabulary.Count;
+
             EatAllLines(comments, c.Baka, limit, out var eated);
             SaveChanges(c.Baka, c.Title);
 
-            var report = FUSION_SUCCESS_REPORT(c.Baka, size, c.Title);
+            var report = FUSION_SUCCESS_REPORT(c.Baka, size, count, c.Title);
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\n Его пополнили {eated} комментов с {subreddit}";

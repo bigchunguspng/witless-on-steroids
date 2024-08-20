@@ -10,7 +10,7 @@ namespace Witlesss.Commands
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
-            var size = SizeInBytes(Baka.FilePath);
+            var size = Baka.FilePath.FileSizeInBytes();
             var icon = size switch
             {
                 <      2_000 => "🗒",
@@ -21,7 +21,7 @@ namespace Witlesss.Commands
                 _            => "📚"
             };
 
-            sb.Append("\nВес словаря: ").Append(FileSize(size)).Append(' ').Append(icon);
+            sb.Append("\nВес словаря: ").Append(size.ReadableFileSize()).Append(' ').Append(icon);
             if (Baka.Loaded)
                 sb
                     .Append("\nСлов в запасе: ")

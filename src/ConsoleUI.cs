@@ -131,7 +131,7 @@ namespace Witlesss
         {
             foreach (var witless in Bakas)
             {
-                if (SizeInBytes(witless.FilePath) > size) continue;
+                if (witless.FilePath.FileSizeInBytes() > size) continue;
 
                 witless.BackupAndDelete();
                 ChatsDealer.RemoveChat(witless.Chat);

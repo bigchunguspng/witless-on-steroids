@@ -37,9 +37,7 @@ namespace Witlesss.Commands.Packing
             }
             else
             {
-                Baka.SaveChanges();
-                Size = SizeInBytes(Baka.FilePath);
-
+                MeasureDick();
                 GetWordsPerLineLimit();
 
                 var args = Args.SplitN();
@@ -108,7 +106,7 @@ namespace Witlesss.Commands.Packing
         {
             await Task.WhenAll(tasks);
 
-            var size = SizeInBytes(c.Baka.FilePath);
+            var size = c.Baka.FilePath.FileSizeInBytes();
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 
@@ -117,7 +115,9 @@ namespace Witlesss.Commands.Packing
 
         private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title, int limit)
         {
-            EatAllLines(lines, baka, limit, out var eated);
+            var count = baka.Baka.DB.Vocabulary.Count;
+
+            EatAllLines(lines, baka, limit, out _);
             SaveChanges(baka, title);
 
             Directory.CreateDirectory(Dir_Board);
@@ -125,9 +125,7 @@ namespace Witlesss.Commands.Packing
             JsonIO.SaveData(lines, path);
             _names.Remove(chat);
 
-            var report = FUSION_SUCCESS_REPORT(baka, size, title);
-            var detais = $"\n\n<b>Новых строк:</b> {BrowseReddit.FormatSubs(eated, "😏")}";
-            Bot.SendMessage(chat, report + detais);
+            Bot.SendMessage(chat, FUSION_SUCCESS_REPORT(baka, size, count, title));
         }
 
 

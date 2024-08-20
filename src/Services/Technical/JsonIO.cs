@@ -20,7 +20,7 @@ namespace Witlesss.Services.Technical
 
         public static T LoadData<T>(string path) where T : new()
         {
-            if (FileEmptyOrNotExist(path)) return NewT<T>(path);
+            if (path.FileIsEmptyOrNotExist()) return NewT<T>(path);
 
             var serializer = SerializerDefault;
             using var stream = File.OpenText(path);
@@ -38,13 +38,11 @@ namespace Witlesss.Services.Technical
 
         private static T NewT<T>(string path) where T : new()
         {
-            if (PathIsNested(path)) CreateFilePath(path);
+            if (path.IsNestedPath()) path.CreateFilePath();
 
             T result = new();
             SaveData(result, path);
             return result;
         }
-
-        private static bool PathIsNested(string path) => path.Contains(Path.PathSeparator);
     }
 }

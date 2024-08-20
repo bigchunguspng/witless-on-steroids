@@ -18,16 +18,22 @@ namespace Witlesss.Commands.Packing
     public class Fuse : SettingsCommand
     {
         protected long Size;
+        protected int Count;
         protected int Limit = int.MaxValue;
 
         private bool _private, _history;
         private Document? _document;
 
-        protected override void RunAuthorized()
+        protected void MeasureDick() // 😂🤣🤣🤣👌
         {
             Baka.SaveChanges();
-            Size = SizeInBytes(Baka.FilePath);
+            Size = Baka.FilePath.FileSizeInBytes();
+            Count = Baka.Baka.DB.Vocabulary.Count;
+        }
 
+        protected override void RunAuthorized()
+        {
+            MeasureDick();
             GetWordsPerLineLimit();
 
             var args = Args.SplitN(2);
@@ -142,7 +148,7 @@ namespace Witlesss.Commands.Packing
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = Baka.FilePath;
             if (File.Exists(path))
-                sb.Append("весит ").Append(FileSize(path));
+                sb.Append("весит ").Append(path.ReadableFileSize());
             else
                 sb.Append("пуст");
             if (!empty) sb.Append(data.Optional);
@@ -163,8 +169,8 @@ namespace Witlesss.Commands.Packing
             foreach (var file in files.Skip(page * perPage).Take(perPage))
             {
                 var name = file.Name.Replace(".json", "");
-                var size = FileSize(file.FullName);
-                yield return $"<code>{name}</code> ({size})";
+                var size = file.Length.ReadableFileSize();
+                yield return $"<code>{name}</code> | {size}";
             }
         }
 
@@ -242,7 +248,7 @@ namespace Witlesss.Commands.Packing
         protected void GoodEnding()
         {
             SaveChanges(Baka, Title);
-            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Title));
+            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
         }
 
         protected static void SaveChanges(Witless baka, string title)
@@ -251,11 +257,16 @@ namespace Witlesss.Commands.Packing
             baka.Save();
         }
 
-        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, string title)
+        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, int count, string title)
         {
-            var newSize = SizeInBytes(baka.FilePath);
-            var difference = newSize - size;
-            return string.Format(FUSE_SUCCESS_RESPONSE, title, FileSize(newSize), FileSize(difference));
+            var newSize = baka.FilePath.FileSizeInBytes();
+            var newCount = baka.Baka.DB.Vocabulary.Count;
+            var deltaSize = newSize - size;
+            var deltaCount = newCount - count;
+            var ns = newSize.ReadableFileSize();
+            var ds = deltaSize.ReadableFileSize();
+            var dc = BrowseReddit.FormatSubs(deltaCount, "💨");
+            return string.Format(FUSE_SUCCESS_RESPONSE, title, ns, ds, dc);
         }
 
         #endregion

@@ -91,7 +91,7 @@ namespace Witlesss.Commands.Meme
 
             return new TextPair(AdjustCase(a), AdjustCase(b));
 
-            string AdjustCase(string s) => capitalize ? s.InLetterCase(LetterCase.Upper) : s;
+            string AdjustCase(string s) => generate || capitalize ? s.InLetterCase(LetterCase.Upper) : s;
         }
 
         private static readonly string[] separators = ["\n\n\n\n", "\n\n\n", "\n\n", "\n"];

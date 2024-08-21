@@ -34,7 +34,7 @@ namespace Witlesss.Commands
             sb.Append("\n\n<u>Авто-мемы:</u>");
             sb.Append("\nТип: ").Append(Types[Baka.Type]);
             sb.Append("\nВероятность: ").Append(Baka.Pics).Append('%');
-            sb.Append("\nСтикеры: ").Append(Baka.Stickers ? "тоже 🍑" : "пропускаем");
+            sb.Append("\nСтикеры: ").Append(Baka.Stickers ? "тоже 👌" : "пропускаем");
 
             if (Baka.Options is not null)
             {

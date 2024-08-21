@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Settings
     {
         private readonly Regex _m = new("^[mм]");
         private readonly Regex _t = new("^[tт]");
-        private readonly Regex _g = new("^[dд][gг]");
+        private readonly Regex _g = new("^[dд][gгvв]");
         private readonly Regex _d = new("^[dд]");
         private readonly Regex _n = new("^[nн]");
 

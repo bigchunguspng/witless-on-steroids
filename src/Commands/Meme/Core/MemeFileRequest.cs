@@ -15,6 +15,7 @@ public class MemeFileRequest(string path, string outputEnding, int quality)
     public bool  ConvertSticker { get; init; }
 
     public bool IsSticker => Type == MemeSourceType.Sticker;
+    public bool IsVideo   => Type == MemeSourceType.Video;
 
     /// <summary>
     /// Constant Rate Factor (for MP4 compression).<br/>

@@ -42,7 +42,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             text = ArrangeText(text, out var emojiPngs);
 
-            SetUpFrameSize();
+            SetUpFrameSize(request);
             using var image = GetImage(request.SourcePath);
 
             SetColor(image);
@@ -60,7 +60,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             text = ArrangeText(text, out var emojiPngs);
 
-            SetUpFrameSize();
+            SetUpFrameSize(request);
             SetColor(CustomColor.ByCoords ? request.GetVideoSnapshot() : null);
 
             using var frame = DrawFrame(text, emojiPngs);
@@ -96,18 +96,19 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             return MakeTextFitCard(text);
         }
 
-        private void SetUpFrameSize()
+        private void SetUpFrameSize(MemeFileRequest request)
         {
             var space = Math.Max(imageH / 30F, 4);
             var lineHeight = FontSize * GetLineSpacing();
             var textHeight = _textHeight + 0.5F * lineHeight;
-            var n = Minimalist ? 2 : 4;
+            var n = Minimalist ? 2 : 3;
             fullH = (imageH + textHeight + n * space).RoundInt().ToEven();
             fullW = Minimalist ? imageW : (fullH * _ratio).RoundInt().ToEven();
 
             marginTop = Minimalist ? 0 : (2 * space).RoundInt();
 
-            var size = new Size(fullW, fullH).FitSize(new Size(1280, 720));
+            var targetSize = request.IsVideo ? new Size(1280, 720) : new Size(1280, 800);
+            var size = new Size(fullW, fullH).FitSize(targetSize);
             if (size.Width != fullW)
             {
                 var k = size.Width / (float) fullW;

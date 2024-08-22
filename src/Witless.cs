@@ -23,11 +23,14 @@ namespace Witlesss
 
         public static Witless GetAverageBaka(CommandContext context)
         {
-            var witless = new Witless(context.Chat)
-            {
-                Type = (MemeType)Random.Shared.Next(4)
-            };
+            var chance = Random.Shared.Next(4);
+            var type = chance.IsEven()
+                ? MemeType.Meme
+                : (chance >> 1).IsEven()
+                    ? MemeType.Dg
+                    : MemeType.Dp;
 
+            var witless = new Witless(context.Chat) { Type = type };
             if (context.ChatIsPrivate)
             {
                 witless.Speech = 100;
@@ -128,7 +131,7 @@ namespace Witlesss
             catch
             {
                 LogError("NO TEXT!?");
-                var response = IsOneIn(3) ? null : DefaultTextProvider.GetRandomResponse();
+                var response = IsOneIn(5) ? null : DefaultTextProvider.GetRandomResponse();
                 return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
             }
         }

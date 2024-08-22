@@ -18,8 +18,9 @@ public partial class Extensions
         var success = File.Exists(path);
         if (success)
         {
-            var content = File.ReadAllText(path);
-            options = options.Replace(match.Value, string.Format(content, args.Skip(1).ToArray()));
+            var aliasRender = string.Format(File.ReadAllText(path), args.Skip(1).ToArray());
+            var regex = new Regex(Regex.Escape(match.Value));
+            options = regex.Replace(options, aliasRender, 1);
         }
         else
             Bot.Instance.SendMessage(context.Chat, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));

@@ -31,9 +31,11 @@ public class FFMpeg : AudioVideoPhotoCommand
         if (options.Contains('!'))
         {
             // APPLY ALIASES
-            var matches = AliasRegex.Matches(options);
-            foreach (var match in matches.OfType<Match>())
+            while (true)
             {
+                var match = AliasRegex.Match(options);
+                if (match.Success == false) break;
+                
                 if (!Context.ApplyAlias(match, ref options, Dir_Alias_Peg)) return;
             }
         }

@@ -48,8 +48,8 @@ namespace Witlesss.Memes
             using var meme = Combine(image, caption);
 
             return request.ExportAsSticker
-                ? ImageSaver.SaveImagePng(meme, request.TargetPath, request.Quality)
-                : ImageSaver.SaveImage   (meme, request.TargetPath, request.Quality);
+                ? ImageSaver.SaveImageWebp(meme, request.TargetPath, request.Quality)
+                : ImageSaver.SaveImage    (meme, request.TargetPath, request.Quality);
         }
 
         public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)

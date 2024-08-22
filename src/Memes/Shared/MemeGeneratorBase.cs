@@ -13,16 +13,22 @@ public abstract class MemeGeneratorBase
     protected void FetchImageSize(MemeFileRequest request)
     {
         _sourceSizeOG = Image.Identify(request.SourcePath).Size;
-        _sourceSizeAdjusted = AdjustImageSize();
+        _sourceSizeAdjusted = AdjustImageSize(request);
     }
 
     protected void FetchVideoSize(MemeFileRequest request)
     {
         _sourceSizeOG = FFMpegXD.GetPictureSize(request.SourcePath);
-        _sourceSizeAdjusted = AdjustImageSize().ValidMp4Size();
+        _sourceSizeAdjusted = AdjustImageSize(request).ValidMp4Size();
     }
 
-    private Size AdjustImageSize() => _sourceSizeOG.EnureIsWideEnough().FitSize(new Size(1280, 720));
+    private Size AdjustImageSize(MemeFileRequest request)
+    {
+        var size = request.ExportAsSticker
+            ? _sourceSizeOG
+            : _sourceSizeOG.EnureIsWideEnough();
+        return size.FitSize(new Size(1280, 720));
+    }
 
     protected Image<Rgba32> GetImage(string path)
     {

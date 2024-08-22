@@ -1,5 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Global
@@ -17,7 +18,7 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
             return path;
         }
 
-        public static string SaveImagePng(Image<Rgba32> image, string path, int quality)
+        public static string SaveImageWebp(Image<Rgba32> image, string path, int quality)
         {
             if (quality <= 25)
             {
@@ -27,11 +28,11 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
                 memory.Position = 0;
                 var jpeg = Image.Load<Rgb24>(memory);
                 image.ApplyQuality(jpeg);
-                sw.Log("jpeg lol");
+                sw.Log("+compression");
             }
 
             path = UniquePath(path);
-            image.SaveAsPng(path);
+            image.SaveAsWebp(path, GetWebpEncoder(quality));
             image.Dispose();
 
             return path;
@@ -47,6 +48,7 @@ namespace Witlesss.Services.Technical // ReSharper disable MemberCanBePrivate.Gl
         }
 
         public static JpegEncoder GetJpegEncoder(int quality) => new() { Quality = Math.Clamp(quality, 1, 100) };
+        public static WebpEncoder GetWebpEncoder(int quality) => new() { Quality = Math.Clamp(quality, 1, 100) };
 
         public static string GetTempPicName() => UniquePath(Dir_Temp, $"x_{_temp++}.png");
     }

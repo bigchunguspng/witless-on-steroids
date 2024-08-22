@@ -11,17 +11,19 @@ public static class SystemHelpers
 
     public static Process StartProcess(string exe, string args, string directory = "", bool redirect = false)
     {
-        var process = new Process
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = exe,
-                Arguments = args,
-                WorkingDirectory = directory,
-                RedirectStandardOutput = redirect,
-                RedirectStandardError  = redirect,
-            }
+            FileName = exe, Arguments = args,
+            WorkingDirectory = directory,
+            RedirectStandardOutput = redirect,
+            RedirectStandardError  = redirect,
         };
+        var process = new Process { StartInfo = startInfo };
+
+#if DEBUG
+        Log($"[{exe.ToUpper()}] >> {args}", ConsoleColor.DarkYellow);
+#endif
+
         process.Start();
         return process;
     }

@@ -18,7 +18,7 @@
             Log($"{Title} >> DAMN [*]");
         }
 
-        private string CompressImage(string path)
+        private string CompressImage(string path) // todo compress stickers as webp
         {
             var directory = Path.GetDirectoryName(path);
             var name = Path.GetFileNameWithoutExtension(path);

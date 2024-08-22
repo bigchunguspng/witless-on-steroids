@@ -95,10 +95,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             };
             for (var i = 0; i < repeats; i++)
             {
-                var result = await MakeMemeStick(request, GetText());
-                if (sticker && ConvertStickers)
-                    result = await new F_Process(result).Output("-stick", ".webp");
-                await using var stream = File.OpenRead(result);
+                await using var stream = File.OpenRead(await MakeMemeStick(request, GetText()));
 
                 if (sticker) Bot.SendSticker(Chat, new InputOnlineFile(stream));
                 else         Bot.SendPhoto  (Chat, new InputOnlineFile(stream));

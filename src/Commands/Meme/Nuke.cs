@@ -7,14 +7,11 @@ namespace Witlesss.Commands.Meme
 {
     public class Nuke : MakeMemeCore<int>, ImageProcessor
     {
-        protected override Regex _cmd { get; } = new(@"^\/nuke(\S*) *", RegexOptions.IgnoreCase);
+        protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 
-        protected override string Log_PHOTO(int x) => $"NUKED [{(x == 1 ? "*" : x)}]";
-        protected override string Log_STICK(int x) => $"NUKED [{(x == 1 ? "*" : x)}] STICKER";
-
-        protected override string Log_VIDEO => "NUKED [*] VID";
         protected override string VideoName => "piece_fap_club-nuke.mp4";
 
+        protected override string Log_STR => "NUKED";
         protected override string Command => "/nuke";
         protected override string Suffix  => "-Nuked"; // Needs more nuking!
 

@@ -85,7 +85,6 @@ public partial class MemeGenerator
                 {
                     var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
                     var targetRatio = textWidthLimit / (textHeightLimit * (Math.Min(lineCount, 4) + ratioFix) / 5F);
-                    Log($"textRatio: {textRatio:F2}, targetRatio: {targetRatio:F2}");
                     if (textRatio < targetRatio) break;
 
                     lineCount++;

@@ -3,16 +3,15 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Commands.Meme.Core;
 
-public class MemeFileRequest(string path, string outputEnding, int quality)
+public class MemeFileRequest(MemeSourceType type, string path, string outputEnding, int quality)
 {
-    public string SourcePath { get; set; } = path;
-    public string TargetPath { get; } = path.ReplaceExtension(outputEnding);
+    public MemeSourceType Type { get; }      = type;
+    public string   SourcePath { get; set; } = path;
+    public string   TargetPath { get; }      = path.ReplaceExtension(outputEnding);
+    public int         Quality { get; }      = quality.Clamp(0, 100);
 
-    public int Quality { get; set; } = quality; // 0 - 100
-
-    public MemeSourceType  Type { get; init; }
     public bool ExportAsSticker { get; init; }
-    public bool  ConvertSticker { get; init; }
+    public bool     JpegSticker { get; init; }
 
     public bool IsSticker => Type == MemeSourceType.Sticker;
     public bool IsVideo   => Type == MemeSourceType.Video;

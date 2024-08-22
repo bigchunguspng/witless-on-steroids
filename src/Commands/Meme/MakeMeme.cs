@@ -9,14 +9,11 @@ namespace Witlesss.Commands.Meme
 {
     public class MakeMeme : MakeMemeCore<TextPair>, ImageProcessor
     {
-        protected override Regex _cmd { get; } = new(@"^\/meme(\S*) *", RegexOptions.IgnoreCase);
+        protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");
 
-        protected override string Log_PHOTO(int x) => $"MEME [{(x == 1 ? "M" : x)}]";
-        protected override string Log_STICK(int x) => $"MEME [{(x == 1 ? "M" : x)}] STICKER";
-
-        protected override string Log_VIDEO => "MEME [M] VID";
         protected override string VideoName => "piece_fap_club-meme.mp4";
 
+        protected override string Log_STR => "MEME";
         protected override string Command => "/meme";
         protected override string Suffix  => "-Meme";
 

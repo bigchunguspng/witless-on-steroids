@@ -1,6 +1,6 @@
 ﻿namespace Witlesss.Commands.Meme.Core;
 
-public class MemeRequest(string dummy, bool empty, string command)
+public class MemeRequest(string dummy, bool empty, string command, string? options)
 {
     /// <summary>
     /// <b>True</b> if both message text and default options are null.
@@ -16,4 +16,9 @@ public class MemeRequest(string dummy, bool empty, string command)
     /// A combination of command and default options.
     /// </summary>
     public string Dummy = dummy;
+    
+    /// <summary>
+    /// Options used.
+    /// </summary>
+    public readonly string? Options = options;
 }

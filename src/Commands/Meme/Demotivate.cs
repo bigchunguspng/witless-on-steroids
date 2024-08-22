@@ -8,14 +8,11 @@ namespace Witlesss.Commands.Meme
 {
     public class Demotivate : MakeMemeCore<TextPair>, ImageProcessor
     {
-        protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*) *", RegexOptions.IgnoreCase);
+        protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
 
-        protected override string Log_PHOTO(int x) => $"DEMOTIVATOR [{(x == 1 ? "_" : x)}]";
-        protected override string Log_STICK(int x) => $"DEMOTIVATOR [{(x == 1 ? "#" : x)}] STICKER";
-
-        protected override string Log_VIDEO => "DEMOTIVATOR [^] VID";
         protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
 
+        protected override string Log_STR => "DEMOTIVATOR";
         protected override string Command => _mode == Square ? "/dg" : "/dv";
         protected override string Suffix  => _mode == Square ? "-Dg" : "-Dv";
 

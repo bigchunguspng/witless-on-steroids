@@ -8,14 +8,11 @@ namespace Witlesss.Commands.Meme
 {
     public class Top : MakeMemeCore<string>, ImageProcessor
     {
-        protected override Regex _cmd { get; } = new(@"^\/top(\S*) *", RegexOptions.IgnoreCase);
+        protected override Regex _cmd { get; } = new(@"^\/top(\S*)");
 
-        protected override string Log_PHOTO(int x) => $"TOP [{(x == 1 ? "=" : x)}]";
-        protected override string Log_STICK(int x) => $"TOP [{(x == 1 ? "$" : x)}] STICKER";
-
-        protected override string Log_VIDEO => "TOP [%] VID";
         protected override string VideoName => "piece_fap_club-top.mp4";
 
+        protected override string Log_STR => "TOP";
         protected override string Command => "/top";
         protected override string Suffix  => "-Top";
 

@@ -116,14 +116,18 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
                 path = await FFMpegXD.CropVideoNote(path);
 
             ParseOptions();
-            var request = new MemeFileRequest(MemeSourceType.Video, path, Suffix + ".mp4", Baka.Quality);
-            await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
-
+            var repeats = GetRepeatCount().Clamp(3);
             var note = type == MediaType.Round && !CropVideoNotes;
-            if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
-            else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+            var request = new MemeFileRequest(MemeSourceType.Video, path, Suffix + ".mp4", Baka.Quality);
+            for (var i = 0; i < repeats; i++)
+            {
+                await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
 
-            Log($"{Title} >> {Log_STR} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
+                if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+                else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+            }
+
+            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }
 
         private string? REP(int repeats) => repeats > 1 ? $"-{repeats}" : null;
@@ -161,7 +165,13 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private Task<string> MakeMemeVideo(MemeFileRequest request, T text)
         {
-            return Queue.Enqueue(() => MemeMaker.GenerateVideoMeme(request, text));
+            return Queue.Enqueue(() =>
+            {
+                var sw = GetStartedStopwatch();
+                var result = MemeMaker.GenerateVideoMeme(request, text);
+                sw.Log(Command + " video");
+                return result;
+            });
         }
 
 

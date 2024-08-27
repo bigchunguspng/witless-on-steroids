@@ -39,7 +39,7 @@ public class Magick : PhotoCommand
         var extension = args[^1];
         if (extension == ".") extension = "png"; // todo get file type corresponding extension
 
-        if (extension.FileNameIsInvalid())
+        if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
             Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
             return;

@@ -55,7 +55,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         var extension = args[^1];
         if (extension == ".") extension = "mp4"; // todo get file type corresponding extension
 
-        if (extension.FileNameIsInvalid())
+        if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
             Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
             return;

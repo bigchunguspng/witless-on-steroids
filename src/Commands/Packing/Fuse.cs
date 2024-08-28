@@ -238,7 +238,7 @@ namespace Witlesss.Commands.Packing
             }
         }
 
-        private static readonly Regex _wordLimit = new(@"^\/\S+(\d+)");
+        private static readonly Regex _wordLimit = new(@"^\/\S+?(\d+)");
 
         protected void GetWordsPerLineLimit()
         {

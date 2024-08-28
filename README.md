@@ -8,14 +8,20 @@
 
 ##### Honorable mentions 😲:
 - 💬 Generation is based on an enhanced [Markov chain] algorithm.
-- 📦 The generation packs can be easily cleaned, or extended via text files 📄 / other chat packs 📦 / 4chan threads 🍀.
+- 📦 The generation packs can be easily cleaned, or extended via:
+  - other chat packs 📦,
+  - text files 📄,
+  - 4chan threads 🍀.
 - ⚙️ Highly customizable.
 - 💭 Can be used in group chats and DMs.
 
 ### Setup ⚙️
 - Have `dotnet-sdk` installed.
 - Have `ffmpeg`, `imagemagick`, `yt-dlp`, and `gallery-dl` on your `PATH`.
-- Setup the WD as shown in [`Paths.cs`](src/Backrooms/Static/Paths.cs) (only `DB/default.json`, [`config.txt`](config-example.txt), and the whole `Static` directory is required for proper work).
+- Setup the working directory as shown in [`Paths.cs`](src/Backrooms/Static/Paths.cs). Required items:
+  - [`config.txt`](config-example.txt),
+  - `DB/default.json`,
+  - the whole `Static` directory.
 
 ### Operating the bot console 💬
 - **s** - saves all data and shuts the bot down.

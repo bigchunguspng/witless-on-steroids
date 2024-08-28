@@ -1,4 +1,4 @@
 tg-token             = VALUE
 reddit-app-id        = VALUE
 reddit-refresh-token = VALUE
-admin-id  	         = VALUE
+admin-id             = VALUE

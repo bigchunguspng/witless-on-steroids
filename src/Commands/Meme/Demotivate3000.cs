@@ -6,7 +6,7 @@ using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class Demotivate3000 : MakeMemeCore<string>, ImageProcessor
+    public class Demotivate3000 : MakeMemeCore<string>
     {
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");
 

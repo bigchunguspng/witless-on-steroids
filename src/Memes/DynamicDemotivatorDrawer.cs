@@ -70,7 +70,7 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             return new F_Combine(request.SourcePath, frameAsFile)
                 .D300(request.GetCRF(), _sourceSizeAdjusted, _imageOrigin, full_size)
-                .OutputAs(request.TargetPath);
+                .OutAs(request.TargetPath);
         }
 
         private void SetUp()

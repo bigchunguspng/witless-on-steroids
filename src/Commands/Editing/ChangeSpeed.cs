@@ -19,10 +19,10 @@ namespace Witlesss.Commands.Editing
 
             if (_mode == Slow) _speed = 1 / _speed;
 
-            var (path, type) = await Bot.Download(FileID, Chat);
+            var path = await Bot.Download(FileID, Chat, Ext);
 
-            var result = await FFMpegXD.ChangeSpeed(path, _speed);
-            SendResult(result, type);
+            var result = await path.UseFFMpeg().ChangeSpeed(_speed).Out("-Speed", Ext);
+            SendResult(result);
             Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 
             double ClampFast(double v) => Math.Clamp(v, 0.5,   94);

@@ -64,7 +64,7 @@ namespace Witlesss.MediaTools
         {
             var name = $"{(artist is null ? "" : $"{artist} - ")}{title}";
             var path = $"{Path.GetDirectoryName(_video)}/{name.ValidFileName('#')}.mp3";
-            return ApplyEffects(o => MetadataArgs(o, artist, title)).OutputAs(path);
+            return ApplyEffects(o => MetadataArgs(o, artist, title)).OutAs(path);
         }
 
         private static void MetadataArgs(FFO o, string? artist, string title)

@@ -175,7 +175,9 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             catch
             {
                 var meme = DownloadMeme(post, gif ? ".gif" : ".png");
-                var path = gif ? FFMpegXD.CompressGIF(meme).Result : FFMpegXD.Compress(meme).Result;
+                var path = gif
+                    ? FFMpegXD.CompressGIF(meme).Result
+                    : FFMpegXD.Compress(meme).Result;
                 
                 using var stream = File.OpenRead(path);
                 SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));

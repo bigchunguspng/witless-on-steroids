@@ -7,9 +7,11 @@ namespace Witlesss.Commands.Editing
     {
         protected override async Task Execute()
         {
-            var (path, _) = await Bot.Download(FileID, Chat);
+            var path = await Bot.Download(FileID, Chat, Ext);
 
-            await using var stream = File.OpenRead(await Stickerize(path));
+            var size = GetPictureSize(path).Normalize().Ok();
+            var result = await path.UseFFMpeg().ToSticker(size).Out("-stick", ".webp");
+            await using var stream = File.OpenRead(result);
             Bot.SendSticker(Chat, new InputOnlineFile(stream));
             if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");

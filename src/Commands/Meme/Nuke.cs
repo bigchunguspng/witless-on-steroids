@@ -5,7 +5,7 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme
 {
-    public class Nuke : MakeMemeCore<int>, ImageProcessor
+    public class Nuke : MakeMemeCore<int>
     {
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 

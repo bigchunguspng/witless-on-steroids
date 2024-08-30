@@ -4,13 +4,13 @@ public class Slice : AudioVideoUrlCommand
 {
     protected override async Task Execute()
     {
-        var (path, type, waitMessage) = await DownloadFileSuperCool();
+        var (path, waitMessage) = await DownloadFileSuperCool();
 
-        var result = await FFMpegXD.Slice(path);
+        var result = await FFMpegXD.Slice(path, Type, Ext);
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 
-        SendResult(result, type);
+        SendResult(result);
         Log($"{Title} >> SLICED [~/~]");
     }
 

@@ -58,7 +58,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
 
         return new F_Combine(request.SourcePath, frameAsFile)
             .When(request.GetCRF(), _sourceSizeAdjusted, Cropping, Location, BlurImage)
-            .OutputAs(request.TargetPath);
+            .OutAs(request.TargetPath);
     }
 
     private void SetUp()

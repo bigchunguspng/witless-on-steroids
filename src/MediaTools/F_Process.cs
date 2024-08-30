@@ -16,7 +16,7 @@ namespace Witlesss.MediaTools
         #region MEDIA CONVERSION
 
         // -s WxH -an -vcodec libx264 -crf 30
-        public F_Action ToAnimation() => ApplyEffects(o =>
+        public F_Action RemoveAudio() => ApplyEffects(o =>
         {
             var v = GetVideoStream(_input)!;
             var size = new Size(v.Width, v.Height).Ok().FitSize().ValidMp4Size().Ok();
@@ -24,7 +24,7 @@ namespace Witlesss.MediaTools
         });
 
         // -c:a libopus -b:a 48k -vn
-        public F_Action ToVoiceMessage() => ApplyEffects(o =>
+        public F_Action ToVoice() => ApplyEffects(o =>
         {
             o.WithAudioCodec("libopus").WithAudioBitrate(48).DisableChannel(Channel.Video);
         });
@@ -63,8 +63,8 @@ namespace Witlesss.MediaTools
             o.FixWebmSize(v).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
         });
 
-        public F_Action DeepFry        (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
-        public F_Action DeepFryVideo(Size s, int f) => ApplyEffects(o => DeepFryArgs(o.Resize(s), f, isVideo: true));
+        public F_Action Nuke        (int qscale) => ApplyEffects(o => DeepFryArgs(o, qscale));
+        public F_Action NukeVideo(Size s, int f) => ApplyEffects(o => DeepFryArgs(o.Resize(s), f, isVideo: true));
 
         private void DeepFryArgs(FFMpAO o, int compression = 0, bool isVideo = false)
         {
@@ -219,7 +219,7 @@ namespace Witlesss.MediaTools
         public F_Action CropVideo (string[] c) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(c)));
 
         // -vf "scale=W:H,setsar=1"
-        public F_Action ScaleVideo(string[] s) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
+        public F_Action Scale(string[] s) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
 
         #endregion
 
@@ -340,7 +340,7 @@ namespace Witlesss.MediaTools
                     if (index + 1 < count) builder.Append("-to ").Append(Format(to));
 
                     ops.WithCustomArgument(builder.ToString());
-                }).Output($"-part-{i}", Path.GetExtension(_input)).Result;
+                }).Out($"-part-{i}", Path.GetExtension(_input)).Result;
             }
 
             for (var i = 0; i < count; i++) // slice each chunk
@@ -351,7 +351,7 @@ namespace Witlesss.MediaTools
                 parts[i] = new F_Process(parts[i]).ApplyEffects(ops =>
                 {
                     ApplyTrims(ops, info, timecodes, offset, take, start);
-                }).Output("-slices", Path.GetExtension(_input)).Result;
+                }).Out("-slices", Path.GetExtension(_input)).Result;
 
                 Log($"PART {i + 1} >> DONE", ConsoleColor.Yellow);
             }

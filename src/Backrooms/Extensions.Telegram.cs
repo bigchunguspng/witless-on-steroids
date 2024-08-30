@@ -83,6 +83,9 @@ public static partial class Extensions
 
     //
 
+    public static bool SenderIsBotAdmin
+        (this Message message) => message.From?.Id == Config.AdminID;
+
     public static async Task<bool> SenderIsAdmin(this Message message)
     {
         var chat = message.Chat.Id;

@@ -6,7 +6,7 @@ using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class Top : MakeMemeCore<string>, ImageProcessor
+    public class Top : MakeMemeCore<string>
     {
         protected override Regex _cmd { get; } = new(@"^\/top(\S*)");
 

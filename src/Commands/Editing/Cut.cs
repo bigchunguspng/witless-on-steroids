@@ -9,7 +9,6 @@ namespace Witlesss.Commands.Editing
         protected override async Task Execute()
         {
             var args = Args?.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
-            // todo move this to another command - /video
 
             var x = ParseArgs(args);
             if (x.failed)
@@ -20,13 +19,13 @@ namespace Witlesss.Commands.Editing
 
             var span = new CutSpan(x.start, x.length);
 
-            var (path, type, waitMessage) = await DownloadFileSuperCool();
+            var (path, waitMessage) = await DownloadFileSuperCool();
 
-            var result = await FFMpegXD.Cut(path, span);
+            var result = await new F_Cut(path, span).Cut().Out("-Cut", Ext);
 
             Bot.DeleteMessageAsync(Chat, waitMessage);
 
-            SendResult(result, type);
+            SendResult(result);
             Log($"{Title} >> CUT [8K-]");
         }
 

@@ -45,9 +45,9 @@
 
                 if (args.Length > 4) args = args.Take(4).ToArray();
 
-                var (path, type) = await Bot.Download(FileID, Chat);
+                var path = await Bot.Download(FileID, Chat, Ext);
 
-                SendResult(await FFMpegXD.Crop(path, args), type);
+                SendResult(await path.UseFFMpeg().CropVideo(args).Out("-crop", Ext));
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else

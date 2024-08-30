@@ -97,25 +97,9 @@ public static partial class Extensions
         return (T)values.GetValue(Random.Shared.Next(values.Length))!;
     }
 
-    // MEDIA | todo find better way
+    // MEDIA
 
-    public static string ShortID           (string id) => id.Remove(62).Remove(2, 44);
-    public static string ExtensionFromID   (string id) => ExtensionsIDs[id.Remove(2)];
-    public static MediaType MediaTypeFromID(string id) => MediaTypes   [id.Remove(2)];
-
-    private static readonly Dictionary<string, string> ExtensionsIDs = new()
-    {
-        { "BA", ".mp4" }, { "Cg", ".mp4" }, // Cg - animation
-        { "CQ", ".mp3" }, { "Aw", ".mp3" }, // Aw - voice message / ogg
-        { "BQ", ".wav" }, { "DQ", ".mp4" }, // DQ - video message
-        { "Ag", ".jpg" }, { "CA", ".webm" } // CA - stickers
-    };
-
-    private static readonly Dictionary<string, MediaType> MediaTypes = new()
-    {
-        { "BA", MediaType.Movie }, { "DQ", MediaType.Round }, { "Cg", MediaType.Video }, { "CA", MediaType.Video },
-        { "Aw", MediaType.Audio }, { "BQ", MediaType.Audio }, { "CQ", MediaType.Audio }, { "Ag", MediaType.Video }
-    };
+    public static string ShortID(string id) => id.Remove(62).Remove(2, 44);
 
     //
 

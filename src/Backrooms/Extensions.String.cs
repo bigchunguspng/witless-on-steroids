@@ -48,11 +48,19 @@ public static partial class Extensions
     public static int GetLineCount
         (this string text) => 1 + text.Count(x => x == '\n');
 
+    // PATH
+
     public static string RemoveExtension
         (this string path) => path.Remove(path.LastIndexOf('.'));
 
     public static string ReplaceExtension
         (this string path, string newExtension) => Regex.Replace(path, @"\.\S+$", newExtension);
+
+    public static string GetExtension
+        (this string? path, string fallback) => path != null ? Path.GetExtension(path) : fallback;
+
+    public static F_Process UseFFMpeg
+        (this string path) => new F_Process(path);
 
     // LANGUAGE DETECTION
 

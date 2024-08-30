@@ -477,17 +477,17 @@ public static class Texts
 
         <b>Синтаксис:</b> <code>/eq [частота,Hz] [сила,dB] [ширина,Hz]</code>
 
-        <b>Дефолтные значения:</b> <code>~</code>, <code>10</code>, <code>2000</code>
+        <b>Дефолтные значения:</b> <code>~</code>, <code>15</code>, <code>2000</code>
 
         <b>Примеры:</b>
 
-        <code>/eq 100</code> 👈 поднять басы на 10dB
-        <code>/eq 1000</code> 👈 поднять средние частоты на 10dB
+        <code>/eq 100</code> 👈 поднять басы на 15dB
+        <code>/eq 1000</code> 👈 поднять средние частоты на 15dB
         <code>/eq 50 40 1000</code> 👈 поднять частоту 50Hz на 40dB
         <code>/eq 1000 100 10</code> 👈 запикать
         <code>/eq 10000 -50 8000</code> 👈 заглушить высокие частоты
 
-        <b>Более подробно <a href='https://ffmpeg.org//ffmpeg-filters.html#equalizer'>тут</a></b>
+        📖 <b>Более подробно <a href='https://ffmpeg.org//ffmpeg-filters.html#equalizer'>тут</a></b>
         """;
 
     public const string VOLUME_MANUAL =
@@ -505,7 +505,7 @@ public static class Texts
         <code>/vol if(gt(t,1),1,t)</code> 👈 плавный 1-секундный вход
         <code>/vol if(gt(t,0.5),1,2*t)</code> 👈 плавный полсекундный вход
 
-        <b>Более подробно <a href='https://ffmpeg.org//ffmpeg-filters.html#volume'>тут</a></b>
+        📖 <b>Более подробно <a href='https://ffmpeg.org//ffmpeg-filters.html#volume'>тут</a></b>
         """;
 
     public const string TRACTOR_GAME_RULES =

@@ -49,6 +49,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         {
             var filter = fc ? "filter_complex" : $"{(vf ? 'v' : 'a')}f";
             options = $"-{filter} \"{options}\"";
+            if (vf || af) options = $"{options} -c:{(vf ? 'a' : 'v')} copy";
         }
 
         // GET EXTENSION
@@ -61,9 +62,10 @@ public class FFMpeg : AudioVideoPhotoCommand
             return;
         }
 
-        var (path, _) = await Bot.Download(FileID, Chat);
+        var path = await Bot.Download(FileID, Chat, Ext);
 
-        SendResult(await FFMpegXD.Edit(path, options, extension), extension, g: OptionUsed('g'));
+        var result = await path.UseFFMpeg().Edit(options).Out("-Edit", $".{extension}");
+        SendResult(result, extension, g: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 
@@ -74,14 +76,15 @@ public class FFMpeg : AudioVideoPhotoCommand
 
     protected override bool MessageContainsFile(Message m)
     {
-        if      (m.Photo     is not null)              FileID = m.Photo[^1].FileId;
-        else if (m.Audio     is not null)              FileID = m.Audio    .FileId;
-        else if (m.Video     is not null)              FileID = m.Video    .FileId;
-        else if (m.Animation is not null)              FileID = m.Animation.FileId;
-        else if (m.Sticker   is { IsAnimated: false }) FileID = m.Sticker  .FileId;
-        else if (m.Voice     is not null)              FileID = m.Voice    .FileId;
-        else if (m.VideoNote is not null)              FileID = m.VideoNote.FileId;
-        else if (m.Document  is not null)              FileID = m.Document .FileId;
+        if      (m.Photo     != null) (FileID, Ext) = (m.Photo[^1].FileId, ".jpg");
+        else if (m.Audio     != null) (FileID, Ext) = (m.Audio    .FileId, m.Audio   .FileName.GetExtension(".mp3"));
+        else if (m.Video     != null) (FileID, Ext) = (m.Video    .FileId, ".mp4");
+        else if (m.Animation != null) (FileID, Ext) = (m.Animation.FileId, ".mp4");
+        else if (m.HasImageSticker()) (FileID, Ext) = (m.Sticker! .FileId, ".webp");
+        else if (m.HasVideoSticker()) (FileID, Ext) = (m.Sticker! .FileId, ".webm");
+        else if (m.Voice     != null) (FileID, Ext) = (m.Voice    .FileId, ".ogg");
+        else if (m.VideoNote != null) (FileID, Ext) = (m.VideoNote.FileId, ".mp4");
+        else if (m.Document  != null) (FileID, Ext) = (m.Document .FileId, m.Document.FileName.GetExtension(".png"));
         else return false;
 
         return true;

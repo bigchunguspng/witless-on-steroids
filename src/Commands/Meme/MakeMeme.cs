@@ -7,7 +7,7 @@ using static Witlesss.Backrooms.Helpers.OptionsParsing;
 
 namespace Witlesss.Commands.Meme
 {
-    public class MakeMeme : MakeMemeCore<TextPair>, ImageProcessor
+    public class MakeMeme : MakeMemeCore<TextPair>
     {
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");
 
@@ -120,6 +120,6 @@ namespace Witlesss.Commands.Meme
 
         Task ProcessPhoto(string fileID);
         Task ProcessStick(string fileID);
-        Task ProcessVideo(string fileID);
+        Task ProcessVideo(string fileID, string extension = ".mp4", bool round = false);
     }
 }

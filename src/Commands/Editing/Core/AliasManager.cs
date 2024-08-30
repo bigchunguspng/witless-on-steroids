@@ -30,7 +30,7 @@ public abstract class AliasManager : SyncCommand
             var name = args[0].ValidFileName();
 
             var files = GetFiles(Directory, $"{name}.*");
-            if (files.Length > 0)
+            if (files.Length > 0 && !Message.SenderIsBotAdmin())
             {
                 var content = File.ReadAllText(files[0]);
                 Bot.SendMessage(Chat, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI_1.PickAny()));

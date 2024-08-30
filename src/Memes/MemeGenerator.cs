@@ -62,7 +62,7 @@ namespace Witlesss.Memes
             var captionAsFile = ImageSaver.SaveImageTemp(caption);
             return new F_Combine(request.SourcePath, captionAsFile)
                 .Meme(request.GetCRF(), _sourceSizeAdjusted)
-                .OutputAs(request.TargetPath);
+                .OutAs(request.TargetPath);
         }
 
         private void SetUp()

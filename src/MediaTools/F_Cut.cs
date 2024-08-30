@@ -54,4 +54,6 @@ namespace Witlesss.MediaTools
             return (_span.Length + _span.Start).Ticks > 0 ? _span : _span with { Length = i.Duration };
         }
     }
+
+    public record CutSpan(TimeSpan Start, TimeSpan Length);
 }

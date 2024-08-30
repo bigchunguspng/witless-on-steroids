@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing
     {
         protected override async Task Execute()
         {
-            var (path, _) = await Bot.Download(FileID, Chat);
+            var path = await Bot.Download(FileID, Chat, Ext);
 
             await using var stream = File.OpenRead(await FFMpegXD.ToVideoNote(path));
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));

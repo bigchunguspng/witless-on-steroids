@@ -13,23 +13,17 @@ namespace Witlesss.MediaTools
         }
 
 
-        public Task<string> OutputAs(string path) => Cook(path);
+        public Task<string> OutAs(string path) => Cook(path);
 
-        public Task<string> Output(string suffix, string extension = ".mp4")
+        public Task<string> Out(string suffix, string extension = ".mp4")
         {
+            if (extension == ".webm") extension = ".mp4";
             return Cook(GetOutputName(suffix, extension));
         }
 
         public string GetOutputName(string suffix, string extension)
         {
             return NameSource.RemoveExtension() + suffix + extension;
-        }
-
-        public Task<string> Output_WEBM_safe(string suffix)
-        {
-            var extension = Path.GetExtension(NameSource);
-            if (extension == ".webm") extension = ".mp4";
-            return Output(suffix, extension);
         }
 
 

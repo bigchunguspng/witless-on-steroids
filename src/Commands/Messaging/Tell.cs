@@ -6,7 +6,7 @@ public class Tell : SyncCommand
 
     protected override void Run()
     {
-        if (Message.From?.Id != Config.AdminID)
+        if (!Message.SenderIsBotAdmin())
         {
             Bot.SendMessage(Chat, "LOL XD)0)");
             return;

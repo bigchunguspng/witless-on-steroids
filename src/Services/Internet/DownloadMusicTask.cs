@@ -117,9 +117,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
             : resize
                 ? img.ResizeThumbnail(CropSquare)
                 : img.CompressJpeg(2);
-        var art = await imgProcess.OutputAs($"{directory}/art.jpg");
+        var art = await imgProcess.OutAs($"{directory}/art.jpg");
         var mp3 = new F_Combine(audioFile, art).AddTrackMetadata(Artist, Title!);
-        var jpg = new F_Process(art).MakeThumb(7).OutputAs($"{directory}/jpg.jpg"); // telegram preview
+        var jpg = new F_Process(art).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
 
         await Task.WhenAll(mp3, jpg);
 

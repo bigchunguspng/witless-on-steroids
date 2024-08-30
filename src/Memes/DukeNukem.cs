@@ -13,9 +13,9 @@ public class DukeNukem : IMemeGenerator<int>
 
         for (var i = 0; i < Depth; i++)
         {
-            path = new F_Process(path)
-                .DeepFry(request.GetQscale())
-                .OutputAs(UniquePath(request.TargetPath)).Result;
+            path = path.UseFFMpeg()
+                .Nuke(request.GetQscale())
+                .OutAs(UniquePath(request.TargetPath)).Result;
         }
 
         return path;
@@ -29,9 +29,9 @@ public class DukeNukem : IMemeGenerator<int>
 
         for (var i = 0; i < Depth.Clamp(3); i++)
         {
-            path = await new F_Process(path)
-                .DeepFryVideo(size.Ok(), request.GetCRF())
-                .OutputAs(UniquePath(request.TargetPath));
+            path = await path.UseFFMpeg()
+                .NukeVideo(size.Ok(), request.GetCRF())
+                .OutAs(UniquePath(request.TargetPath));
         }
 
         return path;

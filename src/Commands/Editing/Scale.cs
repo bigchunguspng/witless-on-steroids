@@ -47,9 +47,9 @@
                 if (args.Length == 3 && !args[2].StartsWith("flags="))
                     args[2] = "flags=" + args[2];
 
-                var (path, type) = await Bot.Download(FileID, Chat);
+                var path = await Bot.Download(FileID, Chat, Ext);
 
-                SendResult(await FFMpegXD.Scale(path, args), type);
+                SendResult(await path.UseFFMpeg().Scale(args).Out("-scale", Ext));
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");
             }
         }

@@ -6,7 +6,7 @@ using static Witlesss.Commands.Meme.Demotivate.Mode;
 
 namespace Witlesss.Commands.Meme
 {
-    public class Demotivate : MakeMemeCore<TextPair>, ImageProcessor
+    public class Demotivate : MakeMemeCore<TextPair>
     {
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
 

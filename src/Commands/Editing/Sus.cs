@@ -18,13 +18,15 @@
                 argless = true;
             }
 
-            var (path, type) = await Bot.Download(FileID, Chat);
+            var span = new CutSpan(x.start, x.length);
+
+            var path = await Bot.Download(FileID, Chat, Ext);
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            var result = await FFMpegXD.Sus(path, new CutSpan(x.start, x.length));
-            SendResult(result, type);
-            Log($"{Title} >> SUS (>_<)");
+            var result = await new F_Cut(path, span).Sus().Out("-Sus", Ext);
+            SendResult(result);
+            Log($"{Title} >> SUS [>_<]");
         }
 
         protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");

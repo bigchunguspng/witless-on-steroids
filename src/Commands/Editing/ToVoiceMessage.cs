@@ -6,12 +6,12 @@ public class ToVoiceMessage : AudioVideoCommand
 {
     protected override async Task Execute()
     {
-        var (path, _) = await Bot.Download(FileID, Chat);
+        var path = await Bot.Download(FileID, Chat, Ext);
 
         string result;
         try
         {
-            result = await FFMpegXD.ToVoice(path);
+            result = await path.UseFFMpeg().ToVoice().Out("-voice", ".ogg");
         }
         catch
         {

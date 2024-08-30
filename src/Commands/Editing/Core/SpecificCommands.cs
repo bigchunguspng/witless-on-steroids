@@ -55,7 +55,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         return true;
     }
 
-    protected async Task<(string path, MediaType type, int waitMessage)> DownloadFileSuperCool()
+    protected async Task<(string path, int waitMessage)> DownloadFileSuperCool()
     {
         if (FileID.StartsWith("http"))
         {
@@ -66,17 +66,17 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
 
             Bot.EditMessage(Chat, waitMessage, PROCESSING.PickAny().XDDD());
 
-            return (await task, MediaType.Video, waitMessage);
+            return (await task, waitMessage);
         }
         else
         {
-            var (path, type) = await Bot.Download(FileID, Chat);
+            var path = await Bot.Download(FileID, Chat, Ext);
 
             var waitMessage = path.FileSizeInBytes() > 4_000_000
                 ? Bot.PingChat(Chat, PROCESSING.PickAny().XDDD())
                 : -1;
 
-            return (path, type, waitMessage);
+            return (path, waitMessage);
         }
     }
 }

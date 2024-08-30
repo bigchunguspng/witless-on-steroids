@@ -13,20 +13,19 @@ namespace Witlesss.Services.Internet
         /// Grabs recent and large files from cache.
         /// To be used with media files attached to commands.
         /// </summary>
-        public async Task<(string path, MediaType type)> Download(string fileID, long chat)
+        public async Task<string> Download(string fileID, long chat, string extension)
         {
             var shortID = ShortID(fileID);
-            var extension = ExtensionFromID(shortID);
-            var type = MediaTypeFromID(shortID);
 
-            if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return (path, type);
+            if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return path;
 
-            path = UniquePath(Path.Combine(Dir_Pics, chat.ToString()), $"{shortID}{extension}");
+            var chatDirectory = Path.Combine(Dir_Pics, chat.ToString());
+            path = UniquePath(chatDirectory, $"{shortID}{extension}");
             await DownloadFile(fileID, path, chat);
 
             (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);
 
-            return (path, type);
+            return path;
         }
 
         /// <summary>

@@ -7,11 +7,12 @@ namespace Witlesss.Commands.Editing
     {
         protected override async Task Execute()
         {
-            var (path, type) = await Bot.Download(FileID, Chat);
+            var path = await Bot.Download(FileID, Chat, Ext);
             
-            if (type == MediaType.Round) path = await CropVideoNote(path);
+            if (Type == MediaType.Round) path = await CropVideoNote(path);
 
-            await using var stream = File.OpenRead(await RemoveAudio(path));
+            var result = await path.UseFFMpeg().RemoveAudio().Out("-silent");
+            await using var stream = File.OpenRead(result);
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
             Log($"{Title} >> GIF [~]");
         }

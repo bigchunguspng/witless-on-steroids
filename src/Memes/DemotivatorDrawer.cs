@@ -74,7 +74,7 @@ namespace Witlesss.Memes
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
             return new F_Combine(request.SourcePath, frameAsFile)
                 .Demo(request.GetCRF(), this)
-                .OutputAs(request.TargetPath);
+                .OutAs(request.TargetPath);
         }
 
 

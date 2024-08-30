@@ -5,9 +5,9 @@ public partial class Bot
     private readonly TelegramFileDownloader _downloader = new();
 
     /// <inheritdoc cref="TelegramFileDownloader.Download"/>
-    public Task<(string path, MediaType type)> Download(string fileID, long chat)
+    public Task<string> Download(string fileID, long chat, string extension)
     {
-        return _downloader.Download(fileID, chat);
+        return _downloader.Download(fileID, chat, extension);
     }
 
     /// <inheritdoc cref="TelegramFileDownloader.DownloadFile"/>

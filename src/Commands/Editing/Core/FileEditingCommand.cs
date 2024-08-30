@@ -5,8 +5,8 @@ namespace Witlesss.Commands.Editing.Core
 {
     public abstract class FileEditingCommand : AsyncCommand
     {
-        protected string FileID = default!;
-        protected bool IsPhoto;
+        protected string FileID = default!, Ext = default!;
+        protected MediaType Type;
 
         // RUN
 
@@ -52,11 +52,11 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetVideoFileID(Message m)
         {
-            if      (m.Video     is not null) FileID = m.Video    .FileId;
-            else if (m.Animation is not null) FileID = m.Animation.FileId;
-            else if (m.HasVideoSticker    ()) FileID = m.Sticker !.FileId;
-          //else if (m.HasAnimeDocument   ()) FileID = m.Document!.FileId; // <-- todo uncomment after making better type detection
-            else if (m.VideoNote is not null) FileID = m.VideoNote.FileId;
+            if      (m.Video      != null) (Type, FileID, Ext) = (MediaType.Movie, m.Video    .FileId, ".mp4" );
+            else if (m.Animation  != null) (Type, FileID, Ext) = (MediaType.Video, m.Animation.FileId, ".mp4" );
+            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Video, m.Sticker !.FileId, ".webm");
+            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Video, m.Document!.FileId, ".gif" );
+            else if (m.VideoNote  != null) (Type, FileID, Ext) = (MediaType.Round, m.VideoNote.FileId, ".mp4" );
             else return false;
 
             return true;
@@ -64,9 +64,9 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetAudioFileID(Message m)
         {
-            if      (m.Audio     is not null) FileID = m.Audio    .FileId;
-            else if (m.Voice     is not null) FileID = m.Voice    .FileId;
-            else if (m.HasAudioDocument   ()) FileID = m.Document!.FileId;
+            if      (m.Audio      != null) (Type, FileID, Ext) = (MediaType.Audio, m.Audio    .FileId, m.Audio   .FileName.GetExtension(".mp3"));
+            else if (m.Voice      != null) (Type, FileID, Ext) = (MediaType.Audio, m.Voice    .FileId, ".ogg");
+            else if (m.HasAudioDocument()) (Type, FileID, Ext) = (MediaType.Audio, m.Document!.FileId, m.Document.FileName.GetExtension(".wav"));
             else return false;
 
             return true;
@@ -74,26 +74,25 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetPhotoFileID(Message m)
         {
-            if      (m.Photo    is not null) FileID = m.Photo[^1].FileId;
-            else if (m.HasImageSticker   ()) FileID = m.Sticker !.FileId;
-            else if (m.HasImageDocument  ()) FileID = m.Document!.FileId;
+            if      (m.Photo      != null) (Type, FileID, Ext) = (MediaType.Photo, m.Photo[^1].FileId, ".jpg");
+            else if (m.HasImageSticker ()) (Type, FileID, Ext) = (MediaType.Stick, m.Sticker !.FileId, ".webp");
+            else if (m.HasImageDocument()) (Type, FileID, Ext) = (MediaType.Photo, m.Document!.FileId, m.Document.FileName.GetExtension(".png"));
             else return false;
-
-            IsPhoto = true;
 
             return true;
         }
 
         // SEND
 
-        protected void SendResult(string result, MediaType type)
+        protected void SendResult(string result)
         {
             using var stream = File.OpenRead(result);
-            if                      (IsPhoto) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
-            else if (type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
-            else if (type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
-            else if (type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
-            else if (type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
+            else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, new InputOnlineFile(stream));
+            else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
+            else if (Type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
+            else if (Type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
+            else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
         }
 
         protected virtual string VideoFileName => "piece_fap_club.mp3";

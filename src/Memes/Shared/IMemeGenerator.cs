@@ -12,3 +12,5 @@ public interface IMemeGenerator<in T>
         GenerateVideoMeme
         (MemeFileRequest request, T text);
 }
+
+public record TextPair(string A, string B);

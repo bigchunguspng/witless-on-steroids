@@ -21,6 +21,8 @@ namespace Witlesss
 
         public void EnterConsoleLoop()
         {
+            Console.CancelKeyPress              += (_, _) => SaveAndExit();
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
             do
             {
                 _input = Console.ReadLine();
@@ -36,7 +38,13 @@ namespace Witlesss
                 {
                     Log(">:^< u/stupid >:^<", ConsoleColor.Yellow);
                 }
-            } while (_input != "s");
+            }
+            while (_input != "s");
+        }
+
+        private void SaveAndExit()
+        {
+            Log("На выход…", ConsoleColor.Yellow);
             ChatsDealer.SaveBakasBeforeExit();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }

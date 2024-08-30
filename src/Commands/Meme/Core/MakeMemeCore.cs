@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Backrooms.Types.SerialQueue;
 using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming

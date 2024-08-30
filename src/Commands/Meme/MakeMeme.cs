@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Witlesss.Backrooms.SerialQueue;
+using Witlesss.Backrooms.Types.SerialQueue;
 using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;

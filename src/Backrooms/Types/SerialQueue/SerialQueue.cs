@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace Witlesss.Backrooms.SerialQueue
+namespace Witlesss.Backrooms.Types.SerialQueue
 {
     /// <summary>
     /// https://github.com/gentlee/SerialQueue

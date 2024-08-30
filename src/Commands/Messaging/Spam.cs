@@ -71,5 +71,5 @@ public class Spam : SyncCommand
         });
     }
 
-    private static void LogSpam(long chat) => Log($"MAIL SENT << {chat}", ConsoleColor.Yellow);
+    private static void LogSpam(long chat) => Log($"MAIL SENT >> {chat}", ConsoleColor.Yellow);
 }

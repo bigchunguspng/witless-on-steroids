@@ -54,7 +54,12 @@ public class FFMpeg : AudioVideoPhotoCommand
 
         // GET EXTENSION
         var extension = args[^1];
-        if (extension == ".") extension = "mp4"; // todo get file type corresponding extension
+        if      (extension == ".") extension = Ext == ".webm" ? "mp4" : Ext.Substring(1);
+        else if (extension == "3") extension = "mp3";
+        else if (extension == "4") extension = "mp4";
+        else if (extension == "p") extension = "png";
+        else if (extension == "j") extension = "jpg";
+        else if (extension == "w") extension = "webp";
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
@@ -65,7 +70,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         var path = await Bot.Download(FileID, Chat, Ext);
 
         var result = await path.UseFFMpeg().Edit(options).Out("-Edit", $".{extension}");
-        SendResult(result, extension, g: OptionUsed('g'));
+        SendResult(result, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 
@@ -90,25 +95,18 @@ public class FFMpeg : AudioVideoPhotoCommand
         return true;
     }
 
-    private void SendResult(string result, string extension, bool g = false)
+    private void SendResult(string result, string extension, bool sendDocument = false)
     {
-        var name = "made with piece_fap_bot";
-
         using var stream = File.OpenRead(result);
-        if      (SendAsDocument())        Bot.SendDocument (Chat, New_InputOnlineFile());
+        if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
         else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
         else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));
         else if (extension == "mp3")      Bot.SendAudio    (Chat, New_InputOnlineFile());
-        else if (SendAsGIF())             Bot.SendAnimation(Chat, New_InputOnlineFile());
-        else if (extension == "mp4")      Bot.SendVideo    (Chat, New_InputOnlineFile());
+        else if (extension == "mp4")      Bot.SendAnimation(Chat, New_InputOnlineFile());
         else                              Bot.SendDocument (Chat, New_InputOnlineFile());
 
-        bool SendAsGIF()      => _gif.IsMatch(extension) && g;
-        bool SendAsDocument() => _pic.IsMatch(extension) && g;
-
-        InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
+        InputOnlineFile New_InputOnlineFile() => new(stream, $"made with piece_fap_bot.{extension}");
     }
 
-    private static readonly Regex _pic = new(@"^(png|jpe?g)$");
-    private static readonly Regex _gif = new(@"^(gif|webm|mp4)$");
+    private static readonly Regex _pic = new("^(png|jpe?g)$");
 }

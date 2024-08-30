@@ -37,7 +37,10 @@ public class Magick : PhotoCommand
 
         // GET EXTENSION
         var extension = args[^1];
-        if (extension == ".") extension = "png"; // todo get file type corresponding extension
+        if      (extension == ".") extension = Ext.Substring(1);
+        else if (extension == "p") extension = "png";
+        else if (extension == "j") extension = "jpg";
+        else if (extension == "w") extension = "webp";
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
@@ -49,7 +52,8 @@ public class Magick : PhotoCommand
 
         try
         {
-            SendResult(await ProcessImage(path, options, extension), extension, g: OptionUsed('g'));
+            var result = await ProcessImage(path, options, extension);
+            SendResult(result, extension, sendDocument: OptionUsed('g'));
         }
         catch
         {
@@ -84,19 +88,16 @@ public class Magick : PhotoCommand
         return output;
     }
 
-    private void SendResult(string result, string extension, bool g = false)
+    private void SendResult(string result, string extension, bool sendDocument = false)
     {
         var name = "made with piece_fap_bot";
 
         using var stream = File.OpenRead(result);
-        if      (SendAsDocument())        Bot.SendDocument (Chat, New_InputOnlineFile());
+        if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
         else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
         else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));
-        else if (SendAsGIF())             Bot.SendAnimation(Chat, New_InputOnlineFile());
+        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Chat, New_InputOnlineFile());
         else                              Bot.SendDocument (Chat, New_InputOnlineFile());
-
-        bool SendAsGIF()      => _gif.IsMatch(extension) && g;
-        bool SendAsDocument() => _pic.IsMatch(extension) && g;
 
         InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
     }
@@ -112,6 +113,5 @@ public class Magick : PhotoCommand
         Bot.SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
     }
 
-    private static readonly Regex _pic = new(@"^(png|jpe?g)$");
-    private static readonly Regex _gif = new(@"^(gif|webm|mp4)$");
+    private static readonly Regex _pic = new("^(png|jpe?g)$"), _gif = new("^(gif|webm|mp4)$");
 }

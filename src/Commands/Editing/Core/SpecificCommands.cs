@@ -52,6 +52,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         if (entity is null) return false;
 
         FileID = text.Substring(entity.Offset, entity.Length);
+        Ext = ".mp4";
         return true;
     }
 

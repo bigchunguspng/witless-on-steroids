@@ -37,6 +37,7 @@ namespace Witlesss.MediaTools
         public static VFO ReverseVideo (this VFO o) => o.With(new  ReverseArgument());
         public static AFO ReverseAudio (this AFO o) => o.With(new AreverseArgument());
 
+        // todo ATTENTION: "-pix_fmt yuv420p" is not supported by JPEG! + not needed for images lol
         public static FFO FixPlayback  (this FFO o) => o.WithCustomArgument("-pix_fmt yuv420p");
 
 

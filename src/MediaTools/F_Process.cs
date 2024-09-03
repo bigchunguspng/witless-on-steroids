@@ -215,11 +215,18 @@ namespace Witlesss.MediaTools
         #region CROP / SCALE
 
         // -filter:v "crop=272:272:56:56"
-        public F_Action CropVideoNote       () => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(VideoNoteCrop)));
-        public F_Action CropVideo (string[] c) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(c)));
+        public F_Action CropVideoNote
+            ()           => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(VideoNoteCrop)));
+        public F_Action CropVideo
+            (string[] c) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Crop(c)));
+        public F_Action CropJpeg
+            (string[] c) => ApplyEffects(o => o              .WithVideoFilters(v => v.Crop(c)));
 
         // -vf "scale=W:H,setsar=1"
-        public F_Action Scale(string[] s) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
+        public F_Action Scale
+            (string[] s) => ApplyEffects(o => o.FixPlayback().WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
+        public F_Action ScaleJpeg
+            (string[] s) => ApplyEffects(o => o              .WithVideoFilters(v => v.Scale(s).SampleRatio(1)));
 
         #endregion
 

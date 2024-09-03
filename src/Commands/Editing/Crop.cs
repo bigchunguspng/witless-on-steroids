@@ -47,7 +47,9 @@
 
                 var path = await Bot.Download(FileID, Chat, Ext);
 
-                SendResult(await path.UseFFMpeg().CropVideo(args).Out("-crop", Ext));
+                var input = path.UseFFMpeg();
+                var process = Ext is ".jpg" ? input.CropJpeg(args) : input.CropVideo(args);
+                SendResult(await process.Out("-crop", Ext));
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else

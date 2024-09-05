@@ -25,6 +25,8 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
+            IFunnyApp.BlurImage = CheckAndCut(Request, _blur);
+
             IFunnyApp.CustomColor.CheckAndCut(Request);
             IFunnyApp.ExtraFonts .CheckAndCut(Request);
 
@@ -32,7 +34,6 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
             IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            IFunnyApp.BlurImage        =  CheckAndCut(Request, _blur   );
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
             IFunnyApp.BackInBlack      =  CheckAndCut(Request, _blackBG);
             IFunnyApp.ForceCenter      =  CheckAndCut(Request, _colorPC);

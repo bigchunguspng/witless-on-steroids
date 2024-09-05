@@ -7,7 +7,7 @@ namespace Witlesss.MediaTools;
 
 public partial class F_Process
 {
-    private static readonly SerialTaskQueue _queue = new();
+    private static readonly SerialTaskQueue _queueHard = new(), _queueEasy = new();
 
     private readonly long Chat;
     public  readonly string Input;
@@ -40,16 +40,18 @@ public partial class F_Process
 
     private async Task<string> Cook(string output)
     {
-        await Run(Arguments.OutputToFile(output, addArguments: Options));
+        var hard = Path.GetExtension(output) is ".mp4" or ".gif";
+        await Run(Arguments.OutputToFile(output, addArguments: Options), hard);
         return output;
     }
 
-    private async Task Run(FFMpegArgumentProcessor processor)
+    private async Task Run(FFMpegArgumentProcessor processor, bool hard)
     {
         var args = processor.Arguments;
         try
         {
-            await _queue.Enqueue(() =>
+            var queue = hard ? _queueHard : _queueEasy;
+            await queue.Enqueue(() =>
             {
 #if DEBUG
                 Log($"[FFMPEG] >> ffmpeg {args}", ConsoleColor.DarkYellow);

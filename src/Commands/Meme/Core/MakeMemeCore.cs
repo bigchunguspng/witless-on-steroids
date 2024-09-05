@@ -55,6 +55,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             else if (message.VideoNote is not null) await ProcessVideo(message.VideoNote.FileId, round: true);
             else if (message.HasImageDocument   ()) await ProcessPhoto(message.Document!.FileId);
             else if (message.HasAnimeDocument   ()) await ProcessVideo(message.Document!.FileId, ".gif");
+            else if (message.HasVideoDocument   ()) await ProcessVideo(message.Document!.FileId, ".webm");
             else return false;
 
             return true;

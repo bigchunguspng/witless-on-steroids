@@ -54,9 +54,10 @@ namespace Witlesss.Commands.Editing.Core
         {
             if      (m.Video      != null) (Type, FileID, Ext) = (MediaType.Video, m.Video    .FileId, ".mp4" );
             else if (m.Animation  != null) (Type, FileID, Ext) = (MediaType.Anime, m.Animation.FileId, ".mp4" );
-            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Anime, m.Sticker !.FileId, ".webm");
-            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Anime, m.Document!.FileId, ".gif" );
             else if (m.VideoNote  != null) (Type, FileID, Ext) = (MediaType.Round, m.VideoNote.FileId, ".mp4" );
+            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Anime, m.Sticker !.FileId, ".webm");
+            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Anime, m.Document!.FileId, m.Document.FileName.GetExtension(".gif"));
+            else if (m.HasVideoDocument()) (Type, FileID, Ext) = (MediaType.Video, m.Document!.FileId, m.Document.FileName.GetExtension(".webm"));
             else return false;
 
             return true;

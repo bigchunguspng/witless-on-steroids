@@ -54,10 +54,9 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
 
         using var card = DrawText(text);
         using var frame = Combine(null, card);
-        var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
-        return new F_Combine(request.SourcePath, frameAsFile)
-            .When(request.GetCRF(), _sourceSizeAdjusted, Cropping, Location, BlurImage)
+        return request.UseFFMpeg()
+            .When(VideoMemeRequest.From(request, frame), _sourceSizeAdjusted, Cropping, Location, BlurImage)
             .OutAs(request.TargetPath);
     }
 

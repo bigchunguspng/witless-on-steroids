@@ -6,7 +6,7 @@ public class Slice : AudioVideoUrlCommand
     {
         var (path, waitMessage) = await DownloadFileSuperCool();
 
-        var result = await FFMpegXD.Slice(path, Type, Ext);
+        var result = await FFMpegXD.Slice(Chat, path, Type, Ext);
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 

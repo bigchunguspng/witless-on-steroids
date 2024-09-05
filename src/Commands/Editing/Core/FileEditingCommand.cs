@@ -52,10 +52,10 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetVideoFileID(Message m)
         {
-            if      (m.Video      != null) (Type, FileID, Ext) = (MediaType.Movie, m.Video    .FileId, ".mp4" );
-            else if (m.Animation  != null) (Type, FileID, Ext) = (MediaType.Video, m.Animation.FileId, ".mp4" );
-            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Video, m.Sticker !.FileId, ".webm");
-            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Video, m.Document!.FileId, ".gif" );
+            if      (m.Video      != null) (Type, FileID, Ext) = (MediaType.Video, m.Video    .FileId, ".mp4" );
+            else if (m.Animation  != null) (Type, FileID, Ext) = (MediaType.Anime, m.Animation.FileId, ".mp4" );
+            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Anime, m.Sticker !.FileId, ".webm");
+            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Anime, m.Document!.FileId, ".gif" );
             else if (m.VideoNote  != null) (Type, FileID, Ext) = (MediaType.Round, m.VideoNote.FileId, ".mp4" );
             else return false;
 
@@ -90,8 +90,8 @@ namespace Witlesss.Commands.Editing.Core
             if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
             else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, new InputOnlineFile(stream));
             else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
-            else if (Type == MediaType.Video) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
-            else if (Type == MediaType.Movie) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
+            else if (Type == MediaType.Anime) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
+            else if (Type == MediaType.Video) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
             else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
         }
 

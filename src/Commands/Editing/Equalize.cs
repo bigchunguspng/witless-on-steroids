@@ -21,7 +21,7 @@
 
                 var path = await Bot.Download(FileID, Chat, Ext);
 
-                SendResult(await path.UseFFMpeg().EQ([f, g, w]).Out("-EQ", Ext));
+                SendResult(await path.UseFFMpeg(Chat).EQ([f, g, w]).Out("-EQ", Ext));
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
         }

@@ -86,6 +86,8 @@ public static partial class Extensions
 
     // COMFIES
 
+    public static F_Process UseFFMpeg(this string path, long chat) => new(path, chat);
+
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {
         foreach (var element in source) action(element);

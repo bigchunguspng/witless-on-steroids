@@ -24,7 +24,7 @@
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            var result = await new F_Cut(path, span).Sus().Out("-Sus", Ext);
+            var result = await path.UseFFMpeg(Chat).Sus(span).Out("-Sus", Ext);
             SendResult(result);
             Log($"{Title} >> SUS [>_<]");
         }

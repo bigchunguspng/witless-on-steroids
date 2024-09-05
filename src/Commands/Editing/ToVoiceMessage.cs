@@ -11,7 +11,7 @@ public class ToVoiceMessage : AudioVideoCommand
         string result;
         try
         {
-            result = await path.UseFFMpeg().ToVoice().Out("-voice", ".ogg");
+            result = await path.UseFFMpeg(Chat).ToVoice().Out("-voice", ".ogg");
         }
         catch
         {

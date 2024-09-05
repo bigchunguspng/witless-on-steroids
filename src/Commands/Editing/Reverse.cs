@@ -6,7 +6,7 @@
         {
             var path = await Bot.Download(FileID, Chat, Ext);
 
-            SendResult(await path.UseFFMpeg().Reverse().Out("-Reverse", Ext));
+            SendResult(await path.UseFFMpeg(Chat).Reverse().Out("-Reverse", Ext));
             Log($"{Title} >> REVERSED [<<]");
         }
         

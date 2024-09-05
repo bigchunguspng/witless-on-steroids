@@ -59,9 +59,8 @@ namespace Witlesss.Memes
             SetCaptionColor(CustomColorText.ByCoords ? request.GetVideoSnapshot() : null);
 
             using var caption = DrawCaption(text);
-            var captionAsFile = ImageSaver.SaveImageTemp(caption);
-            return new F_Combine(request.SourcePath, captionAsFile)
-                .Meme(request.GetCRF(), _sourceSizeAdjusted)
+            return request.UseFFMpeg()
+                .Meme(VideoMemeRequest.From(request, caption), _sourceSizeAdjusted)
                 .OutAs(request.TargetPath);
         }
 

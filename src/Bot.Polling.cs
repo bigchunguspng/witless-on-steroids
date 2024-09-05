@@ -80,7 +80,5 @@ public partial class Bot
     public static void HandleCommandException(Exception e, CommandContext context)
     {
         LogError($"{context.Title} >> BRUH -> {e.GetFixedMessage()}");
-
-        if (FFmpeg.IsMatch(e.Message)) Instance.SendErrorDetails(context.Chat, e);
     }
 }

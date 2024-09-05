@@ -167,7 +167,6 @@ namespace Witlesss
             {
                 LogError($"BRUH -> {e.GetFixedMessage()}");
 
-                if (FFmpeg.IsMatch(e.Message)) SendErrorDetails(chat, e);
                 if (message > 0) EditMessageOnError(chat, message);
             }
         }
@@ -177,11 +176,10 @@ namespace Witlesss
             EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");
         }
 
-        public void SendErrorDetails(long chat, Exception e)
+        public void SendErrorDetails(long chat, string command, string errorMessage)
         {
             var path = UniquePath(Dir_Temp, "error.txt");
-            var args = F_Action.FFMpegCommand;
-            var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), e.GetFixedMessage());
+            var text = string.Format(FF_ERROR_REPORT, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));

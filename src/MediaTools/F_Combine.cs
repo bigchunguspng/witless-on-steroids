@@ -1,91 +1,95 @@
 ﻿using System.Text;
-using FFMpegCore;
 using SixLabors.ImageSharp;
+using Witlesss.Commands.Meme.Core;
 using Drawer = Witlesss.Memes.DemotivatorDrawer;
 using FFO = FFMpegCore.FFMpegArgumentOptions;
 
-namespace Witlesss.MediaTools
+namespace Witlesss.MediaTools;
+
+public record VideoMemeRequest(int Quality, string Caption)
 {
-    public class F_Combine : F_Action
+    public static VideoMemeRequest From
+        (MemeFileRequest request, Image caption)
+        => new(request.GetCRF(), ImageSaver.SaveImageTemp(caption));
+
+    public static VideoMemeRequest From
+        (MemeFileRequest request, string captionAsFile)
+        => new(request.GetCRF(), captionAsFile);
+}
+
+public partial class F_Process
+{
+    private void AddInput(string path) => Arguments.AddFileInput(path);
+
+    // EFFECTS
+
+    // -i video -i image -filter_complex "[0:v]scale=620:420[vid];[vid][1:v]overlay=0:0"
+    public F_Process Meme(VideoMemeRequest request, Size size) => ApplyEffects(o =>
     {
-        private readonly string _video, _image;
+        var filter = $"[0:v]scale={size.Width}:{size.Height}[vid];[vid][1:v]overlay=0:0:format=rgb";
+        BuildAndCompress(o, request, filter);
+    });
 
-        public F_Combine(string video, string image)
-        {
-            _video = video;
-            _image = image;
-        }
+    public F_Process When(VideoMemeRequest request, Size size, Rectangle crop, Point point, bool blur) => ApplyEffects(o =>
+    {
+        var filter = new StringBuilder();
+        filter.Append(FixPicFps());
+        filter.Append($"[0:v]scale={size.Width}:{size.Height}[v0];");
+        filter.Append($"[v0]crop={crop.Width}:{crop.Height}:{crop.X}:{crop.Y}[vid];");
+        filter.Append($"[pic][vid]overlay={point.X}:{point.Y}:format=rgb");
+        if (blur) filter.Append(",gblur=1:1");
+        BuildAndCompress(o, request, filter.ToString());
+    });
 
+    // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
+    public F_Process Demo(VideoMemeRequest request, Drawer drawer) => ApplyEffects(o =>
+    {
+        ArgsDemo(o, request, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);
+    });
 
-        // -i video -i image -filter_complex "[0:v]scale=620:420[vid];[vid][1:v]overlay=0:0"
-        public F_Action Meme(int loss, Size size) => ApplyEffects(o =>
-        {
-            BuildAndCompress(o, loss, Filter.Null.Scale("0:v", size, "vid").Overlay("vid", "1:v", Point.Empty));
-        });
-
-        // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
-        public F_Action Demo(int loss, Drawer drawer) => ApplyEffects(o =>
-        {
-            ArgsDemo(o, loss, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);
-        });
-
-        public F_Action When(int loss, Size size, Rectangle crop, Point point, bool blur) => ApplyEffects(o =>
-        {
-            var filter = FixPicFps().Scale("0:v", size, "v0").Crop("v0", crop, "vid").Overlay("pic", "vid", point, blur ? "ova" : null);
-            if (blur)
-                filter = filter.Blur("ova", 1);
-            BuildAndCompress(o, loss, filter);
-        });
-
-        public F_Action D300(int loss, Size image, Point point, Size frame) => ApplyEffects(o =>
-        {
-            ArgsDemo(o, loss, image, point);
-            o.Resize(frame.Ok());
-        });
+    public F_Process D300(VideoMemeRequest request, Size image, Point point, Size frame) => ApplyEffects(o =>
+    {
+        ArgsDemo(o, request, image, point);
+        o.Resize(frame.Ok());
+    });
 
 
-        private void ArgsDemo(FFO o, int f, Size s, Point p)
-        {
-            BuildAndCompress(o, f, FixPicFps().Scale("0:v", s, "vid").Overlay("pic", "vid", p));
-        }
+    private void ArgsDemo(FFO o, VideoMemeRequest request, Size s, Point p)
+    {
+        var filter = $"{FixPicFps()}[0:v]scale={s.Width}:{s.Height}[vid];[pic][vid]overlay={p.X}:{p.Y}:format=rgb";
+        BuildAndCompress(o, request, filter);
+    }
 
-        private Filter FixPicFps() => Filter.Null.Fps("1:v", new F_Process(_video).GetFramerate(), "pic");
+    private string FixPicFps() => $"[1:v]fps={GetFramerate().Format()}[pic];";
 
-        private static void BuildAndCompress(FFO o, int factor, Filter filter)
-        {
-            o.WithComplexFilter(filter).FixPlayback();
+    private void BuildAndCompress(FFO o, VideoMemeRequest request, string filterComplex)
+    {
+        AddInput(request.Caption);
+        o.WithComplexFilter(filterComplex).FixPlayback();
 
-            if (factor >  0) o.WithCompression(factor);
-            if (factor > 23) o.WithAudioBitrate(154 - 3 * factor);
-        }
-
-
-        public Task<string> AddTrackMetadata(string? artist, string title)
-        {
-            var name = $"{(artist is null ? "" : $"{artist} - ")}{title}";
-            var path = $"{Path.GetDirectoryName(_video)}/{name.ValidFileName('#')}.mp3";
-            return ApplyEffects(o => MetadataArgs(o, artist, title)).OutAs(path);
-        }
-
-        private static void MetadataArgs(FFO o, string? artist, string title)
-        {
-            var sb = new StringBuilder();
-            sb.Append("-map 0:0 -map 1:0 -c copy -id3v2_version 3 ");
-            sb.Append("-metadata:s:v title=\"Album cover\" ");
-            sb.Append("-metadata:s:v comment=\"Cover (front)\" ");
-            if (artist is not null) sb.Append("-metadata artist=\"").Append(artist).Append("\" ");
-            sb.Append                        ("-metadata title=\"" ).Append(title ).Append("\" ");
-
-            o.WithCustomArgument(sb.ToString());
-        }
+        var factor = request.Quality;
+        if (factor >  0) o.WithCompression(factor);
+        if (factor > 23) o.WithAudioBitrate(154 - 3 * factor);
+    }
 
 
-        protected override string NameSource => _video;
+    public Task<string> AddTrackMetadata(string art, string? artist, string title)
+    {
+        AddInput(art);
+        var name = $"{(artist is null ? "" : $"{artist} - ")}{title}";
+        var path = $"{Path.GetDirectoryName(Input)}/{name.ValidFileName('#')}.mp3";
+        return ApplyEffects(o => MetadataArgs(o, artist, title)).OutAs(path);
+    }
 
-        protected override async Task<string> Cook(string output)
-        {
-            await Run(FFMpegArguments.FromFileInput(_video).AddFileInput(_image).OutputToFile(output, addArguments: Action));
-            return output;
-        }
+    private static void MetadataArgs(FFO o, string? artist, string title)
+    {
+        var sb = new StringBuilder();
+        sb.Append("-map 0:0 -map 1:0 -c copy -id3v2_version 3 ");
+        sb.Append("-metadata:s:v title=\"Album cover\" ");
+        sb.Append("-metadata:s:v comment=\"Cover (front)\" ");
+        if (artist is not null) sb.Append("-metadata artist=\"").Append(artist).Append("\" ");
+        sb.Append                        ("-metadata title=\"" ).Append(title ).Append("\" ");
+
+        o.WithCustomArgument(sb.ToString());
     }
 }

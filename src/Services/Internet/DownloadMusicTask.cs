@@ -111,15 +111,15 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var resize = CropSquare || ArtAttached || thumbPath.Contains("maxres");
 
-        var img = new F_Process(thumbSource);
+        var img = thumbSource.UseFFMpeg(context.Chat);
         var imgProcess = ExtractThumb
             ? img.ExportThumbnail(CropSquare)
             : resize
                 ? img.ResizeThumbnail(CropSquare)
                 : img.CompressJpeg(2);
         var art = await imgProcess.OutAs($"{directory}/art.jpg");
-        var mp3 = new F_Combine(audioFile, art).AddTrackMetadata(Artist, Title!);
-        var jpg = new F_Process(art).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
+        var mp3 = audioFile.UseFFMpeg(context.Chat).AddTrackMetadata(art, Artist, Title!);
+        var jpg = art      .UseFFMpeg(context.Chat).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
 
         await Task.WhenAll(mp3, jpg);
 

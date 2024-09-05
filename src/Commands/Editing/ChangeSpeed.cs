@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Editing
 
             var path = await Bot.Download(FileID, Chat, Ext);
 
-            var result = await path.UseFFMpeg().ChangeSpeed(_speed).Out("-Speed", Ext);
+            var result = await path.UseFFMpeg(Chat).ChangeSpeed(_speed).Out("-Speed", Ext);
             SendResult(result);
             Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
 

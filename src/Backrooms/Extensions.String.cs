@@ -59,9 +59,6 @@ public static partial class Extensions
     public static string GetExtension
         (this string? path, string fallback) => path != null ? Path.GetExtension(path) : fallback;
 
-    public static F_Process UseFFMpeg
-        (this string path) => new F_Process(path);
-
     // LANGUAGE DETECTION
 
     private static readonly Regex _lat = new("[A-Za-z]"), _cyr = new("[Ѐ-ӿ]");

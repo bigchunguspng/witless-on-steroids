@@ -8,7 +8,7 @@ namespace Witlesss.Commands.Editing
         {
             var path = await Bot.Download(FileID, Chat, Ext);
 
-            await using var stream = File.OpenRead(await FFMpegXD.ToVideoNote(path));
+            await using var stream = File.OpenRead(await path.UseFFMpeg(Chat).ToVideoNote());
             Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
             Log($"{Title} >> NOTE (*)");
         }

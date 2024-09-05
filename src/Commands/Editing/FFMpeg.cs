@@ -69,7 +69,7 @@ public class FFMpeg : AudioVideoPhotoCommand
 
         var path = await Bot.Download(FileID, Chat, Ext);
 
-        var result = await path.UseFFMpeg().Edit(options).Out("-Edit", $".{extension}");
+        var result = await path.UseFFMpeg(Chat).Edit(options).Out("-Edit", $".{extension}");
         SendResult(result, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }

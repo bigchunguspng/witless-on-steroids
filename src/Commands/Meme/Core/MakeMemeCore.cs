@@ -70,7 +70,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
             ParseOptions();
             var repeats = GetRepeatCount();
-            var request = new MemeFileRequest(MemeSourceType.Image, path, Suffix + ".jpg", Baka.Quality);
+            var request = new MemeFileRequest(Chat, MemeSourceType.Image, path, Suffix + ".jpg", Baka.Quality);
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeImage(request, GetText()));
@@ -88,7 +88,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
             var extension = sticker ? ".webp" : ".jpg";
-            var request = new MemeFileRequest(MemeSourceType.Sticker, path, Suffix + extension, Baka.Quality)
+            var request = new MemeFileRequest(Chat, MemeSourceType.Sticker, path, Suffix + extension, Baka.Quality)
             {
                 ExportAsSticker = sticker,
                 JpegSticker = JpegSticker
@@ -113,12 +113,12 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Request = GetRequestData();
 
             if (round && CropVideoNotes)
-                path = await FFMpegXD.CropVideoNote(path);
+                path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
 
             ParseOptions();
             var repeats = GetRepeatCount().Clamp(3);
             var note = round && !CropVideoNotes;
-            var request = new MemeFileRequest(MemeSourceType.Video, path, Suffix + ".mp4", Baka.Quality);
+            var request = new MemeFileRequest(Chat, MemeSourceType.Video, path, Suffix + ".mp4", Baka.Quality);
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
@@ -159,7 +159,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         private async Task<string> MakeMemeStick(MemeFileRequest request, T text)
         {
             if (request.JpegSticker)
-                request.SourcePath = await FFMpegXD.Convert(request.SourcePath, ".jpg");
+                request.SourcePath = await Chat.Convert(request.SourcePath, ".jpg");
             return await MakeMemeImage(request, text);
         }
 

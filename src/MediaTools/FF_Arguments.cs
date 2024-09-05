@@ -43,7 +43,7 @@ namespace Witlesss.MediaTools
 
     public class ReverseArgument : IVideoFilterArgument
     {
-        public string Key   => null;
+        public string Key   => null!;
         public string Value => "reverse";
     }
 
@@ -60,7 +60,7 @@ namespace Witlesss.MediaTools
 
     public class AreverseArgument : IAudioFilterArgument
     {
-        public string Key   => null;
+        public string Key   => null!;
         public string Value => "areverse";
     }
 
@@ -73,27 +73,7 @@ namespace Witlesss.MediaTools
     public record EqualizeArgument(double[] Args) : IAudioFilterArgument
     {
         public string Key   => "equalizer";
-        public string Value => $"f={Args[0]}:g={Args[1]}:t=h:width={Args[2]}";
-    }
-
-    #endregion
-
-
-    #region OTHER
-
-    public record MapArgument(string Label) : IArgument
-    {
-        public string Text => $"-map \"[{Label}]\"";
-    }
-
-    public record QscaleArgument(int Qscale) : IArgument
-    {
-        public string Text => $"-qscale:v {Qscale}"; // 1 best quality - 31 worst quality
-    }
-
-    public record ComplexFilterArgument(Filter Node) : IArgument
-    {
-        public string Text => $"-filter_complex \"{Node.Text}\"";
+        public string Value => $"equalizer=f={Args[0]}:g={Args[1]}:t=h:width={Args[2]}";
     }
 
     #endregion

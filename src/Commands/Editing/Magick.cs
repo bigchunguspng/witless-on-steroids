@@ -57,7 +57,8 @@ public class Magick : PhotoCommand
         }
         catch
         {
-            SendErrorDetails(Chat);
+            var errorMessage = Output is null ? "*пусто*" : string.Join('\n', Output!);
+            Bot.SendErrorDetails(Chat, $"magick {MagickCommand}", errorMessage);
         }
 
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
@@ -100,17 +101,6 @@ public class Magick : PhotoCommand
         else                              Bot.SendDocument (Chat, New_InputOnlineFile());
 
         InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
-    }
-
-    private void SendErrorDetails(long chat)
-    {
-        var path = UniquePath(Dir_Temp, "error.txt");
-        var args = $"magick {MagickCommand}";
-        var error = Output is null ? "*пусто*" : string.Join('\n', Output!);
-        var text = string.Format(FF_ERROR_REPORT, args, GetRandomASCII(), error);
-        File.WriteAllText(path, text);
-        using var stream = File.OpenRead(path);
-        Bot.SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
     }
 
     private static readonly Regex _pic = new("^(png|jpe?g)$"), _gif = new("^(gif|webm|mp4)$");

@@ -10,10 +10,9 @@ namespace Witlesss.MediaTools
 {
     public static class FF_Extensions
     {
-        public static FFO WithComplexFilter (this FFO o,  Filter node) => o.WithArgument(new ComplexFilterArgument(node));
-        public static FFO WithMapping       (this FFO o, string label) => o.WithArgument(new MapArgument         (label));
+        public static FFO WithComplexFilter (this FFO o,  string args) => o.WithCustomArgument($"-filter_complex \"{args}\"");
 
-        public static FFO WithQscale       (this FFO o, int qscale) => o.WithArgument(new QscaleArgument(qscale));
+        public static FFO WithQscale       (this FFO o, int qscale) => o.WithCustomArgument($"-qscale:v {qscale}");
         public static FFO WithCompression  (this FFO o, int factor) => o.WithVideoCodec("libx264").WithConstantRateFactor(factor);
 
         public static FFO FixWebmSize (this FFO o, VideoStream v) => SizeIsInvalid(v.Width, v.Height) ? o.Resize(ValidSize(v.Width, v.Height)) : o;

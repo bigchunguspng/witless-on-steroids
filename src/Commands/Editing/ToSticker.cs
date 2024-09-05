@@ -10,7 +10,7 @@ namespace Witlesss.Commands.Editing
             var path = await Bot.Download(FileID, Chat, Ext);
 
             var size = GetPictureSize(path).Normalize().Ok();
-            var result = await path.UseFFMpeg().ToSticker(size).Out("-stick", ".webp");
+            var result = await path.UseFFMpeg(Chat).ToSticker(size).Out("-stick", ".webp");
             await using var stream = File.OpenRead(result);
             Bot.SendSticker(Chat, new InputOnlineFile(stream));
             if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");

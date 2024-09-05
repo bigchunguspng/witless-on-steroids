@@ -71,9 +71,8 @@ namespace Witlesss.Memes
         public Task<string> GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
-            var frameAsFile = ImageSaver.SaveImageTemp(frame);
-            return new F_Combine(request.SourcePath, frameAsFile)
-                .Demo(request.GetCRF(), this)
+            return request.UseFFMpeg()
+                .Demo(VideoMemeRequest.From(request, frame), this)
                 .OutAs(request.TargetPath);
         }
 

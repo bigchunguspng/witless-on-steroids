@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Editing
 
             var (path, waitMessage) = await DownloadFileSuperCool();
 
-            var result = await new F_Cut(path, span).Cut().Out("-Cut", Ext);
+            var result = await path.UseFFMpeg(Chat).Cut(span).Out("-Cut", Ext);
 
             Bot.DeleteMessageAsync(Chat, waitMessage);
 

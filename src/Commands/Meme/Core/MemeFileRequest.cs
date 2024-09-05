@@ -3,8 +3,9 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Commands.Meme.Core;
 
-public class MemeFileRequest(MemeSourceType type, string path, string outputEnding, int quality)
+public class MemeFileRequest(long chat, MemeSourceType type, string path, string outputEnding, int quality)
 {
+    public long           Chat { get; } = chat;
     public MemeSourceType Type { get; }      = type;
     public string   SourcePath { get; set; } = path;
     public string   TargetPath { get; }      = path.ReplaceExtension(outputEnding);
@@ -35,6 +36,8 @@ public class MemeFileRequest(MemeSourceType type, string path, string outputEndi
     {
         return 31 - (int)(0.29 * Quality); // 2 - 31
     }
+
+    public F_Process UseFFMpeg() => new(SourcePath, Chat);
 
     public Image<Rgba32> GetVideoSnapshot()
     {

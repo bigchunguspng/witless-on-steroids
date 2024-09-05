@@ -11,9 +11,9 @@ namespace Witlesss.MediaTools
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
 
-        public static async Task<string> Convert(string path, string extension)
+        public static async Task<string> Convert(this long chat, string path, string extension)
         {
-            var ffmpeg = path.UseFFMpeg();
+            var ffmpeg = path.UseFFMpeg(chat);
             var name = ffmpeg.GetOutputName("-W", extension);
             try
             {
@@ -25,7 +25,7 @@ namespace Witlesss.MediaTools
             }
         }
 
-        public static async Task<string> Slice(string path, MediaType type, string extension)
+        public static async Task<string> Slice(long chat, string path, MediaType type, string extension)
         {
             var video = type != MediaType.Audio;
             if (video)
@@ -35,31 +35,33 @@ namespace Witlesss.MediaTools
                 if (size != fits)
                 {
                     string[] args = [fits.Width.ToString(), fits.Height.ToString()];
-                    path = await path.UseFFMpeg().Scale(args).Out("-scale");
+                    path = await path.UseFFMpeg(chat).Scale(args).Out("-scale");
                 }
             }
             
-            return await path.UseFFMpeg().SliceRandom().Out("-slices", extension);
+            return await path.UseFFMpeg(chat).SliceRandom().Out("-slices", extension);
         }
 
         public static Task<string> Compress
-            (string path)
-            => path.UseFFMpeg().CompressImage(GetPictureSize(path).FitSize(2560).Ok()).Out("-small", ".jpg");
+            (this F_Process process)
+            => process.CompressImage(GetPictureSize(process.Input).FitSize(2560).Ok()).Out("-small", ".jpg");
 
         public static Task<string> CompressGIF
-            (string path) => path.UseFFMpeg().CompressAnimation().Out("-small");
+            (this F_Process process)
+            => process.CompressAnimation().Out("-small");
 
-        public static Task<string> CropVideoNote
-            (string path) => path.UseFFMpeg().CropVideoNote().Out("-crop");
+        public static Task<string> CropVideoNoteXD
+            (this F_Process process)
+            => process.CropVideoNote().Out("-crop");
 
-        public static Task<string> ToVideoNote(string path)
+        public static Task<string> ToVideoNote(this F_Process process)
         {
-            var s = GetPictureSize(path);
+            var s = GetPictureSize(process.Input);
             var d = ToEven(Math.Min(s.Width, s.Height));
             var x = (s.Width  - d) / 2;
             var y = (s.Height - d) / 2;
 
-            return path.UseFFMpeg().ToVideoNote(new Rectangle(x, y, d, d)).Out("-vnote");
+            return process.ToVideoNote(new Rectangle(x, y, d, d)).Out("-vnote");
         }
 
         public static string Snapshot(string path)
@@ -71,7 +73,7 @@ namespace Witlesss.MediaTools
 
         public static SixLabors.ImageSharp.Size GetPictureSize(string path)
         {
-            var v = F_Action.GetVideoStream(path)!;
+            var v = F_Process.GetVideoStream(path)!;
             return new SixLabors.ImageSharp.Size(v.Width, v.Height);
         }
     }

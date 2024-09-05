@@ -49,7 +49,7 @@
 
                 var path = await Bot.Download(FileID, Chat, Ext);
 
-                var input = path.UseFFMpeg();
+                var input = path.UseFFMpeg(Chat);
                 var process = Ext is ".jpg" ? input.ScaleJpeg(args) : input.Scale(args);
                 SendResult(await process.Out("-scale", Ext));
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");

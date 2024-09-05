@@ -13,7 +13,7 @@ public class DukeNukem : IMemeGenerator<int>
 
         for (var i = 0; i < Depth; i++)
         {
-            path = path.UseFFMpeg()
+            path = request.UseFFMpeg()
                 .Nuke(request.GetQscale())
                 .OutAs(UniquePath(request.TargetPath)).Result;
         }
@@ -29,7 +29,7 @@ public class DukeNukem : IMemeGenerator<int>
 
         for (var i = 0; i < Depth.Clamp(3); i++)
         {
-            path = await path.UseFFMpeg()
+            path = await request.UseFFMpeg()
                 .NukeVideo(size.Ok(), request.GetCRF())
                 .OutAs(UniquePath(request.TargetPath));
         }

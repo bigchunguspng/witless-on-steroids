@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types.InputFiles;
-using static Witlesss.MediaTools.FFMpegXD;
 
 namespace Witlesss.Commands.Editing
 {
@@ -8,10 +7,10 @@ namespace Witlesss.Commands.Editing
         protected override async Task Execute()
         {
             var path = await Bot.Download(FileID, Chat, Ext);
-            
-            if (Type == MediaType.Round) path = await CropVideoNote(path);
 
-            var result = await path.UseFFMpeg().RemoveAudio().Out("-silent");
+            if (Type == MediaType.Round) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
+
+            var result = await path.UseFFMpeg(Chat).RemoveAudio().Out("-silent");
             await using var stream = File.OpenRead(result);
             Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
             Log($"{Title} >> GIF [~]");

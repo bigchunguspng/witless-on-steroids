@@ -118,6 +118,8 @@ namespace Witlesss
         }
 
 
+        private static readonly Regex _retryAfter = new(@"retry after (\d+)");
+
         private static void TrySend(Task task, long chat, string what, string action = "send", int patience = 5)
         {
             try
@@ -129,8 +131,13 @@ namespace Witlesss
             {
                 var reason = e.GetFixedMessage();
                 LogError($"{chat} >> Can't {action} {what} --> " + reason);
-                if (reason.Contains("Server Error") && patience > 0)
-                    TrySend(task, chat, what, action, patience - 1);
+                if (patience > 0)
+                {
+                    var serverError = reason.Contains("Server Error");
+                    var retryDelay = serverError ? 0 : _retryAfter.ExtractGroup(1, reason, int.Parse, 0);
+                    if (retryDelay > 0) Task.Delay(retryDelay * 250).Wait();
+                    if (retryDelay > 0 || serverError) TrySend(task, chat, what, action, patience - 1);
+                }
             }
         }
         

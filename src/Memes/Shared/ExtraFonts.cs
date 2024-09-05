@@ -40,8 +40,8 @@ namespace Witlesss.Memes.Shared
                 .OrderBy(x => x)
                 .ForEach(x => fallback.Add(x));
             _fallbackDefault = fallback.Families.ToList();
-            _fallbackCo = new[] { _families["co"] }.Concat(_fallbackDefault).ToList();
             _fallbackSg = new[] { _families["sg"] }.Concat(_fallbackDefault).ToList();
+            _fallbackCo = new[] { _families["co"] }.Concat(_fallbackSg).ToList();
         }
 
         public static IEnumerable<string> Keys => _families.Keys;

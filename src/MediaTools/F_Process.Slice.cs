@@ -91,24 +91,31 @@ public partial class F_Process
             }).Out($"-part-{i}", Path.GetExtension(Input)).Result;
         }
 
+        var slices = new List<string>();
+
         for (var i = 0; i < count; i++) // slice each chunk
         {
+            if (!File.Exists(parts[i]))
+            {
+                Log($"PART {i + 1} >> SKIP", ConsoleColor.Yellow);
+                continue;
+            }
+
             var take = takes[i];
             var offset = takes.Take(i).Sum();
             var start = codes[i];
-            parts[i] = new F_Process(parts[i], Chat).ApplyEffects(ops =>
+            slices.Add(new F_Process(parts[i], Chat).ApplyEffects(ops =>
             {
                 ApplyTrims(ops, info, timecodes, offset, take, start);
-            }).Out("-slices", Path.GetExtension(Input)).Result;
+            }).Out("-slices", Path.GetExtension(Input)).Result);
 
             Log($"PART {i + 1} >> DONE", ConsoleColor.Yellow);
         }
 
         var sb = new StringBuilder(); // combine the results
-        for (var i = 0; i < count; i++)
-        {
-            sb.Append("-i \"").Append(parts[i]).Append("\" ");
-        }
+        foreach (var slice in slices) sb.Append("-i \"").Append(slice).Append("\" ");
+
+        count = slices.Count;
 
         sb.Append("-filter_complex \"");
         for (var i = 1; i <= count; i++)

@@ -6,12 +6,14 @@ public class Slice : AudioVideoUrlCommand
     {
         var (path, waitMessage) = await DownloadFileSuperCool();
 
+        var sw = GetStartedStopwatch();
+
         var result = await FFMpegXD.Slice(Chat, path, Type, Ext);
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 
         SendResult(result);
-        Log($"{Title} >> SLICED [~/~]");
+        Log($"{Title} >> SLICED [~/~] >> {sw.ElapsedShort()}");
     }
 
     protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";

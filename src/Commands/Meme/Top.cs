@@ -1,5 +1,4 @@
-﻿using Witlesss.Backrooms.Types.SerialQueue;
-using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
@@ -8,6 +7,10 @@ namespace Witlesss.Commands.Meme
 {
     public class Top : MakeMemeCore<string>
     {
+        private static readonly IFunnyApp _ifunny = new();
+
+        protected override IMemeGenerator<string> MemeMaker => _ifunny;
+
         protected override Regex _cmd { get; } = new(@"^\/top(\S*)");
 
         protected override string VideoName => "piece_fap_club-top.mp4";
@@ -65,13 +68,5 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*");
         private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*");
         private static readonly Regex _fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*");
-
-        // LOGIC
-
-        private static readonly IFunnyApp _ifunny = new();
-        private static readonly SerialTaskQueue _queue = new();
-
-        protected override IMemeGenerator<string> MemeMaker => _ifunny;
-        protected override SerialTaskQueue Queue => _queue;
     }
 }

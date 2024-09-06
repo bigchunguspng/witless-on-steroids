@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Witlesss.Backrooms.Types.SerialQueue;
 using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
@@ -9,6 +8,10 @@ namespace Witlesss.Commands.Meme
 {
     public class MakeMeme : MakeMemeCore<TextPair>
     {
+        private static readonly MemeGenerator _imgflip = new();
+
+        protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
+
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");
 
         protected override string VideoName => "piece_fap_club-meme.mp4";
@@ -43,9 +46,9 @@ namespace Witlesss.Commands.Meme
             var generate = text.IsNullOrEmpty();
             var capitalize = CheckCaps(Request, _caps, generate);
 
-            var add_bottom_text  = Check(Request,  _add_bottom);
-            var only_bottom_text = Check(Request, _only_bottom);
-            var only_top_text    = Check(Request,    _top_only);
+            var addBottomText  = Check(Request,  _add_bottom);
+            var onlyBottomText = Check(Request, _only_bottom);
+            var onlyTopText    = Check(Request,    _top_only);
 
             string a, b;
 
@@ -55,15 +58,15 @@ namespace Witlesss.Commands.Meme
 
                 var chance = Random.Shared.Next(6);
 
-                if /**/ (only_bottom_text) genA = false;
-                else if (only_top_text)    genB = false;
-                else if (chance == 0)      genA = false;
-                else if (chance == 1)      genB = false;
+                if /**/ (onlyBottomText) genA = false;
+                else if (onlyTopText)    genB = false;
+                else if (chance == 0)    genA = false;
+                else if (chance == 1)    genB = false;
 
                 a = genA ? Baka.Generate() : "";
                 b = genB ? Baka.Generate() : "";
 
-                if (genA && !only_top_text && (genB ? a.Length > b.Length : a.Length > 64))
+                if (genA && !onlyTopText && (genB ? a.Length > b.Length : a.Length > 64))
                 {
                     // bigger text (or big enough one) should be at the bottom
                     (a, b) = (b, a);
@@ -82,7 +85,7 @@ namespace Witlesss.Commands.Meme
                 else
                 {
                     a = text;
-                    b = add_bottom_text ? Baka.Generate() : "";
+                    b = addBottomText ? Baka.Generate() : "";
                 }
             }
 
@@ -104,22 +107,5 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex   _colorText = new(@"^\/meme\S*(cc)\S*");
         private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");
-
-        // LOGIC
-
-        private static readonly MemeGenerator _imgflip = new();
-        private static readonly SerialTaskQueue _queue = new();
-
-        protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
-        protected override SerialTaskQueue Queue => _queue;
-    }
-
-    public interface ImageProcessor
-    {
-        void Pass(WitlessContext context);
-
-        Task ProcessPhoto(string fileID);
-        Task ProcessStick(string fileID);
-        Task ProcessVideo(string fileID, string extension = ".mp4", bool round = false);
     }
 }

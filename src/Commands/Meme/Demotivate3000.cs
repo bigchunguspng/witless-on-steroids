@@ -1,5 +1,4 @@
-﻿using Witlesss.Backrooms.Types.SerialQueue;
-using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
@@ -8,6 +7,10 @@ namespace Witlesss.Commands.Meme
 {
     public class Demotivate3000 : MakeMemeCore<string>
     {
+        private static readonly DynamicDemotivatorDrawer _dp = new();
+
+        protected override IMemeGenerator<string> MemeMaker => _dp;
+
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");
 
         protected override string VideoName => "piece_fap_club-dp.mp4";
@@ -47,13 +50,5 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _small   = new(@"^\/dp\S*(xx)\S*");
         private static readonly Regex _fontSM  = new(@"^\/dp\S*?(\d{1,3})("")\S*");
         private static readonly Regex _fontMS  = new(@"^\/dp\S*?(min)(\d{1,3})("")\S*");
-
-        // LOGIC
-
-        private static readonly DynamicDemotivatorDrawer  _dp = new();
-        private static readonly SerialTaskQueue _queue = new();
-
-        protected override IMemeGenerator<string> MemeMaker => _dp;
-        protected override SerialTaskQueue Queue => _queue;
     }
 }

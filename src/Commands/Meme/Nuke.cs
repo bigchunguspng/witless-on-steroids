@@ -1,5 +1,4 @@
-﻿using Witlesss.Backrooms.Types.SerialQueue;
-using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 
@@ -7,6 +6,10 @@ namespace Witlesss.Commands.Meme
 {
     public class Nuke : MakeMemeCore<int>
     {
+        private static readonly DukeNukem _nukem = new();
+
+        protected override IMemeGenerator<int> MemeMaker => _nukem;
+
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 
         protected override string VideoName => "piece_fap_club-nuke.mp4";
@@ -20,6 +23,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("ядерные отходы", "nuke");
 
+        protected override bool CropVideoNotes   => false;
         protected override bool ResultsAreRandom => true;
 
         protected override void ParseOptions()
@@ -30,16 +34,5 @@ namespace Witlesss.Commands.Meme
         protected override int GetMemeText(string? text) => 0;
 
         private static readonly Regex _depth = new(@"^\/nuke\S*?([1-9])("")\S*");
-
-        protected override bool CropVideoNotes  => false;
-        protected override bool ConvertStickers => false;
-
-        // LOGIC
-
-        private static readonly DukeNukem _nukem = new();
-        private static readonly SerialTaskQueue _queue = new();
-
-        protected override IMemeGenerator<int> MemeMaker => _nukem;
-        protected override SerialTaskQueue Queue => _queue;
     }
 }

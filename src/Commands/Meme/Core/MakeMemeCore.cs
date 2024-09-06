@@ -5,6 +5,15 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 {
+    public interface ImageProcessor
+    {
+        void Pass(WitlessContext context);
+
+        Task ProcessPhoto(string fileID);
+        Task ProcessStick(string fileID);
+        Task ProcessVideo(string fileID, string extension = ".mp4", bool round = false);
+    }
+
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
         protected static readonly Regex _repeat = new("[2-9]");
@@ -16,7 +25,9 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
     {
         protected MemeRequest Request = default!;
 
-        protected abstract Regex _cmd { get; } // todo
+        protected abstract IMemeGenerator<T> MemeMaker { get; }
+
+        protected abstract Regex _cmd { get; }
 
         protected abstract string VideoName { get; }
 
@@ -26,9 +37,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         protected abstract string? DefaultOptions { get; }
 
-        protected virtual bool CropVideoNotes  => true;
-        protected virtual bool ConvertStickers => true;
-
+        protected virtual bool CropVideoNotes   => true;
         protected virtual bool ResultsAreRandom => false;
 
         public void Pass(WitlessContext context)
@@ -141,14 +150,14 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         private string? GetTextBase() =>
             Context.Command is not null || Baka.Pics > 100 && Context.Message.ForwardFromChat is null ? Args : null;
 
+
         // MEME GENERATION
 
-        protected abstract IMemeGenerator<T> MemeMaker { get; }
-        protected abstract SerialTaskQueue   Queue     { get; }
+        private readonly SerialTaskQueue _queue = new();
 
         private Task<string> MakeMemeImage(MemeFileRequest request, T text)
         {
-            return Queue.Enqueue(() =>
+            return _queue.Enqueue(() =>
             {
                 var sw = GetStartedStopwatch();
                 var result = MemeMaker.GenerateMeme(request, text);
@@ -166,7 +175,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private Task<string> MakeMemeVideo(MemeFileRequest request, T text)
         {
-            return Queue.Enqueue(() =>
+            return _queue.Enqueue(() =>
             {
                 var sw = GetStartedStopwatch();
                 var result = MemeMaker.GenerateVideoMeme(request, text);

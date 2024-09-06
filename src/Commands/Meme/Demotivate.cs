@@ -1,5 +1,4 @@
-﻿using Witlesss.Backrooms.Types.SerialQueue;
-using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Commands.Meme.Demotivate.Mode;
@@ -8,6 +7,10 @@ namespace Witlesss.Commands.Meme
 {
     public class Demotivate : MakeMemeCore<TextPair>
     {
+        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
+
+        protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int)_mode];
+
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
 
         protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
@@ -89,6 +92,9 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*(nn)\S* *");
         private static readonly Regex _one_line = new(@"^\/d[vg]\S*(ll)\S* *");
 
+
+        // MODE
+
         public Demotivate SetMode(Mode mode)
         {
             _mode = mode;
@@ -97,18 +103,7 @@ namespace Witlesss.Commands.Meme
 
         public void SelectMode(float w, float h) => _mode = w / h > 1.6 ? Wide : Square;
 
-        // LOGIC
-
         private Mode _mode;
-
-        private static readonly SerialTaskQueue _queue = new();
-        private static readonly DemotivatorDrawer[] _drawers =
-        [
-            new DemotivatorDrawer(), new DemotivatorDrawer(1280)
-        ];
-
-        protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int) _mode];
-        protected override SerialTaskQueue Queue => _queue;
 
         public enum Mode
         {

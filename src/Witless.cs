@@ -236,8 +236,8 @@ namespace Witlesss
             {
                 MemeType.Meme => Meme,
                 MemeType.Top  => Top,
-                MemeType.Dg   => Dp,
-                MemeType.Dp   => Dg,
+                MemeType.Dg   => Dg,
+                MemeType.Dp   => Dp,
                 _             => Nuke,
             };
             set

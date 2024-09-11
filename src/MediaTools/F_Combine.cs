@@ -30,14 +30,20 @@ public partial class F_Process
         BuildAndCompress(o, request, filter);
     });
 
-    public F_Process When(VideoMemeRequest request, Size size, Rectangle crop, Point point, bool blur) => ApplyEffects(o =>
+    public F_Process When(VideoMemeRequest request, Size size, Rectangle crop, Point point, float press) => ApplyEffects(o =>
     {
         var filter = new StringBuilder();
         filter.Append(FixPicFps());
         filter.Append($"[0:v]scale={size.Width}:{size.Height}[v0];");
         filter.Append($"[v0]crop={crop.Width}:{crop.Height}:{crop.X}:{crop.Y}[vid];");
         filter.Append($"[pic][vid]overlay={point.X}:{point.Y}:format=rgb");
-        if (blur) filter.Append(",gblur=1:1");
+        if (press != 0)
+        {
+            var value = press.Format();
+            filter.Append($",scale=ceil((iw*{value})/2)*2:ceil((ih*{value})/2)*2");
+            filter.Append($",scale=ceil((iw/{value})/2)*2:ceil((ih/{value})/2)*2");
+        }
+
         BuildAndCompress(o, request, filter.ToString());
     });
 

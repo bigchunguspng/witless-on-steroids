@@ -41,9 +41,16 @@ public static class OptionsParsing
     public static int GetInt(MemeRequest request, Regex regex, int @default, int group = 1)
     {
         var value = GetValue(request, regex, group);
-        if (value is null) return @default;
+        if (string.IsNullOrEmpty(value)) return @default;
 
         return int.Parse(value);
+    }
+
+    public static float GetFraction(MemeRequest request, Regex regex, int @default, int group = 1)
+    {
+        if (Check(request, regex) == false) return 0;
+
+        return GetInt(request, regex, @default, group).ToFraction();
     }
 
     public static void CutCaptureOut(Capture group, MemeRequest request)

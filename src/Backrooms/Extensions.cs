@@ -38,8 +38,8 @@ public static partial class Extensions
 
     // FORMAT
 
-    public static string Format
-        (this double value) => value.ToString(CultureInfo.InvariantCulture);
+    public static string Format(this double value) => value.ToString(CultureInfo.InvariantCulture);
+    public static string Format(this float  value) => value.ToString(CultureInfo.InvariantCulture);
 
     // PATH
 

@@ -534,6 +534,7 @@ public static class Texts
         <code>co</code> - <b><i>Comic Sans MS</i></b> ✨
         <code>bb</code> - <b><i>Bender</i></b> ✨
         <code>ft</code> - <b><i>Futura XBlkCn BT</i></b>
+        <code>ug</code> - <b><i>Upright (Sigma)</i></b>
 
         <u><b>Комиксные:</b></u>
         <code>ap</code> - <b><i>v_Armor Piercing 2.0 BB</i></b>

@@ -27,7 +27,7 @@ public static class Texts
         <code>/set [код] [опции]</code>
         <blockquote><b>Примеры</b>:
         <code>/set M wwsd#lime#</code>
-        <code>/set T largmmww5"</code>
+        <code>/set T largmmww50"*</code>
         <code>/set D imup</code>
         <code>/set Dg xllro-b</code>
         <code>/set N =3</code></blockquote>
@@ -343,7 +343,6 @@ public static class Texts
         <code>-20%</code> - обрезать по 10% сверху и снизу
         <code>100"</code> - стартовый размер шрифта (1-999)
         <code>min10"</code> - мин. размер шрифта (1-999)
-        <code>blur</code> - лёгкое размытие 🎬
         <code>#color#</code> - цвет плашки
 
         <b>Шрифты</b>: /fonts

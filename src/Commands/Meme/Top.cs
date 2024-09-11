@@ -35,8 +35,6 @@ namespace Witlesss.Commands.Meme
             IFunnyApp.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
             IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            IFunnyApp.Press = GetFraction(Request, _press, 75, 2);
-
             IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
             IFunnyApp.BackInBlack      =  CheckAndCut(Request, _blackBG);
             IFunnyApp.ForceCenter      =  CheckAndCut(Request, _colorPC);
@@ -64,7 +62,6 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*");
         private static readonly Regex _colorPC = new(@"^\/top\S*pp(!)\S*");
         private static readonly Regex _blackBG = new(@"^\/top\S*(ob)\S*");
-        private static readonly Regex _press   = new(@"^\/top\S*(\*)(\d{1,2})?\S*");
         private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*");
         private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*");
         private static readonly Regex _fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*");

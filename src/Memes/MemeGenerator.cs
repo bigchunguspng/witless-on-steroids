@@ -47,6 +47,8 @@ namespace Witlesss.Memes
             using var caption = DrawCaption(text);
             using var meme = Combine(image, caption);
 
+            meme.ApplyPressure(request.Press);
+
             return request.ExportAsSticker
                 ? ImageSaver.SaveImageWebp(meme, request.TargetPath, request.Quality)
                 : ImageSaver.SaveImage    (meme, request.TargetPath, request.Quality);

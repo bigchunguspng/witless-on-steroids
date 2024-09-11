@@ -68,4 +68,12 @@ public static partial class Extensions
             png[x, y] = new Rgba32(rgb24.R, rgb24.G, rgb24.B, rgba32.A);
         }
     }
+
+    public static void ApplyPressure(this Image image, float press)
+    {
+        if (press == 0) return;
+
+        var size = image.Size;
+        image.Mutate(x => x.Resize((size * press).CeilingInt()).Resize(size));
+    }
 }

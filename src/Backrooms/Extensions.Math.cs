@@ -24,6 +24,4 @@ public static partial class Extensions
     public static float Gap(this float outer, float inner) => (outer - inner) / 2F;
 
     public static int Clamp(this int x, int min, int max) => Math.Clamp(x, min, max);
-
-    public static float ToFraction(this int x) => x / MathF.Pow(10, x.ToString().Length);
 }

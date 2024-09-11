@@ -17,7 +17,6 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
     public static bool PickColor, ForceCenter, BackInBlack;
     public static int CropPercent = 0;
     public static int MinSizeMultiplier = 10, FontSizeMultiplier = 100;
-    public static float Press;
     public static CustomColorOption CustomColor = new("#");
 
     // SIZE
@@ -44,11 +43,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
         using var card = DrawText(text);
         using var meme = Combine(image, card, sticker: request.IsSticker);
 
-        if (Press != 0)
-        {
-            var size = meme.Size;
-            meme.Mutate(x => x.Resize((size * Press).CeilingInt()).Resize(size));
-        }
+        meme.ApplyPressure(request.Press);
 
         return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
     }
@@ -63,7 +58,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
         using var frame = Combine(null, card);
 
         return request.UseFFMpeg()
-            .When(VideoMemeRequest.From(request, frame), _sourceSizeAdjusted, Cropping, Location, Press)
+            .When(VideoMemeRequest.From(request, frame), _sourceSizeAdjusted, Cropping, Location)
             .OutAs(request.TargetPath);
     }
 

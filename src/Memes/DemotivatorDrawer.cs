@@ -17,8 +17,8 @@ namespace Witlesss.Memes
 
         public static readonly ExtraFonts ExtraFontsL = new("d[vg]", "(?![-bi*])");
         public static readonly ExtraFonts ExtraFontsS = new("dg",    "(?![-bi*])");
-        public static readonly ExtraFonts ExtraFontsA = new("dg", "&");
-        public static readonly ExtraFonts ExtraFontsB = new("dg", @"\*");
+        public static readonly ExtraFonts ExtraFontsA = new("dg",   "(&)");
+        public static readonly ExtraFonts ExtraFontsB = new("dg", @"(\*)");
 
         private static readonly List<Logo> Logos = [];
 
@@ -65,6 +65,7 @@ namespace Witlesss.Memes
         {
             using var frame = DrawFrame(text);
             InsertImage(frame, request);
+            frame.ApplyPressure(request.Press);
             return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 

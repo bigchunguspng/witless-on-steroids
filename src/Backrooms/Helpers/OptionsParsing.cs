@@ -50,7 +50,9 @@ public static class OptionsParsing
     {
         if (Check(request, regex) == false) return 0;
 
-        return GetInt(request, regex, @default, group).ToFraction();
+        var value = GetValue(request, regex, group);
+        var (number, text) = string.IsNullOrEmpty(value) ? (@default, @default.ToString()) : (int.Parse(value), value);
+        return number / MathF.Pow(10, text.Length);
     }
 
     public static void CutCaptureOut(Capture group, MemeRequest request)

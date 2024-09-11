@@ -50,6 +50,8 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
 
             InsertImage(frame, image);
 
+            frame.ApplyPressure(request.Press);
+
             return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 

@@ -6,15 +6,15 @@ using FFO = FFMpegCore.FFMpegArgumentOptions;
 
 namespace Witlesss.MediaTools;
 
-public record VideoMemeRequest(int Quality, string Caption)
+public record VideoMemeRequest(int Quality, float Press, string Caption)
 {
     public static VideoMemeRequest From
         (MemeFileRequest request, Image caption)
-        => new(request.GetCRF(), ImageSaver.SaveImageTemp(caption));
+        => new(request.GetCRF(), request.Press, ImageSaver.SaveImageTemp(caption));
 
     public static VideoMemeRequest From
         (MemeFileRequest request, string captionAsFile)
-        => new(request.GetCRF(), captionAsFile);
+        => new(request.GetCRF(), request.Press, captionAsFile);
 }
 
 public partial class F_Process
@@ -26,47 +26,53 @@ public partial class F_Process
     // -i video -i image -filter_complex "[0:v]scale=620:420[vid];[vid][1:v]overlay=0:0"
     public F_Process Meme(VideoMemeRequest request, Size size) => ApplyEffects(o =>
     {
-        var filter = $"[0:v]scale={size.Width}:{size.Height}[vid];[vid][1:v]overlay=0:0:format=rgb";
-        BuildAndCompress(o, request, filter);
+        var filter = new StringBuilder();
+        filter.Append($"[0:v]scale={size.Width}:{size.Height}[vid];[vid][1:v]overlay=0:0:format=rgb");
+        Press(filter, request.Press);
+        BuildAndCompress(o, request, filter.ToString());
     });
 
-    public F_Process When(VideoMemeRequest request, Size size, Rectangle crop, Point point, float press) => ApplyEffects(o =>
+    public F_Process When(VideoMemeRequest request, Size size, Rectangle crop, Point point) => ApplyEffects(o =>
     {
         var filter = new StringBuilder();
         filter.Append(FixPicFps());
         filter.Append($"[0:v]scale={size.Width}:{size.Height}[v0];");
         filter.Append($"[v0]crop={crop.Width}:{crop.Height}:{crop.X}:{crop.Y}[vid];");
         filter.Append($"[pic][vid]overlay={point.X}:{point.Y}:format=rgb");
-        if (press != 0)
-        {
-            var value = press.Format();
-            filter.Append($",scale=ceil((iw*{value})/2)*2:ceil((ih*{value})/2)*2");
-            filter.Append($",scale=ceil((iw/{value})/2)*2:ceil((ih/{value})/2)*2");
-        }
-
+        Press(filter, request.Press);
         BuildAndCompress(o, request, filter.ToString());
     });
 
     // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
     public F_Process Demo(VideoMemeRequest request, Drawer drawer) => ApplyEffects(o =>
     {
-        ArgsDemo(o, request, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);
+        AddDemotivatorFilter(o, request, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);
     });
 
     public F_Process D300(VideoMemeRequest request, Size image, Point point, Size frame) => ApplyEffects(o =>
     {
-        ArgsDemo(o, request, image, point);
+        AddDemotivatorFilter(o, request, image, point);
         o.Resize(frame.Ok());
     });
 
-
-    private void ArgsDemo(FFO o, VideoMemeRequest request, Size s, Point p)
+    private void AddDemotivatorFilter(FFO o, VideoMemeRequest request, Size s, Point p)
     {
-        var filter = $"{FixPicFps()}[0:v]scale={s.Width}:{s.Height}[vid];[pic][vid]overlay={p.X}:{p.Y}:format=rgb";
-        BuildAndCompress(o, request, filter);
+        var filter = new StringBuilder();
+        filter.Append($"{FixPicFps()}[0:v]scale={s.Width}:{s.Height}[vid];[pic][vid]overlay={p.X}:{p.Y}:format=rgb");
+        Press(filter, request.Press);
+        BuildAndCompress(o, request, filter.ToString());
     }
 
     private string FixPicFps() => $"[1:v]fps={GetFramerate().Format()}[pic];";
+
+    private void Press(StringBuilder filter, float press)
+    {
+        if (press == 0) return;
+
+        var value = press.Format();
+        filter.Append($",scale=ceil((iw*{value})/2)*2:ceil((ih*{value})/2)*2");
+        filter.Append($",scale=ceil((iw/{value})/2)*2:ceil((ih/{value})/2)*2");
+    }
 
     private void BuildAndCompress(FFO o, VideoMemeRequest request, string filterComplex)
     {
@@ -78,6 +84,8 @@ public partial class F_Process
         if (factor > 23) o.WithAudioBitrate(154 - 3 * factor);
     }
 
+
+    // MUSIC METADATA
 
     public Task<string> AddTrackMetadata(string art, string? artist, string title)
     {

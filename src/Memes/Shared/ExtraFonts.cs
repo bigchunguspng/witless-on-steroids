@@ -184,8 +184,10 @@ namespace Witlesss.Memes.Shared
                 var g2 = match.Groups[2];
                 _styleKey = g2.Success ? g2.Value : null;
 
-                OptionsParsing.CutCaptureOut(g2, request);
-                OptionsParsing.CutCaptureOut(g1, request);
+                for (var i = match.Groups.Count - 1; i > 0; i--)
+                {
+                    OptionsParsing.CutCaptureOut(match.Groups[i], request);
+                }
             }
             else
             {

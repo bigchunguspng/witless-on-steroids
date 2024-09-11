@@ -19,6 +19,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         protected static readonly Regex _repeat = new("[2-9]");
         protected static readonly Regex   _caps = new(@"\S*(up)\S*");
         protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
+        protected static readonly Regex  _press = new(@"\S*(\*)(\d{1,2})?\S*");
     }
 
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static, ImageProcessor
@@ -75,12 +76,10 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         public async Task ProcessPhoto(string fileID)
         {
-            var path = await Bot.Download(fileID, Chat, ".jpg");
-            Request = GetRequestData();
+            var path = await DownloadFileAndParseOptions(fileID, ".jpg");
 
-            ParseOptions();
+            var request = GetMemeFileRequest(MemeSourceType.Image, path, Suffix + ".jpg");
             var repeats = GetRepeatCount();
-            var request = new MemeFileRequest(Chat, MemeSourceType.Image, path, Suffix + ".jpg", Baka.Quality);
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeImage(request, GetText()));
@@ -91,18 +90,15 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         public async Task ProcessStick(string fileID)
         {
-            var path = await Bot.Download(fileID, Chat, ".webp");
-            Request = GetRequestData();
+            var path = await DownloadFileAndParseOptions(fileID, ".webp");
 
-            ParseOptions();
-            var repeats = GetRepeatCount();
             var sticker = SendAsSticker;
             var extension = sticker ? ".webp" : ".jpg";
-            var request = new MemeFileRequest(Chat, MemeSourceType.Sticker, path, Suffix + extension, Baka.Quality)
-            {
-                ExportAsSticker = sticker,
-                JpegSticker = JpegSticker
-            };
+
+            var request = GetMemeFileRequest(MemeSourceType.Sticker, path, Suffix + extension);
+            request.ExportAsSticker = sticker;
+            request.JpegSticker = JpegSticker;
+            var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeStick(request, GetText()));
@@ -119,16 +115,13 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
             var sw = GetStartedStopwatch();
 
-            var path = await Bot.Download(fileID, Chat, extension);
-            Request = GetRequestData();
+            var path = await DownloadFileAndParseOptions(fileID, extension);
+            if (round && CropVideoNotes) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
 
-            if (round && CropVideoNotes)
-                path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
-
-            ParseOptions();
-            var repeats = GetRepeatCount().Clamp(3);
             var note = round && !CropVideoNotes;
-            var request = new MemeFileRequest(Chat, MemeSourceType.Video, path, Suffix + ".mp4", Baka.Quality);
+
+            var request = GetMemeFileRequest(MemeSourceType.Video, path, Suffix + ".mp4");
+            var repeats = GetRepeatCount().Clamp(3);
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
@@ -136,19 +129,30 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
                 if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
                 else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
             }
-
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }
 
-        private string? REP(int repeats) => repeats > 1 ? $"-{repeats}" : null;
+        private Task<string> DownloadFileAndParseOptions(string fileID, string extension)
+        {
+            Request = GetRequestData();
+            ParseOptions();
 
-        protected abstract void ParseOptions();
-        protected abstract T GetMemeText(string? text);
+            return Bot.Download(fileID, Chat, extension);
+        }
+
+        private MemeFileRequest GetMemeFileRequest
+            (MemeSourceType type, string path, string outputEnding)
+            => new(Chat, type, path, outputEnding, Baka.Quality, Pressure);
 
         private T GetText() => GetMemeText(GetTextBase());
 
         private string? GetTextBase() =>
             Context.Command is not null || Baka.Pics > 100 && Context.Message.ForwardFromChat is null ? Args : null;
+
+        protected abstract void ParseOptions();
+        protected abstract T GetMemeText(string? text);
+
+        private string? REP(int repeats) => repeats > 1 ? $"-{repeats}" : null;
 
 
         // MEME GENERATION
@@ -214,6 +218,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             if (hasToBeRepeated) repeats = _repeat.ExtractGroup(0, Request.Dummy, int.Parse, repeats);
             return repeats;
         }
+
+        private float     Pressure => OptionsParsing.GetFraction(Request, _press, 75, 2);
 
         private bool SendAsSticker => CheckOptionsFor(options => options.Contains('='));
         private bool   JpegSticker => CheckOptionsFor(options => options.Contains('x'));

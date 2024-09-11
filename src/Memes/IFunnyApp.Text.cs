@@ -28,7 +28,7 @@ public partial class IFunnyApp
 
     private float GetStartingFontSize()
     {
-        var defaultFontSize = Math.Max(48, _cardHeight / 3.75F);
+        var defaultFontSize = Math.Max(24, _cardHeight / 3.75F);
         var multiplier = FontSizeMultiplier / 100F;
         var multiplierM = MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;

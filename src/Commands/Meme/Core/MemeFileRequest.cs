@@ -23,9 +23,7 @@ public class MemeFileRequest(long chat, MemeSourceType type, string path, string
     /// </summary>
     public int GetCRF()
     {
-        return Quality > 80
-            ? 0
-            : 51 - (int)(0.42 * Quality); // 17 - 51
+        return Math.Clamp(51 - (int)(0.35 * Quality), 23, 51);
     }
 
     /// <summary>

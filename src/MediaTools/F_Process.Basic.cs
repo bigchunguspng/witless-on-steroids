@@ -77,9 +77,17 @@ namespace Witlesss.MediaTools
         {
             var i = MediaInfoWithFixing(o);
             if (i.HasVideo) o.WithVideoFilters(v => v.ChangeVideoSpeed(speed).SetFPS(GetFPS())).FixPlayback();
-            if (i.HasAudio) o.WithAudioFilters(a => a.ChangeAudioSpeed(speed));
+            if (i.HasAudio) o.WithAudioFilters(a =>
+            {
+                while (speed < 0.5) // speed = [0.1 - 94]
+                {
+                    a.ChangeAudioSpeed(0.5); // af/atempo accepts: [0.5 - 94]
+                    speed /= 0.5;
+                }
+                a.ChangeAudioSpeed(speed);
+            });
 
-            double GetFPS() => Math.Min(i.Video.AvgFrameRate * speed, 90D);
+            double GetFPS() => Math.Min(i.Video!.AvgFrameRate * speed, 90D);
         });
 
         #endregion

@@ -12,7 +12,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 
-        protected override string VideoName => "piece_fap_club-nuke.mp4";
+        protected override string VideoName => "piece_fap_bot-nuke.mp4";
 
         protected override string Log_STR => "NUKED";
         protected override string Command => "/nuke";

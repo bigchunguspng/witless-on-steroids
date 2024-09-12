@@ -23,14 +23,18 @@ namespace Witlesss.Commands.Editing
 
             var result = await path.UseFFMpeg(Chat).ChangeSpeed(_speed).Out("-Speed", Ext);
             SendResult(result);
-            Log($"{Title} >> {(_mode == Fast ? "FAST" : "SLOW" )} [>>]");
+            Log($"{Title} >> {ModeNameUpper} [{ModeIcon}]");
 
             double ClampFast(double v) => Math.Clamp(v, 0.5,   94);
             double ClampSlow(double v) => Math.Clamp(v, 0.0107, 2);
         }
 
         protected override string AudioFileName => SongNameOr($"Are you {Sender.Split()[0]} or something.mp3");
-        protected override string VideoFileName => $"piece_fap_club-{_speed}.mp4";
+        protected override string VideoFileName => $"piece_fap_bot-{ModeNameLower}-{_speed}.mp4";
+
+        private string ModeNameUpper => _mode == Fast ? "FAST" : "SLOW";
+        private string ModeNameLower => _mode == Fast ? "fast" : "slow";
+        private string ModeIcon      => _mode == Fast ? ">>"   :   "<<";
 
         public enum Mode
         {

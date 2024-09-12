@@ -96,8 +96,8 @@ namespace Witlesss.Commands.Editing.Core
             else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
         }
 
-        protected virtual string VideoFileName => "piece_fap_club.mp3";
-        protected virtual string AudioFileName => "piece_fap_club.mp4";
+        protected virtual string VideoFileName => "piece_fap_bot.mp3";
+        protected virtual string AudioFileName => "piece_fap_bot.mp4";
 
         protected string Sender => Message.GetSenderName().ValidFileName();
         protected string SongNameOr(string s) => Message.GetSongNameOr(s);

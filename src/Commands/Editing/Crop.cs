@@ -2,8 +2,8 @@
 {
     public class Crop : VideoPhotoCommand // todo shake is only for video
     {
-        private const string _crop  = "piece_fap_crop.mp4";
-        private const string _shake = "shake_fap_club.mp4";
+        private const string _crop  = "piece_fap_bot-crop.mp4";
+        private const string _shake = "piece_fap_bot-shake.mp4";
 
         private bool _isShakeMode; 
 

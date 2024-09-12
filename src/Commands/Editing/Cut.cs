@@ -45,7 +45,7 @@ namespace Witlesss.Commands.Editing
             else                                                 return (true,  Zero,  Zero);        // [-------]
         }
 
-        protected override string VideoFileName => "cut_fap_club.mp4";
+        protected override string VideoFileName => "piece_fap_bot-cut.mp4";
         protected override string AudioFileName => SongNameOr($"((({Sender}))).mp3");
     }
 }

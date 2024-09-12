@@ -41,6 +41,6 @@ namespace Witlesss.Commands.Editing
         }
 
         protected override string AudioFileName => SongNameOr($"Damn, {Sender}.mp3");
-        protected override string VideoFileName => $"piece_fap_club-{_value}.mp4";
+        protected override string VideoFileName => $"piece_fap_bot-damn-{_value}.mp4";
     }
 }

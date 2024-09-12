@@ -21,9 +21,9 @@ public partial class F_Process
 {
     private void AddInput(string path) => Arguments.AddFileInput(path);
 
-    // EFFECTS
 
-    // -i video -i image -filter_complex "[0:v]scale=620:420[vid];[vid][1:v]overlay=0:0"
+    // MEMES
+
     public F_Process Meme(VideoMemeRequest request, Size size) => ApplyEffects(o =>
     {
         var filter = new StringBuilder();
@@ -43,7 +43,6 @@ public partial class F_Process
         BuildAndCompress(o, request, filter.ToString());
     });
 
-    // -i video -i image -filter_complex "[0:v]scale=620:530[vid];[1:v][vid]overlay=50:50"
     public F_Process Demo(VideoMemeRequest request, Drawer drawer) => ApplyEffects(o =>
     {
         AddDemotivatorFilter(o, request, drawer.ImagePlacement.Size, drawer.ImagePlacement.Location);

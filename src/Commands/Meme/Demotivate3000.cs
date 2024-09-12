@@ -13,7 +13,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");
 
-        protected override string VideoName => "piece_fap_club-dp.mp4";
+        protected override string VideoName => "piece_fap_bot-dp.mp4";
 
         protected override string Log_STR => "DEMOTIVATOR-B";
         protected override string Command => "/dp";

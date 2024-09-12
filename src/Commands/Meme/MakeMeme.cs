@@ -14,7 +14,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");
 
-        protected override string VideoName => "piece_fap_club-meme.mp4";
+        protected override string VideoName => "piece_fap_bot-meme.mp4";
 
         protected override string Log_STR => "MEME";
         protected override string Command => "/meme";

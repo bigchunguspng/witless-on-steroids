@@ -27,6 +27,6 @@
         }
 
         protected override string AudioFileName => SongNameOr($"Bassboosted by {Sender}.mp3");
-        protected override string VideoFileName => $"piece_fap_club ft. DJ {Sender}.mp4";
+        protected override string VideoFileName => $"piece_fap_bot ft. DJ {Sender}.mp4";
     }
 }

@@ -11,6 +11,6 @@
         }
         
         protected override string AudioFileName => SongNameOr($"Kid Named {Sender}.mp3");
-        protected override string VideoFileName { get; } = "piece_fap_reverse.mp4";
+        protected override string VideoFileName { get; } = "piece_fap_bot-reverse.mp4";
     }
 }

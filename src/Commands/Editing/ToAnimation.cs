@@ -16,6 +16,6 @@ namespace Witlesss.Commands.Editing
             Log($"{Title} >> GIF [~]");
         }
 
-        private new const string VideoFileName = "gif_fap_club.mp4";
+        private new const string VideoFileName = "piece_fap_bot-gif.mp4";
     }
 }

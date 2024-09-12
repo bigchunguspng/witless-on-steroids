@@ -56,6 +56,6 @@
             }
         }
 
-        protected override string VideoFileName { get; } = "scale_fap_club.mp4";
+        protected override string VideoFileName { get; } = "piece_fap_bot-scale.mp4";
     }
 }

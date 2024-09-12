@@ -13,7 +13,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
 
-        protected override string VideoName => $"piece_fap_club-d{(_mode == Square ? "g" : "v")}.mp4";
+        protected override string VideoName => $"piece_fap_bot-d{(_mode == Square ? "g" : "v")}.mp4";
 
         protected override string Log_STR => "DEMOTIVATOR";
         protected override string Command => _mode == Square ? "/dg" : "/dv";

@@ -43,6 +43,7 @@ namespace Witlesss.Backrooms.Static;
         Manual/
         Water/
             556 698.png
+        4chan.html
         art.jpg
         texts.json
         voice.ogg
@@ -81,6 +82,7 @@ public static class Paths
 
     public static string Dir_Fonts_Fallback  { get; } = Path.Combine(Dir_Fonts, "Fallback");
 
+    public static string File_4chanHtmlPage       { get; } = Path.Combine(Dir_Static, "4chan.html");
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
     public static string File_DefaultTexts        { get; } = Path.Combine(Dir_Static, "texts.json");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");

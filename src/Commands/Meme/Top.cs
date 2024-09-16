@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Top;
 
 
-        protected override Task Run() => RunInternal("подписанки", "top"); // 🔥🔥🔥✍️
+        protected override Task Run() => RunInternal("top"); // 🔥🔥🔥✍️
 
         protected override bool ResultsAreRandom => IFunnyApp.ExtraFonts.UseRandom;
 

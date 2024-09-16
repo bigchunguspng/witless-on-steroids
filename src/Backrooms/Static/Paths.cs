@@ -29,8 +29,6 @@ namespace Witlesss.Backrooms.Static;
         History/
             -1001541923355/
                 KINGPIN-funny.json [list]       <-- /fuse * NAME
-        default.json
-        baguette.json
 
     Pics/
         -1001539756197/
@@ -46,6 +44,7 @@ namespace Witlesss.Backrooms.Static;
         Water/
             556 698.png
         art.jpg
+        texts.json
         voice.ogg
 
     config.txt
@@ -68,9 +67,6 @@ public static class Paths
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
 
-    public static string File_DefaultTexts { get; } = Path.Combine(Dir_DB,  "default.json");
-    public static string File_Baguette     { get; } = Path.Combine(Dir_DB, "baguette.json");
-
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");
 
@@ -86,6 +82,7 @@ public static class Paths
     public static string Dir_Fonts_Fallback  { get; } = Path.Combine(Dir_Fonts, "Fallback");
 
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
+    public static string File_DefaultTexts        { get; } = Path.Combine(Dir_Static, "texts.json");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");
 
 

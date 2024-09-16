@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Dp;
 
 
-        protected override Task Run() => RunInternal("демотиваторы👌", "dp");
+        protected override Task Run() => RunInternal("dp");
 
         protected override bool ResultsAreRandom => DynamicDemotivatorDrawer.ExtraFonts.UseRandom;
 

@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Baka.Options?.Nuke;
 
 
-        protected override Task Run() => RunInternal("ядерные отходы", "nuke");
+        protected override Task Run() => RunInternal("nuke");
 
         protected override bool CropVideoNotes   => false;
         protected override bool ResultsAreRandom => true;

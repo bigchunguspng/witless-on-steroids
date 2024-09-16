@@ -14,9 +14,17 @@ namespace Witlesss.MediaTools
         // -s WxH -an -vcodec libx264 -crf 30
         public F_Process RemoveAudio() => ApplyEffects(o =>
         {
+            o.DisableChannel(Channel.Audio).FixPlayback();
+
             var v = GetVideoStream(Input)!;
-            var size = new Size(v.Width, v.Height).Ok().FitSize().ValidMp4Size().Ok();
-            o.Resize(size).DisableChannel(Channel.Audio).WithCompression(30).FixPlayback();
+            if (v.Width.IsOdd() || v.Height.IsOdd())
+            {
+                var size = new Size(v.Width, v.Height).Ok();
+                o.Resize(size.FitSize().ValidMp4Size().Ok());
+                o.WithCompression(30);
+            }
+            else
+                o.CopyChannel(Channel.Video);
         });
 
         // -c:a libopus -b:a 48k -vn

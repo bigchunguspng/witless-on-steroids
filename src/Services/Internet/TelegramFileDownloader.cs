@@ -16,8 +16,9 @@ namespace Witlesss.Services.Internet
             var directory = Path.Combine(Dir_Pics, chat.ToString());
             Directory.CreateDirectory(directory);
 
-            var path = Path.Combine(directory, $"{file.FileUniqueId}{extension}");
-            if (File.Exists(path))
+            var name = $"{file.FileUniqueId}{extension}";
+            var path = Path.Combine(directory, name);
+            if (FileReallyExists(path, directory, name))
             {
                 while (FileIsLocked(path)) await Task.Delay(250);
             }
@@ -50,6 +51,26 @@ namespace Witlesss.Services.Internet
                 Bot.Instance.SendMessage(chat, message);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Checks if the file exists (case sensitive).
+        /// Could be replaced with File.Exists(path) on Linux.
+        /// </summary>
+        private static bool FileReallyExists(string path, string directory, string name)
+        {
+            if (File.Exists(path) == false) return false;
+
+            var files = Directory.GetFiles(directory, name);
+            if (files.Length == 0) return false;
+
+            var caseMatches = files[0].EndsWith(path);
+            if (caseMatches == false)
+            {
+                File.Delete(files[0]);
+            }
+
+            return caseMatches;
         }
 
         private static bool FileIsLocked(string path)

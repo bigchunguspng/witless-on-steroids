@@ -47,7 +47,7 @@
                 if (args.Length == 3 && !args[2].StartsWith("flags="))
                     args[2] = "flags=" + args[2];
 
-                var path = await Bot.Download(FileID, Chat, Ext);
+                var path = await Bot.Download(File, Chat, Ext);
 
                 var input = path.UseFFMpeg(Chat);
                 var process = Ext is ".jpg" ? input.ScaleJpeg(args) : input.Scale(args);

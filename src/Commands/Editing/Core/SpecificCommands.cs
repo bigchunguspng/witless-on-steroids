@@ -39,6 +39,8 @@ public abstract class AudioVideoCommand : FileEditingCommand
 
 public abstract class AudioVideoUrlCommand : FileEditingCommand
 {
+    private string? Url;
+
     protected override string SuportedMedia => "🎬, 🎧, 📎";
     protected override bool MessageContainsFile(Message m)
         => GetVideoFileID(m) || GetAudioFileID(m) || GetVideoURL(m);
@@ -51,7 +53,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         var entity = m.GetURL();
         if (entity is null) return false;
 
-        FileID = text.Substring(entity.Offset, entity.Length);
+        Url = text.Substring(entity.Offset, entity.Length);
         Type = MediaType.Video;
         Ext = ".mp4";
         return true;
@@ -59,11 +61,11 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
 
     protected async Task<(string path, int waitMessage)> DownloadFileSuperCool()
     {
-        if (FileID.StartsWith("http"))
+        if (Url != null)
         {
             var waitMessage = Bot.PingChat(Chat, PLS_WAIT[Random.Shared.Next(5)]);
 
-            var task = new DownloadVideoTask(FileID, Context).RunAsync();
+            var task = new DownloadVideoTask(Url, Context).RunAsync();
             await Bot.RunOrThrow(task, Chat, waitMessage);
 
             Bot.EditMessage(Chat, waitMessage, PROCESSING.PickAny().XDDD());
@@ -72,7 +74,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         }
         else
         {
-            var path = await Bot.Download(FileID, Chat, Ext);
+            var path = await Bot.Download(File, Chat, Ext);
 
             var waitMessage = path.FileSizeInBytes() > 4_000_000
                 ? Bot.PingChat(Chat, PROCESSING.PickAny().XDDD())

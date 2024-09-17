@@ -6,7 +6,7 @@ public class ToVoiceMessage : AudioVideoCommand
 {
     protected override async Task Execute()
     {
-        var path = await Bot.Download(FileID, Chat, Ext);
+        var path = await Bot.Download(File, Chat, Ext);
 
         string result;
         try
@@ -18,7 +18,7 @@ public class ToVoiceMessage : AudioVideoCommand
             result = File_DefaultVoiceMessage;
         }
 
-        await using var stream = File.OpenRead(result);
+        await using var stream = System.IO.File.OpenRead(result);
         Bot.SendVoice(Chat, new InputOnlineFile(stream, "balls.ogg"));
         Log($"{Title} >> VOICE ~|||~");
     }

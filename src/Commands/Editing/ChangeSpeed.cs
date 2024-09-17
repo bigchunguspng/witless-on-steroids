@@ -20,7 +20,7 @@ namespace Witlesss.Commands.Editing
             _speed = Math.Clamp(_speed, 0.1, 94);
             _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
 
-            var path = await Bot.Download(FileID, Chat, Ext);
+            var path = await Bot.Download(File, Chat, Ext);
 
             var result = await path.UseFFMpeg(Chat).ChangeSpeed(_speed).Out("-Speed", Ext);
             SendResult(result);

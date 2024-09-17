@@ -45,7 +45,7 @@
 
                 if (args.Length > 4) args = args.Take(4).ToArray();
 
-                var path = await Bot.Download(FileID, Chat, Ext);
+                var path = await Bot.Download(File, Chat, Ext);
 
                 var input = path.UseFFMpeg(Chat);
                 var process = Ext is ".jpg" ? input.CropJpeg(args) : input.CropVideo(args);

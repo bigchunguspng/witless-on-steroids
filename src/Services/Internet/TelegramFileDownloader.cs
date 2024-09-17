@@ -1,29 +1,30 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Services.Internet
 {
     public class TelegramFileDownloader
     {
-        private readonly LimitedCache<string, string> _recent = new(32);
-        private readonly LimitedCache<string, string>  _large = new(32);
-
         /// <summary>
         /// Downloads a file to the <b>Pics</b> directory.
         /// Grabs recent and large files from cache.
         /// To be used with media files attached to commands.
         /// </summary>
-        public async Task<string> Download(string fileID, long chat, string extension)
+        public async Task<string> Download(FileBase file, long chat, string extension)
         {
-            var shortID = ShortID(fileID);
+            var directory = Path.Combine(Dir_Pics, chat.ToString());
+            Directory.CreateDirectory(directory);
 
-            if (_recent.Contains(shortID, out var path) || _large.Contains(shortID, out path)) return path;
-
-            var chatDirectory = Path.Combine(Dir_Pics, chat.ToString());
-            path = UniquePath(chatDirectory, $"{shortID}{extension}");
-            await DownloadFile(fileID, path, chat);
-
-            (new FileInfo(path).Length > 2_000_000 ? _large : _recent).Add(shortID, path);
+            var path = Path.Combine(directory, $"{file.FileUniqueId}{extension}");
+            if (File.Exists(path))
+            {
+                while (FileIsLocked(path)) await Task.Delay(250);
+            }
+            else
+            {
+                await DownloadFile(file.FileId, path, chat);
+            }
 
             return path;
         }
@@ -49,6 +50,20 @@ namespace Witlesss.Services.Internet
                 Bot.Instance.SendMessage(chat, message);
                 throw;
             }
+        }
+
+        private static bool FileIsLocked(string path)
+        {
+            try
+            {
+                using var fs = File.Open(path, FileMode.Open, FileAccess.Read);
+                fs.Close();
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            return false;
         }
     }
 

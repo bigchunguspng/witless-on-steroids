@@ -16,7 +16,7 @@
             {
                 _arg = Args.Split(' ', 2)[0];
 
-                var path = await Bot.Download(FileID, Chat, Ext);
+                var path = await Bot.Download(File, Chat, Ext);
 
                 SendResult(await path.UseFFMpeg(Chat).ChangeVolume(_arg).Out("-vol", Ext));
                 Log($"{Title} >> VOLUME [{_arg}]");

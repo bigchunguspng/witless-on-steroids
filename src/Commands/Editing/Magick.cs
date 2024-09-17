@@ -48,7 +48,7 @@ public class Magick : PhotoCommand
             return;
         }
 
-        var path = await Bot.Download(FileID, Chat, Ext);
+        var path = await Bot.Download(File, Chat, Ext);
 
         try
         {
@@ -93,7 +93,7 @@ public class Magick : PhotoCommand
     {
         var name = "made with piece_fap_bot";
 
-        using var stream = File.OpenRead(result);
+        using var stream = System.IO.File.OpenRead(result);
         if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
         else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
         else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));

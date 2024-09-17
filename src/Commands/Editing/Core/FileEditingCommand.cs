@@ -5,7 +5,8 @@ namespace Witlesss.Commands.Editing.Core
 {
     public abstract class FileEditingCommand : AsyncCommand
     {
-        protected string FileID = default!, Ext = default!;
+        protected FileBase File = default!;
+        protected string   Ext  = default!;
         protected MediaType Type;
 
         // RUN
@@ -52,12 +53,12 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetVideoFileID(Message m)
         {
-            if      (m.Video      != null) (Type, FileID, Ext) = (MediaType.Video, m.Video    .FileId, ".mp4" );
-            else if (m.Animation  != null) (Type, FileID, Ext) = (MediaType.Anime, m.Animation.FileId, ".mp4" );
-            else if (m.VideoNote  != null) (Type, FileID, Ext) = (MediaType.Round, m.VideoNote.FileId, ".mp4" );
-            else if (m.HasVideoSticker ()) (Type, FileID, Ext) = (MediaType.Anime, m.Sticker !.FileId, ".webm");
-            else if (m.HasAnimeDocument()) (Type, FileID, Ext) = (MediaType.Anime, m.Document!.FileId, m.Document.FileName.GetExtension(".gif"));
-            else if (m.HasVideoDocument()) (Type, FileID, Ext) = (MediaType.Video, m.Document!.FileId, m.Document.FileName.GetExtension(".webm"));
+            if      (m.Video      != null) (Type, File, Ext) = (MediaType.Video, m.Video    , ".mp4" );
+            else if (m.Animation  != null) (Type, File, Ext) = (MediaType.Anime, m.Animation, ".mp4" );
+            else if (m.VideoNote  != null) (Type, File, Ext) = (MediaType.Round, m.VideoNote, ".mp4" );
+            else if (m.HasVideoSticker ()) (Type, File, Ext) = (MediaType.Anime, m.Sticker !, ".webm");
+            else if (m.HasAnimeDocument()) (Type, File, Ext) = (MediaType.Anime, m.Document!, m.Document!.FileName.GetExtension(".gif"));
+            else if (m.HasVideoDocument()) (Type, File, Ext) = (MediaType.Video, m.Document!, m.Document!.FileName.GetExtension(".webm"));
             else return false;
 
             return true;
@@ -65,9 +66,9 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetAudioFileID(Message m)
         {
-            if      (m.Audio      != null) (Type, FileID, Ext) = (MediaType.Audio, m.Audio    .FileId, m.Audio   .FileName.GetExtension(".mp3"));
-            else if (m.Voice      != null) (Type, FileID, Ext) = (MediaType.Audio, m.Voice    .FileId, ".ogg");
-            else if (m.HasAudioDocument()) (Type, FileID, Ext) = (MediaType.Audio, m.Document!.FileId, m.Document.FileName.GetExtension(".wav"));
+            if      (m.Audio      != null) (Type, File, Ext) = (MediaType.Audio, m.Audio    , m.Audio    .FileName.GetExtension(".mp3"));
+            else if (m.Voice      != null) (Type, File, Ext) = (MediaType.Audio, m.Voice    , ".ogg");
+            else if (m.HasAudioDocument()) (Type, File, Ext) = (MediaType.Audio, m.Document!, m.Document!.FileName.GetExtension(".wav"));
             else return false;
 
             return true;
@@ -75,9 +76,9 @@ namespace Witlesss.Commands.Editing.Core
 
         protected bool GetPhotoFileID(Message m)
         {
-            if      (m.Photo      != null) (Type, FileID, Ext) = (MediaType.Photo, m.Photo[^1].FileId, ".jpg");
-            else if (m.HasImageSticker ()) (Type, FileID, Ext) = (MediaType.Stick, m.Sticker !.FileId, ".webp");
-            else if (m.HasImageDocument()) (Type, FileID, Ext) = (MediaType.Photo, m.Document!.FileId, m.Document.FileName.GetExtension(".png"));
+            if      (m.Photo      != null) (Type, File, Ext) = (MediaType.Photo, m.Photo[^1], ".jpg");
+            else if (m.HasImageSticker ()) (Type, File, Ext) = (MediaType.Stick, m.Sticker !, ".webp");
+            else if (m.HasImageDocument()) (Type, File, Ext) = (MediaType.Photo, m.Document!, m.Document!.FileName.GetExtension(".png"));
             else return false;
 
             return true;
@@ -87,7 +88,7 @@ namespace Witlesss.Commands.Editing.Core
 
         protected void SendResult(string result)
         {
-            using var stream = File.OpenRead(result);
+            using var stream = System.IO.File.OpenRead(result);
             if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
             else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, new InputOnlineFile(stream));
             else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));

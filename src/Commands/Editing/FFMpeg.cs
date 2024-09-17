@@ -67,7 +67,7 @@ public class FFMpeg : AudioVideoPhotoCommand
             return;
         }
 
-        var path = await Bot.Download(FileID, Chat, Ext);
+        var path = await Bot.Download(File, Chat, Ext);
 
         var result = await path.UseFFMpeg(Chat).Edit(options).Out("-Edit", $".{extension}");
         SendResult(result, extension, sendDocument: OptionUsed('g'));
@@ -81,15 +81,15 @@ public class FFMpeg : AudioVideoPhotoCommand
 
     protected override bool MessageContainsFile(Message m)
     {
-        if      (m.Photo     != null) (FileID, Ext) = (m.Photo[^1].FileId, ".jpg");
-        else if (m.Audio     != null) (FileID, Ext) = (m.Audio    .FileId, m.Audio   .FileName.GetExtension(".mp3"));
-        else if (m.Video     != null) (FileID, Ext) = (m.Video    .FileId, ".mp4");
-        else if (m.Animation != null) (FileID, Ext) = (m.Animation.FileId, ".mp4");
-        else if (m.HasImageSticker()) (FileID, Ext) = (m.Sticker! .FileId, ".webp");
-        else if (m.HasVideoSticker()) (FileID, Ext) = (m.Sticker! .FileId, ".webm");
-        else if (m.Voice     != null) (FileID, Ext) = (m.Voice    .FileId, ".ogg");
-        else if (m.VideoNote != null) (FileID, Ext) = (m.VideoNote.FileId, ".mp4");
-        else if (m.Document  != null) (FileID, Ext) = (m.Document .FileId, m.Document.FileName.GetExtension(".png"));
+        if      (m.Photo     != null) (File, Ext) = (m.Photo[^1], ".jpg");
+        else if (m.Audio     != null) (File, Ext) = (m.Audio    , m.Audio   .FileName.GetExtension(".mp3"));
+        else if (m.Video     != null) (File, Ext) = (m.Video    , ".mp4");
+        else if (m.Animation != null) (File, Ext) = (m.Animation, ".mp4");
+        else if (m.HasImageSticker()) (File, Ext) = (m.Sticker! , ".webp");
+        else if (m.HasVideoSticker()) (File, Ext) = (m.Sticker! , ".webm");
+        else if (m.Voice     != null) (File, Ext) = (m.Voice    , ".ogg");
+        else if (m.VideoNote != null) (File, Ext) = (m.VideoNote, ".mp4");
+        else if (m.Document  != null) (File, Ext) = (m.Document , m.Document.FileName.GetExtension(".png"));
         else return false;
 
         return true;
@@ -97,7 +97,7 @@ public class FFMpeg : AudioVideoPhotoCommand
 
     private void SendResult(string result, string extension, bool sendDocument = false)
     {
-        using var stream = File.OpenRead(result);
+        using var stream = System.IO.File.OpenRead(result);
         if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
         else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
         else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));

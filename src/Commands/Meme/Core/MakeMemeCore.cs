@@ -9,9 +9,9 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
     {
         void Pass(WitlessContext context);
 
-        Task ProcessPhoto(string fileID);
-        Task ProcessStick(string fileID);
-        Task ProcessVideo(string fileID, string extension = ".mp4", bool round = false);
+        Task ProcessPhoto(FileBase file);
+        Task ProcessStick(FileBase file);
+        Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false);
     }
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
@@ -57,15 +57,15 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             if (message is null) return false;
 
-            if      (message.Photo     is not null) await ProcessPhoto(message.Photo[^1].FileId);
-            else if (message.HasImageSticker    ()) await ProcessStick(message.Sticker !.FileId);
-            else if (message.Animation is not null) await ProcessVideo(message.Animation.FileId);
-            else if (message.HasVideoSticker    ()) await ProcessVideo(message.Sticker !.FileId, ".webm");
-            else if (message.Video     is not null) await ProcessVideo(message.Video    .FileId);
-            else if (message.VideoNote is not null) await ProcessVideo(message.VideoNote.FileId, round: true);
-            else if (message.HasImageDocument   ()) await ProcessPhoto(message.Document!.FileId);
-            else if (message.HasAnimeDocument   ()) await ProcessVideo(message.Document!.FileId, ".gif");
-            else if (message.HasVideoDocument   ()) await ProcessVideo(message.Document!.FileId, ".webm");
+            if      (message.Photo     is not null) await ProcessPhoto(message.Photo[^1]);
+            else if (message.HasImageSticker    ()) await ProcessStick(message.Sticker !);
+            else if (message.Animation is not null) await ProcessVideo(message.Animation);
+            else if (message.HasVideoSticker    ()) await ProcessVideo(message.Sticker !, ".webm");
+            else if (message.Video     is not null) await ProcessVideo(message.Video    );
+            else if (message.VideoNote is not null) await ProcessVideo(message.VideoNote, round: true);
+            else if (message.HasImageDocument   ()) await ProcessPhoto(message.Document!);
+            else if (message.HasAnimeDocument   ()) await ProcessVideo(message.Document!, ".gif");
+            else if (message.HasVideoDocument   ()) await ProcessVideo(message.Document!, ".webm");
             else return false;
 
             return true;
@@ -74,9 +74,9 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         // PROCESS MEDIA
 
-        public async Task ProcessPhoto(string fileID)
+        public async Task ProcessPhoto(FileBase file)
         {
-            var path = await DownloadFileAndParseOptions(fileID, ".jpg");
+            var path = await DownloadFileAndParseOptions(file, ".jpg");
 
             var request = GetMemeFileRequest(MemeSourceType.Image, path, Suffix + ".jpg");
             var repeats = GetRepeatCount();
@@ -88,9 +88,9 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}]");
         }
 
-        public async Task ProcessStick(string fileID)
+        public async Task ProcessStick(FileBase file)
         {
-            var path = await DownloadFileAndParseOptions(fileID, ".webp");
+            var path = await DownloadFileAndParseOptions(file, ".webp");
 
             var sticker = SendAsSticker;
             var extension = sticker ? ".webp" : ".jpg";
@@ -109,13 +109,13 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] STICKER");
         }
 
-        public async Task ProcessVideo(string fileID, string extension = ".mp4", bool round = false)
+        public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
         {
             if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
 
             var sw = GetStartedStopwatch();
 
-            var path = await DownloadFileAndParseOptions(fileID, extension);
+            var path = await DownloadFileAndParseOptions(file, extension);
             if (round && CropVideoNotes) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
 
             var note = round && !CropVideoNotes;
@@ -132,12 +132,12 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }
 
-        private Task<string> DownloadFileAndParseOptions(string fileID, string extension)
+        private Task<string> DownloadFileAndParseOptions(FileBase file, string extension)
         {
             Request = GetRequestData();
             ParseOptions();
 
-            return Bot.Download(fileID, Chat, extension);
+            return Bot.Download(file, Chat, extension);
         }
 
         private MemeFileRequest GetMemeFileRequest

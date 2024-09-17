@@ -2,8 +2,8 @@
 - Random text generation 💬
 - Memes/demotivators 📸🎬😂👌
 - Files editing/converting 📸🎬🎧
+- _~Fetching **[Reddit]** posts~_ ❌
 - Executing **[ffmpeg]** and **[imagemagick]** commands 🔥✍️
-- _~Fetching **[Reddit]** posts~_ [temporarily unavailable] ❌
 - Downloading music & clipping videos from **[YouTube]** 😎
 
 ##### Honorable mentions 😲:
@@ -20,8 +20,7 @@
 - Have `ffmpeg`, `imagemagick`, `yt-dlp`, and `gallery-dl` on your `PATH`.
 - Setup the working directory as shown in [`Paths.cs`](src/Backrooms/Static/Paths.cs). Required items:
   - [`config.txt`](config-example.txt),
-  - `DB/default.json` (optional),
-  - the whole `Static` directory.
+  - the whole `Static` directory 😳.
 
 ### Operating the bot console 💬
 - **s** - save + exit (optional).

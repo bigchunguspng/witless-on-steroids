@@ -15,34 +15,33 @@ namespace Witlesss.Backrooms.Static;
                 bb.txt
         Backup/
             2024-03-14/
-                pack--4147302158.json [dic]
+                pack--4147302158.json [pack]
         Board/
-            a - 2023-12-22 02.41.json [list]    <-- /boards NAME
+            2024-08-21 a.270089129.json [list]  <-- /boards info
         Chat/
             chats.json
             bans.json
-            pack--1001699898486.json [dic]      <-- /fuse   ID
+            pack--1001699898486.json [pack]     <-- /fuse by id
         Fuse/
             -1001541923355/
-                private_3D_AF.json [dic]        <-- /fuse ! NAME
-            any-name-possible.json [dic]        <-- /fuse   NAME
+                private_3D_AF.json [pack]       <-- /fuse ! info
+            any-name-possible.json [pack]       <-- /fuse   info
         History/
             -1001541923355/
-                KINGPIN-funny.json [list]       <-- /fuse * NAME
+                KINGPIN-funny.json [list]       <-- /fuse * info
 
     Pics/
         -1001539756197/
-            Ag0ygAACZ8YxG55ScE-D.jpg
+            AgADgRoAAm3T4Es-Meme.webp
 
     Static/
         ASCII/
         Emoji/
-            1f62d-1f467.png
         Fonts/
             Fallback/
         Manual/
         Water/
-            556 698.png
+
         4chan.html
         art.jpg
         texts.json

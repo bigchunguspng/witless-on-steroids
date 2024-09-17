@@ -2,13 +2,19 @@
 
 public class Slice : AudioVideoUrlCommand
 {
+    private static readonly Regex _multiplier = new(@"\d+");
+
     protected override async Task Execute()
     {
         var (path, waitMessage) = await DownloadFileSuperCool();
 
+        var multiplier = Math.Max(1, _multiplier.ExtractGroup(0, Command!, int.Parse, 5)) / 5D;
+
         var sw = GetStartedStopwatch();
 
-        var result = await FFMpegXD.Slice(Chat, path, Type, Ext);
+        if (Type != MediaType.Audio) path = await FFMpegXD.ReduceSize(Chat, path);
+
+        var result = await path.UseFFMpeg(Chat).SliceRandom(multiplier).Out("-slices", Ext);
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 

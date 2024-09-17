@@ -25,21 +25,17 @@ namespace Witlesss.MediaTools
             }
         }
 
-        public static async Task<string> Slice(long chat, string path, MediaType type, string extension)
+        public static async Task<string> ReduceSize(long chat, string path)
         {
-            var video = type != MediaType.Audio;
-            if (video)
+            var size = GetPictureSize(path);
+            var fits = size.FitSize(720).ValidMp4Size();
+            if (size != fits)
             {
-                var size = GetPictureSize(path);
-                var fits = size.FitSize(720).ValidMp4Size();
-                if (size != fits)
-                {
-                    string[] args = [fits.Width.ToString(), fits.Height.ToString()];
-                    path = await path.UseFFMpeg(chat).Scale(args).Out("-scale");
-                }
+                string[] args = [fits.Width.ToString(), fits.Height.ToString()];
+                return await path.UseFFMpeg(chat).Scale(args).Out("-scale");
             }
-            
-            return await path.UseFFMpeg(chat).SliceRandom().Out("-slices", extension);
+
+            return path;
         }
 
         public static Task<string> Compress

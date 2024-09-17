@@ -5,31 +5,38 @@ namespace Witlesss.MediaTools;
 
 public partial class F_Process
 {
-    public F_Process SliceRandom() => ApplyEffects(SliceRandomArgs);
+    public F_Process SliceRandom(double multiplier) => ApplyEffects(o => SliceRandomArgs(o, multiplier));
 
-    private void SliceRandomArgs(FFMpegArgumentOptions o)
+    private void SliceRandomArgs(FFMpegArgumentOptions o, double multiplier)
     {
         var info = GetMediaInfo();
         var soundOnly = info is { HasAudio: true, HasVideo: false };
         var seconds = info.HasVideo ? info.Video!.Duration.TotalSeconds : info.Audio!.Duration.TotalSeconds;
         var minutes = seconds / 60;
 
-        var timecodes = GetTrimCodes(minutes, seconds, soundOnly);
+        var timecodes = GetTrimCodes(minutes, seconds, multiplier, soundOnly);
 
         TrimAndConcat(o, info, timecodes);
 
         if (info.HasVideo) o.FixPlayback();
     }
 
-    private List<TrimCode> GetTrimCodes(double minutes, double seconds, bool soundOnly)
+    private List<TrimCode> GetTrimCodes(double minutes, double seconds, double multiplier, bool soundOnly)
     {
+        var k = multiplier;
+
         var timecodes = new List<TrimCode>();
         var head = -seconds / 2;
         while (head < seconds)
         {
-            var step = IsFirstOf(seconds < 5 ? 8 : seconds < 30 ? 6 : seconds < 60 ? 4 : 2, 10) ? -1d : 1d;
-            step *=
-                seconds <  5 ? RandomDouble(seconds / 20, seconds / 10)
+            var chanceOfGoingBackwards
+                = seconds <  5 ? 8
+                : seconds < 30 ? 6
+                : seconds < 60 ? 4 : 2;
+
+            var direction = IsFirstOf(chanceOfGoingBackwards, 10) ? -1D : 1D;
+            var step = direction
+                * seconds <  5 ? RandomDouble(seconds / 20, seconds / 5)
                 : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : seconds / 15
                 : seconds < 60 ? IsOneIn(5) ? RandomInt(2, 10) : 5
                 : minutes <  5 ? IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 30) : RandomInt(1, 5) :  5
@@ -39,9 +46,12 @@ public partial class F_Process
                 ? RandomDouble(0.15, 0.35)
                 : RandomDouble(0.25, Math.Min(0.35 + 0.01 * seconds, 1.25));
 
+            step   *= k;
+            length *= k;
+
             if (soundOnly && minutes < 3) length *= RandomDouble(1.5, 3);
 
-            var a = Math.Clamp(head + step, 0, seconds - 0.15);
+            var a = Math.Clamp(head + step, 0, seconds);
             var b = Math.Min(a + length, seconds);
 
             timecodes.Add(new TrimCode(a, b));
@@ -51,7 +61,21 @@ public partial class F_Process
             double BigLeap()
             {
                 var avg = Math.Min(seconds + head, 2 * seconds - head);
-                return step * RandomInt(10, Math.Max(10, (int)(0.1 * avg)));
+                return direction * RandomInt(10, Math.Max(10, (int)(0.1 * avg)));
+            }
+        }
+
+        if (timecodes[^1].B - timecodes[^1].A == 0)
+            timecodes.RemoveAt(timecodes.Count - 1);
+
+        if (seconds < 5) // SHUFFLE
+        {
+            var shuffles = RandomInt(0, timecodes.Count / 3);
+            for (var i = 0; i < shuffles; i++)
+            {
+                var r1 = Random.Shared.Next(timecodes.Count);
+                var r2 = Random.Shared.Next(timecodes.Count);
+                (timecodes[r1], timecodes[r2]) = (timecodes[r2], timecodes[r1]);
             }
         }
 

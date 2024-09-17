@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing
     {
         protected override async Task Execute()
         {
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             if (Type == MediaType.Round) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
 

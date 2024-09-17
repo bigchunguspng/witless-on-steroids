@@ -7,7 +7,7 @@ namespace Witlesss.Commands.Editing
     {
         protected override async Task Execute()
         {
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             var size = GetPictureSize(path).Normalize().Ok();
             var result = await path.UseFFMpeg(Chat).ToSticker(size).Out("-stick", ".webp");

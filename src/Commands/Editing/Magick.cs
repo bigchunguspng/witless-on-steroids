@@ -48,7 +48,7 @@ public class Magick : PhotoCommand
             return;
         }
 
-        var path = await Bot.Download(File, Chat, Ext);
+        var path = await DownloadFile();
 
         try
         {

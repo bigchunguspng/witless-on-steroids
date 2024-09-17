@@ -19,7 +19,7 @@
                 var g = double.TryParse(args.Length > 1 ? args[1] : "", out var v2) ? v2 : 15;
                 var w = double.TryParse(args.Length > 2 ? args[2] : "", out var v3) ? v3 : 2000;
 
-                var path = await Bot.Download(File, Chat, Ext);
+                var path = await DownloadFile();
 
                 SendResult(await path.UseFFMpeg(Chat).EQ([f, g, w]).Out("-EQ", Ext));
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");

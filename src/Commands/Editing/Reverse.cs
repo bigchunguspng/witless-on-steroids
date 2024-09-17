@@ -4,7 +4,7 @@
     {
         protected override async Task Execute()
         {
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             SendResult(await path.UseFFMpeg(Chat).Reverse().Out("-Reverse", Ext));
             Log($"{Title} >> REVERSED [<<]");

@@ -84,6 +84,8 @@ namespace Witlesss.Commands.Editing.Core
             return true;
         }
 
+        protected Task<string> DownloadFile() => Bot.Download(File, Chat, Ext);
+
         // SEND
 
         protected void SendResult(string result)

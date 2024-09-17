@@ -6,7 +6,7 @@ public class ToVoiceMessage : AudioVideoCommand
 {
     protected override async Task Execute()
     {
-        var path = await Bot.Download(File, Chat, Ext);
+        var path = await DownloadFile();
 
         string result;
         try

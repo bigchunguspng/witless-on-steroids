@@ -20,7 +20,7 @@
 
             var span = new CutSpan(x.start, x.length);
 
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             if (argless) x.length = TimeSpan.MinValue;
 

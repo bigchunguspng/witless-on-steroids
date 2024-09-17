@@ -74,7 +74,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         }
         else
         {
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             var waitMessage = path.FileSizeInBytes() > 4_000_000
                 ? Bot.PingChat(Chat, PROCESSING.PickAny().XDDD())

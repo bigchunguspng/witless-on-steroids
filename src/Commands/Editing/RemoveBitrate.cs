@@ -11,7 +11,7 @@ namespace Witlesss.Commands.Editing
         {
             _value = Context.HasIntArgument(out var x) ? Math.Clamp(x, 0, 21) : 21;
 
-            var path = await Bot.Download(File, Chat, Ext);
+            var path = await DownloadFile();
 
             var result = Type switch // image: 1 - 22   video: 30 - 51
             {

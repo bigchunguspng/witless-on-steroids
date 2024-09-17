@@ -19,7 +19,13 @@ public record VideoMemeRequest(int Quality, float Press, string Caption)
 
 public partial class F_Process
 {
-    private void AddInput(string path) => Arguments.AddFileInput(path);
+    private void AddInput
+        (string path)
+        => Arguments.AddFileInput(path);
+
+    private void AddInput
+        (string path, Action<FFO> options)
+        => Arguments.AddFileInput(path, addArguments: options);
 
 
     // MEMES

@@ -17,35 +17,39 @@ namespace Witlesss.Commands.Packing
         private List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);
 
         // /boards
-        // /boards info
-        // /board a.b.c - Y-M-D.json
+        // /boards info  <┬─ SAME
+        // /board  info  <┘
+        // /board Y-M-D a.N.json
         // /board [thread/archive/archive link]
         protected override void RunAuthorized()
         {
-            if (Command!.StartsWith("/boards"))
-            {
-                if (Text?.EndsWith(" info") == true) SendSavedList(new ListPagination(Chat, PerPage: 10));
-                else                                 SendBoardList(new ListPagination(Chat, PerPage: 2));
-
-                return;
-            }
-
             if (Args is null)
             {
-                Bot.SendMessage(Chat, BOARD_MANUAL);
+                if (Command!.StartsWith("/boards"))
+                    SendBoardList(new ListPagination(Chat, PerPage: 2));
+                else
+                    Bot.SendMessage(Chat, BOARD_MANUAL);
             }
             else
             {
-                MeasureDick();
-                GetWordsPerLineLimit();
-
-                var args = Args.SplitN();
-                if (args.Length > 1) FuseWithJsonFile();
-                else                 FuseWithOnlineData(url: args[0]);
+                if (Args.EndsWith("info"))
+                    SendSavedList(new ListPagination(Chat, PerPage: 10));
+                else
+                    EatBoard();
             }
         }
 
-        private void FuseWithJsonFile()
+        private void EatBoard()
+        {
+            MeasureDick();
+            GetWordsPerLineLimit();
+
+            var args = Args.SplitN();
+            if (args.Length > 1) EatJsonFile();
+            else                 EatOnlineData(url: args[0]);
+        }
+
+        private void EatJsonFile()
         {
             var files = GetFiles(Dir_Board, $"{Args}.json");
             if (files.Length > 0)
@@ -57,7 +61,7 @@ namespace Witlesss.Commands.Packing
                 Bot.SendMessage(Chat, FUSE_FAIL_BOARD);
         }
 
-        private void FuseWithOnlineData(string url)
+        private void EatOnlineData(string url)
         {
             var uri = UrlOrBust(ref url);
 

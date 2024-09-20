@@ -39,7 +39,7 @@ namespace Witlesss.Commands.Packing
             _private = args.Length > 1 && args[0] == "!";
             _history = args.Length > 1 && args[0] == "*";
 
-            if      (Message.ProvidesFile("text/plain",       out _document)) ProcessTxtFile();
+            if      (Message.ProvidesFile("text/plain",       out _document)) ProcessTextFile();
             else if (Message.ProvidesFile("application/json", out _document)) ProcessJsonFile();
             else if (args.Length > 0 && args[^1] == "info")
             {
@@ -47,30 +47,75 @@ namespace Witlesss.Commands.Packing
                 else if (_private)         SendFuseList(new ListPagination(Chat), @private: true);
                 else if (args.Length == 1) SendFuseList(new ListPagination(Chat));
             }
-            else if (_history)
-            {
-                var name = string.Join(' ', args.Skip(1));
-                var files = GetFiles(GetHistoryFolder(), $"{name}.json");
-                if (files.Length == 0)
-                {
-                    SendHistoric(new ListPagination(Chat), fail: true);
-                }
-                else
-                {
-                    EatFromJsonFile(files[0]);
-                    GoodEnding();
-                }
-            }
-            else if (_private || args.Length == 1) FuseWitlessDB(args[^1]);
+            else if (_history)                     ProcessEatingRequest(args);
+            else if (_private || args.Length == 1) ProcessFusionRequest(args[^1]);
             else Bot.SendMessage(Chat, FUSE_MANUAL);
         }
 
-        private void ProcessTxtFile()
+        
+        private static readonly Regex _wordLimit = new(@"^\/\S+?(\d+)");
+
+        protected void GetWordsPerLineLimit()
+        {
+            Limit = _wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
+        }
+
+
+        #region FUSION
+
+        private const string HOLY_MOLY = "CAACAgIAAxkBAAI062a2Yi7myiBzNob7ftdyivXXEdJjAAKYDAACjdb4SeqLf5UfqK3dNQQ";
+
+        private void ProcessFusionRequest(string arg)
+        {
+            var argIsChatId = long.TryParse(arg, out var chat);
+            if (chat == Chat)
+            {
+                Bot.SendSticker(Chat, new InputOnlineFile(HOLY_MOLY));
+                return;
+            }
+
+            if (argIsChatId && ChatsDealer.WitlessExist(chat, out var baka))
+            {
+                if (baka.Loaded) baka.SaveChanges();
+
+                FuseWithOtherPack(JsonIO.LoadData<GenerationPack>(baka.FilePath));
+            }
+            else if (GetFiles(GetFuseFolder(_private), $"{arg}.json") is { Length: > 0 } files)
+            {
+                FuseWithOtherPack(JsonIO.LoadData<GenerationPack>(files[0]));
+            }
+            else if (argIsChatId) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
+            else SendFuseList(new ListPagination(Chat), fail: true, @private: _private);
+        }
+
+        private void FuseWithOtherPack(GenerationPack source)
+        {
+            Baka.Fuse(source);
+            GoodEnding();
+        }
+
+
+        private void ProcessEatingRequest(string[] args)
+        {
+            var name = string.Join(' ', args.Skip(1));
+            var files = GetFiles(GetHistoryFolder(), $"{name}.json");
+            if (files.Length == 0)
+            {
+                SendHistoric(new ListPagination(Chat), fail: true);
+            }
+            else
+            {
+                EatFromJsonFile(files[0]);
+                GoodEnding();
+            }
+        }
+
+        private void ProcessTextFile()
         {
             var path = UniquePath(Dir_History, _document!.FileName ?? "fuse.txt");
             Bot.DownloadFile(_document.FileId, path, Chat).Wait();
 
-            EatFromTxtFile(path);
+            EatFromTextFile(path);
             GoodEnding();
         }
 
@@ -90,6 +135,68 @@ namespace Witlesss.Commands.Packing
                 Bot.SendMessage(Chat, GetJsonFormatExample());
             }
         }
+
+        protected void EatFromJsonFile(string path)
+        {
+            var lines = JsonIO.LoadData<List<string>>(path);
+            EatAllLines(lines);
+        }
+
+        private void EatFromTextFile(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            EatAllLines(lines);
+
+            SaveJsonCopy(path, lines);
+        }
+
+        private void SaveJsonCopy(string path, string[] lines)
+        {
+            var directory = GetHistoryFolder();
+            Directory.CreateDirectory(directory);
+
+            var name = Path.GetFileNameWithoutExtension(path);
+            var save = UniquePath(directory, $"{name}.json");
+            JsonIO.SaveData(lines.ToList(), save);
+        }
+
+        private          void EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit, out _);
+        protected static void EatAllLines(IEnumerable<string> lines, Witless baka, int limit, out int eaten)
+        {
+            eaten = 0;
+            foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
+            {
+                if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
+                if (baka.Eat(line)) eaten++;
+            }
+        }
+
+        protected void GoodEnding()
+        {
+            SaveChanges(Baka, Title);
+            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
+        }
+
+        protected static void SaveChanges(Witless baka, string title)
+        {
+            Log($"{title} >> FUSION DONE", ConsoleColor.Magenta);
+            baka.Save();
+        }
+
+        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, int count, string title)
+        {
+            var newSize = baka.FilePath.FileSizeInBytes();
+            var newCount = baka.Baka.DB.Vocabulary.Count;
+            var deltaSize = newSize - size;
+            var deltaCount = newCount - count;
+            var ns = newSize.ReadableFileSize();
+            var ds = deltaSize.ReadableFileSize();
+            var dc = BrowseReddit.FormatSubs(deltaCount, "💨");
+            return string.Format(FUSE_SUCCESS_RESPONSE, title, ns, ds, dc);
+        }
+
+        #endregion
+
 
         #region LISTING
 
@@ -167,101 +274,6 @@ namespace Witlesss.Commands.Packing
                 var size = file.Length.ReadableFileSize();
                 yield return $"<code>{name}</code> | {size}";
             }
-        }
-
-        #endregion
-
-
-        #region FUSION
-
-        private const string HOLY_MOLY = "CAACAgIAAxkBAAI062a2Yi7myiBzNob7ftdyivXXEdJjAAKYDAACjdb4SeqLf5UfqK3dNQQ";
-
-        private void FuseWitlessDB(string arg)
-        {
-            var argIsChatId = long.TryParse(arg, out var chat);
-            if (chat == Chat)
-            {
-                Bot.SendSticker(Chat, new InputOnlineFile(HOLY_MOLY));
-                return;
-            }
-
-            if (argIsChatId && ChatsDealer.WitlessExist(chat, out var baka))
-            {
-                FuseWithWitlessDB(baka.Baka.DB);
-            }
-            else if (GetFiles(GetFuseFolder(_private), $"{arg}.json") is { Length: > 0 } files)
-            {
-                FuseWithWitlessDB(JsonIO.LoadData<GenerationPack>(files[0]));
-            }
-            else if (argIsChatId) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
-            else SendFuseList(new ListPagination(Chat), fail: true, @private: _private);
-        }
-
-        private void FuseWithWitlessDB(GenerationPack source)
-        {
-            Baka.Fuse(source);
-            GoodEnding();
-        }
-
-        private void EatFromTxtFile(string path)
-        {
-            var lines = File.ReadAllLines(path);
-            EatAllLines(lines);
-
-            var directory = GetHistoryFolder();
-            Directory.CreateDirectory(directory);
-
-            var name = Path.GetFileNameWithoutExtension(path);
-            var save = UniquePath(directory, $"{name}.json");
-            JsonIO.SaveData(lines.ToList(), save);
-        }
-
-        protected void EatFromJsonFile(string path)
-        {
-            var lines = JsonIO.LoadData<List<string>>(path);
-            EatAllLines(lines);
-        }
-
-        private          void EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit, out _);
-        protected static void EatAllLines(IEnumerable<string> lines, Witless baka, int limit, out int eaten)
-        {
-            eaten = 0;
-            foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
-            {
-                if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
-                if (baka.Eat(line)) eaten++;
-            }
-        }
-
-        private static readonly Regex _wordLimit = new(@"^\/\S+?(\d+)");
-
-        protected void GetWordsPerLineLimit()
-        {
-            Limit = _wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
-        }
-
-        protected void GoodEnding()
-        {
-            SaveChanges(Baka, Title);
-            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
-        }
-
-        protected static void SaveChanges(Witless baka, string title)
-        {
-            Log($"{title} >> FUSION DONE", ConsoleColor.Magenta);
-            baka.Save();
-        }
-
-        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, int count, string title)
-        {
-            var newSize = baka.FilePath.FileSizeInBytes();
-            var newCount = baka.Baka.DB.Vocabulary.Count;
-            var deltaSize = newSize - size;
-            var deltaCount = newCount - count;
-            var ns = newSize.ReadableFileSize();
-            var ds = deltaSize.ReadableFileSize();
-            var dc = BrowseReddit.FormatSubs(deltaCount, "💨");
-            return string.Format(FUSE_SUCCESS_RESPONSE, title, ns, ds, dc);
         }
 
         #endregion

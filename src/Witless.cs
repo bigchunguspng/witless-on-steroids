@@ -190,6 +190,7 @@ namespace Witlesss
 
         // FUSE / DELETE
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Fuse(GenerationPack pack)
         {
             Backup();
@@ -214,7 +215,7 @@ namespace Witlesss
 
             SaveChanges();
             var file = new FileInfo(FilePath);
-            if (file.Length >= 10_000_000) return; // don't backup big ones
+            if (file.Length >= 4_000_000) return; // don't backup big ones
 
             var date = DateTime.Now.ToString("yyyy-MM-dd");
             var name = $"{Prefix_Pack}-{Chat}.json";

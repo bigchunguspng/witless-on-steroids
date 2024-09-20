@@ -138,11 +138,12 @@ public static class Texts
         Console Commands:
 
         s   - save and exit
-        +55 - select active chat
 
         /s  - save packs
+        /p  - packs info
+        /pp - packs info (full)
 
-        /l  - activate last chat
+        +55 - select active chat
 
         /db - delete blockers
         /DB - delete active if blocked

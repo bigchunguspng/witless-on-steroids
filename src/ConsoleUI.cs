@@ -56,12 +56,13 @@ namespace Witlesss
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) ChatsDealer.SaveBakas();
+            else if (_input == "/p" ) PacksInfo();
+            else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
             else if (_input == "/cc") ClearTempFiles();
             else if (_input == "/cp") ClearDic(Active);
-            else if (_input == "/l" ) ActivateLastChat();
             else if (_input == "/b" ) Thor.  BanChat(_active);
             else if (_input == "/ub") Thor.UnbanChat(_active);
             else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var a1)) DeleteBySize(a1);
@@ -72,8 +73,8 @@ namespace Witlesss
 
         private void SetActiveChat()
         {
-            string shit = _input![1..];
-            foreach (long chat in SussyBakas.Keys)
+            var shit = _input![1..];
+            foreach (var chat in SussyBakas.Keys)
             {
                 if (chat.ToString().EndsWith(shit))
                 {
@@ -101,11 +102,20 @@ namespace Witlesss
             }
         }
 
-        private void ActivateLastChat()
+        private void PacksInfo()
         {
-            var context = Bot.Router.Context;
-            _active = context.Chat;
-            Log($"ACTIVE CHAT >> {_active} ({context.Title})");
+            var loaded = ChatsDealer.SussyBakas.Values.Count(x => x.Loaded);
+            var total = ChatsDealer.SussyBakas.Count;
+            Log($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
+        }
+
+        private void PacksInfoFull()
+        {
+            PacksInfo();
+            foreach (var pair in ChatsDealer.SussyBakas.Where(x => x.Value.Loaded))
+            {
+                Log($"{pair.Key}", ConsoleColor.DarkYellow);
+            }
         }
 
         private static void ClearDic(Witless witless)

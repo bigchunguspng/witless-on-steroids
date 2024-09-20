@@ -39,7 +39,7 @@
             if (s is null) return GetRandomLetterCase();
             if (s == s.ToLower()) return LetterCase.Lower;
             if (s == s.ToUpper()) return LetterCase.Upper;
-            return GetRandomLetterCase();
+            return IsOneIn(8) ? LetterCase.Upper : LetterCase.Sentence;
         }
 
         protected static void LogXD(string title, int repeats, string s)

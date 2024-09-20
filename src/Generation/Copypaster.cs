@@ -279,7 +279,10 @@ namespace Witlesss.Generation
             separated = false;
 
             var id = DB.GetID_ByWord(word);
-            if (id != GenerationPack.NO_WORD) return id;
+            if (id != GenerationPack.NO_WORD)
+            {
+                return id;
+            }
 
             // word is not a part of the vocabulary
 
@@ -294,23 +297,42 @@ namespace Witlesss.Generation
                 // word is not a part of the vocabulary + is separated by space;
             }
 
-            // E lisba -> megalisba S lisba -> lisball
-            if (HasWordsSimilarTo(word, backwards, out var words)) return RandomWordID(words);
+            // S lisba ->     [lisba]ngelion
+            // E lisba -> mega[lisba]
+            if (HasWordsSimilarTo(word, backwards, out var words))
+            {
+                return RandomWordID(words);
+            }
 
             if (word.Length > 2 && backwards ? word.StartsWith("..") : word.EndsWith(".."))
             {
-                // E ...ba -> booBA S lisb... -> LISBowski
-                if (HasWordsSimilarTo(word.Trim('.'), backwards, out words)) return RandomWordID(words); 
+                // S lisb.. -> [lisb]owski
+                // E ...ba  -> boo[ba]
+                if (HasWordsSimilarTo(word.Trim('.'), backwards, out words))
+                {
+                    return RandomWordID(words);
+                }
             }
-            if (word.Length > 3)
-            {
-                // E lisba -> so_SBA S lisba -> LISik
-                var part = backwards ? word[^3..] : word.Remove(3);
-                if (HasWordsSimilarTo(part, backwards, out words)) return RandomWordID(words); 
-            }
+
             if (word.Length > 1)
             {
-                // E lisba -> a S lisba -> lisb
+                // S lisba -> [lis]ik     [li]thium    [l]mao
+                // E lisba -> so_[sba]    yo[ba]       sigm[a]
+                var start = Math.Min(word.Length - 1, 3);
+                for (var i = start; i >= 1; i--)
+                {
+                    var part = backwards ? word[^i..] : word.Remove(i);
+                    if (HasWordsSimilarTo(part, backwards, out words))
+                    {
+                        return RandomWordID(words);
+                    }
+                }
+            }
+
+            if (word.Length > 1)
+            {
+                // S lisba -> lisb
+                // E lisba -> a
                 if (HasWordsSimilarTo(word, backwards, out words, normalWay: false)) 
                 {
                     return DB.GetID_ByWord(words.First(x => x.Length == words.Max(s => s.Length)));

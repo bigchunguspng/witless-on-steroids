@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Telegram.Bot.Types.ReplyMarkups;
 using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
@@ -58,10 +57,7 @@ namespace Witlesss.Commands.Packing
                 }
                 else
                 {
-                    if (name == "*")
-                        foreach (var file in files)
-                            EatFromJsonFile(file);
-                    else    EatFromJsonFile(files[0]);
+                    EatFromJsonFile(files[0]);
                     GoodEnding();
                 }
             }
@@ -97,11 +93,11 @@ namespace Witlesss.Commands.Packing
 
         #region LISTING
 
-        private record FusionListData(string Available, string Object, string Key, string Optional);
+        private record FusionListData(string Available, string Object, string Key);
 
-        private readonly FusionListData ExtraDBp = new("📂 Публичные словари", "словаря", "fi", "");
-        private readonly FusionListData ExtraDBs = new("🔐 Приватные словари", "словаря", "f!", "");
-        private readonly FusionListData Historic = new("🔐 Архив файлов", "файла", "f*", FUSE_HIS_ALL);
+        private readonly FusionListData ExtraDBp = new("📂 Публичные словари", "словаря", "fi");
+        private readonly FusionListData ExtraDBs = new("🔐 Приватные словари", "словаря", "f!");
+        private readonly FusionListData Historic = new("🔐 Архив файлов",      "файла",   "f*");
 
         public void HandleCallback(CallbackQuery query, string[] data)
         {
@@ -134,7 +130,6 @@ namespace Witlesss.Commands.Packing
 
             var files = GetFilesInfo(directory);
             var oneshot = files.Length < perPage;
-            var empty = files.Length == 0;
 
             var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
             var sb = new StringBuilder();
@@ -151,7 +146,7 @@ namespace Witlesss.Commands.Packing
                 sb.Append("весит ").Append(path.ReadableFileSize());
             else
                 sb.Append("пуст");
-            if (!empty) sb.Append(data.Optional);
+
             if (!oneshot) sb.Append(USE_ARROWS);
 
             var buttons = oneshot ? null : GetPaginationKeyboard(page, perPage, lastPage, data.Key);

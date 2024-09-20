@@ -514,9 +514,6 @@ public static class Texts
         🏠 - я, 🚜 - ты
         """;
 
-    public const string FUSE_HIS_ALL =
-        "\n\n<code>/fuse * *</code> - скормить всё сразу";
-
     public const string ONLY_ARRAY_JSON =
         "Годятся только <b>JSON</b>-файлы, в виде <b>списка строк</b>, например:";
 

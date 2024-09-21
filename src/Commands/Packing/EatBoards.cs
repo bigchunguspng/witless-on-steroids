@@ -7,21 +7,21 @@ using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Commands.Packing
 {
+    //      /boards
+    //      /boards info  <┬─ SAME
+    //      /board  info  <┘
+    //      /board Y-M-D a.N.json
+    //      /board [thread/archive/archive link]
+
     public class EatBoards : Fuse
     {
-        private readonly BoardService _chan = new();
-        private List<BoardService.BoardGroup>? _boards;
-
+        private static readonly BoardService _chan = new();
         private static readonly SyncronizedDictionary<long, string> _names = new();
 
-        private List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);
+        private static List<BoardService.BoardGroup>? _boards;
+        private static List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);
 
-        // /boards
-        // /boards info  <┬─ SAME
-        // /board  info  <┘
-        // /board Y-M-D a.N.json
-        // /board [thread/archive/archive link]
-        protected override void RunAuthorized()
+        protected override async Task RunAuthorized()
         {
             if (Args is null)
             {
@@ -35,33 +35,33 @@ namespace Witlesss.Commands.Packing
                 if (Args.EndsWith("info"))
                     SendSavedList(new ListPagination(Chat, PerPage: 10));
                 else
-                    EatBoard();
+                    await EatBoard();
             }
         }
 
-        private void EatBoard()
+        private async Task EatBoard()
         {
             MeasureDick();
             GetWordsPerLineLimit();
 
             var args = Args.SplitN();
-            if (args.Length > 1) EatJsonFile();
-            else                 EatOnlineData(url: args[0]);
+            if (args.Length > 1) await EatJsonFile();
+            else                 await EatOnlineData(url: args[0]);
         }
 
-        private void EatJsonFile()
+        private async Task EatJsonFile()
         {
             var files = GetFiles(Dir_Board, $"{Args}.json");
             if (files.Length > 0)
             {
-                EatFromJsonFile(files[0]);
+                await EatFromJsonFile(files[0]);
                 GoodEnding();
             }
             else
                 Bot.SendMessage(Chat, FUSE_FAIL_BOARD);
         }
 
-        private void EatOnlineData(string url)
+        private async Task EatOnlineData(string url)
         {
             var uri = UrlOrBust(ref url);
 
@@ -74,7 +74,7 @@ namespace Witlesss.Commands.Packing
                 var threads = _chan.GetArchivedThreads(url);
                 var tasks = threads.Select(x => GetDiscussionAsync("https://" + uri.Host + x)).ToList();
 
-                RespondAndStartEating(tasks);
+                await RespondAndStartEating(tasks);
             }
             else if (url.Contains("/thread/"))
             {
@@ -82,7 +82,7 @@ namespace Witlesss.Commands.Packing
 
                 var replies = _chan.GetThreadDiscussion(url).ToList();
 
-                EatMany(replies, Baka, Size, Chat, Title, Limit);
+                await EatMany(replies, Context, Size, Limit);
             }
             else // BOARD
             {
@@ -91,7 +91,7 @@ namespace Witlesss.Commands.Packing
                 var threads = _chan.GetThreads(url);
                 var tasks = threads.Select(x => GetDiscussionAsync(url + x)).ToList();
 
-                RespondAndStartEating(tasks);
+                await RespondAndStartEating(tasks);
             }
         }
 
@@ -102,13 +102,13 @@ namespace Witlesss.Commands.Packing
             return Task.Run(() => _chan.GetThreadDiscussion(url).ToList());
         }
 
-        private void RespondAndStartEating(List<Task<List<string>>> tasks)
+        private async Task RespondAndStartEating(List<Task<List<string>>> tasks)
         {
             var ikuzo = tasks.Count > 60 ? "Начинаю поглощение интернета 😈" : "頂きます！😋🍽";
             var text = string.Format(BOARD_START, tasks.Count, ikuzo);
             if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
             var message = Bot.PingChat(Chat, text);
-            Bot.RunSafelyAsync(EatBoardDiscussion(Context, tasks, Limit), Chat, message);
+            await Bot.RunOrThrow(EatBoardDiscussion(Context, tasks, Limit), Chat, message);
         }
 
 
@@ -120,14 +120,16 @@ namespace Witlesss.Commands.Packing
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 
-            EatMany(lines, c.Baka, size, c.Chat, c.Title, limit);
+            await EatMany(lines, c, size, limit);
         }
 
-        private static void EatMany(List<string> lines, Witless baka, long size, long chat, string title, int limit)
+        private static async Task EatMany(List<string> lines, WitlessContext c, long size, int limit)
         {
+            var (baka, chat, title) = (c.Baka, c.Chat, c.Title);
+
             var count = baka.Baka.DB.Vocabulary.Count;
 
-            EatAllLines(lines, baka, limit, out _);
+            await EatAllLines(lines, baka, limit);
             SaveChanges(baka, title);
 
             JsonIO.SaveData(lines, GetFileName(chat));
@@ -150,7 +152,34 @@ namespace Witlesss.Commands.Packing
 
         private static bool IsBoardOrArchive(string name) => !name.Contains('.') || name.Contains(".zip");
 
-        public new void HandleCallback(CallbackQuery query, string[] data)
+        private Uri UrlOrBust(ref string url)
+        {
+            try
+            {
+                if (!url.Contains('/'))
+                {
+                    var ending = $"/{url}/";
+                    var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();
+                    var match = urls.FirstOrDefault(x => x.EndsWith(ending));
+                    if (match != null)
+                    {
+                        url = match;
+                    }
+                }
+
+                return new Uri(url);
+            }
+            catch
+            {
+                Bot.SendMessage(Chat, "Dude, wrong URL 👉😄");
+                throw;
+            }
+        }
+
+
+        // LISTING
+
+        public new static void HandleCallback(CallbackQuery query, string[] data)
         {
             var pagination = query.GetPagination(data);
 
@@ -158,7 +187,7 @@ namespace Witlesss.Commands.Packing
             else                SendSavedList(pagination);
         }
 
-        private void SendBoardList(ListPagination pagination)
+        private static void SendBoardList(ListPagination pagination)
         {
             var (chat, messageId, page, perPage) = pagination;
 
@@ -186,7 +215,7 @@ namespace Witlesss.Commands.Packing
             Bot.SendOrEditMessage(chat, text, messageId, buttons);
         }
 
-        private void SendSavedList(ListPagination pagination)
+        private static void SendSavedList(ListPagination pagination)
         {
             var (chat, messageId, page, perPage) = pagination;
 
@@ -204,7 +233,7 @@ namespace Witlesss.Commands.Packing
             Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
         }
 
-        private new static IEnumerable<string> JsonList(FileInfo[] files, int page = 0, int perPage = 10)
+        private static IEnumerable<string> JsonList(FileInfo[] files, int page = 0, int perPage = 10)
         {
             if (files.Length == 0)
             {
@@ -246,46 +275,25 @@ namespace Witlesss.Commands.Packing
             Converters = { new ThreadSubjectConverter() }
         };
 
-        private Uri UrlOrBust(ref string url)
+        private class ThreadSubjectConverter : JsonConverter<List<string>>
         {
-            try
+            public override void WriteJson
+                (JsonWriter writer, List<string> value, JsonSerializer serializer)
+                => throw new NotImplementedException();
+
+            /// <summary>
+            /// Returns only the first string from the list.
+            /// </summary>
+            public override List<string> ReadJson
+                (JsonReader reader, Type type, List<string> list, bool hasValue, JsonSerializer serializer)
             {
-                if (!url.Contains('/'))
+                while (reader.Read())
                 {
-                    var ending = $"/{url}/";
-                    var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();
-                    var match = urls.FirstOrDefault(x => x.EndsWith(ending));
-                    if (match != null)
-                    {
-                        url = match;
-                    }
+                    if (reader.TokenType == JsonToken.String) return [(string)reader.Value];
                 }
 
-                return new Uri(url);
+                return [];
             }
-            catch
-            {
-                Bot.SendMessage(Chat, "Dude, wrong URL 👉😄");
-                throw;
-            }
-        }
-    }
-
-    public class ThreadSubjectConverter : JsonConverter<List<string>>
-    {
-        public override void WriteJson
-            (JsonWriter writer, List<string> value, JsonSerializer serializer)
-            => throw new NotImplementedException();
-
-        public override List<string> ReadJson
-            (JsonReader reader, Type type, List<string> list, bool hasValue, JsonSerializer serializer)
-        {
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonToken.String) return [(string)reader.Value];
-            }
-
-            return [];
         }
     }
 }

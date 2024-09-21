@@ -4,14 +4,14 @@
 
 namespace Witlesss.Commands.Packing
 {
-    public class EatReddit : Fuse // todo uninherit it from fuse and make it witless async
+    public class EatReddit : Fuse
     {
         private readonly Regex _que = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
         private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
         private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
 
         // input: /xd [search query] [subreddit*] [-ops]
-        protected override void RunAuthorized()
+        protected override async Task RunAuthorized()
         {
             var args = Args ?? "";
             var que = _que.Match(args);
@@ -45,7 +45,7 @@ namespace Witlesss.Commands.Packing
                 }
 
                 var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                Bot.RunSafelyAsync(EatComments(Context, query, Size, Limit), Chat, message);
+                await Bot.RunOrThrow(EatComments(Context, query, Size, Limit), Chat, message);
             }
             else
             {
@@ -61,13 +61,13 @@ namespace Witlesss.Commands.Packing
 
             var count = c.Baka.Baka.DB.Vocabulary.Count;
 
-            EatAllLines(comments, c.Baka, limit, out var eated);
+            var commentsEaten = await EatAllLines(comments, c.Baka, limit);
             SaveChanges(c.Baka, c.Title);
 
             var report = FUSION_SUCCESS_REPORT(c.Baka, size, count, c.Title);
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
-            var detais = $"\n\n Его пополнили {eated} комментов с {subreddit}";
+            var detais = $"\n\n Его пополнили {commentsEaten} комментов с {subreddit}";
             Bot.SendMessage(c.Chat, report + detais);
         }
     }

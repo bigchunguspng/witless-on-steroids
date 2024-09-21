@@ -20,3 +20,21 @@ public abstract class SettingsCommand : WitlessSyncCommand
 
     protected abstract void RunAuthorized();
 }
+
+/// <summary> <inheritdoc cref="SettingsCommand"/> </summary>
+public abstract class AsyncSettingsCommand : WitlessAsyncCommand
+{
+    private async Task<bool> SenderIsSus()
+    {
+        return Baka.AdminsOnly && await Message.SenderIsAdmin() == false;
+    }
+
+    protected override async Task Run()
+    {
+        if (await SenderIsSus()) return;
+
+        await RunAuthorized();
+    }
+
+    protected abstract Task RunAuthorized();
+}

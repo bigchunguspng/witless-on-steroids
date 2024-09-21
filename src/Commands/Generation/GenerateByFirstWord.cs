@@ -1,10 +1,10 @@
 ﻿namespace Witlesss.Commands.Generation
 {
-    public class GenerateByFirstWord : WitlessSyncCommand
+    public class GenerateByFirstWord : WitlessAsyncCommand
     {
         private static readonly Regex _repeat = new(@"^\/a\S*([2-9])\S*");
 
-        protected override void Run()
+        protected override async Task Run()
         {
             string word = null!, opening = null!;
             var byWord = Args != null;
@@ -24,12 +24,17 @@
 
             var up = Command!.Contains("up");
             var repeats = _repeat.ExtractGroup(1, Command!, int.Parse, 1);
+            var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
-                var mode = up ? LetterCase.Upper : GetMode(Args);
-                var message = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
-                Bot.SendMessage(Chat, message.InLetterCase(mode), preview: true);
+                var text = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
+                texts[i] = text.InLetterCase(up ? LetterCase.Upper : GetMode(Args));
             }
+
+            await Task.Run(() =>
+            {
+                foreach (var text in texts) Bot.SendMessage(Chat, text, preview: true);
+            });
 
             LogXD(Title, repeats, "FUNNY BY WORD");
         }

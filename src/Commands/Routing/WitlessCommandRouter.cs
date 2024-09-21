@@ -10,13 +10,8 @@ namespace Witlesss.Commands.Routing;
 public class WitlessCommandRouter : WitlessSyncCommand
 {
     private readonly ChatInfo _chat = new();
-    private readonly GenerateByFirstWord _generate = new();
-    private readonly GenerateByLastWord _generateB = new();
     private readonly Bouhourt _bouhourt = new();
     private readonly Move _move = new();
-    private readonly Fuse _fuse = new();
-    private readonly EatBoards _boards = new();
-    private readonly EatReddit _comments = new();
     private readonly Set _set = new();
     private readonly SetSpeech _speech = new();
     private readonly SetPics _pics = new();
@@ -51,8 +46,11 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("meme"    , () => new MakeMeme())
             .Register("top"     , () => new Top())
             .Register("nuke"    , () => new Nuke())
-            .Register("a"       , () => _generate)
-            .Register("zz"      , () => _generateB)
+            .Register("a"       , () => new GenerateByFirstWord())
+            .Register("zz"      , () => new GenerateByLastWord())
+            .Register("fuse"    , () => new Fuse())
+            .Register("board"   , () => new EatBoards())
+            .Register("xd"      , () => new EatReddit())
             .Register("b"       , () => _bouhourt)
             .Register("set"     , () => _set)
             .Register("speech"  , () => _speech)
@@ -60,11 +58,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("pics"    , () => _pics)
             .Register("stickers", () => _stickers)
             .Register("chat"    , () => _chat)
-            .Register("fuse"    , () => _fuse)
             .Register("pub"     , () => _move.WithMode(ExportMode.Public))
             .Register("move"    , () => _move.WithMode(ExportMode.Private))
-            .Register("board"   , () => _boards)
-            .Register("xd"      , () => _comments)
             .Register("delete"  , () => _delete)
             .Register("admins"  , () => _admins)
             .Build();
@@ -120,8 +115,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
     public void OnCallback(CallbackQuery query)
     {
         var data = query.GetData();
-        if      (data[0].StartsWith('b')) _boards.HandleCallback(query, data);
-        else if (data[0].StartsWith('f')) _fuse  .HandleCallback(query, data);
+        if      (data[0].StartsWith('b')) EatBoards.HandleCallback(query, data);
+        else if (data[0].StartsWith('f')) Fuse     .HandleCallback(query, data);
         else if (data[0] == "del")
         {
             query.Message!.From = query.From;

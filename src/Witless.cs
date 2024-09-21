@@ -182,7 +182,7 @@ namespace Witlesss
 
         private bool IsUselessEnough()
         {
-            var limitReached = _uselessness + 1 >= MAX_USELESSNESS_BEFORE_UNLOAD;
+            var limitReached = ++_uselessness >= MAX_USELESSNESS_BEFORE_UNLOAD;
             if (limitReached)  _uselessness = 0;
 
             return limitReached;

@@ -140,9 +140,12 @@ namespace Witlesss
                 }
             }
         }
-        
-        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendPhotoAsync    (chat, photo, caption));
-        public void SendAnimaXD(long chat, InputOnlineFile photo, string caption) => SendOrThrow(Client.SendAnimationAsync(chat, photo, caption: caption));
+
+        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) 
+            => SendOrThrow(Client.SendPhotoAsync    (chat, photo, caption));
+
+        public void SendAnimaXD(long chat, InputOnlineFile photo, string caption) 
+            => SendOrThrow(Client.SendAnimationAsync(chat, photo, caption: caption));
 
         private static void SendOrThrow(Task task)
         {

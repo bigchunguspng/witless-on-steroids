@@ -56,7 +56,7 @@ public class Spam : SyncCommand
 
     private static IEnumerable<Witless> GetBakas(int minSize, bool groupsOnly, TimeSpan lastActivity)
     {
-        return ChatsDealer.SussyBakas.Values.Where(x =>
+        return ChatService.SussyBakas.Values.Where(x =>
         {
             var path = x.FilePath;
             if (File.Exists(path))

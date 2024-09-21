@@ -5,7 +5,7 @@
         protected override void RunAuthorized()
         {
             Baka.Stickers = !Baka.Stickers;
-            ChatsDealer.SaveChatList();
+            ChatService.SaveChatsDB();
             Bot.SendMessage(Chat, string.Format(STICKERS_RESPONSE, Baka.Stickers ? "" : "<b>НЕ</b> ").XDDD());
         }
     }

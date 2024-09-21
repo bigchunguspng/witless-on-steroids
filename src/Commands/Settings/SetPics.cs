@@ -7,18 +7,13 @@ public class SetPics : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Baka.Pics = value.ClampByte();
-            ChatsDealer.SaveChatList();
+            ChatService.SaveChatsDB();
             Bot.SendMessage(Chat, string.Format(SET_P_RESPONSE, Baka.Pics).XDDD());
             Log($"{Title} >> MEME CHANCE >> {Baka.Pics}%");
         }
         else
         {
-            var message =
-                $"""
-                 Вероятность мемчиков: {Baka.Pics}%
-
-                 Изменить: <code>/pics {RandomInt(0, 100)}</code>
-                 """;
+            var message = string.Format(SET_X_GUIDE, "Вероятность мемчиков", Baka.Pics, "pics", RandomInt(0, 100));
             Bot.SendMessage(Chat, message);
         }
     }

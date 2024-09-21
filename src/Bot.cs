@@ -14,17 +14,39 @@ namespace Witlesss
         public static string Username { get; private set; } = null!;
         public static Bot    Instance { get; private set; } = null!;
 
-        public static void LaunchInstance(CommandAndCallbackRouter command) => new Bot(command).Run();
+        public static void LaunchInstance
+            (CommandAndCallbackRouter command)
+            => new Bot(command).Run();
 
         private Bot(CommandAndCallbackRouter command)
         {
-            Client = new TelegramBotClient(Config.TelegramToken);
+            Client       = new TelegramBotClient(Config.TelegramToken);
+            Me           = GetMe();
+            Username     = $"@{Me.Username!.ToLower()}";
+            Instance     = this;
+            Router       = command;
+            ThorRagnarok = new BanHammer();
+        }
+
+        private void Run()
+        {
+            ThorRagnarok.GiveBans();
+            ClearTempFiles();
+
+            StartListening();
+            ChatService.StartAutoSaveAsync(TimeSpan.FromMinutes(2));
+
+            new ConsoleUI().EnterConsoleLoop();
+        }
+
+
+        private User GetMe()
+        {
             while (true)
             {
                 try
                 {
-                    Me = Client.GetMeAsync().Result;
-                    break;
+                    return Client.GetMeAsync().Result;
                 }
                 catch (Exception e)
                 {
@@ -32,25 +54,6 @@ namespace Witlesss
                     Task.Delay(5000).Wait();
                 }
             }
-
-            Router = command;
-
-            Instance = this;
-            Username = $"@{Me.Username!.ToLower()}";
-
-            ThorRagnarok = new BanHammer();
-        }
-
-        private void Run()
-        {
-            ThorRagnarok.GiveBans();
-
-            ClearTempFiles();
-
-            StartListening();
-            ChatsDealer.StartAutoSaveLoop(minutes: 2);
-
-            new ConsoleUI().EnterConsoleLoop();
         }
     }
 }

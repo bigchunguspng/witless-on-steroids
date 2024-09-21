@@ -34,8 +34,8 @@ namespace Witlesss
         }
         private void SaveBanList() => JsonIO.SaveData(BannedChats, File_Bans);
 
-        private bool  ChatIsBaka(long chat) => ChatsDealer.SussyBakas.ContainsKey(chat);
-        private Witless BakaFrom(long chat) => ChatsDealer.SussyBakas[chat];
+        private bool  ChatIsBaka(long chat) => ChatService.SussyBakas.ContainsKey(chat);
+        private Witless BakaFrom(long chat) => ChatService.SussyBakas[chat];
 
 
         public  void GiveBans() => BannedChats.Keys.Where(ChatIsBaka).ForEach(chat => BakaFrom(chat).Banned = true);

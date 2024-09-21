@@ -22,7 +22,7 @@
                 if (match.Success) action(match.Groups[1].Value);
                 else
                 {
-                    LogError($"Please add {prop} to {File_Config} and restart the app.");
+                    LogError($"Please add \"{prop}\" to \"{File_Config}\" and restart the app.");
                     Console.ReadKey();
                 }
             }

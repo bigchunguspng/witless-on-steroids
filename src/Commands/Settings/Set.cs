@@ -28,13 +28,13 @@ namespace Witlesss.Commands.Settings
 
                 if (typeWasChanged)
                 {
-                    ChatsDealer.SaveChatList();
+                    ChatService.SaveChatsDB();
                     Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Type]).XDDD());
                     Log($"{Title} >> MEMES TYPE >> {Baka.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
-                    ChatsDealer.SaveChatList();
+                    ChatService.SaveChatsDB();
                     Bot.SendMessage(Chat, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
                     Log($"{Title} >> MEMES OPTIONS");
                 }

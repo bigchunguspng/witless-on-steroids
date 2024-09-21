@@ -18,8 +18,8 @@ namespace Witlesss.Commands.Packing
 
             if (result == "*") result = "*👊 никак*";
 
-            ChatsDealer.RemoveChat(Chat);
-            ChatsDealer.SaveChatList();
+            ChatService.RemoveChat(Chat);
+            ChatService.SaveChatsDB();
 
             Baka.DeleteForever();
 
@@ -68,7 +68,7 @@ namespace Witlesss.Commands.Packing
 
         public void DoGameStep(Message message, string data)
         {
-            Context = WitlessContext.FromMessage(message, ChatsDealer.SussyBakas[message.Chat.Id]);
+            Context = WitlessContext.FromMessage(message, ChatService.SussyBakas[message.Chat.Id]);
 
             var split = data.Split(" - ");
             var num = split[1].Split(':');

@@ -74,7 +74,7 @@ namespace Witlesss.Commands.Packing
                 return;
             }
 
-            if (argIsChatId && ChatsDealer.WitlessExist(chat, out var baka))
+            if (argIsChatId && chat.WitlessExist(out var baka))
             {
                 if (baka.Loaded) baka.SaveChanges();
 
@@ -252,7 +252,7 @@ namespace Witlesss.Commands.Packing
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = ChatsDealer.SussyBakas[pagination.Chat].FilePath;
+            var path = ChatService.SussyBakas[pagination.Chat].FilePath;
             if (File.Exists(path))
                 sb.Append("весит ").Append(path.ReadableFileSize());
             else

@@ -57,6 +57,13 @@ public static class Texts
     public const string FUSE_FAIL_CHAT =
         "К сожалению, у меня нет словаря этой беседы";
 
+    public const string SET_X_GUIDE =
+        """
+        {0}: {1}%
+
+        Изменить: <code>/{2} {3}</code>
+        """;
+
     public const string SET_FREQUENCY_RESPONSE =
         "я буду отвечать на {0}% сообщений";
 
@@ -121,7 +128,7 @@ public static class Texts
         "cтикеры {0}будут ставать мемами в случайном порядке";
 
     public const string ADMINS_RESPONSE =
-        "Параметры генерации смогут менять {0}";
+        "Менять настройки смогут {0}";
 
     public const string GROUPS_ONLY_COMAND =
         "Эта команда только для бесед 🤓";

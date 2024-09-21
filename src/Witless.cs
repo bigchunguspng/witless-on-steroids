@@ -21,14 +21,14 @@ namespace Witlesss
             Quality = jpg;
         }
 
-        public static Witless GetAverageBaka(CommandContext context)
+        public static Witless CreateBaka(CommandContext context)
         {
             var chance = Random.Shared.Next(4);
             var type = chance.IsEven()
-                ? MemeType.Meme
+                ? MemeType.Meme     // 50%
                 : (chance >> 1).IsEven()
-                    ? MemeType.Dg
-                    : MemeType.Dp;
+                    ? MemeType.Dg   // 25%
+                    : MemeType.Dp;  // 25%
 
             var witless = new Witless(context.Chat) { Type = type };
             if (context.ChatIsPrivate)

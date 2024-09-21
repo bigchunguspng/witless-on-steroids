@@ -11,7 +11,7 @@ namespace Witlesss
         private Bot Bot => Bot.Instance;
 
         private BanHammer Thor => Bot.ThorRagnarok;
-        private ChatList SussyBakas => ChatsDealer.SussyBakas;
+        private ChatList SussyBakas => ChatService.SussyBakas;
         private Witless Active => SussyBakas[_active];
 
         private IEnumerable<Witless> Bakas => SussyBakas.Values;
@@ -45,7 +45,7 @@ namespace Witlesss
         private void SaveAndExit()
         {
             Log("На выход…", ConsoleColor.Yellow);
-            ChatsDealer.SaveBakasBeforeExit();
+            ChatService.SaveBakasBeforeExit();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
@@ -55,7 +55,7 @@ namespace Witlesss
 
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) ChatsDealer.SaveBakas();
+            else if (_input == "/s" ) ChatService.SaveBakas();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/db") DeleteBlockers();
@@ -88,7 +88,7 @@ namespace Witlesss
         private void BreakFourthWall()
         {
             string text = _input!.Split (' ', 2)[1];
-            if (!ChatsDealer.WitlessExist(_active)) return;
+            if (!_active.WitlessExist()) return;
 
             if      (_input.StartsWith("/a ") && Active.Eat(text, out var eaten)) // add
             {
@@ -104,15 +104,15 @@ namespace Witlesss
 
         private void PacksInfo()
         {
-            var loaded = ChatsDealer.SussyBakas.Values.Count(x => x.Loaded);
-            var total = ChatsDealer.SussyBakas.Count;
+            var loaded = ChatService.SussyBakas.Values.Count(x => x.Loaded);
+            var total = ChatService.SussyBakas.Count;
             Log($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
         }
 
         private void PacksInfoFull()
         {
             PacksInfo();
-            foreach (var pair in ChatsDealer.SussyBakas.Where(x => x.Value.Loaded))
+            foreach (var pair in ChatService.SussyBakas.Where(x => x.Value.Loaded))
             {
                 Log($"{pair.Key}", ConsoleColor.DarkYellow);
             }
@@ -125,15 +125,15 @@ namespace Witlesss
 
         private void DeleteBlockers()
         {
-            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) ChatsDealer.RemoveChat(w.Chat);
-            ChatsDealer.SaveChatList();
+            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) ChatService.RemoveChat(w.Chat);
+            ChatService.SaveChatsDB();
         }
         private void DeleteBlocker()
         {
             if (DeleteBlocker(Active) == -1)
             {
-                ChatsDealer.RemoveChat(_active);
-                ChatsDealer.SaveChatList();
+                ChatService.RemoveChat(_active);
+                ChatService.SaveChatsDB();
             }
         }
         private int DeleteBlocker(Witless witless)
@@ -152,9 +152,9 @@ namespace Witlesss
                 if (witless.FilePath.FileSizeInBytes() > size) continue;
 
                 witless.BackupAndDelete();
-                ChatsDealer.RemoveChat(witless.Chat);
+                ChatService.RemoveChat(witless.Chat);
             }
-            ChatsDealer.SaveChatList();
+            ChatService.SaveChatsDB();
         }
     }
 }

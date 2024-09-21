@@ -32,7 +32,7 @@ public class Tell : SyncCommand
             if (textProvided)
             {
                 Bot.SendMessage(chat, args[1], preview: true, replyTo);
-                if (ChatsDealer.WitlessExist(chat, out var baka)) baka.Eat(args[1]);
+                if (chat.WitlessExist(out var baka)) baka.Eat(args[1]);
             }
             else
                 Bot.CopyMessage(chat, Chat, messageId, replyTo);

@@ -26,13 +26,13 @@ namespace Witlesss.Commands.Meme
         protected override Task Run() => RunInternal("meme");
 
         protected override bool ResultsAreRandom
-            => MemeGenerator.RandomTextColor || MemeGenerator.ExtraFonts.UseRandom;
+            => MemeGenerator.RandomTextColor || MemeGenerator.FontWizard.UseRandom;
 
         protected override void ParseOptions()
         {
             MemeGenerator.CustomColorBack.CheckAndCut(Request);
             MemeGenerator.CustomColorText.CheckAndCut(Request);
-            MemeGenerator.ExtraFonts     .CheckAndCut(Request);
+            MemeGenerator.FontWizard     .CheckAndCut(Request);
 
             MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 100);
             MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);

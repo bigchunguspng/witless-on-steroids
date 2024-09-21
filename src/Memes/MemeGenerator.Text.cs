@@ -7,7 +7,7 @@ namespace Witlesss.Memes;
 
 public partial class MemeGenerator
 {
-    public static readonly ExtraFonts ExtraFonts = new("meme");
+    public static readonly FontWizard FontWizard = new("meme");
 
 
     private float _startingFontSize;
@@ -20,8 +20,8 @@ public partial class MemeGenerator
 
     private void SetUpFonts()
     {
-        _fontFamily = ExtraFonts.GetFontFamily("im");
-        _fontStyle = ExtraFonts.GetFontStyle(_fontFamily);
+        _fontFamily = FontWizard.GetFontFamily("im");
+        _fontStyle = FontWizard.GetFontStyle(_fontFamily);
 
         _startingFontSize = GetStartingFontSize();
         ResizeFont(_startingFontSize);
@@ -30,7 +30,7 @@ public partial class MemeGenerator
     private void ResizeFont(float size)
     {
         _font = _fontFamily.CreateFont(size, _fontStyle);
-        _fontOffset = FontSize * ExtraFonts.GetFontDependentOffset();
+        _fontOffset = FontSize * FontWizard.GetFontDependentOffset();
     }
 
     private float GetDefaultFontFize () => Math.Min(_w, 1.5F * _h) / 10F;
@@ -38,7 +38,7 @@ public partial class MemeGenerator
     private float GetStartingFontSize()
     {
         var multiplier = FontMultiplier / 100F;
-        return Math.Max(GetDefaultFontFize() * multiplier, 15) * ExtraFonts.GetSizeMultiplier();
+        return Math.Max(GetDefaultFontFize() * multiplier, 15) * FontWizard.GetSizeMultiplier();
     }
 
 
@@ -114,16 +114,16 @@ public partial class MemeGenerator
         Origin = origin,
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies()
+        FallbackFontFamilies = FontWizard.GetFallbackFamilies()
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing();
+    private float GetLineSpacing() => FontWizard.GetLineSpacing();
 
     private PointF GetTextOrigin(string text, bool top, out float caseOffset)
     {
-        caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
+        caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
         var marginY = top ? _marginY : _h - _marginY;
         return new PointF(_w / 2F, marginY + _fontOffset - caseOffset);
     }

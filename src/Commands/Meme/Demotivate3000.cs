@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("dp");
 
-        protected override bool ResultsAreRandom => DynamicDemotivatorDrawer.ExtraFonts.UseRandom;
+        protected override bool ResultsAreRandom => DynamicDemotivatorDrawer.FontWizard.UseRandom;
 
         protected override void ParseOptions()
         {
@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Meme
             DynamicDemotivatorDrawer.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
             DynamicDemotivatorDrawer.CustomColor.CheckAndCut(Request);
-            DynamicDemotivatorDrawer.ExtraFonts .CheckAndCut(Request);
+            DynamicDemotivatorDrawer.FontWizard .CheckAndCut(Request);
 
             DynamicDemotivatorDrawer.WrapText   = !CheckAndCut(Request, _nowrap);
             DynamicDemotivatorDrawer.Minimalist =  CheckAndCut(Request, _small);

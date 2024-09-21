@@ -7,7 +7,7 @@
         protected override async Task Execute()
         {
             var argless = false;
-            var x = Cut.ParseArgs(Args?.Split());
+            var x = ArgumentParsing.GetCutTimecodes(Args?.Split());
             if (x.failed)
             {
                 if (Args is not null)

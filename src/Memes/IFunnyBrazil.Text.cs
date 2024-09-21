@@ -5,9 +5,9 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes;
 
-public partial class IFunnyApp
+public partial class IFunnyBrazil
 {
-    public static readonly ExtraFonts ExtraFonts = new("top");
+    public static readonly FontWizard FontWizard = new("top");
 
     private static Font _font = default!;
     private static FontFamily _fontFamily;
@@ -18,8 +18,8 @@ public partial class IFunnyApp
 
     private void SetUpFonts()
     {
-        _fontFamily = ExtraFonts.GetFontFamily(PreferSegoe ? "sg" : "ft");
-        _fontStyle = ExtraFonts.GetFontStyle(_fontFamily);
+        _fontFamily = FontWizard.GetFontFamily(PreferSegoe ? "sg" : "ft");
+        _fontStyle = FontWizard.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -32,7 +32,7 @@ public partial class IFunnyApp
         var multiplier = FontSizeMultiplier / 100F;
         var multiplierM = MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * ExtraFonts.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontWizard.GetSizeMultiplier();
     }
 
 
@@ -141,7 +141,7 @@ public partial class IFunnyApp
     {
         var k2 = UltraThinCard ? 0.1F : 1F;
         var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(FontSize * k * k2, min) * ExtraFonts.GetRelativeSize();
+        var extra = Math.Max(FontSize * k * k2, min) * FontWizard.GetRelativeSize();
         return (textHeight * k + extra).CeilingInt();
     }
 
@@ -157,12 +157,12 @@ public partial class IFunnyApp
         Origin = GetTextOrigin(),
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies(),
+        FallbackFontFamilies = FontWizard.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => FontWizard.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -185,8 +185,8 @@ public partial class IFunnyApp
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * ExtraFonts.GetFontDependentOffset();
-        _caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * FontWizard.GetFontDependentOffset();
+        _caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         Log($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}", ConsoleColor.DarkYellow);

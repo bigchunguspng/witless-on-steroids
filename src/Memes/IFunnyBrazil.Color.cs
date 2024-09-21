@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Witlesss.Memes;
 
-public partial class IFunnyApp
+public partial class IFunnyBrazil
 {
     private static readonly SolidBrush _white = new(Color.White);
     private static readonly SolidBrush _black = new(Color.Black);

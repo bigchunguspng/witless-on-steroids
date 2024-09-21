@@ -6,7 +6,7 @@ using FontSpecificData = (float size, float offset, float caps);
 
 namespace Witlesss.Memes.Shared
 {
-    public class ExtraFonts // todo rename since it is the main font source now
+    public class FontWizard
     {
         private static readonly Dictionary<string, FontFamily> _families;
         private static readonly IReadOnlyList<FontFamily> _fallbackDefault, _fallbackCo, _fallbackSg;
@@ -17,7 +17,7 @@ namespace Witlesss.Memes.Shared
 
         public bool UseRandom { get; private set; }
 
-        static ExtraFonts()
+        static FontWizard()
         {
             var files = Directory.GetFiles(Dir_Fonts).OrderBy(x => x).ToArray();
             var collection = new FontCollection();
@@ -55,7 +55,7 @@ namespace Witlesss.Memes.Shared
                     : _fallbackSg;
         }
 
-        public ExtraFonts
+        public FontWizard
         (
             [StringSyntax("Regex")] string cmdRegex,
             [StringSyntax("Regex")] string? x = null

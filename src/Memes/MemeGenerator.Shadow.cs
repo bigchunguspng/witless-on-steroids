@@ -15,7 +15,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
     {
         var shadowRealm = new Image<Rgba32>(textLayer.Width, textLayer.Height);
 
-        var pixelated = ExtraFonts.FontIsPixelated();
+        var pixelated = FontWizard.FontIsPixelated();
 
         var opacity = ShadowOpacity / 100F;
         var maxOpacity = (255 * opacity).RoundInt().ClampByte();

@@ -28,11 +28,11 @@ namespace Witlesss.Commands.Meme
 
         private bool RandomFontIsUsed
             => _mode == Wide
-                ? DemotivatorDrawer.ExtraFontsL.UseRandom
+                ? DemotivatorDrawer.FontWizardL.UseRandom
                 : DemotivatorDrawer.SingleLine
-                    ? DemotivatorDrawer.ExtraFontsS.UseRandom
-                    : DemotivatorDrawer.ExtraFontsA.UseRandom
-                   || DemotivatorDrawer.ExtraFontsB.UseRandom;
+                    ? DemotivatorDrawer.FontWizardS.UseRandom
+                    : DemotivatorDrawer.FontWizardA.UseRandom
+                   || DemotivatorDrawer.FontWizardB.UseRandom;
 
         protected override void ParseOptions()
         {
@@ -40,16 +40,16 @@ namespace Witlesss.Commands.Meme
 
             if (_mode == Wide)
             {
-                DemotivatorDrawer.ExtraFontsL.CheckAndCut(Request);
+                DemotivatorDrawer.FontWizardL.CheckAndCut(Request);
             }
             else if (DemotivatorDrawer.SingleLine)
             {
-                DemotivatorDrawer.ExtraFontsS.CheckAndCut(Request);
+                DemotivatorDrawer.FontWizardS.CheckAndCut(Request);
             }
             else
             {
-                DemotivatorDrawer.ExtraFontsA.CheckAndCut(Request);
-                DemotivatorDrawer.ExtraFontsB.CheckAndCut(Request);
+                DemotivatorDrawer.FontWizardA.CheckAndCut(Request);
+                DemotivatorDrawer.FontWizardB.CheckAndCut(Request);
             }
 
             DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);

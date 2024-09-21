@@ -78,6 +78,6 @@ namespace Witlesss.Commands.Core
 
     public abstract class CommandAndCallbackRouter : SyncCommand
     {
-        public abstract void OnCallback(CallbackQuery query); // todo something
+        public abstract void OnCallback(CallbackQuery query);
     }
 }

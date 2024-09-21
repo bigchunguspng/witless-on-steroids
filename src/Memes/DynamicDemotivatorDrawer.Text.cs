@@ -7,7 +7,7 @@ namespace Witlesss.Memes;
 
 public partial class DynamicDemotivatorDrawer
 {
-    public static readonly ExtraFonts ExtraFonts = new("dp");
+    public static readonly FontWizard FontWizard = new("dp");
 
     private static Font _font = default!;
     private static FontFamily _fontFamily;
@@ -18,8 +18,8 @@ public partial class DynamicDemotivatorDrawer
 
     private void SetUpFonts()
     {
-        _fontFamily = ExtraFonts.GetFontFamily("sg");
-        _fontStyle = ExtraFonts.GetFontStyle(_fontFamily);
+        _fontFamily = FontWizard.GetFontFamily("sg");
+        _fontStyle = FontWizard.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -32,7 +32,7 @@ public partial class DynamicDemotivatorDrawer
         var multiplier = FontSizeMultiplier / 100F;
         var multiplierM = MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * ExtraFonts.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontWizard.GetSizeMultiplier();
     }
 
 
@@ -44,7 +44,7 @@ public partial class DynamicDemotivatorDrawer
     {
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
-        var lineHeight = FontSize * ExtraFonts.GetRelativeSize() * GetLineSpacing();
+        var lineHeight = FontSize * FontWizard.GetRelativeSize() * GetLineSpacing();
         var textWidthLimit = (Minimalist ? 0.8F : 1.1F) * imageW;
 
         var k = 1F;
@@ -116,7 +116,7 @@ public partial class DynamicDemotivatorDrawer
         finally
         {
             ResizeFont(FontSize * k);
-            _textHeight = k * lineHeight * lineCount * ExtraFonts.GetSizeMultiplier();
+            _textHeight = k * lineHeight * lineCount * FontWizard.GetSizeMultiplier();
         }
 
         return text;
@@ -150,12 +150,12 @@ public partial class DynamicDemotivatorDrawer
         Origin = GetTextOrigin(),
         WrappingLength = fullW,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = ExtraFonts.GetFallbackFamilies(),
+        FallbackFontFamilies = FontWizard.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => ExtraFonts.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => FontWizard.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -180,8 +180,8 @@ public partial class DynamicDemotivatorDrawer
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * ExtraFonts.GetFontDependentOffset();
-        _caseOffset = FontSize * ExtraFonts.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * FontWizard.GetFontDependentOffset();
+        _caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         Log($"/dp >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);

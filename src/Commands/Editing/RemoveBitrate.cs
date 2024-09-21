@@ -24,7 +24,7 @@ namespace Witlesss.Commands.Editing
             Log($"{Title} >> DAMN [*]");
         }
 
-        private string CompressImage(string path) // todo compress stickers as webp
+        private string CompressImage(string path)
         {
             var output = GetOutPath(path);
             var exe = "magick";

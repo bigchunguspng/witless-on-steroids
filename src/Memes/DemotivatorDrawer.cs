@@ -15,10 +15,10 @@ namespace Witlesss.Memes
         public static bool SingleLine, AddLogo = true;
         public static bool BottomTextIsGenerated;
 
-        public static readonly ExtraFonts ExtraFontsL = new("d[vg]", "(?![-bi*])");
-        public static readonly ExtraFonts ExtraFontsS = new("dg",    "(?![-bi*])");
-        public static readonly ExtraFonts ExtraFontsA = new("dg",   "(&)");
-        public static readonly ExtraFonts ExtraFontsB = new("dg", @"(\*)");
+        public static readonly FontWizard FontWizardL = new("d[vg]", "(?![-bi*])");
+        public static readonly FontWizard FontWizardS = new("dg",    "(?![-bi*])");
+        public static readonly FontWizard FontWizardA = new("dg",   "(&)");
+        public static readonly FontWizard FontWizardB = new("dg", @"(\*)");
 
         private static readonly List<Logo> Logos = [];
 
@@ -168,10 +168,10 @@ namespace Witlesss.Memes
             var lower = type is TextType.Lower;
             var extraFonts = type switch
             {
-                TextType.Lower => ExtraFontsB,
-                TextType.Upper => ExtraFontsA,
-                TextType.Large => ExtraFontsL,
-                _              => ExtraFontsS,
+                TextType.Lower => FontWizardB,
+                TextType.Upper => FontWizardA,
+                TextType.Large => FontWizardL,
+                _              => FontWizardS,
             };
             var family = extraFonts.GetFontFamily(lower ? "co" : "ro");
             var style = extraFonts.GetFontStyle(family);

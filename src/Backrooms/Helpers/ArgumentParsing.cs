@@ -37,7 +37,24 @@ public static class ArgumentParsing
         return double.TryParse(arg.Replace('.', ','), out value);
     }
 
-    public static bool IsTimeSpan(this string text, out TimeSpan span)
+    public static (bool failed, TimeSpan start, TimeSpan length) GetCutTimecodes(string[]? s)
+    {
+        var zero = TimeSpan.Zero;
+
+        if (s is null) return (true, zero, zero);
+
+        var len = s.Length;
+        if     (len == 1 && s[0].IsTimeSpan(out var length)) return (false, zero,  length);      // [++]----]
+        if     (len >= 2 && s[0].IsTimeSpan(out var  start))
+        {
+            if (len == 3 && s[2].IsTimeSpan(out var    end)) return (false, start, end - start); // [-[++]--]
+            if             (s[1].IsTimeSpan(out     length)) return (false, start, length);      // [-[++]--]
+            else                                             return (false, start, zero);        // [-[+++++]
+        }
+        else                                                 return (true,  zero,  zero);        // [-------]
+    }
+
+    private static bool IsTimeSpan(this string text, out TimeSpan span)
     {
         span = TimeSpan.Zero;
         text = text.TrimStart('-');

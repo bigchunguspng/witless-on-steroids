@@ -9,7 +9,7 @@ using Witlesss.Memes.Shared;
 
 namespace Witlesss.Memes; // ReSharper disable InconsistentNaming
 
-public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
+public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 {
     // OPTIONS
 
@@ -150,7 +150,7 @@ public partial class IFunnyApp : MemeGeneratorBase, IMemeGenerator<string>
         // actual font size (same for same pic*text)
         var w = _w * 0.75F;
         var x = _w.Gap(w.RoundInt());
-        var fs = FontSize * ExtraFonts.GetRelativeSize();
+        var fs = FontSize * FontWizard.GetRelativeSize();
         var rect2 = new RectangleF(x, options.Origin.Y - _textOffset - fs / 2F, w, fs);
         image.Mutate(ctx => ctx.Fill(new SolidBrush(Color.Orange), rect2));
     }

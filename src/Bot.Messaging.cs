@@ -166,21 +166,6 @@ namespace Witlesss
             }
         }
 
-        public async Task RunSafelyAsync(Task task, long chat, int message)
-        {
-            try // todo move it to async command class: message - field
-            {
-                await task;
-                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
-            }
-            catch (Exception e)
-            {
-                LogError($"BRUH -> {e.GetFixedMessage()}");
-
-                if (message > 0) EditMessageOnError(chat, message);
-            }
-        }
-
         public void EditMessageOnError(long chat, int message)
         {
             EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");

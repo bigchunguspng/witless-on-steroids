@@ -7,7 +7,7 @@ namespace Witlesss.Commands.Meme
 {
     public class Top : MakeMemeCore<string>
     {
-        private static readonly IFunnyApp _ifunny = new();
+        private static readonly IFunnyBrazil _ifunny = new();
 
         protected override IMemeGenerator<string> MemeMaker => _ifunny;
 
@@ -24,24 +24,24 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("top"); // 🔥🔥🔥✍️
 
-        protected override bool ResultsAreRandom => IFunnyApp.ExtraFonts.UseRandom;
+        protected override bool ResultsAreRandom => IFunnyBrazil.FontWizard.UseRandom;
 
         protected override void ParseOptions()
         {
-            IFunnyApp.CustomColor.CheckAndCut(Request);
-            IFunnyApp.ExtraFonts .CheckAndCut(Request);
+            IFunnyBrazil.CustomColor.CheckAndCut(Request);
+            IFunnyBrazil.FontWizard .CheckAndCut(Request);
 
-            IFunnyApp.CropPercent        = GetInt(Request, _crop,     0);
-            IFunnyApp.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-            IFunnyApp.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+            IFunnyBrazil.CropPercent        = GetInt(Request, _crop,     0);
+            IFunnyBrazil.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+            IFunnyBrazil.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            IFunnyApp.WrapText         = !CheckAndCut(Request, _nowrap );
-            IFunnyApp.BackInBlack      =  CheckAndCut(Request, _blackBG);
-            IFunnyApp.ForceCenter      =  CheckAndCut(Request, _colorPC);
-            IFunnyApp.PickColor        =  CheckAndCut(Request, _colorPP);
-            IFunnyApp.UseLeftAlignment =  CheckAndCut(Request, _left   );
-            IFunnyApp.UltraThinCard    =  CheckAndCut(Request, _thinner);
-            IFunnyApp.ThinCard         =  CheckAndCut(Request, _thin   );
+            IFunnyBrazil.WrapText         = !CheckAndCut(Request, _nowrap );
+            IFunnyBrazil.BackInBlack      =  CheckAndCut(Request, _blackBG);
+            IFunnyBrazil.ForceCenter      =  CheckAndCut(Request, _colorPC);
+            IFunnyBrazil.PickColor        =  CheckAndCut(Request, _colorPP);
+            IFunnyBrazil.UseLeftAlignment =  CheckAndCut(Request, _left   );
+            IFunnyBrazil.UltraThinCard    =  CheckAndCut(Request, _thinner);
+            IFunnyBrazil.ThinCard         =  CheckAndCut(Request, _thin   );
         }
 
         protected override string GetMemeText(string? text)
@@ -51,7 +51,7 @@ namespace Witlesss.Commands.Meme
 
             var caption = generate ? Baka.Generate() : text!;
 
-            IFunnyApp.PreferSegoe = caption.IsMostlyCyrillic();
+            IFunnyBrazil.PreferSegoe = caption.IsMostlyCyrillic();
 
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }

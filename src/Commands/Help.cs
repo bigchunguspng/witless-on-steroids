@@ -21,7 +21,7 @@ public class Help : SyncCommand
     public void HandleCallback(CallbackQuery query, string[] data)
     {
         var text = GetManualPage(data[1], out var address);
-        Bot.EditMessage(query.GetChatId(), query.GetMessageId(), text, GetKeyboard(address));
+        Bot.EditMessage(query.GetChat(), query.GetMessage(), text, GetKeyboard(address));
     }
 
     // number path / search query

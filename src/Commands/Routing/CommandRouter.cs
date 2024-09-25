@@ -52,7 +52,7 @@ namespace Witlesss.Commands.Routing
                 .Register("apeg"   , () => _apeg)
                 .Register("aim"    , () => _aim)
                 .Register("debug"  , () => _debug)
-                .Register("chat_id", () => _mail.WithText($"<code>{Context.Chat}</code>"))
+                .Register("id"     , () => _mail.WithText($"<code>{Context.Chat}</code>"))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_dp"  , () => _mail.WithText(DP_OPTIONS))

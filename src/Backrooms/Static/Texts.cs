@@ -61,7 +61,7 @@ public static class Texts
         """
         {0}: {1}%
 
-        Изменить: <code>/{2} {3}</code>
+        Изменить: <code>/{2} [число]</code>
         """;
 
     public const string SET_FREQUENCY_RESPONSE =

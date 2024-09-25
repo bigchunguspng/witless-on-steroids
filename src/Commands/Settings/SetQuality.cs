@@ -13,7 +13,7 @@ public class SetQuality : SettingsCommand
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Качество графики", Baka.Quality, "quality", RandomInt(0, 100));
+            var message = string.Format(SET_X_GUIDE, "Качество графики", Baka.Quality, "quality");
             Bot.SendMessage(Chat, message);
         }
     }

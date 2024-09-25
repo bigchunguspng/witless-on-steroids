@@ -13,7 +13,7 @@ public class SetPics : SettingsCommand
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Вероятность мемчиков", Baka.Pics, "pics", RandomInt(0, 100));
+            var message = string.Format(SET_X_GUIDE, "Вероятность мемчиков", Baka.Pics, "pics");
             Bot.SendMessage(Chat, message);
         }
     }

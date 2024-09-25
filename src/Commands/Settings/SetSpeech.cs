@@ -13,7 +13,7 @@ public class SetSpeech : SettingsCommand
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Baka.Speech, "speech", RandomInt(0, 100));
+            var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Baka.Speech, "speech");
             Bot.SendMessage(Chat, message);
         }
     }

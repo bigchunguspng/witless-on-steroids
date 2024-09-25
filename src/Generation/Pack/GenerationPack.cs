@@ -5,8 +5,8 @@
 /// </summary>
 public class GenerationPack
 {
-    private const string s_REMOVED = "[R]";
-    private const int REMOVED = -8;
+    public  const string S_REMOVED = "[R]";
+    private const int      REMOVED = -8;
 
     public const int START = -5, END = -3, NO_WORD = -1;
 
@@ -49,7 +49,7 @@ public class GenerationPack
     /// <returns>An ID of existing word or <see cref="NO_WORD"/> code.</returns>
     public int GetID_ByWord(string word)
     {
-        if (word.Equals(s_REMOVED)) return REMOVED;
+        if (word.Equals(S_REMOVED)) return REMOVED;
 
         var useIndex = Vocabulary.Count > 16;
         if (useIndex && Index is null)
@@ -62,7 +62,7 @@ public class GenerationPack
 
     public string? GetWordByID(int id)
     {
-        if (id < 0) return id == REMOVED ? s_REMOVED : null;
+        if (id < 0) return id == REMOVED ? S_REMOVED : null;
 
         return Vocabulary[id];
     }

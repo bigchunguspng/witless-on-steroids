@@ -10,6 +10,7 @@ namespace Witlesss.Commands.Routing
         private readonly Tell _tell = new();
         private readonly Spam _spam = new();
         private readonly Help _help = new();
+        private readonly Piece _piece = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
         private readonly BrowseReddit _reddit = new();
@@ -46,7 +47,7 @@ namespace Witlesss.Commands.Routing
                 .Register("load"   , () => new Load())
                 .Register("im"     , () => new Magick())
                 .Register("peg"    , () => new FFMpeg())
-                .Register("piece"  , () => new Piece())
+                .Register("piece"  , () => _piece)
                 .Register("w"      , () => _reddit)
                 .Register("link"   , () => _link)
                 .Register("apeg"   , () => _apeg)

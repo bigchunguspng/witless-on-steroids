@@ -9,18 +9,20 @@ namespace Witlesss.Generation
     {
         private const string START = "[S]", END = "[E]";
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
-        private const string LINK = "[R]", LINK_Spaced = $" {LINK} ";
+        private const string ADD = "[+]", ADD_Spaced = "[+] ";
+        private const string LINK = GenerationPack.S_REMOVED, LINK_Spaced = $" {LINK} ";
         private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
         private static readonly Regex _urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled);
         private static readonly Regex _skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
+        private static readonly Regex _random = new(@"\[\*(\d{1,9})..(\d{1,9})\]", RegexOptions.Compiled);
 
         public GenerationPack DB { get; set; } = new();
 
 
         // CONSUMING TEXT
 
-        public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
+        public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten, float chance = 0)
         {
             eaten = null;
 
@@ -33,7 +35,8 @@ namespace Witlesss.Generation
             for (var i = 0; i < lines.Length; i++)
             {
                 var tokens = new LinkedList<string>(lines[i]);
-                var chance = Math.Max(0.3F, MathF.Round(2 - MathF.Log10(tokens.Count), 1));
+                if (chance == 0)
+                    chance = Math.Max(0.3F, MathF.Round(2 - MathF.Log10(tokens.Count), 1));
 
                 CombineSomeTokens(tokens);
                 EatInternal(tokens, chance);
@@ -235,7 +238,18 @@ namespace Witlesss.Generation
             foreach (var id in ids)
             {
                 var word = DB.GetWordByID(id);
-                if (word is not null) words.AddLast(word);
+                if (word is not null)
+                {
+                    var match = _random.Match(word); // EXAMPLE: [*0..15928]
+                    if (match.Success)
+                    {
+                        var a = Convert.ToInt32(match.Groups[1].Value);
+                        var b = Convert.ToInt32(match.Groups[2].Value);
+                        word = RandomInt(a, b).ToString();
+                    }
+
+                    words.AddLast(word);
+                }
             }
 
             return words.Count > 0 ? BuildText(words) : throw new Exception("Text wasn't generated");
@@ -249,6 +263,11 @@ namespace Witlesss.Generation
             {
                 var replacement = text.IsMostlyCyrillic() ? text.LooksLikeUkrainian() ? LINK_ua : LINK_ru : LINK_en;
                 text = text.Replace(LINK, replacement);
+            }
+
+            if (words.Any(w => w.EndsWith(ADD))) // "ab[+] cd" -> "abcd"
+            {
+                text = text.Replace(ADD_Spaced, "");
             }
 
             return text.ToRandomLetterCase();

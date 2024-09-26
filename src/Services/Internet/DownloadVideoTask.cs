@@ -33,7 +33,7 @@ public class DownloadVideoTask(string id, CommandContext context)
             return newPath;
         }
 
-        await YtDlp.Use(GetDownloadCommand(id), directory);
+        await YtDlp.Use(GetDownloadCommand(id), directory, context.Chat);
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", ConsoleColor.Yellow);
 
         var directoryInfo = new DirectoryInfo(directory);

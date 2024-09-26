@@ -77,9 +77,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
-        var taskA = YtDlp.Use(GetAudioArgs(url, output), directory);
+        var taskA = YtDlp.Use(GetAudioArgs(url, output), directory, context.Chat);
         var taskV = ExtractThumb
-            ? YtDlp.Use(GetVideoArgs(url), directory)
+            ? YtDlp.Use(GetVideoArgs(url), directory, context.Chat)
             : ArtAttached
                 ? Bot.DownloadFile(Cover!, thumbPath, context.Chat)
                 : youTube

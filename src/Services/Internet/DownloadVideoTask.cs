@@ -2,7 +2,7 @@
 
 namespace Witlesss.Services.Internet;
 
-// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video mp4 "URL" -o "video.%(ext)s"
+// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video gif>gif/mp4 "URL" -o "video.%(ext)s"
 
 public class DownloadVideoTask(string id, CommandContext context)
 {
@@ -13,7 +13,7 @@ public class DownloadVideoTask(string id, CommandContext context)
         var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         var args = "-k -I 1 "
                  + "-f \"bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w\" "
-                 + "--remux-video mp4 ";
+                 + "--remux-video gif>gif/mp4 ";
         builder.Append(args);
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
         return builder.ToString();
@@ -36,7 +36,14 @@ public class DownloadVideoTask(string id, CommandContext context)
         await YtDlp.Use(GetDownloadCommand(id), directory);
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", ConsoleColor.Yellow);
 
-        var result = new DirectoryInfo(directory).GetFiles("video.mp4")[0].FullName;
+        var directoryInfo = new DirectoryInfo(directory);
+        var files = directoryInfo.GetFiles("video.mp4");
+        var result = files.Length > 0
+            ? files[0].FullName
+            : await directoryInfo.GetFiles("video.*") // in case of failed to remux GIF
+                .OrderByDescending(x => x.Length)
+                .First().FullName
+                .UseFFMpeg(context.Chat).Out();
         _cache.Add(id, result);
         return result;
     }

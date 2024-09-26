@@ -32,7 +32,7 @@ public partial class F_Process
         => Cook(path);
 
     public Task<string> Out
-        (string suffix, string extension = ".mp4")
+        (string suffix = "", string extension = ".mp4")
         => Cook(GetOutputName(suffix, extension is ".webm" ? ".mp4" : extension));
 
     public string GetOutputName

@@ -23,7 +23,7 @@ namespace Witlesss.Commands.Packing
                 var name = args.Groups[2].Value.Replace(' ', '_');
                 var post = args.Groups[1].Value;
 
-                var sandwich = $"{url}[+] [*0..{post}]";
+                var sandwich = $"{url}[+] [*1..{post}]";
                 var chance = Convert.ToInt32(post);
 
                 var cp = new Copypaster();

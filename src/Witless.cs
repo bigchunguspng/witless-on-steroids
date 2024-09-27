@@ -15,7 +15,8 @@ namespace Witlesss
             Baka = new Copypaster { DB = JsonIO.LoadData<GenerationPack>(FilePath) };
         }
 
-        public string FilePath => ChatService.GetPath(Chat);
+        public  int    WordCount => Baka.DB.Vocabulary.Count;
+        private string FilePath  => ChatService.GetPath(Chat);
 
         public Copypaster Baka { get; set; }
         public long       Chat { get; set; }

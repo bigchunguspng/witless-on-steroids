@@ -116,7 +116,7 @@ namespace Witlesss.Commands.Packing
         {
             await Task.WhenAll(tasks);
 
-            var size = c.Baka.FilePath.FileSizeInBytes();
+            var size = ChatService.GetPath(c.Chat).FileSizeInBytes();
 
             var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
 
@@ -127,7 +127,7 @@ namespace Witlesss.Commands.Packing
         {
             var (baka, chat, title) = (c.Baka, c.Chat, c.Title);
 
-            var count = baka.Baka.DB.Vocabulary.Count;
+            var count = baka.WordCount;
 
             await EatAllLines(lines, baka, limit);
             SaveChanges(baka, title);

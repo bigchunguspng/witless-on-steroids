@@ -59,12 +59,12 @@ namespace Witlesss.Commands.Packing
         {
             Baka.SaveChanges();
 
-            if (Baka.Baka.DB.Vocabulary.Count == 0)
+            if (Baka.WordCount == 0)
                 return "*"; // can't be in file name
 
             var path = GetUniqueExtraPackPath(name, chat);
 
-            File.Copy(Baka.FilePath, path);
+            File.Copy(PackPath, path);
 
             var result = Path.GetFileNameWithoutExtension(path);
             Log($@"{Title} >> DIC SAVED AS ""{result}""", ConsoleColor.Magenta);

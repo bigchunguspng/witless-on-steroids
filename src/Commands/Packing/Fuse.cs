@@ -26,8 +26,8 @@ namespace Witlesss.Commands.Packing
         protected void MeasureDick() // 😂🤣🤣🤣👌
         {
             Baka.SaveChanges();
-            Size = Baka.FilePath.FileSizeInBytes();
-            Count = Baka.Baka.DB.Vocabulary.Count;
+            Size = PackPath.FileSizeInBytes();
+            Count = Baka.WordCount;
         }
 
         protected override async Task RunAuthorized()
@@ -190,8 +190,8 @@ namespace Witlesss.Commands.Packing
 
         protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long size, int count, string title)
         {
-            var newSize = baka.FilePath.FileSizeInBytes();
-            var newCount = baka.Baka.DB.Vocabulary.Count;
+            var newSize = ChatService.GetPath(baka.Chat).FileSizeInBytes();
+            var newCount = baka.WordCount;
             var deltaSize = newSize - size;
             var deltaCount = newCount - count;
             var ns = newSize.ReadableFileSize();

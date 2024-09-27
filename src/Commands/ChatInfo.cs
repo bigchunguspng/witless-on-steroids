@@ -10,7 +10,7 @@ namespace Witlesss.Commands
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
-            var size = Baka.FilePath.FileSizeInBytes();
+            var size = PackPath.FileSizeInBytes();
             var icon = size switch
             {
                 <      2_000 => "🗒",
@@ -22,10 +22,10 @@ namespace Witlesss.Commands
             };
 
             sb.Append("\nВес словаря: ").Append(size.ReadableFileSize()).Append(' ').Append(icon);
-            if (ChatService.LoadedBakas.ContainsKey(Chat))
+            if (ChatService.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
-                    .Append(BrowseReddit.FormatSubs(Baka.Baka.DB.Vocabulary.Count, "💨")).Append(' ');
+                    .Append(BrowseReddit.FormatSubs(Baka.WordCount, "💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
             if (!Context.ChatIsPrivate)

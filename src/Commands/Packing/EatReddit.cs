@@ -59,7 +59,7 @@ namespace Witlesss.Commands.Packing
             var comments = await RedditTool.Instance.GetComments(query);
             Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
-            var count = c.Baka.Baka.DB.Vocabulary.Count;
+            var count = c.Baka.WordCount;
 
             var commentsEaten = await EatAllLines(comments, c.Baka, limit);
             SaveChanges(c.Baka, c.Title);

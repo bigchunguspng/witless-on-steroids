@@ -71,12 +71,16 @@ namespace Witlesss.Commands.Core
     {
         public ChatSettings    Data => Context.Settings;
         public CopypasterProxy Baka => Context.Baka;
+
+        public string PackPath => ChatService.GetPath(Chat);
     }
 
     public abstract class WitlessAsyncCommand : AnyAsyncCommand<WitlessContext>
     {
         public ChatSettings    Data => Context.Settings;
         public CopypasterProxy Baka => Context.Baka;
+
+        public string PackPath => ChatService.GetPath(Chat);
     }
 
     // ROUTING

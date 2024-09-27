@@ -24,8 +24,10 @@
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
-                var text = byWord ? Baka.GenerateByLast(word.ToLower()) + ending : Baka.GenerateBackwards();
-                texts[i] = text.InLetterCase(up ? LetterCase.Upper : GetMode(Args));
+                var mode = up ? LetterCase.Upper : GetMode(Args);
+                texts[i] = byWord
+                    ? Baka.GenerateByLast(word).InLetterCase(mode) + ending
+                    : Baka.GenerateBackwards().InLetterCase(mode);
             }
 
             await Task.Run(() =>

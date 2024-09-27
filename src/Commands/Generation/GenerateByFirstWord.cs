@@ -10,13 +10,10 @@
             var byWord = Args != null;
             if (byWord)
             {
-                var words = Args!.Split();
-                word = words[^1];
-                if (words.Length > 1)
-                {
-                    word = string.Join(' ', words[^2..]); // take last two words
-                }
+                var lines = Args!.Split('\n');
+                var words = lines[^1].Split();
 
+                word = words.Length == 1 ? words[^1] : string.Join(' ', words[^2..]);
                 word = word.ToLower();
 
                 opening = Args.Remove(Args.Length - word.Length);

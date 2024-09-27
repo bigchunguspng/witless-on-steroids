@@ -6,14 +6,14 @@ public class SetQuality : SettingsCommand
     {
         if (Args is not null && Context.HasIntArgument(out var value))
         {
-            Baka.Quality = value.ClampByte();
+            Data.Quality = value.ClampByte();
             ChatService.SaveChatsDB();
-            Bot.SendMessage(Chat, string.Format(SET_Q_RESPONSE, Baka.Quality).XDDD());
-            Log($"{Title} >> JPG QUALITY >> {Baka.Quality}%");
+            Bot.SendMessage(Chat, string.Format(SET_Q_RESPONSE, Data.Quality).XDDD());
+            Log($"{Title} >> JPG QUALITY >> {Data.Quality}%");
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Качество графики", Baka.Quality, "quality");
+            var message = string.Format(SET_X_GUIDE, "Качество графики", Data.Quality, "quality");
             Bot.SendMessage(Chat, message);
         }
     }

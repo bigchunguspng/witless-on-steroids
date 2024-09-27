@@ -75,9 +75,9 @@ namespace Witlesss.Commands.Routing
 
         protected override void Run()
         {
-            if (Chat.WitlessExist(out var baka))
+            if (ChatService.Knowns(Chat, out var settings))
             {
-                _witlessRouter.Execute(WitlessContext.From(Context, baka));
+                _witlessRouter.Execute(WitlessContext.From(Context, settings));
             }
             else if (Context is { Command: not null, IsForMe: true })
             {
@@ -100,13 +100,12 @@ namespace Witlesss.Commands.Routing
 
         private bool HandleStartCommand()
         {
-            var success = Command == "/start" && ChatService.TryAddChat(Chat, Witless.CreateBaka(Context));
+            var success = Command == "/start" && ChatService.TryAddChat(Chat, ChatSettingsFactory.CreateFrom(Context));
             if (success)
             {
                 ChatService.SaveChatsDB();
                 Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
                 Bot.SendMessage(Chat, START_RESPONSE);
-                Bot.ThorRagnarok.PullBanStatus(Chat);
             }
             return success;
         }

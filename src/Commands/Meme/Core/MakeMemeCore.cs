@@ -111,8 +111,6 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
         {
-            if (Bot.ThorRagnarok.ChatIsBanned(Baka)) return;
-
             var sw = GetStartedStopwatch();
 
             var path = await DownloadFileAndParseOptions(file, extension);
@@ -142,12 +140,12 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private MemeFileRequest GetMemeFileRequest
             (MemeSourceType type, string path, string outputEnding)
-            => new(Chat, type, path, outputEnding, Baka.Quality, Pressure);
+            => new(Chat, type, path, outputEnding, Data.Quality, Pressure);
 
         private T GetText() => GetMemeText(GetTextBase());
 
         private string? GetTextBase() =>
-            Context.Command is not null || Baka.Pics > 100 && Context.Message.ForwardFromChat is null ? Args : null;
+            Context.Command is not null || Data.Pics > 100 && Context.Message.ForwardFromChat is null ? Args : null;
 
         protected abstract void ParseOptions();
         protected abstract T GetMemeText(string? text);

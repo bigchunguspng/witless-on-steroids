@@ -71,7 +71,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             if (Context is { Command: not null, IsForMe: true })
             {
-                if (!_parent.HandleSimpleCommands()) HandleWitlessCommands(Baka);
+                if (!_parent.HandleSimpleCommands()) HandleWitlessCommands(Data);
                 return;
             }
             else if (Baka.Eat(Text, out var eaten))
@@ -84,14 +84,14 @@ public class WitlessCommandRouter : WitlessSyncCommand
         else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2);
         else if (Message.GetAnimation   () is { } f3 && HaveToMeme       ()) GetMemeMaker(f3).ProcessVideo(f3);
         else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
-        else if (LuckyFor(Baka.Speech))
+        else if (LuckyFor(Data.Speech))
         {
             new PoopText().Execute(Context);
         }
 
         ImageProcessor GetMemeMaker(FileBase file)
         {
-            var mematic = _mematics[Baka.Type].Invoke();
+            var mematic = _mematics[Data.Type].Invoke();
             mematic.Pass(Context);
             if (mematic is Demotivate dg)
             {
@@ -102,14 +102,14 @@ public class WitlessCommandRouter : WitlessSyncCommand
             return mematic;
         }
 
-        bool HaveToMeme       () => LuckyFor(Baka.Pics) && !Message.ContainsSpoilers();
-        bool HaveToMemeSticker() => Baka.Stickers && HaveToMeme();
+        bool HaveToMeme       () => LuckyFor(Data.Pics) && !Message.ContainsSpoilers();
+        bool HaveToMemeSticker() => Data.Stickers && HaveToMeme();
     }
 
-    private void HandleWitlessCommands(Witless baka)
+    private void HandleWitlessCommands(ChatSettings settings)
     {
         var func = _witlessCommands.Resolve(Command);
-        func?.Invoke().Execute(WitlessContext.From(Context, baka));
+        func?.Invoke().Execute(WitlessContext.From(Context, settings));
     }
 
     public void OnCallback(CallbackQuery query)

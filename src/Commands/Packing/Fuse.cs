@@ -74,23 +74,24 @@ namespace Witlesss.Commands.Packing
                 return;
             }
 
-            if (argIsChatId && chat.WitlessExist(out var baka))
+            if (argIsChatId && ChatService.Knowns(chat))
             {
-                if (baka.Loaded) baka.SaveChanges();
+                if (ChatService.BakaIsLoaded(chat, out var baka))
+                    baka.SaveChanges();
 
-                await FuseWithOtherPack(JsonIO.LoadData<GenerationPack>(baka.FilePath));
+                await FuseWithOtherPack(ChatService.GetPath(chat));
             }
             else if (GetFiles(GetFuseFolder(Chat, _private), $"{arg}.json") is { Length: > 0 } files)
             {
-                await FuseWithOtherPack(JsonIO.LoadData<GenerationPack>(files[0]));
+                await FuseWithOtherPack(files[0]);
             }
             else if (argIsChatId) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
             else SendFuseList(new ListPagination(Chat), fail: true, @private: _private);
         }
 
-        private Task FuseWithOtherPack(GenerationPack source) => Task.Run(() =>
+        private Task FuseWithOtherPack(string path) => Task.Run(() =>
         {
-            Baka.Fuse(source);
+            Baka.Fuse(JsonIO.LoadData<GenerationPack>(path));
             GoodEnding();
         });
 
@@ -161,7 +162,7 @@ namespace Witlesss.Commands.Packing
         }
 
         private                Task      EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit);
-        protected static async Task<int> EatAllLines(IEnumerable<string> lines, Witless baka, int limit)
+        protected static async Task<int> EatAllLines(IEnumerable<string> lines, CopypasterProxy baka, int limit)
         {
             var linesConsumed = 0;
             await Task.Run(() =>
@@ -181,13 +182,13 @@ namespace Witlesss.Commands.Packing
             Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
         }
 
-        protected static void SaveChanges(Witless baka, string title)
+        protected static void SaveChanges(CopypasterProxy baka, string title)
         {
             Log($"{title} >> FUSION DONE", ConsoleColor.Magenta);
             baka.Save();
         }
 
-        protected static string FUSION_SUCCESS_REPORT(Witless baka, long size, int count, string title)
+        protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long size, int count, string title)
         {
             var newSize = baka.FilePath.FileSizeInBytes();
             var newCount = baka.Baka.DB.Vocabulary.Count;
@@ -252,7 +253,7 @@ namespace Witlesss.Commands.Packing
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = ChatService.SussyBakas[pagination.Chat].FilePath;
+            var path = ChatService.GetPath(pagination.Chat);
             if (File.Exists(path))
                 sb.Append("весит ").Append(path.ReadableFileSize());
             else

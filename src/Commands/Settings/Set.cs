@@ -29,8 +29,8 @@ namespace Witlesss.Commands.Settings
                 if (typeWasChanged)
                 {
                     ChatService.SaveChatsDB();
-                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Baka.Type]).XDDD());
-                    Log($"{Title} >> MEMES TYPE >> {Baka.Type.ToString()[0]}");
+                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]).XDDD());
+                    Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
@@ -43,7 +43,7 @@ namespace Witlesss.Commands.Settings
                 {
                     if      (args.Length > 1 && args[1] == "?")
                     {
-                        var options = Baka.GetMemeOptions()[type];
+                        var options = Data.GetMemeOptions()[type];
                         options = options is null ? "А НЕТУ!!!" : $"<code>{options}</code>";
                         Bot.SendMessage(Chat, $"Опции команды <b>{cmd}</b>: {options}".XDDD());
                     }
@@ -51,14 +51,14 @@ namespace Witlesss.Commands.Settings
                     {
                         command = cmd;
                         result = args[1] == "0" ? null : args[1];
-                        Baka.GetMemeOptions()[type] = result;
-                        if (result is null && (Baka.Options?.IsEmpty() ?? false)) Baka.Options = null;
+                        Data.GetMemeOptions()[type] = result;
+                        if (result is null && (Data.Options?.IsEmpty() ?? false)) Data.Options = null;
                         result = $"{cmd}{result}";
                         optionsWereChanged = true;
                     }
                     else
                     {
-                        Baka.Type = type;
+                        Data.Type = type;
                         typeWasChanged = true;
                     }
                 }

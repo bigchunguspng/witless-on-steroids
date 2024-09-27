@@ -16,7 +16,7 @@ namespace Witlesss.Commands.Packing
     public class EatBoards : Fuse
     {
         private static readonly BoardService _chan = new();
-        private static readonly SyncronizedDictionary<long, string> _names = new();
+        private static readonly SyncDictionary<long, string> _names = new();
 
         private static List<BoardService.BoardGroup>? _boards;
         private static List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);

@@ -10,9 +10,9 @@
             }
             else if (Message.SenderIsAdmin().Result)
             {
-                Baka.AdminsOnly = !Baka.AdminsOnly;
+                Data.AdminsOnly = !Data.AdminsOnly;
                 ChatService.SaveChatsDB();
-                var text = string.Format(ADMINS_RESPONSE, Baka.AdminsOnly ? "только админы 😎" : "все участники 😚");
+                var text = string.Format(ADMINS_RESPONSE, Data.AdminsOnly ? "только админы 😎" : "все участники 😚");
                 Bot.SendMessage(Chat, text);
             }
         }

@@ -16,9 +16,9 @@ public class CommandContext
     public string? Command      { get; }
     /// <summary> All text excluding the command and the following " " or "\n". </summary>
     public string? Args         { get; }
-    /// <summary> True if THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
+    /// <summary> Whether THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
     public bool    IsForMe      { get; }
-    /// <summary> True if SOME bot was mentioned in the command explicitly. </summary>
+    /// <summary> Whether SOME bot was mentioned in the command explicitly. </summary>
     public bool    BotMentioned { get; }
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
@@ -66,11 +66,15 @@ public class CommandContext
 
 public class WitlessContext : CommandContext
 {
-    public Witless Baka { get; }
+    public ChatSettings Settings { get; }
 
-    private WitlessContext(CommandContext context, Witless baka) : base(context) => Baka = baka;
-    private WitlessContext(Message        message, Witless baka) : base(message) => Baka = baka;
+    private CopypasterProxy?        _baka;
+    public  CopypasterProxy Baka => _baka ??= ChatService.GetBaka(Chat);
 
-    public static WitlessContext From(CommandContext context, Witless baka) => new(context, baka);
-    public static WitlessContext FromMessage(Message message, Witless baka) => new(message, baka);
+
+    public static WitlessContext From(CommandContext context, ChatSettings baka) => new(context, baka);
+    public static WitlessContext FromMessage(Message message, ChatSettings baka) => new(message, baka);
+
+    private WitlessContext(CommandContext context, ChatSettings settings) : base(context) => Settings = settings;
+    private WitlessContext(Message        message, ChatSettings settings) : base(message) => Settings = settings;
 }

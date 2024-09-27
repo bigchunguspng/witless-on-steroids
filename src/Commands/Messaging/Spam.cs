@@ -30,40 +30,40 @@ public class Spam : SyncCommand
 
         var chat = Chat;
         var text = Args!;
-        var bakas = GetBakas(size, groupsOnly, TimeSpan.FromDays(days));
+        var bakas = GetChats(size, groupsOnly, TimeSpan.FromDays(days));
 
         if (textProvided) Task.Run(() => SendSpam(bakas, text));
         else              Task.Run(() => CopySpam(bakas, chat, messageId));
     }
 
-    private static void SendSpam(IEnumerable<Witless> bakas, string text)
+    private static void SendSpam(IEnumerable<long> chats, string text)
     {
-        foreach (var witless in bakas)
+        foreach (var chat in chats)
         {
-            Bot.SendMessage(witless.Chat, text, preview: true);
-            LogSpam(witless.Chat);
+            Bot.SendMessage(chat, text, preview: true);
+            LogSpam(chat);
         }
     }
 
-    private static void CopySpam(IEnumerable<Witless> bakas, long chat, int messageId)
+    private static void CopySpam(IEnumerable<long> chats, long fromChat, int messageId)
     {
-        foreach (var witless in bakas)
+        foreach (var chat in chats)
         {
-            Bot.CopyMessage(witless.Chat, chat, messageId);
-            LogSpam(witless.Chat);
+            Bot.CopyMessage(chat, fromChat, messageId);
+            LogSpam(chat);
         }
     }
 
-    private static IEnumerable<Witless> GetBakas(int minSize, bool groupsOnly, TimeSpan lastActivity)
+    private static IEnumerable<long> GetChats(int minSize, bool groupsOnly, TimeSpan lastActivity)
     {
-        return ChatService.SussyBakas.Values.Where(x =>
+        return ChatService.SettingsDB.Keys.Where(chat =>
         {
-            var path = x.FilePath;
+            var path = ChatService.GetPath(chat);
             if (File.Exists(path))
             {
                 var file = new FileInfo(path);
                 return file.Length >= minSize
-                    && (!groupsOnly || x.Chat.ChatIsNotPrivate())
+                    && (!groupsOnly || chat.ChatIsNotPrivate())
                     && file.LastWriteTime.HappenedWithinLast(lastActivity);
             }
 

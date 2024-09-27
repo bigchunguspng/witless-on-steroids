@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command => "/dp";
         protected override string Suffix  => "-Dp";
 
-        protected override string? DefaultOptions => Baka.Options?.Dp;
+        protected override string? DefaultOptions => Data.Options?.Dp;
 
 
         protected override Task Run() => RunInternal("dp");

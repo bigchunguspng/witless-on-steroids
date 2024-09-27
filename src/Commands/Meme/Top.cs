@@ -19,7 +19,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command => "/top";
         protected override string Suffix  => "-Top";
 
-        protected override string? DefaultOptions => Baka.Options?.Top;
+        protected override string? DefaultOptions => Data.Options?.Top;
 
 
         protected override Task Run() => RunInternal("top"); // 🔥🔥🔥✍️

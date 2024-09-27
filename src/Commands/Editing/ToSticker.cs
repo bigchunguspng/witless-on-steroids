@@ -16,7 +16,5 @@ namespace Witlesss.Commands.Editing
             if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
-
-        protected override bool ChatIsBanned() => false;
     }
 }

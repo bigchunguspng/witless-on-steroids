@@ -18,8 +18,6 @@ namespace Witlesss.Commands.Core
         public abstract void Execute(TContext context);
     }
 
-    // SYNC
-
     /// <summary>
     /// Blocking command. Should be used for short simple actions!
     /// The same instance can be used unlimited amount of times.
@@ -28,22 +26,19 @@ namespace Witlesss.Commands.Core
     {
         public sealed override void Execute(TContext context)
         {
-            Context = context;
-            Run();
-            Context = default!;
+            try
+            {
+                Context = context;
+                Run();
+            }
+            finally
+            {
+                Context = default!;
+            }
         }
 
         protected abstract void Run();
     }
-
-    public abstract class SyncCommand : AnySyncCommand<CommandContext>;
-
-    public abstract class WitlessSyncCommand : AnySyncCommand<WitlessContext>
-    {
-        public Witless Baka => Context.Baka;
-    }
-
-    // ASYNC
 
     /// <summary>
     /// Non-blocking command. Should be used for time consuming actions!
@@ -67,11 +62,21 @@ namespace Witlesss.Commands.Core
         protected abstract Task Run();
     }
 
+    // SIMPLE / WITLESS
+
+    public abstract class  SyncCommand :  AnySyncCommand<CommandContext>;
     public abstract class AsyncCommand : AnyAsyncCommand<CommandContext>;
+
+    public abstract class  WitlessSyncCommand :  AnySyncCommand<WitlessContext>
+    {
+        public ChatSettings    Data => Context.Settings;
+        public CopypasterProxy Baka => Context.Baka;
+    }
 
     public abstract class WitlessAsyncCommand : AnyAsyncCommand<WitlessContext>
     {
-        public Witless Baka => Context.Baka;
+        public ChatSettings    Data => Context.Settings;
+        public CopypasterProxy Baka => Context.Baka;
     }
 
     // ROUTING

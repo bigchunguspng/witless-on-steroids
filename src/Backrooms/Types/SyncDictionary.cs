@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Witlesss.Backrooms.Types
 {
-    public class SyncronizedDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
+    public class SyncDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
     {
         private Dictionary<TKey, TValue> _dictionary = new();
 

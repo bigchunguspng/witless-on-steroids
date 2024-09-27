@@ -128,7 +128,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             if (a)  SendGalleryPost(post);
             else SendSingleFilePost(post);
 
-            if (Chat.WitlessExist(out var baka)) baka.Eat(post.Title);
+            if (ChatService.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
 
             Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }

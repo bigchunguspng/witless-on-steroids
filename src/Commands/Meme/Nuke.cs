@@ -18,7 +18,7 @@ namespace Witlesss.Commands.Meme
         protected override string Command => "/nuke";
         protected override string Suffix  => "-Nuked"; // Needs more nuking!
 
-        protected override string? DefaultOptions => Baka.Options?.Nuke;
+        protected override string? DefaultOptions => Data.Options?.Nuke;
 
 
         protected override Task Run() => RunInternal("nuke");

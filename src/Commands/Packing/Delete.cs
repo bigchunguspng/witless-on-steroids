@@ -20,8 +20,7 @@ namespace Witlesss.Commands.Packing
 
             ChatService.RemoveChat(Chat);
             ChatService.SaveChatsDB();
-
-            Baka.DeleteForever();
+            ChatService.DeletePack(Chat);
 
             Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
             Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
@@ -68,7 +67,7 @@ namespace Witlesss.Commands.Packing
 
         public void DoGameStep(Message message, string data)
         {
-            Context = WitlessContext.FromMessage(message, ChatService.SussyBakas[message.Chat.Id]);
+            Context = WitlessContext.FromMessage(message, ChatService.SettingsDB[message.Chat.Id]);
 
             var split = data.Split(" - ");
             var num = split[1].Split(':');

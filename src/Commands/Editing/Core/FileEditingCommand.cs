@@ -20,15 +20,11 @@ namespace Witlesss.Commands.Editing.Core
 
         private bool MessageHasSomethingToProcess()
         {
-            if (ChatIsBanned()) return false;
-
             if (GetFileFrom(Message) || GetFileFrom(Message.ReplyToMessage)) return true;
 
             SendManual();
             return false;
         }
-
-        protected virtual bool ChatIsBanned() => Bot.ThorRagnarok.ChatIsBanned(Chat);
 
         protected void SendManual()
         {

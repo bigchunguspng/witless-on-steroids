@@ -6,14 +6,14 @@ public class SetSpeech : SettingsCommand
     {
         if (Args is not null && Context.HasIntArgument(out var value))
         {
-            Baka.Speech = value.ClampByte();
+            Data.Speech = value.ClampByte();
             ChatService.SaveChatsDB();
-            Bot.SendMessage(Chat, string.Format(SET_FREQUENCY_RESPONSE, Baka.Speech).XDDD());
-            Log($"{Title} >> SPEECH >> {Baka.Speech}");
+            Bot.SendMessage(Chat, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
+            Log($"{Title} >> SPEECH >> {Data.Speech}");
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Baka.Speech, "speech");
+            var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Data.Speech, "speech");
             Bot.SendMessage(Chat, message);
         }
     }

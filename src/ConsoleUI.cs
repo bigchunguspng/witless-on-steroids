@@ -10,11 +10,7 @@ namespace Witlesss
 
         private Bot Bot => Bot.Instance;
 
-        private BanHammer Thor => Bot.ThorRagnarok;
-        private ChatList SussyBakas => ChatService.SussyBakas;
-        private Witless Active => SussyBakas[_active];
-
-        private IEnumerable<Witless> Bakas => SussyBakas.Values;
+        private CopypasterProxy Baka => ChatService.GetBaka(_active);
 
         public static bool LoggedIntoReddit = false;
 
@@ -62,11 +58,7 @@ namespace Witlesss
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
             else if (_input == "/cc") ClearTempFiles();
-            else if (_input == "/cp") ClearDic(Active);
-            else if (_input == "/b" ) Thor.  BanChat(_active);
-            else if (_input == "/ub") Thor.UnbanChat(_active);
             else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var a1)) DeleteBySize(a1);
-            else if (_input.StartsWith("/b" ) && _input.HasIntArgument(out var a2)) Thor.BanChat(_active, a2);
         }
 
         private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
@@ -74,7 +66,7 @@ namespace Witlesss
         private void SetActiveChat()
         {
             var shit = _input![1..];
-            foreach (var chat in SussyBakas.Keys)
+            foreach (var chat in ChatService.SettingsDB.Keys)
             {
                 if (chat.ToString().EndsWith(shit))
                 {
@@ -87,72 +79,69 @@ namespace Witlesss
 
         private void BreakFourthWall()
         {
-            string text = _input!.Split (' ', 2)[1];
-            if (!_active.WitlessExist()) return;
+            var arg = _input!.Split (' ', 2)[1];
+            if (!ChatService.Knowns(_active)) return;
 
-            if      (_input.StartsWith("/a ") && Active.Eat(text, out var eaten)) // add
+            if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {
-                foreach (var line in eaten) Log($"{_active} << {line}", ConsoleColor.Yellow);
+                foreach (var line in eaten) Log($"{_active} += {line}", ConsoleColor.Yellow);
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.SendMessage(_active, text, preview: true);
-                Active.Eat(text);
-                Log($"{_active} >> {text}", ConsoleColor.Yellow);
+                Bot.SendMessage(_active, arg, preview: true);
+                Baka.Eat(arg);
+                Log($"{_active} >> {arg}", ConsoleColor.Yellow);
             }
         }
 
         private void PacksInfo()
         {
-            var loaded = ChatService.SussyBakas.Values.Count(x => x.Loaded);
-            var total = ChatService.SussyBakas.Count;
+            var loaded = ChatService.LoadedBakas.Count;
+            var total  = ChatService.SettingsDB .Count;
             Log($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
         }
 
         private void PacksInfoFull()
         {
             PacksInfo();
-            foreach (var pair in ChatService.SussyBakas.Where(x => x.Value.Loaded))
+            foreach (var pair in ChatService.LoadedBakas)
             {
                 Log($"{pair.Key}", ConsoleColor.DarkYellow);
             }
         }
 
-        private static void ClearDic(Witless witless)
-        {
-            witless.BackupAndDelete();
-        }
-
         private void DeleteBlockers()
         {
-            foreach (var w in Bakas) if (DeleteBlocker(w) == -1) ChatService.RemoveChat(w.Chat);
+            foreach (var chat in ChatService.SettingsDB.Keys)
+                if (DeleteBlocker(chat) == -1)
+                    ChatService.RemoveChat(chat);
             ChatService.SaveChatsDB();
         }
         private void DeleteBlocker()
         {
-            if (DeleteBlocker(Active) == -1)
+            if (DeleteBlocker(_active) == -1)
             {
                 ChatService.RemoveChat(_active);
                 ChatService.SaveChatsDB();
             }
         }
-        private int DeleteBlocker(Witless witless)
+        private int DeleteBlocker(long chat)
         {
-            var x = Bot.PingChat(witless.Chat, notify: false);
-            if (x == -1) witless.BackupAndDelete();
-            else Bot.Client.DeleteMessageAsync(witless.Chat, x);
+            var x = Bot.PingChat(chat, notify: false);
+            if (x == -1) ChatService.BackupAndDeletePack(chat);
+            else Bot.Client.DeleteMessageAsync(chat, x);
 
             return x;
         }
 
         private void DeleteBySize(int size = 2)
         {
-            foreach (var witless in Bakas)
+            foreach (var chat in ChatService.SettingsDB.Keys)
             {
-                if (witless.FilePath.FileSizeInBytes() > size) continue;
+                if (ChatService.GetPath(chat).FileSizeInBytes() > size) continue;
 
-                witless.BackupAndDelete();
-                ChatService.RemoveChat(witless.Chat);
+                ChatService.BackupAndDeletePack(chat);
+                ChatService.RemoveChat(chat);
             }
             ChatService.SaveChatsDB();
         }

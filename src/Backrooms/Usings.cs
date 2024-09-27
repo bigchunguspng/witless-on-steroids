@@ -18,4 +18,3 @@ global using static Witlesss.Backrooms.Static.Paths;
 global using static Witlesss.Backrooms.Static.Responses;
 global using static Witlesss.Services.Technical.Logger;
 global using File = System.IO.File;
-global using ChatList = Witlesss.Backrooms.Types.SyncronizedDictionary<long, Witlesss.Witless>;

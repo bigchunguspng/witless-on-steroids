@@ -8,7 +8,7 @@ public abstract class SettingsCommand : WitlessSyncCommand
 {
     private bool /* when the */ SenderIsSus() // !😳
     {
-        return Baka.AdminsOnly && Message.SenderIsAdmin().Result == false;
+        return Data.AdminsOnly && Message.SenderIsAdmin().Result == false;
     }
 
     protected override void Run()
@@ -26,7 +26,7 @@ public abstract class AsyncSettingsCommand : WitlessAsyncCommand
 {
     private async Task<bool> SenderIsSus()
     {
-        return Baka.AdminsOnly && await Message.SenderIsAdmin() == false;
+        return Data.AdminsOnly && await Message.SenderIsAdmin() == false;
     }
 
     protected override async Task Run()

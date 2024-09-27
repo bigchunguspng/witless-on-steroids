@@ -5,8 +5,6 @@ namespace Witlesss
 {
     public partial class Bot
     {
-        public readonly BanHammer ThorRagnarok;
-
         public readonly TelegramBotClient Client;
         public readonly User Me;
 
@@ -20,17 +18,15 @@ namespace Witlesss
 
         private Bot(CommandAndCallbackRouter command)
         {
-            Client       = new TelegramBotClient(Config.TelegramToken);
-            Me           = GetMe();
-            Username     = $"@{Me.Username!.ToLower()}";
-            Instance     = this;
-            Router       = command;
-            ThorRagnarok = new BanHammer();
+            Client   = new TelegramBotClient(Config.TelegramToken);
+            Me       = GetMe();
+            Username = $"@{Me.Username!.ToLower()}";
+            Instance = this;
+            Router   = command;
         }
 
         private void Run()
         {
-            ThorRagnarok.GiveBans();
             ClearTempFiles();
 
             StartListening();

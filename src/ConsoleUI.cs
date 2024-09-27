@@ -54,11 +54,11 @@ namespace Witlesss
             else if (_input == "/s" ) ChatService.SaveBakas();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
+            else if (_input == "/cc") ClearTempFiles();
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
-            else if (_input == "/cc") ClearTempFiles();
-            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var a1)) DeleteBySize(a1);
+            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var size)) DeleteBySize(size);
         }
 
         private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
@@ -112,36 +112,38 @@ namespace Witlesss
 
         private void DeleteBlockers()
         {
-            foreach (var chat in ChatService.SettingsDB.Keys)
-                if (DeleteBlocker(chat) == -1)
-                    ChatService.RemoveChat(chat);
-            ChatService.SaveChatsDB();
+            var save = ChatService.SettingsDB.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat));
+            if (save)  ChatService.SaveChatsDB();
         }
+
         private void DeleteBlocker()
         {
-            if (DeleteBlocker(_active) == -1)
-            {
-                ChatService.RemoveChat(_active);
-                ChatService.SaveChatsDB();
-            }
+            if (DeleteBlocker(_active)) ChatService.SaveChatsDB();
         }
-        private int DeleteBlocker(long chat)
+
+        private bool DeleteBlocker(long chat)
         {
             var x = Bot.PingChat(chat, notify: false);
-            if (x == -1) ChatService.BackupAndDeletePack(chat);
+            if (x == -1)
+            {
+                ChatService.RemoveChat(chat);
+                ChatService.BackupPack(chat);
+                ChatService.DeletePack(chat);
+            }
             else Bot.Client.DeleteMessageAsync(chat, x);
 
-            return x;
+            return x is -1;
         }
 
-        private void DeleteBySize(int size = 2)
+        private void DeleteBySize(int size = 34)
         {
             foreach (var chat in ChatService.SettingsDB.Keys)
             {
                 if (ChatService.GetPath(chat).FileSizeInBytes() > size) continue;
 
-                ChatService.BackupAndDeletePack(chat);
                 ChatService.RemoveChat(chat);
+                ChatService.BackupPack(chat);
+                ChatService.DeletePack(chat);
             }
             ChatService.SaveChatsDB();
         }

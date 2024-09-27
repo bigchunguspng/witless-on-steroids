@@ -66,18 +66,20 @@ public static class ChatService
         }
     }
 
-    public static void SaveBakasBeforeExit() => ForEachChat(baka => baka.SaveChanges());
+    public static void SaveBakasBeforeExit() => ForEachBaka(baka => baka.SaveChanges());
     public static void SaveBakas()
     {
-        ForEachChat(baka => baka.SaveChanges());
+        ForEachBaka(baka => baka.SaveChanges());
         var uselessChats = LoadedBakas.Where(x => x.Value.IsUselessEnough()).Select(x => x.Key);
         foreach (var chat in uselessChats) UnloadBaka(chat);
     }
 
-    private static void ForEachChat(Action<CopypasterProxy> action)
+    private static void ForEachBaka(Action<CopypasterProxy> action)
     {
         lock (LoadedBakas.Sync) LoadedBakas.Values.ForEach(action);
     }
+
+    // LOAD / UNLOAD
 
     private static CopypasterProxy LoadBaka(long chat)
     {
@@ -88,17 +90,13 @@ public static class ChatService
         return baka;
     }
 
-    public static void UnloadBaka(long chat)
+    private static void UnloadBaka(long chat)
     {
         LoadedBakas.Remove(chat);
         Log($"DIC UNLOAD << {chat}", ConsoleColor.Yellow);
     }
 
-    public static void BackupAndDeletePack(long chat)
-    {
-        Backup(chat);
-        DeletePack(chat);
-    }
+    // DELETE / BACKUP
 
     public static void DeletePack(long chat)
     {
@@ -106,7 +104,7 @@ public static class ChatService
         File.Delete(GetPath(chat));
     }
 
-    public static void Backup(long chat)
+    public static void BackupPack(long chat)
     {
         if (BakaIsLoaded(chat, out var baka)) baka.SaveChanges();
 

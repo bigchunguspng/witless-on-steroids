@@ -20,7 +20,6 @@ namespace Witlesss.Backrooms.Static;
             2024-08-21 a.270089129.json [list]  <-- /boards info
         Chat/
             chats.json
-            bans.json
             pack--1001699898486.json [pack]     <-- /fuse by id
         Fuse/
             -1001541923355/

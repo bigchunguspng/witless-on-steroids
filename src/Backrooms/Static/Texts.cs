@@ -149,18 +149,13 @@ public static class Texts
         /s  - save packs
         /p  - packs info
         /pp - packs info (full)
+        /cc - clear temp files
 
         +55 - select active chat
 
         /db - delete blockers
-        /DB - delete active if blocked
-        /ds - delete by size (max size)
-
-        /cc - clear temp files
-        /cp - clear active pack
-
-        /b  - ban active chat (hours)
-        /ub - unban active chat
+        /DB - delete active chat if blocked
+        /ds - delete by size (max size, bytes)
         """;
 
     public const string SET_Q_RESPONSE =

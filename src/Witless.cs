@@ -68,7 +68,7 @@ namespace Witlesss
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Fuse(GenerationPack pack)
         {
-            ChatService.Backup(Chat);
+            ChatService.BackupPack(Chat);
             Baka.Fuse(pack);
         }
 

@@ -10,13 +10,10 @@
             var byWord = Args != null;
             if (byWord)
             {
-                var words = Args!.Split();
-                word = words[0];
-                if (words.Length > 1)
-                {
-                    word = string.Join(' ', words[..2]); // take first two words
-                }
-
+                var lines = Args!.Split('\n');
+                var words = lines[0].Split();
+                
+                word = words.Length == 1 ? words[0] : string.Join(' ', words[..2]);
                 word = word.ToLower();
 
                 ending = Args[word.Length..];
@@ -27,8 +24,10 @@
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
-                var text = byWord ? Baka.GenerateByLast(word.ToLower()) + ending : Baka.GenerateBackwards();
-                texts[i] = text.InLetterCase(up ? LetterCase.Upper : GetMode(Args));
+                var mode = up ? LetterCase.Upper : GetMode(Args);
+                texts[i] = byWord
+                    ? Baka.GenerateByLast(word).InLetterCase(mode) + ending
+                    : Baka.GenerateBackwards().InLetterCase(mode);
             }
 
             await Task.Run(() =>

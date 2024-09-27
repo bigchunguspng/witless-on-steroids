@@ -26,6 +26,8 @@ public static partial class Extensions
         _   => LetterCase.Upper
     };
 
+    public static LetterCase GetUpperOrLowerLetterCase() => IsOneIn(2) ? LetterCase.Upper : LetterCase.Lower;
+
     public static string EnsureIsNotUppercase(this string s)
     {
         return s.Length > 1 && s.Skip(1).Any(char.IsUpper) ? s[0] + s[1..].ToLower() : s;

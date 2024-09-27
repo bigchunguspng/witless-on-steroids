@@ -10,13 +10,10 @@
             var byWord = Args != null;
             if (byWord)
             {
-                var words = Args!.Split();
-                word = words[^1];
-                if (words.Length > 1)
-                {
-                    word = string.Join(' ', words[^2..]); // take last two words
-                }
+                var lines = Args!.Split('\n');
+                var words = lines[^1].Split();
 
+                word = words.Length == 1 ? words[^1] : string.Join(' ', words[^2..]);
                 word = word.ToLower();
 
                 opening = Args.Remove(Args.Length - word.Length);
@@ -27,8 +24,10 @@
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
-                var text = byWord ? opening + Baka.GenerateByWord(word) : Baka.Generate();
-                texts[i] = text.InLetterCase(up ? LetterCase.Upper : GetMode(Args));
+                var mode = up ? LetterCase.Upper : GetMode(Args);
+                texts[i] = byWord
+                    ? opening + Baka.GenerateByWord(word).InLetterCase(mode)
+                    : Baka.Generate().InLetterCase(mode);
             }
 
             await Task.Run(() =>
@@ -39,12 +38,19 @@
             LogXD(Title, repeats, "FUNNY BY WORD");
         }
 
+        private static readonly Regex _upper = new("[A-ZА-Я]"), _lower = new("[a-zа-я]");
+
         protected static LetterCase GetMode(string? s)
         {
             if (s is null) return GetRandomLetterCase();
-            if (s == s.ToLower()) return LetterCase.Lower;
-            if (s == s.ToUpper()) return LetterCase.Upper;
-            return IsOneIn(8) ? LetterCase.Upper : LetterCase.Sentence;
+            var u = _upper.Count(s);
+            var l = _lower.Count(s);
+            var n = s.Contains("\n\n");
+            return n
+                ? GetUpperOrLowerLetterCase()
+                : u > l
+                    ? LetterCase.Upper
+                    : LetterCase.Lower;
         }
 
         protected static void LogXD(string title, int repeats, string s)

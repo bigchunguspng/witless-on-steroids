@@ -6,7 +6,11 @@ namespace Witlesss.Commands
     {
         protected override void Run()
         {
-            if (Message.ReplyToMessage == null) return;
+            if (Message.ReplyToMessage == null)
+            {
+                Bot.SendMessage(Chat, DEBUG_MANUAL);
+                return;
+            }
 
             var mess = Message.ReplyToMessage;
             var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
@@ -15,6 +19,7 @@ namespace Witlesss.Commands
             JsonIO.SaveData(mess, path, indent: true);
             using var stream = File.OpenRead(path);
             Bot.SendDocument(Chat, new InputOnlineFile(stream, name.Replace("--", "-")));
+            Log($"{Title} >> DEBUG");
         }
     }
 }

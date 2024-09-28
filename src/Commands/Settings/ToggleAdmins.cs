@@ -14,6 +14,7 @@
                 ChatService.SaveChatsDB();
                 var text = string.Format(ADMINS_RESPONSE, Data.AdminsOnly ? "только админы 😎" : "все участники 😚");
                 Bot.SendMessage(Chat, text);
+                Log($"{Title} >> ADMINS ONLY >> {(Data.AdminsOnly ? "YES" : "NO")}");
             }
         }
     }

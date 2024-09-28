@@ -7,6 +7,7 @@
             Data.Stickers = !Data.Stickers;
             ChatService.SaveChatsDB();
             Bot.SendMessage(Chat, string.Format(STICKERS_RESPONSE, Data.Stickers ? "" : "<b>НЕ</b> ").XDDD());
+            Log($"{Title} >> STICKERS >> {(Data.Stickers ? "ON" : "OFF")}");
         }
     }
 }

@@ -65,6 +65,7 @@ namespace Witlesss.Commands
             }
 
             Bot.SendMessage(Chat, sb.ToString());
+            Log($"{Title} >> CHAT INFO");
         }
 
         public static readonly Dictionary<MemeType, string> Types = new()

@@ -20,3 +20,13 @@ public struct ByteFlags
         }
     }
 }
+
+/*
+
+USAGE EXAMPLE:
+
+private ByteFlags _flags;
+
+[JsonProperty] public bool Stickers { get => _flags[1]; set => _flags[1] = value; }
+
+*/

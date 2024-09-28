@@ -1,23 +1,12 @@
 using Newtonsoft.Json;
-using Witlesss.Backrooms.Types;
 using Witlesss.Commands.Meme.Core;
 
 namespace Witlesss;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class ChatSettings(long chat)
+public class ChatSettings // 32 (28) bytes
 {
-    [JsonProperty] public long Chat { get; set; } = chat;
-
-    private ByteFlags _flags;
-    private byte _uselessness;
     private byte _speech, _pics, _quality;
-
-    [JsonProperty] public bool AdminsOnly
-    {
-        get => _flags[0];
-        set => _flags[0] = Chat.ChatIsNotPrivate() && value;
-    }
 
     [JsonProperty] public byte Speech  { get => _speech;  set => _speech  = value.Clamp100(); }
     [JsonProperty] public byte Pics    { get => _pics;    set => _pics    = value.Clamp(150); }
@@ -25,7 +14,8 @@ public class ChatSettings(long chat)
 
     [JsonProperty] public MemeType Type { get; set; }
 
-    [JsonProperty] public bool Stickers { get => _flags[1]; set => _flags[1] = value; }
+    [JsonProperty] public bool Stickers   { get; set; }
+    [JsonProperty] public bool AdminsOnly { get; set; }
 
     [JsonProperty] public MemeOptions? Options { get; set; }
 

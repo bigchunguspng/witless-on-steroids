@@ -7,7 +7,7 @@ public static class ChatSettingsFactory
     public static ChatSettings CreateFrom(CommandContext context)
     {
         var privateChat = context.ChatIsPrivate;
-        return new ChatSettings(context.Chat)
+        return new ChatSettings()
         {
             Type     = GetRandomMemeType(),
             Quality  = 75,

@@ -5,7 +5,10 @@ using Witlesss.Generation.Pack;
 
 namespace Witlesss
 {
-    public class CopypasterProxy
+    /// <summary>
+    /// Thread safe <see cref="Generation.Copypaster"/> wrapper attached to a Telegram chat.
+    /// </summary>
+    public class CopypasterProxy // 40 (34) bytes
     {
         private const byte MAX_USELESSNESS_BEFORE_UNLOAD = 10;
 

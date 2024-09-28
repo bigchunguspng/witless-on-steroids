@@ -8,119 +8,109 @@ namespace Witlesss
 {
     public partial class Bot
     {
+        public void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup? buttons)
+        {
+            if (messageId < 0) SendMessage(chat,            text, buttons);
+            else               EditMessage(chat, messageId, text, buttons);
+        }
+
+        // SEND
+
         public void SendMessage(long chat, string text, bool preview = false, int? replyTo = null)
         {
             var task = Client.SendTextMessageAsync
-                (chat, text, ParseMode.Html, disableWebPagePreview: !preview, replyToMessageId: replyTo);
-            TrySend(task, chat, "message");
+            (
+                chat, text, ParseMode.Html,
+                replyToMessageId: replyTo,
+                disableWebPagePreview: !preview
+            );
+            TrySend(chat, task, "message");
         }
+
         public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
             var task = Client.SendTextMessageAsync
-                (chat, text, ParseMode.Html, disableWebPagePreview: !preview, replyMarkup: inline);
-            TrySend(task, chat, "message [+][-]");
+            (
+                chat, text, ParseMode.Html,
+                replyMarkup: inline,
+                disableWebPagePreview: !preview
+            );
+            TrySend(chat, task, "message [+][-]");
         }
 
         public void CopyMessage(long chat, long fromChat, int messageId, int? replyTo = null)
         {
             var task = Client.CopyMessageAsync(chat, fromChat, messageId, replyToMessageId: replyTo);
-            TrySend(task, chat, "message", "copy");
+            TrySend(chat, task, "message", "copy");
         }
 
-        public void SendOrEditMessage(long chat, string text, int messageId, InlineKeyboardMarkup? buttons)
+        // EDIT
+
+        public void EditMessage(long chat, int id, string text)
         {
-            if (messageId < 0) SendMessage(chat, /*      */ text, buttons);
-            else /*         */ EditMessage(chat, messageId, text, buttons);
+            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
+            TrySend(chat, task, "message", "edit");
+        }
+
+        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline, bool preview = false)
+        {
+            var task = Client.EditMessageTextAsync
+            (
+                chat, id, text, ParseMode.Html,
+                replyMarkup: inline,
+                disableWebPagePreview: !preview
+            );
+            TrySend(chat, task, "message [+][-]", "edit");
+        }
+
+        // DELETE
+
+        public async void DeleteMessageAsync(long chat, int id)
+            => await Task.Run(() => DeleteMessage(chat, id));
+
+        private void DeleteMessage(long chat, int id)
+        {
+            if (id <= 0) return;
+            TrySend(chat, Client.DeleteMessageAsync(chat, id), "message", "delete");
         }
 
         // SEND MEDIA
 
         public void SendPhoto(long chat, InputOnlineFile photo)
-        {
-            var task = Client.SendPhotoAsync(chat, photo);
-            TrySend(task, chat, "photo");
-        }
-
-        public void SendAnimation(long chat, InputOnlineFile animation)
-        {
-            var task = Client.SendAnimationAsync(chat, animation);
-            TrySend(task, chat, "animation");
-        }
+            => TrySend(chat, Client.SendPhotoAsync(chat, photo), "photo");
 
         public void SendVideo(long chat, InputOnlineFile video)
-        {
-            var task = Client.SendVideoAsync(chat, video);
-            TrySend(task, chat, "video");
-        }
+            => TrySend(chat, Client.SendVideoAsync(chat, video), "video");
+
+        public void SendVoice(long chat, InputOnlineFile voice)
+            => TrySend(chat, Client.SendVoiceAsync(chat, voice), "voice");
+
+        public void SendVideoNote(long chat, InputOnlineFile note)
+            => TrySend(chat, Client.SendVideoNoteAsync(chat, note), "videonote");
+
+        public void SendAnimation(long chat, InputOnlineFile animation)
+            => TrySend(chat, Client.SendAnimationAsync(chat, animation), "animation");
+
+        public void SendDocument(long chat, InputOnlineFile document)
+            => TrySend(chat, Client.SendDocumentAsync(chat, document), "document");
+
+        public void SendSticker(long chat, InputOnlineFile sticker)
+            => TrySend(chat, Client.SendStickerAsync(chat, sticker), "sticker");
+
+        public void SendAlbum(long chat, IEnumerable<IAlbumInputMedia> album)
+            => TrySend(chat, Client.SendMediaGroupAsync(chat, album), "album");
 
         public void SendAudio(long chat, InputOnlineFile audio, string? art = null)
         {
             using var cover = File.OpenRead(art ?? File_DefaultAlbumCover);
-            var task = Client.SendAudioAsync(chat, audio, thumb: new InputMedia(cover, "xd"));
-            TrySend(task, chat, "audio");
-        }
-
-        public void SendDocument(long chat, InputOnlineFile document)
-        {
-            var task = Client.SendDocumentAsync(chat, document);
-            TrySend(task, chat, "document");
-        }
-        
-        public void SendSticker(long chat, InputOnlineFile sticker)
-        {
-            var task = Client.SendStickerAsync(chat, sticker);
-            TrySend(task, chat, "sticker");
-        }
-
-        public void SendVideoNote(long chat, InputOnlineFile note)
-        {
-            var task = Client.SendVideoNoteAsync(chat, note);
-            TrySend(task, chat, "videonote");
-        }
-
-        public void SendVoice(long chat, InputOnlineFile voice)
-        {
-            var task = Client.SendVoiceAsync(chat, voice);
-            TrySend(task, chat, "voice");
-        }
-
-        public void SendAlbum(long chat, IEnumerable<IAlbumInputMedia> album)
-        {
-            var task = Client.SendMediaGroupAsync(chat, album);
-            TrySend(task, chat, "album");
-        }
-
-        // EDIT / DELETE
-
-        public void EditMessage(long chat, int id, string text)
-        {
-            var task = Client.EditMessageTextAsync
-                (chat, id, text, ParseMode.Html);
-            TrySend(task, chat, "message", "edit");
-        }
-        public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline, bool preview = false)
-        {
-            var task = Client.EditMessageTextAsync
-                (chat, id, text, ParseMode.Html, disableWebPagePreview: !preview, replyMarkup: inline);
-            TrySend(task, chat, "message [+][-]", "edit");
-        }
-
-        public async void DeleteMessageAsync(long chat, int id)
-        {
-            await Task.Run(() => DeleteMessage(chat, id));
-        }
-
-        public void DeleteMessage(long chat, int id)
-        {
-            if (id <= 0) return;
-            var task = Client.DeleteMessageAsync(chat, id);
-            TrySend(task, chat, "message", "delete");
+            var thumb = new InputMedia(cover, "xd");
+            TrySend(chat, Client.SendAudioAsync(chat, audio, thumb: thumb), "audio");
         }
 
 
         private static readonly Regex _retryAfter = new(@"retry after (\d+)");
 
-        private static void TrySend(Task task, long chat, string what, string action = "send", int patience = 5)
+        private static void TrySend(long chat, Task task, string what, string action = "send", int patience = 5)
         {
             try
             {
@@ -136,7 +126,7 @@ namespace Witlesss
                     var serverError = reason.Contains("Server Error");
                     var retryDelay = serverError ? 0 : _retryAfter.ExtractGroup(1, reason, int.Parse, 0);
                     if (retryDelay > 0) Task.Delay(retryDelay * 250).Wait();
-                    if (retryDelay > 0 || serverError) TrySend(task, chat, what, action, patience - 1);
+                    if (retryDelay > 0 || serverError) TrySend(chat, task, what, action, patience - 1);
                 }
             }
         }
@@ -161,14 +151,9 @@ namespace Witlesss
             }
             catch
             {
-                EditMessageOnError(chat, message);
+                EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");
                 throw;
             }
-        }
-
-        public void EditMessageOnError(long chat, int message)
-        {
-            EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");
         }
 
         public void SendErrorDetails(long chat, string command, string errorMessage)

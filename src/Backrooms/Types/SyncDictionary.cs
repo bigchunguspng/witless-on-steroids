@@ -54,5 +54,27 @@ namespace Witlesss.Backrooms.Types
 
         public ICollection<TKey>   Keys   { get { lock (this) return _dictionary.Keys;   } }
         public ICollection<TValue> Values { get { lock (this) return _dictionary.Values; } }
+
+        // LOOPS
+
+        public TResult Do<TResult>(Func<Dictionary<TKey, TValue>, TResult> func)
+        {
+            lock (Sync) return func(_dictionary);
+        }
+
+        public void ForEachPair(Action<KeyValuePair<TKey, TValue>> action)
+        {
+            lock (Sync) this.ForEach(action);
+        }
+
+        public void ForEachKey(Action<TKey> action)
+        {
+            lock (Sync) Keys.ForEach(action);
+        }
+
+        public void ForEachValue(Action<TValue> action)
+        {
+            lock (Sync) Values.ForEach(action);
+        }
     }
 }

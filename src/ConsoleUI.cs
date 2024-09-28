@@ -41,7 +41,7 @@ namespace Witlesss
         private void SaveAndExit()
         {
             Log("На выход…", ConsoleColor.Yellow);
-            ChatService.SaveBakasBeforeExit();
+            ChatService.SaveBakas();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
@@ -51,7 +51,7 @@ namespace Witlesss
 
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) ChatService.SaveBakas();
+            else if (_input == "/s" ) ChatService.PerformAutoSave();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/cc") ClearTempFiles();
@@ -66,14 +66,11 @@ namespace Witlesss
         private void SetActiveChat()
         {
             var shit = _input![1..];
-            foreach (var chat in ChatService.SettingsDB.Keys)
+            var found = ChatService.SettingsDB.Do(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
+            if (found != 0)
             {
-                if (chat.ToString().EndsWith(shit))
-                {
-                    _active = chat;
-                    Log($"ACTIVE CHAT >> {_active}");
-                    break;
-                }
+                _active = found;
+                Log($"ACTIVE CHAT >> {_active}");
             }
         }
 
@@ -104,15 +101,12 @@ namespace Witlesss
         private void PacksInfoFull()
         {
             PacksInfo();
-            foreach (var pair in ChatService.LoadedBakas)
-            {
-                Log($"{pair.Key}", ConsoleColor.DarkYellow);
-            }
+            ChatService.LoadedBakas.ForEachKey(chat => Log($"{chat}", ConsoleColor.DarkYellow));
         }
 
         private void DeleteBlockers()
         {
-            var save = ChatService.SettingsDB.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat));
+            var save = ChatService.SettingsDB.Do(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
             if (save)  ChatService.SaveChatsDB();
         }
 
@@ -137,14 +131,14 @@ namespace Witlesss
 
         private void DeleteBySize(int size = 34)
         {
-            foreach (var chat in ChatService.SettingsDB.Keys)
+            ChatService.SettingsDB.ForEachKey(chat =>
             {
-                if (ChatService.GetPath(chat).FileSizeInBytes() > size) continue;
+                if (ChatService.GetPath(chat).FileSizeInBytes() > size) return;
 
                 ChatService.RemoveChat(chat);
                 ChatService.BackupPack(chat);
                 ChatService.DeletePack(chat);
-            }
+            });
             ChatService.SaveChatsDB();
         }
     }

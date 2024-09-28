@@ -25,7 +25,7 @@ public class Spam : SyncCommand
 
         var groupsOnly = Command!.Contains('g');
 
-        var size = _size.ExtractGroup(1, Command, int.Parse, 2_000_000);
+        var size = _size.ExtractGroup(1, Command, int.Parse, 00);
         var days = _days.ExtractGroup(1, Command, int.Parse, 28);
 
         var chat = Chat;
@@ -56,7 +56,7 @@ public class Spam : SyncCommand
 
     private static IEnumerable<long> GetChats(int minSize, bool groupsOnly, TimeSpan lastActivity)
     {
-        return ChatService.SettingsDB.Keys.Where(chat =>
+        return ChatService.SettingsDB.Do(x => x.Keys.Where(chat =>
         {
             var path = ChatService.GetPath(chat);
             if (File.Exists(path))
@@ -68,7 +68,7 @@ public class Spam : SyncCommand
             }
 
             return false;
-        });
+        }));
     }
 
     private static void LogSpam(long chat) => Log($"MAIL SENT >> {chat}", ConsoleColor.Yellow);

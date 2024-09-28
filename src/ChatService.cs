@@ -36,7 +36,7 @@ public static class ChatService
 
     public static void SaveChatsDB()
     {
-        JsonIO.SaveData(SettingsDB, File_Chats);
+        lock (SettingsDB.Sync) JsonIO.SaveData(SettingsDB, File_Chats);
         Log("CHATLIST SAVED", ConsoleColor.Green);
     }
 
@@ -62,22 +62,21 @@ public static class ChatService
         while (true)
         {
             await Task.Delay(interval);
-            SaveBakas();
+            PerformAutoSave();
         }
     }
 
-    public static void SaveBakasBeforeExit() => ForEachBaka(baka => baka.SaveChanges());
-    public static void SaveBakas()
+    public static void PerformAutoSave()
     {
-        ForEachBaka(baka => baka.SaveChanges());
-        var uselessChats = LoadedBakas.Where(x => x.Value.IsUselessEnough()).Select(x => x.Key);
-        foreach (var chat in uselessChats) UnloadBaka(chat);
+        SaveBakas();
+        UnloadUselessBakas();
     }
 
-    private static void ForEachBaka(Action<CopypasterProxy> action)
-    {
-        lock (LoadedBakas.Sync) LoadedBakas.Values.ForEach(action);
-    }
+    public static void SaveBakas
+        () => LoadedBakas.ForEachValue(baka => baka.SaveChanges());
+
+    public static void UnloadUselessBakas
+        () => LoadedBakas.ForEachPair(x => { if (x.Value.IsUselessEnough()) UnloadBaka(x.Key); });
 
     // LOAD / UNLOAD
 

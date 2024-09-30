@@ -5,12 +5,12 @@ namespace Witlesss
 {
     public class ConsoleUI
     {
-        private long   _active;
+        private long   _activeChat;
         private string? _input;
 
         private Bot Bot => Bot.Instance;
 
-        private CopypasterProxy Baka => ChatService.GetBaka(_active);
+        private CopypasterProxy Baka => ChatService.GetBaka(_activeChat);
 
         public static bool LoggedIntoReddit = false;
 
@@ -69,25 +69,25 @@ namespace Witlesss
             var found = ChatService.SettingsDB.Do(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
             if (found != 0)
             {
-                _active = found;
-                Log($"ACTIVE CHAT >> {_active}");
+                _activeChat = found;
+                Log($"ACTIVE CHAT >> {_activeChat}");
             }
         }
 
         private void BreakFourthWall()
         {
             var arg = _input!.Split (' ', 2)[1];
-            if (!ChatService.Knowns(_active)) return;
+            if (!ChatService.Knowns(_activeChat)) return;
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {
-                foreach (var line in eaten) Log($"{_active} += {line}", ConsoleColor.Yellow);
+                foreach (var line in eaten) Log($"{_activeChat} += {line}", ConsoleColor.Yellow);
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.SendMessage(_active, arg, preview: true);
+                Bot.SendMessage(_activeChat, arg, preview: true);
                 Baka.Eat(arg);
-                Log($"{_active} >> {arg}", ConsoleColor.Yellow);
+                Log($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Witlesss
 
         private void DeleteBlocker()
         {
-            if (DeleteBlocker(_active)) ChatService.SaveChatsDB();
+            if (DeleteBlocker(_activeChat)) ChatService.SaveChatsDB();
         }
 
         private bool DeleteBlocker(long chat)

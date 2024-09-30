@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using Witlesss.Commands.Meme.Core;
 
-namespace Witlesss;
+namespace Witlesss.Telegram;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class ChatSettings // 32 (28) bytes

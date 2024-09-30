@@ -4,7 +4,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Witlesss;
+namespace Witlesss.Telegram;
 
 public partial class Bot
 {

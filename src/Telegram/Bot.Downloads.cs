@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 
-namespace Witlesss;
+namespace Witlesss.Telegram;
 
 public partial class Bot
 {

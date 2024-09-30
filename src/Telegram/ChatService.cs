@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Witlesss.Backrooms.Types;
 
-namespace Witlesss;
+namespace Witlesss.Telegram;
 
 public static class ChatService
 {

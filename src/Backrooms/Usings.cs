@@ -12,6 +12,7 @@ global using Witlesss.Commands.Editing.Core;
 global using Witlesss.MediaTools;
 global using Witlesss.Services.Internet;
 global using Witlesss.Services.Technical;
+global using Witlesss.Telegram;
 global using static Witlesss.Backrooms.Extensions;
 global using static Witlesss.Backrooms.Static.Texts;
 global using static Witlesss.Backrooms.Static.Paths;

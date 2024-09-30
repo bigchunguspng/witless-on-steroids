@@ -1,6 +1,6 @@
 using Witlesss.Commands.Meme.Core;
 
-namespace Witlesss;
+namespace Witlesss.Telegram;
 
 public static class ChatSettingsFactory
 {

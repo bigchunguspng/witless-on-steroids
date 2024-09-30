@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Witlesss.Generation;
 using Witlesss.Generation.Pack;
 
-namespace Witlesss
+namespace Witlesss.Telegram
 {
     /// <summary>
     /// Thread safe <see cref="Generation.Copypaster"/> wrapper attached to a Telegram chat.

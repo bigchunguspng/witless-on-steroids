@@ -10,19 +10,19 @@
         public static void ReadFromFile()
         {
             var file = File.ReadAllText(File_Config);
-            GetValue(@"t\S*g\S*token\s+=\s+(\S+)",    s => TelegramToken = s, "telegram-token"      );
-            GetValue(   @"r\S*app\S*\s+=\s+(\S+)",    s => RedditAppID   = s, "reddit-app-id"       );
-            GetValue( @"r\S*token\S*\s+=\s+(\S+)",    s => RedditToken   = s, "reddit-refresh-token");
-            GetValue(  @"\S*admin\S*\s+=\s+(\S+)",    s => AdminID       = GetLong(s),    "admin-id");
+            GetValue(s => TelegramToken = s,             "tg-token");
+            GetValue(s => RedditAppID   = s,        "reddit-app-id");
+            GetValue(s => RedditToken   = s, "reddit-refresh-token");
+            GetValue(s => AdminID       = GetLong(s),    "admin-id");
 
-            void GetValue(string pattern, Action<string> action, string prop)
+            void GetValue(Action<string> action, string propertyName)
             {
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+                var regex = new Regex($@"{propertyName}\s+=\s+(\S+)", RegexOptions.IgnoreCase);
                 var match = regex.Match(file);
                 if (match.Success) action(match.Groups[1].Value);
                 else
                 {
-                    LogError($"Please add \"{prop}\" to \"{File_Config}\" and restart the app.");
+                    LogError($"Please add \"{propertyName}\" to \"{File_Config}\" and restart the app.");
                     Console.ReadKey();
                 }
             }

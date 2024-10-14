@@ -15,7 +15,7 @@ public partial class Bot
         Directory.CreateDirectory(directory);
 
         var hash = GetCapitalizationHash(file.FileUniqueId).ToString("X");
-        var name = $"{file.FileUniqueId}#{hash}{extension}";
+        var name = $"{file.FileUniqueId}+{hash}{extension}";
         var path = Path.Combine(directory, name);
         if (File.Exists(path))
         {

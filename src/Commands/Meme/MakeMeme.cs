@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Witlesss.Backrooms.Types.SerialQueue;
 using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
@@ -9,7 +10,9 @@ namespace Witlesss.Commands.Meme
     public class MakeMeme : MakeMemeCore<TextPair>
     {
         private static readonly MemeGenerator _imgflip = new();
+        private static readonly SerialTaskQueue _queue = new();
 
+        protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
 
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");

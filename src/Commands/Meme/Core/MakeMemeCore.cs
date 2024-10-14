@@ -155,11 +155,11 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         // MEME GENERATION
 
-        private readonly SerialTaskQueue _queue = new();
+        protected abstract SerialTaskQueue Queue { get; }
 
         private Task<string> MakeMemeImage(MemeFileRequest request, T text)
         {
-            return _queue.Enqueue(() =>
+            return Queue.Enqueue(() =>
             {
                 var sw = GetStartedStopwatch();
                 var result = MemeMaker.GenerateMeme(request, text);
@@ -177,7 +177,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private Task<string> MakeMemeVideo(MemeFileRequest request, T text)
         {
-            return _queue.Enqueue(() =>
+            return Queue.Enqueue(() =>
             {
                 var sw = GetStartedStopwatch();
                 var result = MemeMaker.GenerateVideoMeme(request, text);

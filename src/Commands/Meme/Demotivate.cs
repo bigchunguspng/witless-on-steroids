@@ -1,4 +1,5 @@
-﻿using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Backrooms.Types.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Commands.Meme.Demotivate.Mode;
@@ -8,7 +9,9 @@ namespace Witlesss.Commands.Meme
     public class Demotivate : MakeMemeCore<TextPair>
     {
         private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
+        private static readonly SerialTaskQueue  [] _queues  = [new SerialTaskQueue(), new SerialTaskQueue()];
 
+        protected override SerialTaskQueue          Queue     => _queues [(int)_mode];
         protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int)_mode];
 
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");

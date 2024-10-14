@@ -1,128 +1,60 @@
-﻿using System.Threading;
+﻿using static System.Threading.Tasks.TaskContinuationOptions;
 
 namespace Witlesss.Backrooms.Types.SerialQueue
 {
     /// <summary>
-    /// https://github.com/gentlee/SerialQueue
+    /// Sauce: https://github.com/gentlee/SerialQueue
     /// </summary>
     public class SerialTaskQueue
     {
-        SpinLock _spinLock = new(false);
-        readonly WeakReference<Task?> _lastTask = new(null);
+        private readonly object _lock = new();
+        private Task? _lastTask;
 
         public Task Enqueue(Action action)
         {
-            bool gotLock = false;
-            try
+            lock (_lock)
             {
-                Task? lastTask;
-                Task resultTask;
+                _lastTask = _lastTask is null
+                    ? Task.Run(action)
+                    : _lastTask.ContinueWith(_ => action(), ExecuteSynchronously);
 
-                _spinLock.Enter(ref gotLock);
-
-                if (_lastTask.TryGetTarget(out lastTask))
-                {
-                    resultTask = lastTask.ContinueWith(_ => action(), TaskContinuationOptions.ExecuteSynchronously);
-                }
-                else
-                {
-                    resultTask = Task.Run(action);
-                }
-
-                _lastTask.SetTarget(resultTask);
-
-                return resultTask;
-            }
-            finally
-            {
-                if (gotLock) _spinLock.Exit(false);
+                return _lastTask;
             }
         }
 
         public Task<T> Enqueue<T>(Func<T> function)
         {
-            bool gotLock = false;
-            try
+            lock (_lock)
             {
-                Task? lastTask;
-                Task<T> resultTask;
+                _lastTask = _lastTask is null
+                    ? Task.Run(function)
+                    : _lastTask.ContinueWith(_ => function(), ExecuteSynchronously);
 
-                _spinLock.Enter(ref gotLock);
-
-                if (_lastTask.TryGetTarget(out lastTask))
-                {
-                    resultTask = lastTask.ContinueWith(_ => function(), TaskContinuationOptions.ExecuteSynchronously);
-                }
-                else
-                {
-                    resultTask = Task.Run(function);
-                }
-
-                _lastTask.SetTarget(resultTask);
-
-                return resultTask;
-            }
-            finally
-            {
-                if (gotLock) _spinLock.Exit(false);
+                return (Task<T>)_lastTask;
             }
         }
 
         public Task Enqueue(Func<Task> asyncAction)
         {
-            bool gotLock = false;
-            try
+            lock (_lock)
             {
-                Task? lastTask;
-                Task resultTask;
+                _lastTask = _lastTask is null
+                    ? Task.Run(asyncAction)
+                    : _lastTask.ContinueWith(_ => asyncAction(), ExecuteSynchronously).Unwrap();
 
-                _spinLock.Enter(ref gotLock);
-
-                if (_lastTask.TryGetTarget(out lastTask))
-                {
-                    resultTask = lastTask.ContinueWith(_ => asyncAction(), TaskContinuationOptions.ExecuteSynchronously).Unwrap();
-                }
-                else
-                {
-                    resultTask = Task.Run(asyncAction);
-                }
-
-                _lastTask.SetTarget(resultTask);
-
-                return resultTask;
-            }
-            finally
-            {
-                if (gotLock) _spinLock.Exit(false);
+                return _lastTask;
             }
         }
 
         public Task<T> Enqueue<T>(Func<Task<T>> asyncFunction)
         {
-            bool gotLock = false;
-            try
+            lock (_lock)
             {
-                Task? lastTask;
-                Task<T> resultTask;
+                _lastTask = _lastTask is null
+                    ? Task.Run(asyncFunction)
+                    : _lastTask.ContinueWith(_ => asyncFunction(), ExecuteSynchronously).Unwrap();
 
-                _spinLock.Enter(ref gotLock);
-
-                if (_lastTask.TryGetTarget(out lastTask))
-                {
-                    resultTask = lastTask.ContinueWith(_ => asyncFunction(), TaskContinuationOptions.ExecuteSynchronously).Unwrap();
-                }
-                else
-                {
-                    resultTask = Task.Run(asyncFunction);
-                }
-
-                _lastTask.SetTarget(resultTask);
-
-                return resultTask;
-            }
-            finally
-            {
-                if (gotLock) _spinLock.Exit(false);
+                return (Task<T>)_lastTask;
             }
         }
     }

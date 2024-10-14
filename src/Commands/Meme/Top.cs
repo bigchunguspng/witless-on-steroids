@@ -1,4 +1,5 @@
-﻿using Witlesss.Commands.Meme.Core;
+﻿using Witlesss.Backrooms.Types.SerialQueue;
+using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
 using static Witlesss.Backrooms.Helpers.OptionsParsing;
@@ -8,7 +9,9 @@ namespace Witlesss.Commands.Meme
     public class Top : MakeMemeCore<string>
     {
         private static readonly IFunnyBrazil _ifunny = new();
+        private static readonly SerialTaskQueue _queue = new();
 
+        protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<string> MemeMaker => _ifunny;
 
         protected override Regex _cmd { get; } = new(@"^\/top(\S*)");

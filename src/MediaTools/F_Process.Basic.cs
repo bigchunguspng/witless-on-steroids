@@ -17,7 +17,7 @@ namespace Witlesss.MediaTools
             o.DisableChannel(Channel.Audio).FixPlayback();
 
             var v = GetVideoStream(Input)!;
-            if (v.Width.IsOdd() || v.Height.IsOdd())
+            if (v.Width.IsOdd() || v.Height.IsOdd() || Input.GetExtension(".mp4") == ".gif")
             {
                 var size = new Size(v.Width, v.Height).Ok();
                 o.Resize(size.FitSize().ValidMp4Size().Ok());

@@ -39,7 +39,7 @@ public partial class Bot
 
     private Task HandlePollingError(ITelegramBotClient bot, Exception exception, CancellationToken token)
     {
-        LogError($"Telegram API Error x_x --> {exception.Message}");
+        LogError($"Telegram API Error x_x --> {exception.Message}\n{exception.StackTrace}");
         return Task.CompletedTask;
     }
 

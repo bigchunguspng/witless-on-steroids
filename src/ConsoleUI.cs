@@ -32,7 +32,7 @@ namespace Witlesss
                 }
                 catch
                 {
-                    Log(">:^< u/stupid >:^<", ConsoleColor.Yellow);
+                    Print(">:^< u/stupid >:^<", ConsoleColor.Yellow);
                 }
             }
             while (_input != "s");
@@ -40,7 +40,7 @@ namespace Witlesss
 
         private void SaveAndExit()
         {
-            Log("На выход…", ConsoleColor.Yellow);
+            Print("На выход…", ConsoleColor.Yellow);
             ChatService.SaveBakas();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
@@ -50,7 +50,7 @@ namespace Witlesss
             if (_input is null) return;
 
             if      (BotWannaSpeak()) BreakFourthWall();
-            else if (_input == "/"  ) Log(CONSOLE_MANUAL, ConsoleColor.Yellow);
+            else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) ChatService.PerformAutoSave();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
@@ -70,7 +70,7 @@ namespace Witlesss
             if (found != 0)
             {
                 _activeChat = found;
-                Log($"ACTIVE CHAT >> {_activeChat}");
+                Print($"ACTIVE CHAT >> {_activeChat}");
             }
         }
 
@@ -81,13 +81,13 @@ namespace Witlesss
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {
-                foreach (var line in eaten) Log($"{_activeChat} += {line}", ConsoleColor.Yellow);
+                foreach (var line in eaten) Print($"{_activeChat} += {line}", ConsoleColor.Yellow);
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
                 Bot.SendMessage(_activeChat, arg, preview: true);
                 Baka.Eat(arg);
-                Log($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
+                Print($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
             }
         }
 
@@ -95,13 +95,13 @@ namespace Witlesss
         {
             var loaded = ChatService.LoadedBakas.Count;
             var total  = ChatService.SettingsDB .Count;
-            Log($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
+            Print($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
         }
 
         private void PacksInfoFull()
         {
             PacksInfo();
-            ChatService.LoadedBakas.ForEachKey(chat => Log($"{chat}", ConsoleColor.DarkYellow));
+            ChatService.LoadedBakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
         }
 
         private void DeleteBlockers()

@@ -109,7 +109,7 @@ public static class Paths
                 if (onePunch) Directory.Delete(path, true);
                 else files.ForEach(File.Delete);
 
-                Log($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
+                Print($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
             }
             catch (Exception e)
             {

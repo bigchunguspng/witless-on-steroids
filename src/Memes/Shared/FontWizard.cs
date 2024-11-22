@@ -210,7 +210,7 @@ namespace Witlesss.Memes.Shared
                 var offset = (marginB - marginT) / 2F;
                 var relativeSize = bound1.Height / 34;
                 var caps = (bound1.Height - bound2.Height) / 2 / (48 / relativeSize);
-                Log($"\"{pair.Key}\" => ({relativeSize:F4}F, {offset:F4}F, {caps:F4}F),");
+                Print($"\"{pair.Key}\" => ({relativeSize:F4}F, {offset:F4}F, {caps:F4}F),");
             }
         }
     }

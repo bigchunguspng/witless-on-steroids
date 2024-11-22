@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Packing
             ChatService.SaveChatsDB();
             ChatService.DeletePack(Chat);
 
-            Log($"{Title} >> DIC REMOVED >> {Chat}", ConsoleColor.Magenta);
+            Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, 13);
             Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
         }
 

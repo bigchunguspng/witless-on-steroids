@@ -37,7 +37,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
             else if (_wtf.IsMatch(Command!))
             {
-                Log("LAST QUERY");
+                LogDebug("LAST QUERY");
                 SendPost(Reddit.GetLastOrRandomQuery(Chat));
             }
             else if (Command!.StartsWith("/wss")) // subreddit
@@ -66,7 +66,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var sort = (SortingMode)options[0];
                     var time = GetTime(options, TimeMatters(sort));
 
-                    Log("SUBREDDIT");
+                    LogDebug("SUBREDDIT");
                     SendPost(new ScrollQuery(subreddit, sort, time));
                 }
                 else
@@ -88,12 +88,12 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var sort = Sorts  [options[0]];
                     var time = GetTime(options, TimeMatters(options[0]));
 
-                    Log("SEARCH");
+                    LogDebug("SEARCH");
                     SendPost(new SearchQuery(subreddit, q, sort, time));
                 }
                 else
                 {
-                    Log("DEFAULT (RANDOM)");
+                    LogDebug("DEFAULT (RANDOM)");
                     SendPost(Reddit.RandomSubredditQuery);
                 }
             }

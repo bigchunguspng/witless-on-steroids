@@ -35,7 +35,7 @@ public class DownloadVideoTask(string id, CommandContext context)
         }
 
         await YtDlp.Use(GetDownloadCommand(id), directory, context.Chat);
-        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", ConsoleColor.Yellow);
+        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", LogLevel.Info, 11);
 
         var directoryInfo = new DirectoryInfo(directory);
         var files = directoryInfo.GetFiles("video.mp4");

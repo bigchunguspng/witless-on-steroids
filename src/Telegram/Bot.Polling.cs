@@ -23,7 +23,7 @@ public partial class Bot
         };
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
-        Log(string.Format(BUENOS_DIAS, Username, Me.FirstName), ConsoleColor.Yellow);
+        Print(string.Format(BUENOS_DIAS, Username, Me.FirstName), ConsoleColor.Yellow);
     }
 
     private Task HandleUpdate(ITelegramBotClient bot, Update update, CancellationToken token)
@@ -73,7 +73,7 @@ public partial class Bot
 
     private Task OnUnknown()
     {
-        Log("How Did We Get Here?");
+        Print("How Did We Get Here?", ConsoleColor.Magenta);
         return Task.CompletedTask;
     }
 

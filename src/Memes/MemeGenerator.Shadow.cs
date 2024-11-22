@@ -52,8 +52,6 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
             var w = Math.Sqrt(fontSize) / (pixelated ? 1.6F : 2F);
             var w2 = (int)Math.Ceiling(w) + 2;
 
-            Log($"/meme >> shadow size: {w:F2} / {w2:F2} px", ConsoleColor.DarkYellow);
-
             var width  = textLayer.Width;
             var height = textLayer.Height;
 

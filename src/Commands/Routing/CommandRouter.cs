@@ -104,7 +104,7 @@ namespace Witlesss.Commands.Routing
             if (success)
             {
                 ChatService.SaveChatsDB();
-                Log($"{Title} >> DIC CREATED >> {Chat}", ConsoleColor.Magenta);
+                Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, 13);
                 Bot.SendMessage(Chat, START_RESPONSE);
             }
             return success;

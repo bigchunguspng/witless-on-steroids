@@ -129,6 +129,6 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         await using var stream = File.OpenRead(mp3.Result);
         Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
-        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", ConsoleColor.Yellow);
+        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", LogLevel.Info, 11);
     }
 }

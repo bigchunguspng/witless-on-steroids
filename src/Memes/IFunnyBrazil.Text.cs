@@ -189,6 +189,6 @@ public partial class IFunnyBrazil
         _caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
-        Log($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}", ConsoleColor.DarkYellow);
+        LogDebug($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}");
     }
 }

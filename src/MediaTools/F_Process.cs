@@ -54,7 +54,7 @@ public partial class F_Process
             await queue.Enqueue(() =>
             {
 #if DEBUG
-                Log($"[FFMPEG] >> ffmpeg {args}", ConsoleColor.DarkYellow);
+                Log($"[FFMPEG] >> ffmpeg {args}", LogLevel.Debug, 3);
 #endif
                 return processor.ProcessAsynchronously();
             });

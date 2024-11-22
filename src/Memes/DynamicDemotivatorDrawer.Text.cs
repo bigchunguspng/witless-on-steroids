@@ -184,6 +184,6 @@ public partial class DynamicDemotivatorDrawer
         _caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
-        Log($"/dp >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+        LogDebug($"/dp >> font size: {FontSize:F2}");
     }
 }

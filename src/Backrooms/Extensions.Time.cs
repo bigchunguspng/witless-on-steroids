@@ -13,7 +13,7 @@ public static partial class Extensions
 
     public static void Log(this Stopwatch sw, string message)
     {
-        Logger.Log($"{sw.ElapsedExact()}\t{message}");
+        Print($"[  T  I  M  E  ]   -  {sw.ElapsedExact()} {message}", ConsoleColor.DarkGray);
         sw.Restart();
     }
 

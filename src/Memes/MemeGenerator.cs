@@ -140,7 +140,7 @@ namespace Witlesss.Memes
                 background.Mutate(ctx => ctx.DrawImage(textLayer, point));
             }
 
-            Log($"/meme >> font size: {FontSize:F2}", ConsoleColor.DarkYellow);
+            LogDebug($"/meme >> font size: {FontSize:F2}");
 
             return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
         }

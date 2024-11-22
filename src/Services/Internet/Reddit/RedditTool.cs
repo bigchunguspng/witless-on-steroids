@@ -136,17 +136,17 @@ namespace Witlesss.Services.Internet.Reddit
                 {
                     ThisQueryCache.UpdateRefreshDate();
                     posts.Clear();
-                    Log("ScrollReddit (old posts)", ConsoleColor.DarkYellow);
+                    LogDebug("ScrollReddit (old posts)");
                     ScrollReddit();
                 }
                 else if (posts.Count == 1) // last post >> load next
                 {
-                    Log("ScrollReddit (1 post)", ConsoleColor.DarkYellow);
+                    LogDebug("ScrollReddit (1 post)");
                     ScrollReddit(posts.Peek().Fullname);
                 }
                 else if (posts.Count == 0) // no posts in queue
                 {
-                    Log("ScrollReddit (0 posts)", ConsoleColor.DarkYellow);
+                    LogDebug("ScrollReddit (0 posts)");
                     ScrollReddit();
                 }
             }
@@ -154,7 +154,7 @@ namespace Witlesss.Services.Internet.Reddit
             {
                 Cache.Add(ThisQuery, new RedditQueryCache());
 
-                Log("ScrollReddit (new Q)", ConsoleColor.DarkYellow);
+                LogDebug("ScrollReddit (new Q)");
                 ScrollReddit();
             }
         }

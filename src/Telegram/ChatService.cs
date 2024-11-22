@@ -38,7 +38,7 @@ public static class ChatService
     public static void SaveChatsDB()
     {
         lock (SettingsDB.Sync) JsonIO.SaveData(SettingsDB, File_Chats);
-        Log("CHATLIST SAVED", ConsoleColor.Green);
+        Log("CHATLIST SAVED", LogLevel.Info, 10);
     }
 
 
@@ -86,7 +86,7 @@ public static class ChatService
     {
         var baka = new CopypasterProxy(chat);
         LoadedBakas.Add(chat, baka);
-        Log($"DIC LOADED >> {chat}", ConsoleColor.Magenta);
+        Log($"DIC LOADED >> {chat}", LogLevel.Info, 13);
 
         return baka;
     }
@@ -94,7 +94,7 @@ public static class ChatService
     private static void UnloadBaka(long chat)
     {
         LoadedBakas.Remove(chat);
-        Log($"DIC UNLOAD << {chat}", ConsoleColor.Yellow);
+        Log($"DIC DROPPED << {chat}", LogLevel.Info, 11);
     }
 
     // DELETE / BACKUP

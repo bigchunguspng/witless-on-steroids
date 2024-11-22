@@ -77,8 +77,9 @@ public partial class Bot
         return Task.CompletedTask;
     }
 
-    public static void HandleCommandException(Exception e, CommandContext context)
+    public static void HandleCommandException(Exception e, CommandContext? context)
     {
-        LogError($"{context.Title} >> BRUH -> {e.GetFixedMessage()}");
+        var title = context?.Title ?? "[unknown]";
+        LogError($"{title} >> BRUH -> {e.GetFixedMessage()}");
     }
 }

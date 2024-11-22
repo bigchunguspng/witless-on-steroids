@@ -21,13 +21,13 @@ namespace Witlesss.Services.Technical
         /// </summary>
         public static void Log(string message, LogLevel level = LogLevel.Info, int color = 7)
         {
-            var s = StyleByLevel(level);
-            var c = LetterByLevel(level);
+            var c = GetLevelChar (level);
+            var s = GetLevelColor(level);
             var m = message.EscapeMarkup();
             AnsiConsole.MarkupLine($"[8]{DateTime.Now:dd'/'MM' 'HH:mm:ss.fff}[/] [{s}]{c}[/] [{color}]{m}[/]");
         }
 
-        private static char LetterByLevel(LogLevel level) => level switch
+        private static char GetLevelChar(LogLevel level) => level switch
         {
             LogLevel.Debug => 'D',
             LogLevel.Info  => '.',
@@ -35,7 +35,7 @@ namespace Witlesss.Services.Technical
             _              => '?'
         };
 
-        private static int StyleByLevel(LogLevel level) => level switch
+        private static int GetLevelColor(LogLevel level) => level switch
         {
             LogLevel.Debug => 3,
             LogLevel.Info  => 7,

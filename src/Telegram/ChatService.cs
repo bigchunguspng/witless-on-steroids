@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Telegram;
@@ -52,6 +53,7 @@ public static class ChatService
     /// <summary>
     /// <b>HIGH MEMORY USAGE!</b> Use only when you actually need the <see cref="Generation.Pack.GenerationPack"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public static CopypasterProxy GetBaka(long chat)
     {
         return LoadedBakas.TryGetValue(chat, out var baka) ? baka : LoadBaka(chat);

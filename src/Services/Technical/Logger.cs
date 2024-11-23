@@ -30,7 +30,7 @@ namespace Witlesss.Services.Technical
         private static char GetLevelChar(LogLevel level) => level switch
         {
             LogLevel.Debug => 'D',
-            LogLevel.Info  => '.',
+            LogLevel.Info  => '#',
             LogLevel.Error => '!',
             _              => '?'
         };

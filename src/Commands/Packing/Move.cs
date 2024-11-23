@@ -67,7 +67,7 @@ namespace Witlesss.Commands.Packing
             File.Copy(PackPath, path);
 
             var result = Path.GetFileNameWithoutExtension(path);
-            Log($@"{Title} >> DIC SAVED AS ""{result}""", LogLevel.Info, 13);
+            Log($"{Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, 13);
             return result;
         }
 

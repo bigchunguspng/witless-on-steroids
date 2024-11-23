@@ -1,6 +1,6 @@
-using Telegram.Bot.Types.InputFiles;
-
 // ReSharper disable InconsistentNaming
+
+using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing;
 
@@ -44,7 +44,7 @@ public class Magick : PhotoCommand
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
-            Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
+            Bot.SendSticker(Chat, InputFile.FromFileId(TROLLFACE));
             return;
         }
 
@@ -94,13 +94,13 @@ public class Magick : PhotoCommand
         var name = "made with piece_fap_bot";
 
         using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));
-        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Chat, New_InputOnlineFile());
-        else                              Bot.SendDocument (Chat, New_InputOnlineFile());
+        if      (sendDocument)            Bot.SendDocument (Chat, InputFile_FromStream());
+        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
+        else if (extension == "webp")     Bot.SendSticker  (Chat, InputFile.FromStream(stream));
+        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Chat, InputFile_FromStream());
+        else                              Bot.SendDocument (Chat, InputFile_FromStream());
 
-        InputOnlineFile New_InputOnlineFile() => new(stream, name + "." + extension);
+        InputFile InputFile_FromStream() => InputFile.FromStream(stream, name + "." + extension);
     }
 
     private static readonly Regex _pic = new("^(png|jpe?g)$"), _gif = new("^(gif|webm|mp4)$");

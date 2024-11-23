@@ -124,7 +124,7 @@ namespace Witlesss
                 ChatService.BackupPack(chat);
                 ChatService.DeletePack(chat);
             }
-            else Bot.Client.DeleteMessageAsync(chat, x);
+            else Bot.Client.DeleteMessage(chat, x);
 
             return x is -1;
         }

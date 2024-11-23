@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 
 // ReSharper disable InconsistentNaming
 
@@ -63,7 +62,7 @@ public class FFMpeg : AudioVideoPhotoCommand
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
-            Bot.SendSticker(Chat, new InputOnlineFile(TROLLFACE));
+            Bot.SendSticker(Chat, InputFile.FromFileId(TROLLFACE));
             return;
         }
 
@@ -98,14 +97,14 @@ public class FFMpeg : AudioVideoPhotoCommand
     private void SendResult(string result, string extension, bool sendDocument = false)
     {
         using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Chat, New_InputOnlineFile());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Chat, new InputOnlineFile(stream));
-        else if (extension == "mp3")      Bot.SendAudio    (Chat, New_InputOnlineFile());
-        else if (extension == "mp4")      Bot.SendAnimation(Chat, New_InputOnlineFile());
-        else                              Bot.SendDocument (Chat, New_InputOnlineFile());
+        if      (sendDocument)            Bot.SendDocument (Chat, InputFile_FromStream());
+        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
+        else if (extension == "webp")     Bot.SendSticker  (Chat, InputFile.FromStream(stream));
+        else if (extension == "mp3")      Bot.SendAudio    (Chat, InputFile_FromStream());
+        else if (extension == "mp4")      Bot.SendAnimation(Chat, InputFile_FromStream());
+        else                              Bot.SendDocument (Chat, InputFile_FromStream());
 
-        InputOnlineFile New_InputOnlineFile() => new(stream, $"made with piece_fap_bot.{extension}");
+        InputFile InputFile_FromStream() => InputFile.FromStream(stream, $"made with piece_fap_bot.{extension}");
     }
 
     private static readonly Regex _pic = new("^(png|jpe?g)$");

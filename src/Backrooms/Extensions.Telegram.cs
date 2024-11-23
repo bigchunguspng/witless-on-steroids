@@ -60,7 +60,7 @@ public static partial class Extensions
         (this Message message) => message.Sticker is { IsVideo: true };
 
     public static bool HasImageDocument
-        (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg", Thumb: not null };
+        (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg", Thumbnail: not null };
 
     public static bool HasAnimeDocument
         (this Message message) => message.Document?.MimeType?.StartsWith("image") ?? false;
@@ -111,7 +111,7 @@ public static partial class Extensions
     {
         if (user is null) return false;
 
-        var admins = await Bot.Instance.Client.GetChatAdministratorsAsync(chat);
+        var admins = await Bot.Instance.Client.GetChatAdministrators(chat);
         return admins.Any(x => x.User.Id == user.Id);
     }
 
@@ -134,11 +134,11 @@ public static partial class Extensions
 
     public static (int width, int height) TryGetSize(this FileBase file)
     {
-        if (file is PhotoSize             f1  ) return (f1.Width, f1.Height);
-        if (file is Sticker               f2  ) return (f2.Width, f2.Height);
-        if (file is Video                 f3  ) return (f3.Width, f3.Height);
-        if (file is Animation             f4  ) return (f4.Width, f4.Height);
-        if (file is Document { Thumb: { } f5 }) return (f5.Width, f5.Height);
+        if (file is PhotoSize                 f1  ) return (f1.Width, f1.Height);
+        if (file is Sticker                   f2  ) return (f2.Width, f2.Height);
+        if (file is Video                     f3  ) return (f3.Width, f3.Height);
+        if (file is Animation                 f4  ) return (f4.Width, f4.Height);
+        if (file is Document { Thumbnail: { } f5 }) return (f5.Width, f5.Height);
         return (0, 0);
     }
 

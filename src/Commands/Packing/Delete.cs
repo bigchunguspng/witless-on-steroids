@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Witlesss.Commands.Packing
@@ -103,7 +102,7 @@ namespace Witlesss.Commands.Packing
             else
                 return;
 
-            Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
+            Bot.EditMessage(Chat, message.Id, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
 
             // EXPLOSION ANIMATION (IF ANY)
 
@@ -118,7 +117,7 @@ namespace Witlesss.Commands.Packing
                     var cell = GetCell(i, j);
                     if (cell == _boom || cell == _fire) SetCell(i, j, _default);
                 }
-                Bot.EditMessage(Chat, message.MessageId, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
+                Bot.EditMessage(Chat, message.Id, TRACTOR_GAME_RULES, new InlineKeyboardMarkup(_game));
             }
 
             // MATCH RESULTS
@@ -133,18 +132,18 @@ namespace Witlesss.Commands.Packing
 
                 if (noHousing && noTractor)
                 {
-                    Bot.SendSticker(Chat, new InputOnlineFile(GG));
+                    Bot.SendSticker(Chat, InputFile.FromFileId(GG));
                     Bot.SendMessage(Chat, "НИЧЬЯ");
                 }
                 else if (noTractor)
                 {
-                    Bot.SendSticker(Chat, new InputOnlineFile(I_WIN));
+                    Bot.SendSticker(Chat, InputFile.FromFileId(I_WIN));
                     Bot.SendMessage(Chat, "RIP 🤣😭😂👌");
                 }
                 else
                 {
-                    Bot.SendSticker(Chat, new InputOnlineFile(U_WIN));
-                    Bot.SendSticker(Chat, new InputOnlineFile(D_100));
+                    Bot.SendSticker(Chat, InputFile.FromFileId(U_WIN));
+                    Bot.SendSticker(Chat, InputFile.FromFileId(D_100));
 
                     DeleteTheDictionary();
                 }

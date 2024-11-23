@@ -42,7 +42,7 @@ namespace Witlesss.Telegram
             {
                 try
                 {
-                    return Client.GetMeAsync().Result;
+                    return Client.GetMe().Result;
                 }
                 catch (Exception e)
                 {

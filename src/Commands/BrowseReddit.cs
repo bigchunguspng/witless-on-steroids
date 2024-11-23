@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Witlesss.Services.Internet.Reddit;
 
 #pragma warning disable CS8509
@@ -155,7 +154,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 var caption = captioned ? null : post.Title;
                 captioned = true;
 
-                return new InputMediaPhoto(new InputMedia(url)) { Caption = caption };
+                return new InputMediaPhoto(InputFile.FromUri(url)) { Caption = caption };
             }
         }
 
@@ -170,7 +169,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             try
             {
                 // todo fix bug: some gifs are sent as "fgsfds.gif.jpg" image document for no reason
-                SendPicOrAnimation(new InputOnlineFile(post.URL));
+                SendPicOrAnimation(InputFile.FromUri(post.URL));
             }
             catch
             {
@@ -181,10 +180,10 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     : process.Compress   ().Result;
                 
                 using var stream = File.OpenRead(path);
-                SendPicOrAnimation(new InputOnlineFile(stream, $"r-{post.Subreddit}.mp4"));
+                SendPicOrAnimation(InputFile.FromStream(stream, $"r-{post.Subreddit}.mp4"));
             }
 
-            void SendPicOrAnimation(InputOnlineFile file)
+            void SendPicOrAnimation(InputFile file)
             {
                 if (gif) Bot.SendAnimaXD(Chat, file, post.Title);
                 else     Bot.SendPhotoXD(Chat, file, post.Title);

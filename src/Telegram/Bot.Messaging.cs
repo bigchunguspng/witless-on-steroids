@@ -1,7 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Witlesss.Telegram
@@ -18,29 +17,33 @@ namespace Witlesss.Telegram
 
         public void SendMessage(long chat, string text, bool preview = false, int? replyTo = null)
         {
-            var task = Client.SendTextMessageAsync
+            var task = Client.SendMessage
             (
                 chat, text, ParseMode.Html,
-                replyToMessageId: replyTo,
-                disableWebPagePreview: !preview
+                replyParameters: GetReplyParameters(replyTo),
+                linkPreviewOptions: GetPreviewOptions(preview)
             );
             TrySend(chat, task, "message");
         }
 
         public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
-            var task = Client.SendTextMessageAsync
+            var task = Client.SendMessage
             (
                 chat, text, ParseMode.Html,
                 replyMarkup: inline,
-                disableWebPagePreview: !preview
+                linkPreviewOptions: GetPreviewOptions(preview)
             );
             TrySend(chat, task, "message [+][-]");
         }
 
         public void CopyMessage(long chat, long fromChat, int messageId, int? replyTo = null)
         {
-            var task = Client.CopyMessageAsync(chat, fromChat, messageId, replyToMessageId: replyTo);
+            var task = Client.CopyMessage
+            (
+                chat, fromChat, messageId,
+                replyParameters: GetReplyParameters(replyTo)
+            );
             TrySend(chat, task, "message", "copy");
         }
 
@@ -48,17 +51,17 @@ namespace Witlesss.Telegram
 
         public void EditMessage(long chat, int id, string text)
         {
-            var task = Client.EditMessageTextAsync(chat, id, text, ParseMode.Html);
+            var task = Client.EditMessageText(chat, id, text, ParseMode.Html);
             TrySend(chat, task, "message", "edit");
         }
 
         public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
-            var task = Client.EditMessageTextAsync
+            var task = Client.EditMessageText
             (
                 chat, id, text, ParseMode.Html,
                 replyMarkup: inline,
-                disableWebPagePreview: !preview
+                linkPreviewOptions: GetPreviewOptions(preview)
             );
             TrySend(chat, task, "message [+][-]", "edit");
         }
@@ -71,40 +74,40 @@ namespace Witlesss.Telegram
         private void DeleteMessage(long chat, int id)
         {
             if (id <= 0) return;
-            TrySend(chat, Client.DeleteMessageAsync(chat, id), "message", "delete");
+            TrySend(chat, Client.DeleteMessage(chat, id), "message", "delete");
         }
 
         // SEND MEDIA
 
-        public void SendPhoto(long chat, InputOnlineFile photo)
-            => TrySend(chat, Client.SendPhotoAsync(chat, photo), "photo");
+        public void SendPhoto(long chat, InputFile photo)
+            => TrySend(chat, Client.SendPhoto(chat, photo), "photo");
 
-        public void SendVideo(long chat, InputOnlineFile video)
-            => TrySend(chat, Client.SendVideoAsync(chat, video), "video");
+        public void SendVideo(long chat, InputFile video)
+            => TrySend(chat, Client.SendVideo(chat, video), "video");
 
-        public void SendVoice(long chat, InputOnlineFile voice)
-            => TrySend(chat, Client.SendVoiceAsync(chat, voice), "voice");
+        public void SendVoice(long chat, InputFile voice)
+            => TrySend(chat, Client.SendVoice(chat, voice), "voice");
 
-        public void SendVideoNote(long chat, InputOnlineFile note)
-            => TrySend(chat, Client.SendVideoNoteAsync(chat, note), "videonote");
+        public void SendVideoNote(long chat, InputFile note)
+            => TrySend(chat, Client.SendVideoNote(chat, note), "videonote");
 
-        public void SendAnimation(long chat, InputOnlineFile animation)
-            => TrySend(chat, Client.SendAnimationAsync(chat, animation), "animation");
+        public void SendAnimation(long chat, InputFile animation)
+            => TrySend(chat, Client.SendAnimation(chat, animation), "animation");
 
-        public void SendDocument(long chat, InputOnlineFile document)
-            => TrySend(chat, Client.SendDocumentAsync(chat, document), "document");
+        public void SendDocument(long chat, InputFile document)
+            => TrySend(chat, Client.SendDocument(chat, document), "document");
 
-        public void SendSticker(long chat, InputOnlineFile sticker)
-            => TrySend(chat, Client.SendStickerAsync(chat, sticker), "sticker");
+        public void SendSticker(long chat, InputFile sticker)
+            => TrySend(chat, Client.SendSticker(chat, sticker), "sticker");
 
         public void SendAlbum(long chat, IEnumerable<IAlbumInputMedia> album)
-            => TrySend(chat, Client.SendMediaGroupAsync(chat, album), "album");
+            => TrySend(chat, Client.SendMediaGroup(chat, album), "album");
 
-        public void SendAudio(long chat, InputOnlineFile audio, string? art = null)
+        public void SendAudio(long chat, InputFile audio, string? art = null)
         {
             using var cover = File.OpenRead(art ?? File_DefaultAlbumCover);
-            var thumb = new InputMedia(cover, "xd");
-            TrySend(chat, Client.SendAudioAsync(chat, audio, thumb: thumb), "audio");
+            var thumb = InputFile.FromStream(cover, "xd");
+            TrySend(chat, Client.SendAudio(chat, audio, thumbnail: thumb), "audio");
         }
 
 
@@ -131,11 +134,11 @@ namespace Witlesss.Telegram
             }
         }
 
-        public void SendPhotoXD(long chat, InputOnlineFile photo, string caption) 
-            => SendOrThrow(Client.SendPhotoAsync    (chat, photo, caption));
+        public void SendPhotoXD(long chat, InputFile photo, string caption) 
+            => SendOrThrow(Client.SendPhoto    (chat, photo, caption));
 
-        public void SendAnimaXD(long chat, InputOnlineFile photo, string caption) 
-            => SendOrThrow(Client.SendAnimationAsync(chat, photo, caption: caption));
+        public void SendAnimaXD(long chat, InputFile photo, string caption) 
+            => SendOrThrow(Client.SendAnimation(chat, photo, caption));
 
         private static void SendOrThrow(Task task)
         {
@@ -162,14 +165,14 @@ namespace Witlesss.Telegram
             var text = string.Format(FF_ERROR_REPORT, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
-            SendDocument(chat, new InputOnlineFile(stream, "произошла ашыпка.txt"));
+            SendDocument(chat, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));
         }
 
         public int PingChat(long chat, string text = "😏", bool notify = true)
         {
             try
             {
-                var task = Client.SendTextMessageAsync(chat, text, ParseMode.Html, disableNotification: !notify);
+                var task = Client.SendMessage(chat, text, ParseMode.Html, disableNotification: !notify);
 
                 task.Wait();
                 if (task.IsFaulted) throw new Exception(task.Exception?.Message);
@@ -187,5 +190,12 @@ namespace Witlesss.Telegram
             e.Message.Contains("Forbidden")
          || e.Message.Contains("chat not found")
          || e.Message.Contains("rights to send");
+
+        private static LinkPreviewOptions GetPreviewOptions(bool showPreview) => new() { IsDisabled = !showPreview };
+
+        private static ReplyParameters? GetReplyParameters(int? replyTo)
+        {
+            return replyTo.HasValue ? new ReplyParameters { MessageId = replyTo.Value } : null;
+        }
     }
 }

@@ -7,7 +7,7 @@ public static class CallbackDataParsing
 {
     public static string[] GetData    (this CallbackQuery query) => query.Data!.Split(" - ", 2);
     public static long     GetChat    (this CallbackQuery query) => query.Message!.Chat.Id;
-    public static int      GetMessage (this CallbackQuery query) => query.Message!.MessageId;
+    public static int      GetMessage (this CallbackQuery query) => query.Message!.Id;
 
     public static ListPagination GetPagination(this CallbackQuery query, string[] data)
     {

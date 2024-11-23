@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 
 namespace Witlesss.Commands.Editing.Core
 {
@@ -87,12 +86,12 @@ namespace Witlesss.Commands.Editing.Core
         protected void SendResult(string result)
         {
             using var stream = System.IO.File.OpenRead(result);
-            if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, new InputOnlineFile(stream));
-            else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, new InputOnlineFile(stream));
-            else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, new InputOnlineFile(stream, AudioFileName));
-            else if (Type == MediaType.Anime) Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
-            else if (Type == MediaType.Video) Bot.SendVideo    (Chat, new InputOnlineFile(stream, VideoFileName));
-            else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
+            else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, InputFile.FromStream(stream));
+            else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, InputFile.FromStream(stream, AudioFileName));
+            else if (Type == MediaType.Anime) Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoFileName));
+            else if (Type == MediaType.Video) Bot.SendVideo    (Chat, InputFile.FromStream(stream, VideoFileName));
+            else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
         }
 
         protected virtual string VideoFileName => "piece_fap_bot.mp3";

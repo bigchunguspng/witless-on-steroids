@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing;
 
@@ -19,7 +19,7 @@ public class ToVoiceMessage : AudioVideoCommand
         }
 
         await using var stream = System.IO.File.OpenRead(result);
-        Bot.SendVoice(Chat, new InputOnlineFile(stream, "balls.ogg"));
+        Bot.SendVoice(Chat, InputFile.FromStream(stream, "balls.ogg"));
         Log($"{Title} >> VOICE ~|||~");
     }
 }

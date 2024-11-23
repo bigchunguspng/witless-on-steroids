@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Telegram.Bot.Types.InputFiles;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Services.Internet;
 
@@ -128,7 +128,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         Bot.DeleteMessageAsync(context.Chat, messageToDelete);
 
         await using var stream = File.OpenRead(mp3.Result);
-        Bot.SendAudio(context.Chat, new InputOnlineFile(stream, mp3.Result), jpg.Result);
+        Bot.SendAudio(context.Chat, InputFile.FromStream(stream, mp3.Result), jpg.Result);
         Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", LogLevel.Info, 11);
     }
 }

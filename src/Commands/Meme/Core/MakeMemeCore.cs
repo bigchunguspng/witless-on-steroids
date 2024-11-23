@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Witlesss.Backrooms.Types.SerialQueue;
 using Witlesss.Memes.Shared;
 
@@ -83,7 +82,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeImage(request, GetText()));
-                Bot.SendPhoto(Chat, new InputOnlineFile(stream));
+                Bot.SendPhoto(Chat, InputFile.FromStream(stream));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}]");
         }
@@ -103,8 +102,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             {
                 await using var stream = File.OpenRead(await MakeMemeStick(request, GetText()));
 
-                if (sticker) Bot.SendSticker(Chat, new InputOnlineFile(stream));
-                else         Bot.SendPhoto  (Chat, new InputOnlineFile(stream));
+                if (sticker) Bot.SendSticker(Chat, InputFile.FromStream(stream));
+                else         Bot.SendPhoto  (Chat, InputFile.FromStream(stream));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] STICKER");
         }
@@ -124,8 +123,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             {
                 await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
 
-                if (note) Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
-                else      Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoName));
+                if (note) Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
+                else      Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoName));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }

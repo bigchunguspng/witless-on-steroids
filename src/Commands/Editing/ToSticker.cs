@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types;
 using static Witlesss.MediaTools.FFMpegXD;
 
 namespace Witlesss.Commands.Editing
@@ -12,7 +12,7 @@ namespace Witlesss.Commands.Editing
             var size = GetPictureSize(path).Normalize().Ok();
             var result = await path.UseFFMpeg(Chat).ToSticker(size).Out("-stick", ".webp");
             await using var stream = System.IO.File.OpenRead(result);
-            Bot.SendSticker(Chat, new InputOnlineFile(stream));
+            Bot.SendSticker(Chat, InputFile.FromStream(stream));
             if (Command![^1] is 's') Bot.SendMessage(Chat, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }

@@ -1,4 +1,7 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Telegram.Bot.Types;
 
 namespace Witlesss.Commands
 {
@@ -12,14 +15,25 @@ namespace Witlesss.Commands
                 return;
             }
 
-            var mess = Message.ReplyToMessage;
-            var name = $"Message-{mess.MessageId}-{mess.Chat.Id}.json";
+            var message = Message.ReplyToMessage;
+
+            var name = $"Message-{message.Id}-{message.Chat.Id}.json";
             var path = Path.Combine(Dir_Temp, name);
             Directory.CreateDirectory(Dir_Temp);
-            JsonIO.SaveData(mess, path, indent: true);
+
+            File.WriteAllText(path, JsonSerializer.Serialize(message, _options));
             using var stream = File.OpenRead(path);
-            Bot.SendDocument(Chat, new InputOnlineFile(stream, name.Replace("--", "-")));
+
+            Bot.SendDocument(Chat, InputFile.FromStream(stream, name.Replace("--", "-")));
             Log($"{Title} >> DEBUG");
         }
+
+        private readonly JsonSerializerOptions _options = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            WriteIndented = true
+        };
     }
 }

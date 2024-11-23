@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing
 {
@@ -9,7 +9,7 @@ namespace Witlesss.Commands.Editing
             var path = await DownloadFile();
 
             await using var stream = System.IO.File.OpenRead(await path.UseFFMpeg(Chat).ToVideoNote());
-            Bot.SendVideoNote(Chat, new InputOnlineFile(stream));
+            Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
             Log($"{Title} >> NOTE (*)");
         }
     }

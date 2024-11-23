@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Witlesss.Commands.Settings;
 using Witlesss.Generation.Pack;
 
@@ -70,7 +69,7 @@ namespace Witlesss.Commands.Packing
             var argIsChatId = long.TryParse(arg, out var chat);
             if (chat == Chat)
             {
-                Bot.SendSticker(Chat, new InputOnlineFile(HOLY_MOLY));
+                Bot.SendSticker(Chat, InputFile.FromFileId(HOLY_MOLY));
                 return;
             }
 

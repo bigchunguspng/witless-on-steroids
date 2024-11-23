@@ -13,7 +13,7 @@ public class Tell : SyncCommand
         }
 
         var args = Args?.Split(' ', 2);
-        var messageId = Message.ReplyToMessage is { } reply ? reply.MessageId : -1;
+        var messageId = Message.ReplyToMessage is { } reply ? reply.Id : -1;
 
         var chatProvided = args is not null && args.Length > 0;
         var textProvided = args is not null && args!.Length >= 2;

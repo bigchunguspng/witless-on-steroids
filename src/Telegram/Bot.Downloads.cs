@@ -37,9 +37,9 @@ public partial class Bot
     {
         try
         {
-            var file = await Client.GetFileAsync(fileId);
+            var file = await Client.GetFile(fileId);
             var stream = new FileStream(path, FileMode.Create);
-            Client.DownloadFileAsync(file.FilePath!, stream).Wait();
+            Client.DownloadFile(file.FilePath!, stream).Wait();
             await stream.DisposeAsync();
         }
         catch (Exception e)

@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Telegram.Bot.Types;
 
 namespace Witlesss.Commands.Editing
 {
@@ -12,7 +12,7 @@ namespace Witlesss.Commands.Editing
 
             var result = await path.UseFFMpeg(Chat).RemoveAudio().Out("-silent");
             await using var stream = System.IO.File.OpenRead(result);
-            Bot.SendAnimation(Chat, new InputOnlineFile(stream, VideoFileName));
+            Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoFileName));
             Log($"{Title} >> GIF [~]");
         }
 

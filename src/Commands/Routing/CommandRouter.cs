@@ -17,6 +17,7 @@ namespace Witlesss.Commands.Routing
         private readonly GetRedditLink _link = new();
         private readonly AliasFFMpeg _apeg = new();
         private readonly AliasMagick _aim = new();
+        private readonly Htmlizer _html = new();
 
         private readonly WitlessCommandRouter _witlessRouter;
 
@@ -60,6 +61,8 @@ namespace Witlesss.Commands.Routing
                 .Register("op_dg"  , () => _mail.WithText(DG_OPTIONS))
                 .Register("op_nuke", () => _mail.WithText(NUKE_OPTIONS))
                 .Register("fonts"  , () => _mail.WithText(FONTS_CHEAT_SHEET))
+                .Register("html"   , () => _html.WithMode(Htmlizer.Mode.ToHtml))
+                .Register("text"   , () => _html.WithMode(Htmlizer.Mode.FromHtml))
                 .Register("spam"   , () => _spam)
                 .Register("tell"   , () => _tell)
                 .Register("help"   , () => _help)

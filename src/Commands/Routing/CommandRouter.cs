@@ -13,8 +13,6 @@ namespace Witlesss.Commands.Routing
         private readonly Piece _piece = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
-        private readonly BrowseReddit _reddit = new();
-        private readonly GetRedditLink _link = new();
         private readonly AliasFFMpeg _apeg = new();
         private readonly AliasMagick _aim = new();
         private readonly Htmlizer _html = new();
@@ -48,9 +46,9 @@ namespace Witlesss.Commands.Routing
                 .Register("load"   , () => new Load())
                 .Register("im"     , () => new Magick())
                 .Register("peg"    , () => new FFMpeg())
+                .Register("w"      , () => new BrowseReddit())
+                .Register("link"   , () => new GetRedditLink())
                 .Register("piece"  , () => _piece)
-                .Register("w"      , () => _reddit)
-                .Register("link"   , () => _link)
                 .Register("apeg"   , () => _apeg)
                 .Register("aim"    , () => _aim)
                 .Register("debug"  , () => _debug)

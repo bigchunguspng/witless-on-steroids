@@ -10,13 +10,13 @@ using Witlesss.Services.Internet.Reddit;
 
 namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
-    public class BrowseReddit : SyncCommand
+    public class BrowseReddit : AsyncCommand
     {
-        private readonly Regex _arg = new(@"((?:(?:.+)(?=\s[a-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
-        private readonly Regex _sub = new(@"([a-z0-9_]+)");
-        private readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
-        private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
-        private readonly Regex _wtf = new(@"^\/w[^\ss_@]");
+        private static readonly Regex _arg = new(@"((?:(?:.+)(?=\s[a-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
+        private static readonly Regex _sub = new(@"([a-z0-9_]+)");
+        private static readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
+        private static readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
+        private static readonly Regex _wtf = new(@"^\/w[^\ss_@]");
 
         private static readonly RedditTool Reddit = RedditTool.Instance;
 
@@ -25,25 +25,25 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         // input: /wss subreddit
         // input: /ws [subreddit [-ops]]
         // input: /w search query [subreddit*] [-ops]   (ops: -h/-n/-t/-c/-ta/...)
-        protected override void Run()
+        protected override async Task Run()
         {
-            //var input = TextWithoutBotUsername;
+            await Task.Delay(50); // to trigger async-ness
 
             if (Message.ReplyToMessage is { Text: { } t } message && IsCommand(t, "/w"))
             {
                 Context = CommandContext.FromMessage(message);
-                Run(); // RECURSIVE
+                await Run(); // RECURSIVE
             }
             else if (_wtf.IsMatch(Command!))
             {
                 LogDebug("LAST QUERY");
-                SendPost(Reddit.GetLastOrRandomQuery(Chat));
+                await RedditTool.Queue.Enqueue(() => SendPost(Reddit.GetLastOrRandomQuery(Chat)));
             }
             else if (Command!.StartsWith("/wss")) // subreddit
             {
                 if (Args is not null)
                 {
-                    var subs = Reddit.FindSubreddits(Args);
+                    var subs = await RedditTool.Queue.Enqueue(() => Reddit.FindSubreddits(Args));
                     var b = subs.Count > 0;
 
                     Bot.SendMessage(Chat, b ? SubredditList(Args, subs) : "<b>*пусто*</b>");
@@ -66,7 +66,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var time = GetTime(options, TimeMatters(sort));
 
                     LogDebug("SUBREDDIT");
-                    SendPost(new ScrollQuery(subreddit, sort, time));
+                    await RedditTool.Queue.Enqueue(() => SendPost(new ScrollQuery(subreddit, sort, time)));
                 }
                 else
                 {
@@ -88,12 +88,12 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var time = GetTime(options, TimeMatters(options[0]));
 
                     LogDebug("SEARCH");
-                    SendPost(new SearchQuery(subreddit, q, sort, time));
+                    await RedditTool.Queue.Enqueue(() => SendPost(new SearchQuery(subreddit, q, sort, time)));
                 }
                 else
                 {
                     LogDebug("DEFAULT (RANDOM)");
-                    SendPost(Reddit.RandomSubredditQuery);
+                    await RedditTool.Queue.Enqueue(() => SendPost(Reddit.RandomSubredditQuery));
                 }
             }
 
@@ -263,15 +263,15 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         #endregion
     }
 
-    public class GetRedditLink : SyncCommand
+    public class GetRedditLink : AsyncCommand
     {
-        protected override void Run()
+        protected override async Task Run()
         {
             if (Message.ReplyToMessage is { } message)
             {
                 Context = CommandContext.FromMessage(message);
 
-                if (Text is not null && RedditTool.Instance.Recognize(Text) is { } post)
+                if (Text != null && await Recognize(Text) is { } post)
                 {
                     Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
                 }
@@ -280,7 +280,12 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     Bot.SendMessage(Chat, $"{I_FORGOR.PickAny()} {FAIL_EMOJI_1.PickAny()}");
                 }
             }
-            else Bot.SendMessage(Chat,  string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
+            else Bot.SendMessage(Chat, string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
+        }
+
+        private Task<PostData?> Recognize(string text)
+        {
+            return RedditTool.Queue.Enqueue(() => RedditTool.Instance.Recognize(text));
         }
     }
 }

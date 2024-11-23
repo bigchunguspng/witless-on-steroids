@@ -1,5 +1,6 @@
 ﻿using Reddit;
 using Reddit.Controllers;
+using Witlesss.Backrooms.Types.SerialQueue;
 
 #pragma warning disable CS8524
 
@@ -10,6 +11,8 @@ namespace Witlesss.Services.Internet.Reddit
         public const int POST_LIMIT = 32, KEEP_POSTS = 50;
 
         public static readonly RedditTool Instance = new();
+
+        public static readonly SerialTaskQueue Queue = new();
 
         private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken, Config.RedditSecret);
 

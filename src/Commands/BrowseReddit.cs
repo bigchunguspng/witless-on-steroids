@@ -47,6 +47,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var b = subs.Count > 0;
 
                     Bot.SendMessage(Chat, b ? SubredditList(Args, subs) : "<b>*пусто*</b>");
+                    Log($"{Title} >> FIND {subs.Count} SUBS >> {Args}");
                 }
                 else
                 {
@@ -274,6 +275,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 if (Text != null && await Recognize(Text) is { } post)
                 {
                     Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
+                    Log($"{Title} >> LINK TO r/{post.Subreddit}");
                 }
                 else
                 {

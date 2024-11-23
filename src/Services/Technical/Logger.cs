@@ -24,7 +24,7 @@ namespace Witlesss.Services.Technical
             var c = GetLevelChar (level);
             var s = GetLevelColor(level);
             var m = message.EscapeMarkup();
-            AnsiConsole.MarkupLine($"[8]{DateTime.Now:dd'/'MM' 'HH:mm:ss.fff}[/] [{s}]{c}[/] [{color}]{m}[/]");
+            AnsiConsole.MarkupLine($"[8]{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}[/] [{s}]{c}[/] [{color}]{m}[/]");
         }
 
         private static char GetLevelChar(LogLevel level) => level switch

@@ -15,13 +15,7 @@ public class Htmlizer : SyncCommand
 
     protected override void Run()
     {
-        if (Message.ReplyToMessage == null)
-        {
-            Bot.SendMessage(Chat, DEBUG_MANUAL);
-            return;
-        }
-
-        var message = Message.ReplyToMessage;
+        var message = Message.ReplyToMessage ?? Message;
 
         var text = _mode is Mode.ToHtml ? HtmlText.Escape(message.ToHtml()) : message.GetTextOrCaption();
         if (text is null)
@@ -30,6 +24,8 @@ public class Htmlizer : SyncCommand
         }
         else
         {
+            if (message == Message) text = text.SplitN(2)[1];
+
             Bot.SendMessage(Chat, _mode is Mode.ToHtml ? $"<pre>{text}</pre>" : text);
             Log($"{Title} >> {(_mode is Mode.ToHtml ? "<HTML/>" : "<TEXT/>")}");
         }

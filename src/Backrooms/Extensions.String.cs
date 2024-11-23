@@ -1,4 +1,6 @@
-﻿namespace Witlesss.Backrooms;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Witlesss.Backrooms;
 
 public static partial class Extensions
 {
@@ -113,6 +115,7 @@ public static partial class Extensions
     public static string? GroupOrNull
         (this Match match, int group) => match.Groups[group].Success ? match.Groups[group].Value : null;
 
+    [return: NotNullIfNotNull(nameof(fallback))]
     public static T? ExtractGroup<T>
         (this Regex regex, int group, string input, Func<string, T> convert, T? fallback = default)
     {

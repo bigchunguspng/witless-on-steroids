@@ -24,7 +24,7 @@ namespace Witlesss.Memes
 
         // DATA
 
-        private SolidBrush _textBrush;
+        private SolidBrush _textBrush = default!;
 
         private readonly SolidBrush _white = new(Color.White);
 

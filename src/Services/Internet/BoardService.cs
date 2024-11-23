@@ -29,7 +29,7 @@ namespace Witlesss.Services.Internet
                 {
                     if (line.StartsWith("<a")) continue;
 
-                    var text = _quote.ExtractGroup(1, line, s => s, line)!;
+                    var text = _quote.ExtractGroup(1, line, s => s, line);
 
                     text = text.Replace("<s>", "").Replace("</s>", "");
                     if (subjectPending)
@@ -110,9 +110,9 @@ namespace Witlesss.Services.Internet
 
         public class BoardGroup
         {
-            public string Title;
+            public string? Title;
             public bool IsNSFW;
-            public readonly List<Board> Boards = new();
+            public readonly List<Board> Boards = [];
 
             public record Board(string Title, string URL);
         }

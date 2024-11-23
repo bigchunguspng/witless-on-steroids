@@ -27,7 +27,7 @@ public partial class F_Process
         if (IsOneIn(isVideo ? 4 : 8))
         {
             var i = GetMediaInfo();
-            var p = Math.Max(2, Math.Min(i.Video.Width, i.Video.Height) / RandomInt(60, 120));
+            var p = Math.Max(2, Math.Min(i.Video!.Width, i.Video.Height) / RandomInt(60, 120));
             sb.Append("pixelize=").Append(p).Append(':').Append(p).Append(":p=3,");
         }
         // https://ffmpeg.org/ffmpeg-filters.html#pixelize

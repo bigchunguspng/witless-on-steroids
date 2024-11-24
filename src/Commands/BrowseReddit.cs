@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
@@ -133,11 +132,42 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }
 
-        private void SendGalleryPost(PostData post) => Bot.SendAlbum(Chat, AlbumFromGallery(post));
-
-        private static IEnumerable<InputMediaPhoto> AlbumFromGallery(PostData post)
+        private PostData? GetPostOrBust(RedditQuery query)
         {
-            var process = StartGalleryDL(post.URL);
+            try
+            {
+                return Reddit.PullPost(query, Chat);
+            }
+            catch
+            {
+                Bot.SendMessage(Chat, "💀");
+
+                //                   He sends
+                // awesome fucking evil blue flaming skull next to
+                //  a keyboard with the "g" key being highlighted
+                //                 to your chat
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣶⣿⣿⣿⣿⣿⣿⣶⣆⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣿⣿⠉⠉⠉⠄⠉⢹⣿⣦⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢿⣿⣿⣁⠄⠄⠤⠤⡀⠻⣿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠘⣿⣿⣿⡗⠖⡶⢾⣶⠊⡏⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢻⣿⣿⣅⣈⠂⠐⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠘⢿⣾⣇⣂⣠⠄⠄⠄⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢘⣿⣗⠒⠄⢨⠶⢁⣄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠨⣿⣿⡿⠋⠁⣴⣿⣿⣷⣦⣄⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣠⣄⣶⣎⢱⢄⢀⣾⣿⣿⣿⣿⣿⣿⣿⣶⣦⣤⣄⠄⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢠⣾⣿⣿⡞⢝⡟⠃⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣇⠄⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⠄⠆⢄⠄⢛⡫⠝⢿⡥⠟⡃⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣼⣭⣻⣿⣿⡀⠄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⠄⣴⣆⠄⢋⠄⠐⣡⣿⣆⣴⣼⣿⣿⣿⣿⣿⣿⣿⣿⠏⢈⣿⣿⣿⣿⣿⣿⣷⡄⠄⠄⠄
+                // ⠄⠄⠄⠄⠄⣼⣿⣷⠄⠉⠒⣪⣹⣟⣹⣿⣿⣿⣿⣿⣟⣿⣿⣿⡇⢀⣸⣿⣿⣿⢟⣽⣿⣿⣇⠄⠄⠄
+                // WHOLESEOME 0 DESTRUCTION 100 QUAGMIRE TOILET 62
+                return null;
+            }
+        }
+
+        private void SendGalleryPost(PostData post)
+        {
+            var process = SystemHelpers.StartReadableProcess("gallery-dl", $"{post.URL} -g");
             var urls = new List<string>();
             for (var i = 0; i < 10; i++)
             {
@@ -147,21 +177,10 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 urls.Add(line);
             }
 
-            var captioned = false;
-            return urls.Select(GetInputMedia);
+            var album = urls.Select(url => new InputMediaPhoto(InputFile.FromUri(url))).ToList();
+            album[0].Caption = post.Title;
 
-            InputMediaPhoto GetInputMedia(string url)
-            {
-                var caption = captioned ? null : post.Title;
-                captioned = true;
-
-                return new InputMediaPhoto(InputFile.FromUri(url)) { Caption = caption };
-            }
-        }
-
-        private static Process StartGalleryDL(string url)
-        {
-            return SystemHelpers.StartReadableProcess("gallery-dl", $"{url} -g");
+            Bot.SendAlbum(Chat, album);
         }
 
         private void SendSingleFilePost(PostData post)
@@ -191,42 +210,9 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
         }
 
-        private PostData? GetPostOrBust(RedditQuery query)
-        {
-            try
-            {
-                return Reddit.PullPost(query, Chat);
-            }
-            catch
-            {
-                Bot.SendMessage(Chat, "💀");
-
-                //                   He sends
-                // awesome fucking evil blue flaming skull next to
-                //  a keyboard with the "g" key being highlighted
-                //                 to your chat
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣶⣿⣿⣿⣿⣿⣿⣶⣆⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣿⣿⠉⠉⠉⠄⠉⢹⣿⣦⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢿⣿⣿⣁⠄⠄⠤⠤⡀⠻⣿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠘⣿⣿⣿⡗⠖⡶⢾⣶⠊⡏⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢻⣿⣿⣅⣈⠂⠐⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠘⢿⣾⣇⣂⣠⠄⠄⠄⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢘⣿⣗⠒⠄⢨⠶⢁⣄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠨⣿⣿⡿⠋⠁⣴⣿⣿⣷⣦⣄⡀⠄⠄⠄⠄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣠⣄⣶⣎⢱⢄⢀⣾⣿⣿⣿⣿⣿⣿⣿⣶⣦⣤⣄⠄⠄⠄⠄
-                // ⠄⠄⠄⠄⠄⠄⠄⢠⣾⣿⣿⡞⢝⡟⠃⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣇⠄⠄⠄
-                // ⠄⠄⠄⠄⠆⢄⠄⢛⡫⠝⢿⡥⠟⡃⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣼⣭⣻⣿⣿⡀⠄⠄
-                // ⠄⠄⠄⣴⣆⠄⢋⠄⠐⣡⣿⣆⣴⣼⣿⣿⣿⣿⣿⣿⣿⣿⠏⢈⣿⣿⣿⣿⣿⣿⣷⡄⠄
-                // ⠄⠄⣼⣿⣷⠄⠉⠒⣪⣹⣟⣹⣿⣿⣿⣿⣿⣟⣿⣿⣿⡇⢀⣸⣿⣿⣿⢟⣽⣿⣿⣇⠄
-                // WHOLESEOME 0 DESTRUCTION 100 QUAGMIRE TOILET 62
-                return null;
-            }
-        }
-
         private static string DownloadMeme(PostData post, string extension)
         {
-            var name = UniquePath(Dir_Pics, $@"{post.Fullname}{extension}");
+            var name = UniquePath(Dir_Pics, $"{post.Fullname}{extension}");
             using var web = new WebClient();
             web.DownloadFile(post.URL, name);
 
@@ -270,12 +256,13 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         {
             if (Message.ReplyToMessage is { } message)
             {
+                var title = Title;
                 Context = CommandContext.FromMessage(message);
 
                 if (Text != null && await Recognize(Text) is { } post)
                 {
                     Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
-                    Log($"{Title} >> LINK TO r/{post.Subreddit}");
+                    Log($"{title} >> LINK TO r/{post.Subreddit}");
                 }
                 else
                 {

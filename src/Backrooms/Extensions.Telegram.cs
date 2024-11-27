@@ -60,7 +60,7 @@ public static partial class Extensions
         (this Message message) => message.Sticker is { IsVideo: true };
 
     public static bool HasImageDocument
-        (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg", Thumbnail: not null };
+        (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg" };
 
     public static bool HasAnimeDocument
         (this Message message) => message.Document?.MimeType?.StartsWith("image") ?? false;

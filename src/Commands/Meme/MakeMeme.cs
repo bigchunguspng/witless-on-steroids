@@ -49,6 +49,7 @@ namespace Witlesss.Commands.Meme
             var generate = text.IsNullOrEmpty();
             var capitalize = CheckCaps(Request, _caps, generate);
 
+            var lowerCase      = Check(Request,   _lowerCase);
             var addBottomText  = Check(Request,  _add_bottom);
             var onlyBottomText = Check(Request, _only_bottom);
             var onlyTopText    = Check(Request,    _top_only);
@@ -94,7 +95,8 @@ namespace Witlesss.Commands.Meme
 
             return new TextPair(AdjustCase(a), AdjustCase(b));
 
-            string AdjustCase(string s) => generate || capitalize ? s.InLetterCase(LetterCase.Upper) : s;
+            string AdjustCase
+                (string s) => lowerCase ? s.ToLower() : generate || capitalize ? s.ToUpper() : s;
         }
 
         private static readonly string[] separators = ["\n\n\n\n", "\n\n\n", "\n\n", "\n"];
@@ -107,6 +109,7 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex  _add_bottom = new(@"^\/meme\S*(s)\S*");
         private static readonly Regex _only_bottom = new(@"^\/meme\S*(d)\S*");
         private static readonly Regex    _top_only = new(@"^\/meme\S*(t)\S*");
+        private static readonly Regex   _lowerCase = new(@"^\/meme\S*(lo)\S*");
         private static readonly Regex   _colorText = new(@"^\/meme\S*(cc)\S*");
         private static readonly Regex      _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
         private static readonly Regex      _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");

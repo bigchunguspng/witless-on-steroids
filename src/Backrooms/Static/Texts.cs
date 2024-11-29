@@ -357,6 +357,7 @@ public static class Texts
         """
         <b>Опции команды</b> <code>/meme</code>:
 
+        <code>lo</code> - текст нижним регистром
         <code>t</code> - только верхний текст
         <code>d</code> - только нижний текст
         <code>s</code> - добавлять нижний текст (к своему)

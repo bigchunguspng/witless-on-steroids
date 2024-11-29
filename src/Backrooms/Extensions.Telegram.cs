@@ -20,6 +20,19 @@ public static partial class Extensions
         return title.Truncate(32);
     }
 
+    private static readonly Regex _chatMessageURL = new(@"https:\/\/t.me\/(?:c\/(\d+)|(\S+))\/(\d+)");
+
+    public static (ChatId chat, int message) GetChatIdAndMessage(this string url)
+    {
+        var match = _chatMessageURL.Match(url);
+        var chat = match.Groups[1].Success
+            ? new ChatId(long.Parse($"-100{match.Groups[1].Value}"))
+            : new ChatId(              $"@{match.Groups[2].Value}");
+        var message = int.Parse(match.Groups[3].Value);
+
+        return (chat, message);
+    }
+
     public static string GetUserFullName(this User user)
     {
         var name = user.FirstName;

@@ -11,6 +11,8 @@ namespace Witlesss.Commands.Routing
         private readonly Spam _spam = new();
         private readonly Help _help = new();
         private readonly Piece _piece = new();
+        private readonly React _react = new();
+        private readonly Reply _reply = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
         private readonly AliasFFMpeg _apeg = new();
@@ -53,6 +55,7 @@ namespace Witlesss.Commands.Routing
                 .Register("aim"    , () => _aim)
                 .Register("debug"  , () => _debug)
                 .Register("id"     , () => _mail.WithText($"<code>{Context.Chat}</code>"))
+                .Register("sid"    , () => _mail.WithText($"<code>\"{Context.Message.ReplyToMessage?.Sticker?.FileId}\",</code>"))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_dp"  , () => _mail.WithText(DP_OPTIONS))
@@ -65,6 +68,8 @@ namespace Witlesss.Commands.Routing
                 .Register("tell"   , () => _tell)
                 .Register("help"   , () => _help)
                 .Register("man"    , () => _help)
+                .Register("re"     , () => _react)
+                .Register("rep"    , () => _reply)
                 .Register("man_crop" , () => _mail.WithText(CROP_MANUAL))
                 .Register("man_scale", () => _mail.WithText(SCALE_MANUAL))
                 .Register("man_cut"  , () => _mail.WithText(CUT_MANUAL))

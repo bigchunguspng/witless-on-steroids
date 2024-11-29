@@ -26,6 +26,17 @@ namespace Witlesss.Telegram
             TrySend(chat, task, "message");
         }
 
+        public void SendMessage(ChatId chat, string text, bool preview = false, int? replyTo = null)
+        {
+            var task = Client.SendMessage
+            (
+                chat, text, ParseMode.Html,
+                replyParameters: GetReplyParameters(replyTo),
+                linkPreviewOptions: GetPreviewOptions(preview)
+            );
+            TrySend(chat.Identifier ?? 0, task, "message");
+        }
+
         public void SendMessage(long chat, string text, InlineKeyboardMarkup? inline, bool preview = false)
         {
             var task = Client.SendMessage
@@ -45,6 +56,22 @@ namespace Witlesss.Telegram
                 replyParameters: GetReplyParameters(replyTo)
             );
             TrySend(chat, task, "message", "copy");
+        }
+
+        public void CopyMessage(ChatId chat, long fromChat, int messageId, int? replyTo = null)
+        {
+            var task = Client.CopyMessage
+            (
+                chat, fromChat, messageId,
+                replyParameters: GetReplyParameters(replyTo)
+            );
+            TrySend(chat.Identifier ?? 0, task, "message", "copy");
+        }
+
+        public void React(ChatId chat, int messageId, ReactionType[]? reaction)
+        {
+            var task = Client.SetMessageReaction(chat, messageId, reaction);
+            TrySend(chat.Identifier ?? 0, task, "reaction", "set");
         }
 
         // EDIT

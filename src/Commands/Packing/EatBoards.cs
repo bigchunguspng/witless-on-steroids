@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
+using Telegram.Bot.Extensions;
 using Telegram.Bot.Types;
 using Witlesss.Backrooms.Types;
 
@@ -253,17 +254,22 @@ namespace Witlesss.Commands.Packing
             }
         }
 
+        private static readonly Regex _url = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
+
         private static string GetThreadSubject(string path)
         {
             var serializer = JsonSerializer;
             using var stream = File.OpenText(path);
             using var reader = new JsonTextReader(stream);
 
-            var text = serializer.Deserialize<List<string>>(reader).First();
-            if (text.Contains(':'))
+            var text = serializer.Deserialize<List<string>>(reader)!.First();
+            text = text.Replace("<wbr>", "");
+            text = HtmlText.Escape(text);
+            text = _url.Replace(text, match => $"<a href=\"{match.Value}\">[deleted]</a>");
+            if (text.Contains(": "))
             {
-                var s = text.Split(':', 2);
-                text = $"<b>{s[0]}</b>:{s[1]}";
+                var s = text.Split(": ", 2);
+                text = $"<b>{s[0]}</b>: {s[1]}";
             }
 
             return text;
@@ -278,18 +284,18 @@ namespace Witlesss.Commands.Packing
         private class ThreadSubjectConverter : JsonConverter<List<string>>
         {
             public override void WriteJson
-                (JsonWriter writer, List<string> value, JsonSerializer serializer)
+                (JsonWriter writer, List<string>? value, JsonSerializer serializer)
                 => throw new NotImplementedException();
 
             /// <summary>
             /// Returns only the first string from the list.
             /// </summary>
             public override List<string> ReadJson
-                (JsonReader reader, Type type, List<string> list, bool hasValue, JsonSerializer serializer)
+                (JsonReader reader, Type type, List<string>? list, bool hasValue, JsonSerializer serializer)
             {
                 while (reader.Read())
                 {
-                    if (reader.TokenType == JsonToken.String) return [(string)reader.Value];
+                    if (reader.TokenType == JsonToken.String) return [(string)reader.Value!];
                 }
 
                 return [];

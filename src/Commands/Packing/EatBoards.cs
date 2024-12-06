@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Telegram.Bot.Extensions;
 using Telegram.Bot.Types;
-using Witlesss.Backrooms.Types;
 
 #pragma warning disable CS4014
 
@@ -17,10 +16,11 @@ namespace Witlesss.Commands.Packing
     public class EatBoards : Fuse
     {
         private static readonly BoardService _chan = new();
-        private static readonly SyncDictionary<long, string> _names = new();
 
         private static List<BoardService.BoardGroup>? _boards;
         private static List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);
+
+        private string _name = default!;
 
         protected override async Task RunAuthorized()
         {
@@ -68,96 +68,84 @@ namespace Witlesss.Commands.Packing
 
             var board = uri.Segments[1].Replace("/", "");
 
-            if (url.EndsWith("/archive"))
-            {
-                _names[Chat] = $"{board}.zip";
-
-                var threads = _chan.GetAllArchivedThreads(url);
-                var tasks = threads.Select(x => GetDiscussionAsync("https://" + uri.Host + x)).ToList();
-
-                await RespondAndStartEating(tasks);
-            }
-            else if (url.Contains("/thread/"))
-            {
-                _names[Chat] = $"{board}.{uri.Segments[3].Replace("/", "")}";
-
-                var replies = _chan.GetThreadDiscussion(url).ToList();
-
-                await EatMany(replies, Context, Size, Limit);
-            }
-            else // THE WHOLE BOARD
-            {
-                _names[Chat] = board;
-
-                var threads = _chan.GetAllActiveThreads(url);
-                var tasks = threads.Select(x => GetDiscussionAsync(url + x)).ToList();
-
-                await RespondAndStartEating(tasks);
-            }
+            if      (url.Contains("/thread/")) await EatSingleThread(url, board, uri);
+            else if (url.EndsWith("/archive")) await EatArchive     (url, board, uri); 
+            else                               await EatWholeBoard  (url, board);
         }
 
-        private Task<List<string>> GetDiscussionAsync(string url)
+        private async Task EatSingleThread(string url, string board, Uri uri)
         {
-            // Use .ToList() if u want the Task to start right at this point!
-            // Otherwise enumeration will be triggered later (slower).
-            return Task.Run(() => _chan.GetThreadDiscussion(url).ToList());
+            _name = $"{board}.{uri.Segments[3].Replace("/", "")}";
+
+            var replies = _chan.GetThreadDiscussion(url).ToList();
+
+            await EatMany(replies, Size, Limit);
         }
 
-        private async Task RespondAndStartEating(List<Task<List<string>>> tasks)
+        private async Task EatWholeBoard(string url, string board)
         {
-            var ikuzo = tasks.Count > 60 ? "Начинаю поглощение интернета 😈" : "頂きます！😋🍽";
-            var text = string.Format(BOARD_START, tasks.Count, ikuzo);
-            if (tasks.Count > 200) text += $"\n\n\n{MAY_TAKE_A_WHILE}";
-            var message = Bot.PingChat(Chat, text);
-            await Bot.RunOrThrow(EatBoardDiscussion(Context, tasks, Limit), Chat, message);
+            _name = board;
+
+            var threads = _chan.GetAllActiveThreads(url);
+            var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(url + x));
+
+            await RespondAndStartEating(tasks);
         }
 
-
-        private static async Task EatBoardDiscussion(WitlessContext c, List<Task<List<string>>> tasks, int limit)
+        private async Task EatArchive(string url, string board, Uri uri)
         {
-            await Task.WhenAll(tasks);
+            _name = $"{board}.zip";
 
-            var size = ChatService.GetPath(c.Chat).FileSizeInBytes();
+            var threads = _chan.GetAllArchivedThreads(url);
+            var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + uri.Host + x));
 
-            var lines = tasks.Select(task => task.Result).SelectMany(s => s).ToList();
-
-            await EatMany(lines, c, size, limit);
+            await RespondAndStartEating(tasks);
         }
 
-        private static async Task EatMany(List<string> lines, WitlessContext c, long size, int limit)
+        private async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks)
         {
-            var (baka, chat, title) = (c.Baka, c.Chat, c.Title);
+            var message = Bot.PingChat(Chat, BOARD_START);
+            var threads = await Task.WhenAll(tasks);
 
-            var count = baka.WordCount;
+            Bot.EditMessage(Chat, message, string.Format(BOARD_START_EDIT, threads.Length));
 
-            await EatAllLines(lines, baka, limit);
-            SaveChanges(baka, title);
+            var size = ChatService.GetPath(Chat).FileSizeInBytes();
+            var lines = threads.SelectMany(s => s).ToList();
 
-            JsonIO.SaveData(lines, GetFileName(chat));
-
-            Bot.SendMessage(chat, FUSION_SUCCESS_REPORT(baka, size, count, title));
+            await EatMany(lines, size, Limit);
         }
 
-        private static string GetFileName(long chat)
+        private async Task EatMany(List<string> lines, long size, int limit)
+        {
+            var count = Baka.WordCount;
+
+            await EatAllLines(lines, Baka, limit);
+            SaveChanges(Baka, Title);
+
+            JsonIO.SaveData(lines, GetFileSavePath());
+
+            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, size, count, Title));
+        }
+
+        private string GetFileSavePath()
         {
             Directory.CreateDirectory(Dir_Board);
 
-            var name = _names[chat];
-            _names.Remove(chat);
+            var thread = FileNameIsThread(_name);
+            var date = thread
+                ? $"{DateTime.Now:yyyy'-'MM'-'dd}"
+                : $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
 
-            var date = IsBoardOrArchive(name)
-                ? $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}"
-                : $"{DateTime.Now:yyyy'-'MM'-'dd}";
-            return Path.Combine(Dir_Board, $"{date} {name}.json");
+            return Path.Combine(Dir_Board, $"{date} {_name}.json");
         }
 
-        private static bool IsBoardOrArchive(string name) => !name.Contains('.') || name.Contains(".zip");
+        private static bool FileNameIsThread(string name) => name.Contains('.') && !name.Contains(".zip");
 
         private Uri UrlOrBust(ref string url)
         {
             try
             {
-                if (!url.Contains('/')) // board code e.g. "a" or "g"
+                if (url.Contains('/') == false) // is a board code e.g. "a" or "g"
                 {
                     var ending = $"/{url}/";
                     var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();
@@ -248,9 +236,10 @@ namespace Witlesss.Commands.Packing
                 var size = file.Length.ReadableFileSize();
                 yield return $"<code>{name}</code> | {size}";
 
-                if (IsBoardOrArchive(name.Split(' ')[^1])) continue;
-
-                yield return $"<blockquote expandable>{GetThreadSubject(file.FullName)}</blockquote>";
+                if (FileNameIsThread(name.Split(' ')[^1]))
+                {
+                    yield return $"<blockquote expandable>{GetThreadSubject(file.FullName)}</blockquote>";
+                }
             }
         }
 

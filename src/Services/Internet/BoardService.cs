@@ -18,6 +18,10 @@ namespace Witlesss.Services.Internet
             (string url) => _web.Load(url).DocumentNode;
 
 
+        /// <inheritdoc cref="GetThreadDiscussion"/> Async version, starts immediately.
+        public Task<List<string>> GetThreadDiscussionAsync
+            (string url) => Task.Run(() => GetThreadDiscussion(url).ToList());
+
         /// <summary> Returns every single line of a thread. </summary>
         /// <param name="url">thread URL, like https://boards.4channel.org/a/thread/XXX</param>
         public IEnumerable<string> GetThreadDiscussion(string url)

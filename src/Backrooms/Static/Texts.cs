@@ -372,10 +372,13 @@ public static class Texts
         """;
 
     public const string BOARD_START =
-        """
-        Тредов найдено: <b>{0}</b>
+        "Начинаю поглощение интернета 😈";
 
-        {1}
+    public const string BOARD_START_EDIT =
+        """
+        Начинаю поглощение интернета 😈
+
+        Тредов найдено: <b>{0}</b>
         """;
 
     public const string BOARD_MANUAL =

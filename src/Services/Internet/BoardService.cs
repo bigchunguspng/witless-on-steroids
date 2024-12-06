@@ -5,34 +5,39 @@ namespace Witlesss.Services.Internet
 {
     public class BoardService
     {
-        private const string BOARD_THREAD = "//a[@class='replylink'][. = 'Reply']";
+        private const string BOARD_THREAD   = "//a[@class='replylink'][. = 'Reply']";
         private const string ARCHIVE_THREAD = "//a[@class='quotelink']";
-        private const string BLOCKQUOTE = "//blockquote";
-        private const string SUBJECT = "//span[@class='subject']";
-        private const string COLUMN = "//div[@class='column']";
+        private const string THREAD_BLOCKQUOTE = "//blockquote";
+        private const string THREAD_SUBJECT = "//span[@class='subject']";
+        private const string HOME_COLUMN     = "//div[@class='column']";
 
-        private readonly Regex _quote = new(@"<span class=""quote"">([\s\S]+?)<\/span>");
+        private readonly Regex _tags  = new("<.*?>");
         private readonly HtmlWeb _web = new();
 
+        private HtmlNode GetDocument
+            (string url) => _web.Load(url).DocumentNode;
 
-        /// <summary> Returns every single line of anons discussion. </summary>
-        /// <param name="url">URL, like https://boards.4channel.org/a/thread/XXX</param>
+
+        /// <summary> Returns every single line of a thread. </summary>
+        /// <param name="url">thread URL, like https://boards.4channel.org/a/thread/XXX</param>
         public IEnumerable<string> GetThreadDiscussion(string url)
         {
             var document = GetDocument(url);
-            var subject = document.SelectSingleNode(SUBJECT).InnerHtml;
+
+            var subject = document.SelectNodes(THREAD_SUBJECT)[^1].InnerHtml;
             var subjectPending = !string.IsNullOrWhiteSpace(subject);
-            foreach (var block in document.SelectNodes(BLOCKQUOTE))
+
+            var posts = document.SelectNodes(THREAD_BLOCKQUOTE);
+            foreach (var post in posts)
             {
-                var lines = block.InnerHtml.Split("<br>", StringSplitOptions.RemoveEmptyEntries);
+                var lines = post.InnerHtml.Split("<br>", StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
-                    if (line.StartsWith("<a")) continue;
+                    if (line.StartsWith("<a")) continue; // skip things like ">>103424950 (OP)"
 
-                    var text = _quote.ExtractGroup(1, line, s => s, line);
+                    var text = _tags.Replace(line, "");
 
-                    text = text.Replace("<s>", "").Replace("</s>", "");
-                    if (subjectPending)
+                    if (subjectPending) // add subject for the 1st line (if any)
                     {
                         text = $"{subject}: {text}";
                         subjectPending = false;
@@ -43,27 +48,41 @@ namespace Witlesss.Services.Internet
             }
         }
 
-        /// <summary> Returns thread URLs from a board page. </summary>
-        /// <param name="url">URL, like https://boards.4channel.org/a/</param>
-        public IEnumerable<string> GetThreads(string url)
+        /// <summary> Returns thread URLs from first 10 pages of the board. </summary>
+        /// <param name="url">board URL, like https://boards.4channel.org/a/</param>
+        public IEnumerable<string> GetAllActiveThreads(string url)
         {
-            return GetHrefs(url, BOARD_THREAD);
+            for (var i = 1; i <= 15; i++)
+            {
+                IEnumerable<string> hrefs;
+                try
+                {
+                    var pageURL = i == 1 ? url : url + i;
+                    hrefs = GetHrefs(pageURL, BOARD_THREAD);
+                }
+                catch // board can have < 10 pages
+                {
+                    yield break;
+                }
+
+                foreach (var href in hrefs) yield return href;
+            }
         }
 
         /// <summary> Returns ARCHIVED thread URLs from a board ARCHIVE page. </summary>
-        /// <param name="url">URL, like https://boards.4channel.org/a/archive</param>
-        public IEnumerable<string> GetArchivedThreads(string url)
-        {
-            return GetHrefs(url, ARCHIVE_THREAD);
-        }
+        /// <param name="url">board archive URL, like https://boards.4channel.org/a/archive</param>
+        public IEnumerable<string> GetAllArchivedThreads
+            (string url) => GetHrefs(url, ARCHIVE_THREAD);
 
-        private IEnumerable<string> GetHrefs(string url, string xpath)
-        {
-            return GetDocument(url).SelectNodes(xpath).Select(x => x.Attributes["href"].Value);
-        }
-        private HtmlNode GetDocument(string url) => _web.Load(url).DocumentNode;
+        private IEnumerable<string> GetHrefs
+            (string url, string xpath)
+            => GetDocument(url).SelectNodes(xpath).Select(x => x.Attributes["href"].Value);
 
 
+        // LISTING BOARDS
+
+        /// <param name="path">path to a saved home page file, since it's more reliable to hae it this way.</param>
+        /// <returns></returns>
         public List<BoardGroup> GetBoardList(string path)
         {
             var boards = new List<BoardGroup>();
@@ -72,7 +91,7 @@ namespace Witlesss.Services.Internet
             var document = new HtmlDocument();
             document.Load(path);
 
-            var columns = document.DocumentNode.SelectNodes(COLUMN);
+            var columns = document.DocumentNode.SelectNodes(HOME_COLUMN);
             var nodes = columns.SelectMany(x => x.ChildNodes.Where(n => n.Name != "#text")).ToList();
             var last = nodes.Last();
 

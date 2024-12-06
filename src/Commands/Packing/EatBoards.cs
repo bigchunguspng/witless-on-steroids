@@ -11,7 +11,7 @@ namespace Witlesss.Commands.Packing
     //      /boards
     //      /boards info  <┬─ SAME
     //      /board  info  <┘
-    //      /board Y-M-D a.N.json
+    //      /board Y-M-D a.N <- [Y-M-D a.N.json]
     //      /board [thread/archive/archive link]
 
     public class EatBoards : Fuse
@@ -72,7 +72,7 @@ namespace Witlesss.Commands.Packing
             {
                 _names[Chat] = $"{board}.zip";
 
-                var threads = _chan.GetArchivedThreads(url);
+                var threads = _chan.GetAllArchivedThreads(url);
                 var tasks = threads.Select(x => GetDiscussionAsync("https://" + uri.Host + x)).ToList();
 
                 await RespondAndStartEating(tasks);
@@ -85,11 +85,11 @@ namespace Witlesss.Commands.Packing
 
                 await EatMany(replies, Context, Size, Limit);
             }
-            else // BOARD
+            else // THE WHOLE BOARD
             {
                 _names[Chat] = board;
 
-                var threads = _chan.GetThreads(url);
+                var threads = _chan.GetAllActiveThreads(url);
                 var tasks = threads.Select(x => GetDiscussionAsync(url + x)).ToList();
 
                 await RespondAndStartEating(tasks);
@@ -157,7 +157,7 @@ namespace Witlesss.Commands.Packing
         {
             try
             {
-                if (!url.Contains('/'))
+                if (!url.Contains('/')) // board code e.g. "a" or "g"
                 {
                     var ending = $"/{url}/";
                     var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();

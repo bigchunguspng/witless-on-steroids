@@ -78,6 +78,12 @@ public static class Texts
         Новых слов: {3}
         """;
 
+    public const string FUSE_SOURCE =
+        """
+
+        Откуда: <b><a href='{0}'>{1}</a></b>
+        """;
+
     public const string MOVING_DONE =
         """
         ♻️ Словарь очищен! *пусто* {0}
@@ -265,7 +271,6 @@ public static class Texts
     public const string REDDIT_COMMENTS_START =
         """
         НАЧИНАЕМ ПРИЗЫВ СОТОНЫ!!!
-
         {0}
         """;
 
@@ -398,7 +403,10 @@ public static class Texts
         """;
 
     public const string MAY_TAKE_A_WHILE =
-        "(может занять до пары минут)";
+        """
+
+        (может занять до пары минут 😵)
+        """;
 
     public const string FUSE_FAIL_BOARD =
         """

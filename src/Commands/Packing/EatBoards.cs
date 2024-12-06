@@ -21,6 +21,7 @@ namespace Witlesss.Commands.Packing
         private static List<BoardService.BoardGroup> Boards => _boards ??= _chan.GetBoardList(File_4chanHtmlPage);
 
         private string _name = default!;
+        private Uri     _uri = default!;
 
         protected override async Task RunAuthorized()
         {
@@ -64,18 +65,18 @@ namespace Witlesss.Commands.Packing
 
         private async Task EatOnlineData(string url)
         {
-            var uri = UrlOrBust(ref url);
+            _uri = UrlOrBust(ref url);
 
-            var board = uri.Segments[1].Replace("/", "");
+            var board = _uri.Segments[1].Replace("/", "");
 
-            if      (url.Contains("/thread/")) await EatSingleThread(url, board, uri);
-            else if (url.EndsWith("/archive")) await EatArchive     (url, board, uri); 
+            if      (url.Contains("/thread/")) await EatSingleThread(url, board);
+            else if (url.EndsWith("/archive")) await EatArchive     (url, board); 
             else                               await EatWholeBoard  (url, board);
         }
 
-        private async Task EatSingleThread(string url, string board, Uri uri)
+        private async Task EatSingleThread(string url, string board)
         {
-            _name = $"{board}.{uri.Segments[3].Replace("/", "")}";
+            _name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
 
             var replies = _chan.GetThreadDiscussion(url).ToList();
 
@@ -92,12 +93,12 @@ namespace Witlesss.Commands.Packing
             await RespondAndStartEating(tasks);
         }
 
-        private async Task EatArchive(string url, string board, Uri uri)
+        private async Task EatArchive(string url, string board)
         {
             _name = $"{board}.zip";
 
             var threads = _chan.GetAllArchivedThreads(url);
-            var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + uri.Host + x));
+            var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + _uri.Host + x));
 
             await RespondAndStartEating(tasks);
         }
@@ -107,7 +108,10 @@ namespace Witlesss.Commands.Packing
             var message = Bot.PingChat(Chat, BOARD_START);
             var threads = await Task.WhenAll(tasks);
 
-            Bot.EditMessage(Chat, message, string.Format(BOARD_START_EDIT, threads.Length));
+            var text = string.Format(BOARD_START_EDIT, threads.Length);
+            if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
+
+            Bot.EditMessage(Chat, message, text);
 
             var size = ChatService.GetPath(Chat).FileSizeInBytes();
             var lines = threads.SelectMany(s => s).ToList();
@@ -124,7 +128,10 @@ namespace Witlesss.Commands.Packing
 
             JsonIO.SaveData(lines, GetFileSavePath());
 
-            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, size, count, Title));
+            var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title)
+                       + string.Format(FUSE_SOURCE, _uri, _uri.LocalPath);
+
+            Bot.SendMessage(Chat, report);
         }
 
         private string GetFileSavePath()

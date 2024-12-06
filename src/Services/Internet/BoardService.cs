@@ -7,8 +7,10 @@ namespace Witlesss.Services.Internet
     {
         private const string BOARD_THREAD   = "//a[@class='replylink'][. = 'Reply']";
         private const string ARCHIVE_THREAD = "//a[@class='quotelink']";
-        private const string THREAD_BLOCKQUOTE = "//blockquote";
+        private const string THREAD_POST = "//blockquote";
+        private const string THREAD_POST_DESU = "//div[@class='text']";
         private const string THREAD_SUBJECT = "//span[@class='subject']";
+        private const string THREAD_SUBJECT_DESU = "//h2[@class='post_title']";
         private const string HOME_COLUMN     = "//div[@class='column']";
 
         private readonly Regex _tags  = new("<.*?>");
@@ -17,6 +19,15 @@ namespace Witlesss.Services.Internet
         private HtmlNode GetDocument
             (string url) => _web.Load(url).DocumentNode;
 
+        private string GetXPathToSubject
+            (bool desu) => desu
+            ? THREAD_SUBJECT_DESU
+            : THREAD_SUBJECT;
+
+        private string GetXPathToPosts
+            (bool desu) => desu
+            ? THREAD_POST_DESU
+            : THREAD_POST;
 
         /// <inheritdoc cref="GetThreadDiscussion"/> Async version, starts immediately.
         public Task<List<string>> GetThreadDiscussionAsync
@@ -28,16 +39,19 @@ namespace Witlesss.Services.Internet
         {
             var document = GetDocument(url);
 
-            var subject = document.SelectNodes(THREAD_SUBJECT)[^1].InnerHtml;
+            var desu = url.Contains("desuarchive.org");
+            var replyIndicator = desu ? " <span class=\"greentext\"><a" : "<a";
+
+            var subject = document.SelectNodes(GetXPathToSubject(desu))[desu ? 0 : ^1].InnerHtml;
             var subjectPending = !string.IsNullOrWhiteSpace(subject);
 
-            var posts = document.SelectNodes(THREAD_BLOCKQUOTE);
+            var posts = document.SelectNodes(GetXPathToPosts(desu));
             foreach (var post in posts)
             {
                 var lines = post.InnerHtml.Split("<br>", StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
-                    if (line.StartsWith("<a")) continue; // skip things like ">>103424950 (OP)"
+                    if (line.StartsWith(replyIndicator)) continue; // skip things like ">>103424950 (OP)"
 
                     var text = _tags.Replace(line, "");
 

@@ -50,6 +50,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("zz"      , () => new GenerateByLastWord())
             .Register("fuse"    , () => new Fuse())
             .Register("board"   , () => new EatBoards())
+            .Register("plank"   , () => new EatPlanks())
             .Register("xd"      , () => new EatReddit())
             .Register("b"       , () => _bouhourt)
             .Register("set"     , () => _set)
@@ -116,6 +117,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
     {
         var data = query.GetData();
         if      (data[0].StartsWith('b')) EatBoards.HandleCallback(query, data);
+        if      (data[0].StartsWith('p')) EatPlanks.HandleCallback(query, data);
         else if (data[0].StartsWith('f')) Fuse     .HandleCallback(query, data);
         else if (data[0] == "del")
         {

@@ -3,14 +3,13 @@ using System.Web;
 using HtmlAgilityPack;
 using RestSharp;
 
-namespace Witlesss.Services.Internet
+namespace Witlesss.Services.Internet.Boards
 {
     public class BoardService
     {
         private const string BOARD_THREAD   = "//a[@class='replylink'][. = 'Reply']";
         private const string ARCHIVE_THREAD = "//a[@class='quotelink']";
         private const string SEARCH_THREAD  = "//span[@class='post_controls']/a[1]";
-        private const string HOME_COLUMN    = "//div[@class='column']";
 
         private static readonly Regex _thread_post      = new(@"<blockquote.*?>(.*?)<\/blockquote>");
         private static readonly Regex _thread_post_desu = new(@"<div class=""text"">(.*?)<\/div>");
@@ -108,7 +107,7 @@ namespace Witlesss.Services.Internet
             }
         }
 
-        /// <summary> Returns ARCHIVED thread URLs from a board ARCHIVE page. </summary>
+        /// <summary> Returns ARCHIVED thread URLs (local paths) from a board ARCHIVE page. </summary>
         /// <param name="url">board archive URL, like https://boards.4channel.org/a/archive</param>
         public IEnumerable<string> GetAllArchivedThreads
             (string url) => GetHrefs(url, ARCHIVE_THREAD);
@@ -130,8 +129,9 @@ namespace Witlesss.Services.Internet
 
         // LISTING BOARDS
 
+        private const string HOME_COLUMN = "//div[@class='column']";
+
         /// <param name="path">path to a saved home page file, since it's more reliable to hae it this way.</param>
-        /// <returns></returns>
         public List<BoardGroup> GetBoardList(string path)
         {
             var boards = new List<BoardGroup>();
@@ -166,7 +166,7 @@ namespace Witlesss.Services.Internet
                         var name = HttpUtility.HtmlDecode(item.InnerText);
                         var href = item.ChildNodes[0].Attributes["href"].Value;
 
-                        group.Boards.Add(new BoardGroup.Board(name, href));
+                        group.Boards.Add(new BoardGroup.Board(name, href, false));
                     }
                     boards.Add(group);
                     if (node != last) group = new BoardGroup();
@@ -174,15 +174,6 @@ namespace Witlesss.Services.Internet
             }
 
             return boards;
-        }
-
-        public class BoardGroup
-        {
-            public string? Title;
-            public bool IsNSFW;
-            public readonly List<Board> Boards = [];
-
-            public record Board(string Title, string URL);
         }
     }
 }

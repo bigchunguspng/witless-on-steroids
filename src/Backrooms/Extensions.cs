@@ -10,6 +10,7 @@ public static partial class Extensions
 
     public static readonly Regex EmojiRegex = new(EMOJI_REGEX);
     public static readonly Regex FFmpeg = new("ffmpeg|ffprobe", RegexOptions.IgnoreCase);
+    public static readonly Regex URL_Regex = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
 
     // RANDOM
 

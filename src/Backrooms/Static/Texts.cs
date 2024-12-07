@@ -388,16 +388,23 @@ public static class Texts
 
     public const string BOARD_MANUAL =
         """
-        Этой командой можно скармливать мне треды с форча.
+        🍀 <b><u>Кормёжка тредами с <a href="https://www.4chan.org/">форчана</a></u></b>
 
         <b>Синтаксис:</b>
-        <code>/board [ссылка на тред/доску/архив]</code>
-        <code>/board [имя сохранёнки]</code>
+        <blockquote expandable><code>/board [тред/доска/архив]</code>
+        /board <a href="https://boards.4chan.org/a/">a</a>
+        /board https://boards.4chan.org/a/
+        /board https://boards.4chan.org/vm/archive
+        /board https://boards.4chan.org/g/thread/102519935
+        /board https://desuarchive.org/a/thread/273519954</blockquote>
+        <blockquote><code>/board [имя сохранёнки]</code>
+        /board 2024-12-06 g.103418613</blockquote>
+        <blockquote><code>/board [_/код доски] [запрос]</code>
+        /board a higurashi
+        /board _ hood classic</blockquote>
 
-        <code>/board info</code> - архив 💾📝 
         <code>/boards</code> - список досок 🍀📝
-
-        Ссылка на архив = ссылка на доску + <code>archive</code>
+        <code>/board info</code> - список сохранёнок 💾📝 
 
         💀На абордаж! 🏴‍☠️
         """;
@@ -412,11 +419,11 @@ public static class Texts
         """
         К сожалению, я не нашёл сохранённых обсуждений с таким названием. Пропишите
 
-        <code>/boards info</code>
+        <code>/{0} info</code>
 
         и выберите один из вариантов, или пропишите
 
-        <code>/boards</code>
+        <code>/{0}</code>
 
         чтобы найти новый материал
         """;

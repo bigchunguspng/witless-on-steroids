@@ -28,6 +28,8 @@ namespace Witlesss.Backrooms.Static;
         History/
             -1001541923355/
                 KINGPIN-funny.json [list]       <-- /fuse * info
+        Plank/
+            2024-08-21 a.7819159.json [list]    <-- /planks info
 
     Pics/
         -1001539756197/
@@ -41,6 +43,7 @@ namespace Witlesss.Backrooms.Static;
         Manual/
         Water/
 
+        2chan.html
         4chan.html
         art.jpg
         texts.json
@@ -65,12 +68,12 @@ public static class Paths
     public static string Dir_Chat    { get; } = Path.Combine(Dir_DB, "Chat");
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
+    public static string Dir_Plank   { get; } = Path.Combine(Dir_DB, "Plank");
 
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");
 
     public static string File_Chats { get; } = Path.Combine(Dir_Chat, "chats.json");
-    public static string File_Bans  { get; } = Path.Combine(Dir_Chat,  "bans.json");
 
     public static string Dir_ASCII  { get; } = Path.Combine(Dir_Static, "ASCII");
     public static string Dir_Emoji  { get; } = Path.Combine(Dir_Static, "Emoji");
@@ -80,6 +83,7 @@ public static class Paths
 
     public static string Dir_Fonts_Fallback  { get; } = Path.Combine(Dir_Fonts, "Fallback");
 
+    public static string File_2chanHtmlPage       { get; } = Path.Combine(Dir_Static, "2chan.html");
     public static string File_4chanHtmlPage       { get; } = Path.Combine(Dir_Static, "4chan.html");
     public static string File_DefaultAlbumCover   { get; } = Path.Combine(Dir_Static, "art.jpg");
     public static string File_DefaultTexts        { get; } = Path.Combine(Dir_Static, "texts.json");

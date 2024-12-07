@@ -10,6 +10,7 @@ namespace Witlesss.Commands.Packing
     //      /boards
     //      /boards info  <┬─ SAME
     //      /board  info  <┘
+    //      /board [_/a] [search query]
     //      /board Y-M-D a.N <- [Y-M-D a.N.json]
     //      /board [thread/archive/archive link]
 
@@ -46,9 +47,12 @@ namespace Witlesss.Commands.Packing
             MeasureDick();
             GetWordsPerLineLimit();
 
-            var args = Args.SplitN();
-            if (args.Length > 1) await EatJsonFile();
-            else                 await EatOnlineData(url: args[0]);
+            var args = Args.SplitN(2);
+            var pair = args.Length > 1;
+            var json = pair && args[0].Contains('-');
+            if      (json) await EatJsonFile();
+            else if (pair) await EatOnlineFind(args);
+            else           await EatOnlineData(url: args[0]);
         }
 
         private async Task EatJsonFile()
@@ -77,10 +81,15 @@ namespace Witlesss.Commands.Packing
         private async Task EatSingleThread(string url, string board)
         {
             _name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
-
-            var replies = _chan.GetThreadDiscussion(url).ToList();
-
-            await EatMany(replies, Size, Limit);
+            try
+            {
+                var replies = _chan.GetThreadDiscussion(url).ToList();
+                await EatMany(replies, Size, Limit);
+            }
+            catch
+            {
+                Bot.SendMessage(Chat, Bot.GetSillyErrorMessage());
+            }
         }
 
         private async Task EatWholeBoard(string url, string board)
@@ -103,20 +112,40 @@ namespace Witlesss.Commands.Packing
             await RespondAndStartEating(tasks);
         }
 
+        private async Task EatOnlineFind(string[] args)
+        {
+            var url = _chan.GetDesuSearchURL(args[0], args[1]);
+
+            _uri = new Uri(url);
+            _name = string.Join('_', args);
+            
+            var threads = _chan.GetSearchResults(url);
+            var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
+
+            await RespondAndStartEating(tasks);
+        }
+
         private async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks)
         {
             var message = Bot.PingChat(Chat, BOARD_START);
-            var threads = await Task.WhenAll(tasks);
+            try
+            {
+                var threads = await Task.WhenAll(tasks);
 
-            var text = string.Format(BOARD_START_EDIT, threads.Length);
-            if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
+                var text = string.Format(BOARD_START_EDIT, threads.Length);
+                if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
 
-            Bot.EditMessage(Chat, message, text);
+                Bot.EditMessage(Chat, message, text);
 
-            var size = ChatService.GetPath(Chat).FileSizeInBytes();
-            var lines = threads.SelectMany(s => s).ToList();
+                var size = ChatService.GetPath(Chat).FileSizeInBytes();
+                var lines = threads.SelectMany(s => s).ToList();
 
-            await EatMany(lines, size, Limit);
+                await EatMany(lines, size, Limit);
+            }
+            catch
+            {
+                Bot.SendMessage(Chat, Bot.GetSillyErrorMessage());
+            }
         }
 
         private async Task EatMany(List<string> lines, long size, int limit)
@@ -128,8 +157,9 @@ namespace Witlesss.Commands.Packing
 
             JsonIO.SaveData(lines, GetFileSavePath());
 
+            var shortURL = _uri.Segments[2].Contains("search") ? "desuarchive.org" : _uri.LocalPath;
             var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title)
-                       + string.Format(FUSE_SOURCE, _uri, _uri.LocalPath);
+                       + string.Format(FUSE_SOURCE, _uri, shortURL);
 
             Bot.SendMessage(Chat, report);
         }

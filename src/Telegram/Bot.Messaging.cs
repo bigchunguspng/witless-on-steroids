@@ -181,10 +181,12 @@ namespace Witlesss.Telegram
             }
             catch
             {
-                EditMessage(chat, message, $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}");
+                EditMessage(chat, message, GetSillyErrorMessage());
                 throw;
             }
         }
+
+        public string GetSillyErrorMessage() => $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}";
 
         public void SendErrorDetails(long chat, string command, string errorMessage)
         {

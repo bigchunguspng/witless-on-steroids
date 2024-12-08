@@ -3,9 +3,10 @@ using Witlesss.Generation.Pack;
 
 namespace Witlesss.Commands.Packing
 {
-    //      /move [name]    PRIVATE
-    //      /pub  [name]    PUBLIC
-    //      /_  ! [name]    PRIVATE -> PUBLIC
+    //      /move  [name]    PRIVATE
+    //      /pub   [name]    PUBLIC
+    //      /pub ! [name]    PRIVATE -> PUBLIC PACK
+    //      /pub * [name]    PRIVATE -> PUBLIC FILE
 
     public class Move : SettingsCommand
     {
@@ -20,20 +21,10 @@ namespace Witlesss.Commands.Packing
         protected override void RunAuthorized()
         {
             var args = Args.SplitN(2);
-            var pubX = args.Length > 1 && args[0] == "!";
-            if (pubX) // publish a pack from private storage
-            {
-                var name = args[^1];
-                var file = Path.Combine(Dir_Fuse, Chat.ToString(), $"{name}.json");
-                if (File.Exists(file) == false)
-                {
-                    Bot.SendMessage(Chat, string.Format(PUB_EX_NOT_FOUND, FAIL_EMOJI_1.PickAny()));
-                    return;
-                }
-
-                File.Move(file, UniquePath(Dir_Fuse, $"{name}.json"));
-                Bot.SendMessage(Chat, string.Format(PUB_EX_DONE, name));
-            }
+            var publishPack = args.Length > 1 && args[0] == "!";
+            var publishFile = args.Length > 1 && args[0] == "*";
+            if      (publishPack) Publish(args[^1], Dir_Fuse   , ["словарь", "!", "Словарь",   ""]);
+            else if (publishFile) Publish(args[^1], Dir_History, ["файл"   , "*", "Файл"   , "@ "]);
             else
             {
                 var name = (Args ?? Title).Replace(' ', '_').ValidFileName('-');
@@ -53,6 +44,20 @@ namespace Witlesss.Commands.Packing
                     Bot.SendMessage(Chat, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
                 }
             }
+        }
+
+        private void Publish(string name, string directory, string[] x)
+        {
+            var file = Path.Combine(directory, Chat.ToString(), $"{name}.json");
+            if (File.Exists(file) == false)
+            {
+                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI_1.PickAny(), x[0], x[1]);
+                Bot.SendMessage(Chat, text);
+                return;
+            }
+
+            File.Move(file, UniquePath(directory, $"{name}.json"));
+            Bot.SendMessage(Chat, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
         protected string MoveDictionary(string name, long chat)

@@ -77,8 +77,7 @@ namespace Witlesss.Commands.Packing
 
         private string GetFileSavePath(RedditQuery query)
         {
-            var directory = Path.Combine(Dir_History, Chat.ToString());
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(Dir_History);
 
             var date = $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
             var name = query switch
@@ -88,7 +87,7 @@ namespace Witlesss.Commands.Packing
                 _ => throw new ArgumentOutOfRangeException(nameof(query))
             };
 
-            return Path.Combine(directory, $"{date} {name}.json");
+            return Path.Combine(Dir_History, $"{date} {name}.json");
         }
     }
 }

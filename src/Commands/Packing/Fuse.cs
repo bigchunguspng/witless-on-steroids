@@ -6,9 +6,9 @@ using Witlesss.Generation.Pack;
 namespace Witlesss.Commands.Packing
 {
     //      /fuse
-    //      /fuse <-[file]
-    //      /fuse [id  / name / info]
-    //      /fuse [*/!] [name / info]
+    //      /fuse [JSON / TXT]
+    //      /fuse [id   /  name / info]
+    //      /fuse [*/!/@] [name / info]
 
     //      * - history
     //      ! - private packs
@@ -19,8 +19,10 @@ namespace Witlesss.Commands.Packing
         private   int Count;
         protected int Limit = int.MaxValue;
 
-        private bool _private, _history;
         private Document? _document;
+
+        private      FuseSource _source;
+        private enum FuseSource { PackPublic, PackPrivate, FilePublic, FilePrivate }
 
         protected void MeasureDick() // 😂🤣🤣🤣👌
         {
@@ -35,20 +37,28 @@ namespace Witlesss.Commands.Packing
             GetWordsPerLineLimit();
 
             var args = Args.SplitN(2);
-            _private = args.Length > 1 && args[0] == "!";
-            _history = args.Length > 1 && args[0] == "*";
+            if (args.Length == 0)
+            {
+                Bot.SendMessage(Chat, FUSE_MANUAL);
+                return;
+            }
+
+            _source =
+                args.Length > 1 && args[0] == "!" ? FuseSource.PackPrivate :
+                args.Length > 1 && args[0] == "*" ? FuseSource.FilePrivate :
+                args.Length > 1 && args[0] == "@" ? FuseSource.FilePublic : FuseSource.PackPublic;
 
             if      (Message.ProvidesFile("text/plain",       out _document)) await ProcessTextFile();
             else if (Message.ProvidesFile("application/json", out _document)) await ProcessJsonFile();
             else if (args.Length > 0 && args[^1] == "info")
             {
-                if      (_history)         SendHistoric(new ListPagination(Chat));
-                else if (_private)         SendFuseList(new ListPagination(Chat), @private: true);
-                else if (args.Length == 1) SendFuseList(new ListPagination(Chat));
+                if      (_source is FuseSource.PackPublic ) SendPackList(new ListPagination(Chat));
+                else if (_source is FuseSource.PackPrivate) SendPackList(new ListPagination(Chat), @private: true);
+                else if (_source is FuseSource.FilePublic ) SendFileList(new ListPagination(Chat));
+                else if (_source is FuseSource.FilePrivate) SendFileList(new ListPagination(Chat), @private: true);
             }
-            else if (_history)                     await ProcessEatingRequest(args);
-            else if (_private || args.Length == 1) await ProcessFusionRequest(args[^1]);
-            else Bot.SendMessage(Chat, FUSE_MANUAL);
+            else if (_source is FuseSource.FilePrivate or FuseSource.FilePublic) await ProcessEatingRequest(args);
+            else if (_source is FuseSource.PackPrivate or FuseSource.PackPublic) await ProcessFusionRequest(args[^1]);
         }
 
         
@@ -66,6 +76,8 @@ namespace Witlesss.Commands.Packing
 
         private async Task ProcessFusionRequest(string arg)
         {
+            var @private = _source is FuseSource.PackPrivate;
+
             var argIsChatId = long.TryParse(arg, out var chat);
             if (chat == Chat)
             {
@@ -80,12 +92,12 @@ namespace Witlesss.Commands.Packing
 
                 await FuseWithOtherPack(ChatService.GetPath(chat));
             }
-            else if (GetFiles(GetFuseFolder(Chat, _private), $"{arg}.json") is { Length: > 0 } files)
+            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}.json") is { Length: > 0 } files)
             {
                 await FuseWithOtherPack(files[0]);
             }
             else if (argIsChatId) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
-            else SendFuseList(new ListPagination(Chat), fail: true, @private: _private);
+            else SendPackList(new ListPagination(Chat), fail: true, @private);
         }
 
         private Task FuseWithOtherPack(string path) => Task.Run(() =>
@@ -97,11 +109,13 @@ namespace Witlesss.Commands.Packing
 
         private async Task ProcessEatingRequest(string[] args)
         {
+            var @private = _source is FuseSource.FilePrivate;
             var name = string.Join(' ', args.Skip(1));
-            var files = GetFiles(GetHistoryFolder(Chat), $"{name}.json");
+
+            var files = GetFiles(GetFilesFolder(Chat, @private), $"{name}.json");
             if (files.Length == 0)
             {
-                SendHistoric(new ListPagination(Chat), fail: true);
+                SendFileList(new ListPagination(Chat), fail: true, @private);
             }
             else
             {
@@ -112,7 +126,7 @@ namespace Witlesss.Commands.Packing
 
         private async Task ProcessTextFile()
         {
-            var path = UniquePath(Dir_History, _document!.FileName ?? "fuse.txt");
+            var path = UniquePath(Dir_Temp, _document!.FileName ?? "fuse.txt");
             await Bot.DownloadFile(_document.FileId, path, Chat);
 
             await EatFromTextFile(path);
@@ -121,7 +135,7 @@ namespace Witlesss.Commands.Packing
 
         private async Task ProcessJsonFile()
         {
-            var path = UniquePath(GetHistoryFolder(Chat), _document!.FileName ?? "fuse.json");
+            var path = UniquePath(GetPrivateFilesFolder(Chat), _document!.FileName ?? "fuse.json");
             await Bot.DownloadFile(_document.FileId, path, Chat);
 
             try
@@ -152,7 +166,7 @@ namespace Witlesss.Commands.Packing
 
         private void SaveJsonCopy(string path, string[] lines)
         {
-            var directory = GetHistoryFolder(Chat);
+            var directory = GetPrivateFilesFolder(Chat);
             Directory.CreateDirectory(directory);
 
             var name = Path.GetFileNameWithoutExtension(path);
@@ -204,32 +218,35 @@ namespace Witlesss.Commands.Packing
 
         #region LISTING
 
-        private record FusionListData(string Available, string Object, string Key);
+        private record FusionListData(string Available, string Object, string Key, string Marker);
 
-        private static readonly FusionListData ExtraDBp = new("📂 Публичные словари", "словаря", "fi");
-        private static readonly FusionListData ExtraDBs = new("🔐 Приватные словари", "словаря", "f!");
-        private static readonly FusionListData Historic = new("🔐 Архив файлов",      "файла",   "f*");
+        private static readonly FusionListData PublicPacks  = new("📂 Публичные словари", "словаря", "fi",   "");
+        private static readonly FusionListData PrivatePacks = new("🔐 Приватные словари", "словаря", "f!", "! ");
+        private static readonly FusionListData PublicFiles  = new("📂 Публичные файлы",   "файла",   "f@", "@ ");
+        private static readonly FusionListData PrivateFiles = new("🔐 Приватные файлы",   "файла",   "f*", "* ");
 
         public static void HandleCallback(CallbackQuery query, string[] data)
         {
             var pagination = query.GetPagination(data);
 
-            if (data[0] == "fi") SendFuseList(pagination);
-            if (data[0] == "f!") SendFuseList(pagination, @private: true);
-            else                 SendHistoric(pagination);
+            if (data[0] == "fi") SendPackList(pagination);
+            if (data[0] == "f!") SendPackList(pagination, @private: true);
+            if (data[0] == "f@") SendFileList(pagination);
+            else         /* f* */SendFileList(pagination, @private: true);
         }
 
-        private static void SendFuseList(ListPagination pagination, bool fail = false, bool @private = false)
+        private static void SendPackList(ListPagination pagination, bool fail = false, bool @private = false)
         {
-            var fuseList  = @private ? ExtraDBs : ExtraDBp;
-            var directory = GetFuseFolder(pagination.Chat, @private);
+            var fuseList  = @private ? PrivatePacks : PublicPacks;
+            var directory = GetPacksFolder(pagination.Chat, @private);
             SendFilesList(fuseList, directory, pagination, fail);
         }
 
-        private static void SendHistoric(ListPagination pagination, bool fail = false)
+        private static void SendFileList(ListPagination pagination, bool fail = false, bool @private = false)
         {
-            var directory = GetHistoryFolder(pagination.Chat);
-            SendFilesList(Historic, directory, pagination, fail);
+            var fuseList  = @private ? PrivateFiles : PublicFiles;
+            var directory = GetFilesFolder(pagination.Chat, @private);
+            SendFilesList(fuseList, directory, pagination, fail);
         }
 
         private static void SendFilesList
@@ -250,7 +267,7 @@ namespace Witlesss.Commands.Packing
             }
             sb.Append("<b>").Append(data.Available).Append(":</b>");
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
-            sb.Append("\n\n").AppendJoin('\n', JsonList(files, page, perPage));
+            sb.Append("\n\n").AppendJoin('\n', JsonList(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = ChatService.GetPath(pagination.Chat);
             if (File.Exists(path))
@@ -264,7 +281,7 @@ namespace Witlesss.Commands.Packing
             Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
         }
 
-        private static IEnumerable<string> JsonList(FileInfo[] files, int page = 0, int perPage = 25)
+        private static IEnumerable<string> JsonList(FileInfo[] files, string marker, int page = 0, int perPage = 25)
         {
             if (files.Length == 0)
             {
@@ -276,18 +293,21 @@ namespace Witlesss.Commands.Packing
             {
                 var name = file.Name.Replace(".json", "");
                 var size = file.Length.ReadableFileSize();
-                yield return $"<code>{name}</code> | {size}";
+                yield return $"<code>{marker}{name}</code> | {size}";
             }
         }
 
         #endregion
 
 
-        private static string GetHistoryFolder(long chat) => Path.Combine(Dir_History, chat.ToString());
-        private static string GetPrivateFolder(long chat) => Path.Combine(Dir_Fuse,    chat.ToString());
+        private static string GetPrivatePacksFolder(long chat) => Path.Combine(Dir_Fuse,    chat.ToString());
+        private static string GetPrivateFilesFolder(long chat) => Path.Combine(Dir_History, chat.ToString());
 
-        private static string GetFuseFolder
-            (long chat, bool @private) => @private ? GetPrivateFolder(chat) : Dir_Fuse;
+        private static string GetPacksFolder
+            (long chat, bool @private) => @private ? GetPrivatePacksFolder(chat) : Dir_Fuse;
+
+        private static string GetFilesFolder
+            (long chat, bool @private) => @private ? GetPrivateFilesFolder(chat) : Dir_History;
 
         private string GetJsonFormatExample()
         {

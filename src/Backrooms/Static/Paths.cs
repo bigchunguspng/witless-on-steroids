@@ -92,33 +92,28 @@ public static class Paths
 
     public static void ClearTempFiles()
     {
-        ClearDirectory(Dir_Temp,    "*",      new EnumerationOptions { RecurseSubdirectories = true  });
-        ClearDirectory(Dir_History, "*",      new EnumerationOptions { RecurseSubdirectories = false });
-        ClearDirectory(Dir_Fuse, "del*.json", new EnumerationOptions { RecurseSubdirectories = true  });
+        ClearDirectory(Dir_Temp,    "*",      new EnumerationOptions { RecurseSubdirectories = true });
+        ClearDirectory(Dir_Fuse, "del*.json", new EnumerationOptions { RecurseSubdirectories = true });
+    }
 
-        if (Directory.Exists(Dir_Fuse))
+    private static void ClearDirectory(string path, string pattern, EnumerationOptions options)
+    {
+        if (!Directory.Exists(path)) return;
+
+        var files = Directory.GetFiles(path, pattern, options);
+        if (files.Length == 0) return;
+
+        try
         {
-            var files = Directory.GetFiles(Dir_Fuse, "del*.json", SearchOption.AllDirectories);
-            foreach (var file in files) File.Delete(file);
+            var onePunch = options.RecurseSubdirectories && pattern is "*";
+            if (onePunch) Directory.Delete(path, true);
+            else files.ForEach(File.Delete);
+
+            Print($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
         }
-
-        void ClearDirectory(string path, string pattern, EnumerationOptions options)
+        catch (Exception e)
         {
-            if (!Directory.Exists(path)) return;
-            var files = Directory.GetFiles(path, pattern, options);
-            if (files.Length == 0) return;
-            try
-            {
-                var onePunch = options.RecurseSubdirectories && pattern is "*";
-                if (onePunch) Directory.Delete(path, true);
-                else files.ForEach(File.Delete);
-
-                Print($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
-            }
-            catch (Exception e)
-            {
-                LogError($"CAN'T CLEAR [{path}] >> {e.Message}");
-            }
+            Print($"CAN'T CLEAR [{path}] >> {e.Message}", ConsoleColor.Red);
         }
     }
 }

@@ -22,7 +22,7 @@ public class EatPlanks : ChanEaterCore
     protected override string CallbackKey => "p";
     protected override string CommandName => "plank";
     protected override string BoardsTitle => BOARDS_2CHAN;
-    protected override string Manual      => BOARD_MANUAL; // todo PLANK_MANUAL
+    protected override string Manual      => PLANK_MANUAL;
     protected override string UnknownURL  => UNKNOWN_LINK_2CHAN;
     protected override string EmojiLogo   => "⚡️";
     protected override string FileName    => _name;

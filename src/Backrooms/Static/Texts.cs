@@ -417,8 +417,26 @@ public static class Texts
 
         <code>/boards</code> - список досок 🍀📝
         <code>/board info</code> - список сохранёнок 💾📝 
+        """;
 
-        💀На абордаж! 🏴‍☠️
+    public const string PLANK_MANUAL =
+        """
+        ⚡️ <b><u>Кормёжка тредами с <a href="https://2ch.hk/">двача</a></u></b>
+        
+        <b>Синтаксис:</b>
+        <blockquote expandable><code>/plank [тред/доска]</code>
+        /plank <a href="https://2ch.hk/a/">a</a>
+        /plank https://2ch.hk/a/
+        /plank https://2ch.hk/hw/
+        /plank https://2ch.hk/a/res/7819159.html</blockquote>
+        <blockquote><code>/plank [имя сохранёнки]</code>
+        /plank 2024-12-08 di.527818</blockquote>
+        <blockquote><code>/plank [код доски] [запрос]</code>
+        /plank a ван пис
+        /plank mu рхчп</blockquote>
+        
+        <code>/planks</code> - список досок ⚡️📝
+        <code>/plank info</code> - список сохранёнок 💾📝
         """;
 
     public const string MAY_TAKE_A_WHILE =

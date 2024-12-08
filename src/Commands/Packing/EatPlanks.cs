@@ -30,7 +30,7 @@ public class EatPlanks : ChanEaterCore
 
     protected override string? GetSourceAnnotation()
     {
-        return _uri is null ? null : string.Format(FUSE_SOURCE, _uri, _uri.LocalPath);
+        return _uri is null ? null : string.Format(FUSE_SOURCE, _uri, _uri.LocalPath.Replace(".html", ""));
     }
 
     protected override async Task EatOnlineData(string url)
@@ -45,7 +45,7 @@ public class EatPlanks : ChanEaterCore
 
     private async Task EatSingleThread(string url, string board)
     {
-        _name = $"{board}.{_uri!.Segments[3].Replace("/", "")}";
+        _name = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
         try
         {
             var replies = _chan.GetThreadDiscussion(url).ToList();

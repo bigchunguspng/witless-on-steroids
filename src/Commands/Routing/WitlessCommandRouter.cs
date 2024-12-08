@@ -113,12 +113,15 @@ public class WitlessCommandRouter : WitlessSyncCommand
         func?.Invoke().Execute(WitlessContext.From(Context, settings));
     }
 
+    private readonly Lazy<EatBoards> _boards = new(new EatBoards());
+    private readonly Lazy<EatPlanks> _planks = new(new EatPlanks());
+
     public void OnCallback(CallbackQuery query)
     {
         var data = query.GetData();
-        if      (data[0].StartsWith('b')) EatBoards.HandleCallback(query, data);
-        if      (data[0].StartsWith('p')) EatPlanks.HandleCallback(query, data);
-        else if (data[0].StartsWith('f')) Fuse     .HandleCallback(query, data);
+        if      (data[0].StartsWith('b')) _boards.Value.HandleCallback(query, data);
+        if      (data[0].StartsWith('p')) _planks.Value.HandleCallback(query, data);
+        else if (data[0].StartsWith('f'))          Fuse.HandleCallback(query, data);
         else if (data[0] == "del")
         {
             query.Message!.From = query.From;

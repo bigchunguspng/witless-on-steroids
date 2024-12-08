@@ -1,10 +1,23 @@
 using Newtonsoft.Json;
 using Telegram.Bot.Extensions;
+using Witlesss.Services.Internet.Boards;
 
 namespace Witlesss.Backrooms.Helpers;
 
 public static class BoardHelpers
 {
+    public static void PrintMenu(IEnumerable<BoardGroup> menu)
+    {
+        foreach (var group in menu)
+        {
+            Print($"{group.Title}{(group.IsNSFW ? " (18+)" : "")}");
+            foreach (var board in group.Boards)
+            {
+                Print($"\t{board.Title,-25}{board.URL,-30}{(board.IsNSFW ? "18+" : "")}");
+            }
+        }
+    }
+
     /// <summary> Checks if the filename describes a <b>single thread</b> discussion. </summary>
     /// <param name="name">filename part without date and time</param>
     public static bool FileNameIsThread(string name) => name.Contains('.') && !name.Contains(".zip");

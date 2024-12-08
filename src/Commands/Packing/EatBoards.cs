@@ -1,5 +1,4 @@
-﻿using Telegram.Bot.Types;
-using Witlesss.Commands.Packing.Core;
+﻿using Witlesss.Commands.Packing.Core;
 using Witlesss.Services.Internet.Boards;
 
 namespace Witlesss.Commands.Packing;
@@ -20,18 +19,14 @@ public class EatBoards : ChanEaterCore
     private Uri     _uri = default!;
 
     protected override string ArchivePath => Dir_Board;
-    protected override string CommandString => "board";
-    protected override string Manual   => BOARD_MANUAL;
-    protected override string FileName => _name;
+    protected override string CallbackKey => "b";
+    protected override string CommandName => "board";
+    protected override string BoardsTitle => BOARDS_4CHAN;
+    protected override string Manual      => BOARD_MANUAL;
+    protected override string UnknownURL  => UNKNOWN_LINK_4CHAN;
+    protected override string EmojiLogo   => "🍀";
+    protected override string FileName    => _name;
     protected override List<BoardGroup> Boards => _boards.Value;
-
-    public new static void HandleCallback(CallbackQuery query, string[] data)
-    {
-        var pagination = query.GetPagination(data);
-
-        if (data[0] == "b") SendBoardList(pagination, _boards.Value);
-        else                SendSavedList(pagination, Dir_Board);
-    }
 
     protected override string GetSourceAnnotation()
     {

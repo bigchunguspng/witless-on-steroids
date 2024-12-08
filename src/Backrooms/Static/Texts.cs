@@ -386,6 +386,18 @@ public static class Texts
         Тредов найдено: <b>{0}</b>
         """;
 
+    public const string BOARDS_4CHAN =
+        """🍀🍀🍀 <b><a href="https://www.4chan.org/">4CHAN</a> BOARDS</b> 🍀🍀🍀""";
+
+    public const string BOARDS_2CHAN =
+        """⚡️⚡️⚡️ <b>ДОСКИ <a href="https://2ch.hk/">ДВАЧА</a></b> ⚡️⚡️⚡️""";
+
+    public const string UNKNOWN_LINK_4CHAN =
+        "Dude, wrong URL 👉😄";
+
+    public const string UNKNOWN_LINK_2CHAN =
+        "Это куда ссылка? 👉😄";
+
     public const string BOARD_MANUAL =
         """
         🍀 <b><u>Кормёжка тредами с <a href="https://www.4chan.org/">форчана</a></u></b>

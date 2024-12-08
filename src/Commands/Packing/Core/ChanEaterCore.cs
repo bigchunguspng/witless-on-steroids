@@ -1,14 +1,19 @@
 using System.Text;
+using Telegram.Bot.Types;
 using Witlesss.Services.Internet.Boards;
 
 namespace Witlesss.Commands.Packing.Core;
 
 public abstract class ChanEaterCore : Fuse
 {
-    protected abstract string ArchivePath   { get; }
-    protected abstract string CommandString { get; }
-    protected abstract string Manual        { get; }
-    protected abstract string FileName      { get; }
+    protected abstract string ArchivePath { get; }
+    protected abstract string CallbackKey { get; }
+    protected abstract string CommandName { get; }
+    protected abstract string BoardsTitle { get; }
+    protected abstract string Manual      { get; }
+    protected abstract string UnknownURL  { get; }
+    protected abstract string EmojiLogo   { get; }
+    protected abstract string FileName    { get; }
 
     protected abstract List<BoardGroup> Boards { get; }
 
@@ -18,18 +23,26 @@ public abstract class ChanEaterCore : Fuse
     {
         if (Args is null)
         {
-            if (Command!.StartsWith($"/{CommandString}s"))
-                SendBoardList(new ListPagination(Chat, PerPage: 2), Boards);
+            if (Command!.StartsWith($"/{CommandName}s"))
+                SendBoardList(new ListPagination(Chat, PerPage: 2));
             else
                 Bot.SendMessage(Chat, Manual);
         }
         else
         {
             if (Args.EndsWith("info"))
-                SendSavedList(new ListPagination(Chat, PerPage: 10), ArchivePath);
+                SendSavedList(new ListPagination(Chat, PerPage: 10));
             else
                 await EatBoard();
         }
+    }
+
+    public new void HandleCallback(CallbackQuery query, string[] data)
+    {
+        var pagination = query.GetPagination(data);
+
+        if (data[0] == CallbackKey) SendBoardList(pagination);
+        else                        SendSavedList(pagination);
     }
 
     private async Task EatBoard()
@@ -54,7 +67,7 @@ public abstract class ChanEaterCore : Fuse
             GoodEnding();
         }
         else
-            Bot.SendMessage(Chat, string.Format(FUSE_FAIL_BOARD, $"{CommandString}s"));
+            Bot.SendMessage(Chat, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
     }
 
     protected abstract Task EatOnlineData(string url);
@@ -101,14 +114,14 @@ public abstract class ChanEaterCore : Fuse
 
     private string GetFileSavePath()
     {
-        Directory.CreateDirectory(Dir_Board);
+        Directory.CreateDirectory(ArchivePath);
 
         var thread = BoardHelpers.FileNameIsThread(FileName);
         var date = thread
             ? $"{DateTime.Now:yyyy'-'MM'-'dd}"
             : $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
 
-        return Path.Combine(Dir_Board, $"{date} {FileName}.json");
+        return Path.Combine(ArchivePath, $"{date} {FileName.Replace(' ', '-')}.json");
     }
 
     protected Uri UrlOrBust(ref string url)
@@ -130,7 +143,7 @@ public abstract class ChanEaterCore : Fuse
         }
         catch
         {
-            Bot.SendMessage(Chat, "Dude, wrong URL 👉😄");
+            Bot.SendMessage(Chat, UnknownURL);
             throw;
         }
     }
@@ -138,15 +151,14 @@ public abstract class ChanEaterCore : Fuse
 
     // LISTING
 
-    protected static void SendBoardList(ListPagination pagination, List<BoardGroup> allBoards) // todo NSFW boards
+    private void SendBoardList(ListPagination pagination)
     {
         var (chat, messageId, page, perPage) = pagination;
 
-        var boards = allBoards.Skip(page * perPage).Take(perPage);
-        var last = (int)Math.Ceiling(allBoards.Count / (double)perPage) - 1;
+        var boards = Boards.Skip(page * perPage).Take(perPage);
+        var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
 
-        var sb = new StringBuilder("🍀🍀🍀 <b>4CHAN BOARDS</b> 🍀🍀🍀");
-        sb.Append(" [PAGE: ").Append(page + 1).Append('/').Append(last + 1).Append(']');
+        var sb = new StringBuilder(BoardsTitle).Append($" [PAGE: {page + 1}/{last + 1}]");
         foreach (var group in boards)
         {
             sb.Append($"\n\n<b><u>{group.Title}</u></b>");
@@ -154,33 +166,35 @@ public abstract class ChanEaterCore : Fuse
             sb.Append('\n');
             foreach (var board in group.Boards)
             {
-                sb.Append($"\n<i>{board.Title}</i> - <code>{board.URL}</code>");
+                sb.Append($"\n<i>{board.Title}</i>");
+                if (board.IsNSFW) sb.Append(" (NSFW🥵)");
+                sb.Append($" - <code>{board.URL}</code>");
             }
         }
         sb.Append(string.Format(BrowseReddit.SEARCH_FOOTER, Bot.Me.FirstName));
         sb.Append(USE_ARROWS);
 
         var text = sb.ToString();
-        var buttons = GetPaginationKeyboard(page, perPage, last, "b");
+        var buttons = GetPaginationKeyboard(page, perPage, last, CallbackKey);
 
         Bot.SendOrEditMessage(chat, text, messageId, buttons);
     }
 
-    protected static void SendSavedList(ListPagination pagination, string directory)
+    private void SendSavedList(ListPagination pagination)
     {
         var (chat, messageId, page, perPage) = pagination;
 
-        var files = GetFilesInfo(directory).OrderByDescending(x => x.Name).ToArray();
+        var files = GetFilesInfo(ArchivePath).OrderByDescending(x => x.Name).ToArray();
 
-        var single = files.Length <= perPage;
-
+        var paginated = files.Length > perPage;
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
-        var sb = new StringBuilder("🍀 <b>Архив досокъ/трѣдовъ:</b> ");
-        if (!single) sb.Append("📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
-        sb.Append("\n\n").AppendJoin('\n', BoardHelpers.GetJsonList(files, page, perPage));
-        if (!single) sb.Append(USE_ARROWS);
 
-        var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "bi");
+        var sb = new StringBuilder(EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b> ");
+        if (paginated) sb.Append($"📄[{page + 1}/{lastPage + 1}]");
+        sb.Append("\n\n").AppendJoin('\n', BoardHelpers.GetJsonList(files, page, perPage));
+        if (paginated) sb.Append(USE_ARROWS);
+
+        var buttons = paginated ? GetPaginationKeyboard(page, perPage, lastPage, $"{CallbackKey}i") : null;
         Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
     }
 }

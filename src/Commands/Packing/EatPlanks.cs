@@ -1,4 +1,3 @@
-using Telegram.Bot.Types;
 using Witlesss.Commands.Packing.Core;
 using Witlesss.Services.Internet.Boards;
 
@@ -20,18 +19,14 @@ public class EatPlanks : ChanEaterCore
     private Uri? _uri;
 
     protected override string ArchivePath => Dir_Plank;
-    protected override string CommandString => "plank";
-    protected override string Manual   => BOARD_MANUAL; // todo PLANK_MANUAL
-    protected override string FileName => _name;
+    protected override string CallbackKey => "p";
+    protected override string CommandName => "plank";
+    protected override string BoardsTitle => BOARDS_2CHAN;
+    protected override string Manual      => BOARD_MANUAL; // todo PLANK_MANUAL
+    protected override string UnknownURL  => UNKNOWN_LINK_2CHAN;
+    protected override string EmojiLogo   => "⚡️";
+    protected override string FileName    => _name;
     protected override List<BoardGroup> Boards => _boards.Value;
-
-    public new static void HandleCallback(CallbackQuery query, string[] data)
-    {
-        var pagination = query.GetPagination(data);
-
-        if (data[0] == "p") SendBoardList(pagination, _boards.Value);
-        else                SendSavedList(pagination, Dir_Plank);
-    }
 
     protected override string? GetSourceAnnotation()
     {
@@ -67,7 +62,7 @@ public class EatPlanks : ChanEaterCore
         _name = board;
 
         var threads = _chan.GetSomeThreads(url);
-        var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(url + x));
+        var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
 
         await RespondAndStartEating(tasks);
     }

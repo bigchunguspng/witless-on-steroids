@@ -220,10 +220,10 @@ namespace Witlesss.Commands.Packing
 
         private record FusionListData(string Available, string Object, string Key, string Marker);
 
-        private static readonly FusionListData PublicPacks  = new("📂 Публичные словари", "словаря", "fi",   "");
-        private static readonly FusionListData PrivatePacks = new("🔐 Приватные словари", "словаря", "f!", "! ");
-        private static readonly FusionListData PublicFiles  = new("📂 Публичные файлы",   "файла",   "f@", "@ ");
-        private static readonly FusionListData PrivateFiles = new("🔐 Приватные файлы",   "файла",   "f*", "* ");
+        private static readonly FusionListData PublicPacks  = new("📂 Общие словари" , "словаря", "fi",   "");
+        private static readonly FusionListData PrivatePacks = new("🔐 Личные словари", "словаря", "f!", "! ");
+        private static readonly FusionListData PublicFiles  = new("📂 Общие файлы" ,   "файла",   "f@", "@ ");
+        private static readonly FusionListData PrivateFiles = new("🔐 Личные файлы",   "файла",   "f*", "* ");
 
         public static void HandleCallback(CallbackQuery query, string[] data)
         {

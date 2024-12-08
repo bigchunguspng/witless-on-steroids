@@ -47,10 +47,10 @@ public static class Texts
         🗞 именами файлов со склада
 
         <u>Списки:</u>
-        <code>/fuse   info</code> - публичный склад 📦
-        <code>/fuse ! info</code> - приватный склад 📦
-        <code>/fuse @ info</code> - публичный склад 🗞
-        <code>/fuse * info</code> - приватный склад 🗞
+        <code>/fuse   info</code> - общий склад 📦
+        <code>/fuse ! info</code> - личный склад 📦
+        <code>/fuse @ info</code> - общий склад 🗞
+        <code>/fuse * info</code> - личный склад 🗞
 
         📖 Гайды: /man_22, /man_221, /man_222
         """;

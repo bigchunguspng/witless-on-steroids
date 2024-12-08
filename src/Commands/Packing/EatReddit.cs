@@ -71,7 +71,7 @@ namespace Witlesss.Commands.Packing
             var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title);
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
-            var detais = $"\n\n Его пополнили {commentsEaten} комментов с {subreddit}";
+            var detais = $"\n\nЕго пополнили {commentsEaten} комментов с {subreddit}";
             Bot.SendMessage(Chat, report + detais);
         }
 

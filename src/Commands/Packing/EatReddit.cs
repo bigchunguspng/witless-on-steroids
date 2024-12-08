@@ -18,18 +18,20 @@ namespace Witlesss.Commands.Packing
             var sub = _sub.Match(args);
             var ops = _ops.Match(args);
 
-            if (que.Success || sub.Success)
+            var queSuccess = que.Success && !string.IsNullOrWhiteSpace(que.Groups[1].Value);
+
+            if (Args != null && (queSuccess || sub.Success))
             {
                 MeasureDick();
                 GetWordsPerLineLimit();
 
                 var q = que.GroupOrNull(1);
                 var s = sub.GroupOrNull(1);
-                var o = ops.Success ? ops.Value : que.Success ? "ra" : "ha";
+                var o = ops.Success ? ops.Value : queSuccess ? "ra" : "ha";
 
                 RedditQuery query;
 
-                if (que.Success)
+                if (queSuccess)
                 {
                     var sort = BrowseReddit.Sorts  [o[0]];
                     var time = BrowseReddit.GetTime(o, BrowseReddit.TimeMatters(o[0]));
@@ -45,7 +47,7 @@ namespace Witlesss.Commands.Packing
                 }
 
                 var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                await Bot.RunOrThrow(EatComments(Context, query, Size, Limit), Chat, message);
+                await Bot.RunOrThrow(EatComments(query, Size, Limit), Chat, message);
             }
             else
             {
@@ -53,22 +55,40 @@ namespace Witlesss.Commands.Packing
             }
         }
 
-        private async Task EatComments(WitlessContext c, RedditQuery query, long size, int limit)
+        private async Task EatComments(RedditQuery query, long size, int limit)
         {
             var sw = GetStartedStopwatch();
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
             Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
-            var count = c.Baka.WordCount;
+            var count = Baka.WordCount;
 
-            var commentsEaten = await EatAllLines(comments, c.Baka, limit);
-            SaveChanges(c.Baka, c.Title);
+            var commentsEaten = await EatAllLines(comments, Baka, limit);
+            SaveChanges(Baka, Title);
 
-            var report = FUSION_SUCCESS_REPORT(c.Baka, size, count, c.Title);
+            JsonIO.SaveData(comments, GetFileSavePath(query));
+
+            var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title);
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\n Его пополнили {commentsEaten} комментов с {subreddit}";
-            Bot.SendMessage(c.Chat, report + detais);
+            Bot.SendMessage(Chat, report + detais);
+        }
+
+        private string GetFileSavePath(RedditQuery query)
+        {
+            var directory = Path.Combine(Dir_History, Chat.ToString());
+            Directory.CreateDirectory(directory);
+
+            var date = $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
+            var name = query switch
+            {
+                ScrollQuery sc => $"{sc.Subreddit}",
+                SearchQuery se => $"{se.Subreddit}_{se.Q.Replace(' ', '-')}",
+                _ => throw new ArgumentOutOfRangeException(nameof(query))
+            };
+
+            return Path.Combine(directory, $"{date} {name}.json");
         }
     }
 }

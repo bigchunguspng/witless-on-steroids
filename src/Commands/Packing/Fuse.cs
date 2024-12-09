@@ -37,12 +37,6 @@ namespace Witlesss.Commands.Packing
             GetWordsPerLineLimit();
 
             var args = Args.SplitN(2);
-            if (args.Length == 0)
-            {
-                Bot.SendMessage(Chat, FUSE_MANUAL);
-                return;
-            }
-
             _source =
                 args.Length > 1 && args[0] == "!" ? FuseSource.PackPrivate :
                 args.Length > 1 && args[0] == "*" ? FuseSource.FilePrivate :
@@ -50,7 +44,8 @@ namespace Witlesss.Commands.Packing
 
             if      (Message.ProvidesFile("text/plain",       out _document)) await ProcessTextFile();
             else if (Message.ProvidesFile("application/json", out _document)) await ProcessJsonFile();
-            else if (args.Length > 0 && args[^1] == "info")
+            else if (args.Length == 0) Bot.SendMessage(Chat, FUSE_MANUAL);
+            else if (args.Length  > 0 && args[^1] == "info")
             {
                 if      (_source is FuseSource.PackPublic ) SendPackList(new ListPagination(Chat));
                 else if (_source is FuseSource.PackPrivate) SendPackList(new ListPagination(Chat), @private: true);

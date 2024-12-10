@@ -10,7 +10,7 @@ public class SendMessage : SyncCommand
         return this;
     }
 
-    protected override void Run() => Bot.SendMessage(Chat, _text);
+    protected override void Run() => Bot.SendMessage(Origin, _text);
 }
 
 //                    L I V E   G O K U   R E A C T I O N :

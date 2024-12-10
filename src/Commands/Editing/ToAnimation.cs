@@ -8,11 +8,11 @@ namespace Witlesss.Commands.Editing
         {
             var path = await DownloadFile();
 
-            if (Type == MediaType.Round) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
+            if (Type == MediaType.Round) path = await path.UseFFMpeg(Origin).CropVideoNoteXD();
 
-            var result = await path.UseFFMpeg(Chat).RemoveAudio().Out("-silent");
+            var result = await path.UseFFMpeg(Origin).RemoveAudio().Out("-silent");
             await using var stream = System.IO.File.OpenRead(result);
-            Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoFileName));
+            Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoFileName));
             Log($"{Title} >> GIF [~]");
         }
 

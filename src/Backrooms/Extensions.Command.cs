@@ -23,7 +23,7 @@ public partial class Extensions
             options = regex.Replace(options, aliasRender, 1);
         }
         else
-            Bot.Instance.SendMessage(context.Chat, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));
+            Bot.Instance.SendMessage(context.Origin, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI_2.PickAny()));
 
         return success;
     }

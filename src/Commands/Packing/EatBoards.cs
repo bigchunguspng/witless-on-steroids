@@ -55,7 +55,7 @@ public class EatBoards : ChanEaterCore
         }
         catch
         {
-            Bot.SendMessage(Chat, Bot.GetSillyErrorMessage());
+            Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
         }
     }
 

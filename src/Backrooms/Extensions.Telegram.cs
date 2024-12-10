@@ -47,6 +47,9 @@ public static partial class Extensions
 
     // MEDIA GET
 
+    public static MessageOrigin GetOrigin
+        (this Message message) => (message.Chat.Id, message.MessageThreadId);
+
     public static PhotoSize? GetPhoto
         (this Message message) => message.Photo?[^1];
 
@@ -109,11 +112,11 @@ public static partial class Extensions
         {
             if (message.SenderChat.Id == chat) return true;
 
-            Bot.Instance.SendMessage(chat, UNKNOWN_CHAT.PickAny());
+            Bot.Instance.SendMessage(message.GetOrigin(), UNKNOWN_CHAT.PickAny());
         }
         else if (await message.From.IsAdminInChat(chat) == false)
         {
-            Bot.Instance.SendMessage(chat, NOT_ADMIN.PickAny());
+            Bot.Instance.SendMessage(message.GetOrigin(), NOT_ADMIN.PickAny());
         }
         else return true;
 

@@ -15,6 +15,8 @@ namespace Witlesss.Commands.Core
         public string? Command  => Context.Command;
         public string? Args     => Context.Args;
 
+        public MessageOrigin Origin => Context.Origin;
+
         public abstract void Execute(TContext context);
     }
 

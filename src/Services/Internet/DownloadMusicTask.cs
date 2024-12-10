@@ -77,11 +77,11 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
-        var taskA = YtDlp.Use(GetAudioArgs(url, output), directory, context.Chat);
+        var taskA = YtDlp.Use(GetAudioArgs(url, output), directory, context.Origin);
         var taskV = ExtractThumb
-            ? YtDlp.Use(GetVideoArgs(url), directory, context.Chat)
+            ? YtDlp.Use(GetVideoArgs(url), directory, context.Origin)
             : ArtAttached
-                ? Bot.DownloadFile(Cover!, thumbPath, context.Chat)
+                ? Bot.DownloadFile(Cover!, thumbPath, context.Origin)
                 : youTube
                     ? Task.Run(() => thumbPath = YouTubePreviewFetcher.DownloadPreview(id, directory).Result)
                     : Task.CompletedTask;
@@ -111,15 +111,15 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var resize = CropSquare || ArtAttached || thumbPath.Contains("maxres");
 
-        var img = thumbSource.UseFFMpeg(context.Chat);
+        var img = thumbSource.UseFFMpeg(context.Origin);
         var imgProcess = ExtractThumb
             ? img.ExportThumbnail(CropSquare)
             : resize
                 ? img.ResizeThumbnail(CropSquare)
                 : img.CompressJpeg(2);
         var art = await imgProcess.OutAs($"{directory}/art.jpg");
-        var mp3 = audioFile.UseFFMpeg(context.Chat).AddTrackMetadata(art, Artist, Title!);
-        var jpg = art      .UseFFMpeg(context.Chat).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
+        var mp3 = audioFile.UseFFMpeg(context.Origin).AddTrackMetadata(art, Artist, Title!);
+        var jpg = art      .UseFFMpeg(context.Origin).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
 
         await Task.WhenAll(mp3, jpg);
 
@@ -128,7 +128,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         Bot.DeleteMessageAsync(context.Chat, messageToDelete);
 
         await using var stream = File.OpenRead(mp3.Result);
-        Bot.SendAudio(context.Chat, InputFile.FromStream(stream, mp3.Result), jpg.Result);
+        Bot.SendAudio(context.Origin, InputFile.FromStream(stream, mp3.Result), jpg.Result);
         Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", LogLevel.Info, 11);
     }
 }

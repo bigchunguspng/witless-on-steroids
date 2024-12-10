@@ -11,7 +11,7 @@ namespace Witlesss.Commands
         {
             if (Message.ReplyToMessage == null)
             {
-                Bot.SendMessage(Chat, DEBUG_MANUAL);
+                Bot.SendMessage(Origin, DEBUG_MANUAL);
                 return;
             }
 
@@ -24,7 +24,7 @@ namespace Witlesss.Commands
             File.WriteAllText(path, JsonSerializer.Serialize(message, _options));
             using var stream = File.OpenRead(path);
 
-            Bot.SendDocument(Chat, InputFile.FromStream(stream, name.Replace("--", "-")));
+            Bot.SendDocument(Origin, InputFile.FromStream(stream, name.Replace("--", "-")));
             Log($"{Title} >> DEBUG");
         }
 

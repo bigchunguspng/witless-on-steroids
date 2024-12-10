@@ -50,7 +50,7 @@ public static class YtDlp
 {
     public const string DEFAULT_ARGS = "--no-mtime --no-warnings --cookies-from-browser firefox ";
 
-    public static async Task Use(string args, string directory, long chat)
+    public static async Task Use(string args, string directory, MessageOrigin origin)
     {
         var exe = "yt-dlp";
         using var memory = new MemoryStream();
@@ -81,7 +81,7 @@ public static class YtDlp
             }
 
             var message = sb.ToString();
-            Bot.Instance.SendErrorDetails(chat, $"{exe} {args}", message);
+            Bot.Instance.SendErrorDetails(origin, $"{exe} {args}", message);
             throw new Exception(shortMessage);
         }
     }

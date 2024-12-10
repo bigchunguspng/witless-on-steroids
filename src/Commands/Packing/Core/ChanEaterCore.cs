@@ -24,14 +24,14 @@ public abstract class ChanEaterCore : Fuse
         if (Args is null)
         {
             if (Command!.StartsWith($"/{CommandName}s"))
-                SendBoardList(new ListPagination(Chat, PerPage: 2));
+                SendBoardList(new ListPagination(Origin, PerPage: 2));
             else
-                Bot.SendMessage(Chat, Manual);
+                Bot.SendMessage(Origin, Manual);
         }
         else
         {
             if (Args.EndsWith("info"))
-                SendSavedList(new ListPagination(Chat, PerPage: 10));
+                SendSavedList(new ListPagination(Origin, PerPage: 10));
             else
                 await EatBoard();
         }
@@ -67,7 +67,7 @@ public abstract class ChanEaterCore : Fuse
             GoodEnding();
         }
         else
-            Bot.SendMessage(Chat, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
+            Bot.SendMessage(Origin, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
     }
 
     protected abstract Task EatOnlineData(string url);
@@ -75,7 +75,7 @@ public abstract class ChanEaterCore : Fuse
 
     protected async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks)
     {
-        var message = Bot.PingChat(Chat, BOARD_START);
+        var message = Bot.PingChat(Origin, BOARD_START);
         try
         {
             var threads = await Task.WhenAll(tasks);
@@ -92,7 +92,7 @@ public abstract class ChanEaterCore : Fuse
         }
         catch
         {
-            Bot.SendMessage(Chat, Bot.GetSillyErrorMessage());
+            Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public abstract class ChanEaterCore : Fuse
         var source = GetSourceAnnotation();
         if (source != null) report += source;
 
-        Bot.SendMessage(Chat, report);
+        Bot.SendMessage(Origin, report);
     }
 
     private string GetFileSavePath()
@@ -143,7 +143,7 @@ public abstract class ChanEaterCore : Fuse
         }
         catch
         {
-            Bot.SendMessage(Chat, UnknownURL);
+            Bot.SendMessage(Origin, UnknownURL);
             throw;
         }
     }
@@ -153,7 +153,7 @@ public abstract class ChanEaterCore : Fuse
 
     private void SendBoardList(ListPagination pagination)
     {
-        var (chat, messageId, page, perPage) = pagination;
+        var (origin, messageId, page, perPage) = pagination;
 
         var boards = Boards.Skip(page * perPage).Take(perPage);
         var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
@@ -177,12 +177,12 @@ public abstract class ChanEaterCore : Fuse
         var text = sb.ToString();
         var buttons = GetPaginationKeyboard(page, perPage, last, CallbackKey);
 
-        Bot.SendOrEditMessage(chat, text, messageId, buttons);
+        Bot.SendOrEditMessage(origin, text, messageId, buttons);
     }
 
     private void SendSavedList(ListPagination pagination)
     {
-        var (chat, messageId, page, perPage) = pagination;
+        var (origin, messageId, page, perPage) = pagination;
 
         var files = GetFilesInfo(ArchivePath).OrderByDescending(x => x.Name).ToArray();
 
@@ -195,6 +195,6 @@ public abstract class ChanEaterCore : Fuse
         if (paginated) sb.Append(USE_ARROWS);
 
         var buttons = paginated ? GetPaginationKeyboard(page, perPage, lastPage, $"{CallbackKey}i") : null;
-        Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
+        Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
     }
 }

@@ -18,11 +18,11 @@ public abstract class AliasManager : SyncCommand
     {
         if (Args is "info")
         {
-            SendAliasList(new ListPagination(Chat, PerPage: 10));
+            SendAliasList(new ListPagination(Origin, PerPage: 10));
         }
         else if (Args is null || !Regex.IsMatch(Args, @"\s"))
         {
-            Bot.SendMessage(Chat, string.Format(ALIAS_SYNTAX, CMD, Tool));
+            Bot.SendMessage(Origin, string.Format(ALIAS_SYNTAX, CMD, Tool));
         }
         else
         {
@@ -33,13 +33,13 @@ public abstract class AliasManager : SyncCommand
             if (files.Length > 0 && !Message.SenderIsBotAdmin())
             {
                 var content = File.ReadAllText(files[0]);
-                Bot.SendMessage(Chat, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI_1.PickAny()));
+                Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI_1.PickAny()));
             }
             else
             {
                 var options = Regex.Replace(args[1], @"\s+", " ");
                 File.WriteAllText(Path.Combine(Directory, $"{name}.txt"), options);
-                Bot.SendMessage(Chat, string.Format(ALIAS_SAVED_RESPONSE, name));
+                Bot.SendMessage(Origin, string.Format(ALIAS_SAVED_RESPONSE, name));
                 Log($"{Title} >> {CMD.ToUpper()} ALIAS ADDED [{name}]");
             }
         }
@@ -53,7 +53,7 @@ public abstract class AliasManager : SyncCommand
 
     protected void SendAliasList(ListPagination pagination)
     {
-        var (chat, messageId, page, perPage) = pagination;
+        var (origin, messageId, page, perPage) = pagination;
 
         var files = GetFiles(Directory);
 
@@ -66,7 +66,7 @@ public abstract class AliasManager : SyncCommand
         if (!single) sb.Append(USE_ARROWS);
 
         var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, Code);
-        Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
+        Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
     }
 
     private IEnumerable<string> AliasList(string[] files, int page = 0, int perPage = 25)

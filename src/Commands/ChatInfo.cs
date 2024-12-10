@@ -64,7 +64,7 @@ namespace Witlesss.Commands
                 }
             }
 
-            Bot.SendMessage(Chat, sb.ToString());
+            Bot.SendMessage(Origin, sb.ToString());
             Log($"{Title} >> CHAT INFO");
         }
 

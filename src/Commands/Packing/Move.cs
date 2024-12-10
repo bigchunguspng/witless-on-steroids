@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Packing
                 var newName = MoveDictionary(name, _public ? 0 : Chat);
                 if (newName == "*")
                 {
-                    Bot.SendMessage(Chat, "Ваш словарь пуст, сударь 🫥");
+                    Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
                 }
                 else
                 {
@@ -41,7 +41,7 @@ namespace Witlesss.Commands.Packing
                     Baka.Save();
 
                     var result = _public ? "опубликовано" : "сохранено";
-                    Bot.SendMessage(Chat, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
+                    Bot.SendMessage(Origin, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
                 }
             }
         }
@@ -52,12 +52,12 @@ namespace Witlesss.Commands.Packing
             if (File.Exists(file) == false)
             {
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI_1.PickAny(), x[0], x[1]);
-                Bot.SendMessage(Chat, text);
+                Bot.SendMessage(Origin, text);
                 return;
             }
 
             File.Move(file, UniquePath(directory, $"{name}.json"));
-            Bot.SendMessage(Chat, string.Format(PUB_DONE, x[2], name, x[3]));
+            Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
         protected string MoveDictionary(string name, long chat)

@@ -44,7 +44,7 @@ public class Magick : PhotoCommand
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
-            Bot.SendSticker(Chat, InputFile.FromFileId(TROLLFACE));
+            Bot.SendSticker(Origin, InputFile.FromFileId(TROLLFACE));
             return;
         }
 
@@ -58,7 +58,7 @@ public class Magick : PhotoCommand
         catch
         {
             var errorMessage = Output is null ? "*пусто*" : string.Join('\n', Output!);
-            Bot.SendErrorDetails(Chat, $"magick {MagickCommand}", errorMessage);
+            Bot.SendErrorDetails(Origin, $"magick {MagickCommand}", errorMessage);
         }
 
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
@@ -94,11 +94,11 @@ public class Magick : PhotoCommand
         var name = "made with piece_fap_bot";
 
         using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Chat, InputFile_FromStream());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Chat, InputFile.FromStream(stream));
-        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Chat, InputFile_FromStream());
-        else                              Bot.SendDocument (Chat, InputFile_FromStream());
+        if      (sendDocument)            Bot.SendDocument (Origin, InputFile_FromStream());
+        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Origin, InputFile.FromStream(stream));
+        else if (extension == "webp")     Bot.SendSticker  (Origin, InputFile.FromStream(stream));
+        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Origin, InputFile_FromStream());
+        else                              Bot.SendDocument (Origin, InputFile_FromStream());
 
         InputFile InputFile_FromStream() => InputFile.FromStream(stream, name + "." + extension);
     }

@@ -12,9 +12,9 @@ public class Slice : AudioVideoUrlCommand
 
         var sw = GetStartedStopwatch();
 
-        if (Type != MediaType.Audio) path = await FFMpegXD.ReduceSize(Chat, path);
+        if (Type != MediaType.Audio) path = await FFMpegXD.ReduceSize(Origin, path);
 
-        var result = await path.UseFFMpeg(Chat).SliceRandom(multiplier).Out("-slices", Ext);
+        var result = await path.UseFFMpeg(Origin).SliceRandom(multiplier).Out("-slices", Ext);
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 

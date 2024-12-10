@@ -8,13 +8,13 @@ public class Tell : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Chat, "LOL XD)0)");
+            Bot.SendMessage(Origin, "LOL XD)0)");
             return;
         }
 
         if (Args is null)
         {
-            Bot.SendMessage(Chat, "<code>/tell [chat|@chat|.] [text|message]</code>");
+            Bot.SendMessage(Origin, "<code>/tell [chat|@chat|.] [text|message]</code>");
             return;
         }
 

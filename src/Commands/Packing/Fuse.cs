@@ -44,13 +44,13 @@ namespace Witlesss.Commands.Packing
 
             if      (Message.ProvidesFile("text/plain",       out _document)) await ProcessTextFile();
             else if (Message.ProvidesFile("application/json", out _document)) await ProcessJsonFile();
-            else if (args.Length == 0) Bot.SendMessage(Chat, FUSE_MANUAL);
+            else if (args.Length == 0) Bot.SendMessage(Origin, FUSE_MANUAL);
             else if (args.Length  > 0 && args[^1] == "info")
             {
-                if      (_source is FuseSource.PackPublic ) SendPackList(new ListPagination(Chat));
-                else if (_source is FuseSource.PackPrivate) SendPackList(new ListPagination(Chat), @private: true);
-                else if (_source is FuseSource.FilePublic ) SendFileList(new ListPagination(Chat));
-                else if (_source is FuseSource.FilePrivate) SendFileList(new ListPagination(Chat), @private: true);
+                if      (_source is FuseSource.PackPublic ) SendPackList(new ListPagination(Origin));
+                else if (_source is FuseSource.PackPrivate) SendPackList(new ListPagination(Origin), @private: true);
+                else if (_source is FuseSource.FilePublic ) SendFileList(new ListPagination(Origin));
+                else if (_source is FuseSource.FilePrivate) SendFileList(new ListPagination(Origin), @private: true);
             }
             else if (_source is FuseSource.FilePrivate or FuseSource.FilePublic) await ProcessEatingRequest(args);
             else if (_source is FuseSource.PackPrivate or FuseSource.PackPublic) await ProcessFusionRequest(args[^1]);
@@ -76,7 +76,7 @@ namespace Witlesss.Commands.Packing
             var argIsChatId = long.TryParse(arg, out var chat);
             if (chat == Chat)
             {
-                Bot.SendSticker(Chat, InputFile.FromFileId(HOLY_MOLY));
+                Bot.SendSticker(Origin, InputFile.FromFileId(HOLY_MOLY));
                 return;
             }
 
@@ -91,8 +91,8 @@ namespace Witlesss.Commands.Packing
             {
                 await FuseWithOtherPack(files[0]);
             }
-            else if (argIsChatId) Bot.SendMessage(Chat, FUSE_FAIL_CHAT);
-            else SendPackList(new ListPagination(Chat), fail: true, @private);
+            else if (argIsChatId) Bot.SendMessage(Origin, FUSE_FAIL_CHAT);
+            else SendPackList(new ListPagination(Origin), fail: true, @private);
         }
 
         private Task FuseWithOtherPack(string path) => Task.Run(() =>
@@ -110,7 +110,7 @@ namespace Witlesss.Commands.Packing
             var files = GetFiles(GetFilesFolder(Chat, @private), $"{name}.json");
             if (files.Length == 0)
             {
-                SendFileList(new ListPagination(Chat), fail: true, @private);
+                SendFileList(new ListPagination(Origin), fail: true, @private);
             }
             else
             {
@@ -122,7 +122,7 @@ namespace Witlesss.Commands.Packing
         private async Task ProcessTextFile()
         {
             var path = UniquePath(Dir_Temp, _document!.FileName ?? "fuse.txt");
-            await Bot.DownloadFile(_document.FileId, path, Chat);
+            await Bot.DownloadFile(_document.FileId, path, Origin);
 
             await EatFromTextFile(path);
             GoodEnding();
@@ -131,7 +131,7 @@ namespace Witlesss.Commands.Packing
         private async Task ProcessJsonFile()
         {
             var path = UniquePath(GetPrivateFilesFolder(Chat), _document!.FileName ?? "fuse.json");
-            await Bot.DownloadFile(_document.FileId, path, Chat);
+            await Bot.DownloadFile(_document.FileId, path, Origin);
 
             try
             {
@@ -141,7 +141,7 @@ namespace Witlesss.Commands.Packing
             catch // wrong format
             {
                 File.Delete(path);
-                Bot.SendMessage(Chat, GetJsonFormatExample());
+                Bot.SendMessage(Origin, GetJsonFormatExample());
             }
         }
 
@@ -187,7 +187,7 @@ namespace Witlesss.Commands.Packing
         protected void GoodEnding()
         {
             SaveChanges(Baka, Title);
-            Bot.SendMessage(Chat, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
+            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
         }
 
         protected static void SaveChanges(CopypasterProxy baka, string title)
@@ -233,14 +233,14 @@ namespace Witlesss.Commands.Packing
         private static void SendPackList(ListPagination pagination, bool fail = false, bool @private = false)
         {
             var fuseList  = @private ? PrivatePacks : PublicPacks;
-            var directory = GetPacksFolder(pagination.Chat, @private);
+            var directory = GetPacksFolder(pagination.Origin.Chat, @private);
             SendFilesList(fuseList, directory, pagination, fail);
         }
 
         private static void SendFileList(ListPagination pagination, bool fail = false, bool @private = false)
         {
             var fuseList  = @private ? PrivateFiles : PublicFiles;
-            var directory = GetFilesFolder(pagination.Chat, @private);
+            var directory = GetFilesFolder(pagination.Origin.Chat, @private);
             SendFilesList(fuseList, directory, pagination, fail);
         }
 
@@ -249,7 +249,7 @@ namespace Witlesss.Commands.Packing
             FusionListData data, string directory, ListPagination pagination, bool fail = false
         )
         {
-            var (chat, messageId, page, perPage) = pagination;
+            var (origin, messageId, page, perPage) = pagination;
 
             var files = GetFilesInfo(directory);
             var oneshot = files.Length < perPage;
@@ -264,7 +264,7 @@ namespace Witlesss.Commands.Packing
             if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = ChatService.GetPath(pagination.Chat);
+            var path = ChatService.GetPath(origin.Chat);
             if (File.Exists(path))
                 sb.Append("весит ").Append(path.ReadableFileSize());
             else
@@ -273,7 +273,7 @@ namespace Witlesss.Commands.Packing
             if (!oneshot) sb.Append(USE_ARROWS);
 
             var buttons = oneshot ? null : GetPaginationKeyboard(page, perPage, lastPage, data.Key);
-            Bot.SendOrEditMessage(chat, sb.ToString(), messageId, buttons);
+            Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
         }
 
         private static IEnumerable<string> JsonList(FileInfo[] files, string marker, int page = 0, int perPage = 25)
@@ -319,5 +319,5 @@ namespace Witlesss.Commands.Packing
         }
     }
 
-    public record ListPagination(long Chat, int MessageId = -1, int Page = 0, int PerPage = 25);
+    public record ListPagination(MessageOrigin Origin, int MessageId = -1, int Page = 0, int PerPage = 25);
 }

@@ -10,6 +10,7 @@ public class CommandContext
 
     public Message Message      { get; }
     public long    Chat         { get; }
+    public int?    Thread       { get; }
     public string  Title        { get; }
     public string? Text         { get; }
     /// <summary> Lowercase command with "/" symbol and bot username removed. </summary>
@@ -23,11 +24,13 @@ public class CommandContext
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
 
+    public MessageOrigin Origin => (Chat, Thread);
 
     protected CommandContext(CommandContext context)
     {
         Message = context.Message;
         Chat = context.Chat;
+        Thread = context.Thread;
         Title = context.Title;
         Text = context.Text;
         Command = context.Command;
@@ -40,6 +43,7 @@ public class CommandContext
     {
         Message = message;
         Chat = message.Chat.Id;
+        Thread = message.IsTopicMessage ? message.MessageThreadId : null;
         Title = message.GetChatTitle();
         Text = message.GetTextOrCaption();
 

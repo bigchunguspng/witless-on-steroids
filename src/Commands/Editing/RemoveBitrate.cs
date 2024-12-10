@@ -17,7 +17,7 @@ namespace Witlesss.Commands.Editing
             {
                 MediaType.Photo => CompressImage(path),
                 MediaType.Stick => ImageSaver.SaveImageWebp(Image.Load<Rgba32>(path), GetOutPath(path), 22 - _value),
-                _               => await path.UseFFMpeg(Chat).Compress(_value + 30).Out("-DAMN", Ext)
+                _               => await path.UseFFMpeg(Origin).Compress(_value + 30).Out("-DAMN", Ext)
             };
 
             SendResult(result);

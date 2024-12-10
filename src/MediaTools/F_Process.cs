@@ -9,16 +9,16 @@ public partial class F_Process
 {
     private static readonly SerialTaskQueue _queueHard = new(), _queueEasy = new();
 
-    private readonly long Chat;
+    private readonly MessageOrigin Origin;
     public  readonly string Input;
 
     private readonly FFMpegArguments Arguments;
     private Action<FFMpegArgumentOptions>? Options;
 
-    public F_Process(string input, long chat)
+    public F_Process(string input, MessageOrigin origin)
     {
         Input = input;
-        Chat = chat;
+        Origin = origin;
         Arguments = FFMpegArguments.FromFileInput(Input);
     }
 
@@ -61,7 +61,7 @@ public partial class F_Process
         }
         catch (Exception e)
         {
-            Bot.Instance.SendErrorDetails(Chat, $"ffmpeg {args}", e.GetFixedMessage());
+            Bot.Instance.SendErrorDetails(Origin, $"ffmpeg {args}", e.GetFixedMessage());
             throw;
         }
     }

@@ -15,7 +15,7 @@ public class Help : SyncCommand
     protected override void Run()
     {
         var args = Args ?? (Command!.Contains('_') ? Command.Substring(Command.IndexOf('_') + 1) : "");
-        Bot.SendMessage(Chat, GetManualPage(args, out var address), GetKeyboard(address));
+        Bot.SendMessage(Origin, GetManualPage(args, out var address), GetKeyboard(address));
     }
 
     public void HandleCallback(CallbackQuery query, string[] data)

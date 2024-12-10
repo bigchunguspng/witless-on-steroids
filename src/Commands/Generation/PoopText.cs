@@ -6,7 +6,7 @@ public class PoopText : WitlessAsyncCommand
     {
         await Task.Delay(GetRealisticResponseDelay(Text));
 
-        Bot.SendMessage(Chat, Baka.Generate(), preview: true);
+        Bot.SendMessage(Origin, Baka.Generate(), preview: true);
         Log($"{Title} >> FUNNY");
     }
 

@@ -9,7 +9,7 @@
         {
             if (Args is null)
             {
-                Bot.SendMessage(Chat, EQ_MANUAL);
+                Bot.SendMessage(Origin, EQ_MANUAL);
             }
             else
             {
@@ -21,7 +21,7 @@
 
                 var path = await DownloadFile();
 
-                SendResult(await path.UseFFMpeg(Chat).EQ([f, g, w]).Out("-EQ", Ext));
+                SendResult(await path.UseFFMpeg(Origin).EQ([f, g, w]).Out("-EQ", Ext));
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
         }

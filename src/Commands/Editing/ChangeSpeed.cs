@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Editing
 
             var path = await DownloadFile();
 
-            var result = await path.UseFFMpeg(Chat).ChangeSpeed(_speed).Out("-Speed", Ext);
+            var result = await path.UseFFMpeg(Origin).ChangeSpeed(_speed).Out("-Speed", Ext);
             SendResult(result);
             Log($"{Title} >> {ModeNameUpper} [{ModeIcon}]");
         }

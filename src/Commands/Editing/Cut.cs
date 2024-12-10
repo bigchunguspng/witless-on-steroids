@@ -11,7 +11,7 @@
             var x = ArgumentParsing.GetCutTimecodes(args);
             if (x.failed)
             {
-                Bot.SendMessage(Chat, CUT_MANUAL);
+                Bot.SendMessage(Origin, CUT_MANUAL);
                 return;
             }
 
@@ -19,7 +19,7 @@
 
             var (path, waitMessage) = await DownloadFileSuperCool();
 
-            var result = await path.UseFFMpeg(Chat).Cut(span).Out("-Cut", Ext);
+            var result = await path.UseFFMpeg(Origin).Cut(span).Out("-Cut", Ext);
 
             Bot.DeleteMessageAsync(Chat, waitMessage);
 

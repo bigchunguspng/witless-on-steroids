@@ -14,7 +14,7 @@ namespace Witlesss.Commands.Packing
         {
             if (Args == null || !_args.IsMatch(Args))
             {
-                Bot.SendMessage(Chat, PIECE_MANUAL);
+                Bot.SendMessage(Origin, PIECE_MANUAL);
             }
             else
             {
@@ -32,7 +32,7 @@ namespace Witlesss.Commands.Packing
                 var path = Move.GetUniqueExtraPackPath(name);
                 JsonIO.SaveData(cp.DB, path);
 
-                Bot.SendMessage(Chat, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
+                Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
                 Log($"{Title} >> THE ONE PIECE IS REAL!!!");
             }
         }

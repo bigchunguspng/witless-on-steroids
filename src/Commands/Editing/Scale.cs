@@ -10,7 +10,7 @@
         {
             if (Args is null)
             {
-                Bot.SendMessage(Chat, SCALE_MANUAL);
+                Bot.SendMessage(Origin, SCALE_MANUAL);
             }
             else
             {
@@ -49,7 +49,7 @@
 
                 var path = await DownloadFile();
 
-                var input = path.UseFFMpeg(Chat);
+                var input = path.UseFFMpeg(Origin);
                 var process = Ext is ".jpg" ? input.ScaleJpeg(args) : input.Scale(args);
                 SendResult(await process.Out("-scale", Ext));
                 Log($"{Title} >> SCALE [{string.Join(':', args)}]");

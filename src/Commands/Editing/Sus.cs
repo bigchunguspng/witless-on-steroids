@@ -12,7 +12,7 @@
             {
                 if (Args is not null)
                 {
-                    Bot.SendMessage(Chat, SUS_MANUAL);
+                    Bot.SendMessage(Origin, SUS_MANUAL);
                     return;
                 }
                 argless = true;
@@ -24,7 +24,7 @@
 
             if (argless) x.length = TimeSpan.MinValue;
 
-            var result = await path.UseFFMpeg(Chat).Sus(span).Out("-Sus", Ext);
+            var result = await path.UseFFMpeg(Origin).Sus(span).Out("-Sus", Ext);
             SendResult(result);
             Log($"{Title} >> SUS [>_<]");
         }

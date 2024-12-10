@@ -46,12 +46,12 @@ namespace Witlesss.Commands.Packing
                     query = new ScrollQuery(s, sort, time);
                 }
 
-                var message = Bot.PingChat(Chat, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
+                var message = Bot.PingChat(Origin, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
                 await Bot.RunOrThrow(EatComments(query, Size, Limit), Chat, message);
             }
             else
             {
-                Bot.SendMessage(Chat, REDDIT_COMMENTS_MANUAL);
+                Bot.SendMessage(Origin, REDDIT_COMMENTS_MANUAL);
             }
         }
 
@@ -72,7 +72,7 @@ namespace Witlesss.Commands.Packing
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\nЕго пополнили {commentsEaten} комментов с {subreddit}";
-            Bot.SendMessage(Chat, report + detais);
+            Bot.SendMessage(Origin, report + detais);
         }
 
         private string GetFileSavePath(RedditQuery query)

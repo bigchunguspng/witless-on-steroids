@@ -6,7 +6,7 @@ public class Load : AudioVideoPhotoCommand
     {
         var path = await DownloadFile();
 
-        Bot.SendMessage(Chat, $"<code>-i {path}</code>");
+        Bot.SendMessage(Origin, $"<code>-i {path}</code>");
         Log($"{Title} >> LOAD");
     }
 }

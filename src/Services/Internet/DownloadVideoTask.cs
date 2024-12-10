@@ -34,7 +34,7 @@ public class DownloadVideoTask(string id, CommandContext context)
             return newPath;
         }
 
-        await YtDlp.Use(GetDownloadCommand(id), directory, context.Chat);
+        await YtDlp.Use(GetDownloadCommand(id), directory, context.Origin);
         Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", LogLevel.Info, 11);
 
         var directoryInfo = new DirectoryInfo(directory);
@@ -44,7 +44,7 @@ public class DownloadVideoTask(string id, CommandContext context)
             : await directoryInfo.GetFiles("video.*") // in case of failed to remux GIF
                 .OrderByDescending(x => x.Length)
                 .First().FullName
-                .UseFFMpeg(context.Chat).Out();
+                .UseFFMpeg(context.Origin).Out();
         _cache.Add(id, result);
         return result;
     }

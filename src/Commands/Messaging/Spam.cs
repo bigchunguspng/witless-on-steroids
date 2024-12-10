@@ -8,7 +8,7 @@ public class Spam : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Chat, "LOL XD)0)");
+            Bot.SendMessage(Origin, "LOL XD)0)");
             return;
         }
 
@@ -19,7 +19,7 @@ public class Spam : SyncCommand
 
         if (!textProvided && !copyProvided)
         {
-            Bot.SendMessage(Chat, "<code>/spam[g/aN/sB] [reply / message]</code>");
+            Bot.SendMessage(Origin, "<code>/spam[g/aN/sB] [reply / message]</code>");
             return;
         }
 

@@ -30,7 +30,7 @@ namespace Witlesss.Commands.Editing.Core
             var manual = SyntaxManual is null
                 ? string.Format(EDIT_MANUAL,     SuportedMedia)
                 : string.Format(EDIT_MANUAL_SYN, SuportedMedia, SyntaxManual);
-            Bot.SendMessage(Chat, manual);
+            Bot.SendMessage(Origin, manual);
         }
 
         protected virtual string? SyntaxManual => null;
@@ -79,19 +79,19 @@ namespace Witlesss.Commands.Editing.Core
             return true;
         }
 
-        protected Task<string> DownloadFile() => Bot.Download(File, Chat, Ext);
+        protected Task<string> DownloadFile() => Bot.Download(File, Origin, Ext);
 
         // SEND
 
         protected void SendResult(string result)
         {
             using var stream = System.IO.File.OpenRead(result);
-            if      (Type == MediaType.Photo) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
-            else if (Type == MediaType.Stick) Bot.SendSticker  (Chat, InputFile.FromStream(stream));
-            else if (Type == MediaType.Audio) Bot.SendAudio    (Chat, InputFile.FromStream(stream, AudioFileName));
-            else if (Type == MediaType.Anime) Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoFileName));
-            else if (Type == MediaType.Video) Bot.SendVideo    (Chat, InputFile.FromStream(stream, VideoFileName));
-            else if (Type == MediaType.Round) Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
+            if      (Type == MediaType.Photo) Bot.SendPhoto    (Origin, InputFile.FromStream(stream));
+            else if (Type == MediaType.Stick) Bot.SendSticker  (Origin, InputFile.FromStream(stream));
+            else if (Type == MediaType.Audio) Bot.SendAudio    (Origin, InputFile.FromStream(stream, AudioFileName));
+            else if (Type == MediaType.Anime) Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoFileName));
+            else if (Type == MediaType.Video) Bot.SendVideo    (Origin, InputFile.FromStream(stream, VideoFileName));
+            else if (Type == MediaType.Round) Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
         }
 
         protected virtual string VideoFileName => "piece_fap_bot.mp3";

@@ -13,7 +13,7 @@
             for (var i = 1; i < length; i++) lines.Add(GenerateLine());
 
             var result = string.Join("\n@\n", lines.Where(x => x != "")).Replace(" @ ", "\n@\n").ToUpper();
-            Bot.SendMessage(Chat, result, preview: true);
+            Bot.SendMessage(Origin, result, preview: true);
             Log($"{Title} >> BUGURT #@#{length}");
 
             string GenerateLine() => Baka.Generate().Trim('@').TrimStart();

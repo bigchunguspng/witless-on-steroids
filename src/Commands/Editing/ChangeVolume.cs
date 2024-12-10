@@ -10,7 +10,7 @@
         {
             if (Args is null)
             {
-                Bot.SendMessage(Chat, VOLUME_MANUAL);
+                Bot.SendMessage(Origin, VOLUME_MANUAL);
             }
             else
             {
@@ -18,7 +18,7 @@
 
                 var path = await DownloadFile();
 
-                SendResult(await path.UseFFMpeg(Chat).ChangeVolume(_arg).Out("-vol", Ext));
+                SendResult(await path.UseFFMpeg(Origin).ChangeVolume(_arg).Out("-vol", Ext));
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
         }

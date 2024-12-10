@@ -45,12 +45,12 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                     var subs = await RedditTool.Queue.Enqueue(() => Reddit.FindSubreddits(Args));
                     var b = subs.Count > 0;
 
-                    Bot.SendMessage(Chat, b ? SubredditList(Args, subs) : "<b>*пусто*</b>");
+                    Bot.SendMessage(Origin, b ? SubredditList(Args, subs) : "<b>*пусто*</b>");
                     Log($"{Title} >> FIND {subs.Count} SUBS >> {Args}");
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, REDDIT_SUBS_MANUAL);
+                    Bot.SendMessage(Origin, REDDIT_SUBS_MANUAL);
                 }
             }
             else if (Command!.StartsWith("/ws")) // [subreddit [-ops]]
@@ -70,7 +70,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, REDDIT_MANUAL);
+                    Bot.SendMessage(Origin, REDDIT_MANUAL);
                 }
             }
             else // /w search query [subreddit*] [-ops]
@@ -140,7 +140,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             }
             catch
             {
-                Bot.SendMessage(Chat, "💀");
+                Bot.SendMessage(Origin, "💀");
 
                 //                   He sends
                 // awesome fucking evil blue flaming skull next to
@@ -180,7 +180,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             var album = urls.Select(url => new InputMediaPhoto(InputFile.FromUri(url))).ToList();
             album[0].Caption = post.Title;
 
-            Bot.SendAlbum(Chat, album);
+            Bot.SendAlbum(Origin, album);
         }
 
         private void SendSingleFilePost(PostData post)
@@ -194,7 +194,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
             catch
             {
                 var meme = DownloadMeme(post, gif ? ".gif" : ".png");
-                var process = meme.UseFFMpeg(Chat);
+                var process = meme.UseFFMpeg(Origin);
                 var path = gif
                     ? process.CompressGIF().Result
                     : process.Compress   ().Result;
@@ -205,8 +205,8 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
             void SendPicOrAnimation(InputFile file)
             {
-                if (gif) Bot.SendAnimaXD(Chat, file, post.Title);
-                else     Bot.SendPhotoXD(Chat, file, post.Title);
+                if (gif) Bot.SendAnimaXD(Origin, file, post.Title);
+                else     Bot.SendPhotoXD(Origin, file, post.Title);
             }
         }
 
@@ -261,15 +261,15 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 
                 if (Text != null && await Recognize(Text) is { } post)
                 {
-                    Bot.SendMessage(Chat, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
+                    Bot.SendMessage(Origin, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
                     Log($"{title} >> LINK TO r/{post.Subreddit}");
                 }
                 else
                 {
-                    Bot.SendMessage(Chat, $"{I_FORGOR.PickAny()} {FAIL_EMOJI_1.PickAny()}");
+                    Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI_1.PickAny()}");
                 }
             }
-            else Bot.SendMessage(Chat, string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
+            else Bot.SendMessage(Origin, string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
         }
 
         private Task<PostData?> Recognize(string text)

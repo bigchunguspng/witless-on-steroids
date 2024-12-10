@@ -6,13 +6,13 @@ public class Reply : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Chat, "LOL XD)0)");
+            Bot.SendMessage(Origin, "LOL XD)0)");
             return;
         }
 
         if (Args is null)
         {
-            Bot.SendMessage(Chat, "<code>/rep [message_url] [text|message]</code>");
+            Bot.SendMessage(Origin, "<code>/rep [message_url] [text|message]</code>");
             return;
         }
 

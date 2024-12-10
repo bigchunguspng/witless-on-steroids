@@ -85,7 +85,7 @@ namespace Witlesss
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.SendMessage(_activeChat, arg, preview: true);
+                Bot.SendMessage((_activeChat, null), arg, preview: true);
                 Baka.Eat(arg);
                 Print($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
             }
@@ -117,7 +117,7 @@ namespace Witlesss
 
         private bool DeleteBlocker(long chat)
         {
-            var x = Bot.PingChat(chat, notify: false);
+            var x = Bot.PingChat((chat, null), notify: false);
             if (x == -1)
             {
                 ChatService.RemoveChat(chat);

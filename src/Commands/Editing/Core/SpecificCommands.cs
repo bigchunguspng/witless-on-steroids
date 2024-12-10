@@ -63,7 +63,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
     {
         if (Url != null)
         {
-            var waitMessage = Bot.PingChat(Chat, PLS_WAIT[Random.Shared.Next(5)]);
+            var waitMessage = Bot.PingChat(Origin, PLS_WAIT[Random.Shared.Next(5)]);
 
             var task = new DownloadVideoTask(Url, Context).RunAsync();
             await Bot.RunOrThrow(task, Chat, waitMessage);
@@ -77,7 +77,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
             var path = await DownloadFile();
 
             var waitMessage = path.FileSizeInBytes() > 4_000_000
-                ? Bot.PingChat(Chat, PROCESSING.PickAny().XDDD())
+                ? Bot.PingChat(Origin, PROCESSING.PickAny().XDDD())
                 : -1;
 
             return (path, waitMessage);

@@ -6,7 +6,7 @@
         {
             var path = await DownloadFile();
 
-            SendResult(await path.UseFFMpeg(Chat).Reverse().Out("-Reverse", Ext));
+            SendResult(await path.UseFFMpeg(Origin).Reverse().Out("-Reverse", Ext));
             Log($"{Title} >> REVERSED [<<]");
         }
         

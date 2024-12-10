@@ -62,13 +62,13 @@ public class FFMpeg : AudioVideoPhotoCommand
 
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
-            Bot.SendSticker(Chat, InputFile.FromFileId(TROLLFACE));
+            Bot.SendSticker(Origin, InputFile.FromFileId(TROLLFACE));
             return;
         }
 
         var path = await DownloadFile();
 
-        var result = await path.UseFFMpeg(Chat).Edit(options).Out("-Edit", $".{extension}");
+        var result = await path.UseFFMpeg(Origin).Edit(options).Out("-Edit", $".{extension}");
         SendResult(result, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
@@ -97,12 +97,12 @@ public class FFMpeg : AudioVideoPhotoCommand
     private void SendResult(string result, string extension, bool sendDocument = false)
     {
         using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Chat, InputFile_FromStream());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Chat, InputFile.FromStream(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Chat, InputFile.FromStream(stream));
-        else if (extension == "mp3")      Bot.SendAudio    (Chat, InputFile_FromStream());
-        else if (extension == "mp4")      Bot.SendAnimation(Chat, InputFile_FromStream());
-        else                              Bot.SendDocument (Chat, InputFile_FromStream());
+        if      (sendDocument)            Bot.SendDocument (Origin, InputFile_FromStream());
+        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Origin, InputFile.FromStream(stream));
+        else if (extension == "webp")     Bot.SendSticker  (Origin, InputFile.FromStream(stream));
+        else if (extension == "mp3")      Bot.SendAudio    (Origin, InputFile_FromStream());
+        else if (extension == "mp4")      Bot.SendAnimation(Origin, InputFile_FromStream());
+        else                              Bot.SendDocument (Origin, InputFile_FromStream());
 
         InputFile InputFile_FromStream() => InputFile.FromStream(stream, $"made with piece_fap_bot.{extension}");
     }

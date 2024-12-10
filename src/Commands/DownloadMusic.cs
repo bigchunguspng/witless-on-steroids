@@ -38,7 +38,7 @@ public class DownloadMusic : AsyncCommand
                 ? null
                 : Regex.Match(options, @"\d+").Value.MakeNull_IfEmpty();
 
-            var message = Bot.PingChat(Chat, PLS_WAIT.PickAny());
+            var message = Bot.PingChat(Origin, PLS_WAIT.PickAny());
 
             var task = new DownloadMusicTask(idOrUrl, youTube, Context, message)
             {
@@ -58,7 +58,7 @@ public class DownloadMusic : AsyncCommand
             await Bot.RunOrThrow(task.RunAsync(), Chat, message);
         }
         else
-            Bot.SendMessage(Chat, SONG_MANUAL);
+            Bot.SendMessage(Origin, SONG_MANUAL);
     }
 
     private string? GetArgsWithURL()

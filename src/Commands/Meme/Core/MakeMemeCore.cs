@@ -49,7 +49,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         {
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
-            Bot.SendMessage(Chat, string.Format(MEME_MANUAL, options));
+            Bot.SendMessage(Origin, string.Format(MEME_MANUAL, options));
         }
 
         private async Task<bool> ProcessMessage(Message? message)
@@ -82,7 +82,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             for (var i = 0; i < repeats; i++)
             {
                 await using var stream = File.OpenRead(await MakeMemeImage(request, GetText()));
-                Bot.SendPhoto(Chat, InputFile.FromStream(stream));
+                Bot.SendPhoto(Origin, InputFile.FromStream(stream));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}]");
         }
@@ -102,8 +102,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             {
                 await using var stream = File.OpenRead(await MakeMemeStick(request, GetText()));
 
-                if (sticker) Bot.SendSticker(Chat, InputFile.FromStream(stream));
-                else         Bot.SendPhoto  (Chat, InputFile.FromStream(stream));
+                if (sticker) Bot.SendSticker(Origin, InputFile.FromStream(stream));
+                else         Bot.SendPhoto  (Origin, InputFile.FromStream(stream));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] STICKER");
         }
@@ -113,7 +113,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             var sw = GetStartedStopwatch();
 
             var path = await DownloadFileAndParseOptions(file, extension);
-            if (round && CropVideoNotes) path = await path.UseFFMpeg(Chat).CropVideoNoteXD();
+            if (round && CropVideoNotes) path = await path.UseFFMpeg(Origin).CropVideoNoteXD();
 
             var note = round && !CropVideoNotes;
 
@@ -123,8 +123,8 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             {
                 await using var stream = File.OpenRead(await MakeMemeVideo(request, GetText()));
 
-                if (note) Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
-                else      Bot.SendAnimation(Chat, InputFile.FromStream(stream, VideoName));
+                if (note) Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
+                else      Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoName));
             }
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }
@@ -134,12 +134,12 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
             Request = GetRequestData();
             ParseOptions();
 
-            return Bot.Download(file, Chat, extension);
+            return Bot.Download(file, Origin, extension);
         }
 
         private MemeFileRequest GetMemeFileRequest
             (MemeSourceType type, string path, string outputEnding)
-            => new(Chat, type, path, outputEnding, Data.Quality, Pressure);
+            => new(Origin, type, path, outputEnding, Data.Quality, Pressure);
 
         private T GetText() => GetMemeText(GetTextBase());
 
@@ -170,7 +170,7 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
         private async Task<string> MakeMemeStick(MemeFileRequest request, T text)
         {
             if (request.JpegSticker)
-                request.SourcePath = await Chat.Convert(request.SourcePath, ".jpg");
+                request.SourcePath = await Origin.Convert(request.SourcePath, ".jpg");
             return await MakeMemeImage(request, text);
         }
 

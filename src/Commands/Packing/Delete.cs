@@ -7,7 +7,7 @@ namespace Witlesss.Commands.Packing
     {
         protected override void RunAuthorized()
         {
-            Bot.SendMessage(Chat, TRACTOR_GAME_RULES, GetMinigameKeyboard());
+            Bot.SendMessage(Origin, TRACTOR_GAME_RULES, GetMinigameKeyboard());
         }
 
         private void DeleteTheDictionary()
@@ -22,7 +22,7 @@ namespace Witlesss.Commands.Packing
             ChatService.DeletePack(Chat);
 
             Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, 13);
-            Bot.SendMessage(Chat, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
+            Bot.SendMessage(Origin, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
         }
 
 
@@ -66,6 +66,7 @@ namespace Witlesss.Commands.Packing
 
         public void DoGameStep(Message message, string data)
         {
+            // Callback blocks the thread, so this must be safe 😎
             Context = WitlessContext.FromMessage(message, ChatService.SettingsDB[message.Chat.Id]);
 
             var split = data.Split(" - ");
@@ -132,18 +133,18 @@ namespace Witlesss.Commands.Packing
 
                 if (noHousing && noTractor)
                 {
-                    Bot.SendSticker(Chat, InputFile.FromFileId(GG));
-                    Bot.SendMessage(Chat, "НИЧЬЯ");
+                    Bot.SendSticker(Origin, InputFile.FromFileId(GG));
+                    Bot.SendMessage(Origin, "НИЧЬЯ");
                 }
                 else if (noTractor)
                 {
-                    Bot.SendSticker(Chat, InputFile.FromFileId(I_WIN));
-                    Bot.SendMessage(Chat, "RIP 🤣😭😂👌");
+                    Bot.SendSticker(Origin, InputFile.FromFileId(I_WIN));
+                    Bot.SendMessage(Origin, "RIP 🤣😭😂👌");
                 }
                 else
                 {
-                    Bot.SendSticker(Chat, InputFile.FromFileId(U_WIN));
-                    Bot.SendSticker(Chat, InputFile.FromFileId(D_100));
+                    Bot.SendSticker(Origin, InputFile.FromFileId(U_WIN));
+                    Bot.SendSticker(Origin, InputFile.FromFileId(D_100));
 
                     DeleteTheDictionary();
                 }

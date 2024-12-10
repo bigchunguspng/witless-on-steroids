@@ -8,13 +8,13 @@ public class SetSpeech : SettingsCommand
         {
             Data.Speech = value.ClampByte();
             ChatService.SaveChatsDB();
-            Bot.SendMessage(Chat, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
+            Bot.SendMessage(Origin, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
             Log($"{Title} >> SPEECH >> {Data.Speech}");
         }
         else
         {
             var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Data.Speech, "speech");
-            Bot.SendMessage(Chat, message);
+            Bot.SendMessage(Origin, message);
         }
     }
 }

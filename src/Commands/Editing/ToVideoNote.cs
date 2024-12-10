@@ -8,8 +8,8 @@ namespace Witlesss.Commands.Editing
         {
             var path = await DownloadFile();
 
-            await using var stream = System.IO.File.OpenRead(await path.UseFFMpeg(Chat).ToVideoNote());
-            Bot.SendVideoNote(Chat, InputFile.FromStream(stream));
+            await using var stream = System.IO.File.OpenRead(await path.UseFFMpeg(Origin).ToVideoNote());
+            Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
             Log($"{Title} >> NOTE (*)");
         }
     }

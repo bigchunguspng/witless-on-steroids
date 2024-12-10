@@ -11,9 +11,9 @@ namespace Witlesss.MediaTools
         public static readonly Rectangle VideoNoteCrop = new(56, 56, 272, 272);
 
 
-        public static async Task<string> Convert(this long chat, string path, string extension)
+        public static async Task<string> Convert(this MessageOrigin origin, string path, string extension)
         {
-            var ffmpeg = path.UseFFMpeg(chat);
+            var ffmpeg = path.UseFFMpeg(origin);
             var name = ffmpeg.GetOutputName("-W", extension);
             try
             {
@@ -25,14 +25,14 @@ namespace Witlesss.MediaTools
             }
         }
 
-        public static async Task<string> ReduceSize(long chat, string path)
+        public static async Task<string> ReduceSize(MessageOrigin origin, string path)
         {
             var size = GetPictureSize(path);
             var fits = size.FitSize(720).ValidMp4Size();
             if (size != fits)
             {
                 string[] args = [fits.Width.ToString(), fits.Height.ToString()];
-                return await path.UseFFMpeg(chat).Scale(args).Out("-scale");
+                return await path.UseFFMpeg(origin).Scale(args).Out("-scale");
             }
 
             return path;

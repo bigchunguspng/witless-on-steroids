@@ -47,13 +47,13 @@
 
                 var path = await DownloadFile();
 
-                var input = path.UseFFMpeg(Chat);
+                var input = path.UseFFMpeg(Origin);
                 var process = Ext is ".jpg" ? input.CropJpeg(args) : input.CropVideo(args);
                 SendResult(await process.Out("-crop", Ext));
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }
             else
-                Bot.SendMessage(Chat, CROP_MANUAL);
+                Bot.SendMessage(Origin, CROP_MANUAL);
         }
 
         protected override string VideoFileName => _isShakeMode ? _shake : _crop;

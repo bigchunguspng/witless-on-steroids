@@ -32,7 +32,7 @@
 
             await Task.Run(() =>
             {
-                foreach (var text in texts) Bot.SendMessage(Chat, text, preview: true);
+                foreach (var text in texts) Bot.SendMessage(Origin, text, preview: true);
             });
 
             LogXD(Title, repeats, "FUNNY BY WORD");

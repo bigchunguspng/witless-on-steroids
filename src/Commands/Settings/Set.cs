@@ -24,18 +24,18 @@ namespace Witlesss.Commands.Settings
                 else if (_g.IsMatch(w)) Set(MemeType.Dg,   "/dg"  );
                 else if (_d.IsMatch(w)) Set(MemeType.Dp,   "/dp"  );
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
-                else Bot.SendMessage(Chat, string.Format(SET_MEME_TYPE_MANUAL, w));
+                else Bot.SendMessage(Origin, string.Format(SET_MEME_TYPE_MANUAL, w));
 
                 if (typeWasChanged)
                 {
                     ChatService.SaveChatsDB();
-                    Bot.SendMessage(Chat, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]).XDDD());
+                    Bot.SendMessage(Origin, string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]).XDDD());
                     Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
                 }
                 else if (optionsWereChanged)
                 {
                     ChatService.SaveChatsDB();
-                    Bot.SendMessage(Chat, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
+                    Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
                     Log($"{Title} >> MEMES OPTIONS");
                 }
 
@@ -45,7 +45,7 @@ namespace Witlesss.Commands.Settings
                     {
                         var options = Data.GetMemeOptions()[type];
                         options = options is null ? "А НЕТУ!!!" : $"<code>{options}</code>";
-                        Bot.SendMessage(Chat, $"Опции команды <b>{cmd}</b>: {options}".XDDD());
+                        Bot.SendMessage(Origin, $"Опции команды <b>{cmd}</b>: {options}".XDDD());
                     }
                     else if (args.Length > 1)
                     {
@@ -64,7 +64,7 @@ namespace Witlesss.Commands.Settings
                 }
             }
             else
-                Bot.SendMessage(Chat, SET_MANUAL);
+                Bot.SendMessage(Origin, SET_MANUAL);
         }
     }
 }

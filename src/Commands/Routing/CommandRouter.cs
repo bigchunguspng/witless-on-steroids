@@ -91,7 +91,7 @@ namespace Witlesss.Commands.Routing
 
                 if (success == false && (Context.ChatIsPrivate || Context.BotMentioned))
                 {
-                    Bot.SendMessage(Chat, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
+                    Bot.SendMessage(Origin, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
                 }
             }
         }
@@ -111,7 +111,7 @@ namespace Witlesss.Commands.Routing
             {
                 ChatService.SaveChatsDB();
                 Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, 13);
-                Bot.SendMessage(Chat, START_RESPONSE);
+                Bot.SendMessage(Origin, START_RESPONSE);
             }
             return success;
         }

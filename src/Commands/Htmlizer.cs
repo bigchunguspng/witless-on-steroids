@@ -21,13 +21,13 @@ public class Htmlizer : SyncCommand
         var text = htmlize ? HtmlText.Escape(message.ToHtml()) : message.GetTextOrCaption();
         if (text is null)
         {
-            Bot.SendSticker(Chat, InputFile.FromFileId(LOL.PickAny()));
+            Bot.SendSticker(Origin, InputFile.FromFileId(LOL.PickAny()));
         }
         else
         {
             if (message == Message) text = text.SplitN(2)[1];
 
-            Bot.SendMessage(Chat, htmlize ? $"<pre>{text}</pre>" : text);
+            Bot.SendMessage(Origin, htmlize ? $"<pre>{text}</pre>" : text);
             Log($"{Title} >> {(htmlize ? "<HTML/>" : "<TEXT/>")}");
         }
     }

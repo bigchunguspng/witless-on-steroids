@@ -8,7 +8,7 @@ public class React : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Chat, "LOL XD)0)");
+            Bot.SendMessage(Origin, "LOL XD)0)");
             return;
         }
 
@@ -20,7 +20,7 @@ public class React : SyncCommand
 
                 Reactions: 👍👎❤🔥🥰👏😁🤔🤯😱🤬😢🎉🤩🤮💩🙏👌🕊🤡🥱🥴😍🐳❤‍🔥🌚🌭💯🤣⚡🍌🏆💔🤨😐🍓🍾💋🖕😈😴😭🤓👻👨‍💻👀🎃🙈😇😨🤝✍🤗🫡🎅🎄☃💅🤪🗿🆒💘🙉🦄😘💊🙊😎👾🤷‍♂🤷🤷‍♀😡
                 """;
-            Bot.SendMessage(Chat, manual);
+            Bot.SendMessage(Origin, manual);
             return;
         }
 

@@ -166,7 +166,8 @@ namespace Witlesss.Services.Internet.Boards
                         var name = HttpUtility.HtmlDecode(item.InnerText);
                         var href = item.ChildNodes[0].Attributes["href"].Value;
 
-                        group.Boards.Add(new BoardGroup.Board(name, href, false));
+                        var key = new Uri(href).Segments[1].Trim('/');
+                        group.Boards.Add(new BoardGroup.Board(name, key, href, false));
                     }
                     boards.Add(group);
                     if (node != last) group = new BoardGroup();

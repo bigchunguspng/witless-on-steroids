@@ -6,5 +6,5 @@ public class BoardGroup
     public bool IsNSFW;
     public readonly List<Board> Boards = [];
 
-    public record Board(string Title, string URL, bool IsNSFW);
+    public record Board(string Title, string? Key, string URL, bool IsNSFW);
 }

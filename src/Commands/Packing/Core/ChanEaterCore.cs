@@ -158,7 +158,7 @@ public abstract class ChanEaterCore : Fuse
         var boards = Boards.Skip(page * perPage).Take(perPage);
         var last = (int)Math.Ceiling(Boards.Count / (double)perPage) - 1;
 
-        var sb = new StringBuilder(BoardsTitle).Append($" [PAGE: {page + 1}/{last + 1}]");
+        var sb = new StringBuilder(BoardsTitle).Append($" 📃{page + 1}/{last + 1}");
         foreach (var group in boards)
         {
             sb.Append($"\n\n<b><u>{group.Title}</u></b>");
@@ -166,12 +166,11 @@ public abstract class ChanEaterCore : Fuse
             sb.Append('\n');
             foreach (var board in group.Boards)
             {
-                sb.Append($"\n<i>{board.Title}</i>");
+                sb.Append(board.Key is null ? "\n\n" : $"\n<code>{board.Key}</code> - ");
+                sb.Append($"<i><a href='{board.URL}'>{board.Title}</a></i>");
                 if (board.IsNSFW) sb.Append(" (NSFW🥵)");
-                sb.Append($" - <code>{board.URL}</code>");
             }
         }
-        sb.Append(string.Format(BrowseReddit.SEARCH_FOOTER, Bot.Me.FirstName));
         sb.Append(USE_ARROWS);
 
         var text = sb.ToString();
@@ -189,8 +188,8 @@ public abstract class ChanEaterCore : Fuse
         var paginated = files.Length > perPage;
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
 
-        var sb = new StringBuilder(EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b> ");
-        if (paginated) sb.Append($"📄[{page + 1}/{lastPage + 1}]");
+        var sb = new StringBuilder(EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b>");
+        if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
         sb.Append("\n\n").AppendJoin('\n', BoardHelpers.GetJsonList(files, page, perPage));
         if (paginated) sb.Append(USE_ARROWS);
 

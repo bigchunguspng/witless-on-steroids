@@ -261,7 +261,7 @@ namespace Witlesss.Commands.Packing
                 sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
             }
             sb.Append("<b>").Append(data.Available).Append(":</b>");
-            if (!oneshot) sb.Append(" 📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
+            if (!oneshot) sb.Append($" 📃{page + 1}/{lastPage + 1}");
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = ChatService.GetPath(origin.Chat);

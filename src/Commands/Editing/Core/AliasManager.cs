@@ -60,8 +60,8 @@ public abstract class AliasManager : SyncCommand
         var single = files.Length <= perPage;
 
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
-        var sb = new StringBuilder("🔥 <b>Ярлыки команды /").Append(CMD).Append(":</b> ");
-        if (!single) sb.Append("📄[").Append(page + 1).Append('/').Append(lastPage + 1).Append(']');
+        var sb = new StringBuilder("🔥 <b>Ярлыки команды /").Append(CMD).Append(":</b>");
+        if (!single) sb.Append($" 📃{page + 1}/{lastPage + 1}");
         sb.Append("\n\n").AppendJoin('\n', AliasList(files, page, perPage));
         if (!single) sb.Append(USE_ARROWS);
 

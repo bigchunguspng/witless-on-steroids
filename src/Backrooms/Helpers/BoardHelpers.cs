@@ -6,6 +6,9 @@ namespace Witlesss.Backrooms.Helpers;
 
 public static class BoardHelpers
 {
+    public static void Print4chan() => PrintMenu(new BoardService().GetBoardList(File_4chanHtmlPage));
+    public static void Print2chan() => PrintMenu(new PlankService().GetBoardList(File_2chanHtmlPage));
+
     public static void PrintMenu(IEnumerable<BoardGroup> menu)
     {
         foreach (var group in menu)

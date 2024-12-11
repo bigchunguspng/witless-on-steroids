@@ -106,7 +106,12 @@ public class PlankService
                 var url   = match.Groups[1].Value;
                 var nsfw  = match.Groups[3].Success;
 
-                group.Boards.Add(new BoardGroup.Board(title, url, nsfw));
+                var uri = new Uri(url);
+                if (uri.Host.StartsWith("2")      == false) continue; // tv, t.me
+                if (uri.Segments[1].EndsWith('/') == false) continue; // api.yml
+
+                var key = uri.Segments.Length > 2 ? null : uri.Segments[1].Trim('/');
+                group.Boards.Add(new BoardGroup.Board(title, key, url, nsfw));
             }
             else
             {

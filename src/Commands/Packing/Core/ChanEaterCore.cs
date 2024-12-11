@@ -90,8 +90,9 @@ public abstract class ChanEaterCore : Fuse
 
             await EatMany(lines, size, Limit);
         }
-        catch
+        catch (Exception e)
         {
+            LogError(e.Message);
             Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
         }
     }
@@ -130,12 +131,11 @@ public abstract class ChanEaterCore : Fuse
         {
             if (url.Contains('/') == false) // is a board code e.g. "a" or "b"
             {
-                var ending = $"/{url}/";
-                var urls = Boards.SelectMany(x => x.Boards.Select(b => b.URL)).ToList();
-                var match = urls.FirstOrDefault(x => x.EndsWith(ending));
+                var key = url;
+                var match = Boards.SelectMany(x => x.Boards).FirstOrDefault(x => x.Key == key);
                 if (match != null)
                 {
-                    url = match;
+                    url = match.URL;
                 }
             }
 

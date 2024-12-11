@@ -30,7 +30,9 @@ public class EatBoards : ChanEaterCore
 
     protected override string GetSourceAnnotation()
     {
-        var shortURL = _uri.Segments[2].Contains("search") ? "desuarchive.org" : _uri.LocalPath;
+        var shortURL = _uri.Segments.Length > 2 && _uri.Segments[2].Contains("search")
+            ? "desuarchive.org"
+            : _uri.LocalPath;
         return string.Format(FUSE_SOURCE, _uri, shortURL);
     }
 

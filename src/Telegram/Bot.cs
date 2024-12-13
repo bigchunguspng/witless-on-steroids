@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Net.Http;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace Witlesss.Telegram
@@ -18,7 +19,9 @@ namespace Witlesss.Telegram
 
         private Bot(CommandAndCallbackRouter command)
         {
-            Client   = new TelegramBotClient(Config.TelegramToken);
+            var httpClient = new HttpClient() { Timeout = TimeSpan.FromMinutes(5) };
+
+            Client = new TelegramBotClient(Config.TelegramToken, httpClient);
             Me       = GetMe();
             Username = $"@{Me.Username!.ToLower()}";
             Instance = this;

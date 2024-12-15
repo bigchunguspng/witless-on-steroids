@@ -32,9 +32,13 @@ public static class Responses
         "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",
         "🍒", "🧄", "🍿", "😭", "🪶", "✨", "🍻", "👌", "💀", "🎳", "🗿", "🔧", "🎉", "🎻"
     ];
-    public static readonly string[] FAIL_EMOJI_1 = ["😭", "😎", "😙", "💀", "😤", "😩", "😔"];
-    public static readonly string[] FAIL_EMOJI_2 = ["😵", "😧", "😨", "😰", "😮", "😲", "💀", "😭", "😔"];
-    public static readonly string[] EMPTY_EMOJI  = ["🐾", "💀", "👻", "💯", "💢", "🗑", "🍽"];
+
+    public static readonly string[] FAIL_EMOJI =
+    [
+        "😵", "😵‍💫", "😧", "😨", "😰", "😮", "😲", "😳", "💀", "😭", "😔", "😤", "😩", "😫"
+    ];
+
+    public static readonly string[] EMPTY_EMOJI = ["🐾", "💀", "👻", "💯", "💢", "🗑", "🍽"];
 
     public static string XDDD(this string text) => $"{RANDOM_EMOJI.PickAny()} {text}";
 

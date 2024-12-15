@@ -33,7 +33,7 @@ public abstract class AliasManager : SyncCommand
             if (files.Length > 0 && !Message.SenderIsBotAdmin())
             {
                 var content = File.ReadAllText(files[0]);
-                Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI_1.PickAny()));
+                Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI.PickAny()));
             }
             else
             {

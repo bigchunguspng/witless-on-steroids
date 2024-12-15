@@ -190,7 +190,7 @@ namespace Witlesss.Telegram
             }
         }
 
-        public string GetSillyErrorMessage() => $"произошла ашыпка {FAIL_EMOJI_2.PickAny()}";
+        public string GetSillyErrorMessage() => $"произошла ашыпка {FAIL_EMOJI.PickAny()}";
 
         public void SendErrorDetails(MessageOrigin origin, string command, string errorMessage)
         {

@@ -51,7 +51,7 @@ namespace Witlesss.Commands.Packing
             var file = Path.Combine(directory, Chat.ToString(), $"{name}.json");
             if (File.Exists(file) == false)
             {
-                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI_1.PickAny(), x[0], x[1]);
+                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
                 Bot.SendMessage(Origin, text);
                 return;
             }

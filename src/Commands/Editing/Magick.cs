@@ -49,6 +49,7 @@ public class Magick : PhotoCommand
         }
 
         var path = await DownloadFile();
+        options = options.Replace("THIS", path);
 
         try
         {

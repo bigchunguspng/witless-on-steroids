@@ -67,6 +67,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         }
 
         var path = await DownloadFile();
+        options = options.Replace("THIS", path);
 
         var result = await path.UseFFMpeg(Origin).Edit(options).Out("-Edit", $".{extension}");
         SendResult(result, extension, sendDocument: OptionUsed('g'));

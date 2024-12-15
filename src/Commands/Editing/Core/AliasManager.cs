@@ -16,7 +16,7 @@ public abstract class AliasManager : SyncCommand
 
     protected override void Run()
     {
-        if (Args is "info")
+        if (Args != null && Args.EndsWith("info"))
         {
             SendAliasList(new ListPagination(Origin, PerPage: 10));
         }

@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Memes.Shared
 {
@@ -254,7 +255,7 @@ namespace Witlesss.Memes.Shared
                     {
                         repeat = false;
 
-                        var files = Directory.GetFiles(Dir_Emoji, name + "*.png");
+                        var files = GetEmojiFilesCached(name);
                         if (files.Length == 1) file = files[0];
                         else if (files.Length > 1)
                         {
@@ -287,6 +288,19 @@ namespace Witlesss.Memes.Shared
             }
 
             return pngs;
+        }
+
+        private static readonly LimitedCache<string, string[]> _emojiCache = new(128);
+
+        private static string[] GetEmojiFilesCached(string name)
+        {
+            if (!_emojiCache.Contains(name, out var files))
+            {
+                files = Directory.GetFiles(Dir_Emoji, name + "*.png");
+                _emojiCache.Add(name, files);
+            }
+
+            return files;
         }
     }
 

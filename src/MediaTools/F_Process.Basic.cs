@@ -27,6 +27,22 @@ namespace Witlesss.MediaTools
                 o.CopyChannel(Channel.Video);
         });
 
+        // -loop 1 -i INPUT -t 5 [-s WxH -vcodec libx264 -crf 30]
+        public F_Process LoopPhoto(int duration) => ApplyEffects(o =>
+        {
+            o.WithCustomArgument($"-loop 1 -i \"{Input}\" -t {duration}");
+
+            var v = GetVideoStream(Input)!;
+            if (v.Width.IsOdd() || v.Height.IsOdd())
+            {
+                var size = new Size(v.Width, v.Height).Ok();
+                o.Resize(size.FitSize().ValidMp4Size().Ok());
+            }
+
+            o.WithCompression(30);
+            o.WithCustomArgument("-map 1");
+        });
+
         // -c:a libopus -b:a 48k -vn
         public F_Process ToVoice() => ApplyEffects(o =>
         {

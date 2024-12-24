@@ -1,4 +1,5 @@
-﻿using FFMpegCore;
+﻿using System.Diagnostics;
+using FFMpegCore;
 using Witlesss.Backrooms.Types.SerialQueue;
 
 namespace Witlesss.MediaTools;
@@ -56,7 +57,9 @@ public partial class F_Process
 #if DEBUG
                 Log($"[FFMPEG] >> ffmpeg {args}", LogLevel.Debug, 3);
 #endif
-                return processor.ProcessAsynchronously();
+                return processor.ProcessAsynchronously()
+                    .WaitAsync(TimeSpan.FromMinutes(2))
+                    .ContinueWith(_ => Process.GetProcessesByName("ffmpeg").FirstOrDefault()?.Kill());
             });
         }
         catch (Exception e)

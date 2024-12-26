@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using FFMpegCore;
+using FFMpegCore.Exceptions;
 using Witlesss.Backrooms.Types.SerialQueue;
 
 namespace Witlesss.MediaTools;
@@ -57,18 +58,38 @@ public partial class F_Process
 #if DEBUG
                 Log($"[FFMPEG] >> ffmpeg {args}", LogLevel.Debug, 3);
 #endif
-                return processor.ProcessAsynchronously()
-                    .WaitAsync(TimeSpan.FromMinutes(2))
-                    .ContinueWith(_ => Process.GetProcessesByName("ffmpeg").FirstOrDefault()?.Kill());
+                KillProcessIfStuck();
+                return Task.Run(async () =>
+                {
+                    await processor.ProcessAsynchronously();
+                    _finished = true;
+                });
             });
         }
-        catch (Exception e)
+        catch (FFMpegException e)
         {
-            Bot.Instance.SendErrorDetails(Origin, $"ffmpeg {args}", e.GetFixedMessage());
-            throw;
+            var message = e.FFMpegErrorOutput;
+            if (_killed) message = $"[ THE PROCESS WAS KILLED ]\n\n{message}";
+            Bot.Instance.SendErrorDetails(Origin, $"ffmpeg {args}", message);
+            throw new Exception(e.FFMpegErrorOutput);
         }
     }
 
+    private bool _finished, _killed;
+
+    private async void KillProcessIfStuck()
+    {
+        await Task.Delay(TimeSpan.FromMinutes(2));
+        if (_finished) return;
+
+        var ffmpeg = Process.GetProcessesByName("ffmpeg").FirstOrDefault();
+        if (ffmpeg != null)
+        {
+            LogError("KILL FFMPEG");
+            _killed = true;
+            ffmpeg.Kill();
+        }
+    }
 
     /// <summary> Gets media info + adds fixes to the options </summary>
     private MediaInfo MediaInfoWithFixing(FFMpegArgumentOptions o)

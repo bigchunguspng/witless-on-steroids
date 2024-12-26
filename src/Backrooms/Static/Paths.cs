@@ -28,6 +28,7 @@ namespace Witlesss.Backrooms.Static;
         History/
             -1001541923355/
                 KINGPIN-funny.json [list]       <-- /fuse * info
+            that-funny-file-1.json [list]       <-- /fuse @ info
         Plank/
             2024-08-21 a.7819159.json [list]    <-- /planks info
 

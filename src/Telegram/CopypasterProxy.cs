@@ -62,7 +62,7 @@ namespace Witlesss.Telegram
             catch
             {
                 LogError("NO TEXT!?");
-                var response = IsOneIn(5) ? null : DefaultTextProvider.GetRandomResponse();
+                var response = IsOneIn(8) ? null : DefaultTextProvider.GetRandomResponse();
                 return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
             }
         }

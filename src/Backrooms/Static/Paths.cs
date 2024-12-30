@@ -16,8 +16,6 @@ namespace Witlesss.Backrooms.Static;
         Backup/
             2024-03-14/
                 pack--4147302158.json [pack]
-        Board/
-            2024-08-21 a.270089129.json [list]  <-- /boards info
         Chat/
             chats.json
             pack--1001699898486.json [pack]     <-- /fuse by id
@@ -31,10 +29,12 @@ namespace Witlesss.Backrooms.Static;
             that-funny-file-1.json [list]       <-- /fuse @ info
         Plank/
             2024-08-21 a.7819159.json [list]    <-- /planks info
+        Board/
+            2024-08-21 a.270089129.json [list]  <-- /boards info
 
     Pics/
         -1001539756197/
-            AgADgRoAAm3T4Es-Meme.webp
+            AgAD5g0AAkFXMUk+3D8D-Meme.webp
 
     Static/
         ASCII/

@@ -62,7 +62,7 @@
                 var path = await DownloadFile();
 
                 var input = path.UseFFMpeg(Origin);
-                var process = Ext is ".jpg" ? input.CropJpeg(args) : input.CropVideo(args);
+                var process = Ext is ".mp4" or ".webm" ? input.CropVideo(args) : input.CropJpeg(args);
                 SendResult(await process.Out("-crop", Ext));
                 Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
             }

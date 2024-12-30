@@ -79,7 +79,7 @@ public partial class F_Process
 
     private async void KillProcessIfStuck()
     {
-        await Task.Delay(TimeSpan.FromMinutes(2));
+        await Task.Delay(TimeSpan.FromMinutes(5));
         if (_finished) return;
 
         var ffmpeg = Process.GetProcessesByName("ffmpeg").FirstOrDefault();

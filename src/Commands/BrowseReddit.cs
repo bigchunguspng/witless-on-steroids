@@ -11,10 +11,10 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
 {
     public class BrowseReddit : AsyncCommand
     {
-        private static readonly Regex _arg = new(@"((?:(?:.+)(?=\s[a-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
-        private static readonly Regex _sub = new(@"([a-z0-9_]+)");
-        private static readonly Regex sub_ = new(@"([a-z0-9_]+)\*");
-        private static readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
+        private static readonly Regex _arg = new(@"((?:(?:.+)(?=\s[A-Za-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
+        private static readonly Regex _sub = new(@"([A-Za-z0-9_]+)");
+        private static readonly Regex sub_ = new(@"([A-Za-z0-9_]+)\*");
+        private static readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$", RegexOptions.IgnoreCase);
         private static readonly Regex _wtf = new(@"^\/w[^\ss_@]");
 
         private static readonly RedditTool Reddit = RedditTool.Instance;

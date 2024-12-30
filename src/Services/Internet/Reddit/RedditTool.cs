@@ -16,7 +16,7 @@ namespace Witlesss.Services.Internet.Reddit
 
         private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken, Config.RedditSecret);
 
-        private readonly Regex _img = new(@"(\.png|\.jpg|\.gif)$|(reddit\.com\/gallery\/)");
+        private readonly Regex _img = new(@"(\.png|\.jpg|\.jpeg|\.gif)$|(reddit\.com\/gallery\/)");
 
         private RedditTool()
         {

@@ -63,6 +63,8 @@ public class FFMpeg : AudioVideoPhotoCommand
         if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
         {
             Bot.SendSticker(Origin, InputFile.FromFileId(TROLLFACE));
+            await Task.Delay(RandomInt(900, 1100));
+            Bot.SendMessage(Origin, PEG_EXTENSION_MISSING);
             return;
         }
 

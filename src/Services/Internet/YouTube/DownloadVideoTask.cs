@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Witlesss.Backrooms.Types;
 
-namespace Witlesss.Services.Internet;
+namespace Witlesss.Services.Internet.YouTube;
 
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video gif>gif/mp4 "URL" -o "video.%(ext)s"
 

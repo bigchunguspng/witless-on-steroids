@@ -2,7 +2,7 @@
 
 #pragma warning disable SYSLIB0014
 
-namespace Witlesss.Services.Internet
+namespace Witlesss.Services.Internet.YouTube
 {
     public static class YouTubePreviewFetcher
     {

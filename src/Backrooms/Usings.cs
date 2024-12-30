@@ -10,7 +10,6 @@ global using Witlesss.Backrooms.Helpers;
 global using Witlesss.Commands.Core;
 global using Witlesss.Commands.Editing.Core;
 global using Witlesss.MediaTools;
-global using Witlesss.Services.Internet;
 global using Witlesss.Services.Technical;
 global using Witlesss.Telegram;
 global using static Witlesss.Backrooms.Extensions;

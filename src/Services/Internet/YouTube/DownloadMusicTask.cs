@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Telegram.Bot.Types;
 
-namespace Witlesss.Services.Internet;
+namespace Witlesss.Services.Internet.YouTube;
 
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f ba -k -x --audio-format mp3 -I 1 "URL" -o "%(artist)s - %(title)s xd.%(ext)s"
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f "bv*[height<=720]" -k -I 1 "URL" -o "video.%(ext)s"

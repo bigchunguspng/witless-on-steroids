@@ -72,6 +72,7 @@ namespace Witlesss.Commands.Routing
                 .Register("rep"    , () => _reply)
                 .Register("man_g"    , () => _mail.WithText(G_MANUAL))
                 .Register("man_crop" , () => _mail.WithText(CROP_MANUAL))
+                .Register("man_shake", () => _mail.WithText(SHAKE_MANUAL))
                 .Register("man_scale", () => _mail.WithText(SCALE_MANUAL))
                 .Register("man_cut"  , () => _mail.WithText(CUT_MANUAL))
                 .Register("man_sus"  , () => _mail.WithText(SUS_MANUAL))

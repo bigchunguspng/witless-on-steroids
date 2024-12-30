@@ -33,7 +33,7 @@ public static class ArgumentParsing
         value = 0;
         if (c.Args is null) return false;
 
-        var arg = c.Args.SplitN()[0];
+        var arg = c.Args.SplitN(2)[0];
         return double.TryParse(arg.Replace('.', ','), out value);
     }
 

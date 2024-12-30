@@ -28,9 +28,9 @@ namespace Witlesss.MediaTools
         });
 
         // -loop 1 -i INPUT -t 5 [-s WxH -vcodec libx264 -crf 30]
-        public F_Process LoopPhoto(int duration) => ApplyEffects(o =>
+        public F_Process LoopPhoto(double duration) => ApplyEffects(o =>
         {
-            o.WithCustomArgument($"-loop 1 -i \"{Input}\" -t {duration}");
+            o.WithCustomArgument($"-loop 1 -i \"{Input}\" -t {duration.Format()}");
 
             var v = GetVideoStream(Input)!;
             if (v.Width.IsOdd() || v.Height.IsOdd())

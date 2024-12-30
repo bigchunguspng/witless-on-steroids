@@ -13,7 +13,7 @@ namespace Witlesss.Commands.Editing
             if (Type == MediaType.Round) path = await path.UseFFMpeg(Origin).CropVideoNoteXD();
 
             var photo = Type is MediaType.Photo or MediaType.Stick;
-            var duration = Args != null && int.TryParse(Args, out var value) ? Math.Clamp(value, 1, 120) : 5; 
+            var duration = Context.HasDoubleArgument(out var value) ? Math.Clamp(value, 0.01, 120) : 5; 
             var process = path.UseFFMpeg(Origin);
             var result = photo
                 ? await process.LoopPhoto(duration).Out("-loop")

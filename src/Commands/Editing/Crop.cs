@@ -19,7 +19,7 @@
             return this;
         }
 
-        protected override string SyntaxManual => "/man_crop";
+        protected override string SyntaxManual => _isShakeMode ? "/man_shake" : "/man_crop";
 
         protected override async Task Execute()
         {

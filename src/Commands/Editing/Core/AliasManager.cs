@@ -12,6 +12,7 @@ public abstract class AliasManager : SyncCommand
     protected abstract string Directory { get; }
 
     // /a{cmd} [code] [options] // ALIAS CREATION
+    // /a{cmd} [code] 0         // ALIAS DELETION (admin only)
     // /a{cmd}  info            // ALIAS INFO
 
     protected override void Run()
@@ -29,18 +30,30 @@ public abstract class AliasManager : SyncCommand
             var args = Args!.SplitN(2);
             var name = args[0].ValidFileName();
 
+            var admin = Message.SenderIsBotAdmin();
             var files = GetFiles(Directory, $"{name}.*");
-            if (files.Length > 0 && !Message.SenderIsBotAdmin())
+            if (files.Length > 0 && !admin)
             {
                 var content = File.ReadAllText(files[0]);
                 Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI.PickAny()));
             }
             else
             {
+                var path = Path.Combine(Directory, $"{name}.txt");
+
                 var options = Regex.Replace(args[1], @"\s+", " ");
-                File.WriteAllText(Path.Combine(Directory, $"{name}.txt"), options);
-                Bot.SendMessage(Origin, string.Format(ALIAS_SAVED_RESPONSE, name));
-                Log($"{Title} >> {CMD.ToUpper()} ALIAS ADDED [{name}]");
+                if (options == "0" && admin)
+                {
+                    File.Delete(path);
+                    Bot.SendMessage(Origin, string.Format(ALIAS_DELETED_RESPONSE, name));
+                    Log($"{Title} >> {CMD.ToUpper()} ALIAS REMOVED [{name}]");
+                }
+                else
+                {
+                    File.WriteAllText(path, options);
+                    Bot.SendMessage(Origin, string.Format(ALIAS_SAVED_RESPONSE, name));
+                    Log($"{Title} >> {CMD.ToUpper()} ALIAS ADDED [{name}]");
+                }
             }
         }
     }

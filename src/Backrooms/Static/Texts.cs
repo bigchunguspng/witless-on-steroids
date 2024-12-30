@@ -730,6 +730,11 @@ public static class Texts
         Ярлык "<code>{0}</code>" успешно сохранён 🥂
         """;
 
+    public const string ALIAS_DELETED_RESPONSE =
+        """
+        Ярлык "<code>{0}</code>" успешно удалён ♻️
+        """;
+
     public const string ALIAS_NOT_FOUND =
         """
         Не могу найти ярлык "<code>{0}</code>" {1}

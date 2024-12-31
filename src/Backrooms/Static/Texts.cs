@@ -323,6 +323,16 @@ public static class Texts
     public const string DEBUG_MANUAL =
         "Отправь это в ответ на любое сообщение";
 
+    public const string DEBUG_ADMIN_MANUAL =
+        """
+        <code>/debug [code]</code>
+
+        <code>m</code> → memory usage
+        <code>p</code> → packs info
+        <code>r</code> → reddit cache
+        <code>e</code> → emoji cache
+        """;
+
     public const string SET_MEME_OPS_RESPONSE =
         "Опции команды <b>{0}</b> изменены на <b>{1}</b>";
 

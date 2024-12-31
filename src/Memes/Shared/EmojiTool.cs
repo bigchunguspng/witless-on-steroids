@@ -302,6 +302,8 @@ namespace Witlesss.Memes.Shared
 
             return files;
         }
+
+        public static int EmojisCached => _emojiCache.Count;
     }
 
     public class EmojiPngList(int count) : List<List<string>>(count)

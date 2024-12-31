@@ -16,6 +16,8 @@ public class LimitedCache<TKey, TValue> where TKey : notnull
         _paths = new Dictionary<TKey, TValue>(_limit);
     }
 
+    public int Count => _keys.Count;
+
     public void Add(TKey id, TValue value)
     {
         if (_keys.Count == _limit)

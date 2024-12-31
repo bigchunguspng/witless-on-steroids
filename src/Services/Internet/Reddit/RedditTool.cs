@@ -262,6 +262,15 @@ namespace Witlesss.Services.Internet.Reddit
         public int QueriesCached => Cache.Count;
         public int   PostsCached => Cache.Values.Sum(c => c.Posts.Count);
 
+        public string DebugCache()
+        {
+            var rows = Cache
+                .OrderByDescending(x => x.Value.Posts.Count)
+                .Select(x => $"{x.Value.Posts.Count} - <code>{x.Key}</code>");
+
+            return string.Join('\n', rows);
+        }
+
         public List<Subreddit> FindSubreddits(string search)
         {
             return client.SearchSubreddits(search).Where(s => s.Subscribers > 0).ToList();

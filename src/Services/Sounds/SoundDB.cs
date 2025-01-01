@@ -14,6 +14,8 @@ public class SoundDB
 
     private SoundDB()
     {
+        var sw = GetStartedStopwatch();
+
         _sounds = [];
 
         if (File.Exists(File_Sounds) == false) return;
@@ -26,13 +28,18 @@ public class SoundDB
             var args = line.Split(' ', 2);
             _sounds.Add((args[0], args[1]));
         }
+
+        Log($"[SoundDB] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: 11);
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     private void SaveData(List<Sound> newSounds)
     {
+        if (newSounds.Count == 0) return;
+
         var skip = _sounds.Count;
         _sounds.AddRange(newSounds);
+        newSounds.Clear();
 
         using var writer = File.AppendText(File_Sounds);
         foreach (var sound in _sounds.Skip(skip))
@@ -47,7 +54,7 @@ public class SoundDB
     [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Sound> Search(string query)
     {
-        return _sounds.Where(x => x.Text.ToLower().Contains(query.ToLower())).Take(25);
+        return _sounds.Where(x => x.Text.ToLower().Contains(query.ToLower())).Take(50);
     }
 
     // UPLOAD
@@ -65,7 +72,7 @@ public class SoundDB
     {
         var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
         int count = 0, total = files.Length;
-        var newSounds = new List<Sound>(total);
+        var buffer = new List<Sound>(total);
         Directory.CreateDirectory(Dir_Temp);
         foreach (var file in files)
         {
@@ -73,17 +80,20 @@ public class SoundDB
             var text = Path.GetFileNameWithoutExtension(name);
             try
             {
-                var id = await UploadFile(file, Config.SoundChannel);
-                newSounds.Add((id, text));
-                Log($"[SoundDB] << {++count, 3} / {total} {ShortID(id)}", color: 11);
+                var fileId = await UploadFile(file, Config.SoundChannel);
+                buffer.Add((fileId, text));
+                Log($"[SoundDB] << {++count, 3} / {total} {ShortID(fileId)}", color: 11);
+
+                if (count % 10 == 0) SaveData(buffer);
             }
             catch (Exception e)
             {
+                total--;
                 LogError($"[SoundDB] >> Can't have [{name}] in Detroit X_X --> {e.Message}");
             }
         }
 
-        SaveData(newSounds);
+        SaveData(buffer);
     }
 
     /// <summary>

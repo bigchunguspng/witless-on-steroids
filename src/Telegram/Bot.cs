@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Witlesss.Commands.Routing;
 
 namespace Witlesss.Telegram
 {
@@ -13,9 +14,10 @@ namespace Witlesss.Telegram
         public static string Username { get; private set; } = null!;
         public static Bot    Instance { get; private set; } = null!;
 
-        public static void LaunchInstance
-            (CommandAndCallbackRouter command)
-            => new Bot(command).Run();
+        public static void LaunchInstance(string? args)
+        {
+            new Bot(args != null ? new Skip() : new CommandRouter()).Run(listen: args != "!");
+        }
 
         private Bot(CommandAndCallbackRouter command)
         {
@@ -28,11 +30,11 @@ namespace Witlesss.Telegram
             Router   = command;
         }
 
-        private void Run()
+        private void Run(bool listen = true)
         {
             ClearTempFiles();
 
-            StartListening();
+            if (listen) StartListening();
             ChatService.StartAutoSaveAsync(TimeSpan.FromMinutes(2));
 
             new ConsoleUI().EnterConsoleLoop();

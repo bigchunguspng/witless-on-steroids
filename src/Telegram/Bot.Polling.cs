@@ -3,12 +3,14 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Witlesss.Services.Sounds;
 
 namespace Witlesss.Telegram;
 
 public partial class Bot
 {
     public static CommandAndCallbackRouter Router { get; private set; } = default!;
+    public static InlineRequestHandler    Inliner { get; private set; } = new();
 
     private void StartListening()
     {
@@ -18,7 +20,8 @@ public partial class Bot
             [
                 UpdateType.Message,
                 UpdateType.EditedMessage,
-                UpdateType.CallbackQuery
+                UpdateType.CallbackQuery,
+                UpdateType.InlineQuery
             ]
         };
 
@@ -33,6 +36,7 @@ public partial class Bot
             { Message:       { } message } => OnMessage(message),
             { EditedMessage: { } message } => OnMessage(message),
             { CallbackQuery: { } query   } => OnCallback(query),
+            { InlineQuery:   { } inline  } => OnInline(inline),
             _ => OnUnknown()
         };
     }
@@ -69,6 +73,18 @@ public partial class Bot
         }
 
         return Task.CompletedTask;
+    }
+
+    private async Task OnInline(InlineQuery inline)
+    {
+        try
+        {
+            await Inliner.HandleRequest(inline);
+        }
+        catch (Exception e)
+        {
+            LogError($"Inline >> BRUH -> {e.GetFixedMessage()}");
+        }
     }
 
     private Task OnUnknown()

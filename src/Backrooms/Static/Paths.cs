@@ -32,6 +32,8 @@ namespace Witlesss.Backrooms.Static;
         Board/
             2024-08-21 a.270089129.json [list]  <-- /boards info
 
+        sounds.txt
+
     Pics/
         -1001539756197/
             AgAD5g0AAkFXMUk+3D8D-Meme.webp
@@ -70,6 +72,7 @@ public static class Paths
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
     public static string Dir_Plank   { get; } = Path.Combine(Dir_DB, "Plank");
+    public static string File_Sounds { get; } = Path.Combine(Dir_DB, "sounds.txt");
 
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");

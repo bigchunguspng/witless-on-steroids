@@ -20,6 +20,11 @@ public static partial class Extensions
         return title.Truncate(32);
     }
 
+    public static string GetFullNameTruncated(this User user)
+    {
+        return user.GetUserFullName().Truncate(32);
+    }
+
     private static readonly Regex _chatMessageURL = new(@"https:\/\/t.me\/(?:c\/(\d+)|(\S+))\/(\d+)");
 
     public static (ChatId chat, int message) GetChatIdAndMessage(this string url)

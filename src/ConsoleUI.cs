@@ -1,5 +1,7 @@
 ﻿using Telegram.Bot;
 using Witlesss.Services.Internet.Reddit;
+using Witlesss.Services.Sounds;
+using Exception = System.Exception;
 
 namespace Witlesss
 {
@@ -30,9 +32,9 @@ namespace Witlesss
                         else if (_input.StartsWith("/")                     ) DoConsoleCommands();
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    Print(">:^< u/stupid >:^<", ConsoleColor.Yellow);
+                    LogError($"[Console] >> BRUH -> {e.Message}");
                 }
             }
             while (_input != "s");
@@ -58,6 +60,7 @@ namespace Witlesss
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
+            else if (_input.StartsWith("/up") && _input.Contains(' ')) UploadSounds(_input.Split(' ', 2)[1]);
             else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var size)) DeleteBySize(size);
         }
 
@@ -141,5 +144,7 @@ namespace Witlesss
             });
             ChatService.SaveChatsDB();
         }
+
+        private void UploadSounds(string path) => Task.Run(() => SoundDB.Instance.UploadMany(path));
     }
 }

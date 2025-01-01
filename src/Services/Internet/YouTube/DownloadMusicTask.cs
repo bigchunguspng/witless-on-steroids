@@ -70,8 +70,8 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var output = $"{artist} - {title} xd.%(ext)s";
 
-        var directory = $"{Dir_Temp}/{DateTime.Now.Ticks}";
-        var thumbPath = $"{directory}/thumb.jpg";
+        var directory = Path.Combine(Dir_Temp, $"song-{DateTime.Now.Ticks}");
+        var thumbPath = Path.Combine(directory, "thumb.jpg");
 
         Directory.CreateDirectory(directory);
 

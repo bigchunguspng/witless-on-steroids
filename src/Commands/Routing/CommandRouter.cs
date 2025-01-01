@@ -46,6 +46,7 @@ namespace Witlesss.Commands.Routing
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
                 .Register("load"   , () => new Load())
+                .Register("upload" , () => new UploadSound())
                 .Register("im"     , () => new Magick())
                 .Register("peg"    , () => new FFMpeg())
                 .Register("w"      , () => new BrowseReddit())

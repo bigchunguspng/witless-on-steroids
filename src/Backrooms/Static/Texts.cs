@@ -158,11 +158,13 @@ public static class Texts
         /pp - packs info (full)
         /cc - clear temp files
 
+        /up - upload sounds [path]
+
         +55 - select active chat
 
         /db - delete blockers
         /DB - delete active chat if blocked
-        /ds - delete by size (max size, bytes)
+        /ds - delete by size [max size, bytes]
         """;
 
     public const string SET_Q_RESPONSE =

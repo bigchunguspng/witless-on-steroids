@@ -24,7 +24,7 @@ public class DownloadVideoTask(string id, CommandContext context)
     {
         var sw = GetStartedStopwatch();
 
-        var directory = Path.Combine(Dir_Temp, DateTime.Now.Ticks.ToString());
+        var directory = Path.Combine(Dir_Temp, $"vid-{DateTime.Now.Ticks}");
         Directory.CreateDirectory(directory);
 
         if (_cache.Contains(id, out var path))

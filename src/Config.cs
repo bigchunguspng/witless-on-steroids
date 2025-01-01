@@ -7,6 +7,7 @@
         public static string RedditToken   { get; private set; } = default!;
         public static string RedditSecret  { get; private set; } = default!;
         public static long   AdminID       { get; private set; }
+        public static long   SoundChannel  { get; private set; }
 
         public static void ReadFromFile()
         {
@@ -16,6 +17,7 @@
             GetValue(s => RedditToken   = s, "reddit-refresh-token");
             GetValue(s => RedditSecret  = s, "reddit-secret"       );
             GetValue(s => AdminID       = GetLong(s),    "admin-id");
+            GetValue(s => SoundChannel  = GetLong(s),  "sound-chat");
 
             void GetValue(Action<string> action, string propertyName)
             {

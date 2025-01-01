@@ -102,7 +102,7 @@ public static partial class Extensions
 
     // MEDIA
 
-    public static string ShortID(string id) => id.Remove(62).Remove(2, 44);
+    public static string ShortID(string id) => id.Remove(56).Remove(0, 23);
 
     //
 

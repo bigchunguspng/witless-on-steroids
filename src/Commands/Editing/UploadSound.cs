@@ -11,7 +11,7 @@ public class UploadSound : AudioCommand
         var text = userText ?? Path.GetFileNameWithoutExtension(fileName);
         var name = $"{text}{Ext}";
         await SoundDB.Instance.UploadSingle(File.FileId, name, Origin);
-        Bot.SendMessage(Origin, $"Файл был сохранён как:\n\n<code>{text}</code>".XDDD());
+        Bot.SendMessage(Origin, string.Format(FILE_UPLOADED, text));
         Log($"{Title} >> SOUND UPLOADED [{text}]");
     }
 }

@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Telegram.Bot;
-using Sound = (string FileId, string Text);
+using Telegram.Bot.Types;
+using Sound = (string Id, string FileId, string Text);
 
 namespace Witlesss.Services.Sounds;
 
@@ -25,26 +26,28 @@ public class SoundDB
             var line = reader.ReadLine();
             if (line is null) break;
 
-            var args = line.Split(' ', 2);
-            _sounds.Add((args[0], args[1]));
+            if (line.Length == 0 || line.StartsWith('#')) continue;
+
+            var args = line.Split(' ', 3);
+            _sounds.Add((args[0], args[1], args[2]));
         }
 
         Log($"[SoundDB] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: 11);
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    private void SaveData(List<Sound> newSounds)
+    private void SaveData(List<Sound> buffer)
     {
-        if (newSounds.Count == 0) return;
+        if (buffer.Count == 0) return;
 
         var skip = _sounds.Count;
-        _sounds.AddRange(newSounds);
-        newSounds.Clear();
+        _sounds.AddRange(buffer);
+        buffer.Clear();
 
         using var writer = File.AppendText(File_Sounds);
         foreach (var sound in _sounds.Skip(skip))
         {
-            writer.WriteLine($"{sound.FileId} {sound.Text}");
+            writer.WriteLine($"{sound.Id} {sound.FileId} {sound.Text}");
         }
         Log($"[SoundDB] >> ADDED {_sounds.Count - skip} SOUNDS", color: 10);
     }
@@ -80,9 +83,9 @@ public class SoundDB
             var text = Path.GetFileNameWithoutExtension(name);
             try
             {
-                var fileId = await UploadFile(file, Config.SoundChannel);
-                buffer.Add((fileId, text));
-                Log($"[SoundDB] << {++count, 3} / {total} {ShortID(fileId)}", color: 11);
+                var voice = await UploadFile(file, Config.SoundChannel);
+                buffer.Add((voice.FileUniqueId, voice.FileId, text));
+                Log($"[SoundDB] << {++count, 3} / {total} {voice.FileUniqueId}", color: 11);
 
                 if (count % 10 == 0) SaveData(buffer);
             }
@@ -99,13 +102,13 @@ public class SoundDB
     /// <summary>
     /// Uploads file to Telegram server and returns its ID.
     /// </summary>
-    private async Task<string> UploadFile(string path, long channel)
+    private async Task<Voice> UploadFile(string path, long channel)
     {
         var temp = Path.Combine(Dir_Temp, $"{Guid.NewGuid()}.ogg");
         var opus = await path.UseFFMpeg((0, 0)).ToVoice().OutAs(temp);
 
         await using var stream = File.OpenRead(opus);
         var message = await Bot.Instance.Client.SendVoice(channel, stream);
-        return message.Voice!.FileId;
+        return message.Voice!;
     }
 }

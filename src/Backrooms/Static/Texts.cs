@@ -756,4 +756,11 @@ public static class Texts
         """
         Не могу найти ярлык "<code>{0}</code>" {1}
         """;
+
+    public const string FILE_UPLOADED =
+        """
+        🎙 Файл сохранён как:
+
+        <code>{0}</code>
+        """;
 }

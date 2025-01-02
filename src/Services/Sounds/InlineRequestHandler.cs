@@ -13,7 +13,7 @@ public class InlineRequestHandler
         var sounds = SoundDB.Instance.Search(inline.Query);
         foreach (var sound in sounds)
         {
-            results.Add(new InlineQueryResultCachedVoice(sound.Id, sound.FileId, sound.Text));
+            results.Add(new InlineQueryResultCachedVoice(sound.Id, sound.FileId, sound.GetTitle()));
         }
 
         await Bot.Instance.Client.AnswerInlineQuery(inline.Id, results);

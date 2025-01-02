@@ -117,3 +117,14 @@ public class SoundDB
         return message.Voice!;
     }
 }
+
+public static class SoundExtensions
+{
+    private static readonly Regex _tags = new(@"#\S+\s");
+
+    public static string GetTitle(this Sound sound)
+    {
+        var text = sound.Text;
+        return text.StartsWith('#') ? _tags.Replace(text, string.Empty) : text;
+    }
+}

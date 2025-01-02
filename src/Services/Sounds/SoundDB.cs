@@ -57,7 +57,12 @@ public class SoundDB
     [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Sound> Search(string query)
     {
-        return _sounds.Where(x => x.Text.ToLower().Contains(query.ToLower())).Take(50);
+        var words = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var pickChance = Math.Max(1, 5000 / _sounds.Count);
+        var filtered = string.IsNullOrWhiteSpace(query)
+            ? _sounds.Where(_ => LuckyFor(pickChance))
+            : _sounds.Where(x => words.All(w => x.Text.ToLower().Contains(w)));
+        return filtered.Take(50);
     }
 
     // UPLOAD

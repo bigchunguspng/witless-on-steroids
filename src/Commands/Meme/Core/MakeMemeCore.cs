@@ -176,10 +176,10 @@ namespace Witlesss.Commands.Meme.Core // ReSharper disable InconsistentNaming
 
         private Task<string> MakeMemeVideo(MemeFileRequest request, T text)
         {
-            return Queue.Enqueue(() =>
+            return Queue.Enqueue(async () =>
             {
                 var sw = GetStartedStopwatch();
-                var result = MemeMaker.GenerateVideoMeme(request, text);
+                var result = await MemeMaker.GenerateVideoMeme(request, text);
                 sw.Log(Command + " video");
                 return result;
             });

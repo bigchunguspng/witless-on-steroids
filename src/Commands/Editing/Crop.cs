@@ -48,13 +48,11 @@
                     else if (a0 == "b") args = ["iw", $"(1-{a1})*ih", "0", "0"];
                     else if (a0 == "r") args = [$"(1-{a1})*iw", "ih", "0", "0"];
                 }
-                else // crop w h x y
+                
+                for (var i = 0; i < Math.Min(args!.Length, 4); i++)
                 {
-                    for (var i = 0; i < Math.Min(args!.Length, 4); i++)
-                    {
-                        var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
-                        args[i] = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
-                    }
+                    var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
+                    args[i] = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
                 }
 
                 if (args.Length > 4) args = args.Take(4).ToArray();

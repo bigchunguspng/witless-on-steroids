@@ -56,6 +56,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         if      (extension == ".") extension = Ext == ".webm" ? "mp4" : Ext.Substring(1);
         else if (extension == "3") extension = "mp3";
         else if (extension == "4") extension = "mp4";
+        else if (extension == "o") extension = "ogg";
         else if (extension == "p") extension = "png";
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";

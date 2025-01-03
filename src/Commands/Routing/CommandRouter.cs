@@ -103,9 +103,14 @@ namespace Witlesss.Commands.Routing
         public bool HandleSimpleCommands()
         {
             var func = _simpleCommands.Resolve(Command);
+            if (func != null)
+            {
+                Telemetry.LogCommand(Context.Chat, Context.Text);
 
-            func?.Invoke().Execute(Context);
-            return func is not null;
+                func.Invoke().Execute(Context);
+            }
+
+            return func != null;
         }
 
         private bool HandleStartCommand()
@@ -113,6 +118,8 @@ namespace Witlesss.Commands.Routing
             var success = Command == "/start" && ChatService.TryAddChat(Chat, ChatSettingsFactory.CreateFrom(Context));
             if (success)
             {
+                Telemetry.LogCommand(Context.Chat, Context.Text);
+
                 ChatService.SaveChatsDB();
                 Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, 13);
                 Bot.SendMessage(Origin, START_RESPONSE);

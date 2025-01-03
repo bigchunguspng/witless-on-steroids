@@ -87,6 +87,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
         else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
         else if (LuckyFor(Data.Speech))
         {
+            Telemetry.LogAuto(Context.Chat, Data.Speech, "FUNNY");
+
             new PoopText().Execute(Context);
         }
 
@@ -100,6 +102,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
                 dg.SelectMode(w, h);
             }
 
+            Telemetry.LogAuto(Context.Chat, Data.Pics, $"/{Data.Type.ToString().ToLower()}{Data.Options?[Data.Type]}");
+
             return mematic;
         }
 
@@ -109,6 +113,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
     private void HandleWitlessCommands(ChatSettings settings)
     {
+        Telemetry.LogCommand(Context.Chat, Context.Text);
+
         var func = _witlessCommands.Resolve(Command);
         func?.Invoke().Execute(WitlessContext.From(Context, settings));
     }

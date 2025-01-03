@@ -42,11 +42,10 @@ public class Magick : PhotoCommand
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";
 
-        if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
+        var extensionInvalid = extension.FileNameIsInvalid();
+        if (extensionInvalid || FFMpeg.OptionsMentionsPrivateFile(options))
         {
-            Bot.SendSticker(Origin, InputFile.FromFileId(TROLLFACE));
-            await Task.Delay(RandomInt(900, 1100));
-            Bot.SendMessage(Origin, PEG_EXTENSION_MISSING);
+            await FFMpeg.SendTrollface(Origin, extensionInvalid);
             return;
         }
 

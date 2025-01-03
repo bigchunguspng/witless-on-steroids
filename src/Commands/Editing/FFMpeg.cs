@@ -60,11 +60,10 @@ public class FFMpeg : AudioVideoPhotoCommand
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";
 
-        if (extension.FileNameIsInvalid() || options.Contains(File_Config, StringComparison.OrdinalIgnoreCase))
+        var extensionInvalid = extension.FileNameIsInvalid();
+        if (extensionInvalid || OptionsMentionsPrivateFile(options))
         {
-            Bot.SendSticker(Origin, InputFile.FromFileId(TROLLFACE));
-            await Task.Delay(RandomInt(900, 1100));
-            Bot.SendMessage(Origin, PEG_EXTENSION_MISSING);
+            await SendTrollface(Origin, extensionInvalid);
             return;
         }
 
@@ -74,6 +73,20 @@ public class FFMpeg : AudioVideoPhotoCommand
         var result = await path.UseFFMpeg(Origin).Edit(options).Out("-Edit", $".{extension}");
         SendResult(result, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
+    }
+
+    public static bool OptionsMentionsPrivateFile(string options) =>
+        options.Contains(File_Config, StringComparison.OrdinalIgnoreCase)
+     || options.Contains(File_Log,    StringComparison.OrdinalIgnoreCase);
+
+    public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
+    {
+        Bot.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
+        if (extensionInvalid)
+        {
+            await Task.Delay(RandomInt(900, 1100));
+            Bot.SendMessage(origin, PEG_EXTENSION_MISSING);
+        }
     }
 
     private bool OptionUsed(char option)

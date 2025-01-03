@@ -8,6 +8,8 @@ public class InlineRequestHandler
 {
     public async Task HandleRequest(InlineQuery inline)
     {
+        Telemetry.LogInline(inline.From.Id, inline.Query);
+
         var results = new List<InlineQueryResult>();
 
         var sounds = SoundDB.Instance.Search(inline.Query);

@@ -43,6 +43,7 @@ namespace Witlesss
         private void SaveAndExit()
         {
             Print("На выход…", ConsoleColor.Yellow);
+            Telemetry.Write();
             ChatService.SaveBakas();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }

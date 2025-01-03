@@ -32,6 +32,7 @@ namespace Witlesss.Backrooms.Static;
         Board/
             2024-08-21 a.270089129.json [list]  <-- /boards info
 
+        log.txt
         sounds.txt
 
     Pics/
@@ -63,6 +64,7 @@ public static class Paths
     public const string Prefix_Pack = "pack";
 
     public const string File_Config      = "config.txt";
+    public const string File_Log         = "log.txt";
     public const string File_RedditPosts = "reddit-posts.json";
 
     public static string Dir_Alias   { get; } = Path.Combine(Dir_DB, "Alias");

@@ -32,7 +32,6 @@ public static class Telemetry
     private static void Log(long chat, string? text)
     {
         _buffer[_head] = $"[{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff} | ..{chat.ToString()[^4..]}] >> {text}";
-        Print($"[{_head}] - {_buffer[_head]}");
         MoveHead();
     }
 

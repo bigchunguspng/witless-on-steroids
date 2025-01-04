@@ -7,8 +7,8 @@ namespace Witlesss.Commands;
 
 public class DownloadMusic : AsyncCommand
 {
-    private static readonly Regex  _url = new(@"(http\S*|[A-Za-z0-9_-]{11,})");
-    private static readonly Regex _args = new(@"(http\S*|[A-Za-z0-9_-]{11,})\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
+    private static readonly Regex  _url = new(@"(http\S*)");
+    private static readonly Regex _args = new(@"(http\S*)\s*(?:([\S\s][^-]+) - )?([\S\s]+)?");
     private static readonly Regex   _id = new(@"((\?v=)|(v\/)|(\.be\/)|(embed\/)|(u\/1\/))([A-Za-z0-9_-]{11,})");
     private static readonly Regex   _pl = new(@"list=([A-Za-z0-9_-]+)");
     private static readonly Regex  _ops = new(@"\/song(\S+)");

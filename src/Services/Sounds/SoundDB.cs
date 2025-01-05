@@ -110,7 +110,7 @@ public class SoundDB
     private async Task<Voice> UploadFile(string path, long channel)
     {
         var temp = Path.Combine(Dir_Temp, $"{Guid.NewGuid()}.ogg");
-        var opus = await path.UseFFMpeg((0, 0)).ToVoice().OutAs(temp);
+        var opus = await path.UseFFMpeg((0, null)).ToVoice().OutAs(temp);
 
         await using var stream = File.OpenRead(opus);
         var message = await Bot.Instance.Client.SendVoice(channel, stream);

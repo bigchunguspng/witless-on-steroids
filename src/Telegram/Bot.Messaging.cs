@@ -15,13 +15,12 @@ namespace Witlesss.Telegram
 
         // SEND
 
-        public void SendMessage(MessageOrigin origin, string text, bool preview = false, int? replyTo = null)
+        public void SendMessage(MessageOrigin origin, string text, bool preview = false)
         {
             var task = Client.SendMessage
             (
                 origin.Chat, text, ParseMode.Html,
-                messageThreadId: origin.Thread,
-                replyParameters: GetReplyParameters(replyTo),
+                replyParameters: origin.Thread,
                 linkPreviewOptions: GetPreviewOptions(preview)
             );
             TrySend(origin.Chat, task, "message");
@@ -32,7 +31,7 @@ namespace Witlesss.Telegram
             var task = Client.SendMessage
             (
                 origin.Chat, text, ParseMode.Html,
-                messageThreadId: origin.Thread,
+                replyParameters: origin.Thread,
                 replyMarkup: inline,
                 linkPreviewOptions: GetPreviewOptions(preview)
             );
@@ -46,7 +45,7 @@ namespace Witlesss.Telegram
             var task = Client.SendMessage
             (
                 chat, text, ParseMode.Html,
-                replyParameters: GetReplyParameters(replyTo),
+                replyParameters: replyTo,
                 linkPreviewOptions: GetPreviewOptions(preview)
             );
             TrySend(chat.Identifier ?? 0, task, "message");
@@ -57,7 +56,7 @@ namespace Witlesss.Telegram
             var task = Client.CopyMessage
             (
                 chat, fromChat, messageId,
-                replyParameters: GetReplyParameters(replyTo)
+                replyParameters: replyTo
             );
             TrySend(chat, task, "message", "copy");
         }
@@ -67,7 +66,7 @@ namespace Witlesss.Telegram
             var task = Client.CopyMessage
             (
                 chat, fromChat, messageId,
-                replyParameters: GetReplyParameters(replyTo)
+                replyParameters: replyTo
             );
             TrySend(chat.Identifier ?? 0, task, "message", "copy");
         }
@@ -110,35 +109,22 @@ namespace Witlesss.Telegram
 
         // SEND MEDIA
 
-        public void SendPhoto(MessageOrigin og, InputFile photo)
-            => TrySend(og.Chat, Client.SendPhoto(og.Chat, photo, messageThreadId: og.Thread), "photo");
-
-        public void SendVideo(MessageOrigin og, InputFile video)
-            => TrySend(og.Chat, Client.SendVideo(og.Chat, video, messageThreadId: og.Thread), "video");
-
-        public void SendVoice(MessageOrigin og, InputFile voice)
-            => TrySend(og.Chat, Client.SendVoice(og.Chat, voice, messageThreadId: og.Thread), "voice");
-
-        public void SendVideoNote(MessageOrigin og, InputFile note)
-            => TrySend(og.Chat, Client.SendVideoNote(og.Chat, note, messageThreadId: og.Thread), "videonote");
-
-        public void SendAnimation(MessageOrigin og, InputFile animation)
-            => TrySend(og.Chat, Client.SendAnimation(og.Chat, animation, messageThreadId: og.Thread), "animation");
-
-        public void SendDocument(MessageOrigin og, InputFile document)
-            => TrySend(og.Chat, Client.SendDocument(og.Chat, document, messageThreadId: og.Thread), "document");
-
-        public void SendSticker(MessageOrigin og, InputFile sticker)
-            => TrySend(og.Chat, Client.SendSticker(og.Chat, sticker, messageThreadId: og.Thread), "sticker");
-
-        public void SendAlbum(MessageOrigin og, IEnumerable<IAlbumInputMedia> album)
-            => TrySend(og.Chat, Client.SendMediaGroup(og.Chat, album, messageThreadId: og.Thread), "album");
+        public void SendPhoto     (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendPhoto     (og.Chat, file, replyParameters: og.Thread), "photo");
+        public void SendVideo     (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendVideo     (og.Chat, file, replyParameters: og.Thread), "video");
+        public void SendVoice     (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendVoice     (og.Chat, file, replyParameters: og.Thread), "voice");
+        public void SendVideoNote (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendVideoNote (og.Chat, file, replyParameters: og.Thread), "videonote");
+        public void SendAnimation (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendAnimation (og.Chat, file, replyParameters: og.Thread), "animation");
+        public void SendDocument  (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendDocument  (og.Chat, file, replyParameters: og.Thread), "document");
+        public void SendSticker   (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendSticker   (og.Chat, file, replyParameters: og.Thread), "sticker");
+        public void SendAlbum
+            (MessageOrigin og, IEnumerable<IAlbumInputMedia> album) 
+            => TrySend(og.Chat, Client.SendMediaGroup(og.Chat, album, replyParameters: og.Thread), "album");
 
         public void SendAudio(MessageOrigin og, InputFile audio, string? art = null)
         {
             using var cover = File.OpenRead(art ?? File_DefaultAlbumCover);
             var thumb = InputFile.FromStream(cover, "xd");
-            TrySend(og.Chat, Client.SendAudio(og.Chat, audio, thumbnail: thumb, messageThreadId: og.Thread), "audio");
+            TrySend(og.Chat, Client.SendAudio(og.Chat, audio, thumbnail: thumb, replyParameters: og.Thread), "audio");
         }
 
 
@@ -165,11 +151,11 @@ namespace Witlesss.Telegram
             }
         }
 
-        public void SendPhotoXD(MessageOrigin origin, InputFile photo, string caption)
-            => SendOrThrow(Client.SendPhoto    (origin.Chat, photo, caption, messageThreadId: origin.Thread));
+        public void SendPhotoXD(MessageOrigin og, InputFile photo, string caption)
+            => SendOrThrow(Client.SendPhoto    (og.Chat, photo, caption, replyParameters: og.Thread));
 
-        public void SendAnimaXD(MessageOrigin origin, InputFile photo, string caption)
-            => SendOrThrow(Client.SendAnimation(origin.Chat, photo, caption, messageThreadId: origin.Thread));
+        public void SendAnimaXD(MessageOrigin og, InputFile anima, string caption)
+            => SendOrThrow(Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread));
 
         private static void SendOrThrow(Task task)
         {
@@ -231,10 +217,5 @@ namespace Witlesss.Telegram
          || e.Message.Contains("rights to send");
 
         private static LinkPreviewOptions GetPreviewOptions(bool showPreview) => new() { IsDisabled = !showPreview };
-
-        private static ReplyParameters? GetReplyParameters(int? replyTo)
-        {
-            return replyTo.HasValue ? new ReplyParameters { MessageId = replyTo.Value } : null;
-        }
     }
 }

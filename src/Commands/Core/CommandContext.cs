@@ -43,7 +43,7 @@ public class CommandContext
     {
         Message = message;
         Chat = message.Chat.Id;
-        Thread = message.IsTopicMessage ? message.MessageThreadId : null;
+        Thread = message.MessageThreadId;
         Title = message.GetChatTitle();
         Text = message.GetTextOrCaption();
 

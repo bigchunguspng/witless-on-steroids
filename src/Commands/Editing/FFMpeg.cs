@@ -62,7 +62,7 @@ public class FFMpeg : AudioVideoPhotoCommand
         else if (extension == "w") extension = "webp";
 
         var extensionInvalid = extension.FileNameIsInvalid();
-        if (extensionInvalid || OptionsMentionsPrivateFile(options))
+        if (extensionInvalid || OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
             await SendTrollface(Origin, extensionInvalid);
             return;
@@ -79,6 +79,9 @@ public class FFMpeg : AudioVideoPhotoCommand
     public static bool OptionsMentionsPrivateFile(string options) =>
         options.Contains(File_Config, StringComparison.OrdinalIgnoreCase)
      || options.Contains(File_Log,    StringComparison.OrdinalIgnoreCase);
+
+    private bool PixelThiefDetected(string options) =>
+        !Message.SenderIsBotAdmin() && (options.Contains("gdigrab") || options.Contains("x11grab"));
 
     public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
     {

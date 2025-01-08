@@ -169,7 +169,7 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         {
             var process = SystemHelpers.StartReadableProcess("gallery-dl", $"{post.URL} -g");
             var urls = new List<string>();
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 50; i++)
             {
                 var line = process.StandardOutput.ReadLine();
                 if (line is null) break;
@@ -177,10 +177,17 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
                 urls.Add(line);
             }
 
-            var album = urls.Select(url => new InputMediaPhoto(InputFile.FromUri(url))).ToList();
-            album[0].Caption = post.Title;
+            var origin = Origin;
+            for (var i = 0; i < 5; i++)
+            {
+                var album = urls.Skip(10 * i).Take(10).Select(url => new InputMediaPhoto(InputFile.FromUri(url))).ToList();
+                if (album.Count == 0) break;
+                if (i == 0) album[0].Caption = post.Title;
 
-            Bot.SendAlbum(Origin, album);
+                var messages = Bot.SendAlbum(origin, album);
+                if (messages?.Length > 0)    origin = (Chat, messages[0].Id);
+                else break;
+            }
         }
 
         private void SendSingleFilePost(PostData post)

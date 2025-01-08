@@ -71,10 +71,16 @@ namespace Witlesss.Telegram
             TrySend(chat.Identifier ?? 0, task, "message", "copy");
         }
 
-        public void React(ChatId chat, int messageId, ReactionType[]? reaction)
+        public async void ReactAsync(ChatId chat, int messageId, ReactionType[]? reaction)
         {
-            var task = Client.SetMessageReaction(chat, messageId, reaction);
-            TrySend(chat.Identifier ?? 0, task, "reaction", "set");
+            try
+            {
+                await Client.SetMessageReaction(chat, messageId, reaction);
+            }
+            catch (Exception e)
+            {
+                LogError($"{chat} >> Can't set reaction --> {e.GetFixedMessage()}");
+            }
         }
 
         // EDIT
@@ -99,12 +105,16 @@ namespace Witlesss.Telegram
         // DELETE
 
         public async void DeleteMessageAsync(long chat, int id)
-            => await Task.Run(() => DeleteMessage(chat, id));
-
-        private void DeleteMessage(long chat, int id)
         {
             if (id <= 0) return;
-            TrySend(chat, Client.DeleteMessage(chat, id), "message", "delete");
+            try
+            {
+                await Client.DeleteMessage(chat, id);
+            }
+            catch (Exception e)
+            {
+                LogError($"{chat} >> Can't delete message --> {e.GetFixedMessage()}");
+            }
         }
 
         // SEND MEDIA
@@ -116,7 +126,7 @@ namespace Witlesss.Telegram
         public void SendAnimation (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendAnimation (og.Chat, file, replyParameters: og.Thread), "animation");
         public void SendDocument  (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendDocument  (og.Chat, file, replyParameters: og.Thread), "document");
         public void SendSticker   (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendSticker   (og.Chat, file, replyParameters: og.Thread), "sticker");
-        public void SendAlbum
+        public Message[]? SendAlbum
             (MessageOrigin og, IEnumerable<IAlbumInputMedia> album) 
             => TrySend(og.Chat, Client.SendMediaGroup(og.Chat, album, replyParameters: og.Thread), "album");
 
@@ -130,25 +140,28 @@ namespace Witlesss.Telegram
 
         private static readonly Regex _retryAfter = new(@"retry after (\d+)");
 
-        private static void TrySend(long chat, Task task, string what, string action = "send", int patience = 5)
+        private static T? TrySend<T>(long chat, Task<T> task, string what, string action = "send", int patience = 5)
         {
+            var result = default(T);
             try
             {
                 task.Wait();
-                if (task.IsFaulted) throw new Exception(task.Exception?.Message);
+                result = task.IsFaulted ? throw new Exception(task.Exception?.Message) : task.Result;
             }
             catch (Exception e)
             {
                 var reason = e.GetFixedMessage();
-                LogError($"{chat} >> Can't {action} {what} --> " + reason);
+                LogError($"{chat} >> Can't {action} {what} --> {reason}");
                 if (patience > 0)
                 {
                     var serverError = reason.Contains("Server Error");
                     var retryDelay = serverError ? 0 : _retryAfter.ExtractGroup(1, reason, int.Parse, 0);
                     if (retryDelay > 0) Task.Delay(retryDelay * 250).Wait();
-                    if (retryDelay > 0 || serverError) TrySend(chat, task, what, action, patience - 1);
+                    if (retryDelay > 0 || serverError) return TrySend(chat, task, what, action, patience - 1);
                 }
             }
+
+            return result;
         }
 
         public void SendPhotoXD(MessageOrigin og, InputFile photo, string caption)

@@ -31,6 +31,6 @@ public class React : SyncCommand
 
         var (chat, message) = args[0].GetChatIdAndMessage();
 
-        Bot.React(chat, message, reaction);
+        Bot.ReactAsync(chat, message, reaction);
     }
 }

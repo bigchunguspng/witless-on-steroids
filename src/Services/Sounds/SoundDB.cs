@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Sound = (string Id, string FileId, string Text);
+using Sound = (string Id, string FileId, string Text, string LowercaseText);
 
 namespace Witlesss.Services.Sounds;
 
@@ -29,7 +29,7 @@ public class SoundDB
             if (line.Length == 0 || line.StartsWith('#')) continue;
 
             var args = line.Split(' ', 3);
-            _sounds.Add((args[0], args[1], args[2]));
+            _sounds.Add((args[0], args[1], args[2], args[2].ToLower()));
         }
 
         Log($"[SoundDB] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: 11);
@@ -57,12 +57,36 @@ public class SoundDB
     [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Sound> Search(string query)
     {
-        var words = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var pickChance = Math.Max(1, 5000 / _sounds.Count);
         var filtered = string.IsNullOrWhiteSpace(query)
-            ? _sounds.Where(_ => LuckyFor(pickChance))
-            : _sounds.Where(x => words.All(w => x.Text.ToLower().Contains(w)));
+            ? GetRandomSounds()
+            : GetSoundsByQuery(query);
         return filtered.Take(50);
+    }
+
+    private IEnumerable<Sound> GetRandomSounds()
+    {
+        var pickChance = Math.Max(1, 5000 / _sounds.Count);
+        return _sounds.Where(_ => LuckyFor(pickChance));
+    }
+
+    private IEnumerable<Sound> GetSoundsByQuery(string query)
+    {
+        var words = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var except = words.Where(x => x.Length > 1 && x.StartsWith('!')).ToArray();
+        if (except.Length == 0)
+        {
+            return _sounds.Where(x => words.All(w => x.LowercaseText.Contains(w)));
+        }
+        else
+        {
+            var includeWords = words.Except(except).ToArray();
+            var excludeWords = except.Select(x => x.Substring(1)).ToArray();
+            return _sounds.Where(x =>
+            {
+                return includeWords.All(w => x.LowercaseText.Contains(w))
+                    && excludeWords.Any(w => x.LowercaseText.Contains(w)) == false;
+            });
+        }
     }
 
     // UPLOAD
@@ -89,7 +113,7 @@ public class SoundDB
             try
             {
                 var voice = await UploadFile(file, Config.SoundChannel);
-                buffer.Add((voice.FileUniqueId, voice.FileId, text));
+                buffer.Add((voice.FileUniqueId, voice.FileId, text, text.ToLower()));
                 Log($"[SoundDB] << {++count, 3} / {total} {voice.FileUniqueId}", color: 11);
 
                 if (count % 10 == 0) SaveData(buffer);

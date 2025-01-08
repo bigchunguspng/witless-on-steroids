@@ -12,6 +12,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
     private const string _YT_list  = "https://www.youtube.com/playlist?list=";
 
     private static readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
+    private static readonly Regex _thumb = new(".jpg$|.png$|.webp$");
 
     public required string? PlaylistID;
     public required string? PlayListIndex;
@@ -95,9 +96,13 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
             ? GetFile("video.*")
             : youTube || ArtAttached
                 ? thumbPath
-                : GetFile("*.jpg");
+                : GetThumbFile() ?? File_DefaultAlbumCover;
 
-        string GetFile(string pattern) => directoryInfo.GetFiles(pattern)[0].FullName;
+        string GetFile(string pattern)
+            => directoryInfo.GetFiles(pattern)[0].FullName;
+
+        string? GetThumbFile()
+            => directoryInfo.GetFiles().FirstOrDefault(x => _thumb.IsMatch(x.FullName))?.FullName;
 
         // META INFORMATION
         var meta = _name.Match(Path.GetFileName(audioFile));

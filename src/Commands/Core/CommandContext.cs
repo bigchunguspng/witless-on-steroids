@@ -53,7 +53,6 @@ public class CommandContext
                 : message.ReplyToMessage?.Id
                ?? message.MessageThreadId;
 
-        Print($"{Thread}", ConsoleColor.Magenta);
         var match = _command.MatchOrNull(Text);
         if (match is { Success: true })
         {

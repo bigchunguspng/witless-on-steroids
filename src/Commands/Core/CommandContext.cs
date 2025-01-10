@@ -43,10 +43,17 @@ public class CommandContext
     {
         Message = message;
         Chat = message.Chat.Id;
-        Thread = message.MessageThreadId;
         Title = message.GetChatTitle();
         Text = message.GetTextOrCaption();
 
+        Thread = message.IsAutomaticForward // channel post
+            ? message.Id
+            : message.IsTopicMessage        // forum thread message
+                ? message.MessageThreadId
+                : message.ReplyToMessage?.Id
+               ?? message.MessageThreadId;
+
+        Print($"{Thread}", ConsoleColor.Magenta);
         var match = _command.MatchOrNull(Text);
         if (match is { Success: true })
         {

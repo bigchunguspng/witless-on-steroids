@@ -263,13 +263,11 @@ namespace Witlesss.Commands // ReSharper disable InconsistentNaming
         {
             if (Message.ReplyToMessage is { } message)
             {
-                var title = Title;
-                Context = CommandContext.FromMessage(message);
-
-                if (Text != null && await Recognize(Text) is { } post)
+                var text = message.GetTextOrCaption();
+                if (text != null && await Recognize(text) is { } post)
                 {
                     Bot.SendMessage(Origin, $"<b><a href='{post.Permalink}'>r/{post.Subreddit}</a></b>");
-                    Log($"{title} >> LINK TO r/{post.Subreddit}");
+                    Log($"{Title} >> LINK TO r/{post.Subreddit}");
                 }
                 else
                 {

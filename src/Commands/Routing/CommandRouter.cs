@@ -57,7 +57,6 @@ namespace Witlesss.Commands.Routing
                 .Register("aim"    , () => _aim)
                 .Register("debug"  , () => _debug)
                 .Register("id"     , () => _mail.WithText($"<code>{Context.Chat}</code>"))
-                .Register("sid"    , () => _mail.WithText($"<code>\"{Context.Message.ReplyToMessage?.Sticker?.FileId}\",</code>"))
                 .Register("op_meme", () => _mail.WithText(MEME_OPTIONS))
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_dp"  , () => _mail.WithText(DP_OPTIONS))

@@ -10,6 +10,9 @@ namespace Witlesss.Commands;
 
 public class DebugMessage : SyncCommand
 {
+    private readonly Regex _jsonFileId   = new(@"""file_id"": ?""(.+?)""");
+    private readonly Regex _jsonFileSize = new(@"""file_size"": ?(\d+)");
+
     protected override void Run()
     {
         var admin = Message.SenderIsBotAdmin();
@@ -27,19 +30,35 @@ public class DebugMessage : SyncCommand
             return;
         }
 
-        if (Message.ReplyToMessage == null)
+        var message = Message.ReplyToMessage;
+        if (message == null)
         {
             Bot.SendMessage(Origin, DEBUG_MANUAL);
             return;
         }
 
-        var message = Message.ReplyToMessage;
+        var json = JsonSerializer.Serialize(message, _options);
+        var id   = _jsonFileId  .Matches(json).LastOrDefault();
+        var size = _jsonFileSize.Matches(json).LastOrDefault();
+        if (Command!.Contains('!') && id is { Success: true } && size is { Success: true })
+        {
+            var fileId = id.Groups[1].Value;
+            var fileSize = long.Parse(size.Groups[1].Value);
+            var text =
+                $"""
+                 {GetFileSizeEmoji(fileSize)} {fileSize.ReadableFileSize()}
+                 <code>{fileId}</code>
+                 """;
+            Bot.SendMessage(Origin, text);
+            Log($"{Title} >> DEBUG [!]");
+            return;
+        }
 
         var name = $"Message-{message.Id}-{message.Chat.Id}.json";
         var path = Path.Combine(Dir_Temp, name);
-        Directory.CreateDirectory(Dir_Temp);
 
-        File.WriteAllText(path, JsonSerializer.Serialize(message, _options));
+        Directory.CreateDirectory(Dir_Temp);
+        File.WriteAllText(path, json);
         using var stream = File.OpenRead(path);
 
         Bot.SendDocument(Origin, InputFile.FromStream(stream, name.Replace("--", "-")));
@@ -52,6 +71,14 @@ public class DebugMessage : SyncCommand
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         WriteIndented = true
+    };
+
+    private static string GetFileSizeEmoji(long size) => size switch
+    {
+        > 1024 * 1024 * 20 => "😵",
+        > 1024 * 1024 * 5  => "😤",
+        > 1024 * 1024 * 1  => "👌",
+        _                  => "👍",
     };
 
 

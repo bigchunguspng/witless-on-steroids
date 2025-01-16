@@ -51,6 +51,7 @@ namespace Witlesss.Commands.Routing
                 .Register("peg"    , () => new FFMpeg())
                 .Register("w"      , () => new BrowseReddit())
                 .Register("link"   , () => new GetRedditLink())
+                .Register("run"    , () => new RunProcess())
                 .Register("kill"   , () => new KillProcess())
                 .Register("piece"  , () => _piece)
                 .Register("apeg"   , () => _apeg)

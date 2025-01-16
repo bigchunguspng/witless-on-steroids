@@ -208,7 +208,7 @@ namespace Witlesss.Telegram
                 var task = Client.SendMessage
                 (
                     origin.Chat, text, ParseMode.Html,
-                    messageThreadId: origin.Thread,
+                    replyParameters: origin.Thread,
                     disableNotification: !notify
                 );
 

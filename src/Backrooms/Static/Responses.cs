@@ -20,7 +20,7 @@ public static class Responses
     ];
     public static readonly string[] PLS_WAIT =
     [
-        "жди 😎", "загрузка пошла 😮", "✋ ща всё будет", "принял👌", "ваш заказ принят 🥸", "еду скачивать музон 🛒"
+        "жди 😎", "загрузка пошла 😈", "✋ ща всё будет", "принял👌", "ваш заказ принят 🥸", "еду скачивать музон 🛒"
     ];
     public static readonly string[] PROCESSING =
     [

@@ -108,7 +108,7 @@ public static partial class Extensions
     //
 
     public static bool SenderIsBotAdmin
-        (this Message message) => message.From?.Id == Config.AdminID;
+        (this Message message) => message.From != null && Config.AdminIDs.Contains(message.From.Id);
 
     public static async Task<bool> SenderIsAdmin(this Message message)
     {

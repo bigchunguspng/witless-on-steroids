@@ -19,7 +19,15 @@ public class Spam : SyncCommand
 
         if (!textProvided && !copyProvided)
         {
-            Bot.SendMessage(Origin, "<code>/spam[g/aN/sB] [reply / message]</code>");
+            var manual =
+                """
+                <code>/spam[g/aN/sB] [text|message]</code>
+
+                <code>g</code> → only to <u><b>g</b></u>roups
+                <code>a</code> → last <u><b>a</b></u>ctivity, days ago
+                <code>s</code> → min pack <u><b>s</b></u>ize, bytes
+                """;
+            Bot.SendMessage(Origin, manual);
             return;
         }
 

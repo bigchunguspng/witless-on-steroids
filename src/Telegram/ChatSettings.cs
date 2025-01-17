@@ -28,6 +28,7 @@ public class MemeOptions
     [JsonProperty] public string? Top  { get; set; }
     [JsonProperty] public string? Dp   { get; set; }
     [JsonProperty] public string? Dg   { get; set; }
+    [JsonProperty] public string? Snap { get; set; }
     [JsonProperty] public string? Nuke { get; set; }
 
     public string? this [MemeType type]
@@ -38,17 +39,25 @@ public class MemeOptions
             MemeType.Top  => Top,
             MemeType.Dg   => Dg,
             MemeType.Dp   => Dp,
+            MemeType.Snap => Snap,
             _             => Nuke,
         };
         set
         {
             if      (type is MemeType.Meme) Meme = value;
-            else if (type is MemeType.Top)  Top  = value;
-            else if (type is MemeType.Dp )  Dp   = value;
-            else if (type is MemeType.Dg )  Dg   = value;
+            else if (type is MemeType.Top ) Top  = value;
+            else if (type is MemeType.Dp  ) Dp   = value;
+            else if (type is MemeType.Dg  ) Dg   = value;
+            else if (type is MemeType.Snap) Snap = value;
             else                            Nuke = value;
         }
     }
 
-    public bool IsEmpty() => Meme is null && Top is null && Dp is null && Dg is null && Nuke is null;
+    public bool IsEmpty() =>
+        Meme is null
+     && Top  is null
+     && Dp   is null
+     && Dg   is null
+     && Snap is null
+     && Nuke is null;
 }

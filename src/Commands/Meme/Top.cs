@@ -25,7 +25,7 @@ namespace Witlesss.Commands.Meme
         protected override string? DefaultOptions => Data.Options?.Top;
 
 
-        protected override Task Run() => RunInternal("top"); // 🔥🔥🔥✍️
+        protected override Task Run() => RunInternal("top");
 
         protected override bool ResultsAreRandom => IFunnyBrazil.FontWizard.UseRandom;
 

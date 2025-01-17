@@ -17,13 +17,11 @@ public static class ChatSettingsFactory
         };
     }
 
-    private static MemeType GetRandomMemeType()
+    private static MemeType GetRandomMemeType() => Random.Shared.Next(4) switch
     {
-        var chance = Random.Shared.Next(4);
-        return chance.IsEven()
-            ? MemeType.Meme     // 50%
-            : (chance >> 1).IsEven()
-                ? MemeType.Dg   // 25%
-                : MemeType.Dp;  // 25%
-    }
+        0 => MemeType.Meme,
+        1 => MemeType.Snap,
+        2 => MemeType.Dg,
+        _ => MemeType.Dp,
+    };
 }

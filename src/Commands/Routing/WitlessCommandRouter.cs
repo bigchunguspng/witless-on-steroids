@@ -36,6 +36,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             { MemeType.Meme, () => new MakeMeme() },
             { MemeType.Top,  () => new Top() },
             { MemeType.Dp,   () => new Demotivate3000() },
+            { MemeType.Snap, () => new Snap() },
             { MemeType.Nuke, () => new Nuke() }
         };
 
@@ -45,6 +46,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("dv"      , () => new Demotivate().SetMode(Demotivate.Mode.Wide))
             .Register("meme"    , () => new MakeMeme())
             .Register("top"     , () => new Top())
+            .Register("snap"    , () => new Snap())
             .Register("nuke"    , () => new Nuke())
             .Register("a"       , () => new GenerateByFirstWord())
             .Register("zz"      , () => new GenerateByLastWord())

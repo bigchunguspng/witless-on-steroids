@@ -23,6 +23,7 @@ namespace Witlesss.Commands.Settings
                 else if (_t.IsMatch(w)) Set(MemeType.Top,  "/top" );
                 else if (_g.IsMatch(w)) Set(MemeType.Dg,   "/dg"  );
                 else if (_d.IsMatch(w)) Set(MemeType.Dp,   "/dp"  );
+                else if (_n.IsMatch(w)) Set(MemeType.Snap, "/snap");
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Origin, string.Format(SET_MEME_TYPE_MANUAL, w));
 

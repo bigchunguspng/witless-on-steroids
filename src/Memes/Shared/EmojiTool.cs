@@ -31,7 +31,7 @@ namespace Witlesss.Memes.Shared
             var paragraphs = text.Split('\n');
             var lines = paragraphs
                 .Select(paragraph => DrawEmojiTextParagraph(paragraph, rto, options, pngs))
-                .SelectMany(x => x).Take(maxLines).ToList();
+                .Take(maxLines).ToList();
             linesFilled = lines.Count;
 
             // COMBINE
@@ -59,7 +59,7 @@ namespace Witlesss.Memes.Shared
             return canvas;
         }
 
-        private static List<Image<Rgba32>> DrawEmojiTextParagraph
+        private static Image<Rgba32> DrawEmojiTextParagraph
         (
             string paragraph, RichTextOptions rto, Options options, Queue<string> pngs
         )
@@ -67,16 +67,13 @@ namespace Witlesss.Memes.Shared
             var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
             var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
 
-            var lines = new List<Image<Rgba32>>();
-
-            var width = rto.WrappingLength.CeilingInt();
+            var width  = rto.WrappingLength.CeilingInt();
             var height = rto.Font.Size * rto.LineSpacing;
             var safeHeight = (1.5F * height).CeilingInt();
             var margin = (0.25F * height).RoundInt();
 
             var canvas = GetEmptyCanvas();
-
-            int x = 0, max = 0;
+            var x = 0;
 
             for (var i = 0; i < emojiChunks.Count; i++)
             {
@@ -85,9 +82,10 @@ namespace Witlesss.Memes.Shared
             }
             DrawText(textChunks[^1]);
 
-            RenderLine();
+            if (x < canvas.Width)
+                canvas.Mutate(ctx => ctx.Crop(Math.Max(x, 1), canvas.Height));
 
-            return lines;
+            return canvas;
 
 
             // == FUN ==
@@ -104,8 +102,6 @@ namespace Witlesss.Memes.Shared
 
                 foreach (var _ in sequence)
                 {
-                    if (side + x > width) NewLine();
-
                     var emoji = pngs.Dequeue();
                     if (emoji.EndsWith(".png"))
                     {
@@ -123,81 +119,20 @@ namespace Witlesss.Memes.Shared
 
             void DrawText(string text) // todo make emoji drawer a transient class with methods ?
             {
-                var rest = width - x;
-                if (rest == 0)
+                var optionsW = new RichTextOptions(rto)
                 {
-                    NewLine();
-                    DrawText(text);
-                }
-                else
-                {
-                    //text = text.TrimEnd();
-                    
-                    var optionsW = new RichTextOptions(rto)
-                    {
-                        WrappingLength = width
-                    }.WithDefaultAlignment();
-                    var ms = TextMeasuring.MeasureTextSize(text, optionsW, out var linesFilled);
-                    var w = linesFilled > 1 ? rest : (int) Math.Min(ms.Width, rest);
+                    WrappingLength = -1,
+                    Origin = GetDrawingOffsetTxt()
+                }.WithDefaultAlignment();
 
-                    if (w < rest) DrawSingleLineText();
-                    else
-                    {
-                        var optionsR = new RichTextOptions(rto)
-                        {
-                            Origin = GetDrawingOffsetTxt(), WrappingLength = rest
-                        }.WithDefaultAlignment();
-                        _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsR, out var chars); // w - x
-                        _ = TextMeasuring.MeasureTextSizeSingleLine(text, optionsW, out var cw); // w
-                        var start = (int)(Math.Max(0.66f - x / (float)width, 0) * cw);
-                        var space = text[start..cw].Contains(' ');
-                        var index = text[..chars].LastIndexOf(' ');
-                        var cr = index < 0;
-                        var trim = space ? cr ? "" : text[..index] : text[..chars];
-                        ms = TextMeasuring.MeasureTextSize(trim, optionsR, out _);
-                        optionsR.WrappingLength = ms.Width + 0.05F; // safe space, fixes text being not rendered.
-#if DEBUG
-                        canvas.Mutate(ctx => ctx.Fill(Color.Crimson, new Rectangle(x, 0, rest, safeHeight)));
-#endif
-                        canvas.Mutate(ctx => ctx.DrawText(optionsR, trim, options.Color));
-                        MoveX((int)TextMeasuring.MeasureTextSize(trim, optionsR, out _).Width);
-                        var next = space ? cr ? text : text[(index + 1)..] : text[chars..];
-                        NewLine();
-                        DrawText(next);
-                    }
-
-                    void DrawSingleLineText()
-                    {
-#if DEBUG
-                        canvas.Mutate(ctx => ctx.Fill(Color.Chocolate, new Rectangle(x, 0, w, safeHeight)));
-#endif
-                        optionsW.Origin = GetDrawingOffsetTxt();
-                        canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
-                        MoveX(w);
-                    }
-                }
+                var textSize = TextMeasuring.MeasureTextSize(text, optionsW, out _);
+                canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
+                MoveX((int)textSize.Width);
             }
 
             void MoveX(int offset)
             {
                 x += offset;
-                max = Math.Max(x, max);
-            }
-
-            void NewLine()
-            {
-                RenderLine();
-
-                x = 0;
-                max = 0;
-
-                canvas = GetEmptyCanvas();
-            }
-
-            void RenderLine()
-            {
-                canvas.Mutate(ctx => ctx.Crop(Math.Max(max, 1), canvas.Height));
-                lines.Add(canvas);
             }
 
             Point GetDrawingOffsetEmo() => new(x, margin + 0);

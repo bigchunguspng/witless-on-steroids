@@ -12,9 +12,9 @@ namespace Witlesss.Memes
     {
         // OPTIONS
 
-        public static bool WrapText = true, RandomTextColor;
+        public static bool WrapText = true, RandomTextColor, NoMargin, AbsolutelyNoMargin;
         public static int FontMultiplier = 100, ShadowOpacity = 100;
-        public static CustomColorOption CustomColorBack = new("!"), CustomColorText = new("#");
+        public static CustomColorOption CustomColorBack = new("_"), CustomColorText = new("#");
 
         // SIZE
 
@@ -71,8 +71,8 @@ namespace Witlesss.Memes
             _w = _sourceSizeAdjusted.Width;
             _h = _sourceSizeAdjusted.Height;
 
-            _marginX = Math.Max(_w / 20, 10);
-            _marginY = Math.Max(_h / 30, 10);
+            _marginX = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _w / 20 : Math.Max(_w / 20, 10);
+            _marginY = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _h / 30 : Math.Max(_h / 30, 10);
 
             SetUpFonts();
         }

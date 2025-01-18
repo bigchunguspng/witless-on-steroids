@@ -45,7 +45,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         //
 
-        int GetSafeShadowHeight(float height) => height.RoundInt() + 4 * _marginY;
+        int GetSafeShadowHeight(float height) => height.RoundInt() + 4 * Math.Max(0, _marginY);
 
         void ShadowImagePart(float fontSize, Rectangle rectangle)
         {

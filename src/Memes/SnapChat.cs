@@ -11,25 +11,20 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 {
     // OPTIONS
 
-    public static bool WrapText = true, BackInBlack;
+    public static bool WrapText = true, RandomOffset;
     public static int CardOpacity = 62, CardOffset = 50;
     public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
     public static CustomColorOption CustomColorBack = new("!"), CustomColorText = new("#");
 
     // SIZE
 
-    private int _w, _h, _marginY, _marginX, _offsetY, _cardHeight;
+    private int _w, _h, _marginX, _offsetY, _cardHeight;
 
     // DATA
 
     private SolidBrush _textBrush = default!;
 
     private readonly SolidBrush _white = new(Color.White);
-
-    private readonly DrawingOptions _textDrawingOptions = new()
-    {
-        GraphicsOptions = new GraphicsOptions { Antialias = true, AntialiasSubpixelDepth = 16 }
-    };
 
     public string GenerateMeme(MemeFileRequest request, string text)
     {
@@ -40,7 +35,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
         SetCaptionColor(image);
         using var card = DrawText(text);
-        using var meme = Combine(image, card, sticker: request.IsSticker);
+        using var meme = Combine(image, card);
 
         meme.ApplyPressure(request.Press);
 
@@ -66,9 +61,9 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         _w = _sourceSizeAdjusted.Width;
         _h = _sourceSizeAdjusted.Height;
 
+        var offsetBase = RandomOffset ? RandomInt(25, 75) : CardOffset;
+        _offsetY = _h * offsetBase / 100;
         _marginX = Math.Max(_w / 20, 10);
-        _marginY = Math.Max(_h / 30, 10);
-        _offsetY = _h * CardOffset / 100;
 
         SetUpFonts();
     }
@@ -130,12 +125,9 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         return image;
     }
 
-    private Image<Rgba32> Combine(Image? source, Image caption, bool sticker = false)
+    private Image<Rgba32> Combine(Image? source, Image caption)
     {
         var meme = new Image<Rgba32>(_w, _h);
-
-        if (sticker)
-            meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Color.White));
 
         if (source != null)
             meme.Mutate(x => x.DrawImage(source));

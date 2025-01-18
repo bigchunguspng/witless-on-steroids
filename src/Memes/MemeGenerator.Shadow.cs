@@ -1,4 +1,5 @@
 ﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -55,6 +56,9 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
             var width  = textLayer.Width;
             var height = textLayer.Height;
 
+#if DEBUG
+            shadowRealm.Mutate(x => x.Draw(Color.Black, 1, rectangle));
+#endif
             for (var y = rectangle.Y; y < rectangle.Bottom; y++)
             for (var x = rectangle.X; x < rectangle.Right; x++)
             {

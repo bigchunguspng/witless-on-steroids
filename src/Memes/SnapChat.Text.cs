@@ -28,7 +28,7 @@ public partial class SnapChat
 
     private float GetStartingFontSize()
     {
-        var defaultFontSize = Math.Min(_w, 1.5F * _h) / 10F;
+        var defaultFontSize = Math.Min(_w, 1.5F * _h) * 0.052F;
         var multiplier = FontSizeMultiplier / 100F;
         var multiplierM = MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
@@ -81,11 +81,11 @@ public partial class SnapChat
             if (textWidth * k > textWidthLimit)
             {
                 var minRatio = GetMinTextRatio(textWidth);
-                var lineCount = 2;
+                var lineCount = 1;
                 while (true) // calculate line count
                 {
                     var textRatio = (textWidth / lineCount) / (lineHeight * lineCount);
-                    var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 6F));
+                    var targetRatio = Math.Min(minRatio, textWidthLimit / (_cardHeight * Math.Min(lineCount, 4) / 2.5F));
                     if (textRatio < targetRatio) break;
 
                     lineCount++;
@@ -102,9 +102,7 @@ public partial class SnapChat
                 textHeight = lineHeight;
         }
 
-        var height = GetHeightWithPadding(textHeight, k);
-
-        SetCardHeight(height);
+        SetCardHeight(GetHeightWithPadding(textHeight, k));
         ResizeFont(FontSize * k);
 
         return text;
@@ -132,7 +130,7 @@ public partial class SnapChat
 
     private int GetHeightWithPadding(float textHeight, float k)
     {
-        var extra = Math.Max(FontSize * k, 16) * FontWizard.GetRelativeSize();
+        var extra = Math.Max(FontSize * k * 0.9, 8) * FontWizard.GetRelativeSize();
         return (textHeight * k + extra).CeilingInt();
     }
 

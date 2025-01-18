@@ -96,11 +96,6 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     private Image<Rgba32> DrawText(string text)
     {
-        // fit text -> get text size
-        // add background
-        // add text
-        // result - transparent w*h with caption on card
-
         var emoji = EmojiRegex.Matches(text);
         var plain = emoji.Count == 0;
 
@@ -112,9 +107,13 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         var image = new Image<Rgba32>(_w, _h);
         var options = GetDefaultTextOptions();
 
-        var cardColor = new Rgba32(0, 0, 0, CardOpacity / 100F);
-        var cardRectangle = new Rectangle(0, _h.Gap(_cardHeight).RoundInt(), _w, _cardHeight);
-        image.Mutate(x => x.Fill(cardColor, cardRectangle));
+        image.Mutate(x =>
+        {
+            var y = (_offsetY - 0.5 * _cardHeight).RoundInt();
+            var rect = new Rectangle(0, y, _w, _cardHeight);
+            var color = new Rgba32(0, 0, 0, CardOpacity / 100F);
+            x.Fill(color, rect);
+        });
 
         if (plain)
         {

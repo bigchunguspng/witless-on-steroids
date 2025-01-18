@@ -62,6 +62,7 @@ namespace Witlesss.Commands.Routing
                 .Register("op_top" , () => _mail.WithText(TOP_OPTIONS))
                 .Register("op_dp"  , () => _mail.WithText(DP_OPTIONS))
                 .Register("op_dg"  , () => _mail.WithText(DG_OPTIONS))
+                .Register("op_snap", () => _mail.WithText(SNAP_OPTIONS))
                 .Register("op_nuke", () => _mail.WithText(NUKE_OPTIONS))
                 .Register("fonts"  , () => _mail.WithText(FONTS_CHEAT_SHEET))
                 .Register("html"   , () => _html.WithMode(Htmlizer.Mode.ToHtml))

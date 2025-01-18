@@ -688,6 +688,22 @@ public static class Texts
         <b>Общие опции</b>: /man_32
         """;
 
+    public const string SNAP_OPTIONS =
+        """
+        <b>Опции команды</b> <code>/snap</code>:
+        
+        <code>62%</code> - непрозрачность плашки (0-100)
+        <code>50!</code> - сдвиг плашки
+        <code>!!</code> - случайный сдвиг плашки
+        <code>100"</code> - стартовый размер шрифта (1-999)
+        <code>min10"</code> - мин. размер шрифта (1-999)
+        <code>#color#</code> - цвет текста
+        <code>!color!</code> - цвет фона (стикеры)
+
+        <b>Шрифты</b>: /fonts
+        <b>Общие опции</b>: /man_32
+        """;
+
     public const string NUKE_OPTIONS =
         """
         <b>Опции команды</b> <code>/nuke</code>:

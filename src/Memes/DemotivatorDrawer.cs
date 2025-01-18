@@ -120,8 +120,8 @@ namespace Witlesss.Memes
             else
             {
                 var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
-                var optionsE = new EmojiTool.Options(_heisenberg, GetEmojiSize(type), fontOffset, lines);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs, out _);
+                var optionsE = new EmojiTool.Options(_heisenberg, _w, GetEmojiSize(type), fontOffset, lines);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs);
                 var x = _w.Gap(textLayer.Width);
                 var y = offset - textLayer.Height / 2F + caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());

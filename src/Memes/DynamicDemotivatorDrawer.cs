@@ -151,8 +151,8 @@ namespace Witlesss.Memes // ReSharper disable InconsistentNaming
             }
             else
             {
-                var optionsE = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, emojiPngs.AsQueue(), out _);
+                var optionsE = new EmojiTool.Options(TextBrush, fullW, GetEmojiSize(), _fontOffset);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, emojiPngs.AsQueue());
 
                 background.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
             }

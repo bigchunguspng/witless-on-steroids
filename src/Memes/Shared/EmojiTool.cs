@@ -14,6 +14,7 @@ namespace Witlesss.Memes.Shared
         public record Options
         (
             SolidBrush Color,
+            int Width,
             float EmojiSize,
             float FontOffset = 0,
             int MaxLines = -1,
@@ -22,7 +23,7 @@ namespace Witlesss.Memes.Shared
 
         public static Image<Rgba32> DrawEmojiText
         (
-            string text, RichTextOptions rto, Options options, Queue<string> pngs, out int linesFilled
+            string text, RichTextOptions rto, Options options, Queue<string> pngs
         )
         {
             // RENDER EACH PARAGRAPH
@@ -32,11 +33,10 @@ namespace Witlesss.Memes.Shared
             var lines = paragraphs
                 .Select(paragraph => DrawEmojiTextParagraph(paragraph, rto, options, pngs))
                 .Take(maxLines).ToList();
-            linesFilled = lines.Count;
 
             // COMBINE
 
-            var width = rto.WrappingLength.CeilingInt();
+            var width  = options.Width;
             var height = rto.Font.Size * rto.LineSpacing;
 
             var canvas = new Image<Rgba32>(width, ((lines.Count + 0.5F) * height).RoundInt());
@@ -67,7 +67,7 @@ namespace Witlesss.Memes.Shared
             var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
             var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
 
-            var width  = rto.WrappingLength.CeilingInt();
+            var width  = options.Width;
             var height = rto.Font.Size * rto.LineSpacing;
             var safeHeight = (1.5F * height).CeilingInt();
             var margin = (0.25F * height).RoundInt();

@@ -122,8 +122,8 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         }
         else
         {
-            var optionsE = new EmojiTool.Options(_textBrush, GetEmojiSize(), _fontOffset);
-            var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
+            var optionsE = new EmojiTool.Options(_textBrush, _w, GetEmojiSize(), _fontOffset);
+            var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue());
             image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
         }
 

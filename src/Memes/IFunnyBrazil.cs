@@ -130,8 +130,8 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
         }
         else
         {
-            var optionsE = new EmojiTool.Options(TextBrush, GetEmojiSize(), _fontOffset);
-            var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue(), out _);
+            var optionsE = new EmojiTool.Options(TextBrush, _w, GetEmojiSize(), _fontOffset);
+            var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue());
             image.Mutate(ctx => ctx.DrawImage(textLayer, GetOriginFunny(textLayer.Size)));
         }
 

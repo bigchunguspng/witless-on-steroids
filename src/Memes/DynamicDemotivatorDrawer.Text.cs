@@ -70,7 +70,7 @@ public partial class DynamicDemotivatorDrawer
             else // le "most cases" branch
             {
                 var textWidth = textChunks.Sum(x => x.Width);
-                if (textWidth * 2F < imageW && !Minimalist)
+                if (textWidth * 2F < imageW && !Minimalist && text == text.ToUpper())
                 {
                     k = 2;
                     return text; // Make it bigger!

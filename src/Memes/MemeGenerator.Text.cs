@@ -9,9 +9,6 @@ public partial class MemeGenerator
 {
     public static readonly FontWizard FontWizard = new("meme");
 
-
-    private float _startingFontSize;
-
     private static Font _font = default!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
@@ -23,8 +20,7 @@ public partial class MemeGenerator
         _fontFamily = FontWizard.GetFontFamily("im");
         _fontStyle = FontWizard.GetFontStyle(_fontFamily);
 
-        _startingFontSize = GetStartingFontSize();
-        ResizeFont(_startingFontSize);
+        ResizeFont(GetStartingFontSize());
     }
 
     private void ResizeFont(float size)

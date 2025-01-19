@@ -1,5 +1,4 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -27,14 +26,12 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         if (top.height > 0)
         {
-            ShadowImagePart(top.fontSize, new Rectangle(0, 0, _w, GetSafeShadowHeight(top.height)));
+            ShadowImagePart(top.fontSize, new Rectangle(0, 0, _w, _h / 2));
         }
 
         if (bottom.height > 0)
         {
-            var height = GetSafeShadowHeight(bottom.height);
-            var y = _h - height;
-            ShadowImagePart(bottom.fontSize, new Rectangle(0, y, _w, height));
+            ShadowImagePart(bottom.fontSize, new Rectangle(0, _h / 2, _w, _h - _h / 2));
         }
 
         sw.Log("DrawShadow");
@@ -46,8 +43,6 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         //
 
-        int GetSafeShadowHeight(float height) => height.RoundInt() + 4 * Math.Max(0, _marginY);
-
         void ShadowImagePart(float fontSize, Rectangle rectangle)
         {
             var w = Math.Sqrt(fontSize) / (pixelated ? 1.6F : 2F);
@@ -55,32 +50,41 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
             var width  = textLayer.Width;
             var height = textLayer.Height;
-
-#if DEBUG
-            shadowRealm.Mutate(x => x.Draw(Color.Black, 1, rectangle));
-#endif
-            for (var y = rectangle.Y; y < rectangle.Bottom; y++)
-            for (var x = rectangle.X; x < rectangle.Right; x++)
+            
+            shadowRealm.ProcessPixelRows(accessor =>
             {
-                var textA = textLayer[x, y].A;
-                if (textA == 0) continue;
-
-                for (var ky = y - w2; ky <= y + w2; ky++)
-                for (var kx = x - w2; kx <= x + w2; kx++)
+                for (var y = rectangle.Y; y < rectangle.Bottom; y++)
+                for (var x = rectangle.X; x < rectangle.Right;  x++)
                 {
-                    var outsideImage = kx < 0 || kx >= width || ky < 0 || ky >= height;
-                    if (outsideImage) continue;
+                    var textA = textLayer[x, y].A;
+                    if (textA == 0) continue;
 
-                    var shadowA = shadowRealm[kx, ky].A;
-                    if (shadowA == maxOpacity) continue;
+                    for (var ky = y - w2; ky <= y + w2; ky++)
+                    {
+                        var outsideY = ky < 0 || ky >= height;
+                        if (outsideY) continue;
 
-                    var shadowOpacity = opacity * getShadowOpacity(kx - x, ky - y, w);
-                    if (shadowOpacity == 0) continue;
+                        var row = accessor.GetRowSpan(ky);
 
-                    var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
-                    shadowRealm[kx, ky] = new Rgba32(0, 0, 0, a);
+                        for (var kx = x - w2; kx <= x + w2; kx++)
+                        {
+                            var outsideX = kx < 0 || kx >= width;
+                            if (outsideX) continue;
+
+                            ref var pixel = ref row[kx];
+
+                            var shadowA = pixel.A;
+                            if (shadowA == maxOpacity) continue;
+
+                            var shadowOpacity = opacity * getShadowOpacity(kx - x, ky - y, w);
+                            if (shadowOpacity == 0) continue;
+
+                            var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
+                            pixel = new Rgba32(0, 0, 0, a);
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 

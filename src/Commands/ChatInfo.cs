@@ -74,7 +74,7 @@ namespace Witlesss.Commands
             { MemeType.Dg,   "демотиваторы💀"   },
             { MemeType.Top,  "подписанки 💬"    },
             { MemeType.Dp,   "демотиваторы👌"   },
-            { MemeType.Snap, "снапчаты😭"       },
+            { MemeType.Snap, "снапчаты 😭"      },
             { MemeType.Nuke, "ядерные отходы🍤" }
         };
     }

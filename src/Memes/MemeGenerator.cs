@@ -12,9 +12,11 @@ namespace Witlesss.Memes
     {
         // OPTIONS
 
-        public static bool WrapText = true, RandomTextColor, NoMargin, AbsolutelyNoMargin;
-        public static int FontMultiplier = 100, ShadowOpacity = 100;
+        public static bool WrapText = true, RandomTextColor, RandomOffset, NoMargin, AbsolutelyNoMargin;
+        public static int FontMultiplier = 100, ShadowOpacity = 100, TextOffset = -1;
         public static CustomColorOption CustomColorBack = new("_"), CustomColorText = new("#");
+
+        public static bool CustomOffsetMode => RandomOffset || TextOffset >= 0;
 
         // SIZE
 
@@ -74,6 +76,12 @@ namespace Witlesss.Memes
             _marginX = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _w / 20 : Math.Max(_w / 20, 10);
             _marginY = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _h / 30 : Math.Max(_h / 30, 10);
 
+            if (CustomOffsetMode)
+            {
+                var offset = RandomOffset ? RandomInt(15, 85) : TextOffset;
+                _marginY = _h * offset / 100;
+            }
+
             SetUpFonts();
         }
 
@@ -103,7 +111,11 @@ namespace Witlesss.Memes
         {
             var canvas = new Image<Rgba32>(_w, _h);
 
-            _captionSize = new Size(_w - 2 * _marginX, _h / 3 - _marginY);
+            var height = CustomOffsetMode
+                ? _h / 3
+                : _h / 3 - _marginY;
+
+            _captionSize = new Size(_w - 2 * _marginX, height);
 
             var tuple1 = AddText(canvas, text.A, top: true);
             var tuple2 = AddText(canvas, text.B, top: false);

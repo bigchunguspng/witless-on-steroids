@@ -39,7 +39,9 @@ namespace Witlesss.Commands.Meme
 
             MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 100);
             MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);
+            MemeGenerator.TextOffset     =  GetInt(Request, _offset, -1);
 
+            MemeGenerator.RandomOffset       =  CheckAndCut(Request, _randomOffset);
             MemeGenerator.WrapText           = !CheckAndCut(Request, _nowrap);
             MemeGenerator.RandomTextColor    =  CheckAndCut(Request, _colorText);
             MemeGenerator.AbsolutelyNoMargin =  CheckAndCut(Request, _noMarginDude);
@@ -58,7 +60,12 @@ namespace Witlesss.Commands.Meme
 
             string a, b;
 
-            if (generate)
+            if (MemeGenerator.CustomOffsetMode)
+            {
+                a = generate ? Baka.Generate() : text!;
+                b = "";
+            }
+            else if (generate)
             {
                 var (genA, genB) = (true, true);
 
@@ -113,9 +120,11 @@ namespace Witlesss.Commands.Meme
         private static readonly Regex     _top_only = new(@"^\/meme\S*(t)\S*");
         private static readonly Regex    _lowerCase = new(@"^\/meme\S*(lo)\S*");
         private static readonly Regex    _colorText = new(@"^\/meme\S*(cc)\S*");
+        private static readonly Regex _randomOffset = new(@"^\/meme\S*(!!)\S*");
         private static readonly Regex _noMargin     = new(@"^\/meme\S*(mm)\S*");
         private static readonly Regex _noMarginDude = new(@"^\/meme\S*(mm!)\S*");
         private static readonly Regex       _fontSM = new(@"^\/meme\S*?(\d{1,3})("")\S*");
         private static readonly Regex       _shadow = new(@"^\/meme\S*?(\d{1,3})(%)\S*");
+        private static readonly Regex       _offset = new(@"^\/meme\S*?(\d{1,3})(!)\S*");
     }
 }

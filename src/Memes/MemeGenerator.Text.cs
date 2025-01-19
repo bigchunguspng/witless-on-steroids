@@ -106,7 +106,11 @@ public partial class MemeGenerator
     {
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = top ? VerticalAlignment.Top : VerticalAlignment.Bottom,
+        VerticalAlignment = CustomOffsetMode
+            ? VerticalAlignment.Center
+            : top
+                ? VerticalAlignment.Top
+                : VerticalAlignment.Bottom,
         Origin = origin,
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
@@ -124,11 +128,15 @@ public partial class MemeGenerator
         return new PointF(_w / 2F, marginY + _fontOffset - caseOffset);
     }
 
-    private Point GetFunnyOrigin(Size size, RichTextOptions options, bool top, float caseOffset)
+    private Point GetFunnyOrigin(Size textArea, RichTextOptions options, bool top, float caseOffset)
     {
         var space = 0.25F * options.Font.Size * options.LineSpacing;
-        var marginY = top ? _marginY - space : _h - _marginY - size.Height + space;
-        var x = _w.Gap(size.Width);
+        var marginY = CustomOffsetMode
+            ? _marginY - 0.5 * textArea.Height
+            : top
+                ? _marginY - space
+                : _h - _marginY - textArea.Height + space;
+        var x = _w.Gap(textArea.Width);
         var y = marginY - caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());
     }

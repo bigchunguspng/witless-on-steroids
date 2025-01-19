@@ -8,6 +8,7 @@ namespace Witlesss.Commands.Settings
         private readonly Regex _t = new("^[tт]");
         private readonly Regex _g = new("^[dд][gгvв]");
         private readonly Regex _d = new("^[dд]");
+        private readonly Regex _s = new("^[sс]");
         private readonly Regex _n = new("^[nн]");
 
         protected override void RunAuthorized()
@@ -23,7 +24,7 @@ namespace Witlesss.Commands.Settings
                 else if (_t.IsMatch(w)) Set(MemeType.Top,  "/top" );
                 else if (_g.IsMatch(w)) Set(MemeType.Dg,   "/dg"  );
                 else if (_d.IsMatch(w)) Set(MemeType.Dp,   "/dp"  );
-                else if (_n.IsMatch(w)) Set(MemeType.Snap, "/snap");
+                else if (_s.IsMatch(w)) Set(MemeType.Snap, "/snap");
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
                 else Bot.SendMessage(Origin, string.Format(SET_MEME_TYPE_MANUAL, w));
 

@@ -20,6 +20,7 @@ public static class Texts
         <code>/set T </code> - подписанки 💬
         <code>/set D </code> - демотиваторы👌
         <code>/set Dg</code> - демотиваторы💀
+        <code>/set S </code> - снапчаты 😭
         <code>/set N </code> - ядерный фритюр 🍤</blockquote>
 
         ⚙️ <u><b>Авто-опции</b></u>:
@@ -30,6 +31,7 @@ public static class Texts
         <code>/set T largmmww50"*</code>
         <code>/set D imup</code>
         <code>/set Dg xllro-b</code>
+        <code>/set S !!80%*85</code>
         <code>/set N =3</code></blockquote>
 
         <code>/set [код] ?</code> - узнать 👁
@@ -195,6 +197,7 @@ public static class Texts
         <code>T </code> → <b>/top</b>
         <code>D </code> → <b>/dp</b>
         <code>Dg</code> → <b>/dg</b>
+        <code>S </code> → <b>/snap</b>
         <code>N </code> → <b>/nuke</b>
         """;
 

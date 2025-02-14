@@ -43,6 +43,7 @@ namespace Witlesss.Commands.Routing
                 .Register("vol"    , () => new ChangeVolume())
                 .Register("g"      , () => new ToAnimation())
                 .Register("sex"    , () => new ToSticker())
+                .Register("hex"    , () => new CorruptImage())
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
                 .Register("load"   , () => new Load())

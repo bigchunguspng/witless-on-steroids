@@ -4,90 +4,99 @@ namespace Witlesss.Commands.Editing;
 
 public class CorruptImage : PhotoCommand
 {
+    //      /hex  N
+    //      /hexg N
+    // todo /hexg N1 N2 … NN
+
+    private string _name      = null!;
+    private byte[] _jpegBytes = null!;
+
     protected override async Task Execute()
     {
         var path = await DownloadFile();
-        
         var jpeg = await path.UseFFMpeg(Origin).Out("-jpeg", ".jpg");
-        var name = jpeg.RemoveExtension();
 
-        var jpegBytes = await System.IO.File.ReadAllBytesAsync(jpeg);
+        _name = jpeg.RemoveExtension();
+        _jpegBytes = await System.IO.File.ReadAllBytesAsync(jpeg);
 
-        var match = Regex.Match(Context.Command!, @"g((\d{1,5})(-(\d{1,5}))?)?");
-        var g = match.Success;
-        if (g)
-        {
-            var v1 = match.Groups[2].Success ? int.Parse(match.Groups[2].Value) : 1;
-            var v2 = match.Groups[4].Success ? int.Parse(match.Groups[4].Value) : v1;
-
-            var id = GetHashCode();
-
-            for (var i = 0; i < 30; i++)
-            {
-                var bytes = jpegBytes.ToArray();
-                var file = $"{name}-{id}-{i:d3}.jpg";
-
-                var value = (v1 + (v2 - v1) * (i / 30F)).RoundInt();
-                Corrupt(bytes, value);
-                await System.IO.File.WriteAllBytesAsync(file, bytes);
-            }
-
-            var input  = $"{name}-{id}-*.jpg";
-            var result = $"{name}-{id}.mp4";
-            var args = $"-delay 5 \"{input}\" -loop 0 \"{result}\"";
-            await SystemHelpers.StartProcess("magick", args).WaitForExitAsync();
-
-            await using var stream = System.IO.File.OpenRead(result);
-            Bot.SendAnimation(Origin, InputFile.FromStream(stream, "piece_fap_bot-hex.mp4"));
-            Log($"{Title} >> HEX [#] VID");
-        }
-        else
-        {
-            var value = Context.HasIntArgument(out var x) ? Math.Clamp(x, 0, 1_000_000) : 1;
-            var jpegCorrupted = name + "Hex.jpg";
-
-            Corrupt(jpegBytes, value);
-            await System.IO.File.WriteAllBytesAsync(jpegCorrupted, jpegBytes);
-
-            var result = name + "-Hex-Fix.png";
-            var exe = "magick";
-            var args = $"\"{jpegCorrupted}\" \"{result}\"";
-            await SystemHelpers.StartReadableProcess(exe, args).WaitForExitAsync();
-
-            await using var stream = System.IO.File.OpenRead(result);
-            Bot.SendPhoto(Origin, InputFile.FromStream(stream));
-            Log($"{Title} >> HEX [#]");
-        }
+        var g = Context.Command!.Contains('g');
+        if (g) await HexVid();
+        else   await HexPic();
     }
 
-    private void Corrupt(byte[] bytes, int corruptionLevel)
+    private async Task HexVid()
+    {
+        var corruptionCount = Context.HasIntArgument(out var x) 
+            ? Math.Max(x, 0) 
+            : (_jpegBytes.Length / 1500F).CeilingInt();
+
+        var id = GetHashCode();
+
+        for (var i = 0; i < 30; i++)
+        {
+            var bytes = _jpegBytes.ToArray();
+            var file = $"{_name}-{id}-{i:d3}.jpg";
+
+            Corrupt(bytes, corruptionCount);
+            await System.IO.File.WriteAllBytesAsync(file, bytes);
+        }
+
+        var inputPattern  = $"{_name}-{id}-*.jpg";
+        var result        = $"{_name}-{id}.mp4";
+
+        var args = $"-delay 5 \"{inputPattern}\" -loop 0 \"{result}\"";
+        await SystemHelpers.StartProcess("magick", args).WaitForExitAsync();
+
+        await using var stream = System.IO.File.OpenRead(result);
+        Bot.SendAnimation(Origin, InputFile.FromStream(stream, "piece_fap_bot-hex.mp4"));
+        Log($"{Title} >> HEX [#{corruptionCount}] VID");
+    }
+
+    private async Task HexPic()
+    {
+        var corruptionCount = Context.HasIntArgument(out var x) 
+            ? Math.Max(x, 0) 
+            : (_jpegBytes.Length / 1500F).CeilingInt();
+
+        Corrupt(_jpegBytes, corruptionCount);
+
+        var corruptedFile = $"{_name}-Hex.jpg";
+        await System.IO.File.WriteAllBytesAsync(corruptedFile, _jpegBytes);
+
+        var extension = Type is MediaType.Stick ? "webp" : "png";
+        var result = $"{_name}-Hex-Fix.{extension}";
+        var args = $"\"{corruptedFile}\" \"{result}\"";
+        await SystemHelpers.StartReadableProcess("magick", args).WaitForExitAsync();
+
+        SendResult(result);
+        Log($"{Title} >> HEX [#{corruptionCount}]");
+    }
+
+    private void Corrupt(byte[] bytes, int corruptionCount)
     {
         var start = 0;
-        var length_m1 = bytes.Length - 1;
+        var end = bytes.Length - 2;
 
-        for (var i = 0; i < length_m1; i++)
+        for (var i = 0; i < end; i++)
         {
-            if (bytes[i] == 0xFF && bytes[i + 1] == 0xDA) // start
+            // find START OF SCAN marker FFDA
+            if (bytes[i] == 0xFF && bytes[i + 1] == 0xDA)
             {
-                start = i + 2;
+                start = i + 2 + bytes[i + 3];
                 break;
             }
         }
 
-        for (var i = start; i < length_m1; i++)
+        var glitches = new byte[corruptionCount];
+        Random.Shared.NextBytes(glitches);
+
+        for (var i = 0; i < corruptionCount; i++)
         {
-            if (bytes[i] == 0xFF)
-            {
-                if (bytes[i + 1] == 0xD9) return; // end
+            // don't put END OF IMAGE marker FFD9 in the IMAGE DATA segment
+            if (glitches[i] is 0xFF or 0xD9) glitches[i] = 0x11;
 
-                i++;
-                continue; // don't touch FF bytes
-            }
-
-            if (LuckyFor(corruptionLevel, 1_000_000))
-            {
-                bytes[i] = Random.Shared.Next(255).ClampByte();
-            }
+            var offset = Random.Shared.Next(start, end);
+            bytes[offset] = glitches[i];
         }
     }
 }

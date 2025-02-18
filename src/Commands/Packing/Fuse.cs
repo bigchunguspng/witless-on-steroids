@@ -213,7 +213,7 @@ namespace Witlesss.Commands.Packing
 
         #region LISTING
 
-        private record FusionListData(string Available, string Object, string Key, string Marker);
+        private record FusionListData(string Title, string Object, string Key, string Marker);
 
         private static readonly FusionListData PublicPacks  = new("📂 Общие словари" , "словаря", "fi",   "");
         private static readonly FusionListData PrivatePacks = new("🔐 Личные словари", "словаря", "f!", "! ");
@@ -224,10 +224,10 @@ namespace Witlesss.Commands.Packing
         {
             var pagination = query.GetPagination(data);
 
-            if (data[0] == "fi") SendPackList(pagination);
-            if (data[0] == "f!") SendPackList(pagination, @private: true);
-            if (data[0] == "f@") SendFileList(pagination);
-            else         /* f* */SendFileList(pagination, @private: true);
+            if      (data[0] == "fi") SendPackList(pagination);
+            else if (data[0] == "f!") SendPackList(pagination, @private: true);
+            else if (data[0] == "f@") SendFileList(pagination);
+            else              /* f* */SendFileList(pagination, @private: true);
         }
 
         private static void SendPackList(ListPagination pagination, bool fail = false, bool @private = false)
@@ -260,7 +260,7 @@ namespace Witlesss.Commands.Packing
             {
                 sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
             }
-            sb.Append("<b>").Append(data.Available).Append(":</b>");
+            sb.Append("<b>").Append(data.Title).Append(":</b>");
             if (!oneshot) sb.Append($" 📃{page + 1}/{lastPage + 1}");
             sb.Append("\n\n").AppendJoin('\n', JsonList(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");

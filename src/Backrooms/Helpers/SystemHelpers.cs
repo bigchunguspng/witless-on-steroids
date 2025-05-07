@@ -50,7 +50,7 @@ public static class YtDlp
 {
     public const string DEFAULT_ARGS = "--no-mtime --no-warnings --cookies-from-browser firefox ";
 
-    public static async Task Use(string args, string directory, MessageOrigin origin)
+    public static async Task Use(string args, string directory, MessageOrigin origin, bool firstTime = true)
     {
         var exe = "yt-dlp";
         using var memory = new MemoryStream();
@@ -63,6 +63,18 @@ public static class YtDlp
             
         if (process.ExitCode != 0)
         {
+            if (firstTime && !LastUpdate.HappenedWithinLast(TimeSpan.FromHours(8)))
+            {
+                var updated = await Update();
+                if (updated)
+                {
+                    Directory.GetFiles(directory).ForEach(File.Delete);
+                    await Use(args, directory, origin, firstTime: false);
+
+                    return;
+                }
+            }
+
             memory.Position = 0;
             using var reader = new StreamReader(memory);
             var output = await reader.ReadToEndAsync();
@@ -84,5 +96,24 @@ public static class YtDlp
             Bot.Instance.SendErrorDetails(origin, $"{exe} {args}", message);
             throw new Exception(shortMessage);
         }
+    }
+
+    private static DateTime LastUpdate;
+
+    private static async Task<bool> Update()
+    {
+        using var memory = new MemoryStream();
+        var process = SystemHelpers.StartProcess("yt-dlp", "-U", redirect: true);
+        var taskO = SystemHelpers.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
+        var taskE = SystemHelpers.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
+        await Task.WhenAll(taskO, taskE);
+        await process.WaitForExitAsync();
+
+        LastUpdate = DateTime.Now;
+
+        memory.Position = 0;
+        using var reader = new StreamReader(memory);
+        var output = await reader.ReadToEndAsync();
+        return output.Contains("Updated yt-dlp");
     }
 }

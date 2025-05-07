@@ -3,7 +3,7 @@ using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Services.Internet.YouTube;
 
-// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video gif>gif/mp4 "URL" -o "video.%(ext)s"
+// yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -k -I 1 -f "bv*[height<=480][width<=720][vcodec*=avc]+ba[acodec*=mp4a]/b[height<=480][width<=720][vcodec*=avc][acodec*=mp4a]/bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w" --remux-video gif>gif/mp4 "URL" -o "video.%(ext)s"
 
 public class DownloadVideoTask(string id, CommandContext context)
 {
@@ -13,7 +13,12 @@ public class DownloadVideoTask(string id, CommandContext context)
     {
         var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         var args = "-k -I 1 "
-                 + "-f \"bv*[height<=480][width<=720]+ba/b[height<=480][width<=720]/wv*+ba/w\" "
+                 + "-f \""
+                 + "bv*[height<=480][width<=720][vcodec*=avc]+ba[acodec*=mp4a]/"
+                 +   "b[height<=480][width<=720][vcodec*=avc][acodec*=mp4a]/"
+                 + "bv*[height<=480][width<=720]+ba/"
+                 +   "b[height<=480][width<=720]/"
+                 + "wv*+ba/w\" "
                  + "--remux-video gif>gif/mp4 ";
         builder.Append(args);
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());

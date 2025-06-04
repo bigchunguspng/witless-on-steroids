@@ -38,6 +38,8 @@ public static class Texts
 
         <code>/set [код] ?</code> - узнать 👁
         <code>/set [код] 0</code> - сбросить ❌
+        <code>/set [код]+ [опции]</code> - добавить
+        <code>/set [код]- [опции]</code> - убрать
         """;
 
     public const string FUSE_MANUAL =

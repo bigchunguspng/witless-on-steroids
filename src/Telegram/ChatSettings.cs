@@ -41,6 +41,7 @@ public class MemeOptions
             MemeType.Dg   => Dg,
             MemeType.Dp   => Dp,
             MemeType.Snap => Snap,
+            MemeType.Nuke => Nuke,
             _             => Auto,
         };
         set
@@ -50,6 +51,7 @@ public class MemeOptions
             else if (type is MemeType.Dp  ) Dp   = value;
             else if (type is MemeType.Dg  ) Dg   = value;
             else if (type is MemeType.Snap) Snap = value;
+            else if (type is MemeType.Nuke) Nuke = value;
             else                            Auto = value;
         }
     }

@@ -41,17 +41,20 @@ namespace Witlesss.Commands.Settings
                             : $"Опции команды <b>{command}</b>: {options}";
                         Bot.SendMessage(Origin, message.XDDD());
                     }
-                    else if (args.Length > 1 && command == "*") // /set a p:scale 0.5; v:nuke; a:peg rip! 3; u:songcs
+                    else if (args.Length > 1) 
                     {
-                        AutoHandler.ClearCache(Origin.Chat);
+                        if (command == "*") // /set a p:scale 0.5; v:nuke; a:peg rip! 3; u:songcs
+                        {
+                            AutoHandler.ClearCache(Origin.Chat);
 
-                        var result = SetOrClearOptions(type, Args.SplitN(2));
-                        ReportAutoHandlerSet(result);
-                    }
-                    else if (args.Length > 1) // /set m largmm!!420"!!
-                    {
-                        var result = $"{command}{SetOrClearOptions(type, args)}";
-                        ReportOptionsSet(command, result);
+                            var result = SetOrClearOptions(type, Args.SplitN(2));
+                            ReportAutoHandlerSet(result);
+                        }
+                        else // /set m largmm!!420"!!
+                        {
+                            var result = $"{command}{SetOrClearOptions(type, args)}";
+                            ReportOptionsSet(command, result);
+                        }
                     }
                     else // /set m
                     {
@@ -66,9 +69,14 @@ namespace Witlesss.Commands.Settings
         
         private string? SetOrClearOptions(MemeType type, string[] args)
         {
-            var result = args[1] == "0"
-                ? null
+            var add = args[0].EndsWith('+');
+            var rem = args[0].EndsWith('-');
+
+            var result = args[1] == "0" ? null
+                : add ? $"{Data.GetOrCreateMemeOptions()[type]}{args[1]}"
+                : rem ?    Data.GetOrCreateMemeOptions()[type]?.Replace(args[1], "").MakeNull_IfEmpty()
                 : args[1];
+
             Data.GetOrCreateMemeOptions()[type] = result;
             if (result is null && (Data.Options?.IsEmpty() ?? false)) Data.Options = null;
             return result;
@@ -105,7 +113,7 @@ namespace Witlesss.Commands.Settings
             if (handler != null)
             {
                 Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());
-                Log($"{Title} >> AUTO HANDLER SET >> {handler}");
+                Log($"{Title} >> AUTO HANDLER >> {handler}");
             }
             else
             {

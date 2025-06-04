@@ -103,7 +103,7 @@ public static class YtDlp
     private static async Task<bool> Update()
     {
         using var memory = new MemoryStream();
-        var process = SystemHelpers.StartProcess("yt-dlp", "-U", redirect: true);
+        var process = SystemHelpers.StartProcess("yt-dlp", "--update-to nightly", redirect: true);
         var taskO = SystemHelpers.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
         var taskE = SystemHelpers.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
         await Task.WhenAll(taskO, taskE);

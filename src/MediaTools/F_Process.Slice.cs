@@ -5,26 +5,24 @@ namespace Witlesss.MediaTools;
 
 public partial class F_Process
 {
-    public F_Process SliceRandom(double multiplier) => ApplyEffects(o => SliceRandomArgs(o, multiplier));
+    public F_Process SliceRandom(double breaks, double pacing) => ApplyEffects(o => SliceRandomArgs(o, breaks, pacing));
 
-    private void SliceRandomArgs(FFMpegArgumentOptions o, double multiplier)
+    private void SliceRandomArgs(FFMpegArgumentOptions o, double breaks, double pacing)
     {
         var info = GetMediaInfo();
         var soundOnly = info is { HasAudio: true, HasVideo: false };
         var seconds = info.HasVideo ? info.Video!.Duration.TotalSeconds : info.Audio!.Duration.TotalSeconds;
         var minutes = seconds / 60;
 
-        var timecodes = GetTrimCodes(minutes, seconds, multiplier, soundOnly);
+        var timecodes = GetTrimCodes(minutes, seconds, breaks, pacing, soundOnly);
 
         TrimAndConcat(o, info, timecodes);
 
         if (info.HasVideo) o.FixPlayback();
     }
 
-    private List<TrimCode> GetTrimCodes(double minutes, double seconds, double multiplier, bool soundOnly)
+    private List<TrimCode> GetTrimCodes(double minutes, double seconds, double breaks, double pacing, bool soundOnly)
     {
-        var k = multiplier;
-
         var timecodes = new List<TrimCode>();
         var head = -seconds / 2;
         while (head < seconds)
@@ -46,8 +44,8 @@ public partial class F_Process
                 ? RandomDouble(0.15, 0.35)
                 : RandomDouble(0.25, Math.Min(0.35 + 0.01 * seconds, 1.25));
 
-            step   *= k;
-            length *= k;
+            step   *= breaks; // skip: less..more
+            length *= pacing; // fast..slow
 
             if (soundOnly && minutes < 3) length *= RandomDouble(1.5, 3);
 

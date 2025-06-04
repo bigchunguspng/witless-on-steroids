@@ -123,10 +123,10 @@ public static partial class Extensions
         return match.Success ? convert(match.Groups[group].Value) : fallback;
     }
 
-    public static T? ExtractGroup<T>
-        (this Regex regex, int group, string input, Func<string, T> convert, T? fallback = default) where T : struct
+    public static T ExtractGroup<T>
+        (this Match match, int group, Func<string, T> convert, T fallback = default) where T : struct
     {
-        var match = regex.Match(input);
-        return match.Success ? convert(match.Groups[group].Value) : fallback;
+        var g = match.Groups[group];
+        return g.Success ? convert(g.Value) : fallback;
     }
 }

@@ -83,15 +83,33 @@ public class WitlessCommandRouter : WitlessSyncCommand
             }
         }
 
-        if      (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1);
+        if (Data.Type is MemeType.Auto)
+        {
+            if (Data.Options != null && TryAutoHandleMessage() == false) TryLuckForFunnyText();
+        }
+        else if (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1);
         else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2);
         else if (Message.GetAnimation   () is { } f3 && HaveToMeme       ()) GetMemeMaker(f3).ProcessVideo(f3);
         else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
-        else if (LuckyFor(Data.Speech))
+        else TryLuckForFunnyText();
+
+        void TryLuckForFunnyText()
         {
+            if (!LuckyFor(Data.Speech)) return;
+
             Telemetry.LogAuto(Context.Chat, Data.Speech, "FUNNY");
 
             new PoopText().Execute(Context);
+        }
+
+        bool TryAutoHandleMessage()
+        {
+            var command = AutoHandler.TryGetMessageHandler(Context, Data);
+            if (command is null) return false;
+            
+            AutoHandleCommand(Data, command);
+            
+            return true;
         }
 
         ImageProcessor GetMemeMaker(FileBase file)
@@ -111,6 +129,23 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         bool HaveToMeme       () => LuckyFor(Data.Pics) && !Message.ContainsSpoilers();
         bool HaveToMemeSticker() => Data.Stickers && HaveToMeme();
+    }
+
+    private void AutoHandleCommand(ChatSettings settings, string command)
+    {
+        Context.ChangeText(command);
+        Telemetry.LogAutoCommand(Context.Chat, Context.Text);
+
+        var funcS = _parent.SimpleCommands.Resolve(Command);
+        if (funcS != null)
+        {
+            funcS.Invoke().Execute(Context);
+        }
+        else
+        {
+            var funcW = _witlessCommands.Resolve(Command);
+            funcW?.Invoke().Execute(WitlessContext.From(Context, settings));
+        }
     }
 
     private void HandleWitlessCommands(ChatSettings settings)

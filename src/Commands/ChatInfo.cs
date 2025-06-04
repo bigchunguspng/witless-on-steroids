@@ -33,19 +33,22 @@ namespace Witlesss.Commands
 
             sb.Append("\n\n<u>Авто-мемы:</u>");
             sb.Append("\nТип: ").Append(Types[Data.Type]);
+            if (Data.Type == MemeType.Auto) sb.Append("<s>");
             sb.Append("\nВероятность: ").Append(Data.Pics).Append('%');
             sb.Append("\nСтикеры: ").Append(Data.Stickers ? "тоже 👌" : "пропускаем");
+            if (Data.Type == MemeType.Auto) sb.Append("</s>");
 
             if (Data.Options is not null)
             {
                 var anyOptions = false;
                 var optionsBuilder = new StringBuilder("\n\n<u>Авто-опции</u>:");
 
-                if (IsNotNull(Data.Options.Meme)) AppendOptions("meme", Data.Options.Meme);
-                if (IsNotNull(Data.Options.Top )) AppendOptions("top",  Data.Options.Top );
-                if (IsNotNull(Data.Options.Dp  )) AppendOptions("dp",   Data.Options.Dp  );
-                if (IsNotNull(Data.Options.Dg  )) AppendOptions("dg",   Data.Options.Dg  );
-                if (IsNotNull(Data.Options.Nuke)) AppendOptions("nuke", Data.Options.Nuke);
+                if (IsNotNull(Data.Options.Meme)) AppendOptions("/meme",          Data.Options.Meme);
+                if (IsNotNull(Data.Options.Top )) AppendOptions("/top",           Data.Options.Top );
+                if (IsNotNull(Data.Options.Dp  )) AppendOptions("/dp",            Data.Options.Dp  );
+                if (IsNotNull(Data.Options.Dg  )) AppendOptions("/dg",            Data.Options.Dg  );
+                if (IsNotNull(Data.Options.Nuke)) AppendOptions("/nuke",          Data.Options.Nuke);
+                if (IsNotNull(Data.Options.Auto)) AppendOptions("авто-обработка", Data.Options.Auto);
 
                 if (anyOptions) sb.Append(optionsBuilder);
 
@@ -60,7 +63,7 @@ namespace Witlesss.Commands
 
                 void AppendOptions(string cmd, string options)
                 {
-                    optionsBuilder.Append("\n- /").Append(cmd).Append(": <code>").Append(options).Append("</code>");
+                    optionsBuilder.Append("\n- ").Append(cmd).Append(": <code>").Append(options).Append("</code>");
                 }
             }
 
@@ -75,7 +78,8 @@ namespace Witlesss.Commands
             { MemeType.Top,  "подписанки 💬"    },
             { MemeType.Dp,   "демотиваторы👌"   },
             { MemeType.Snap, "снапчаты 😭"      },
-            { MemeType.Nuke, "ядерные отходы🍤" }
+            { MemeType.Nuke, "ядерные отходы🍤" },
+            { MemeType.Auto, "авто-обработка 👾"}
         };
     }
 }

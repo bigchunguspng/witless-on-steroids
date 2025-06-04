@@ -20,6 +20,10 @@ public static class Telemetry
         (long chat, string? text)
         => Log(chat, $"{text}");
 
+    public static void LogAutoCommand
+        (long chat, string? text)
+        => Log(chat, $"[auto] {text}");
+
     public static void LogInline
         (long chat, string? text)
         => Log(chat, $"{Bot.Username} {text}");

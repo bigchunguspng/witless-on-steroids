@@ -7,5 +7,6 @@ public enum MemeType : byte
     Top,
     Dp,
     Snap,
-    Nuke
+    Nuke,
+    Auto
 }

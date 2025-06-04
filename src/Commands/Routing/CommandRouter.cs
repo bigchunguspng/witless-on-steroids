@@ -22,6 +22,7 @@ namespace Witlesss.Commands.Routing
         private readonly WitlessCommandRouter _witlessRouter;
 
         private readonly CommandRegistry<AnyCommand<CommandContext>> _simpleCommands;
+        public           CommandRegistry<AnyCommand<CommandContext>>  SimpleCommands => _simpleCommands;
 
         public CommandRouter()
         {

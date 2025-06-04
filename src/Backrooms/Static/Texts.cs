@@ -199,6 +199,31 @@ public static class Texts
         <code>Dg</code> → <b>/dg</b>
         <code>S </code> → <b>/snap</b>
         <code>N </code> → <b>/nuke</b>
+        <code>A </code> → <b>авто-обработка</b>
+        """;
+
+    public const string SET_AUTO_HANDLER_MANUAL =
+        """
+        <u><b>Синтаксис установки авто-обработки</b></u>:
+
+        <code>/set a [types][%]:[command][options] [args][;]</code>
+        <code>/set a ?</code> - узнать 👁
+        <code>/set a 0</code> - сбросить ❌
+
+        <b>Типы:</b>
+        <code>p</code> = photo 📸
+        <code>v</code> = video 🎬
+        <code>a</code> = audio 🎧
+        <code>g</code> = GIF 🎬🔇
+        <code>u</code> = URL 📎
+        <code>s</code> = sticker 💯
+
+        <blockquote><b>Примеры:</b>
+        <code>/set a u:songcs
+        /set a u:songcs; p:crop 1280 720; s:im cc:16! .
+        /set a psg:meme; v:scale 0.25
+        /set a p:meme; s:nuke; g:dg
+        /set a psg50%:meme; psg25%:top; psg25%:dp;</code></blockquote>
         """;
 
     public const string SET_MEMES_RESPONSE =
@@ -340,6 +365,20 @@ public static class Texts
 
     public const string SET_MEME_OPS_RESPONSE =
         "Опции команды <b>{0}</b> изменены на <b>{1}</b>";
+
+    public const string SET_AUTO_HANDLER_RESPONSE =
+        """
+        Активировано режим <b>авто-обработки</b>
+        
+        Установите авто-обработчик командой <code>/set</code>
+        """;
+
+    public const string SET_AUTO_HANDLER_OPTIONS_RESPONSE =
+        """
+        Установлен <b>авто-обработчик</b>:
+
+        <code>{0}</code>
+        """;
 
     public const string DP_OPTIONS =
         """

@@ -19,7 +19,7 @@ public class ChatSettings // 32 (28) bytes
 
     [JsonProperty] public MemeOptions? Options { get; set; }
 
-    public MemeOptions GetMemeOptions() => Options ??= new MemeOptions();
+    public MemeOptions GetOrCreateMemeOptions() => Options ??= new MemeOptions();
 }
 
 public class MemeOptions
@@ -30,6 +30,7 @@ public class MemeOptions
     [JsonProperty] public string? Dg   { get; set; }
     [JsonProperty] public string? Snap { get; set; }
     [JsonProperty] public string? Nuke { get; set; }
+    [JsonProperty] public string? Auto { get; set; }
 
     public string? this [MemeType type]
     {
@@ -40,7 +41,7 @@ public class MemeOptions
             MemeType.Dg   => Dg,
             MemeType.Dp   => Dp,
             MemeType.Snap => Snap,
-            _             => Nuke,
+            _             => Auto,
         };
         set
         {
@@ -49,7 +50,7 @@ public class MemeOptions
             else if (type is MemeType.Dp  ) Dp   = value;
             else if (type is MemeType.Dg  ) Dg   = value;
             else if (type is MemeType.Snap) Snap = value;
-            else                            Nuke = value;
+            else                            Auto = value;
         }
     }
 
@@ -59,5 +60,6 @@ public class MemeOptions
      && Dp   is null
      && Dg   is null
      && Snap is null
-     && Nuke is null;
+     && Nuke is null
+     && Auto is null;
 }

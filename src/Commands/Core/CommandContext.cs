@@ -12,15 +12,15 @@ public class CommandContext
     public long    Chat         { get; }
     public int?    Thread       { get; }
     public string  Title        { get; }
-    public string? Text         { get; }
+    public string? Text         { get; private set; }
     /// <summary> Lowercase command with "/" symbol and bot username removed. </summary>
-    public string? Command      { get; }
+    public string? Command      { get; private set; }
     /// <summary> All text excluding the command and the following " " or "\n". </summary>
-    public string? Args         { get; }
+    public string? Args         { get; private set; }
     /// <summary> Whether THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
-    public bool    IsForMe      { get; }
+    public bool    IsForMe      { get; private set; }
     /// <summary> Whether SOME bot was mentioned in the command explicitly. </summary>
-    public bool    BotMentioned { get; }
+    public bool    BotMentioned { get; private set; }
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
 
@@ -44,14 +44,21 @@ public class CommandContext
         Message = message;
         Chat = message.Chat.Id;
         Title = message.GetChatTitle();
-        Text = message.GetTextOrCaption();
-
         Thread = message.IsAutomaticForward // channel post
             ? message.Id
             : message.IsTopicMessage        // forum thread message
                 ? message.MessageThreadId
                 : message.ReplyToMessage?.Id
                ?? message.MessageThreadId;
+
+        SetTextItems(message.GetTextOrCaption());
+    }
+
+    public void ChangeText(string text) => SetTextItems(text);
+
+    private void SetTextItems(string? text)
+    {
+        Text = text;
 
         var match = _command.MatchOrNull(Text);
         if (match is { Success: true })

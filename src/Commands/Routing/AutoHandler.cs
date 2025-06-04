@@ -10,7 +10,10 @@ public static class AutoHandler
 
     private static readonly LimitedCache<long, Dictionary<char, List<(int Percent, string Command)>>> Cache = new(32);
 
-    public static void ClearCache(long chat) => Cache.Add(chat, []);
+    public static void ClearCache(long chat)
+    {
+        if (Cache.Contains(chat, out var dictionary)) dictionary.Clear();
+    }
 
     public static string? TryGetMessageHandler(WitlessContext context, ChatSettings data)
     {
@@ -26,7 +29,13 @@ public static class AutoHandler
             var handler = handlers[type].FirstOrDefault(x => LuckyFor(x.Percent));
             if (handler != default && MessageMatches(type, context.Message))
             {
-                return handler.Command;
+                if (type is not 'u')
+                    return handler.Command;
+
+                var split = handler.Command.SplitN(2);
+                var command = split[0];
+                var args = split.Length > 1 ? split[1] : null;
+                return $"{command} {GetURL(context.Message)} {args}"; // e.g. /cut URL 300
             }
         }
 
@@ -79,7 +88,6 @@ public static class AutoHandler
     {
         return message.Video     != null
             || message.VideoNote != null
-            || message.HasVideoSticker()
             || message.HasVideoDocument();
     }
 
@@ -93,6 +101,7 @@ public static class AutoHandler
     private static bool CheckGIF(Message message)
     {
         return message.Animation != null
+            || message.HasVideoSticker()
             || message.HasAnimeDocument();
     }
 
@@ -105,5 +114,12 @@ public static class AutoHandler
     private static bool CheckSticker(Message message)
     {
         return message.HasImageSticker();
+    }
+
+    private static string GetURL(Message message)
+    {
+        var text = message.GetTextOrCaption()!;
+        var url  = message.GetURL()!;
+        return text.Substring(url.Offset, url.Length);
     }
 }

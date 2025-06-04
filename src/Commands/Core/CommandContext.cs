@@ -51,12 +51,10 @@ public class CommandContext
                 : message.ReplyToMessage?.Id
                ?? message.MessageThreadId;
 
-        SetTextItems(message.GetTextOrCaption());
+        UseText(message.GetTextOrCaption());
     }
 
-    public void ChangeText(string text) => SetTextItems(text);
-
-    private void SetTextItems(string? text)
+    public void UseText(string? text)
     {
         Text = text;
 

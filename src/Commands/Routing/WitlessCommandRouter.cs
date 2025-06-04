@@ -133,7 +133,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
     private void AutoHandleCommand(ChatSettings settings, string command)
     {
-        Context.ChangeText(command);
+        Context.UseText(command);
         Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
         var funcS = _parent.SimpleCommands.Resolve(Command);

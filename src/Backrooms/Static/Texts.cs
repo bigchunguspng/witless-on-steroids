@@ -21,7 +21,8 @@ public static class Texts
         <code>/set D </code> - демотиваторы👌
         <code>/set Dg</code> - демотиваторы💀
         <code>/set S </code> - снапчаты 😭
-        <code>/set N </code> - ядерный фритюр 🍤</blockquote>
+        <code>/set N </code> - ядерный фритюр 🍤
+        <code>/set A </code> - авто-обработка 🍤</blockquote>
 
         ⚙️ <u><b>Авто-опции</b></u>:
 
@@ -32,7 +33,8 @@ public static class Texts
         <code>/set D imup</code>
         <code>/set Dg xllro-b</code>
         <code>/set S !!80%*85</code>
-        <code>/set N =3</code></blockquote>
+        <code>/set N =3</code>
+        <code>/set A u:song; psg:meme</code></blockquote>
 
         <code>/set [код] ?</code> - узнать 👁
         <code>/set [код] 0</code> - сбросить ❌
@@ -202,30 +204,6 @@ public static class Texts
         <code>A </code> → <b>авто-обработка</b>
         """;
 
-    public const string SET_AUTO_HANDLER_MANUAL =
-        """
-        <u><b>Синтаксис установки авто-обработки</b></u>:
-
-        <code>/set a [types][%]:[command][options] [args][;]</code>
-        <code>/set a ?</code> - узнать 👁
-        <code>/set a 0</code> - сбросить ❌
-
-        <b>Типы:</b>
-        <code>p</code> = photo 📸
-        <code>v</code> = video 🎬
-        <code>a</code> = audio 🎧
-        <code>g</code> = GIF 🎬🔇
-        <code>u</code> = URL 📎
-        <code>s</code> = sticker 💯
-
-        <blockquote><b>Примеры:</b>
-        <code>/set a u:songcs
-        /set a u:songcs; p:crop 1280 720; s:im cc:16! .
-        /set a psg:meme; v:scale 0.25
-        /set a p:meme; s:nuke; g:dg
-        /set a psg50%:meme; psg25%:top; psg25%:dp;</code></blockquote>
-        """;
-
     public const string SET_MEMES_RESPONSE =
         "Картинки будут превращаться в {0}";
 
@@ -370,7 +348,13 @@ public static class Texts
         """
         Активировано режим <b>авто-обработки</b>
         
-        Установите авто-обработчик командой <code>/set</code>
+        {0}
+        """;
+
+    public const string SET_AUTO_HANDLER_EMPTY_TIP =
+        """
+        ⚠️ Чтобы всё работало, установите авто-обработчик
+        📖 Гайд по авто-обработке: /man_341
         """;
 
     public const string SET_AUTO_HANDLER_OPTIONS_RESPONSE =
@@ -379,6 +363,9 @@ public static class Texts
 
         <code>{0}</code>
         """;
+
+    public const string SET_AUTO_HANDLER_OPTIONS_CLEAR_RESPONSE =
+        "<b>Авто-обработчик</b> сброшен";
 
     public const string DP_OPTIONS =
         """

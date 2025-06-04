@@ -48,9 +48,15 @@ namespace Witlesss.Commands
                 if (IsNotNull(Data.Options.Dp  )) AppendOptions("/dp",            Data.Options.Dp  );
                 if (IsNotNull(Data.Options.Dg  )) AppendOptions("/dg",            Data.Options.Dg  );
                 if (IsNotNull(Data.Options.Nuke)) AppendOptions("/nuke",          Data.Options.Nuke);
-                if (IsNotNull(Data.Options.Auto)) AppendOptions("авто-обработка", Data.Options.Auto);
 
                 if (anyOptions) sb.Append(optionsBuilder);
+
+                if (Data.Options.Auto != null)
+                {
+                    var onOff = Data.Type == MemeType.Auto ? "ВКЛ" : "ВЫКЛ";
+                    sb.Append("\n\n<u>Авто-обработка</u> (").Append(onOff).Append("):");
+                    sb.Append("<blockquote expandable><code>").Append(Data.Options.Auto).Append("</code></blockquote>");
+                }
 
                 // ==
 

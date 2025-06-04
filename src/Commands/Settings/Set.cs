@@ -11,7 +11,7 @@ namespace Witlesss.Commands.Settings
         private readonly Regex _d = new("^[dд]");
         private readonly Regex _s = new("^[sс]");
         private readonly Regex _n = new("^[nн]");
-        private readonly Regex _u = new("^[aа]");
+        private readonly Regex _a = new("^[aа]");
 
         protected override void RunAuthorized()
         {
@@ -25,7 +25,7 @@ namespace Witlesss.Commands.Settings
                 else if (_d.IsMatch(w)) Set(MemeType.Dp,   "/dp"  );
                 else if (_s.IsMatch(w)) Set(MemeType.Snap, "/snap");
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
-                else if (_u.IsMatch(w)) Set(MemeType.Auto, "*");
+                else if (_a.IsMatch(w)) Set(MemeType.Auto, "*");
                 else Bot.SendMessage(Origin, string.Format(SET_MEME_TYPE_MANUAL, w));
 
                 void Set(MemeType type, string command)
@@ -37,37 +37,20 @@ namespace Witlesss.Commands.Settings
                             ? "А НЕТУ!!!"
                             : $"<code>{commandOptions}</code>";
                         var message = command == "*"
-                            ? $"Опции команды <b>{command}</b>: {options}"
-                            : $"Опции авто-обработки: {options}";
+                            ? $"Текущий авто-обработчик: {options}"
+                            : $"Опции команды <b>{command}</b>: {options}";
                         Bot.SendMessage(Origin, message.XDDD());
                     }
                     else if (args.Length > 1 && command == "*") // /set a p:scale 0.5; v:nuke; a:peg rip! 3; u:songcs
                     {
-                        var args_ = Args.SplitN(2);
-                        if (args_.Length < 2)
-                        {
-                            Bot.SendMessage(Origin, SET_AUTO_HANDLER_MANUAL);
-                            return;
-                        }
-
                         AutoHandler.ClearCache(Origin.Chat);
 
-                        var result = args_[1] == "0"
-                            ? null
-                            : args_[1];
-                        Data.GetOrCreateMemeOptions()[type] = result;
-                        if (result is null && (Data.Options?.IsEmpty() ?? false)) Data.Options = null;
-                        result ??= "😴";
+                        var result = SetOrClearOptions(type, Args.SplitN(2));
                         ReportAutoHandlerSet(result);
                     }
                     else if (args.Length > 1) // /set m largmm!!420"!!
                     {
-                        var result = args[1] == "0" 
-                            ? null 
-                            : args[1];
-                        Data.GetOrCreateMemeOptions()[type] = result;
-                        if (result is null && (Data.Options?.IsEmpty() ?? false)) Data.Options = null;
-                        result = $"{command}{result}";
+                        var result = $"{command}{SetOrClearOptions(type, args)}";
                         ReportOptionsSet(command, result);
                     }
                     else // /set m
@@ -76,33 +59,59 @@ namespace Witlesss.Commands.Settings
                         ReportTypeSet(command);
                     }
                 }
-
-                void ReportTypeSet(string command)
-                {
-                    ChatService.SaveChatsDB();
-                    var message = command == "*"
-                        ? SET_AUTO_HANDLER_RESPONSE
-                        : string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]);
-                    Bot.SendMessage(Origin, message.XDDD());
-                    Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
-                }
-
-                void ReportOptionsSet(string command, string result)
-                {
-                    ChatService.SaveChatsDB();
-                    Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
-                    Log($"{Title} >> MEMES OPTIONS >> {result}");
-                }
-                
-                void ReportAutoHandlerSet(string handler)
-                {
-                    ChatService.SaveChatsDB();
-                    Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());
-                    Log($"{Title} >> AUTO HANDLER SET >> {handler}");
-                }
             }
             else
                 Bot.SendMessage(Origin, SET_MANUAL);
+        }
+        
+        private string? SetOrClearOptions(MemeType type, string[] args)
+        {
+            var result = args[1] == "0"
+                ? null
+                : args[1];
+            Data.GetOrCreateMemeOptions()[type] = result;
+            if (result is null && (Data.Options?.IsEmpty() ?? false)) Data.Options = null;
+            return result;
+        }
+
+        private void ReportTypeSet(string command)
+        {
+            ChatService.SaveChatsDB();
+            var message = command == "*"
+                ? string.Format(SET_AUTO_HANDLER_RESPONSE, GetAutoHandlerTip())
+                : string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]);
+            Bot.SendMessage(Origin, message.XDDD());
+            Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
+        }
+
+        private string GetAutoHandlerTip()
+        {
+            var options = Data.Options?.Auto;
+            return options != null
+                ? $"Текущий авто-обработчик:\n<code>{options}</code>"
+                : SET_AUTO_HANDLER_EMPTY_TIP;
+        }
+
+        private void ReportOptionsSet(string command, string result)
+        {
+            ChatService.SaveChatsDB();
+            Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
+            Log($"{Title} >> MEMES OPTIONS >> {result}");
+        }
+                
+        private void ReportAutoHandlerSet(string? handler)
+        {
+            ChatService.SaveChatsDB();
+            if (handler != null)
+            {
+                Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());
+                Log($"{Title} >> AUTO HANDLER SET >> {handler}");
+            }
+            else
+            {
+                Bot.SendMessage(Origin, SET_AUTO_HANDLER_OPTIONS_CLEAR_RESPONSE.XDDD());
+                Log($"{Title} >> AUTO HANDLER CLEAR");
+            }
         }
     }
 }

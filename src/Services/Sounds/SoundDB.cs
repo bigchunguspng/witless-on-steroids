@@ -32,7 +32,7 @@ public class SoundDB
             _sounds.Add((args[0], args[1], args[2], args[2].ToLower()));
         }
 
-        Log($"[SoundDB] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: 11);
+        Log($"[SoundDB] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: LogColor.Yellow);
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
@@ -49,7 +49,7 @@ public class SoundDB
         {
             writer.WriteLine($"{sound.Id} {sound.FileId} {sound.Text}");
         }
-        Log($"[SoundDB] >> ADDED {_sounds.Count - skip} SOUNDS", color: 10);
+        Log($"[SoundDB] >> ADDED {_sounds.Count - skip} SOUNDS", color: LogColor.Lime);
     }
 
     // SEARCH
@@ -114,7 +114,7 @@ public class SoundDB
             {
                 var voice = await UploadFile(file, Config.SoundChannel);
                 buffer.Add((voice.FileUniqueId, voice.FileId, text, text.ToLower()));
-                Log($"[SoundDB] << {++count, 3} / {total} {voice.FileUniqueId}", color: 11);
+                Log($"[SoundDB] << {++count, 3} / {total} {voice.FileUniqueId}", color: LogColor.Yellow);
 
                 if (count % 10 == 0) SaveData(buffer);
             }

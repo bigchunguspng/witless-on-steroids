@@ -13,18 +13,15 @@ namespace Witlesss.Services.Technical
             Console.ResetColor();
         }
 
-        public static void LogError(string message) => Log(message, LogLevel.Error, 1);
-        public static void LogDebug(string message) => Log(message, LogLevel.Debug, 8);
+        public static void LogError(string message) => Log(message, LogLevel.Error, LogColor.Maroon);
+        public static void LogDebug(string message) => Log(message, LogLevel.Debug, LogColor.Grey);
 
-        /// <summary>
-        /// Color to number <a href='https://spectreconsole.net/appendix/colors'>cheat sheet</a>
-        /// </summary>
-        public static void Log(string message, LogLevel level = LogLevel.Info, int color = 7)
+        public static void Log(string message, LogLevel level = LogLevel.Info, LogColor color = LogColor.Silver)
         {
             var c = GetLevelChar (level);
             var s = GetLevelColor(level);
             var m = message.EscapeMarkup();
-            AnsiConsole.MarkupLine($"[8]{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}[/] [{s}]{c}[/] [{color}]{m}[/]");
+            AnsiConsole.MarkupLine($"[8]{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}[/] [{(int)s}]{c}[/] [{color}]{m}[/]");
         }
 
         private static char GetLevelChar(LogLevel level) => level switch
@@ -35,12 +32,12 @@ namespace Witlesss.Services.Technical
             _              => '?'
         };
 
-        private static int GetLevelColor(LogLevel level) => level switch
+        private static LogColor GetLevelColor(LogLevel level) => level switch
         {
-            LogLevel.Debug => 3,
-            LogLevel.Info  => 7,
-            LogLevel.Error => 9,
-            _              => 7
+            LogLevel.Debug => LogColor.Olive,
+            LogLevel.Info  => LogColor.Silver,
+            LogLevel.Error => LogColor.Red,
+            _              => LogColor.Silver
         };
     }
 
@@ -49,5 +46,21 @@ namespace Witlesss.Services.Technical
         Debug,
         Info,
         Error
+    }
+
+    /// <summary>
+    /// See <a href='https://spectreconsole.net/appendix/colors'>cheat sheet</a>
+    /// </summary>
+    public enum LogColor
+    {
+        Maroon   =  1,
+        Olive    =  3,
+        Silver   =  7,
+        Grey     =  8,
+        Red      =  9,
+        Lime     = 10,
+        Yellow   = 11,
+        Blue     = 12,
+        Fuchsia  = 13,
     }
 }

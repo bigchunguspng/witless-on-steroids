@@ -29,7 +29,7 @@ public class KillProcess : AsyncCommand
                 await Task.Delay(100);
             }
 
-            Log($"{Title} >> KILL {name.ToUpper()}", color: 11);
+            Log($"{Title} >> KILL {name.ToUpper()}", color: LogColor.Yellow);
             process.Kill();
             Bot.SendSticker(Origin, OK.PickAny());
         }

@@ -37,7 +37,7 @@ namespace Witlesss.Commands.Packing
                 else
                 {
                     Baka.Baka.DB = new GenerationPack();
-                    Log($"{Title} >> DIC CLEARED!", LogLevel.Info, 13);
+                    Log($"{Title} >> DIC CLEARED!", LogLevel.Info, LogColor.Fuchsia);
                     Baka.Save();
 
                     var result = _public ? "опубликовано" : "сохранено";
@@ -72,7 +72,7 @@ namespace Witlesss.Commands.Packing
             File.Copy(PackPath, path);
 
             var result = Path.GetFileNameWithoutExtension(path);
-            Log($"{Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, 13);
+            Log($"{Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, LogColor.Fuchsia);
             return result;
         }
 

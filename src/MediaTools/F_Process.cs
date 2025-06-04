@@ -56,7 +56,7 @@ public partial class F_Process
             await queue.Enqueue(() =>
             {
 #if DEBUG
-                Log($"[FFMPEG] >> ffmpeg {args}", LogLevel.Debug, 3);
+                Log($"[FFMPEG] >> ffmpeg {args}", LogLevel.Debug, LogColor.Olive);
 #endif
                 KillProcessIfStuck();
                 return Task.Run(async () =>

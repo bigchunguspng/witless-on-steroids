@@ -192,7 +192,7 @@ namespace Witlesss.Commands.Packing
 
         protected static void SaveChanges(CopypasterProxy baka, string title)
         {
-            Log($"{title} >> FUSION DONE", LogLevel.Info, 13);
+            Log($"{title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
             baka.Save();
         }
 

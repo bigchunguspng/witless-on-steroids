@@ -79,5 +79,5 @@ public class Spam : SyncCommand
         }));
     }
 
-    private static void LogSpam(long chat) => Log($"SPAM >> {chat}", LogLevel.Info, 11);
+    private static void LogSpam(long chat) => Log($"SPAM >> {chat}", LogLevel.Info, LogColor.Yellow);
 }

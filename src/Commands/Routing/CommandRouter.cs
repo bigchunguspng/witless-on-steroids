@@ -125,7 +125,7 @@ namespace Witlesss.Commands.Routing
                 Telemetry.LogCommand(Context.Chat, Context.Text);
 
                 ChatService.SaveChatsDB();
-                Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, 13);
+                Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
                 Bot.SendMessage(Origin, START_RESPONSE);
             }
             return success;

@@ -41,7 +41,7 @@ public class RunProcess : AsyncCommand
             sb.Append("<pre>").Append(HtmlText.Escape(stderr)).Append("</pre>");
         }
 
-        Log($"{Title} >> RUN {exe.ToUpper()} {args}", color: 11);
+        Log($"{Title} >> RUN {exe.ToUpper()} {args}", color: LogColor.Yellow);
         Bot.SendMessage(Origin, sb.ToString());
     }
 }

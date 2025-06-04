@@ -21,7 +21,7 @@ namespace Witlesss.Commands.Packing
             ChatService.SaveChatsDB();
             ChatService.DeletePack(Chat);
 
-            Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, 13);
+            Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
             Bot.SendMessage(Origin, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
         }
 

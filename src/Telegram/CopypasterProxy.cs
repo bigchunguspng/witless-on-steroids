@@ -89,7 +89,7 @@ namespace Witlesss.Telegram
         {
             JsonIO.SaveData(Baka.DB, FilePath);
             ResetState();
-            Log($"DIC SAVE << {Chat}", LogLevel.Info, 10);
+            Log($"DIC SAVE << {Chat}", LogLevel.Info, LogColor.Lime);
         }
 
         private void ResetState()

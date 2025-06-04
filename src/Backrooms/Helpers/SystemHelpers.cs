@@ -24,7 +24,7 @@ public static class SystemHelpers
         var process = new Process { StartInfo = startInfo };
 
 #if DEBUG
-        Log($"[{exe.ToUpper()}] >> {args}", LogLevel.Debug, 3);
+        Log($"[{exe.ToUpper()}] >> {args}", LogLevel.Debug, LogColor.Olive);
 #endif
 
         process.Start();

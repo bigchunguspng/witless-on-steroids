@@ -43,6 +43,12 @@ namespace Witlesss.Commands.Settings
                     }
                     else if (args.Length > 1) 
                     {
+                        if (args[0].Contains('!'))
+                        {
+                            Data.Type = type;
+                            ReportTypeSet(command);
+                        }
+
                         if (command == "*") // /set a p:scale 0.5; v:nuke; a:peg rip! 3; u:songcs
                         {
                             AutoHandler.ClearCache(Origin.Chat);
@@ -66,11 +72,11 @@ namespace Witlesss.Commands.Settings
             else
                 Bot.SendMessage(Origin, SET_MANUAL);
         }
-        
+
         private string? SetOrClearOptions(MemeType type, string[] args)
         {
-            var add = args[0].EndsWith('+');
-            var rem = args[0].EndsWith('-');
+            var add = args[0].Contains('+');
+            var rem = args[0].Contains('-');
 
             var result = args[1] == "0" ? null
                 : add ? $"{Data.GetOrCreateMemeOptions()[type]}{args[1]}"

@@ -40,6 +40,9 @@ public static class Texts
         <code>/set [код] 0</code> - сбросить ❌
         <code>/set [код]+ [опции]</code> - добавить
         <code>/set [код]- [опции]</code> - убрать
+
+        👌 <u><b>Тип и опции сразу</b></u>:
+        <code>/set [код]! [опции]</code>
         """;
 
     public const string FUSE_MANUAL =

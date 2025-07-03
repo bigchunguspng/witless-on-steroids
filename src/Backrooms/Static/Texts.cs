@@ -22,7 +22,7 @@ public static class Texts
         <code>/set Dg</code> - демотиваторы💀
         <code>/set S </code> - снапчаты 😭
         <code>/set N </code> - ядерный фритюр 🍤
-        <code>/set A </code> - авто-обработка 🍤</blockquote>
+        <code>/set A </code> - авто-обработка 👾</blockquote>
 
         ⚙️ <u><b>Авто-опции</b></u>:
 

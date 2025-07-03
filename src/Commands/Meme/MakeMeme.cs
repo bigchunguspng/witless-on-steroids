@@ -29,7 +29,9 @@ namespace Witlesss.Commands.Meme
         protected override Task Run() => RunInternal("meme");
 
         protected override bool ResultsAreRandom
-            => MemeGenerator.RandomTextColor || MemeGenerator.FontWizard.UseRandom;
+            => MemeGenerator.RandomTextColor
+            || MemeGenerator.FontWizard.UseRandom
+            || Check(Request, _add_bottom) && !Args!.Contains('\n');
 
         protected override void ParseOptions()
         {

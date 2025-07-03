@@ -2,6 +2,7 @@
 using Witlesss.Commands.Meme.Core;
 using Witlesss.Memes;
 using Witlesss.Memes.Shared;
+using static Witlesss.Backrooms.Helpers.OptionsParsing;
 using static Witlesss.Commands.Meme.Demotivate.Mode;
 
 namespace Witlesss.Commands.Meme
@@ -27,7 +28,10 @@ namespace Witlesss.Commands.Meme
 
         protected override Task Run() => RunInternal("dg");
 
-        protected override bool ResultsAreRandom => DemotivatorDrawer.AddLogo || RandomFontIsUsed;
+        protected override bool ResultsAreRandom
+            => DemotivatorDrawer.AddLogo
+            || RandomFontIsUsed
+            || !Check(Request, _one_line) && !Args!.Contains('\n');
 
         private bool RandomFontIsUsed
             => _mode == Wide
@@ -39,7 +43,7 @@ namespace Witlesss.Commands.Meme
 
         protected override void ParseOptions()
         {
-            DemotivatorDrawer.SingleLine = OptionsParsing.CheckAndCut(Request, _one_line);
+            DemotivatorDrawer.SingleLine = CheckAndCut(Request, _one_line);
 
             if (_mode == Wide)
             {
@@ -55,7 +59,7 @@ namespace Witlesss.Commands.Meme
                 DemotivatorDrawer.FontWizardB.CheckAndCut(Request);
             }
 
-            DemotivatorDrawer.AddLogo = !OptionsParsing.Check(Request, _no_logo);
+            DemotivatorDrawer.AddLogo = !Check(Request, _no_logo);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -86,7 +90,7 @@ namespace Witlesss.Commands.Meme
                 }
             }
 
-            var capitalize = OptionsParsing.CheckCaps(Request, _caps, generate);
+            var capitalize = CheckCaps(Request, _caps, generate);
             if (capitalize) a = a.InLetterCase(LetterCase.Upper);
 
             return new TextPair(a, b);

@@ -30,6 +30,8 @@ public partial class F_Process
         return this;
     }
 
+    public string ArgumentsText => Arguments.Text;
+
     public Task<string> OutAs(string path)
         => Cook(path);
 

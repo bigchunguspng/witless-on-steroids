@@ -16,7 +16,7 @@ namespace Witlesss.Telegram
 
         public static void LaunchInstance(string? args)
         {
-            new Bot(args != null ? new Skip() : new CommandRouter()).Run(listen: args != "!");
+            new Bot(args == null ? new CommandRouter() : new Skip()).Run(listen: args != "!");
         }
 
         private Bot(CommandAndCallbackRouter command)

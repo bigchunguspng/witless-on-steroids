@@ -151,6 +151,16 @@ public static partial class Extensions
         return message?.Audio?.FileName ?? message?.Document?.FileName;
     }
 
+    public static string GetAnimationNameOr(this Message message, string text)
+    {
+        return message.GetAnimationName() ?? message.ReplyToMessage.GetAnimationName() ?? text;
+    }
+
+    private static string? GetAnimationName(this Message? message)
+    {
+        return message?.Animation?.FileName ?? message?.Document?.FileName;
+    }
+
     public static bool ChatIsNotPrivate(this long chatId) => chatId < 0;
 
     public static (int width, int height) TryGetSize(this FileBase file)

@@ -189,7 +189,8 @@ public static class Texts
         /pp - packs info (full)
         /cc - clear temp files
 
-        /up - upload sounds [path]
+        /ups - upload sounds [path]
+        /upg - upload GIFs   [path]
 
         +55 - select active chat
 
@@ -840,9 +841,16 @@ public static class Texts
         Не могу найти ярлык "<code>{0}</code>" {1}
         """;
 
-    public const string FILE_UPLOADED =
+    public const string SOUND_UPLOADED =
         """
         🎙 Файл сохранён как:
+
+        <code>{0}</code>
+        """;
+
+    public const string GIF_UPLOADED =
+        """
+        📹 Файл сохранён как:
 
         <code>{0}</code>
         """;

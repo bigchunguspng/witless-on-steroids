@@ -61,8 +61,9 @@ namespace Witlesss
             else if (_input == "/db") DeleteBlockers();
             else if (_input == "/DB") DeleteBlocker();
             else if (_input == "/ds") DeleteBySize();
-            else if (_input.StartsWith("/up") && _input.Contains(' ')) UploadSounds(_input.Split(' ', 2)[1]);
-            else if (_input.StartsWith("/ds") && _input.HasIntArgument(out var size)) DeleteBySize(size);
+            else if (_input.StartsWith("/ups") && _input.Contains(' ')) UploadSounds(_input.Split(' ', 2)[1]);
+            else if (_input.StartsWith("/upg") && _input.Contains(' ')) UploadGIFs  (_input.Split(' ', 2)[1]);
+            else if (_input.StartsWith("/ds")  && _input.HasIntArgument(out var size)) DeleteBySize(size);
         }
 
         private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
@@ -147,5 +148,6 @@ namespace Witlesss
         }
 
         private void UploadSounds(string path) => Task.Run(() => SoundDB.Instance.UploadMany(path));
+        private void UploadGIFs  (string path) => Task.Run(() => GIF_DB .Instance.UploadMany(path));
     }
 }

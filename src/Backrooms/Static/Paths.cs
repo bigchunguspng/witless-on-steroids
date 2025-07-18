@@ -32,7 +32,7 @@ namespace Witlesss.Backrooms.Static;
         Board/
             2024-08-21 a.270089129.json [list]  <-- /boards info
 
-        log.txt
+        GIFs.txt
         sounds.txt
 
     Pics/
@@ -54,6 +54,7 @@ namespace Witlesss.Backrooms.Static;
         voice.ogg
 
     config.txt
+    log.txt
     reddit-posts.json
 */
 
@@ -75,6 +76,7 @@ public static class Paths
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
     public static string Dir_Plank   { get; } = Path.Combine(Dir_DB, "Plank");
     public static string File_Sounds { get; } = Path.Combine(Dir_DB, "sounds.txt");
+    public static string File_GIFs   { get; } = Path.Combine(Dir_DB, "GIFs.txt");
 
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");

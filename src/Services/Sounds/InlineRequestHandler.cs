@@ -8,7 +8,7 @@ namespace Witlesss.Services.Sounds;
 public class InlineRequestHandler
 {
     private readonly Regex _gif_mode = new(@"^[g!*.@гж](?=[\s]|$)");
-    private readonly Regex _caption  = new(@"^(.*)\|\s?(.*)$");
+    private readonly Regex _caption  = new(@"^(.*?)\|\s?(.*)$");
 
     // @bot [g!*.@гж] query[|caption]
 

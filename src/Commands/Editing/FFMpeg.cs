@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing;
 
 public class FFMpeg : AudioVideoPhotoCommand
 {
-    protected override string SyntaxManual => "/man_44";
+    protected override string SyntaxManual => $"/man_44\n{ALIAS_INFO}/apeg_info";
 
     // /peg  [options]      [extension]
     // /pegv [videofilters] [extension]

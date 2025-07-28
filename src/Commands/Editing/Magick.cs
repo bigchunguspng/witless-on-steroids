@@ -6,7 +6,7 @@ namespace Witlesss.Commands.Editing;
 
 public class Magick : PhotoCommand
 {
-    protected override string SyntaxManual => "/man_43";
+    protected override string SyntaxManual => $"/man_43\n{ALIAS_INFO}/aim_info";
 
     private string? MagickCommand;
     private List<string>? Output;

@@ -17,7 +17,7 @@ public abstract class AliasManager : SyncCommand
 
     protected override void Run()
     {
-        if (Args != null && Args.EndsWith("info"))
+        if (Args != null && Args.EndsWith("info") || Command != null && Command.StartsWith($"/a{CMD}_info"))
         {
             SendAliasList(new ListPagination(Origin, PerPage: 10));
         }

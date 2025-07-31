@@ -93,6 +93,8 @@ public class WitlessCommandRouter : WitlessSyncCommand
         else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
         else TryLuckForFunnyText();
 
+        // LOCALS
+
         void TryLuckForFunnyText()
         {
             if (!LuckyFor(Data.Speech)) return;

@@ -9,7 +9,7 @@ public class RunProcess : AsyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Origin, "LOL XD)0)");
+            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
         }
 

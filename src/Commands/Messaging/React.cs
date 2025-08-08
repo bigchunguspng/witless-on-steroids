@@ -8,7 +8,7 @@ public class React : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Origin, "LOL XD)0)");
+            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
         }
 
@@ -32,5 +32,6 @@ public class React : SyncCommand
         var (chat, message) = args[0].GetChatIdAndMessage();
 
         Bot.ReactAsync(chat, message, reaction);
+        Log($"REACTION >> {chat}", LogLevel.Info, LogColor.Yellow);
     }
 }

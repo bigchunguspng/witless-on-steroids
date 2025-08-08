@@ -161,7 +161,7 @@ public static partial class Extensions
         return message?.Animation?.FileName ?? message?.Document?.FileName;
     }
 
-    public static bool ChatIsNotPrivate(this long chatId) => chatId < 0;
+    public static bool ChatIsPrivate(this long chatId) => chatId > 0;
 
     public static (int width, int height) TryGetSize(this FileBase file)
     {

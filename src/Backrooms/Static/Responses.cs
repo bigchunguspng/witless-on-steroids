@@ -27,6 +27,11 @@ public static class Responses
         "идёт обработка...", "вжжжжж...", "брррррр..."
     ];
 
+    public static readonly string[] FORBIDDEN =
+    [
+        "LOL XD)0)", "KWAB", "bro thinks he's saul 😭😭💀"
+    ];
+
     public static readonly string[] RANDOM_EMOJI =
     [
         "🔥✍️", "🪵", "😈", "😎", "💯", "📦", "⚙", "🪤", "💡", "🧨", "🫗", "🌭", "☝️",

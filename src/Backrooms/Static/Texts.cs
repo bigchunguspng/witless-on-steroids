@@ -855,4 +855,25 @@ public static class Texts
 
         <code>{0}</code>
         """;
+
+    public const string SPAM_MANUAL =
+        """
+        <code>/spam[g/p/aN/sB]? [text|message]</code>
+
+        <u><b>Chat filters</b></u>:
+        <code>g</code> → only <u><b>g</b></u>roups
+        <code>p</code> → only <u><b>p</b></u>rivate chats
+
+        📆 Last <u><b>a</b></u>ctivity, days ago
+        <blockquote><code>a[&gt;|&lt;|&gt;=|&lt;=:]?[int]</code>
+        <i>Examples</i>:
+        - <code>a&lt;30</code> → some activity in last 30 days
+        - <code>a&gt;7 </code> → no activity in last 7 days</blockquote>
+        📦 Pack <u><b>s</b></u>ize, [K|M]B
+        <blockquote><code>s[&gt;|&lt;|&gt;=|&lt;=]?[int][K|M]?</code>
+        <i>Examples</i>:
+        - <code>s&gt;=10M</code> → pack is 10 MB minimum
+        - <code>s&lt;100K</code> → pack is less than 100 KB
+        - <code>s&lt;=34 </code> → pack is 34 bytes (empty)</blockquote>
+        """;
 }

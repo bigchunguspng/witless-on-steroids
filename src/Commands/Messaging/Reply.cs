@@ -1,3 +1,5 @@
+using Telegram.Bot.Types;
+
 namespace Witlesss.Commands.Messaging;
 
 public class Reply : SyncCommand
@@ -6,7 +8,7 @@ public class Reply : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Origin, "LOL XD)0)");
+            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
         }
 
@@ -25,8 +27,14 @@ public class Reply : SyncCommand
             Bot.SendMessage(chat, args[1], preview: true, replyTo: message);
             var chatId = chat.Identifier ?? 0;
             if (chatId != 0 && ChatService.Knowns(chatId)) ChatService.GetBaka(chatId).Eat(args[1]);
+            LogReply(chat);
         }
         else
+        {
             Bot.CopyMessage(chat, Chat, messageToCopy, replyTo: message);
+            LogReply(chat);
+        }
     }
+
+    private static void LogReply(ChatId chat) => Log($"REPLY >> {chat}", LogLevel.Info, LogColor.Yellow);
 }

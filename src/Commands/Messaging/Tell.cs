@@ -8,7 +8,7 @@ public class Tell : SyncCommand
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Origin, "LOL XD)0)");
+            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
         }
 
@@ -27,8 +27,14 @@ public class Tell : SyncCommand
             Bot.SendMessage(chat, args[1], preview: true);
             var chatId = chat.Identifier ?? 0;
             if (chatId != 0 && ChatService.Knowns(chatId)) ChatService.GetBaka(chatId).Eat(args[1]);
+            LogTell(chat);
         }
         else
+        {
             Bot.CopyMessage(chat, Chat, messageToCopy);
+            LogTell(chat);
+        }
     }
+
+    private static void LogTell(ChatId chat) => Log($"TELL >> {chat}", LogLevel.Info, LogColor.Yellow);
 }

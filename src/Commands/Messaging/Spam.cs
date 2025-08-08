@@ -2,13 +2,13 @@
 
 public class Spam : SyncCommand
 {
-    private readonly Regex _days = new(@"a(\d+)"), _size = new(@"s(\d+)");
+    private readonly Regex _days = new(@"a(>|<|>=|<=)?(\d+)"), _size = new(@"s(>|<|>=|<=)?(\d+)([km])?");
 
     protected override void Run()
     {
         if (!Message.SenderIsBotAdmin())
         {
-            Bot.SendMessage(Origin, "LOL XD)0)");
+            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
         }
 
@@ -19,26 +19,32 @@ public class Spam : SyncCommand
 
         if (!textProvided && !copyProvided)
         {
-            var manual =
-                """
-                <code>/spam[g/aN/sB] [text|message]</code>
-
-                <code>g</code> → only to <u><b>g</b></u>roups
-                <code>a</code> → last <u><b>a</b></u>ctivity, days ago
-                <code>s</code> → min pack <u><b>s</b></u>ize, bytes
-                """;
-            Bot.SendMessage(Origin, manual);
+            Bot.SendMessage(Origin, SPAM_MANUAL);
             return;
         }
 
-        var groupsOnly = Command!.Contains('g');
+        var options = Command!.Substring(5);
+        var onlyGroups   = options.Contains('g');
+        var onlyPrivates = options.Contains('p');
 
-        var size = _size.ExtractGroup(1, Command, int.Parse, 00);
-        var days = _days.ExtractGroup(1, Command, int.Parse, 28);
+        var type
+            = onlyGroups   ? GetChatsType.OnlyGroups
+            : onlyPrivates ? GetChatsType.OnlyPrivates
+            :                GetChatsType.All;
+        var matchDays = _days.Match(Command);
+        var matchSize = _size.Match(Command);
+        var daysOperator = matchDays.ExtractGroup(1, s => s);
+        var sizeOperator = matchSize.ExtractGroup(1, s => s);
+        var daysValue    = matchDays.ExtractGroup(2, int.Parse);
+        var sizeValue    = matchSize.ExtractGroup(2, int.Parse);
+        var sizeUnits    = matchSize.ExtractGroup(3, s => s is "k" ? 1024 : s is "m" ? 1024 * 1024 : 1, 1);
+
+        var size = new ComparisonExpression(sizeOperator, sizeValue * sizeUnits);
+        var days = new ComparisonExpression(daysOperator, daysValue);
+        var bakas = GetChats(type, size, days);
 
         var chat = Chat;
         var text = Args!;
-        var bakas = GetChats(size, groupsOnly, TimeSpan.FromDays(days));
 
         if (textProvided) Task.Run(() => SendSpam(bakas, text));
         else              Task.Run(() => CopySpam(bakas, chat, messageId));
@@ -62,7 +68,11 @@ public class Spam : SyncCommand
         }
     }
 
-    private static IEnumerable<long> GetChats(int minSize, bool groupsOnly, TimeSpan lastActivity)
+    private enum GetChatsType { All, OnlyGroups, OnlyPrivates }
+
+    private record ComparisonExpression(string? Operator, int Value);
+
+    private static IEnumerable<long> GetChats(GetChatsType type, ComparisonExpression size, ComparisonExpression days)
     {
         return ChatService.SettingsDB.Do(x => x.Keys.Where(chat =>
         {
@@ -70,9 +80,29 @@ public class Spam : SyncCommand
             if (File.Exists(path))
             {
                 var file = new FileInfo(path);
-                return file.Length >= minSize
-                    && (!groupsOnly || chat.ChatIsNotPrivate())
-                    && file.LastWriteTime.HappenedWithinLast(lastActivity);
+                var typeMathes
+                    = type is GetChatsType.All
+                   || type is GetChatsType.OnlyPrivates &&  chat.ChatIsPrivate()
+                   || type is GetChatsType.OnlyGroups   && !chat.ChatIsPrivate();
+                var sizeMathces = size.Operator switch
+                {
+                    ">"  => file.Length >  size.Value,
+                    "<"  => file.Length <  size.Value,
+                    ">=" => file.Length >= size.Value,
+                    "<=" => file.Length <= size.Value,
+                    _    => true
+                };
+                var timeOfInactivity = DateTime.Now - file.LastWriteTime;
+                var time = TimeSpan.FromDays(days.Value);
+                var daysMatches = days.Operator switch
+                {
+                    ">"  => timeOfInactivity >  time,
+                    "<"  => timeOfInactivity <  time,
+                    ">=" => timeOfInactivity >= time,
+                    "<=" => timeOfInactivity <= time,
+                    _    => true
+                };
+                return typeMathes && sizeMathces && daysMatches;
             }
 
             return false;

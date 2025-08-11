@@ -18,7 +18,7 @@ public partial class IFunnyBrazil
         var pick = PickColor && image != null;
 
         Background = CustomColor.GetColor(image) ?? (pick ? PickColorFromImage(image!) : Color.White);
-        TextBrush  = custom || pick && Background.Rgb.WhiteTextIsBetter() ? _white : _black;
+        TextBrush  = (custom || pick) && Background.Rgb.WhiteTextIsBetter() ? _white : _black;
     }
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)

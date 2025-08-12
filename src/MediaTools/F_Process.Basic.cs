@@ -55,6 +55,16 @@ namespace Witlesss.MediaTools
             o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize).FixPlayback();
         });
 
+        public F_Process ToVideoSize() => ApplyEffects(o =>
+        {
+            var v = GetVideoStream(Input)!;
+            if (v.Width.IsOdd() || v.Height.IsOdd())
+            {
+                var size = new Size(v.Width, v.Height).Ok();
+                o.Resize(size.FitSize().ValidMp4Size().Ok());
+            }
+        });
+
         public F_Process ToSticker(Size size) => ApplyEffects(o => o.Resize(size));
 
         public F_Process Edit(string options) => ApplyEffects(o => o.WithCustomArgument(options));

@@ -13,13 +13,16 @@ public class CorruptImage : PhotoCommand
 
     protected override async Task Execute()
     {
+        var g = Context.Command!.Contains('g');
+
         var path = await DownloadFile();
-        var jpeg = await path.UseFFMpeg(Origin).Out("-jpeg", ".jpg");
+        var process = path.UseFFMpeg(Origin);
+        process = g ? process.ToVideoSize() : process;
+        var jpeg = await process.Out("-jpeg", ".jpg");
 
         _name = jpeg.RemoveExtension();
         _jpegBytes = await System.IO.File.ReadAllBytesAsync(jpeg);
 
-        var g = Context.Command!.Contains('g');
         if (g) await HexVid();
         else   await HexPic();
     }

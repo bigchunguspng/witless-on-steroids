@@ -8,7 +8,7 @@ public class EatBoards : ChanEaterCore
     //      /boards
     //      /boards info  <┬─ SAME
     //      /board  info  <┘
-    //      /board [_/a] [search query]
+    //      /board [_/a](!) [search query]
     //      /board [thread/board/archive]
     //      /board Y-M-D a.N    <- [Y-M-D a.N.json]
 
@@ -83,11 +83,14 @@ public class EatBoards : ChanEaterCore
 
     protected override async Task EatOnlineFind(string[] args)
     {
-        var url = _chan.GetDesuSearchURL(args[0], args[1]);
+        var bySubject = args[0].Contains('!');
+        var url = bySubject
+            ? _chan.GetDesuSearchURLSubject(args[0].Replace("!", ""), args[1])
+            : _chan.GetDesuSearchURLText   (args[0],                  args[1]);
 
         _uri = new Uri(url);
         _name = string.Join('_', args);
-            
+
         var threads = _chan.GetSearchResults(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
 

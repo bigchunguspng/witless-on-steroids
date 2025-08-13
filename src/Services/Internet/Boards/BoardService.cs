@@ -113,14 +113,18 @@ namespace Witlesss.Services.Internet.Boards
             (string url) => GetHrefs(url, ARCHIVE_THREAD);
 
         /// <summary> Returns thread URLs from the first page of https://desuarchive.org search. </summary>
-        /// <param name="url"> use <see cref="GetDesuSearchURL"/> to obtain.</param>
+        /// <param name="url"> use <see cref="GetDesuSearchURLText"/> to obtain.</param>
         public IEnumerable<string> GetSearchResults
             (string url) => GetHrefs(url, SEARCH_THREAD).Select(x => x.Remove(x.LastIndexOf('/')));
 
         /// <param name="place">board code or "_" to searh anywhere</param>
         /// <param name="query">search string</param>
-        public string GetDesuSearchURL
+        public string GetDesuSearchURLText
             (string place, string query) => $"https://desuarchive.org/{place}/search/text/{query}/type/op/";
+
+        /// <inheritdoc cref="GetDesuSearchURLText"/>
+        public string GetDesuSearchURLSubject
+            (string place, string query) => $"https://desuarchive.org/{place}/search/subject/{query}/type/op/";
 
         private IEnumerable<string> GetHrefs
             (string url, string xpath)

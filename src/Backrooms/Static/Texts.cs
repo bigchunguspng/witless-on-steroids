@@ -485,8 +485,9 @@ public static class Texts
         /board https://desuarchive.org/a/thread/273519954</blockquote>
         <blockquote><code>/board [имя сохранёнки]</code>
         /board 2024-12-06 g.103418613</blockquote>
-        <blockquote><code>/board [_/код доски] [запрос]</code>
-        /board a higurashi
+        <blockquote><code>/board [_/код доски](!) [запрос]</code>
+        /board a higurashi ← <i>by text</i>
+        /board a! made in abyss ← <i>by subject</i>
         /board _ hood classic</blockquote>
 
         <code>/boards</code> - список досок 🍀📝
@@ -496,7 +497,7 @@ public static class Texts
     public const string PLANK_MANUAL =
         """
         ⚡️ <b><u>Кормёжка тредами с <a href="https://2ch.hk/">двача</a></u></b>
-        
+
         <b>Синтаксис:</b>
         <blockquote expandable><code>/plank [тред/доска]</code>
         /plank <a href="https://2ch.hk/a/">a</a>
@@ -508,7 +509,7 @@ public static class Texts
         <blockquote><code>/plank [код доски] [запрос]</code>
         /plank a ван пис
         /plank mu рхчп</blockquote>
-        
+
         <code>/planks</code> - список досок ⚡️📝
         <code>/plank info</code> - список сохранёнок 💾📝
         """;

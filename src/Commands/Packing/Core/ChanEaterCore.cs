@@ -183,7 +183,7 @@ public abstract class ChanEaterCore : Fuse
     {
         var (origin, messageId, page, perPage) = pagination;
 
-        var files = GetFilesInfo(ArchivePath).OrderByDescending(x => x.Name).ToArray();
+        var files = GetFilesInfo(ArchivePath).Where(x => x.Length > 2).OrderByDescending(x => x.Name).ToArray();
 
         var paginated = files.Length > perPage;
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;

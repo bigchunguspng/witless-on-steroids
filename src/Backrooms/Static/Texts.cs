@@ -360,8 +360,9 @@ public static class Texts
         """
         ☝️ Отправь это в ответ на любое сообщение ↩️
 
-        <code>/debug </code> - полностью
-        <code>/debug!</code> - коротко (только с файлами)
+        <code>/debug  </code> - полностью
+        <code>/debug! </code> - коротко (только с файлами)
+        <code>/debug !</code> - ???
         """;
 
     public const string DEBUG_EX_MANUAL =

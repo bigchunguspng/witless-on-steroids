@@ -135,13 +135,15 @@ public class DebugMessage : SyncCommand
 
     private string GetGIFs_TagsInfo()
     {
-        var tags = GIF_DB.Instance.GetTopTags(100).Select(x => $"{x.Count}×{x.Tag}");
-        return $"📹 <u>TOP 100 TAGS (GIFs)</u>\n{string.Join(", ", tags)}";
+        var tags = GIF_DB.Instance.GetTopTags(300);
+        var join = string.Join(", ", tags.Select(x => $"{x.Count}×{x.Tag}"));
+        return $"📹 <u>TOP {tags.Count} TAGS (GIFs)</u>\n{join}";
     }
 
     private string GetAudioTagsInfo()
     {
-        var tags = SoundDB.Instance.GetTopTags(100).Select(x => $"{x.Count}×{x.Tag}");
-        return $"🎙 <u>TOP 100 TAGS (Sounds)</u>\n{string.Join(", ", tags)}";
+        var tags = SoundDB.Instance.GetTopTags(300);
+        var join = string.Join(", ", tags.Select(x => $"{x.Count}×{x.Tag}"));
+        return $"🎙 <u>TOP {tags.Count} TAGS (Sounds)</u>\n{join}";
     }
 }

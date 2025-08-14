@@ -13,6 +13,7 @@ namespace Witlesss.Commands.Routing
         private readonly Piece _piece = new();
         private readonly React _react = new();
         private readonly Reply _reply = new();
+        private readonly QueueMessage _que = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
         private readonly AliasFFMpeg _apeg = new();
@@ -75,6 +76,7 @@ namespace Witlesss.Commands.Routing
                 .Register("man"    , () => _help)
                 .Register("re"     , () => _react)
                 .Register("rep"    , () => _reply)
+                .Register("que"    , () => _que)
                 .Register("man_g"    , () => _mail.WithText(G_MANUAL))
                 .Register("man_crop" , () => _mail.WithText(CROP_MANUAL))
                 .Register("man_shake", () => _mail.WithText(SHAKE_MANUAL))

@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Telegram.Bot.Types;
 using Witlesss.Memes.Shared;
 using Witlesss.Services.Internet.Reddit;
+using Witlesss.Services.Sounds;
 
 namespace Witlesss.Commands;
 
@@ -18,8 +19,7 @@ public class DebugMessage : SyncCommand
 
     protected override void Run()
     {
-        var admin = Message.SenderIsBotAdmin();
-        if (admin && Args != null)
+        if (Args != null)
         {
             var response = Args.SplitN(2)[0][0] switch
             {
@@ -27,7 +27,9 @@ public class DebugMessage : SyncCommand
                 'p' => GetPacksInfo(),
                 'r' => GetRedditInfo(),
                 'e' => GetEmojiInfo(),
-                _ => DEBUG_ADMIN_MANUAL,
+                'g' => GetGIFs_TagsInfo(),
+                'a' => GetAudioTagsInfo(),
+                _ => DEBUG_EX_MANUAL,
             };
             Bot.SendMessage(Origin, response);
             return;
@@ -99,7 +101,7 @@ public class DebugMessage : SyncCommand
     }
 
 
-    // ADMIN
+    // EXTENDED
 
     private static string GetResourceUsage()
     {
@@ -129,5 +131,17 @@ public class DebugMessage : SyncCommand
     private string GetEmojiInfo()
     {
         return $"🏀 <u>EMOJI CACHE</u>: {EmojiTool.EmojisCached} шт.";
+    }
+
+    private string GetGIFs_TagsInfo()
+    {
+        var tags = GIF_DB.Instance.GetTopTags(100).Select(x => $"{x.Count}×{x.Tag}");
+        return $"📹 <u>TOP 100 TAGS (GIFs)</u>\n{string.Join(", ", tags)}";
+    }
+
+    private string GetAudioTagsInfo()
+    {
+        var tags = SoundDB.Instance.GetTopTags(100).Select(x => $"{x.Count}×{x.Tag}");
+        return $"🎙 <u>TOP 100 TAGS (Sounds)</u>\n{string.Join(", ", tags)}";
     }
 }

@@ -136,6 +136,29 @@ public abstract class MediaDB<T> where T : FileBase
     /// Uploads file to Telegram server and returns its ID.
     /// </summary>
     protected abstract Task<T> UploadFile(string path, long channel);
+
+
+    // META
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public List<(string Tag, int Count)> GetTopTags(int take)
+    {
+        var tagCounts = new Dictionary<string, int>();
+        foreach (var file in _files)
+        {
+            var tags = file.LowercaseText.Split();
+            foreach (var tag in tags)
+            {
+                if (tagCounts.TryAdd(tag, 1) == false) tagCounts[tag]++;
+            }
+        }
+
+        return tagCounts
+            .OrderByDescending(x => x.Value)
+            .Take(take)
+            .Select(x => (x.Key, x.Value))
+            .ToList();
+    }
 }
 
 public static class MediaExtensions

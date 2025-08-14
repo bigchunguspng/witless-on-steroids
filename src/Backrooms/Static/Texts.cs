@@ -364,7 +364,7 @@ public static class Texts
         <code>/debug!</code> - коротко (только с файлами)
         """;
 
-    public const string DEBUG_ADMIN_MANUAL =
+    public const string DEBUG_EX_MANUAL =
         """
         <code>/debug [code]</code>
 
@@ -372,6 +372,8 @@ public static class Texts
         <code>p</code> → packs info
         <code>r</code> → reddit cache
         <code>e</code> → emoji cache
+        <code>g</code> → top GIF tags
+        <code>a</code> → top audio tags
         """;
 
     public const string SET_MEME_OPS_RESPONSE =

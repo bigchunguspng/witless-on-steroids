@@ -357,7 +357,12 @@ public static class Texts
         """;
 
     public const string DEBUG_MANUAL =
-        "Отправь это в ответ на любое сообщение";
+        """
+        ☝️ Отправь это в ответ на любое сообщение ↩️
+
+        <code>/debug </code> - полностью
+        <code>/debug!</code> - коротко (только с файлами)
+        """;
 
     public const string DEBUG_ADMIN_MANUAL =
         """

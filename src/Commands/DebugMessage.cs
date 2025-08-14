@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,7 +12,9 @@ namespace Witlesss.Commands;
 public class DebugMessage : SyncCommand
 {
     private readonly Regex _jsonFileId   = new(@"""file_id"": ?""(.+?)""");
+    private readonly Regex _jsonFileName = new(@"""file_name"": ?""(.+?)""");
     private readonly Regex _jsonFileSize = new(@"""file_size"": ?(\d+)");
+    private readonly Regex _jsonWH       = new(@"""width"": ?(\d+),\s+?""height"": ?(\d+)");
 
     protected override void Run()
     {
@@ -39,30 +42,38 @@ public class DebugMessage : SyncCommand
 
         var json = JsonSerializer.Serialize(message, _options);
         var id   = _jsonFileId  .Matches(json).LastOrDefault();
+        var name = _jsonFileName.Matches(json).LastOrDefault();
         var size = _jsonFileSize.Matches(json).LastOrDefault();
+        var wh   = _jsonWH      .Matches(json);
         if (Command!.Contains('!') && id is { Success: true } && size is { Success: true })
         {
             var fileId = id.Groups[1].Value;
             var fileSize = long.Parse(size.Groups[1].Value);
-            var text =
-                $"""
-                 {GetFileSizeEmoji(fileSize)} {fileSize.ReadableFileSize()}
-                 <code>{fileId}</code>
-                 """;
-            Bot.SendMessage(Origin, text);
+            var fileName = name?.Groups[1].Value;
+            var resolutions = FormatResolutions(wh);
+
+            var sb = new StringBuilder(GetFileSizeEmoji(fileSize)).Append(' ').Append(fileSize.ReadableFileSize());
+            if (resolutions.Length > 0)
+                sb.Append("\n🎬 ").Append(resolutions);
+            if (fileName != null)
+                sb.Append("\n ✍️ <i>").Append(fileName).Append("</i>");
+            sb.Append("\n<code>").Append(fileId).Append("</code>");
+
+            Bot.SendMessage(Origin, sb.ToString());
             Log($"{Title} >> DEBUG [!]");
-            return;
         }
+        else
+        {
+            var fileName = $"Message-{message.Id}-{message.Chat.Id}.json";
+            var path = Path.Combine(Dir_Temp, fileName);
 
-        var name = $"Message-{message.Id}-{message.Chat.Id}.json";
-        var path = Path.Combine(Dir_Temp, name);
+            Directory.CreateDirectory(Dir_Temp);
+            File.WriteAllText(path, json);
+            using var stream = File.OpenRead(path);
 
-        Directory.CreateDirectory(Dir_Temp);
-        File.WriteAllText(path, json);
-        using var stream = File.OpenRead(path);
-
-        Bot.SendDocument(Origin, InputFile.FromStream(stream, name.Replace("--", "-")));
-        Log($"{Title} >> DEBUG");
+            Bot.SendDocument(Origin, InputFile.FromStream(stream, fileName.Replace("--", "-")));
+            Log($"{Title} >> DEBUG");
+        }
     }
 
     private readonly JsonSerializerOptions _options = new()
@@ -80,6 +91,12 @@ public class DebugMessage : SyncCommand
         > 1024 * 1024 * 1  => "👌",
         _                  => "👍",
     };
+
+    private static string FormatResolutions(MatchCollection matches)
+    {
+        var resolutions = matches.Where(x => x.Success).Select(x => $"{x.Groups[1].Value}x{x.Groups[2].Value}").Distinct();
+        return string.Join(", ", resolutions);
+    }
 
 
     // ADMIN

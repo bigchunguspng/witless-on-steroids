@@ -42,7 +42,7 @@ public class DebugMessage : SyncCommand
             return;
         }
 
-        var json = JsonSerializer.Serialize(message, _options);
+        var json = JsonSerializer.Serialize(message, JsonOptions);
         var id   = _jsonFileId  .Matches(json).LastOrDefault();
         var name = _jsonFileName.Matches(json).LastOrDefault();
         var size = _jsonFileSize.Matches(json).LastOrDefault();
@@ -78,7 +78,7 @@ public class DebugMessage : SyncCommand
         }
     }
 
-    private readonly JsonSerializerOptions _options = new()
+    public static readonly JsonSerializerOptions JsonOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,

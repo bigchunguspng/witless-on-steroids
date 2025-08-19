@@ -1,8 +1,10 @@
-﻿using System.Threading;
+﻿using System.Text.Json;
+using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Witlesss.Commands;
 using Witlesss.Services.Sounds;
 
 namespace Witlesss.Telegram;
@@ -69,7 +71,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            HandleError(e, "Callback");
+            HandleError(e, query, "Callback");
         }
 
         return Task.CompletedTask;
@@ -83,7 +85,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            HandleError(e, "Inline");
+            HandleError(e, inline, "Inline");
         }
     }
 
@@ -95,15 +97,26 @@ public partial class Bot
 
     public static void HandleCommandException(Exception e, CommandContext? context)
     {
-        HandleError(e, context?.Title ?? "[unknown]");
+        HandleError(e, context, context?.Title ?? "[unknown]");
     }
 
-    private static void HandleError(Exception e, string context)
+    private static void HandleError(Exception e, object? context, string title)
     {
-        LogError($"{context} >> BRUH -> {e.GetFixedMessage()}");
+        LogError($"{title} >> BRUH -> {e.GetFixedMessage()}");
         try
         {
-            File.AppendAllText(File_Errors, $"[{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}]\n{e}\n\n");
+            var json = JsonSerializer.Serialize(context, DebugMessage.JsonOptions);
+            var entry =
+                $"""
+                 # [{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}]
+                 ## Error
+                 {e}
+                 ## Context
+                 {json}
+
+
+                 """;
+            File.AppendAllText(File_Errors, entry);
         }
         catch
         {

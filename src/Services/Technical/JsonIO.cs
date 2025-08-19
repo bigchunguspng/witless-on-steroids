@@ -25,7 +25,8 @@ namespace Witlesss.Services.Technical
             var serializer = SerializerDefault;
             using var stream = File.OpenText(path);
             using var reader = new JsonTextReader(stream);
-            return serializer.Deserialize<T>(reader);
+            return serializer.Deserialize<T>(reader)
+                ?? throw new IOException($"Coundn't deserialize an object of type {typeof(T)}");
         }
 
         public static void SaveData<T>(T db, string path, bool indent = false)

@@ -84,11 +84,19 @@ public static class ChatService
 
     private static CopypasterProxy LoadBaka(long chat)
     {
-        var baka = new CopypasterProxy(chat);
-        LoadedBakas.Add(chat, baka);
-        Log($"DIC LOAD >> {chat}", LogLevel.Info, LogColor.Fuchsia);
+        try
+        {
+            var baka = new CopypasterProxy(chat);
+            LoadedBakas.Add(chat, baka);
+            Log($"DIC LOAD >> {chat}", LogLevel.Info, LogColor.Fuchsia);
 
-        return baka;
+            return baka;
+        }
+        catch
+        {
+            LogError($"CAN'T LOAD DIC >> {chat}");
+            throw;
+        }
     }
 
     private static void UnloadBaka(long chat)

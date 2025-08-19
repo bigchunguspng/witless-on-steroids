@@ -69,7 +69,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            LogError($"Callback >> BRUH -> {e.GetFixedMessage()}");
+            HandleError(e, "Callback");
         }
 
         return Task.CompletedTask;
@@ -83,7 +83,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            LogError($"Inline >> BRUH -> {e.GetFixedMessage()}");
+            HandleError(e, "Inline");
         }
     }
 
@@ -95,7 +95,19 @@ public partial class Bot
 
     public static void HandleCommandException(Exception e, CommandContext? context)
     {
-        var title = context?.Title ?? "[unknown]";
-        LogError($"{title} >> BRUH -> {e.GetFixedMessage()}");
+        HandleError(e, context?.Title ?? "[unknown]");
+    }
+
+    private static void HandleError(Exception e, string context)
+    {
+        LogError($"{context} >> BRUH -> {e.GetFixedMessage()}");
+        try
+        {
+            File.AppendAllText(File_Errors, $"[{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}]\n{e}\n\n");
+        }
+        catch
+        {
+            //
+        }
     }
 }

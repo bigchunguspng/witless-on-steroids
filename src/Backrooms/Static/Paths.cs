@@ -54,6 +54,7 @@ namespace Witlesss.Backrooms.Static;
         voice.ogg
 
     config.txt
+    errors.txt
     log.txt
     reddit-posts.json
 */
@@ -65,6 +66,7 @@ public static class Paths
     public const string Prefix_Pack = "pack";
 
     public const string File_Config      = "config.txt";
+    public const string File_Errors      = "errors.txt";
     public const string File_Log         = "log.txt";
     public const string File_RedditPosts = "reddit-posts.json";
 

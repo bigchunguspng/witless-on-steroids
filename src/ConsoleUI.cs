@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Threading;
+using Telegram.Bot;
 using Witlesss.Services.Internet.Reddit;
 using Witlesss.Services.Sounds;
 using Exception = System.Exception;
@@ -19,6 +20,7 @@ namespace Witlesss
 
         public void EnterConsoleLoop()
         {
+            Thread.CurrentThread.Name = "Console UI";
             Console.CancelKeyPress              += (_, _) => SaveAndExit();
             AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
             do

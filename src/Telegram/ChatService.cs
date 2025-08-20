@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Witlesss.Backrooms.Types;
 
 namespace Witlesss.Telegram;
@@ -59,12 +60,30 @@ public static class ChatService
         return LoadedBakas.TryGetValue(chat, out var baka) ? baka : LoadBaka(chat);
     }
 
-    public static async void StartAutoSaveAsync(TimeSpan interval)
+    public static void StartAutoSaveAsync(TimeSpan interval)
+    {
+        var thread = new Thread(() => AutoSaveLoop(interval))
+        {
+            Name = "AutoSave",
+            IsBackground = true
+        };
+
+        thread.Start();
+    }
+
+    private static void AutoSaveLoop(TimeSpan interval)
     {
         while (true)
         {
-            await Task.Delay(interval);
-            PerformAutoSave();
+            Thread.Sleep(interval);
+            try
+            {
+                PerformAutoSave();
+            }
+            catch (Exception e)
+            {
+                LogError($"AUTOSAVE >> FAIL >> {e}");
+            }
         }
     }
 

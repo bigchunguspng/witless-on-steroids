@@ -13,25 +13,25 @@ namespace Witlesss.Backrooms.Static;
                 vintage.txt
             Im/
                 bb.txt
-        Backup/
-            2024-03-14/
-                pack--4147302158.json [pack]
         Chat/
-            chats.json
-            pack--1001699898486.json [pack]     <-- /fuse by id
+            pack--1001699898486.json     [pack] <-- /fuse by id
+        Chat.Backup/
+            2024-03-14/
+                pack--4147302158.json    [pack]
         Fuse/
             -1001541923355/
-                private_3D_AF.json [pack]       <-- /fuse ! info
-            any-name-possible.json [pack]       <-- /fuse   info
+                private_3D_AF.json       [pack] <-- /fuse ! info
+            any-name-possible.json       [pack] <-- /fuse   info
         History/
             -1001541923355/
-                KINGPIN-funny.json [list]       <-- /fuse * info
-            that-funny-file-1.json [list]       <-- /fuse @ info
-        Plank/
-            2024-08-21 a.7819159.json [list]    <-- /planks info
-        Board/
-            2024-08-21 a.270089129.json [list]  <-- /boards info
+                KINGPIN-funny.json       [list] <-- /fuse * info
+            that-funny-file-1.json       [list] <-- /fuse @ info
+        History.Board/
+            2024-08-21 a.270089129.json  [list] <-- /boards info
+        History.Plank/
+            2024-08-21 a.7819159.json    [list] <-- /planks info
 
+        chats.json
         GIFs.txt
         sounds.txt
 
@@ -53,6 +53,9 @@ namespace Witlesss.Backrooms.Static;
         texts.json
         voice.ogg
 
+    Temp/
+        ...
+
     config.txt
     errors.txt
     log.txt
@@ -71,19 +74,18 @@ public static class Paths
     public const string File_RedditPosts = "reddit-posts.json";
 
     public static string Dir_Alias   { get; } = Path.Combine(Dir_DB, "Alias");
-    public static string Dir_Backup  { get; } = Path.Combine(Dir_DB, "Backup");
-    public static string Dir_Board   { get; } = Path.Combine(Dir_DB, "Board");
     public static string Dir_Chat    { get; } = Path.Combine(Dir_DB, "Chat");
+    public static string Dir_Backup  { get; } = Path.Combine(Dir_DB, "Chat.Backup");
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
-    public static string Dir_Plank   { get; } = Path.Combine(Dir_DB, "Plank");
-    public static string File_Sounds { get; } = Path.Combine(Dir_DB, "sounds.txt");
+    public static string Dir_Board   { get; } = Path.Combine(Dir_DB, "History.Board");
+    public static string Dir_Plank   { get; } = Path.Combine(Dir_DB, "History.Plank");
+    public static string File_Chats  { get; } = Path.Combine(Dir_DB, "chats.json");
     public static string File_GIFs   { get; } = Path.Combine(Dir_DB, "GIFs.txt");
+    public static string File_Sounds { get; } = Path.Combine(Dir_DB, "sounds.txt");
 
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");
-
-    public static string File_Chats { get; } = Path.Combine(Dir_Chat, "chats.json");
 
     public static string Dir_ASCII  { get; } = Path.Combine(Dir_Static, "ASCII");
     public static string Dir_Emoji  { get; } = Path.Combine(Dir_Static, "Emoji");

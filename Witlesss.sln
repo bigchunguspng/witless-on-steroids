@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Witlesss", "src\Witlesss.csproj", "{EE94D96B-6E0D-4095-BB6A-C22560E48F85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PF_Bot", "src\PF_Bot\PF_Bot.csproj", "{EE94D96B-6E0D-4095-BB6A-C22560E48F85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

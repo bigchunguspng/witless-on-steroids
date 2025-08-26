@@ -17,10 +17,8 @@ public static class GenerationPackIO
         var temp = path.Replace(Dir_Chat, Dir_Temp);
         Directory.CreateDirectory(Dir_Temp);
 
-        using var fs = new FileStream(temp, FileMode.Create, FileAccess.Write);
-        using var writer = new BinaryWriter(fs);
-        BinarySerialization.Serialize(writer, pack);
-        File.Move(temp, path);
+        SaveAs(pack, temp);
+        File.Move(temp, path, overwrite: true);
     }
 
     public static void SaveAs(GenerationPack pack, string path)

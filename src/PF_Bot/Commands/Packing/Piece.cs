@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Generation;
+using PF_Tools.Copypaster;
+using PF_Tools.Copypaster.Extensions;
 
 namespace PF_Bot.Commands.Packing
 {
@@ -26,11 +28,11 @@ namespace PF_Bot.Commands.Packing
                 var sandwich = $"{url}[+] [*1..{post}]";
                 var chance = Convert.ToInt32(post);
 
-                var cp = new Copypaster();
-                cp.Eat(sandwich, out _, chance);
+                var pack = new GenerationPack();
+                pack.Eat_Advanced(sandwich, out _, chance);
 
                 var path = Move.GetUniqueExtraPackPath(name);
-                JsonIO.SaveData(cp.DB, path);
+                GenerationPackIO.SaveAs(pack, path);
 
                 Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
                 Log($"{Title} >> THE ONE PIECE IS REAL!!!");

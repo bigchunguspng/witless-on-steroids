@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using PF_Tools.Backrooms.Helpers;
 
-namespace PF_Bot.Generation.Pack;
+namespace PF_Tools.Copypaster_Legacy.Pack;
 
 public class TransitionTableConverter : JsonConverter<Dictionary<int, TransitionTable>>
 {

@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Generation.Pack;
+﻿namespace PF_Tools.Copypaster_Legacy.Pack;
 
 public class TransitionTableSingle : TransitionTable // 24B
 {

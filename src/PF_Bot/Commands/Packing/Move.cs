@@ -1,5 +1,5 @@
 ﻿using PF_Bot.Commands.Settings;
-using PF_Bot.Generation.Pack;
+using PF_Tools.Copypaster;
 
 namespace PF_Bot.Commands.Packing
 {
@@ -36,7 +36,7 @@ namespace PF_Bot.Commands.Packing
                 }
                 else
                 {
-                    Baka.Baka.DB = new GenerationPack();
+                    Baka.Baka = new GenerationPack();
                     Log($"{Title} >> DIC CLEARED!", LogLevel.Info, LogColor.Fuchsia);
                     Baka.Save();
 
@@ -48,7 +48,7 @@ namespace PF_Bot.Commands.Packing
 
         private void Publish(string name, string directory, string[] x)
         {
-            var file = Path.Combine(directory, Chat.ToString(), $"{name}.json");
+            var file = Path.Combine(directory, Chat.ToString(), $"{name}.pack");
             if (File.Exists(file) == false)
             {
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
@@ -56,7 +56,7 @@ namespace PF_Bot.Commands.Packing
                 return;
             }
 
-            File.Move(file, UniquePath(directory, $"{name}.json"));
+            File.Move(file, UniquePath(directory, $"{name}.pack"));
             Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
@@ -79,7 +79,7 @@ namespace PF_Bot.Commands.Packing
         public static string GetUniqueExtraPackPath(string name, long chat = 0)
         {
             var path = chat == 0 ? Dir_Fuse : Path.Combine(Dir_Fuse, chat.ToString());
-            return UniquePath(path, $"{name}.json", name is "info" or "his");
+            return UniquePath(path, $"{name}.pack", name is "info" or "his");
         }
     }
 

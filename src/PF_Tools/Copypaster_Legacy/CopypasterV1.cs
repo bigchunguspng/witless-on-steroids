@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using PF_Bot.Generation.Pack;
-using PF_Bot.Generation.Tokens;
+using PF_Tools.Copypaster_Legacy.Pack;
+using PF_Tools.Copypaster_Legacy.Tokens;
 
-namespace PF_Bot.Generation
+namespace PF_Tools.Copypaster_Legacy
 {
-    public class Copypaster
+    public class CopypasterV1
     {
         private const string START = "[S]", END = "[E]";
         private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
@@ -225,7 +225,7 @@ namespace PF_Bot.Generation
                     r -= transition.Chance;
                 }
 
-                LogError("GenerationPack.PickWordID >> UNEXPECTED EXECUTION PATH");
+                throw new Exception("UNEXPECTED EXECUTION PATH");
             }
 
             return fallback;

@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Generation.Pack;
+﻿namespace PF_Tools.Copypaster_Legacy.Pack;
 
 public class TransitionTableLarge : TransitionTable
 {
@@ -22,7 +22,7 @@ public class TransitionTableLarge : TransitionTable
     public float TotalChance { get; private set; }
 
     private void IncreaseTotalChanceBy(float value)
-        => TotalChance = TotalChance.CombineRound(value);
+        => TotalChance = TotalChance.CombineRound(value, 1);
 
     public Transition this[int index]
     {

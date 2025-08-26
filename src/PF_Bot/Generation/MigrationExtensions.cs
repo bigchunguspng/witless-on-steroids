@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using PF_Tools.Copypaster;
 
 namespace PF_Bot.Generation;
@@ -10,21 +11,25 @@ public static class MigrationExtensions
         var options = new EnumerationOptions { RecurseSubdirectories = true };
         foreach (var dir in dirs)
         {
+            Log($"Migrating {dir}");
             var files = Directory.GetFiles(dir, "*.json", options);
             foreach (var file in files)
             {
-                var bakaV1 = JsonIO.LoadData<PF_Bot.Generation.Pack.GenerationPack>(file);
+                var sw = Stopwatch.StartNew();
+
+                var bakaV1 = JsonIO.LoadData<PF_Tools.Copypaster_Legacy.Pack.GenerationPack>(file);
                 var bakaV2 = new GenerationPack();
                 bakaV2.FuseMigrate(bakaV1);
 
-                var newFileName = $"{Path.GetFileNameWithoutExtension(file).Replace("pack-", "")}.bin";
+                var newFileName = $"{Path.GetFileNameWithoutExtension(file).Replace("pack-", "")}.pack";
                 var path = Path.Combine(dir, newFileName);
-                using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
-                using var writer = new BinaryWriter(fs);
+                GenerationPackIO.SaveAs(bakaV2, path);
+                
+                sw.Log($"Migrated {file}");
             }
         }
     }
-    public static void FuseMigrate(this GenerationPack target, Pack.GenerationPack source)
+    public static void FuseMigrate(this GenerationPack target, PF_Tools.Copypaster_Legacy.Pack.GenerationPack source)
     {
         // update vocabulary
         var ids = source.Vocabulary.Select(target.TryAddWord_GetWordId).ToList();

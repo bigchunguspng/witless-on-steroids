@@ -1,6 +1,6 @@
-﻿using PF_Bot.Generation.Pack;
+﻿using PF_Tools.Copypaster_Legacy.Pack;
 
-namespace PF_Bot.Generation.Tokens;
+namespace PF_Tools.Copypaster_Legacy.Tokens;
 
 /// <summary>
 /// Double word token (2 words, 1 space).

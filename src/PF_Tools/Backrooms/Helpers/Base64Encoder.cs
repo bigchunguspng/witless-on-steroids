@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Backrooms.Helpers;
+﻿namespace PF_Tools.Backrooms.Helpers;
 
 /// <summary>
 /// Converts <see cref="int"/> into <see cref="string"/> and back using base 64 number system.

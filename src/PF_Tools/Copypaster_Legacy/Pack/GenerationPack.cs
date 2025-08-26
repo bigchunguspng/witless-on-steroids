@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Generation.Pack;
+﻿namespace PF_Tools.Copypaster_Legacy.Pack;
 
 /// <summary>
 /// Represents a data used for text generation.

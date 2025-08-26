@@ -1,11 +1,11 @@
-﻿namespace PF_Bot.Generation.Pack; // ReSharper disable ReplaceWithPrimaryConstructorParameter
+﻿namespace PF_Tools.Copypaster_Legacy.Pack; // ReSharper disable ReplaceWithPrimaryConstructorParameter
 
 public class TransitionTableDouble(Transition transition) : TransitionTable // 32B
 {
     private Transition _transition1 = transition;
     private Transition _transition2 = Transition.Impossible;
 
-    public float TotalChance => _transition1.Chance.CombineRound(_transition2.Chance);
+    public float TotalChance => _transition1.Chance.CombineRound(_transition2.Chance, 1);
 
     public Transition this[int index]
     {

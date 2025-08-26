@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using PF_Bot.Generation.Pack;
+using PF_Tools.Copypaster_Legacy.Pack;
 
 namespace PF_Bot.Services.Technical
 {

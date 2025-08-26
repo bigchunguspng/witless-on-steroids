@@ -14,14 +14,11 @@ namespace PF_Bot.Backrooms.Static;
             Im/
                 bb.txt
         Chat/
-            pack--1001699898486.json     [pack] <-- /fuse by id
-        Chat.Backup/
-            2024-03-14/
-                pack--4147302158.json    [pack]
+            -1001699898486.pack          [pack] <-- /fuse by id
         Fuse/
             -1001541923355/
-                private_3D_AF.json       [pack] <-- /fuse ! info
-            any-name-possible.json       [pack] <-- /fuse   info
+                private_3D_AF.pack       [pack] <-- /fuse ! info
+            any-name-possible.pack       [pack] <-- /fuse   info
         History/
             -1001541923355/
                 KINGPIN-funny.json       [list] <-- /fuse * info
@@ -66,8 +63,6 @@ public static class Paths
 {
     public const string Dir_DB = "DB", Dir_Pics = "Pics", Dir_Static = "Static", Dir_Temp = "Temp";
 
-    public const string Prefix_Pack = "pack";
-
     public const string File_Config      = "config.txt";
     public const string File_Errors      = "errors.txt";
     public const string File_Log         = "log.txt";
@@ -75,7 +70,6 @@ public static class Paths
 
     public static string Dir_Alias   { get; } = Path.Combine(Dir_DB, "Alias");
     public static string Dir_Chat    { get; } = Path.Combine(Dir_DB, "Chat");
-    public static string Dir_Backup  { get; } = Path.Combine(Dir_DB, "Chat.Backup");
     public static string Dir_Fuse    { get; } = Path.Combine(Dir_DB, "Fuse");
     public static string Dir_History { get; } = Path.Combine(Dir_DB, "History");
     public static string Dir_Board   { get; } = Path.Combine(Dir_DB, "History.Board");

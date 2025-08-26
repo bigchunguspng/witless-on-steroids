@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using PF_Bot.Backrooms.Types;
+using PF_Tools.Copypaster;
 
 namespace PF_Bot.Telegram;
 
@@ -17,7 +17,7 @@ public static class ChatService
     {
         if (PackPaths.TryGetValue(chat, out var path) == false)
         {
-            path = Path.Combine(Dir_Chat, $"{Prefix_Pack}-{chat}.json");
+            path = Path.Combine(Dir_Chat, $"{chat}.pack");
             PackPaths.Add(chat, path);
         }
 
@@ -52,7 +52,7 @@ public static class ChatService
         => LoadedBakas.TryGetValue(chat, out baka);
 
     /// <summary>
-    /// <b>HIGH MEMORY USAGE!</b> Use only when you actually need the <see cref="Generation.Pack.GenerationPack"/>.
+    /// <b>HIGH MEMORY USAGE!</b> Use only when you actually need the <see cref="GenerationPack"/>.
     /// </summary>
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static CopypasterProxy GetBaka(long chat)
@@ -124,23 +124,11 @@ public static class ChatService
         Log($"DIC DROP << {chat}", LogLevel.Info, LogColor.Yellow);
     }
 
-    // DELETE / BACKUP
+    // DELETE
 
     public static void DeletePack(long chat)
     {
         UnloadBaka(chat);
         File.Delete(GetPath(chat));
-    }
-
-    public static void BackupPack(long chat)
-    {
-        if (BakaIsLoaded(chat, out var baka)) baka.SaveChanges();
-
-        var file = new FileInfo(GetPath(chat));
-        if (file.Length is <= 34 or >= 4_000_000) return; // don't backup empty and big ones
-
-        var date = DateTime.Now.ToString("yyyy-MM-dd");
-        var name = $"{Prefix_Pack}-{chat}.json";
-        file.CopyTo(UniquePath(Path.Combine(Dir_Backup, date), name));
     }
 }

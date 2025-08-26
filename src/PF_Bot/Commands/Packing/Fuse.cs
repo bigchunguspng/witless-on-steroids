@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Telegram.Bot.Types;
 using PF_Bot.Commands.Settings;
-using PF_Bot.Generation.Pack;
+using PF_Bot.Generation;
 
 namespace PF_Bot.Commands.Packing
 {
@@ -87,7 +87,7 @@ namespace PF_Bot.Commands.Packing
 
                 await FuseWithOtherPack(ChatService.GetPath(chat));
             }
-            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}.json") is { Length: > 0 } files)
+            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}.pack") is { Length: > 0 } files)
             {
                 await FuseWithOtherPack(files[0]);
             }
@@ -97,7 +97,7 @@ namespace PF_Bot.Commands.Packing
 
         private Task FuseWithOtherPack(string path) => Task.Run(() =>
         {
-            Baka.Fuse(JsonIO.LoadData<GenerationPack>(path));
+            Baka.Fuse(GenerationPackIO.Load(path));
             GoodEnding();
         });
 
@@ -262,7 +262,7 @@ namespace PF_Bot.Commands.Packing
             }
             sb.Append("<b>").Append(data.Title).Append(":</b>");
             if (!oneshot) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-            sb.Append("\n\n").AppendJoin('\n', JsonList(files, data.Marker, page, perPage));
+            sb.Append("\n\n").AppendJoin('\n', ListFiles(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = ChatService.GetPath(origin.Chat);
             if (File.Exists(path))
@@ -276,7 +276,7 @@ namespace PF_Bot.Commands.Packing
             Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
         }
 
-        private static IEnumerable<string> JsonList(FileInfo[] files, string marker, int page = 0, int perPage = 25)
+        private static IEnumerable<string> ListFiles(FileInfo[] files, string marker, int page = 0, int perPage = 25)
         {
             if (files.Length == 0)
             {
@@ -286,7 +286,7 @@ namespace PF_Bot.Commands.Packing
 
             foreach (var file in files.Skip(page * perPage).Take(perPage))
             {
-                var name = file.Name.Replace(".json", "");
+                var name = Path.GetFileNameWithoutExtension(file.Name);
                 var size = file.Length.ReadableFileSize();
                 yield return $"<code>{marker}{name}</code> | {size}";
             }

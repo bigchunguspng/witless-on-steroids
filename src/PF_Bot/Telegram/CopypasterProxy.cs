@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using PF_Bot.Generation;
-using PF_Bot.Generation.Pack;
+using PF_Tools.Copypaster;
+using PF_Tools.Copypaster.Extensions;
 
 namespace PF_Bot.Telegram
 {
     /// <summary>
-    /// Thread safe <see cref="Generation.Copypaster"/> wrapper attached to a Telegram chat.
+    /// Thread safe <see cref="GenerationPack"/> wrapper attached to a Telegram chat.
     /// </summary>
     public class CopypasterProxy // 40 (34) bytes
     {
@@ -15,14 +16,14 @@ namespace PF_Bot.Telegram
         public CopypasterProxy(long chat)
         {
             Chat = chat;
-            Baka = new Copypaster { DB = JsonIO.LoadData<GenerationPack>(FilePath) };
+            Baka = GenerationPackIO.Load(FilePath);
         }
 
-        public  int    WordCount => Baka.DB.Vocabulary.Count;
+        public  int    WordCount => Baka.VocabularyCount;
         private string FilePath  => ChatService.GetPath(Chat);
 
-        public Copypaster Baka { get; set; }
-        public long       Chat { get; set; }
+        public GenerationPack Baka { get; set; }
+        public long           Chat { get; set; }
 
         private bool _dirty;
         private byte _uselessness;
@@ -32,19 +33,19 @@ namespace PF_Bot.Telegram
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text)
-            => _dirty = Baka.Eat(text, out _);
+            => _dirty = Baka.Eat_Advanced(text, out _);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
-            => _dirty = Baka.Eat(text, out eaten);
+            => _dirty = Baka.Eat_Advanced(text, out eaten);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate
-            () => TextOrBust(() => Baka.Generate());
+            () => TextOrBust(() => Baka.RenderText(Baka.Generate()));
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateBackwards
-            () => TextOrBust(() => Baka.GenerateBackwards());
+            () => TextOrBust(() => Baka.RenderText(Baka.GenerateBackwards()));
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));
@@ -70,11 +71,7 @@ namespace PF_Bot.Telegram
         // FUSE
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Fuse(GenerationPack pack)
-        {
-            ChatService.BackupPack(Chat);
-            Baka.Fuse(pack);
-        }
+        public void Fuse(GenerationPack pack) => Baka.Fuse(pack);
 
 
         // SAVE
@@ -87,7 +84,7 @@ namespace PF_Bot.Telegram
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-            JsonIO.SaveData(Baka.DB, FilePath);
+            GenerationPackIO.Save(Baka, FilePath);
             ResetState();
             Log($"DIC SAVE << {Chat}", LogLevel.Info, LogColor.Lime);
         }

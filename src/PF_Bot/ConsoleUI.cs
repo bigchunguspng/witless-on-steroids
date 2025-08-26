@@ -127,7 +127,6 @@ namespace PF_Bot
             if (x == -1)
             {
                 ChatService.RemoveChat(chat);
-                ChatService.BackupPack(chat);
                 ChatService.DeletePack(chat);
             }
             else Bot.Client.DeleteMessage(chat, x);
@@ -142,7 +141,6 @@ namespace PF_Bot
                 if (ChatService.GetPath(chat).FileSizeInBytes() > size) return;
 
                 ChatService.RemoveChat(chat);
-                ChatService.BackupPack(chat);
                 ChatService.DeletePack(chat);
             });
             ChatService.SaveChatsDB();

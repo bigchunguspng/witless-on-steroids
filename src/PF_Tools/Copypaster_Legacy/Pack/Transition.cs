@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Generation.Pack;
+﻿namespace PF_Tools.Copypaster_Legacy.Pack;
 
 public readonly struct Transition(int wordID, float chance)
 {
@@ -7,7 +7,7 @@ public readonly struct Transition(int wordID, float chance)
 
     public Transition WithChanceIncreasedBy(float value)
     {
-        return this with { Chance = Chance.CombineRound(value) };
+        return this with { Chance = Chance.CombineRound(value, 1) };
     }
 
     public Transition WithMaxChance(float value, out float difference)

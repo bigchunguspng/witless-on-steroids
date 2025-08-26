@@ -3,6 +3,7 @@ using System.Text;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 using PF_Bot.Services.Internet.Reddit;
+using PF_Bot.State.Chats;
 
 #pragma warning disable CS8509
 #pragma warning disable SYSLIB0014
@@ -127,7 +128,7 @@ namespace PF_Bot.Commands // ReSharper disable InconsistentNaming
             if (a)  SendGalleryPost(post);
             else SendSingleFilePost(post);
 
-            if (ChatService.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
+            if (ChatManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
 
             Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }

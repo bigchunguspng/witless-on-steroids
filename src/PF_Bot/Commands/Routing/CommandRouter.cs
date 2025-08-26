@@ -2,6 +2,7 @@
 using PF_Bot.Commands.Editing;
 using PF_Bot.Commands.Messaging;
 using PF_Bot.Commands.Packing;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands.Routing
 {
@@ -91,7 +92,7 @@ namespace PF_Bot.Commands.Routing
 
         protected override void Run()
         {
-            if (ChatService.Knowns(Chat, out var settings))
+            if (ChatManager.KnownsChat(Chat, out var settings))
             {
                 _witlessRouter.Execute(WitlessContext.From(Context, settings));
             }
@@ -121,12 +122,12 @@ namespace PF_Bot.Commands.Routing
 
         private bool HandleStartCommand()
         {
-            var success = Command == "/start" && ChatService.TryAddChat(Chat, ChatSettingsFactory.CreateFrom(Context));
+            var success = Command == "/start" && ChatManager.TryAddChat(Chat, Context.ChatIsPrivate);
             if (success)
             {
                 Telemetry.LogCommand(Context.Chat, Context.Text);
 
-                ChatService.SaveChatsDB();
+                ChatManager.SaveChatsDB();
                 Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
                 Bot.SendMessage(Origin, START_RESPONSE);
             }

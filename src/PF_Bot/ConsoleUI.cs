@@ -1,5 +1,7 @@
-﻿using PF_Bot.Services.Internet.Reddit;
+﻿using PF_Bot.Generation;
+using PF_Bot.Services.Internet.Reddit;
 using PF_Bot.Services.Sounds;
+using PF_Bot.State.Chats;
 using Telegram.Bot;
 using Exception = System.Exception;
 
@@ -12,7 +14,7 @@ namespace PF_Bot
 
         private Telegram.Bot Bot => Telegram.Bot.Instance;
 
-        private CopypasterProxy Baka => ChatService.GetBaka(_activeChat);
+        private CopypasterProxy Baka => ChatManager.GetBaka(_activeChat);
 
         public static bool LoggedIntoReddit = false;
 
@@ -45,7 +47,7 @@ namespace PF_Bot
         {
             Print("На выход…", ConsoleColor.Yellow);
             Telemetry.Write();
-            ChatService.SaveBakas();
+            ChatManager.SaveBakas();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
@@ -55,7 +57,7 @@ namespace PF_Bot
 
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) ChatService.PerformAutoSave();
+            else if (_input == "/s" ) ChatManager.PerformAutoSave();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/cc") ClearTempFiles();
@@ -72,7 +74,7 @@ namespace PF_Bot
         private void SetActiveChat()
         {
             var shit = _input![1..];
-            var found = ChatService.SettingsDB.Do(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
+            var found = ChatManager.SettingsDB.Do(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
             if (found != 0)
             {
                 _activeChat = found;
@@ -83,7 +85,7 @@ namespace PF_Bot
         private void BreakFourthWall()
         {
             var arg = _input!.Split (' ', 2)[1];
-            if (!ChatService.Knowns(_activeChat)) return;
+            if (!ChatManager.KnownsChat(_activeChat)) return;
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {
@@ -99,26 +101,26 @@ namespace PF_Bot
 
         private void PacksInfo()
         {
-            var loaded = ChatService.LoadedBakas.Count;
-            var total  = ChatService.SettingsDB .Count;
+            var loaded = ChatManager.LoadedBakas.Count;
+            var total  = ChatManager.SettingsDB .Count;
             Print($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
         }
 
         private void PacksInfoFull()
         {
             PacksInfo();
-            ChatService.LoadedBakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
+            ChatManager.LoadedBakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
         }
 
         private void DeleteBlockers()
         {
-            var save = ChatService.SettingsDB.Do(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
-            if (save)  ChatService.SaveChatsDB();
+            var save = ChatManager.SettingsDB.Do(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
+            if (save)  ChatManager.SaveChatsDB();
         }
 
         private void DeleteBlocker()
         {
-            if (DeleteBlocker(_activeChat)) ChatService.SaveChatsDB();
+            if (DeleteBlocker(_activeChat)) ChatManager.SaveChatsDB();
         }
 
         private bool DeleteBlocker(long chat)
@@ -126,8 +128,8 @@ namespace PF_Bot
             var x = Bot.PingChat((chat, null), notify: false);
             if (x == -1)
             {
-                ChatService.RemoveChat(chat);
-                ChatService.DeletePack(chat);
+                ChatManager.RemoveChat(chat);
+                ChatManager.DeletePack(chat);
             }
             else Bot.Client.DeleteMessage(chat, x);
 
@@ -136,14 +138,14 @@ namespace PF_Bot
 
         private void DeleteBySize(int size = 34)
         {
-            ChatService.SettingsDB.ForEachKey(chat =>
+            ChatManager.SettingsDB.ForEachKey(chat =>
             {
-                if (ChatService.GetPath(chat).FileSizeInBytes() > size) return;
+                if (ChatManager.GetPackPath(chat).FileSizeInBytes() > size) return;
 
-                ChatService.RemoveChat(chat);
-                ChatService.DeletePack(chat);
+                ChatManager.RemoveChat(chat);
+                ChatManager.DeletePack(chat);
             });
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
         }
 
         private void UploadSounds(string path) => Task.Run(() => SoundDB.Instance.UploadMany(path));

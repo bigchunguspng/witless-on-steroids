@@ -2,6 +2,7 @@
 using Telegram.Bot.Types;
 using PF_Bot.Commands.Settings;
 using PF_Bot.Generation;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands.Packing
 {
@@ -80,12 +81,12 @@ namespace PF_Bot.Commands.Packing
                 return;
             }
 
-            if (argIsChatId && ChatService.Knowns(chat))
+            if (argIsChatId && ChatManager.KnownsChat(chat))
             {
-                if (ChatService.BakaIsLoaded(chat, out var baka))
+                if (ChatManager.BakaIsLoaded(chat, out var baka))
                     baka.SaveChanges();
 
-                await FuseWithOtherPack(ChatService.GetPath(chat));
+                await FuseWithOtherPack(ChatManager.GetPackPath(chat));
             }
             else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}.pack") is { Length: > 0 } files)
             {
@@ -198,7 +199,7 @@ namespace PF_Bot.Commands.Packing
 
         protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long size, int count, string title)
         {
-            var newSize = ChatService.GetPath(baka.Chat).FileSizeInBytes();
+            var newSize = ChatManager.GetPackPath(baka.Chat).FileSizeInBytes();
             var newCount = baka.WordCount;
             var deltaSize = newSize - size;
             var deltaCount = newCount - count;
@@ -264,7 +265,7 @@ namespace PF_Bot.Commands.Packing
             if (!oneshot) sb.Append($" 📃{page + 1}/{lastPage + 1}");
             sb.Append("\n\n").AppendJoin('\n', ListFiles(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = ChatService.GetPath(origin.Chat);
+            var path = ChatManager.GetPackPath(origin.Chat);
             if (File.Exists(path))
                 sb.Append("весит ").Append(path.ReadableFileSize());
             else

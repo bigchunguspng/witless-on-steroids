@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
-using PF_Bot.Commands.Meme.Core;
 
-namespace PF_Bot.Telegram;
+namespace PF_Bot.State.Chats;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class ChatSettings // 32 (28) bytes
@@ -20,6 +19,17 @@ public class ChatSettings // 32 (28) bytes
     [JsonProperty] public MemeOptions? Options { get; set; }
 
     public MemeOptions GetOrCreateMemeOptions() => Options ??= new MemeOptions();
+}
+
+public enum MemeType : byte
+{
+    Dg,
+    Meme,
+    Top,
+    Dp,
+    Snap,
+    Nuke,
+    Auto,
 }
 
 public class MemeOptions

@@ -1,6 +1,7 @@
 using System.Text;
 using Telegram.Bot.Types;
 using PF_Bot.Services.Internet.Boards;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands.Packing.Core;
 
@@ -85,7 +86,7 @@ public abstract class ChanEaterCore : Fuse
 
             Bot.EditMessage(Chat, message, text);
 
-            var size = ChatService.GetPath(Chat).FileSizeInBytes();
+            var size = ChatManager.GetPackPath(Chat).FileSizeInBytes();
             var lines = threads.SelectMany(s => s).ToList();
 
             await EatMany(lines, size, Limit);

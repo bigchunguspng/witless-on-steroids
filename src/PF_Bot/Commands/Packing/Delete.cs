@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using PF_Bot.State.Chats;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Commands.Packing
@@ -17,9 +18,9 @@ namespace PF_Bot.Commands.Packing
 
             if (result == "*") result = "*👊 никак*";
 
-            ChatService.RemoveChat(Chat);
-            ChatService.SaveChatsDB();
-            ChatService.DeletePack(Chat);
+            ChatManager.RemoveChat(Chat);
+            ChatManager.SaveChatsDB();
+            ChatManager.DeletePack(Chat);
 
             Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
             Bot.SendMessage(Origin, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
@@ -67,7 +68,7 @@ namespace PF_Bot.Commands.Packing
         public void DoGameStep(Message message, string data)
         {
             // Callback blocks the thread, so this must be safe 😎
-            Context = WitlessContext.FromMessage(message, ChatService.SettingsDB[message.Chat.Id]);
+            Context = WitlessContext.FromMessage(message, ChatManager.SettingsDB[message.Chat.Id]);
 
             var split = data.Split(" - ");
             var num = split[1].Split(':');

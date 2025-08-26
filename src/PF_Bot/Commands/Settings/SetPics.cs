@@ -1,4 +1,6 @@
-﻿namespace PF_Bot.Commands.Settings;
+﻿using PF_Bot.State.Chats;
+
+namespace PF_Bot.Commands.Settings;
 
 public class SetPics : SettingsCommand
 {
@@ -7,7 +9,7 @@ public class SetPics : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Pics = value.ClampByte();
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             Bot.SendMessage(Origin, string.Format(SET_P_RESPONSE, Data.Pics).XDDD());
             Log($"{Title} >> MEME CHANCE >> {Data.Pics}%");
         }

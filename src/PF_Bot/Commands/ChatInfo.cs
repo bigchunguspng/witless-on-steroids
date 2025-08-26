@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using PF_Bot.Commands.Meme.Core;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands
 {
@@ -22,7 +22,7 @@ namespace PF_Bot.Commands
             };
 
             sb.Append("\nВес словаря: ").Append(size.ReadableFileSize()).Append(' ').Append(icon);
-            if (ChatService.BakaIsLoaded(Chat))
+            if (ChatManager.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
                     .Append(BrowseReddit.FormatSubs(Baka.WordCount, "💨")).Append(' ');

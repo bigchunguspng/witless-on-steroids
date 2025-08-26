@@ -1,5 +1,5 @@
-﻿using PF_Bot.Commands.Meme.Core;
-using PF_Bot.Commands.Routing;
+﻿using PF_Bot.Commands.Routing;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands.Settings
 {
@@ -90,7 +90,7 @@ namespace PF_Bot.Commands.Settings
 
         private void ReportTypeSet(string command)
         {
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             var message = command == "*"
                 ? string.Format(SET_AUTO_HANDLER_RESPONSE, GetAutoHandlerTip())
                 : string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]);
@@ -108,14 +108,14 @@ namespace PF_Bot.Commands.Settings
 
         private void ReportOptionsSet(string command, string result)
         {
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
             Log($"{Title} >> MEMES OPTIONS >> {result}");
         }
                 
         private void ReportAutoHandlerSet(string? handler)
         {
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             if (handler != null)
             {
                 Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());

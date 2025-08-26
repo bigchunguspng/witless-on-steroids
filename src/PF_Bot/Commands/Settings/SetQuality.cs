@@ -1,4 +1,6 @@
-﻿namespace PF_Bot.Commands.Settings;
+﻿using PF_Bot.State.Chats;
+
+namespace PF_Bot.Commands.Settings;
 
 public class SetQuality : SettingsCommand
 {
@@ -7,7 +9,7 @@ public class SetQuality : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Quality = value.ClampByte();
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             Bot.SendMessage(Origin, string.Format(SET_Q_RESPONSE, Data.Quality).XDDD());
             Log($"{Title} >> QUALITY >> {Data.Quality}%");
         }

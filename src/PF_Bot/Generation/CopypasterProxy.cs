@@ -1,29 +1,22 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using PF_Bot.Generation;
+using PF_Bot.State.Chats;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 
-namespace PF_Bot.Telegram
+namespace PF_Bot.Generation
 {
-    /// <summary>
-    /// Thread safe <see cref="GenerationPack"/> wrapper attached to a Telegram chat.
-    /// </summary>
-    public class CopypasterProxy // 40 (34) bytes
+    /// Thread safe <see cref="GenerationPack"/> wrapper
+    /// attached to a Telegram chat.
+    public class CopypasterProxy(long chat, GenerationPack pack) // 40 (34) bytes | todo change - old info
     {
         private const byte MAX_USELESSNESS_BEFORE_UNLOAD = 10;
 
-        public CopypasterProxy(long chat)
-        {
-            Chat = chat;
-            Baka = GenerationPackIO.Load(FilePath);
-        }
-
         public  int    WordCount => Baka.VocabularyCount;
-        private string FilePath  => ChatService.GetPath(Chat);
+        private string FilePath  => ChatManager.GetPackPath(Chat);
 
-        public GenerationPack Baka { get; set; }
-        public long           Chat { get; set; }
+        public GenerationPack Baka { get; set; } = pack;
+        public long           Chat { get; set; } = chat;
 
         private bool _dirty;
         private byte _uselessness;

@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types;
+﻿using PF_Bot.Generation;
+using PF_Bot.State.Chats;
+using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Core
 {
@@ -74,7 +76,7 @@ namespace PF_Bot.Commands.Core
         public ChatSettings    Data => Context.Settings;
         public CopypasterProxy Baka => Context.Baka;
 
-        public string PackPath => ChatService.GetPath(Chat);
+        public string PackPath => ChatManager.GetPackPath(Chat);
     }
 
     public abstract class WitlessAsyncCommand : AnyAsyncCommand<WitlessContext>
@@ -82,7 +84,7 @@ namespace PF_Bot.Commands.Core
         public ChatSettings    Data => Context.Settings;
         public CopypasterProxy Baka => Context.Baka;
 
-        public string PackPath => ChatService.GetPath(Chat);
+        public string PackPath => ChatManager.GetPackPath(Chat);
     }
 
     // ROUTING

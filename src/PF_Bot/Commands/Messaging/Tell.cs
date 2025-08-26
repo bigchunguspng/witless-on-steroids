@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using PF_Bot.State.Chats;
+using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Messaging;
 
@@ -26,7 +27,7 @@ public class Tell : SyncCommand
         {
             Bot.SendMessage(chat, args[1], preview: true);
             var chatId = chat.Identifier ?? 0;
-            if (chatId != 0 && ChatService.Knowns(chatId)) ChatService.GetBaka(chatId).Eat(args[1]);
+            if (chatId != 0 && ChatManager.KnownsChat(chatId)) ChatManager.GetBaka(chatId).Eat(args[1]);
             LogTell(chat);
         }
         else

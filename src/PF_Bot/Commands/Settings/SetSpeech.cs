@@ -1,4 +1,6 @@
-﻿namespace PF_Bot.Commands.Settings;
+﻿using PF_Bot.State.Chats;
+
+namespace PF_Bot.Commands.Settings;
 
 public class SetSpeech : SettingsCommand
 {
@@ -7,7 +9,7 @@ public class SetSpeech : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Speech = value.ClampByte();
-            ChatService.SaveChatsDB();
+            ChatManager.SaveChatsDB();
             Bot.SendMessage(Origin, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
             Log($"{Title} >> SPEECH >> {Data.Speech}");
         }

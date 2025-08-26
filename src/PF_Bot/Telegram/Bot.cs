@@ -1,7 +1,7 @@
-﻿using System.Net.Http;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using PF_Bot.Commands.Routing;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Telegram
 {
@@ -35,7 +35,7 @@ namespace PF_Bot.Telegram
             ClearTempFiles();
 
             if (listen) StartListening();
-            ChatService.StartAutoSaveAsync(TimeSpan.FromMinutes(2));
+            ChatManager.StartAutoSaveAsync(TimeSpan.FromMinutes(2));
 
             new ConsoleUI().EnterConsoleLoop();
         }

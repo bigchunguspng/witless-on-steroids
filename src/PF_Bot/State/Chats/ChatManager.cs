@@ -1,40 +1,37 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using PF_Bot.Backrooms.Types;
+using PF_Bot.Generation;
 using PF_Tools.Copypaster;
 
-namespace PF_Bot.Telegram;
+namespace PF_Bot.State.Chats;
 
-public static class ChatService
+public static class ChatManager
 {
-    public static readonly SyncDictionary<long, string>          PackPaths   = new();
     public static readonly SyncDictionary<long, CopypasterProxy> LoadedBakas = new();
     public static readonly SyncDictionary<long, ChatSettings>    SettingsDB
         =  JsonIO.LoadData<SyncDictionary<long, ChatSettings>>(File_Chats);
 
 
-    public static string GetPath(long chat)
-    {
-        if (PackPaths.TryGetValue(chat, out var path) == false)
-        {
-            path = Path.Combine(Dir_Chat, $"{chat}.pack");
-            PackPaths.Add(chat, path);
-        }
+    // PATHS
 
-        return path;
-    }
+    public static string GetPackPath
+        (long chat) => Path.Combine(Dir_Chat, $"{chat}.pack");
 
 
-    // SETTINGS
+    // CHATLIST / SETTINGS
 
-    public static bool Knowns(long chat)
+    public static bool KnownsChat(long chat)
         => SettingsDB.ContainsKey(chat);
 
-    public static bool Knowns(long chat, [NotNullWhen(true)] out ChatSettings? settings)
+    public static bool KnownsChat(long chat, [NotNullWhen(true)] out ChatSettings? settings)
         => SettingsDB.TryGetValue(chat, out settings);
 
-    public static bool TryAddChat(long chat, ChatSettings settings) => SettingsDB.TryAdd(chat, settings);
-    public static void RemoveChat(long chat)                        => SettingsDB.Remove(chat);
+    public static bool TryAddChat(long chat, bool privateChat)
+        => SettingsDB.TryAdd(chat, ChatSettingsFactory.CreateFor(privateChat));
+
+    public static void RemoveChat(long chat)
+        => SettingsDB.Remove(chat);
 
     public static void SaveChatsDB()
     {
@@ -43,7 +40,7 @@ public static class ChatService
     }
 
 
-    // BAKAS
+    // PACKS / BAKAS
 
     public static bool BakaIsLoaded(long chat)
         => LoadedBakas.ContainsKey(chat);
@@ -65,7 +62,7 @@ public static class ChatService
         var thread = new Thread(() => AutoSaveLoop(interval))
         {
             Name = "AutoSave",
-            IsBackground = true
+            IsBackground = true,
         };
 
         thread.Start();
@@ -105,7 +102,7 @@ public static class ChatService
     {
         try
         {
-            var baka = new CopypasterProxy(chat);
+            var baka = new CopypasterProxy(chat, GenerationPackIO.Load(GetPackPath(chat)));
             LoadedBakas.Add(chat, baka);
             Log($"DIC LOAD >> {chat}", LogLevel.Info, LogColor.Fuchsia);
 
@@ -129,6 +126,6 @@ public static class ChatService
     public static void DeletePack(long chat)
     {
         UnloadBaka(chat);
-        File.Delete(GetPath(chat));
+        File.Delete(GetPackPath(chat));
     }
 }

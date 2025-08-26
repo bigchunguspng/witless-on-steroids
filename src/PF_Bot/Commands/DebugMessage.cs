@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using PF_Bot.Memes.Shared;
 using PF_Bot.Services.Internet.Reddit;
 using PF_Bot.Services.Sounds;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands;
 
@@ -112,9 +113,9 @@ public class DebugMessage : SyncCommand
 
     private static string GetPacksInfo()
     {
-        var loaded = ChatService.LoadedBakas.Count;
-        var total  = ChatService.SettingsDB .Count;
-        var packs = string.Join('\n', ChatService.LoadedBakas.Select(x => x.Key.ToString()));
+        var loaded = ChatManager.LoadedBakas.Count;
+        var total  = ChatManager.SettingsDB .Count;
+        var packs = string.Join('\n', ChatManager.LoadedBakas.Select(x => x.Key.ToString()));
         return $"📝 <u>PACKS LOADED</u>: {loaded}/{total}\n<blockquote expandable>{packs}</blockquote>";
     }
 

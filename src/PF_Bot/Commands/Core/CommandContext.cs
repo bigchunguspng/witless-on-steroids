@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types;
+﻿using PF_Bot.Generation;
+using PF_Bot.State.Chats;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Commands.Core;
@@ -84,7 +86,7 @@ public class WitlessContext : CommandContext
     public ChatSettings Settings { get; }
 
     private CopypasterProxy?        _baka;
-    public  CopypasterProxy Baka => _baka ??= ChatService.GetBaka(Chat);
+    public  CopypasterProxy Baka => _baka ??= ChatManager.GetBaka(Chat);
 
 
     public static WitlessContext From(CommandContext context, ChatSettings baka) => new(context, baka);

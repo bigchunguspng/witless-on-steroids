@@ -27,6 +27,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="../PF_Tools/PF_Tools.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Reference Include="Reddit.NET">
             <HintPath>$(SolutionDir)/lib/Reddit.NET.dll</HintPath>
         </Reference>

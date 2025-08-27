@@ -2,13 +2,14 @@ using System.Text;
 
 namespace PF_Tools.FFMpeg;
 
-public class FFMpegResult
+public class FFMpegResult(FFMpegArgs args)
 {
-    public required string        Command       { get; init; }
-    public required StringBuilder ProcessOutput { get; init; }
-    public required int           ExitCode      { get; init; }
+    public string        Arguments     { get; } = args.Build();
+    public StringBuilder ProcessOutput { get; } = new();
 
-    public          bool          Success => ExitCode == 0;
-    public          bool          Failure => ExitCode != 0;
+    public int  ExitCode  { get; set; }
+    public bool WasKilled { get; set; }
 
+    public bool Success => ExitCode == 0;
+    public bool Failure => ExitCode != 0;
 }

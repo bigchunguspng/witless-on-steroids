@@ -1,4 +1,4 @@
-﻿using PF_Bot.Commands.Meme.Core;
+﻿using PF_Bot.Features.Generate.Memes.Core;
 
 namespace PF_Bot.Backrooms.Helpers;
 

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
+using PF_Bot.Tools_Legacy.BoardScrappers;
 using Telegram.Bot.Extensions;
-using PF_Bot.Services.Internet.Boards;
 
 namespace PF_Bot.Backrooms.Helpers;
 

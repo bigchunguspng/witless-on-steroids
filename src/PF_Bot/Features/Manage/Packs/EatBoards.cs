@@ -1,0 +1,99 @@
+﻿using PF_Bot.Features.Manage.Packs.Core;
+using PF_Bot.Tools_Legacy.BoardScrappers;
+
+namespace PF_Bot.Features.Manage.Packs;
+
+public class EatBoards : ChanEaterCore
+{
+    //      /boards
+    //      /boards info  <┬─ SAME
+    //      /board  info  <┘
+    //      /board [_/a](!) [search query]
+    //      /board [thread/board/archive]
+    //      /board Y-M-D a.N    <- [Y-M-D a.N.json]
+
+    private static readonly BoardService _chan = new();
+    private static readonly Lazy<List<BoardGroup>> _boards = new(_chan.GetBoardList(File_4chanHtmlPage));
+
+    private string _name = default!;
+    private Uri     _uri = default!;
+
+    protected override string ArchivePath => Dir_Board;
+    protected override string CallbackKey => "b";
+    protected override string CommandName => "board";
+    protected override string BoardsTitle => BOARDS_4CHAN;
+    protected override string Manual      => BOARD_MANUAL;
+    protected override string UnknownURL  => UNKNOWN_LINK_4CHAN;
+    protected override string EmojiLogo   => "🍀";
+    protected override string FileName    => _name;
+    protected override List<BoardGroup> Boards => _boards.Value;
+
+    protected override string GetSourceAnnotation()
+    {
+        var shortURL = _uri.Segments.Length > 2 && _uri.Segments[2].Contains("search")
+            ? "desuarchive.org"
+            : _uri.LocalPath;
+        return string.Format(FUSE_SOURCE, _uri, shortURL);
+    }
+
+    protected override async Task EatOnlineData(string url)
+    {
+        _uri = UrlOrBust(ref url);
+
+        var board = _uri.Segments[1].Replace("/", "");
+
+        if      (url.Contains("/thread/")) await EatSingleThread(url, board);
+        else if (url.EndsWith("/archive")) await EatArchive     (url, board); 
+        else                               await EatWholeBoard  (url, board);
+    }
+
+    private async Task EatSingleThread(string url, string board)
+    {
+        _name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
+        try
+        {
+            var replies = _chan.GetThreadDiscussion(url).ToList();
+            await EatMany(replies, Size, Limit);
+        }
+        catch
+        {
+            Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
+        }
+    }
+
+    private async Task EatWholeBoard(string url, string board)
+    {
+        _name = board;
+
+        var threads = _chan.GetAllActiveThreads(url);
+        var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(url + x));
+
+        await RespondAndStartEating(tasks);
+    }
+
+    private async Task EatArchive(string url, string board)
+    {
+        _name = $"{board}.zip";
+
+        var threads = _chan.GetAllArchivedThreads(url);
+        var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + _uri.Host + x));
+
+        await RespondAndStartEating(tasks);
+    }
+
+    protected override async Task EatOnlineFind(string[] args)
+    {
+        var bySubject = args[0].Contains('!');
+        var url = bySubject
+            ? _chan.GetDesuSearchURLSubject(args[0].Replace("!", ""), args[1])
+            : _chan.GetDesuSearchURLText   (args[0],                  args[1]);
+
+        _uri = new Uri(url);
+        _name = string.Join('_', args);
+
+        var threads = _chan.GetSearchResults(url);
+        var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
+
+        await RespondAndStartEating(tasks);
+    }
+}

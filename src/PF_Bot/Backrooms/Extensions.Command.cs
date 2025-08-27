@@ -1,5 +1,8 @@
 // ReSharper disable CoVariantArrayConversion
 
+using PF_Bot.Routing.Commands;
+using PF_Bot.Telegram;
+
 namespace PF_Bot.Backrooms;
 
 public partial class Extensions

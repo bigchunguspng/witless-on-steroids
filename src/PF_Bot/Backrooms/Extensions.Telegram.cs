@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using PF_Bot.State;
+using PF_Bot.Telegram;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;

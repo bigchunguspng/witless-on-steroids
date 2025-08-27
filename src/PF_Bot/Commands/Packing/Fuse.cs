@@ -29,7 +29,7 @@ namespace PF_Bot.Commands.Packing
         {
             Baka.SaveChanges();
             Size = PackPath.FileSizeInBytes();
-            Count = Baka.WordCount;
+            Count = Baka.VocabularySize;
         }
 
         protected override async Task RunAuthorized()
@@ -200,7 +200,7 @@ namespace PF_Bot.Commands.Packing
         protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long size, int count, string title)
         {
             var newSize = ChatManager.GetPackPath(baka.Chat).FileSizeInBytes();
-            var newCount = baka.WordCount;
+            var newCount = baka.VocabularySize;
             var deltaSize = newSize - size;
             var deltaCount = newCount - count;
             var ns = newSize.ReadableFileSize();

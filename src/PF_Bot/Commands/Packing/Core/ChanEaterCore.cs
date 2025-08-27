@@ -100,7 +100,7 @@ public abstract class ChanEaterCore : Fuse
 
     protected async Task EatMany(List<string> lines, long size, int limit)
     {
-        var count = Baka.WordCount;
+        var count = Baka.VocabularySize;
 
         await EatAllLines(lines, Baka, limit);
         SaveChanges(Baka, Title);

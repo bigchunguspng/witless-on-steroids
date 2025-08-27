@@ -61,7 +61,7 @@ namespace PF_Bot.Commands.Packing
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
             Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
-            var count = Baka.WordCount;
+            var count = Baka.VocabularySize;
 
             var commentsEaten = await EatAllLines(comments, Baka, limit);
             SaveChanges(Baka, Title);

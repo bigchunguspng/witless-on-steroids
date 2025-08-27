@@ -64,7 +64,7 @@ namespace PF_Bot.Commands.Packing
         {
             Baka.SaveChanges();
 
-            if (Baka.WordCount == 0)
+            if (Baka.VocabularySize == 0)
                 return "*"; // can't be in file name
 
             var path = GetUniqueExtraPackPath(name, chat);

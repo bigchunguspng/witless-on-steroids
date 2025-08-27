@@ -11,18 +11,23 @@ public class CommandContext
     private static readonly string _botUsernameStart = Bot.Username.Remove(7);
 
     public Message Message      { get; }
-    public long    Chat         { get; }
-    public int?    Thread       { get; }
     public string  Title        { get; }
     public string? Text         { get; private set; }
     /// <summary> Lowercase command with "/" symbol and bot username removed. </summary>
     public string? Command      { get; private set; }
     /// <summary> All text excluding the command and the following " " or "\n". </summary>
     public string? Args         { get; private set; }
+
+    // todo remove 2 below - needed only in router
     /// <summary> Whether THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
     public bool    IsForMe      { get; private set; }
     /// <summary> Whether SOME bot was mentioned in the command explicitly. </summary>
     public bool    BotMentioned { get; private set; }
+
+    public long    Chat => Message.Chat.Id;
+    private int? Thread => Message.IsAutomaticForward  ? Message.Id              // channel post
+                         : Message.IsTopicMessage      ? Message.MessageThreadId // forum thread message
+                         : Message.ReplyToMessage?.Id ?? Message.MessageThreadId;
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
 
@@ -31,8 +36,6 @@ public class CommandContext
     protected CommandContext(CommandContext context)
     {
         Message = context.Message;
-        Chat = context.Chat;
-        Thread = context.Thread;
         Title = context.Title;
         Text = context.Text;
         Command = context.Command;
@@ -44,14 +47,7 @@ public class CommandContext
     protected CommandContext(Message message)
     {
         Message = message;
-        Chat = message.Chat.Id;
         Title = message.GetChatTitle();
-        Thread = message.IsAutomaticForward // channel post
-            ? message.Id
-            : message.IsTopicMessage        // forum thread message
-                ? message.MessageThreadId
-                : message.ReplyToMessage?.Id
-               ?? message.MessageThreadId;
 
         UseText(message.GetTextOrCaption());
     }

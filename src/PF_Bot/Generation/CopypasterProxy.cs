@@ -12,15 +12,18 @@ namespace PF_Bot.Generation
     {
         private const byte MAX_USELESSNESS_BEFORE_UNLOAD = 10;
 
-        public  int    WordCount => Baka.VocabularyCount;
-        private string FilePath  => ChatManager.GetPackPath(Chat);
+        public  int VocabularySize => Baka.VocabularyCount;
+        private string    FilePath => ChatManager.GetPackPath(Chat);
 
         public GenerationPack Baka { get; set; } = pack;
-        public long           Chat { get; set; } = chat;
+        public long           Chat { get; set; } = chat; // todo remove
 
         private bool _dirty;
         private byte _uselessness;
 
+        // todo: this is just a thread safe wrapper
+        // todo: all save, load, unload happens in manager
+        // todo: expose: useless value, dirty
 
         // EAT / GENERATE
 
@@ -77,6 +80,7 @@ namespace PF_Bot.Generation
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
+            // todo call manager
             GenerationPackIO.Save(Baka, FilePath);
             ResetState();
             Log($"DIC SAVE << {Chat}", LogLevel.Info, LogColor.Lime);

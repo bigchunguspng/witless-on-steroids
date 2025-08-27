@@ -7,22 +7,22 @@ namespace PF_Bot.Generation
 {
     /// Thread safe <see cref="GenerationPack"/> wrapper.
     /// Tracks changes and usage.
-    public class Copypaster(GenerationPack pack) // 40 (34) bytes | todo change - old info
+    public class Copypaster(GenerationPack pack) // 32 (26) bytes
     {
-        public GenerationPack Baka { get; private set; } = pack;
+        public GenerationPack Pack { get; private set; } = pack;
 
-        /// True if <see cref="Baka"/> content was modified.
+        /// True if <see cref="Pack"/> content was modified.
         public bool IsDirty { get; private set; }
 
         /// Resets to 0 after every usage (read or write).
         public byte Idle    { get; private set; }
 
-        public int  VocabularyCount => Baka.VocabularyCount;
+        public int  VocabularyCount => Pack.VocabularyCount;
 
-        /// Replaces wrapped <see cref="Baka"/> with a new empty one.
+        /// Replaces wrapped <see cref="Pack"/> with a new empty one.
         public void ClearPack()
         {
-            Baka = new GenerationPack();
+            Pack = new GenerationPack();
             IsDirty = true;
         }
 
@@ -33,11 +33,11 @@ namespace PF_Bot.Generation
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text)
-            => EatIfTasty(() => Baka.Eat_Advanced(text), out _);
+            => EatIfTasty(() => Pack.Eat_Advanced(text), out _);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
-            => EatIfTasty(() => Baka.Eat_Advanced(text), out eaten);
+            => EatIfTasty(() => Pack.Eat_Advanced(text), out eaten);
 
         private bool EatIfTasty(Func<string[]?> eat, out string[]? eaten)
         {
@@ -55,17 +55,17 @@ namespace PF_Bot.Generation
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate
-            () => TextOrBust(() => Baka.RenderText(Baka.Generate()));
+            () => TextOrBust(() => Pack.RenderText(Pack.Generate()));
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string GenerateBackwards
-            () => TextOrBust(() => Baka.RenderText(Baka.GenerateBackwards()));
+            () => TextOrBust(() => Pack.RenderText(Pack.GenerateBackwards()));
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public string GenerateByWord(string word) => TextOrBust(() => Baka.GenerateByWord(word));
+        public string GenerateByWord(string word) => TextOrBust(() => Pack.GenerateByWord(word));
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public string GenerateByLast(string word) => TextOrBust(() => Baka.GenerateByLast(word));
+        public string GenerateByLast(string word) => TextOrBust(() => Pack.GenerateByLast(word));
 
         private string TextOrBust(Func<string> generate)
         {
@@ -87,7 +87,7 @@ namespace PF_Bot.Generation
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Fuse(GenerationPack pack)
         {
-            Baka.Fuse(pack);
+            Pack.Fuse(pack);
             IsDirty = true;
         }
     }

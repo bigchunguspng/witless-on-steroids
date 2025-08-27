@@ -106,7 +106,7 @@ public static class ChatManager
         var temp = GetTempPath(chat);
         lock (baka)
         {
-            GenerationPackIO.Save(baka.Baka, path, temp);
+            GenerationPackIO.Save(baka.Pack, path, temp);
             baka.ResetDirty();
         }
         Log($"DIC SAVE << {chat}", LogLevel.Info, LogColor.Lime);

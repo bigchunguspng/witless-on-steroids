@@ -7,7 +7,7 @@ namespace PF_Bot.Generation
 {
     /// Thread safe <see cref="GenerationPack"/> wrapper.
     /// Tracks changes and usage.
-    public class CopypasterProxy(GenerationPack pack) // 40 (34) bytes | todo change - old info
+    public class Copypaster(GenerationPack pack) // 40 (34) bytes | todo change - old info
     {
         public GenerationPack Baka { get; private set; } = pack;
 

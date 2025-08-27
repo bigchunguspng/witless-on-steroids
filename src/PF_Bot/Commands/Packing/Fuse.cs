@@ -171,7 +171,7 @@ namespace PF_Bot.Commands.Packing
         }
 
         private                Task      EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit);
-        protected static async Task<int> EatAllLines(IEnumerable<string> lines, CopypasterProxy baka, int limit)
+        protected static async Task<int> EatAllLines(IEnumerable<string> lines, Copypaster baka, int limit)
         {
             var linesConsumed = 0;
             await Task.Run(() =>
@@ -191,13 +191,13 @@ namespace PF_Bot.Commands.Packing
             Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(Baka, Chat, Size, Count, Title));
         }
 
-        protected static void SaveChanges(CopypasterProxy baka, long chat, string title)
+        protected static void SaveChanges(Copypaster baka, long chat, string title)
         {
             Log($"{title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
             ChatManager.SaveBaka(chat, baka);
         }
 
-        protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long chat, long size, int count, string title)
+        protected static string FUSION_SUCCESS_REPORT(Copypaster baka, long chat, long size, int count, string title)
         {
             var newSize = ChatManager.GetPackPath(chat).FileSizeInBytes();
             var newCount = baka.VocabularyCount;

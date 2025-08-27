@@ -73,16 +73,16 @@ namespace PF_Bot.Commands.Core
 
     public abstract class  WitlessSyncCommand :  AnySyncCommand<WitlessContext>
     {
-        public ChatSettings    Data => Context.Settings;
-        public CopypasterProxy Baka => Context.Baka;
+        public ChatSettings Data => Context.Settings;
+        public Copypaster   Baka => Context.Baka;
 
         public string PackPath => ChatManager.GetPackPath(Chat);
     }
 
     public abstract class WitlessAsyncCommand : AnyAsyncCommand<WitlessContext>
     {
-        public ChatSettings    Data => Context.Settings;
-        public CopypasterProxy Baka => Context.Baka;
+        public ChatSettings Data => Context.Settings;
+        public Copypaster   Baka => Context.Baka;
 
         public string PackPath => ChatManager.GetPackPath(Chat);
     }

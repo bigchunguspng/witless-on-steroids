@@ -81,8 +81,8 @@ public class WitlessContext : CommandContext
 {
     public ChatSettings Settings { get; }
 
-    private CopypasterProxy?        _baka;
-    public  CopypasterProxy Baka => _baka ??= ChatManager.GetBaka(Chat);
+    private Copypaster?        _baka;
+    public  Copypaster Baka => _baka ??= ChatManager.GetBaka(Chat);
 
 
     public static WitlessContext From(CommandContext context, ChatSettings baka) => new(context, baka);

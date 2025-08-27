@@ -14,7 +14,7 @@ namespace PF_Bot
 
         private Telegram.Bot Bot => Telegram.Bot.Instance;
 
-        private CopypasterProxy Baka => ChatManager.GetBaka(_activeChat);
+        private Copypaster Baka => ChatManager.GetBaka(_activeChat);
 
         public static bool LoggedIntoReddit = false;
 

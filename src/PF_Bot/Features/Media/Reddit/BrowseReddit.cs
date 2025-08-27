@@ -5,6 +5,7 @@ using PF_Bot.Routing.Commands;
 using PF_Bot.State.Chats;
 using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.RedditSearch;
+using PF_Tools.Backrooms.Helpers;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 
@@ -171,7 +172,7 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
 
         private void SendGalleryPost(PostData post)
         {
-            var process = SystemHelpers.StartReadableProcess("gallery-dl", $"{post.URL} -g");
+            var process = ProcessRunner.StartReadableProcess("gallery-dl", $"{post.URL} -g");
             var urls = new List<string>();
             for (var i = 0; i < 50; i++)
             {

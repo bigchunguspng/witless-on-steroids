@@ -2,6 +2,7 @@
 using PF_Bot.Features.Edit.Core;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -33,7 +34,7 @@ namespace PF_Bot.Features.Edit.Filter
             var output = GetOutPath(path);
             var exe = "magick";
             var args = $"\"{path}\" -compress JPEG -quality {22 - _value} \"{output}\"";
-            SystemHelpers.StartReadableProcess(exe, args).WaitForExit();
+            ProcessRunner.StartReadableProcess(exe, args).WaitForExit();
             return output;
         }
 

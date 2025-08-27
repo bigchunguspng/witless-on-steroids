@@ -2,6 +2,7 @@
 
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Edit.Direct;
@@ -81,7 +82,7 @@ public class UseMagick : PhotoCommand
         var exe = "magick";
         MagickCommand = $"\"{path}\" {options} \"{output}\"";
         Output = [];
-        var process = SystemHelpers.StartReadableProcess(exe, MagickCommand);
+        var process = ProcessRunner.StartReadableProcess(exe, MagickCommand);
         while (true)
         {
             var line = await process.StandardError.ReadLineAsync();

@@ -1,6 +1,7 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
 using PF_Bot.Routing.Commands;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Edit.Filter;
@@ -51,7 +52,7 @@ public class CorruptImage : PhotoCommand
         var result        = $"{_name}-{id}.mp4";
 
         var args = $"-delay 5 \"{inputPattern}\" -loop 0 \"{result}\"";
-        await SystemHelpers.StartProcess("magick", args).WaitForExitAsync();
+        await ProcessRunner.StartProcess("magick", args).WaitForExitAsync();
 
         await using var stream = System.IO.File.OpenRead(result);
         Bot.SendAnimation(Origin, InputFile.FromStream(stream, "piece_fap_bot-hex.mp4"));
@@ -72,7 +73,7 @@ public class CorruptImage : PhotoCommand
         var extension = Type is MediaType.Stick ? "webp" : "png";
         var result = $"{_name}-Hex-Fix.{extension}";
         var args = $"\"{corruptedFile}\" \"{result}\"";
-        await SystemHelpers.StartReadableProcess("magick", args).WaitForExitAsync();
+        await ProcessRunner.StartReadableProcess("magick", args).WaitForExitAsync();
 
         SendResult(result);
         Log($"{Title} >> HEX [#{corruptionCount}]");

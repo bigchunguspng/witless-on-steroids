@@ -1,6 +1,6 @@
 using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace PF_Tools.Backrooms;
+namespace PF_Tools.Backrooms.Extensions;
 
 public static partial class Extensions
 {

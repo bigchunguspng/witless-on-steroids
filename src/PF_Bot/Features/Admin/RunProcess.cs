@@ -2,6 +2,7 @@ using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Extensions;
 
 namespace PF_Bot.Features.Admin;
@@ -26,7 +27,7 @@ public class RunProcess : AsyncCommand
         var exe = split[0];
         var args = split.Length > 1 ? split[1] : "";
 
-        var process = SystemHelpers.StartReadableProcess(exe, args);
+        var process = ProcessRunner.StartReadableProcess(exe, args);
         await process.WaitForExitAsync();
 
         var stdout = await process.StandardOutput.ReadToEndAsync();

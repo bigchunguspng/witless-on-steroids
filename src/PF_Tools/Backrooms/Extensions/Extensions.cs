@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace PF_Tools.Backrooms;
+namespace PF_Tools.Backrooms.Extensions;
 
 public static partial class Extensions
 {

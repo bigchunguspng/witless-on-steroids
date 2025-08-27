@@ -1,51 +1,8 @@
-﻿using System.Diagnostics;
 using System.Text;
 using PF_Bot.Telegram;
+using PF_Tools.Backrooms.Helpers;
 
 namespace PF_Bot.Backrooms.Helpers;
-
-public static class SystemHelpers
-{
-    public static Process StartReadableProcess(string exe, string args, string directory = "")
-    {
-        return StartProcess(exe, args, directory, redirect: true);
-    }
-
-    public static Process StartProcess(string exe, string args, string directory = "", bool redirect = false)
-    {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = exe, Arguments = args,
-            WorkingDirectory = directory,
-            RedirectStandardOutput = redirect,
-            RedirectStandardError  = redirect,
-            StandardOutputEncoding = redirect ? Encoding.UTF8 : null,
-            StandardErrorEncoding  = redirect ? Encoding.UTF8 : null
-        };
-        var process = new Process { StartInfo = startInfo };
-
-#if DEBUG
-        Log($"[{exe.ToUpper()}] >> {args}", LogLevel.Debug, LogColor.Olive);
-#endif
-
-        process.Start();
-        return process;
-    }
-
-    public static async Task ReadAndEcho(StreamReader input, Stream output1, Stream output2)
-    {
-        var buffer = new byte[4096];
-        int bytesRead;
-
-        while ((bytesRead = await input.BaseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-        {
-            await output1.WriteAsync(buffer, 0, bytesRead);
-            await output1.FlushAsync();
-            await output2.WriteAsync(buffer, 0, bytesRead);
-            await output2.FlushAsync();
-        }
-    }
-}
 
 public static class YtDlp
 {
@@ -56,9 +13,9 @@ public static class YtDlp
         var exe = "yt-dlp";
         using var memory = new MemoryStream();
 
-        var process = SystemHelpers.StartProcess(exe, args, directory, redirect: true);
-        var taskO = SystemHelpers.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
-        var taskE = SystemHelpers.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
+        var process = ProcessRunner.StartProcess(exe, args, directory, redirect: true);
+        var taskO = ProcessRunner.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
+        var taskE = ProcessRunner.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
         await Task.WhenAll(taskO, taskE);
         await process.WaitForExitAsync();
             
@@ -104,9 +61,9 @@ public static class YtDlp
     private static async Task<bool> Update()
     {
         using var memory = new MemoryStream();
-        var process = SystemHelpers.StartProcess("yt-dlp", "--update-to nightly", redirect: true);
-        var taskO = SystemHelpers.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
-        var taskE = SystemHelpers.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
+        var process = ProcessRunner.StartProcess("yt-dlp", "--update-to nightly", redirect: true);
+        var taskO = ProcessRunner.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
+        var taskE = ProcessRunner.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
         await Task.WhenAll(taskO, taskE);
         await process.WaitForExitAsync();
 

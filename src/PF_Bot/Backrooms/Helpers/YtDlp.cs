@@ -13,7 +13,7 @@ public static class YtDlp
         var exe = "yt-dlp";
         using var memory = new MemoryStream();
 
-        var process = ProcessRunner.StartProcess(exe, args, directory, redirect: true);
+        var process = ProcessRunner.StartReadableProcess(exe, args, directory);
         var taskO = ProcessRunner.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
         var taskE = ProcessRunner.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
         await Task.WhenAll(taskO, taskE);
@@ -61,7 +61,7 @@ public static class YtDlp
     private static async Task<bool> Update()
     {
         using var memory = new MemoryStream();
-        var process = ProcessRunner.StartProcess("yt-dlp", "--update-to nightly", redirect: true);
+        var process = ProcessRunner.StartReadableProcess("yt-dlp", "--update-to nightly");
         var taskO = ProcessRunner.ReadAndEcho(process.StandardOutput, Console.OpenStandardOutput(), memory);
         var taskE = ProcessRunner.ReadAndEcho(process.StandardError , Console.OpenStandardError() , memory);
         await Task.WhenAll(taskO, taskE);

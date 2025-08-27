@@ -8,6 +8,8 @@ namespace PF_Bot.State.Chats;
 
 public static class ChatManager
 {
+    private const byte MAX_IDLE_BEFORE_UNLOAD = 10;
+
     public static readonly SyncDictionary<long, CopypasterProxy> LoadedBakas = new();
     public static readonly SyncDictionary<long, ChatSettings>    SettingsDB
         =  JsonIO.LoadData<SyncDictionary<long, ChatSettings>>(File_Chats);
@@ -17,6 +19,8 @@ public static class ChatManager
 
     public static string GetPackPath
         (long chat) => Path.Combine(Dir_Chat, $"{chat}.pack");
+    public static string GetTempPath
+        (long chat) => Path.Combine(Dir_Temp, $"{chat}.pack");
 
 
     // CHATLIST / SETTINGS
@@ -75,7 +79,7 @@ public static class ChatManager
             Thread.Sleep(interval);
             try
             {
-                PerformAutoSave();
+                Bakas_SaveDirty_UnloadIdle();
             }
             catch (Exception e)
             {
@@ -84,17 +88,29 @@ public static class ChatManager
         }
     }
 
-    public static void PerformAutoSave()
+    public static void Bakas_SaveDirty_UnloadIdle()
     {
-        SaveBakas();
-        UnloadUselessBakas();
+        Bakas_SaveDirty();
+        Bakas_UnloadIdle();
     }
 
-    public static void SaveBakas
-        () => LoadedBakas.ForEachValue(baka => baka.SaveChanges());
+    public static void Bakas_SaveDirty
+        () => LoadedBakas.ForEachPair(x => SaveBaka(x.Key, x.Value));
 
-    public static void UnloadUselessBakas
-        () => LoadedBakas.ForEachPair(x => { if (x.Value.IsUselessEnough()) UnloadBaka(x.Key); });
+    /// Saves <see cref="baka"/> if it's dirty.
+    public static void SaveBaka(long chat, CopypasterProxy baka)
+    {
+        if (!baka.IsDirty) return;
+
+        var path = GetPackPath(chat);
+        var temp = GetTempPath(chat);
+        lock (baka)
+        {
+            GenerationPackIO.Save(baka.Baka, path, temp);
+            baka.ResetDirty();
+        }
+        Log($"DIC SAVE << {chat}", LogLevel.Info, LogColor.Lime);
+    }
 
     // LOAD / UNLOAD
 
@@ -102,7 +118,7 @@ public static class ChatManager
     {
         try
         {
-            var baka = new CopypasterProxy(chat, GenerationPackIO.Load(GetPackPath(chat)));
+            var baka = new CopypasterProxy(GenerationPackIO.Load(GetPackPath(chat)));
             LoadedBakas.Add(chat, baka);
             Log($"DIC LOAD >> {chat}", LogLevel.Info, LogColor.Fuchsia);
 
@@ -115,13 +131,30 @@ public static class ChatManager
         }
     }
 
+    private static void Bakas_UnloadIdle
+        () => LoadedBakas.ForEachPair(x => UnloadBaka_IfIdle(x.Key, x.Value));
+
+    private static void UnloadBaka_IfIdle(long chat, CopypasterProxy baka)
+    {
+        if (baka.Idle >= MAX_IDLE_BEFORE_UNLOAD) UnloadBaka(chat);
+        else
+            baka.BumpIdle();
+    }
+
     private static void UnloadBaka(long chat)
     {
         LoadedBakas.Remove(chat);
         Log($"DIC DROP << {chat}", LogLevel.Info, LogColor.Yellow);
     }
 
-    // DELETE
+    // CLEAR / DELETE
+
+
+    public static void ClearPack(long chat, CopypasterProxy baka)
+    {
+        baka.ClearPack();
+        SaveBaka(chat, baka);
+    }
 
     public static void DeletePack(long chat)
     {

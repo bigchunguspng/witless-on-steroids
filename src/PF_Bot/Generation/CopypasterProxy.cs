@@ -1,39 +1,57 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using PF_Bot.State.Chats;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 
 namespace PF_Bot.Generation
 {
-    /// Thread safe <see cref="GenerationPack"/> wrapper
-    /// attached to a Telegram chat.
-    public class CopypasterProxy(long chat, GenerationPack pack) // 40 (34) bytes | todo change - old info
+    /// Thread safe <see cref="GenerationPack"/> wrapper.
+    /// Tracks changes and usage.
+    public class CopypasterProxy(GenerationPack pack) // 40 (34) bytes | todo change - old info
     {
-        private const byte MAX_USELESSNESS_BEFORE_UNLOAD = 10;
+        public GenerationPack Baka { get; private set; } = pack;
 
-        public  int VocabularySize => Baka.VocabularyCount;
-        private string    FilePath => ChatManager.GetPackPath(Chat);
+        /// True if <see cref="Baka"/> content was modified.
+        public bool IsDirty { get; private set; }
 
-        public GenerationPack Baka { get; set; } = pack;
-        public long           Chat { get; set; } = chat; // todo remove
+        /// Resets to 0 after every usage (read or write).
+        public byte Idle    { get; private set; }
 
-        private bool _dirty;
-        private byte _uselessness;
+        public int  VocabularyCount => Baka.VocabularyCount;
 
-        // todo: this is just a thread safe wrapper
-        // todo: all save, load, unload happens in manager
-        // todo: expose: useless value, dirty
+        /// Replaces wrapped <see cref="Baka"/> with a new empty one.
+        public void ClearPack()
+        {
+            Baka = new GenerationPack();
+            IsDirty = true;
+        }
 
-        // EAT / GENERATE
+        public void ResetDirty() => IsDirty = false;
+        public void BumpIdle  () => Idle++;
+
+        // EAT
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text)
-            => _dirty = Baka.Eat_Advanced(text, out _);
+            => EatIfTasty(() => Baka.Eat_Advanced(text), out _);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
-            => _dirty = Baka.Eat_Advanced(text, out eaten);
+            => EatIfTasty(() => Baka.Eat_Advanced(text), out eaten);
+
+        private bool EatIfTasty(Func<string[]?> eat, out string[]? eaten)
+        {
+            eaten = eat();
+            var success = eaten != null;
+            if (success)
+            {
+                IsDirty = true;
+                Idle = 0;
+            }
+            return success;
+        }
+
+        // GENERATE
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public string Generate
@@ -53,10 +71,10 @@ namespace PF_Bot.Generation
         {
             try
             {
-                _uselessness = 0;
+                Idle = 0;
                 return generate();
             }
-            catch
+            catch // todo move calls to DefaultTextProvider elsewhere?
             {
                 LogError("NO TEXT!?");
                 var response = IsOneIn(8) ? null : DefaultTextProvider.GetRandomResponse();
@@ -67,37 +85,10 @@ namespace PF_Bot.Generation
         // FUSE
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Fuse(GenerationPack pack) => Baka.Fuse(pack);
-
-
-        // SAVE
-
-        public void SaveChanges()
+        public void Fuse(GenerationPack pack)
         {
-            if (_dirty) Save();
-        }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Save()
-        {
-            // todo call manager
-            GenerationPackIO.Save(Baka, FilePath);
-            ResetState();
-            Log($"DIC SAVE << {Chat}", LogLevel.Info, LogColor.Lime);
-        }
-
-        private void ResetState()
-        {
-            _dirty = false;
-            _uselessness = 0;
-        }
-
-        public bool IsUselessEnough()
-        {
-            var yes = ++_uselessness >= MAX_USELESSNESS_BEFORE_UNLOAD;
-            if (yes)    _uselessness = 0;
-
-            return yes;
+            Baka.Fuse(pack);
+            IsDirty = true;
         }
     }
 }

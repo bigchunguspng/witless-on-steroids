@@ -61,14 +61,14 @@ namespace PF_Bot.Commands.Packing
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
             Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
 
-            var count = Baka.VocabularySize;
+            var count = Baka.VocabularyCount;
 
             var commentsEaten = await EatAllLines(comments, Baka, limit);
-            SaveChanges(Baka, Title);
+            SaveChanges(Baka, Chat, Title);
 
             JsonIO.SaveData(comments, GetFileSavePath(query));
 
-            var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title);
+            var report = FUSION_SUCCESS_REPORT(Baka, Chat, size, count, Title);
             var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
             subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
             var detais = $"\n\nЕго пополнили {commentsEaten} комментов с {subreddit}";

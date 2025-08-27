@@ -29,10 +29,10 @@ namespace PF_Bot.Commands.Packing
                 var chance = Convert.ToInt32(post);
 
                 var pack = new GenerationPack();
-                pack.Eat_Advanced(sandwich, out _, chance);
+                pack.Eat_Advanced(sandwich, chance);
 
                 var path = Move.GetUniqueExtraPackPath(name);
-                GenerationPackIO.SaveAs(pack, path);
+                GenerationPackIO.Save(pack, path);
 
                 Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
                 Log($"{Title} >> THE ONE PIECE IS REAL!!!");

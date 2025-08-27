@@ -12,17 +12,16 @@ public static class GenerationPackIO
         return BinarySerialization.Deserialize(reader);
     }
 
-    public static void Save(GenerationPack pack, string path)
+    public static void Save(GenerationPack pack, string path, string temp)
     {
-        var temp = path.Replace(Dir_Chat, Dir_Temp);
-        Directory.CreateDirectory(Dir_Temp);
-
-        SaveAs(pack, temp);
+        Save(pack, temp);
+        path.CreateFilePath();
         File.Move(temp, path, overwrite: true);
     }
 
-    public static void SaveAs(GenerationPack pack, string path)
+    public static void Save(GenerationPack pack, string path)
     {
+        path.CreateFilePath();
         using var fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write);
         using var writer = new BinaryWriter(fs);
         BinarySerialization.Serialize(writer, pack);

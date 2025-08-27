@@ -152,7 +152,14 @@ public static partial class Extensions
         (this string path) => path.Contains(Path.PathSeparator);
 
     public static void CreateFilePath
-        (this string path) => Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
+        (this string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        if (string.IsNullOrWhiteSpace(directory) == false)
+        {
+            Directory.CreateDirectory(directory);
+        }
+    }
 
     public static FileInfo[] GetFilesInfo(string path, bool recursive = false)
     {

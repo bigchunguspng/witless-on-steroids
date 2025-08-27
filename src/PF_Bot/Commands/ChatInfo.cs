@@ -25,7 +25,7 @@ namespace PF_Bot.Commands
             if (ChatManager.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
-                    .Append(BrowseReddit.FormatSubs(Baka.VocabularySize, "💨")).Append(' ');
+                    .Append(BrowseReddit.FormatSubs(Baka.VocabularyCount, "💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
             if (!Context.ChatIsPrivate)

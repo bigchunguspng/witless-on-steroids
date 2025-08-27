@@ -27,9 +27,9 @@ namespace PF_Bot.Commands.Packing
 
         protected void MeasureDick() // 😂🤣🤣🤣👌
         {
-            Baka.SaveChanges();
+            ChatManager.SaveBaka(Chat, Baka);
             Size = PackPath.FileSizeInBytes();
-            Count = Baka.VocabularySize;
+            Count = Baka.VocabularyCount;
         }
 
         protected override async Task RunAuthorized()
@@ -84,7 +84,7 @@ namespace PF_Bot.Commands.Packing
             if (argIsChatId && ChatManager.KnownsChat(chat))
             {
                 if (ChatManager.BakaIsLoaded(chat, out var baka))
-                    baka.SaveChanges();
+                    ChatManager.SaveBaka(chat, baka);
 
                 await FuseWithOtherPack(ChatManager.GetPackPath(chat));
             }
@@ -187,20 +187,20 @@ namespace PF_Bot.Commands.Packing
 
         protected void GoodEnding()
         {
-            SaveChanges(Baka, Title);
-            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(Baka, Size, Count, Title));
+            SaveChanges(Baka, Chat, Title);
+            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(Baka, Chat, Size, Count, Title));
         }
 
-        protected static void SaveChanges(CopypasterProxy baka, string title)
+        protected static void SaveChanges(CopypasterProxy baka, long chat, string title)
         {
             Log($"{title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
-            baka.Save();
+            ChatManager.SaveBaka(chat, baka);
         }
 
-        protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long size, int count, string title)
+        protected static string FUSION_SUCCESS_REPORT(CopypasterProxy baka, long chat, long size, int count, string title)
         {
-            var newSize = ChatManager.GetPackPath(baka.Chat).FileSizeInBytes();
-            var newCount = baka.VocabularySize;
+            var newSize = ChatManager.GetPackPath(chat).FileSizeInBytes();
+            var newCount = baka.VocabularyCount;
             var deltaSize = newSize - size;
             var deltaCount = newCount - count;
             var ns = newSize.ReadableFileSize();

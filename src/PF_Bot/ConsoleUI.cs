@@ -47,7 +47,7 @@ namespace PF_Bot
         {
             Print("На выход…", ConsoleColor.Yellow);
             Telemetry.Write();
-            ChatManager.SaveBakas();
+            ChatManager.Bakas_SaveDirty();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
@@ -57,7 +57,7 @@ namespace PF_Bot
 
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) ChatManager.PerformAutoSave();
+            else if (_input == "/s" ) ChatManager.Bakas_SaveDirty_UnloadIdle();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/cc") ClearTempFiles();

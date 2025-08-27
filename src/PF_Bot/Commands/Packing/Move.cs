@@ -1,5 +1,5 @@
 ﻿using PF_Bot.Commands.Settings;
-using PF_Tools.Copypaster;
+using PF_Bot.State.Chats;
 
 namespace PF_Bot.Commands.Packing
 {
@@ -36,9 +36,8 @@ namespace PF_Bot.Commands.Packing
                 }
                 else
                 {
-                    Baka.Baka = new GenerationPack();
+                    ChatManager.ClearPack(Chat, Baka);
                     Log($"{Title} >> DIC CLEARED!", LogLevel.Info, LogColor.Fuchsia);
-                    Baka.Save();
 
                     var result = _public ? "опубликовано" : "сохранено";
                     Bot.SendMessage(Origin, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
@@ -62,9 +61,9 @@ namespace PF_Bot.Commands.Packing
 
         protected string MoveDictionary(string name, long chat)
         {
-            Baka.SaveChanges();
+            ChatManager.SaveBaka(Chat, Baka);
 
-            if (Baka.VocabularySize == 0)
+            if (Baka.VocabularyCount == 0)
                 return "*"; // can't be in file name
 
             var path = GetUniqueExtraPackPath(name, chat);

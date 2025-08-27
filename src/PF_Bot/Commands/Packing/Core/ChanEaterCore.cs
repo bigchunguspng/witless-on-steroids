@@ -100,14 +100,14 @@ public abstract class ChanEaterCore : Fuse
 
     protected async Task EatMany(List<string> lines, long size, int limit)
     {
-        var count = Baka.VocabularySize;
+        var count = Baka.VocabularyCount;
 
         await EatAllLines(lines, Baka, limit);
-        SaveChanges(Baka, Title);
+        SaveChanges(Baka, Chat, Title);
 
         JsonIO.SaveData(lines, GetFileSavePath());
 
-        var report = FUSION_SUCCESS_REPORT(Baka, size, count, Title);
+        var report = FUSION_SUCCESS_REPORT(Baka, Chat, size, count, Title);
         var source = GetSourceAnnotation();
         if (source != null) report += source;
 

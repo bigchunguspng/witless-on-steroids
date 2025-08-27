@@ -12,15 +12,13 @@ public static class Consuming_Advanced
 
     // LOGIC
 
-    public static bool Eat_Advanced(this GenerationPack pack, string text, [NotNullWhen(true)] out string[]? eaten, float chance = 0)
+    public static string[]? Eat_Advanced(this GenerationPack pack, string text, float chance = 0)
     {
-        eaten = null;
-
-        if (_skip.IsMatch(text)) return false;
+        if (_skip.IsMatch(text)) return null;
 
         var lines = TokenizeMultiline(text);
 
-        eaten = new string[lines.Length];
+        var result = new string[lines.Length];
 
         for (var i = 0; i < lines.Length; i++)
         {
@@ -32,10 +30,10 @@ public static class Consuming_Advanced
             tokens.RemoveLineBreaks();
             pack.Eat(tokens, chance);
 
-            eaten[i] = string.Join(' ', tokens.Select(word => word.Replace(' ', '_')));
+            result[i] = string.Join(' ', tokens.Select(word => word.Replace(' ', '_')));
         }
 
-        return true;
+        return result; // todo replace string[] accol with smth else - return ids for example and use console render
     }
 
     private static string[][] TokenizeMultiline(string text)

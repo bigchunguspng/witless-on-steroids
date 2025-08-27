@@ -23,7 +23,7 @@ public static class MigrationExtensions
 
                 var newFileName = $"{Path.GetFileNameWithoutExtension(file).Replace("pack-", "")}.pack";
                 var path = Path.Combine(dir, newFileName);
-                GenerationPackIO.SaveAs(bakaV2, path);
+                GenerationPackIO.Save(bakaV2, path);
                 
                 sw.Log($"Migrated {file}");
             }

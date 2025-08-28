@@ -8,50 +8,28 @@ public class FFMpegOutputOptions
     private readonly List<string> _af = [];
     private readonly List<string> _options = [];
 
-    public FFMpegOutputOptions Options(string options)
-    {
-        _options.Add(options);
-        return this;
-    }
+    public FFMpegOutputOptions Options
+        (string options)
+        => this.Fluent(() => _options.Add(options));
 
-    public FFMpegOutputOptions VF(string filter)
-    {
-        _vf.Add(filter);
-        return this;
-    }
+    public FFMpegOutputOptions VF
+        (string filter)
+        => this.Fluent(() => _vf.Add(filter));
 
-    public FFMpegOutputOptions AF(string filter)
-    {
-        _af.Add(filter);
-        return this;
-    }
+    public FFMpegOutputOptions AF
+        (string filter)
+        => this.Fluent(() => _af.Add(filter));
 
-    public FFMpegOutputOptions Map(string label)
-    {
-        return Options($"-map {label}");
-    }
+    public FFMpegOutputOptions Map
+        (string label)
+        => Options($"-map {label}");
 
     public StringBuilder Build()
     {
         var sb = new StringBuilder();
-
-        if (_vf.Count > 0)
-        {
-            sb.Append("-vf ").AppendInQuotes(_vf, ',');
-        }
-
-        if (_af.Count > 0)
-        {
-            sb.AppendSpaceSeparator();
-            sb.Append("-af ").AppendInQuotes(_af, ',');
-        }
-
-        if (_options.Count > 0)
-        {
-            sb.AppendSpaceSeparator();
-            sb.AppendJoin(' ', _options);
-        }
-
+        if (_vf     .Count > 0) sb                       .Append("-vf ").AppendInQuotes(_vf, ',');
+        if (_af     .Count > 0) sb.AppendSpaceSeparator().Append("-af ").AppendInQuotes(_af, ',');
+        if (_options.Count > 0) sb.AppendSpaceSeparator().AppendJoin(' ', _options);
         return sb;
     }
 }

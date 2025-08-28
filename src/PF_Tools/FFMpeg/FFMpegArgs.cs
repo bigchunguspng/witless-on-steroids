@@ -12,53 +12,39 @@ public class FFMpegArgs
     private readonly       List<string>                      _filters = [];
     private readonly Dictionary<string, FFMpegOutputOptions> _outputs = new();
 
-    public FFMpegArgs Globals(string options)
-    {
-        _globals.Add(options);
-        return this;
-    }
+    //
 
-    public FFMpegArgs Input(string path)
-    {
-        _inputs.Add(path, new FFMpegInputOptions());
-        return this;
-    }
+    public FFMpegArgs Globals
+        (string options)
+        => this.Fluent(() => _globals.Add(options));
 
-    public FFMpegArgs Input(string path, FFMpegInputOptions options)
-    {
-        _inputs.Add(path, options);
-        return this;
-    }
+    public FFMpegArgs Input
+        (string path)
+        => this.Fluent(() => _inputs.Add(path, new FFMpegInputOptions()));
 
-    public FFMpegArgs Input(string path, Func<FFMpegInputOptions, FFMpegInputOptions> options)
-    {
-        _inputs.Add(path, options(new FFMpegInputOptions()));
-        return this;
-    }
+    public FFMpegArgs Input
+        (string path, FFMpegInputOptions options)
+        => this.Fluent(() => _inputs.Add(path, options));
 
-    public FFMpegArgs Filter(string filter)
-    {
-        _filters.Add(filter);
-        return this;
-    }
+    public FFMpegArgs Input
+        (string path, FFMpegInputPipeline options)
+        => this.Fluent(() => _inputs.Add(path, options(new FFMpegInputOptions())));
 
-    public FFMpegArgs Out(string path)
-    {
-        _outputs.Add(path, new FFMpegOutputOptions());
-        return this;
-    }
+    public FFMpegArgs Filter
+        (string filter)
+        => this.Fluent(() => _filters.Add(filter));
 
-    public FFMpegArgs Out(string path, FFMpegOutputOptions options)
-    {
-        _outputs.Add(path, options);
-        return this;
-    }
+    public FFMpegArgs Out
+        (string path)
+        => this.Fluent(() => _outputs.Add(path, new FFMpegOutputOptions()));
 
-    public FFMpegArgs Out(string path, Func<FFMpegOutputOptions, FFMpegOutputOptions> options)
-    {
-        _outputs.Add(path, options(new FFMpegOutputOptions()));
-        return this;
-    }
+    public FFMpegArgs Out
+        (string path, FFMpegOutputOptions options)
+        => this.Fluent(() => _outputs.Add(path, options));
+
+    public FFMpegArgs Out
+        (string path, FFMpegOutputPipeline options)
+        => this.Fluent(() => _outputs.Add(path, options(new FFMpegOutputOptions())));
 
     public string Build()
     {
@@ -69,10 +55,8 @@ public class FFMpegArgs
             input.Deconstruct(out var path, out var options);
 
             sb.AppendSpaceSeparator();
-            var optionsText = options.Build();
-            if (optionsText.Length > 0)
-                sb.Append(optionsText).Append(' ');
-
+            var optionsSb = options.Build();
+            if (optionsSb.Length > 0) sb.Append(optionsSb).Append(' ');
             sb.Append("-i ").AppendInQuotes(path);
         }
 
@@ -87,10 +71,8 @@ public class FFMpegArgs
             output.Deconstruct(out var path, out var options);
 
             sb.AppendSpaceSeparator();
-            var optionsText = options.Build();
-            if (optionsText.Length > 0)
-                sb.Append(optionsText).Append(' ');
-
+            var optionsSb = options.Build();
+            if (optionsSb.Length > 0) sb.Append(optionsSb).Append(' ');
             sb.AppendInQuotes(path);
         }
 

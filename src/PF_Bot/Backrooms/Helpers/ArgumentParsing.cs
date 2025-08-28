@@ -36,7 +36,7 @@ public static class ArgumentParsing
         if (c.Args is null) return false;
 
         var arg = c.Args.SplitN(2)[0];
-        return double.TryParse(arg.Replace('.', ','), out value);
+        return double.TryParse(arg.Replace(',', '.'), out value);
     }
 
     public static (bool failed, TimeSpan start, TimeSpan length) GetCutTimecodes(string[]? s)
@@ -61,10 +61,10 @@ public static class ArgumentParsing
         span = TimeSpan.Zero;
         text = text.TrimStart('-');
 
-        var match = Regex.Match(text, @"^(?:(\d+)[:;^Жж])?(\d+(?:[,.юб]\d+)?)$");
+        var match = Regex.Match(text, @"^(?:(\d+)[:;^Жж])?(\d+(?:[.,юб]\d+)?)$");
         if (match.Success == false) return false;
 
-        var s = Regex.Replace(match.Groups[2].Value, "[.юб]", ",");
+        var s = Regex.Replace(match.Groups[2].Value, "[,юб]", ".");
         var m = match.GroupOrNull(1) ?? "0";
 
         if (double.TryParse(s, out var seconds)) span  = TimeSpan.FromSeconds(seconds);

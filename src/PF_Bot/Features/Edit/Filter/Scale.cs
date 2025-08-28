@@ -4,7 +4,7 @@ namespace PF_Bot.Features.Edit.Filter
 {
     public class Scale : VideoPhotoCommand
     {
-        private readonly Regex _number = new(@"^\d+(\.\d+)?$");
+        private readonly Regex _number = new(@"^\d+([\.,]\d+)?$");
 
         protected override string SyntaxManual => "/man_scale";
 
@@ -25,8 +25,8 @@ namespace PF_Bot.Features.Edit.Filter
                 {
                     if (args.Length > i && _number.IsMatch(args[i]))
                     {
-                        var d = double.TryParse(args[i].Replace('.', ','), out var value);
-                        if (d && value < 5) args[i] = args[i] + '*' + side;
+                        var d = double.TryParse(args[i].Replace(',', '.'), out var value);
+                        if (d && value < 5) args[i] = $"{value}*{side}";
                     }
                 }
 

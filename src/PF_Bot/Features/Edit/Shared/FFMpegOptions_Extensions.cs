@@ -17,7 +17,7 @@ public static class FFMpegOptions_Extensions
         return options.VF($"crop={rect.Width}:{rect.Height}:{rect.X}:{rect.Y}");
     }
 
-    /// Fixes video playback in Telegram mobile app.
+    /// Fixes video playback in Telegram mobile app. Apply only to videos!
     public static FFMpegOutputOptions FixVideoPlayback
         (this FFMpegOutputOptions options)
     {

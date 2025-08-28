@@ -13,31 +13,6 @@ public static partial class Extensions
     public static readonly Regex FFmpeg = new("ffmpeg|ffprobe", RegexOptions.IgnoreCase);
     public static readonly Regex URL_Regex = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
 
-    // RANDOM
-
-    public static bool IsOneIn(int x)
-        => Random.Shared.Next(x) == 0;
-
-    public static bool IsFirstOf(int a, int b)
-        => Random.Shared.Next(a + b) < a;
-
-    public static bool LuckyFor(int chance, int max = 100)
-        => Random.Shared.Next(max) < chance;
-
-    public static int RandomInt(int min, int max)
-        => Random.Shared.Next(min, max + 1);
-
-    public static double RandomDouble(double min, double max)
-    {
-        var k = 10_000d;
-        return RandomInt((int)(min * k), (int)(max * k)) / k;
-    }
-
-    public static T PickAny<T>(this ICollection<T> collection)
-    {
-        return collection.ElementAt(Random.Shared.Next(collection.Count));
-    }
-
     // FORMAT
 
     public static string Format(this double value) => value.ToString(CultureInfo.InvariantCulture);

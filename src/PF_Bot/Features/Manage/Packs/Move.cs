@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Manage.Settings;
 using PF_Bot.State.Chats;
-using PF_Bot.Tools_Legacy.Technical;
 
 namespace PF_Bot.Features.Manage.Packs
 {

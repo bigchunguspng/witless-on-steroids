@@ -2,6 +2,7 @@
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Bot.Tools_Legacy.MemeMakers;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Tools.Backrooms.Helpers;
 using static PF_Bot.Backrooms.Helpers.OptionsParsing;
 
 namespace PF_Bot.Features.Generate.Memes

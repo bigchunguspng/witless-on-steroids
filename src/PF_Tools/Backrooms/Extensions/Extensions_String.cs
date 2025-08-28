@@ -1,34 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace PF_Bot.Backrooms;
+namespace PF_Tools.Backrooms.Extensions;
 
-public static partial class Extensions
+public static class Extensions_String
 {
     // CHANGE CASE
-
-    public enum LetterCase
-    {
-        Lower, Upper, Sentence
-    }
-
-    public static string ToRandomLetterCase(this string text) => InLetterCase(text, GetRandomLetterCase());
-
-    public static string InLetterCase(this string text, LetterCase mode) => mode switch
-    {
-        LetterCase.Lower    => text.ToLower(),
-        LetterCase.Upper    => text.ToUpper(),
-        LetterCase.Sentence => char.ToUpper(text[0]) + text[1..].ToLower(),
-        _ => text
-    };
-
-    public static LetterCase GetRandomLetterCase() => Random.Shared.Next(8) switch
-    {
-        < 5 => LetterCase.Lower,
-        < 7 => LetterCase.Sentence,
-        _   => LetterCase.Upper
-    };
-
-    public static LetterCase GetUpperOrLowerLetterCase() => IsOneIn(2) ? LetterCase.Upper : LetterCase.Lower;
 
     public static string EnsureIsNotUppercase(this string s)
     {

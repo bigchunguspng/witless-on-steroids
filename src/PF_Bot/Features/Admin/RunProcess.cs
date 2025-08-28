@@ -1,7 +1,6 @@
 using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Extensions;
 

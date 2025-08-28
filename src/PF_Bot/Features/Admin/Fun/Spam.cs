@@ -1,6 +1,5 @@
 ﻿using PF_Bot.Routing.Commands;
 using PF_Bot.State.Chats;
-using PF_Bot.Tools_Legacy.Technical;
 
 namespace PF_Bot.Features.Admin.Fun;
 

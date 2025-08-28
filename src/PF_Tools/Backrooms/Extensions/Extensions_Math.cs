@@ -1,6 +1,6 @@
 ﻿namespace PF_Tools.Backrooms.Extensions;
 
-public static partial class Extensions
+public static class Extensions_Math
 {
     public static int RoundInt(this double x) => (int)Math.Round(x);
     public static int RoundInt(this float  x) => (int)Math.Round(x);

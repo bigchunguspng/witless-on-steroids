@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using PF_Bot.State;
 using PF_Bot.Telegram;
-using PF_Bot.Tools_Legacy.Technical;
 using Telegram.Bot.Types;
 using MediaFile = (string Id, string FileId, string Text, string LowercaseText);
 

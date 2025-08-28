@@ -1,8 +1,8 @@
 ﻿using SixLabors.ImageSharp;
 
-namespace PF_Bot.Backrooms;
+namespace PF_Tools.Backrooms.Extensions;
 
-public static partial class Extensions
+public static class Extensions_Size
 {
     public static Size GrowSize(this Size size, int minSemiperimeter = 400)
     {

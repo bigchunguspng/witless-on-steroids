@@ -1,7 +1,6 @@
-using System.Drawing;
 using System.Text;
 using FFMpegCore;
-using PF_Bot.Backrooms;
+using PF_Tools.Backrooms.Helpers;
 
 namespace PF_Bot.Tools_Legacy.FFMpeg;
 
@@ -119,7 +118,6 @@ public partial class F_Process
         if (isVideo) AddCompression(o, factor);
         o.WithQscale(factor).WithCustomArgument(sb.ToString());
 
-
-        string RandomDouble(double min, double max) => Extensions.RandomDouble(min, max).Format();
+        string RandomDouble(double min, double max) => Fortune.RandomDouble(min, max).Format();
     }
 }

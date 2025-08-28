@@ -2,7 +2,7 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace PF_Tools.Backrooms.Extensions;
 
-public static partial class Extensions
+public static class Extensions_Time
 {
     public static Stopwatch GetStartedStopwatch()
     {
@@ -11,8 +11,22 @@ public static partial class Extensions
         return sw;
     }
 
+    public static void Log(this Stopwatch sw, string message)
+    {
+        Print($"[TIME IN SECONDS]  -  {sw.ElapsedExact()} {message}", ConsoleColor.DarkGray);
+        sw.Restart();
+    }
+
     public static string ElapsedShort(this Stopwatch sw) => sw.Elapsed.ReadableTimeShort();
     public static string ElapsedExact(this Stopwatch sw) => sw.Elapsed.ReadableTimeExact();
+
+    public static T MeasureTime<T>(Func<T> func, string caption)
+    {
+        var sw = GetStartedStopwatch();
+        var result = func.Invoke();
+        sw.Log(caption);
+        return result;
+    }
 
     public static string ReadableTimeShort
         (this TimeSpan t) => t.Minutes >= 5

@@ -5,9 +5,9 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Backrooms;
+namespace PF_Tools.Backrooms.Extensions;
 
-public static partial class Extensions
+public static class Extensions_Drawing
 {
     public static T WithDefaultAlignment<T>(this T options) where T : TextOptions
     {

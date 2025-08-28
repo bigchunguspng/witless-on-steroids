@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Routing.Commands;
+using PF_Tools.Backrooms.Helpers;
 
 namespace PF_Bot.Features.Generate.Text
 {
@@ -44,12 +45,12 @@ namespace PF_Bot.Features.Generate.Text
 
         protected static LetterCase GetMode(string? s)
         {
-            if (s is null) return GetRandomLetterCase();
+            if (s is null) return LetterCaseHelpers.GetRandomLetterCase();
             var u = _upper.Count(s);
             var l = _lower.Count(s);
             var n = s.Contains("\n\n");
             return n
-                ? GetUpperOrLowerLetterCase()
+                ? LetterCaseHelpers.GetUpperOrLowerLetterCase()
                 : u > l
                     ? LetterCase.Upper
                     : LetterCase.Lower;

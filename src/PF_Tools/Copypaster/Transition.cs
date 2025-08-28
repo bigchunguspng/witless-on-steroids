@@ -1,6 +1,4 @@
-﻿using PF_Tools.Backrooms;
-
-namespace PF_Tools.Copypaster;
+﻿namespace PF_Tools.Copypaster;
 
 /// Transition chance [from one word] to another word.
 public readonly struct Transition(int wordId, float chance)

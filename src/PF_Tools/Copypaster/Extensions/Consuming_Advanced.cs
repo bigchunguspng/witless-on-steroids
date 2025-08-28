@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace PF_Tools.Copypaster.Extensions;
+﻿namespace PF_Tools.Copypaster.Extensions;
 
 public static class Consuming_Advanced
 {

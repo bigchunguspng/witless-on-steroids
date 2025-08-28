@@ -11,9 +11,10 @@ global using static PF_Bot.Backrooms.Extensions;
 global using static PF_Bot.Backrooms.Static.Texts;
 global using static PF_Bot.Backrooms.Static.Paths;
 global using static PF_Bot.Backrooms.Static.Responses;
-global using static PF_Bot.Tools_Legacy.Technical.Logger;
 
+global using PF_Tools;
 global using static PF_Tools.Backrooms.Static.CLIs;
+global using static PF_Tools.Logger;
 
 global using File = System.IO.File;
 global using MessageOrigin = (long Chat, int? Thread);

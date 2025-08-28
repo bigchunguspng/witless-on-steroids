@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 
-namespace PF_Bot.Tools_Legacy.Technical
+namespace PF_Tools
 {
     public static class Logger
     {

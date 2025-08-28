@@ -10,8 +10,9 @@ public static class FFMpeg
     private const int         IDLE_AFTER_MINUTES =  5;
     private const int         KILL_AFTER_MINUTES = 30;
 
-    /// Creates <see cref="FFMpegArgs"/> instance.
-    public static FFMpegArgs Args() => new();
+    public static FFMpegArgs          Args          () => new();
+    public static FFMpegInputOptions  InputOptions  () => new();
+    public static FFMpegOutputOptions OutputOptions () => new();
 
     /// Priority of the process is reduced over time.
     /// After 30 minutes the process is killed.

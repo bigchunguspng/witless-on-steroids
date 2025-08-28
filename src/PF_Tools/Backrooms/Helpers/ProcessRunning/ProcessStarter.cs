@@ -38,7 +38,7 @@ public static class ProcessStarter
         (string file, string arguments, string directory, ProcessOutputHandler handler)
     {
 #if DEBUG
-        Log($"[{file.ToUpper()}] >> {arguments}", LogLevel.Debug, LogColor.Olive);
+        Log($"[RUN] >> {file} {arguments}", LogLevel.Debug, LogColor.Olive);
 #endif
         var process = InitProcess(file, arguments, directory);
         var result = new StartedProcess(process);

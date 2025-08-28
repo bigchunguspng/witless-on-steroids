@@ -14,7 +14,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
+        <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -26,12 +26,11 @@
         <PackageReference Include="SixLabors.Fonts" Version="2.1.3"/>
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11"/>
         <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7"/>
-        <PackageReference Include="Spectre.Console" Version="0.49.1"/>
         <PackageReference Include="Telegram.Bot" Version="22.5.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../PF_Tools/PF_Tools.csproj" />
+        <ProjectReference Include="../PF_Tools/PF_Tools.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

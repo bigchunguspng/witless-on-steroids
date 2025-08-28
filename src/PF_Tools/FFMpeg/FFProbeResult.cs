@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace PF_Tools.FFMpeg;
 
 public class FFProbeResult
@@ -23,6 +25,8 @@ public class FFProbeResult
         public int?    Width        { get; set; }
         public int?    Height       { get; set; }
         public string? PixFmt       { get; set; }
+
+        public Size Size => new(Width ?? 0, Height ?? 0);
 
         public Type StreamType =>
             CodecType is CODEC_audio

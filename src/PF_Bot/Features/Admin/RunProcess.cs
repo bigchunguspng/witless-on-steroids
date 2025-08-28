@@ -2,7 +2,7 @@ using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.Technical;
-using PF_Tools.Backrooms.Helpers;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Extensions;
 
 namespace PF_Bot.Features.Admin;
@@ -27,25 +27,24 @@ public class RunProcess : AsyncCommand
         var exe = split[0];
         var args = split.Length > 1 ? split[1] : "";
 
-        var process = ProcessRunner.StartReadableProcess(exe, args);
-        await process.WaitForExitAsync();
+        var (stdout, stderr) = await ProcessRunner.Run_GetOutput(exe, args);
 
-        var stdout = await process.StandardOutput.ReadToEndAsync();
-        var stderr = await process.StandardError.ReadToEndAsync();
+        Log($"{Title} >> RUN {exe} {args}", color: LogColor.Yellow);
+        Bot.SendMessage(Origin, FormatProcessOutputs(stdout, stderr));
+    }
 
+    private static string FormatProcessOutputs(string stdout, string stderr)
+    {
         var sb = new StringBuilder();
-        if (!string.IsNullOrWhiteSpace(stdout))
+        if (string.IsNullOrWhiteSpace(stdout) == false)
         {
-            sb.Append("<u>OUT</u>:\n");
-            sb.Append("<pre>").Append(HtmlText.Escape(stdout)).Append("</pre>");
+            sb.Append("<u>OUT</u>:\n<pre>").Append(HtmlText.Escape(stdout)).Append("</pre>");
         }
-        if (!string.IsNullOrWhiteSpace(stderr))
+        if (string.IsNullOrWhiteSpace(stderr) == false)
         {
-            sb.Append("<u>ERR</u>:\n");
-            sb.Append("<pre>").Append(HtmlText.Escape(stderr)).Append("</pre>");
+            sb.Append("<u>ERR</u>:\n<pre>").Append(HtmlText.Escape(stderr)).Append("</pre>");
         }
 
-        Log($"{Title} >> RUN {exe.ToUpper()} {args}", color: LogColor.Yellow);
-        Bot.SendMessage(Origin, sb.ToString());
+        return sb.ToString();
     }
 }

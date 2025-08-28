@@ -3,6 +3,7 @@ using FFMpegCore;
 using FFMpegCore.Exceptions;
 using PF_Bot.Backrooms.Types.SerialQueue;
 using PF_Bot.Telegram;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 
 namespace PF_Bot.Tools_Legacy.FFMpeg;
 
@@ -73,7 +74,7 @@ public partial class F_Process
         {
             var message = e.FFMpegErrorOutput;
             if (_killed) message = $"[ THE PROCESS WAS KILLED ]\n\n{message}";
-            Bot.Instance.SendErrorDetails(Origin, $"ffmpeg {args}", message);
+            Bot.Instance.SendErrorDetails(Origin, FFMPEG, args, message);
             throw new Exception(e.FFMpegErrorOutput);
         }
     }
@@ -85,7 +86,7 @@ public partial class F_Process
         await Task.Delay(TimeSpan.FromMinutes(5));
         if (_finished) return;
 
-        var ffmpeg = Process.GetProcessesByName("ffmpeg").FirstOrDefault();
+        var ffmpeg = Process.GetProcessesByName(FFMPEG).FirstOrDefault();
         if (ffmpeg != null)
         {
             LogError("KILL FFMPEG");

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using PF_Tools.Backrooms.Helpers.ProcessRunning;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -191,10 +192,21 @@ namespace PF_Bot.Telegram
 
         public string GetSillyErrorMessage() => $"произошла ашыпка {FAIL_EMOJI.PickAny()}";
 
-        public void SendErrorDetails(MessageOrigin origin, string command, string errorMessage)
+        public void SendErrorDetails(ProcessException e, MessageOrigin origin)
         {
             var path = UniquePath(Dir_Temp, "error.txt");
-            var text = string.Format(FF_ERROR_REPORT, command, GetRandomASCII(), errorMessage);
+            var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
+            var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
+            File.WriteAllText(path, text);
+            using var stream = File.OpenRead(path);
+            SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));
+        }
+
+        [Obsolete]
+        public void SendErrorDetails(MessageOrigin origin, string file, string command, string errorMessage)
+        {
+            var path = UniquePath(Dir_Temp, "error.txt");
+            var text = string.Format(FF_ERROR_REPORT, file, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));

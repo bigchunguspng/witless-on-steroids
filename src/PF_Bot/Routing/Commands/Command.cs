@@ -1,6 +1,7 @@
 ﻿using PF_Bot.State.Chats;
 using PF_Bot.State.Generation;
 using PF_Bot.Telegram;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing.Commands
@@ -57,6 +58,10 @@ namespace PF_Bot.Routing.Commands
             try
             {
                 await Run();
+            }
+            catch (ProcessException e)
+            {
+                Bot.SendErrorDetails(e, Context.Origin);
             }
             catch (Exception e)
             {

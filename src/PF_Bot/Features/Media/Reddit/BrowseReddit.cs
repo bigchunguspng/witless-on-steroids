@@ -1,11 +1,10 @@
 ﻿using System.Net;
 using System.Text;
-using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Routing.Commands;
 using PF_Bot.State.Chats;
 using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.RedditSearch;
-using PF_Tools.Backrooms.Helpers;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 
@@ -123,14 +122,14 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
 
         #region SENDING MEMES
 
-        private void SendPost(RedditQuery query)
+        private async Task SendPost(RedditQuery query)
         {
             var post = GetPostOrBust(query);
             if (post == null) return;
 
             var a = post.URL.Contains("/gallery/");
-            if (a)  SendGalleryPost(post);
-            else SendSingleFilePost(post);
+            if (a)  await SendGalleryPost(post);
+            else       SendSingleFilePost(post);
 
             if (ChatManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
 
@@ -170,13 +169,16 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private void SendGalleryPost(PostData post)
+        private async Task SendGalleryPost(PostData post)
         {
-            var process = ProcessRunner.StartReadableProcess("gallery-dl", $"{post.URL} -g");
+            var processResult = await ProcessRunner.Run(GALLERY_DL, $"{post.URL} -g");
+            if (processResult.Failure) throw new ProcessException(GALLERY_DL, processResult);
+
             var urls = new List<string>();
+            using var reader = new StringReader(processResult.Output.ToString());
             for (var i = 0; i < 50; i++)
             {
-                var line = process.StandardOutput.ReadLine();
+                var line = await reader.ReadLineAsync();
                 if (line is null) break;
 
                 urls.Add(line);

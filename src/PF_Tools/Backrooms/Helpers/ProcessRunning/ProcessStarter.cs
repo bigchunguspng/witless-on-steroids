@@ -3,37 +3,44 @@ using System.Text;
 
 namespace PF_Tools.Backrooms.Helpers.ProcessRunning;
 
+/// Helper class to start processes with output redirection.
 public static class ProcessStarter
 {
     // STARTERS
 
-    public static StartedProcess StartProcess(string file, string arguments)
+    /// Returns a process with redirected stdout/stderr ready to be started.
+    public static Process InitProcess
+        (string file, string arguments, string directory = "") => new()
     {
-        return StartProcess_Internal(file, arguments, Output_Save);
-    }
-
-    public static StartedProcess StartProcess_WithEcho(string file, string arguments)
-    {
-        return StartProcess_Internal(file, arguments, Output_SaveAndPrint);
-    }
-
-    private static StartedProcess StartProcess_Internal(string file, string arguments, ProcessOutputHandler handler)
-    {
-        var process = new Process
+        StartInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = file,
-                Arguments = arguments,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8,
-            },
-            SynchronizingObject = null,
-        };
+            FileName = file, Arguments = arguments,
+            WorkingDirectory = directory,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError  = true,
+            StandardOutputEncoding = Encoding.UTF8,
+            StandardErrorEncoding  = Encoding.UTF8,
+        },
+    };
 
+    /// Saves all stdout/stderr to result's property <see cref="StartedProcess.Output"/>.
+    public static StartedProcess StartProcess
+        (string file, string arguments, string directory = "") =>
+        StartProcess_WithOutputHandler(file, arguments, directory, Output_Save);
+
+    /// Saves all stdout/stderr to result's property <see cref="StartedProcess.Output"/> and prints them to Console.
+    public static StartedProcess StartProcess_WithEcho
+        (string file, string arguments, string directory = "") =>
+        StartProcess_WithOutputHandler(file, arguments, directory, Output_SaveAndPrint);
+
+    private static StartedProcess StartProcess_WithOutputHandler
+        (string file, string arguments, string directory, ProcessOutputHandler handler)
+    {
+#if DEBUG
+        Log($"[{file.ToUpper()}] >> {arguments}", LogLevel.Debug, LogColor.Olive);
+#endif
+        var process = InitProcess(file, arguments, directory);
         var result = new StartedProcess(process);
 
         process.OutputDataReceived += (_, e) => handler(e.Data, result.Output);

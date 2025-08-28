@@ -20,7 +20,7 @@ public class KillProcess : AsyncCommand
     {
         if (Message.SenderIsBotAdmin() == false) return;
 
-        var name = Args ?? "ffmpeg";
+        var name = Args ?? FFMPEG;
         var process = Process.GetProcessesByName(name).FirstOrDefault();
         if (process != null)
         {

@@ -37,7 +37,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private string GetAudioArgs(string url, string output)
     {
-        var builder = new StringBuilder(Backrooms.Helpers.YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(PF_Tools.YtDlp.YtDlp.DEFAULT_ARGS);
         if (HighQuality)
             builder.Append("--audio-quality 0 ");
         if (!youTube && !ExtractThumb && !ArtAttached)
@@ -50,7 +50,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private string GetVideoArgs(string url)
     {
-        var builder = new StringBuilder(Backrooms.Helpers.YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(PF_Tools.YtDlp.YtDlp.DEFAULT_ARGS);
         builder.Append("-f \"bv*[height<=720]\" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
@@ -81,9 +81,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
-        var taskA = Backrooms.Helpers.YtDlp.Use(GetAudioArgs(url, output), directory, context.Origin);
+        var taskA = PF_Tools.YtDlp.YtDlp.Run(GetAudioArgs(url, output), directory);
         var taskV = ExtractThumb
-            ? Backrooms.Helpers.YtDlp.Use(GetVideoArgs(url), directory, context.Origin)
+            ? PF_Tools.YtDlp.YtDlp.Run(GetVideoArgs(url), directory)
             : ArtAttached
                 ? Bot.DownloadFile(Cover!, thumbPath, context.Origin)
                 : youTube
@@ -131,7 +131,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         await Task.WhenAll(mp3, jpg);
 
-        // SEND THE RESULT
+        // SEND THE RESULT todo move to bot
 
         Bot.DeleteMessageAsync(context.Chat, messageToDelete);
 

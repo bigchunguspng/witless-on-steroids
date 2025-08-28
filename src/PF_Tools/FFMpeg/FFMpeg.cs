@@ -4,13 +4,14 @@ using PF_Tools.Backrooms.Helpers.ProcessRunning;
 namespace PF_Tools.FFMpeg;
 
 /// Runs FFMpeg processes and manages their priority.
-public static class FFMpegRunner
+public static class FFMpeg
 {
-    public const string FFMPEG = "ffmpeg";
-
     private const int DEPRIORITIZE_AFTER_SECONDS = 30;
     private const int         IDLE_AFTER_MINUTES =  5;
     private const int         KILL_AFTER_MINUTES = 30;
+
+    /// Creates <see cref="FFMpegArgs"/> instance.
+    public static FFMpegArgs Args() => new();
 
     /// Priority of the process is reduced over time.
     /// After 30 minutes the process is killed.

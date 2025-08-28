@@ -2,7 +2,7 @@
 
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
-using PF_Tools.Backrooms.Helpers;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Edit.Direct;
@@ -10,9 +10,6 @@ namespace PF_Bot.Features.Edit.Direct;
 public class UseMagick : PhotoCommand
 {
     protected override string SyntaxManual => $"/man_43\n{ALIAS_INFO}/aim_info";
-
-    private string? MagickCommand;
-    private List<string>? Output;
 
     // /im [options] [extension]
 
@@ -55,16 +52,8 @@ public class UseMagick : PhotoCommand
         var path = await DownloadFile();
         options = options.Replace("THIS", path);
 
-        try
-        {
-            var result = await ProcessImage(path, options, extension);
-            SendResult(result, extension, sendDocument: OptionUsed('g'));
-        }
-        catch
-        {
-            var errorMessage = Output is null ? "*пусто*" : string.Join('\n', Output!);
-            Bot.SendErrorDetails(Origin, $"magick {MagickCommand}", errorMessage);
-        }
+        var result = await ProcessImage(path, options, extension);
+        SendResult(result, extension, sendDocument: OptionUsed('g'));
 
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
     }
@@ -79,18 +68,9 @@ public class UseMagick : PhotoCommand
         var directory = Path.GetDirectoryName(path);
         var name = Path.GetFileNameWithoutExtension(path);
         var output = UniquePath(directory, name + $"-Mgk.{extension}");
-        var exe = "magick";
-        MagickCommand = $"\"{path}\" {options} \"{output}\"";
-        Output = [];
-        var process = ProcessRunner.StartReadableProcess(exe, MagickCommand);
-        while (true)
-        {
-            var line = await process.StandardError.ReadLineAsync();
-            if (line is null) break;
+        var processResult = await ProcessRunner.Run(MAGICK, $"\"{path}\" {options} \"{output}\"");
+        if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
 
-            Output.Add(line);
-            LogError(line);
-        }
         return output;
     }
 

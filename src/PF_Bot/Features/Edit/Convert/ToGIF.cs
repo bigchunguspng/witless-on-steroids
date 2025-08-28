@@ -28,7 +28,7 @@ public class ToGIF : VideoPhotoCommand
         {
             // photo / video -> ensure valid size
             var video = await EditingHelpers.GetVideoStream(input);
-            var size = video.Size.Ok();
+            var size = video.Size;
             var sizeMp4 = size.ValidMp4Size();
 
             var sizeIsValid = size == sizeMp4;

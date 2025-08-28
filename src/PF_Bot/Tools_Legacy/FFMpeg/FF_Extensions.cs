@@ -15,8 +15,8 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
         public static FFO WithQscale       (this FFO o, int qscale) => o.WithCustomArgument($"-qscale:v {qscale}");
         public static FFO WithCompression  (this FFO o, int factor) => o.WithVideoCodec("libx264").WithConstantRateFactor(factor);
 
-        public static FFO FixWebmSize (this FFO o, VideoStream v) => SizeIsInvalid(v.Width, v.Height) ? o.Resize(ValidSize(v.Width, v.Height)) : o;
-        public static FFO FixSongArt  (this FFO o, IMediaAnalysis info) => info.ErrorData.Count > 0   ? o.DisableChannel(Channel.Video)        : o;
+        public static FFO FixWebmSize (this FFO o, VideoStream v) => SizeIsInvalid(v.Width, v.Height) ? o.Resize(ValidSize(v.Width, v.Height).Ok()) : o;
+        public static FFO FixSongArt  (this FFO o, IMediaAnalysis info) => info.ErrorData.Count > 0   ? o.DisableChannel(Channel.Video)             : o;
 
         public static VFO ChangeVideoSpeed (this VFO o, double speed) => o.With(new SpeedArgument (speed));
         public static AFO ChangeAudioSpeed (this AFO o, double speed) => o.With(new AtempoArgument(speed));

@@ -17,4 +17,5 @@ global using static PF_Tools.Backrooms.Static.CLIs;
 global using static PF_Tools.Logger;
 
 global using File = System.IO.File;
+global using Size = SixLabors.ImageSharp.Size;
 global using MessageOrigin = (long Chat, int? Thread);

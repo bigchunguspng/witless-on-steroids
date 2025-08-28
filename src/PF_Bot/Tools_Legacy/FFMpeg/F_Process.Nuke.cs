@@ -10,7 +10,7 @@ public partial class F_Process
 {
     public F_Process Nuke     (int qscale)         => ApplyEffects(o => NukeArgs(o, qscale));
 
-    public F_Process NukeVideo(Size size, int crf) => ApplyEffects(o => NukeArgs(o.Resize(size), crf, isVideo: true));
+    public F_Process NukeVideo(Size size, int crf) => ApplyEffects(o => NukeArgs(o.Resize(size.Ok()), crf, isVideo: true));
 
     private void NukeArgs(FFMpegArgumentOptions o, int compression = 0, bool isVideo = false)
     {

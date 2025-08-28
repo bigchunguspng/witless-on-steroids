@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Tools_Legacy.Technical;
 using static PF_Bot.Tools_Legacy.FFMpeg.FF_Extensions;
 using Rectangle = System.Drawing.Rectangle;
-using Size = System.Drawing.Size;
 
 namespace PF_Bot.Tools_Legacy.FFMpeg
 {
@@ -40,7 +39,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
 
         public static Task<string> Compress
             (this F_Process process)
-            => process.CompressImage(GetPictureSize(process.Input).FitSize(2560).Ok()).Out("-small", ".jpg");
+            => process.CompressImage(GetPictureSize(process.Input).FitSize(2560)).Out("-small", ".jpg");
 
         public static Task<string> CompressGIF
             (this F_Process process)

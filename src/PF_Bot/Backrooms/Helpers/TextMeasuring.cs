@@ -2,7 +2,6 @@
 using System.Text;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using Size = SixLabors.ImageSharp.Size;
 
 namespace PF_Bot.Backrooms.Helpers;
 

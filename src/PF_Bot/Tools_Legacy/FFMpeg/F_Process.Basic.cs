@@ -1,9 +1,9 @@
-﻿using System.Drawing;
-using FFMpegCore.Arguments;
+﻿using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using PF_Bot.Backrooms;
 using static PF_Bot.Tools_Legacy.FFMpeg.FFMpegXD;
 using FFMpAO = FFMpegCore.FFMpegArgumentOptions;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace PF_Bot.Tools_Legacy.FFMpeg
 {
@@ -20,7 +20,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
             if (v.Width.IsOdd() || v.Height.IsOdd() || Input.GetExtension(".mp4") == ".gif")
             {
                 var size = new Size(v.Width, v.Height).Ok();
-                o.Resize(size.FitSize().ValidMp4Size().Ok());
+                o.Resize(size.Ok().FitSize().ValidMp4Size().Ok());
                 o.WithCompression(30);
             }
             else
@@ -35,7 +35,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
             var v = GetVideoStream(Input)!;
             if (v.Width.IsOdd() || v.Height.IsOdd())
             {
-                var size = new Size(v.Width, v.Height).Ok();
+                var size = new Size(v.Width, v.Height);
                 o.Resize(size.FitSize().ValidMp4Size().Ok());
             }
 
@@ -52,7 +52,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
         // -filter:v "crop=W:H:X:Y" -s 384x384
         public F_Process ToVideoNote(Rectangle crop) => ApplyEffects(o =>
         {
-            o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize).FixPlayback();
+            o.WithVideoFilters(v => v.Crop(crop)).Resize(VideoNoteSize.Ok()).FixPlayback();
         });
 
         public F_Process ToVideoSize() => ApplyEffects(o =>
@@ -60,12 +60,12 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
             var v = GetVideoStream(Input)!;
             if (v.Width.IsOdd() || v.Height.IsOdd())
             {
-                var size = new Size(v.Width, v.Height).Ok();
+                var size = new Size(v.Width, v.Height);
                 o.Resize(size.FitSize().ValidMp4Size().Ok());
             }
         });
 
-        public F_Process ToSticker(Size size) => ApplyEffects(o => o.Resize(size));
+        public F_Process ToSticker(Size size) => ApplyEffects(o => o.Resize(size.Ok()));
 
         public F_Process Edit(string options) => ApplyEffects(o => o.WithCustomArgument(options));
 
@@ -86,7 +86,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
             if (i.HasAudio && !i.HasVideo) o.ForceFormat("mp3");
         }
 
-        public F_Process CompressImage (Size s) => ApplyEffects(o => o.Resize(s).WithQscale(5)); // -qscale:v 5
+        public F_Process CompressImage (Size s) => ApplyEffects(o => o.Resize(s.Ok()).WithQscale(5)); // -qscale:v 5
         public F_Process CompressAnimation   () => ApplyEffects(o =>
         {
             var v = GetVideoStream(Input)!;

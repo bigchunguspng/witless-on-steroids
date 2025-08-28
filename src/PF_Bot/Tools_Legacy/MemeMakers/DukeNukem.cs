@@ -34,7 +34,7 @@ public class DukeNukem : IMemeGenerator<int>
         {
             var process = request.UseFFMpeg();
             path = await process
-                .NukeVideo(size.Ok(), request.GetCRF())
+                .NukeVideo(size, request.GetCRF())
                 .OutAs(UniquePath(request.TargetPath));
             LogNuke(process, request);
         }

@@ -8,8 +8,6 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <OutputPath>$(SolutionDir)/out/$(Configuration)/</OutputPath>
-        <PathMap>$(SolutionDir)=.</PathMap>
         <ApplicationIcon>$(SolutionDir)/img/icon.ico</ApplicationIcon>
     </PropertyGroup>
 
@@ -18,12 +16,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FFMpegCore" Version="5.1.0"/>
-        <PackageReference Include="Telegram.Bot" Version="22.5.1"/>
+        <ProjectReference Include="../PF_Tools/PF_Tools.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../PF_Tools/PF_Tools.csproj"/>
+        <PackageReference Include="FFMpegCore" Version="5.1.0"/>
+        <PackageReference Include="Telegram.Bot" Version="22.5.1"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -6,13 +6,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-
-    <PropertyGroup>
-        <OutputPath>$(SolutionDir)/out/$(Configuration)/</OutputPath>
-        <PathMap>$(SolutionDir)=.</PathMap>
-    </PropertyGroup>
-
-
     <ItemGroup>
         <PackageReference Include="ColorHelper" Version="1.8.1"/>
         <PackageReference Include="HtmlAgilityPack" Version="1.11.61"/>

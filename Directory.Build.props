@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <PathMap>$(SolutionDir)=.</PathMap>
+        <BaseOutputPath>$(MSBuildThisFileDirectory)out/bin/</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)out/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+        <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+    </PropertyGroup>
+</Project>

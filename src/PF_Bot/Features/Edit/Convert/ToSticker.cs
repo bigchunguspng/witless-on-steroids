@@ -12,10 +12,13 @@ namespace PF_Bot.Features.Edit.Convert
             var input = await DownloadFile();
             var output = EditingHelpers.GetOutputFilePath(input, "stick", ".webp");
 
-            var video = await EditingHelpers.GetVideoStream(input);
+            var video = await FFProbe.GetVideoStream(input);
             var size = video.Size.Normalize();
-            var args = FFMpeg.Args().Input(input).Out(output, o => o.Resize(size));
-            await EditingHelpers.FFMpeg_Run(args);
+
+            await FFMpeg.Args()
+                .Input(input)
+                .Out(output, o => o.Resize(size))
+                .FFMpeg_Run();
 
             await using var stream = System.IO.File.OpenRead(output);
             Bot.SendSticker(Origin, InputFile.FromStream(stream));

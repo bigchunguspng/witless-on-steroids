@@ -27,7 +27,7 @@ public class ToGIF : VideoPhotoCommand
         else
         {
             // photo / video -> ensure valid size
-            var video = await EditingHelpers.GetVideoStream(input);
+            var video = await FFProbe.GetVideoStream(input);
             var size = video.Size;
             var sizeMp4 = size.ValidMp4Size();
 
@@ -55,9 +55,11 @@ public class ToGIF : VideoPhotoCommand
 
         var suffix = photo ? "loop" : "GIF";
         var output = EditingHelpers.GetOutputFilePath(input, suffix, ".mp4");
-        args.Out(output, options);
 
-        await EditingHelpers.FFMpeg_Run(args);
+        await args
+            .Out(output, options)
+            .FFMpeg_Run();
+
         await using var stream = System.IO.File.OpenRead(output);
         Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoFileName));
         Log($"{Title} >> GIF [~]");

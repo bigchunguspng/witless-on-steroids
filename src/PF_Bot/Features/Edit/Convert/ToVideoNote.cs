@@ -12,7 +12,7 @@ namespace PF_Bot.Features.Edit.Convert
             var input = await DownloadFile();
             var output = EditingHelpers.GetOutputFilePath(input, "vn", ".mp4");
 
-            var video = await EditingHelpers.GetVideoStream(input);
+            var video = await FFProbe.GetVideoStream(input);
             var size = video.Size;
             var diameter = Math.Min(size.Width, size.Height).ToEven();
             var x = (size.Width  - diameter) / 2;
@@ -22,8 +22,10 @@ namespace PF_Bot.Features.Edit.Convert
                 .VF($"crop={diameter}:{diameter}:{x}:{y}")
                 .Resize(FFMpegOptions.VIDEONOTE_SIZE).FixVideoPlayback();
 
-            var args = FFMpeg.Args().Input(input).Out(output, options);
-            await EditingHelpers.FFMpeg_Run(args);
+            await FFMpeg.Args()
+                .Input(input)
+                .Out(output, options)
+                .FFMpeg_Run();
 
             await using var stream = System.IO.File.OpenRead(output);
             Bot.SendVideoNote(Origin, InputFile.FromStream(stream));

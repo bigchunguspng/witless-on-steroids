@@ -1,4 +1,5 @@
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
+using PF_Tools.Backrooms.Types;
 
 namespace PF_Tools.FFMpeg;
 
@@ -16,6 +17,25 @@ public static class FFProbe
 
     private const string ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{RAW_RATE},{AVG_RATE},{W},{H},{PIXFMT}";
     private const string ARGS     = $"-v error -show_entries stream={ENTRIES}";
+
+
+    // WRAPPERS
+
+    /// Returns primary stream or throws <see cref="UnexpectedException"/>.
+    public static async Task<FFProbeResult.Stream> 
+        GetVideoStream
+        (string filePath)
+    {
+        var probe = await Analyze(filePath);
+        return probe.GetVideoStream();
+    }
+
+    /// Returns primary stream or throws <see cref="UnexpectedException"/>.
+    public static FFProbeResult.Stream
+        GetVideoStream
+        (this FFProbeResult probe) =>
+        probe.GetPrimaryVideoStream() ?? throw new UnexpectedException("FILE HAS NO VIDEO STREAM");
+
 
     // LOGIC
 

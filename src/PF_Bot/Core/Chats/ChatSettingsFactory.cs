@@ -1,4 +1,4 @@
-namespace PF_Bot.State.Chats;
+namespace PF_Bot.Core.Chats;
 
 public static class ChatSettingsFactory
 {

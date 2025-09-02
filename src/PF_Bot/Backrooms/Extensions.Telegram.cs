@@ -1,4 +1,4 @@
-﻿using PF_Bot.State;
+﻿using PF_Bot.Core;
 using PF_Bot.Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Types;

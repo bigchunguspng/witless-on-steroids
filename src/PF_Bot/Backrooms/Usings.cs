@@ -9,9 +9,9 @@ global using System.Threading.Tasks;
 
 global using PF_Bot.Backrooms;
 global using static PF_Bot.Backrooms.Extensions;
-global using static PF_Bot.Backrooms.Static.Texts;
-global using static PF_Bot.Backrooms.Static.Paths;
-global using static PF_Bot.Backrooms.Static.Responses;
+global using static PF_Bot.Core.Paths;
+global using static PF_Bot.Telegram.Literals.Texts;
+global using static PF_Bot.Telegram.Literals.Responses;
 
 global using PF_Tools;
 global using PF_Tools.Backrooms.Extensions;

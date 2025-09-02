@@ -1,4 +1,4 @@
-namespace PF_Bot.Backrooms.Static;
+namespace PF_Bot.Telegram.Literals;
 
 public static class Texts
 {

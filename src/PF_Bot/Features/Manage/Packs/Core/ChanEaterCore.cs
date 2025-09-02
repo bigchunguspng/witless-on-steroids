@@ -1,6 +1,6 @@
 using System.Text;
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.State.Chats;
+using PF_Bot.Core.Chats;
 using PF_Bot.Tools_Legacy.BoardScrappers;
 using PF_Bot.Tools_Legacy.Technical;
 using Telegram.Bot.Types;

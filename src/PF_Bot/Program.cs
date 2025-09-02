@@ -1,4 +1,6 @@
-﻿using PF_Bot.State;
+﻿using System.Diagnostics;
+using PF_Bot.Core;
+using PF_Bot.Core.Generation;
 using PF_Bot.Telegram;
 
 namespace PF_Bot

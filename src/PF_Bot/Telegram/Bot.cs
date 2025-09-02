@@ -1,9 +1,9 @@
-﻿using PF_Bot.Routing;
+﻿using PF_Bot.Core;
+using PF_Bot.Core.Chats;
+using PF_Bot.Routing;
 using PF_Bot.Routing.Commands;
-using PF_Bot.State;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using PF_Bot.State.Chats;
 
 namespace PF_Bot.Telegram
 {

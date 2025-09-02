@@ -1,6 +1,6 @@
 ﻿using PF_Bot.Tools_Legacy.Technical;
 
-namespace PF_Bot.State.Generation;
+namespace PF_Bot.Core.Generation;
 
 public static class DefaultTextProvider
 {

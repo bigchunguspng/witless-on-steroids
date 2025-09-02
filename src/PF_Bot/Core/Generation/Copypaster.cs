@@ -5,7 +5,7 @@ using PF_Tools.Backrooms.Helpers;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 
-namespace PF_Bot.State.Generation
+namespace PF_Bot.Core.Generation
 {
     /// Thread safe <see cref="GenerationPack"/> wrapper.
     /// Tracks changes and usage.

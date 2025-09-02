@@ -1,7 +1,7 @@
 using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core.Chats;
 using PF_Bot.Features.Generate.Text;
 using PF_Bot.Routing.Commands;
-using PF_Bot.State.Chats;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Admin.Fun;

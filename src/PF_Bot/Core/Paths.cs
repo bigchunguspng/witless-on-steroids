@@ -1,7 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace PF_Bot.Backrooms.Static;
+namespace PF_Bot.Core;
 
 /*
     Nobody:

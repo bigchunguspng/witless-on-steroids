@@ -1,5 +1,5 @@
-﻿using PF_Bot.Routing.Commands;
-using PF_Bot.State.Chats;
+﻿using PF_Bot.Core.Chats;
+using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features.Manage.Settings
 {

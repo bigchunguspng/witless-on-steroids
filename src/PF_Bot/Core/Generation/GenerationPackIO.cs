@@ -1,7 +1,7 @@
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Helpers;
 
-namespace PF_Bot.State.Generation;
+namespace PF_Bot.Core.Generation;
 
 public static class GenerationPackIO
 {

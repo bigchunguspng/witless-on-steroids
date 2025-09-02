@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace PF_Bot.State.Chats;
+namespace PF_Bot.Core.Chats;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class ChatSettings // 32 (28) bytes

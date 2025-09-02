@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using PF_Bot.Core.Chats;
 using PF_Bot.Features.Media.Reddit;
 using PF_Bot.Routing.Commands;
-using PF_Bot.State.Chats;
 
 namespace PF_Bot.Features.Help
 {

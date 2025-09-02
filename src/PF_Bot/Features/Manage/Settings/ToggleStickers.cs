@@ -1,4 +1,4 @@
-﻿using PF_Bot.State.Chats;
+﻿using PF_Bot.Core.Chats;
 
 namespace PF_Bot.Features.Manage.Settings
 {

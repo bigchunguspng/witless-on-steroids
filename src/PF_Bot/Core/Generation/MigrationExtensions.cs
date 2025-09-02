@@ -2,7 +2,7 @@ using System.Diagnostics;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.Copypaster;
 
-namespace PF_Bot.State.Generation;
+namespace PF_Bot.Core.Generation;
 
 public static class MigrationExtensions
 {

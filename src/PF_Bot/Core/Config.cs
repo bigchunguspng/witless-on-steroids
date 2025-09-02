@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.State // ReSharper disable InconsistentNaming
+﻿namespace PF_Bot.Core // ReSharper disable InconsistentNaming
 {
     public static class Config
     {

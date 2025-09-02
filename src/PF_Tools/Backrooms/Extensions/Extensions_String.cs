@@ -49,13 +49,13 @@ public static class Extensions_String
         (this string path) => path.Contains(Path.PathSeparator);
 
     public static void CreateParentDirectory
-        (this string path)
+        (this string path) => Path.GetDirectoryName(path).CreateDirectory();
+
+    public static void CreateDirectory
+        (this string? directory)
     {
-        var directory = Path.GetDirectoryName(path);
         if (string.IsNullOrWhiteSpace(directory) == false)
-        {
             Directory.CreateDirectory(directory);
-        }
     }
 
     // LANGUAGE DETECTION

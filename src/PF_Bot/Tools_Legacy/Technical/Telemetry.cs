@@ -1,21 +1,10 @@
-using System.Runtime.CompilerServices;
 using PF_Bot.Telegram;
 
 namespace PF_Bot.Tools_Legacy.Technical;
 
 public static class Telemetry
 {
-    private static readonly string[] _buffer = new string[32];
-
-    private static int _head;
-
-    private static void MoveHead()
-    {
-        if (++_head < 32) return;
-
-        Write();
-        _head &= 0b00011111; // same as % 32
-    }
+    private static readonly FileLogger_Batch _logger = new (File_Log);
 
     public static void LogCommand
         (long chat, string? text)
@@ -33,13 +22,11 @@ public static class Telemetry
         (long chat, byte chance, string? text)
         => Log(chat, $"[auto, {chance,3}%] {text}");
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     private static void Log(long chat, string? text)
     {
-        _buffer[_head] = $"[{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff} | ..{chat.ToString()[^4..]}] >> {text}";
-        MoveHead();
+        var chat_Last4Digits = chat.ToString()[^4..];
+        _logger.Log($"[{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff} | ..{chat_Last4Digits}] >> {text}");
     }
 
-    public static void Write
-        () => File.AppendAllLines(File_Log, _buffer.Take(_head));
+    public static void Write() => _logger.Write();
 }

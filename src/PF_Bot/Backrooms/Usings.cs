@@ -13,12 +13,12 @@ global using static PF_Bot.Core.Paths;
 global using static PF_Bot.Telegram.Literals.Texts;
 global using static PF_Bot.Telegram.Literals.Responses;
 
-global using PF_Tools;
 global using PF_Tools.Backrooms.Extensions;
+global using PF_Tools.Logging;
 global using static PF_Tools.Backrooms.Extensions.Extensions_Time;
 global using static PF_Tools.Backrooms.Helpers.Fortune;
 global using static PF_Tools.Backrooms.Static.CLIs;
-global using static PF_Tools.Logger;
+global using static PF_Tools.Logging.ConsoleLogger;
 
 global using File = System.IO.File;
 global using Size = SixLabors.ImageSharp.Size;

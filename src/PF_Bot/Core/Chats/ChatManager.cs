@@ -20,8 +20,6 @@ public static class ChatManager
 
     public static string GetPackPath
         (long chat) => Path.Combine(Dir_Chat, $"{chat}.pack");
-    public static string GetTempPath
-        (long chat) => Path.Combine(Dir_Temp, $"{chat}.pack");
 
 
     // CHATLIST / SETTINGS
@@ -104,7 +102,7 @@ public static class ChatManager
         if (!baka.IsDirty) return;
 
         var path = GetPackPath(chat);
-        var temp = GetTempPath(chat);
+        var temp = $"{path}~";
         lock (baka)
         {
             GenerationPackIO.Save(baka.Pack, path, temp);

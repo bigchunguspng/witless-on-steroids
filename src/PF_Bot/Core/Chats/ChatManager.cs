@@ -19,7 +19,7 @@ public static class ChatManager
     // PATHS
 
     public static string GetPackPath
-        (long chat) => Path.Combine(Dir_Chat, $"{chat}.pack");
+        (long chat) => Path.Combine(Dir_Chat, $"{chat}{Ext_Pack}");
 
 
     // CHATLIST / SETTINGS

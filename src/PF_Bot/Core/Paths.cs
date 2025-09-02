@@ -14,11 +14,11 @@ namespace PF_Bot.Core;
             Im/
                 bb.txt
         Chat/
-            -1001699898486.pack          [pack] <-- /fuse by id
+            -1001699898486.tgp           [pack] <-- /fuse by id
         Fuse/
             -1001541923355/
-                private_3D_AF.pack       [pack] <-- /fuse ! info
-            any-name-possible.pack       [pack] <-- /fuse   info
+                private_3D_AF.tgp        [pack] <-- /fuse ! info
+            any-name-possible.tgp        [pack] <-- /fuse   info
         History/
             -1001541923355/
                 KINGPIN-funny.json       [list] <-- /fuse * info
@@ -67,6 +67,8 @@ public static class Paths
     public const string File_Errors      = "errors.txt";
     public const string File_Log         = "log.txt";
     public const string File_RedditPosts = "reddit-posts.json";
+
+    public const string Ext_Pack = ".tgp";
 
     public static string Dir_Alias   { get; } = Path.Combine(Dir_DB, "Alias");
     public static string Dir_Chat    { get; } = Path.Combine(Dir_DB, "Chat");

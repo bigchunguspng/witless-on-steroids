@@ -22,7 +22,8 @@ public static class MigrationExtensions
                 var bakaV2 = new GenerationPack();
                 bakaV2.FuseMigrate(bakaV1);
 
-                var newFileName = $"{Path.GetFileNameWithoutExtension(file).Replace("pack-", "")}.pack";
+                var name = Path.GetFileNameWithoutExtension(file).Replace("pack-", "");
+                var newFileName = $"{name}{Ext_Pack}";
                 var path = Path.Combine(dir, newFileName);
                 GenerationPackIO.Save(bakaV2, path);
                 

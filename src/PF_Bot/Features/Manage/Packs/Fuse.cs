@@ -91,7 +91,7 @@ namespace PF_Bot.Features.Manage.Packs
 
                 await FuseWithOtherPack(ChatManager.GetPackPath(chat));
             }
-            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}.pack") is { Length: > 0 } files)
+            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}{Ext_Pack}") is { Length: > 0 } files)
             {
                 await FuseWithOtherPack(files[0]);
             }

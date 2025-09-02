@@ -48,7 +48,7 @@ namespace PF_Bot.Features.Manage.Packs
 
         private void Publish(string name, string directory, string[] x)
         {
-            var file = Path.Combine(directory, Chat.ToString(), $"{name}.pack");
+            var file = Path.Combine(directory, Chat.ToString(), $"{name}{Ext_Pack}");
             if (File.Exists(file) == false)
             {
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
@@ -56,7 +56,7 @@ namespace PF_Bot.Features.Manage.Packs
                 return;
             }
 
-            File.Move(file, UniquePath(directory, $"{name}.pack"));
+            File.Move(file, UniquePath(directory, $"{name}{Ext_Pack}"));
             Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
@@ -79,12 +79,13 @@ namespace PF_Bot.Features.Manage.Packs
         public static string GetUniqueExtraPackPath(string name, long chat = 0)
         {
             var path = chat == 0 ? Dir_Fuse : Path.Combine(Dir_Fuse, chat.ToString());
-            return UniquePath(path, $"{name}.pack", name is "info" or "his");
+            return UniquePath(path, $"{name}{Ext_Pack}", name is "info" or "his");
         }
     }
 
     public enum ExportMode
     {
-        Public, Private
+        Public,
+        Private,
     }
 }

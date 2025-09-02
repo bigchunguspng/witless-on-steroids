@@ -15,13 +15,13 @@ public static class GenerationPackIO
     public static void Save(GenerationPack pack, string path, string temp)
     {
         Save(pack, temp);
-        path.CreateFilePath();
+        path.CreateParentDirectory();
         File.Move(temp, path, overwrite: true);
     }
 
     public static void Save(GenerationPack pack, string path)
     {
-        path.CreateFilePath();
+        path.CreateParentDirectory();
         using var fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write);
         using var writer = new BinaryWriter(fs);
         BinarySerialization.Serialize(writer, pack);

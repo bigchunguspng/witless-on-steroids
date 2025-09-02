@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
+﻿// ReSharper disable MemberCanBePrivate.Global
 
 namespace PF_Bot.Core;
 
@@ -32,6 +31,12 @@ namespace PF_Bot.Core;
         GIFs.txt
         sounds.txt
 
+    Log/
+        Reports/
+            2025-09-11-ffmpeg--1001539756197-BRS0peYTP41.txt
+        errors.txt
+        log.txt
+
     Pics/
         -1001539756197/
             AgAD5g0AAkFXMUk+3D8D-Meme.webp
@@ -54,18 +59,14 @@ namespace PF_Bot.Core;
         ...
 
     config.txt
-    errors.txt
-    log.txt
     reddit-posts.json
 */
 
 public static class Paths
 {
-    public const string Dir_DB = "DB", Dir_Pics = "Pics", Dir_Static = "Static", Dir_Temp = "Temp";
+    public const string Dir_DB = "DB", Dir_Log = "Log", Dir_Pics = "Pics", Dir_Static = "Static", Dir_Temp = "Temp";
 
     public const string File_Config      = "config.txt";
-    public const string File_Errors      = "errors.txt";
-    public const string File_Log         = "log.txt";
     public const string File_RedditPosts = "reddit-posts.json";
 
     public const string Ext_Pack = ".tgp";
@@ -79,6 +80,10 @@ public static class Paths
     public static string File_Chats  { get; } = Path.Combine(Dir_DB, "chats.json");
     public static string File_GIFs   { get; } = Path.Combine(Dir_DB, "GIFs.txt");
     public static string File_Sounds { get; } = Path.Combine(Dir_DB, "sounds.txt");
+
+    public static string Dir_Reports { get; } = Path.Combine(Dir_Log, "Reports");
+    public static string File_Log    { get; } = Path.Combine(Dir_Log, "log.txt");
+    public static string File_Errors { get; } = Path.Combine(Dir_Log, "errors.txt");
 
     public static string Dir_Alias_Peg { get; } = Path.Combine(Dir_Alias, "Peg");
     public static string Dir_Alias_Im  { get; } = Path.Combine(Dir_Alias, "Im");
@@ -97,6 +102,8 @@ public static class Paths
     public static string File_DefaultTexts        { get; } = Path.Combine(Dir_Static, "texts.json");
     public static string File_DefaultVoiceMessage { get; } = Path.Combine(Dir_Static, "voice.ogg");
 
+
+    // TODO: MOVE TFO
 
     public static void ClearTempFiles()
     {

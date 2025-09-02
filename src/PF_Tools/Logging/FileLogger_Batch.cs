@@ -26,6 +26,9 @@ public class FileLogger_Batch(string filePath)
     }
 
     /// Writes pending logs to file. Call this before exit!
-    public void Write
-        () => File.AppendAllLines(filePath, _buffer.Take(_head));
+    public void Write()
+    {
+        filePath.CreateParentDirectory();
+        File.AppendAllLines(filePath, _buffer.Take(_head));
+    }
 }

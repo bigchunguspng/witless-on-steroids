@@ -39,7 +39,7 @@ namespace PF_Bot.Tools_Legacy.Technical
 
         private static T NewT<T>(string path) where T : new()
         {
-            if (path.IsNestedPath()) path.CreateFilePath();
+            if (path.IsNestedPath()) path.CreateParentDirectory();
 
             T result = new();
             SaveData(result, path);

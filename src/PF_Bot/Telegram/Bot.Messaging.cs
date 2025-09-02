@@ -1,4 +1,5 @@
-﻿using PF_Tools.Backrooms.Helpers.ProcessRunning;
+﻿using PF_Tools.Backrooms.Helpers;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -194,7 +195,9 @@ namespace PF_Bot.Telegram
 
         public void SendErrorDetails(ProcessException e, MessageOrigin origin)
         {
-            var path = UniquePath(Dir_Temp, "error.txt");
+            var random = RandomStringGenerator.GenerateRandomString();
+            var fileName = $"{DateTime.Now:yyyy-MM-dd}-{e.File}-{origin.Chat}-{random}.txt";
+            var path = UniquePath(Path.Combine(Dir_Reports, fileName));
             var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
             var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
             File.WriteAllText(path, text);
@@ -205,7 +208,9 @@ namespace PF_Bot.Telegram
         [Obsolete]
         public void SendErrorDetails(MessageOrigin origin, string file, string command, string errorMessage)
         {
-            var path = UniquePath(Dir_Temp, "error.txt");
+            var random = RandomStringGenerator.GenerateRandomString();
+            var fileName = $"{DateTime.Now:yyyy-MM-dd}-{file}-{origin.Chat}-{random}.txt";
+            var path = UniquePath(Path.Combine(Dir_Reports, fileName));
             var text = string.Format(FF_ERROR_REPORT, file, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);

@@ -20,6 +20,10 @@ public static partial class Extensions
 
     // PATH
 
+    // TODO: REFACTOR
+    // TODO:    don't allocate strings if name is already unique (file don't exists)
+    // TODO:    move Directory.CreateDirectory() outta here ?
+
     public static string UniquePath(string path, bool extraCondition = false)
     {
         return UniquePath(Path.GetDirectoryName(path), Path.GetFileName(path), extraCondition);
@@ -119,25 +123,6 @@ public static partial class Extensions
 
     public static string ReadableFileSize
         (this string path) => path.FileSizeInBytes().ReadableFileSize();
-
-    public static long FileSizeInBytes
-        (this string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
-
-    public static bool FileIsEmptyOrNotExist
-        (this string path) => !File.Exists(path) || path.FileSizeInBytes() == 0;
-
-    public static bool IsNestedPath
-        (this string path) => path.Contains(Path.PathSeparator);
-
-    public static void CreateFilePath
-        (this string path)
-    {
-        var directory = Path.GetDirectoryName(path);
-        if (string.IsNullOrWhiteSpace(directory) == false)
-        {
-            Directory.CreateDirectory(directory);
-        }
-    }
 
     public static FileInfo[] GetFilesInfo(string path, bool recursive = false)
     {

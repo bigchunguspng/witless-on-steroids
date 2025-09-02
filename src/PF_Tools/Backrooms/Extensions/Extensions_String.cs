@@ -39,6 +39,25 @@ public static class Extensions_String
     public static string GetExtension
         (this string? path, string fallback) => path != null ? Path.GetExtension(path) : fallback;
 
+    public static long FileSizeInBytes
+        (this string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
+
+    public static bool FileIsEmptyOrNotExist
+        (this string path) => !File.Exists(path) || path.FileSizeInBytes() == 0;
+
+    public static bool IsNestedPath
+        (this string path) => path.Contains(Path.PathSeparator);
+
+    public static void CreateParentDirectory
+        (this string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        if (string.IsNullOrWhiteSpace(directory) == false)
+        {
+            Directory.CreateDirectory(directory);
+        }
+    }
+
     // LANGUAGE DETECTION
 
     private static readonly Regex _lat = new("[A-Za-z]"), _cyr = new("[Ѐ-ӿ]");

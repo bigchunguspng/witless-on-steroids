@@ -100,6 +100,8 @@ public partial class Bot
         HandleError(e, context, context?.Title ?? "[unknown]");
     }
 
+    private static readonly FileLogger_Simple _errorLogger = new (File_Errors);
+
     private static void HandleError(Exception e, object? context, string title)
     {
         LogError($"{title} >> BRUH -> {e.GetFixedMessage()}");
@@ -116,7 +118,7 @@ public partial class Bot
 
 
                  """;
-            File.AppendAllText(File_Errors, entry);
+            _errorLogger.Log(entry);
         }
         catch
         {

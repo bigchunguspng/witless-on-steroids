@@ -28,7 +28,7 @@ public class FFMpegArgs
 
     public FFMpegArgs Input
         (string path, FFMpegInputPipeline options)
-        => this.Fluent(() => _inputs.Add(path, options(new FFMpegInputOptions())));
+        => this.Fluent(() => _inputs.Add(path, options));
 
     public FFMpegArgs Filter
         (string filter)
@@ -44,7 +44,7 @@ public class FFMpegArgs
 
     public FFMpegArgs Out
         (string path, FFMpegOutputPipeline options)
-        => this.Fluent(() => _outputs.Add(path, options(new FFMpegOutputOptions())));
+        => this.Fluent(() => _outputs.Add(path, options));
 
     public string Build()
     {

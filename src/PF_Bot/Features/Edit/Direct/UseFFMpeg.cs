@@ -1,5 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
 // ReSharper disable InconsistentNaming
@@ -70,11 +72,16 @@ public class UseFFMpeg : AudioVideoPhotoCommand
             return;
         }
 
-        var path = await DownloadFile();
-        options = options.Replace("THIS", path);
+        // EXECUTE
 
-        var result = await path.UseFFMpeg(Origin).Edit(options).Out("-Edit", $".{extension}");
-        SendResult(result, extension, sendDocument: OptionUsed('g'));
+        var input = await DownloadFile();
+        var output = EditingHelpers.GetOutputFilePath(input, "Edit", $".{extension}");
+
+        options = options.Replace("THIS", input);
+
+        await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+        SendResult(output, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 

@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -18,14 +20,23 @@ namespace PF_Bot.Features.Edit.Filter
             {
                 _arg = Args.Split(' ', 2)[0];
 
-                var path = await DownloadFile();
+                var input = await DownloadFile();
+                var output = EditingHelpers.GetOutputFilePath(input, "vol", Ext);
 
-                SendResult(await path.UseFFMpeg(Origin).ChangeVolume(_arg).Out("-vol", Ext));
+                await FFMpeg.Args()
+                    .Input(input)
+                    .Out(output, o => o
+                        .AF($"volume='{_arg}':eval=frame")
+                        .FixVideo_Playback()
+                        .Options(FFMpegOptions.Out_cv_copy))
+                    .FFMpeg_Run();
+
+                SendResult(output);
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
         }
 
         protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");
-        protected override string VideoFileName => _arg.Length < 8 ? $"VOLUME-{_arg.ValidFileName()}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
+        protected override string VideoFileName => _arg.Length < 4 ? $"VOLUME-{_arg.ValidFileName()}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
     }
 }

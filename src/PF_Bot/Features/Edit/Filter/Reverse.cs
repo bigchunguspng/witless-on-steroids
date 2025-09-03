@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -6,12 +8,23 @@ namespace PF_Bot.Features.Edit.Filter
     {
         protected override async Task Execute()
         {
-            var path = await DownloadFile();
+            var input = await DownloadFile();
+            var output = EditingHelpers.GetOutputFilePath(input, "Reverse", Ext);
 
-            SendResult(await path.UseFFMpeg(Origin).Reverse().Out("-Reverse", Ext));
+            var options = FFMpeg.OutputOptions();
+
+            var probe = await FFProbe.Analyze(input);
+            if (probe.HasVideo()) options.VF( "reverse");
+            if (probe.HasAudio()) options.AF("areverse");
+
+            options.Fix_AudioVideo(probe);
+
+            await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+            SendResult(output);
             Log($"{Title} >> REVERSED [<<]");
         }
-        
+
         protected override string AudioFileName => SongNameOr($"Kid Named {Sender}.mp3");
         protected override string VideoFileName { get; } = "piece_fap_bot-reverse.mp4";
     }

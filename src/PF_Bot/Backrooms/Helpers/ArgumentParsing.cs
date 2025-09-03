@@ -39,7 +39,7 @@ public static class ArgumentParsing
         return double.TryParse(arg.Replace(',', '.'), out value);
     }
 
-    public static (bool failed, TimeSpan start, TimeSpan length) GetCutTimecodes(string[]? s)
+    public static (bool Failed, TimeSpan Start, TimeSpan Length) GetCutTimecodes(string[]? s)
     {
         var zero = TimeSpan.Zero;
 

@@ -32,4 +32,10 @@ public class FFMpegOutputOptions
         if (_options.Count > 0) sb.AppendSpaceSeparator().AppendJoin(' ', _options);
         return sb;
     }
+
+    public static implicit operator FFMpegOutputOptions
+        (string options) => new FFMpegOutputOptions().Options(options);
+
+    public static implicit operator FFMpegOutputOptions
+        (FFMpegOutputPipeline options) => options(new FFMpegOutputOptions());
 }

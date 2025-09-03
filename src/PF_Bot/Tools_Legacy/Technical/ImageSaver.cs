@@ -9,6 +9,7 @@ namespace PF_Bot.Tools_Legacy.Technical // ReSharper disable MemberCanBePrivate.
     {
         private static int _temp;
 
+        // todo try make them async
         public static string SaveImage(Image image, string path, int quality)
         {
             path = UniquePath(path);

@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -59,12 +61,20 @@ namespace PF_Bot.Features.Edit.Filter
 
                 if (args.Length > 4) args = args.Take(4).ToArray();
 
-                var path = await DownloadFile();
+                var cropArgs = string.Join(':', args);
 
-                var input = path.UseFFMpeg(Origin);
-                var process = Ext is ".mp4" or ".webm" ? input.CropVideo(args) : input.CropJpeg(args);
-                SendResult(await process.Out("-crop", Ext));
-                Log($"{Title} >> {CropOrShake} [{string.Join(':', _isShakeMode ? log! : args)}]");
+                var input = await DownloadFile();
+                var output = EditingHelpers.GetOutputFilePath(input, "crop", Ext);
+
+                await FFMpeg.Args()
+                    .Input(input)
+                    .Out(output, o => o
+                        .FixVideo_Playback()
+                        .VF($"crop={cropArgs}"))
+                    .FFMpeg_Run();
+
+                SendResult(output);
+                Log($"{Title} >> {CropOrShake} [{(_isShakeMode ? string.Join(':', log!) : cropArgs)}]");
             }
             else
                 Bot.SendMessage(Origin, CROP_MANUAL);

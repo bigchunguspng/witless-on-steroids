@@ -15,4 +15,10 @@ public class FFMpegInputOptions
         var sb = new StringBuilder();
         return _options.Count > 0 ? sb.AppendJoin(' ', _options) : sb;
     }
+
+    public static implicit operator FFMpegInputOptions
+        (string options) => new FFMpegInputOptions().Options(options);
+
+    public static implicit operator FFMpegInputOptions
+        (FFMpegInputPipeline options) => options(new FFMpegInputOptions());
 }

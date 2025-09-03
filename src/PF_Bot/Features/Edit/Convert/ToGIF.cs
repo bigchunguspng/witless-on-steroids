@@ -15,7 +15,7 @@ public class ToGIF : VideoPhotoCommand
     {
         var input = await DownloadFile();
 
-        var options = FFMpeg.OutputOptions().FixVideoPlayback();
+        var options = FFMpeg.OutputOptions().FixVideo_Playback();
 
         var photo = Type is MediaType.Photo or MediaType.Stick;
         var round = Type is MediaType.Round;
@@ -28,12 +28,7 @@ public class ToGIF : VideoPhotoCommand
         {
             // photo / video -> ensure valid size
             var video = await FFProbe.GetVideoStream(input);
-            var size = video.Size;
-            var sizeMp4 = size.ValidMp4Size();
-
-            var sizeIsValid = size == sizeMp4;
-            if (sizeIsValid == false)
-                options.Resize(sizeMp4);
+            options.MP4_EnsureValidSize(video, out var sizeIsValid);
 
             // video of valid size -> copy codec
             var copyCodec = sizeIsValid && photo == false && input.GetExtension(".mp4") != ".gif";

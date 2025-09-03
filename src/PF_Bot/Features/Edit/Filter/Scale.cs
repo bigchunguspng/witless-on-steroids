@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -49,12 +51,20 @@ namespace PF_Bot.Features.Edit.Filter
                 if (args.Length == 3 && !args[2].StartsWith("flags="))
                     args[2] = "flags=" + args[2];
 
-                var path = await DownloadFile();
+                var scaleArgs = string.Join(':', args);
 
-                var input = path.UseFFMpeg(Origin);
-                var process = Ext is ".jpg" ? input.ScaleJpeg(args) : input.Scale(args);
-                SendResult(await process.Out("-scale", Ext));
-                Log($"{Title} >> SCALE [{string.Join(':', args)}]");
+                var input = await DownloadFile();
+                var output = EditingHelpers.GetOutputFilePath(input, "scale", Ext);
+
+                await FFMpeg.Args()
+                    .Input(input)
+                    .Out(output, o => o
+                        .FixVideo_Playback()
+                        .VF($"scale='{scaleArgs}'"))
+                    .FFMpeg_Run();
+
+                SendResult(output);
+                Log($"{Title} >> SCALE [{scaleArgs}]");
             }
         }
 

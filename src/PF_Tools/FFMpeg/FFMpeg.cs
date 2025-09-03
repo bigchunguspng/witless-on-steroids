@@ -16,6 +16,14 @@ public static class FFMpeg
     public static FFMpegInputOptions  InputOptions  () => new();
     public static FFMpegOutputOptions OutputOptions () => new();
 
+    public static FFMpegArgs Command
+        (string input, string output, FFMpegOutputOptions options)
+        => Args().Input(input).Out(output, options);
+    
+    public static FFMpegArgs Command
+        (string input, string output, FFMpegOutputPipeline options)
+        => Args().Input(input).Out(output, options);
+
 
     // RUN
 

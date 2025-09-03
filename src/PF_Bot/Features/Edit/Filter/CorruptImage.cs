@@ -1,7 +1,9 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
+using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Edit.Filter;
@@ -19,16 +21,28 @@ public class CorruptImage : PhotoCommand
     {
         var g = Context.Command!.Contains('g');
 
-        var path = await DownloadFile();
-        var process = path.UseFFMpeg(Origin);
-        process = g ? process.ToVideoSize() : process;
-        var jpeg = await process.Out("-jpeg", ".jpg");
+        var input = await DownloadFile();
+        var jpeg = EditingHelpers.GetOutputFilePath(input, "jpeg", ".jpg");
+
+        await JpegImage(input, output: jpeg, g);
 
         _name = jpeg.RemoveExtension();
         _jpegBytes = await System.IO.File.ReadAllBytesAsync(jpeg);
 
         if (g) await HexVid();
         else   await HexPic();
+    }
+
+    private async Task JpegImage(string input, string output, bool g)
+    {
+        var options = FFMpeg.OutputOptions();
+        if (g)
+        {
+            var video = await FFProbe.GetVideoStream(input);
+            options.MP4_EnsureValidSize(video);
+        }
+
+        await FFMpeg.Command(input, output, options).FFMpeg_Run();
     }
 
     private async Task HexVid()

@@ -15,10 +15,7 @@ namespace PF_Bot.Features.Edit.Convert
             var video = await FFProbe.GetVideoStream(input);
             var size = video.Size.Normalize();
 
-            await FFMpeg.Args()
-                .Input(input)
-                .Out(output, o => o.Resize(size))
-                .FFMpeg_Run();
+            await FFMpeg.Command(input, output, o => o.Resize(size)).FFMpeg_Run();
 
             await using var stream = System.IO.File.OpenRead(output);
             Bot.SendSticker(Origin, InputFile.FromStream(stream));

@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -12,22 +13,41 @@ namespace PF_Bot.Features.Edit.Filter
         {
             var args = Args?.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
 
-            var x = ArgumentParsing.GetCutTimecodes(args);
-            if (x.failed)
+            var parsing = ArgumentParsing.GetCutTimecodes(args);
+            if (parsing.Failed)
             {
                 Bot.SendMessage(Origin, CUT_MANUAL);
                 return;
             }
 
-            var span = new CutSpan(x.start, x.length);
+            var (_, start, length) = parsing;
 
-            var (path, waitMessage) = await DownloadFileSuperCool();
+            var (input, waitMessage) = await DownloadFileSuperCool();
+            var output = EditingHelpers.GetOutputFilePath(input, "Cut", Ext);
 
-            var result = await path.UseFFMpeg(Origin).Cut(span).Out("-Cut", Ext);
+            var options = FFMpeg.OutputOptions();
+
+            var probe = await FFProbe.Analyze(input);
+            if (start == TimeSpan.Zero && length > probe.Duration)
+            {
+                options.Options("-c copy");
+            }
+            else
+            {
+                var video = probe.GetPrimaryVideoStream();
+                if (video != null) options.MP4_EnsureValidSize(video);
+
+                if (start  != TimeSpan.Zero) options.Options($"-ss {start}");
+                if (length != TimeSpan.Zero) options.Options($"-t {length}");
+
+                options.Fix_AudioVideo(probe);
+            }
+
+            await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
             Bot.DeleteMessageAsync(Chat, waitMessage);
 
-            SendResult(result);
+            SendResult(output);
             Log($"{Title} >> CUT [8K-]");
         }
 

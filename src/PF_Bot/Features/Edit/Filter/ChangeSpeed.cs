@@ -1,5 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 using static PF_Bot.Features.Edit.Filter.ChangeSpeed.Mode;
 
 namespace PF_Bot.Features.Edit.Filter
@@ -22,10 +24,40 @@ namespace PF_Bot.Features.Edit.Filter
             _speed = Math.Clamp(_speed, 0.1, 94);
             _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
 
-            var path = await DownloadFile();
+            var input = await DownloadFile();
+            var output = EditingHelpers.GetOutputFilePath(input, "Speed", Ext);
 
-            var result = await path.UseFFMpeg(Origin).ChangeSpeed(_speed).Out("-Speed", Ext);
-            SendResult(result);
+            var options = FFMpeg.OutputOptions();
+
+            var probe = await FFProbe.Analyze(input);
+            if (probe.HasVideo())
+            {
+                var video = probe.GetVideoStream();
+                var fps = Math.Min(video.AvgFramerate * _speed, 90D);
+
+                options
+                    .VF($"setpts={1 / _speed}*PTS")
+                    .VF($"fps={fps}")
+                    .MP4_EnsureValidSize(video);
+            }
+
+            if (probe.HasAudio())
+            {
+                var speed = _speed;
+                while (speed < 0.5) // speed = [0.1 - 94]
+                {
+                    options.AF("atempo=0.5"); // af.atempo: [0.5 - 94]
+                    speed *= 2;
+                }
+
+                options.AF($"atempo={speed}");
+            }
+
+            options.Fix_AudioVideo(probe);
+
+            await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+            SendResult(output);
             Log($"{Title} >> {ModeNameUpper} [{ModeIcon}]");
         }
 
@@ -38,7 +70,7 @@ namespace PF_Bot.Features.Edit.Filter
 
         public enum Mode
         {
-            Fast, Slow
+            Fast, Slow,
         }
     }
 }

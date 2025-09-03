@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -11,8 +12,8 @@ namespace PF_Bot.Features.Edit.Filter
         protected override async Task Execute()
         {
             var argless = false;
-            var x = ArgumentParsing.GetCutTimecodes(Args?.Split());
-            if (x.failed)
+            var parsing = ArgumentParsing.GetCutTimecodes(Args?.Split());
+            if (parsing.Failed)
             {
                 if (Args is not null)
                 {
@@ -22,15 +23,42 @@ namespace PF_Bot.Features.Edit.Filter
                 argless = true;
             }
 
-            var span = new CutSpan(x.start, x.length);
+            var (_, start, length) = parsing;
 
-            var path = await DownloadFile();
+            var input = await DownloadFile();
+            var output = EditingHelpers.GetOutputFilePath(input, "Sus", Ext);
 
-            if (argless) x.length = TimeSpan.MinValue;
+            var probe = await FFProbe.Analyze(input);
 
-            var result = await path.UseFFMpeg(Origin).Sus(span).Out("-Sus", Ext);
-            SendResult(result);
+            length = argless                  ? probe.Duration / 2D
+                : (start + length).Ticks <= 0 ? probe.Duration
+                : length;
+
+            var options = FFMpeg.OutputOptions().Fix_AudioVideo(probe);
+
+            var args = FFMpeg.Command(input, output, options);
+
+            if (probe.HasVideo()) AddSusFilter(args, start, length, "v",  "", "v=1");
+            if (probe.HasAudio()) AddSusFilter(args, start, length, "a", "a", "v=0:a=1");
+
+            await args.FFMpeg_Run();
+
+            SendResult(output);
             Log($"{Title} >> SUS [>_<]");
+        }
+
+        private void AddSusFilter
+        (
+            FFMpegArgs args, TimeSpan start, TimeSpan length,
+            string av, string a, string concat
+        )
+        {
+            var ss = start.TotalSeconds;
+            var ls = length.TotalSeconds;
+            args
+                .Filter($"[0:{av}]{a}trim=start={ss}:duration={ls},{a}setpts=PTS-STARTPTS,{a}split=2[{av}0][{av}1]")
+                .Filter($"[{av}1]{a}reverse,{a}setpts=PTS-STARTPTS[{av}r]")
+                .Filter($"[{av}0][{av}r]concat=n=2:{concat}");
         }
 
         protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");

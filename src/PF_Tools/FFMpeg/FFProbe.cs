@@ -9,13 +9,14 @@ public static class FFProbe
         CODEC_TYPE  = "codec_type",
         DURATION    = "duration",
         DURATION_TS = "duration_ts",
+        BIT_RATE    = "bit_rate",
         RAW_RATE    =   "r_frame_rate",
         AVG_RATE    = "avg_frame_rate",
         W = "width",
         H = "height",
         PIXFMT = "pix_fmt";
 
-    private const string ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{RAW_RATE},{AVG_RATE},{W},{H},{PIXFMT}";
+    private const string ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{BIT_RATE},{RAW_RATE},{AVG_RATE},{W},{H},{PIXFMT}";
     private const string ARGS     = $"-v error -show_entries stream={ENTRIES}";
 
 
@@ -30,11 +31,17 @@ public static class FFProbe
         return probe.GetVideoStream();
     }
 
-    /// Returns primary stream or throws <see cref="UnexpectedException"/>.
+    /// Returns primary video stream or throws <see cref="UnexpectedException"/>.
     public static FFProbeResult.Stream
         GetVideoStream
         (this FFProbeResult probe) =>
         probe.GetPrimaryVideoStream() ?? throw new UnexpectedException("FILE HAS NO VIDEO STREAM");
+
+    /// Returns primary audio stream or throws <see cref="UnexpectedException"/>.
+    public static FFProbeResult.Stream
+        GetAudioStream
+        (this FFProbeResult probe) =>
+        probe.GetPrimaryVideoStream() ?? throw new UnexpectedException("FILE HAS NO AUDIO STREAM");
 
 
     // LOGIC
@@ -77,6 +84,7 @@ public static class FFProbe
                 case PIXFMT:      streams[^1].PixFmt       = value;                break; // string
                 case DURATION:    streams[^1].Duration     = ParseFloat_NA(value); break; // float      | N/A -> NaN
                 case DURATION_TS: streams[^1].DurationTs   = ParseInt___NA(value); break; // int        | N/A -> -1
+                case BIT_RATE:    streams[^1].Bitrate      = ParseInt___NA(value); break; // int        | N/A -> -1
                 case W:           streams[^1].Width        = ParseInt___NA(value); break; // int        | -
                 case H:           streams[^1].Height       = ParseInt___NA(value); break; // int        | -
                 case RAW_RATE:    streams[^1].RawFramerate = ParseFps___NA(value); break; // 24000/1001 | N/A -> NaN

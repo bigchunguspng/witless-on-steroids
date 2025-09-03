@@ -15,11 +15,14 @@ public class FFProbeResult
     private static readonly Predicate<Stream> IsVideo = (x) => x.StreamType is Stream.Type.Video;
     private static readonly Predicate<Stream> IsAudio = (x) => x.StreamType is Stream.Type.Audio;
 
+    public TimeSpan Duration => TimeSpan.FromSeconds(Streams[0].Duration);
+
     public class Stream
     {
         public string  CodecType    { get; set; } = null!;
         public float   Duration     { get; set; } // seconds
         public int     DurationTs   { get; set; } // timebase units
+        public int     Bitrate      { get; set; }
         public float   AvgFramerate { get; set; }
         public float   RawFramerate { get; set; }
         public int?    Width        { get; set; }

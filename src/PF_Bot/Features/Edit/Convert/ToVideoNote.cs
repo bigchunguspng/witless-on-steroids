@@ -20,12 +20,9 @@ namespace PF_Bot.Features.Edit.Convert
 
             var options = FFMpeg.OutputOptions()
                 .VF($"crop={diameter}:{diameter}:{x}:{y}")
-                .Resize(FFMpegOptions.VIDEONOTE_SIZE).FixVideoPlayback();
+                .Resize(FFMpegOptions.VIDEONOTE_SIZE).FixVideo_Playback();
 
-            await FFMpeg.Args()
-                .Input(input)
-                .Out(output, options)
-                .FFMpeg_Run();
+            await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
             await using var stream = System.IO.File.OpenRead(output);
             Bot.SendVideoNote(Origin, InputFile.FromStream(stream));

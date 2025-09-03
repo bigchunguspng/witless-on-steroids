@@ -49,12 +49,13 @@ public class UseMagick : PhotoCommand
             return;
         }
 
+        // EXECUTE
+
         var path = await DownloadFile();
         options = options.Replace("THIS", path);
 
-        var result = await ProcessImage(path, options, extension);
-        SendResult(result, extension, sendDocument: OptionUsed('g'));
-
+        var output = await ProcessImage(path, options, extension);
+        SendResult(output, extension, sendDocument: OptionUsed('g'));
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
     }
 

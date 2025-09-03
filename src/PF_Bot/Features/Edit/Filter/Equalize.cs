@@ -1,4 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
 {
@@ -21,9 +23,18 @@ namespace PF_Bot.Features.Edit.Filter
                 var g = double.TryParse(args.Length > 1 ? args[1] : "", out var v2) ? v2 : 15;
                 var w = double.TryParse(args.Length > 2 ? args[2] : "", out var v3) ? v3 : 2000;
 
-                var path = await DownloadFile();
+                var input = await DownloadFile();
+                var output = EditingHelpers.GetOutputFilePath(input, "EQ", Ext);
 
-                SendResult(await path.UseFFMpeg(Origin).EQ([f, g, w]).Out("-EQ", Ext));
+                await FFMpeg.Args()
+                    .Input(input)
+                    .Out(output, o => o
+                        .AF($"equalizer=f={f}:g={g}:t=h:width={w}")
+                        .FixVideo_Playback()
+                        .Options(FFMpegOptions.Out_cv_copy))
+                    .FFMpeg_Run();
+
+                SendResult(output);
                 Log($"{Title} >> EQ [{f} Hz, {g} dB, {w} Hz]");
             }
         }

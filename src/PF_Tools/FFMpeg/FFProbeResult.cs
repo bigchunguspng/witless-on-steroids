@@ -2,12 +2,12 @@ using SixLabors.ImageSharp;
 
 namespace PF_Tools.FFMpeg;
 
-public class FFProbeResult
+public class FFProbeResult(List<FFProbeResult.Stream> streams)
 {
-    public List<Stream> Streams { get; } = [];
+    public IReadOnlyCollection<Stream> Streams { get; } = streams;
 
-    public bool HasVideo() => Streams.Any(x => IsVideo(x));
-    public bool HasAudio() => Streams.Any(x => IsAudio(x));
+    public bool HasVideo = streams.Any(x => IsVideo(x));
+    public bool HasAudio = streams.Any(x => IsAudio(x));
 
     public Stream? GetPrimaryVideoStream() => Streams.FirstOrDefault(x => IsVideo(x));
     public Stream? GetPrimaryAudioStream() => Streams.FirstOrDefault(x => IsAudio(x));
@@ -15,7 +15,7 @@ public class FFProbeResult
     private static readonly Predicate<Stream> IsVideo = (x) => x.StreamType is Stream.Type.Video;
     private static readonly Predicate<Stream> IsAudio = (x) => x.StreamType is Stream.Type.Audio;
 
-    public TimeSpan Duration => TimeSpan.FromSeconds(Streams[0].Duration);
+    public TimeSpan Duration => TimeSpan.FromSeconds(Streams.Max(x => x.Duration));
 
     public class Stream
     {

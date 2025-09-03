@@ -37,7 +37,7 @@ namespace PF_Bot.Features.Edit.Filter
             var options = FFMpeg.OutputOptions();
 
             var probe = await FFProbe.Analyze(input);
-            if (probe.HasVideo())
+            if (probe.HasVideo)
             {
                 options
                     .Options(FFMpegOptions.Out_cv_libx264)
@@ -45,12 +45,12 @@ namespace PF_Bot.Features.Edit.Filter
                     .MP4_EnsureValidSize(probe.GetVideoStream());
             }
 
-            if (probe.HasAudio())
+            if (probe.HasAudio)
             {
                 var audio = probe.GetAudioStream();
                 var bitrate = GetAudioBitrate(audio.Bitrate);
                 options.Options($"-b:a {bitrate}");
-                if (probe.HasVideo() == false) options.Options("-f mp3");
+                if (probe.HasVideo == false) options.Options("-f mp3");
             }
 
             options.Fix_AudioVideo(probe);

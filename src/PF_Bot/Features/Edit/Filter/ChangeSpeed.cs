@@ -30,7 +30,7 @@ namespace PF_Bot.Features.Edit.Filter
             var options = FFMpeg.OutputOptions();
 
             var probe = await FFProbe.Analyze(input);
-            if (probe.HasVideo())
+            if (probe.HasVideo)
             {
                 var video = probe.GetVideoStream();
                 var fps = Math.Min(video.AvgFramerate * _speed, 90D);
@@ -41,7 +41,7 @@ namespace PF_Bot.Features.Edit.Filter
                     .MP4_EnsureValidSize(video);
             }
 
-            if (probe.HasAudio())
+            if (probe.HasAudio)
             {
                 var speed = _speed;
                 while (speed < 0.5) // speed = [0.1 - 94]

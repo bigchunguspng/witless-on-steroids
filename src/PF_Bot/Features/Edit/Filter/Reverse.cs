@@ -14,8 +14,8 @@ namespace PF_Bot.Features.Edit.Filter
             var options = FFMpeg.OutputOptions();
 
             var probe = await FFProbe.Analyze(input);
-            if (probe.HasVideo()) options.VF( "reverse");
-            if (probe.HasAudio()) options.AF("areverse");
+            if (probe.HasVideo) options.VF( "reverse");
+            if (probe.HasAudio) options.AF("areverse");
 
             options.Fix_AudioVideo(probe);
 

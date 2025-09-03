@@ -55,15 +55,15 @@ public static class FFProbe
 
     private static async Task<FFProbeResult> ParseOutput(string stdout)
     {
-        var result = new FFProbeResult();
+        var streams = new List<FFProbeResult.Stream>();
 
         using var reader = new StringReader(stdout);
         while (await reader.ReadLineAsync() is { } line)
         {
-            ParseLine(line, result.Streams);
+            ParseLine(line, streams);
         }
 
-        return result;
+        return new FFProbeResult(streams);
     }
 
     private static void ParseLine(string line, List<FFProbeResult.Stream> streams)

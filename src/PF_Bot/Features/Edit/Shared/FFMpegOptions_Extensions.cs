@@ -20,8 +20,8 @@ public static class FFMpegOptions_Extensions
     public static FFMpegOutputOptions Fix_AudioVideo
         (this FFMpegOutputOptions options, FFProbeResult probe)
     {
-        if (probe.HasVideo()) options.FixVideo_Playback();
-        if (probe.HasAudio()) options.FixAudio_InvalidVideo(probe);
+        if (probe.HasVideo) options.FixVideo_Playback();
+        if (probe.HasAudio) options.FixAudio_InvalidVideo(probe);
 
         return options;
     }

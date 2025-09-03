@@ -38,8 +38,8 @@ namespace PF_Bot.Features.Edit.Filter
 
             var args = FFMpeg.Command(input, output, options);
 
-            if (probe.HasVideo()) AddSusFilter(args, start, length, "v",  "", "v=1");
-            if (probe.HasAudio()) AddSusFilter(args, start, length, "a", "a", "v=0:a=1");
+            if (probe.HasVideo) AddSusFilter(args, start, length, "v",  "", "v=1");
+            if (probe.HasAudio) AddSusFilter(args, start, length, "a", "a", "v=0:a=1");
 
             await args.FFMpeg_Run();
 

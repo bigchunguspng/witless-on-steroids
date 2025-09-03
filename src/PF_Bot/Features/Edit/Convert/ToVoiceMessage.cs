@@ -13,7 +13,7 @@ public class ToVoiceMessage : AudioVideoCommand
 
         string output;
         var probe = await FFProbe.Analyze(input);
-        if (probe.HasAudio())
+        if (probe.HasAudio)
         {
             output = EditingHelpers.GetOutputFilePath(input, "voice", ".ogg");
 

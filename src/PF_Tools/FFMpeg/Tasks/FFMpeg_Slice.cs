@@ -8,14 +8,14 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
 
     public FFMpegArgs ApplyRandomSlices(double breaks, double pacing)
     {
-        var soundOnly = probe is { HasAudio: true, HasVideo: false };
+        var soundOnly = probe.HasAudio && (probe.HasVideo == false || probe.GetVideoStream().IsLikelyImage);
         var seconds = probe.Duration.TotalSeconds;
         var minutes = seconds / 60;
 
         var timecodes = GetTrimCodes(minutes, seconds, breaks, pacing, soundOnly);
 
         AddInputs(timecodes);
-        AddFilter(timecodes);
+        AddFilter(timecodes, soundOnly);
 
         return _args;
     }
@@ -25,11 +25,11 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
         timecodes.ForEach(codes => _args.Input(input, $"-ss {codes.A:F3} -to {codes.B:F3}"));
     }
 
-    private void AddFilter(List<TrimCode> timecodes)
+    private void AddFilter(List<TrimCode> timecodes, bool soundOnly)
     {
         var sb = new StringBuilder();
         var count = timecodes.Count;
-        var video = probe.HasVideo;
+        var video = probe.HasVideo && !soundOnly;
         var audio = probe.HasAudio;
         for (var i = 0; i < count; i++)
         {
@@ -38,8 +38,8 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
         }
 
         sb.Append("concat=n=").Append(count);
-        sb.Append(":v=").Append(probe.HasVideo ? 1 : 0);
-        sb.Append(":a=").Append(probe.HasAudio ? 1 : 0);
+        sb.Append(":v=").Append(video ? 1 : 0);
+        sb.Append(":a=").Append(audio ? 1 : 0);
 
         _args.Filter(sb.ToString());
     }

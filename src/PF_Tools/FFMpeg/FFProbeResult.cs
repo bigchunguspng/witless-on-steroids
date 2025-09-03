@@ -37,13 +37,13 @@ public class FFProbeResult(List<FFProbeResult.Stream> streams)
                 : CodecType is CODEC_video
                     ? Type.Video
                     : Type.Other;
-        /*
-        public bool IsLikelyImage =>
-            DurationTs <= 1
+
+        public bool IsLikelyImage => Bitrate <= 0;
+
+            /*DurationTs <= 1
          || AvgFramerate is 25
          || AvgFramerate is float.NaN && RawFramerate is 90000
-         || PixFmt is "yuva420p" or "yuvj420p";
-         */
+         || PixFmt is "yuva420p" or "yuvj420p";*/
 
         public enum Type
         {

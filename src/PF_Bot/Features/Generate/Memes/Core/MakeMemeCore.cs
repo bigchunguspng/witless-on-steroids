@@ -1,8 +1,10 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Backrooms.Types.SerialQueue;
+using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentNaming
@@ -116,7 +118,12 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             var sw = GetStartedStopwatch();
 
             var path = await DownloadFileAndParseOptions(file, extension);
-            if (round && CropVideoNotes) path = await path.UseFFMpeg(Origin).CropVideoNoteXD();
+            if (round && CropVideoNotes)
+            {
+                var crop = EditingHelpers.GetOutputFilePath(path, "crop", ".mp4");
+                await FFMpeg.Command(path, crop, o => o.Crop(FFMpegOptions.VIDEONOTE_CROP)).FFMpeg_Run();
+                path = crop;
+            }
 
             var note = round && !CropVideoNotes;
 

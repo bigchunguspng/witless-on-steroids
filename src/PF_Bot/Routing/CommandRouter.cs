@@ -62,7 +62,7 @@ namespace PF_Bot.Routing
                 .Register("note"   , () => new ToVideoNote())
                 .Register("vova"   , () => new ToVoiceMessage())
                 .Register("load"   , () => new Load())
-                .Register("upload" , () => new UploadSound())
+                .Register("upload" , () => new UploadFile())
                 .Register("im"     , () => new UseMagick())
                 .Register("peg"    , () => new UseFFMpeg())
                 .Register("w"      , () => new BrowseReddit())

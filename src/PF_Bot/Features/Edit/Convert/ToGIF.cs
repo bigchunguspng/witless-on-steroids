@@ -51,9 +51,7 @@ public class ToGIF : VideoPhotoCommand
         var suffix = photo ? "loop" : "GIF";
         var output = EditingHelpers.GetOutputFilePath(input, suffix, ".mp4");
 
-        await args
-            .Out(output, options)
-            .FFMpeg_Run();
+        await args.Out(output, options).FFMpeg_Run();
 
         await using var stream = System.IO.File.OpenRead(output);
         Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoFileName));

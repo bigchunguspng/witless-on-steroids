@@ -3,7 +3,7 @@ using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features.Media.MediaDB;
 
-public class UploadSound : AudioVideoCommand
+public class UploadFile : AudioVideoCommand
 {
     protected override string SyntaxManual => "/man_7";
 

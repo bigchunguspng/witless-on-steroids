@@ -17,9 +17,7 @@ public class ToVoiceMessage : AudioVideoCommand
         {
             output = EditingHelpers.GetOutputFilePath(input, "voice", ".ogg");
 
-            await FFMpeg
-                .Command(input, output, "-vn -c:a libopus -b:a 48k")
-                .FFMpeg_Run();
+            await FFMpeg.Command(input, output, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
         }
         else
             output = File_DefaultVoiceMessage;

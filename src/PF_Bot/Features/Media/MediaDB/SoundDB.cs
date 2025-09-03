@@ -1,4 +1,6 @@
+using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Telegram;
+using PF_Tools.FFMpeg;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -16,9 +18,10 @@ public class SoundDB : MediaDB<Voice>
     protected override async Task<Voice> UploadFile(string path, long channel)
     {
         var temp = Path.Combine(Dir_Temp, $"{Guid.NewGuid()}.ogg");
-        var opus = await path.UseFFMpeg((0, null)).ToVoice().OutAs(temp);
 
-        await using var stream = File.OpenRead(opus);
+        await FFMpeg.Command(path, temp, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
+
+        await using var stream = File.OpenRead(temp);
         var message = await Bot.Instance.Client.SendVoice(channel, stream);
         return message.Voice!;
     }

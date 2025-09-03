@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Features.Edit.Core;
-using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.FFMpeg;
+using PF_Bot.Features.Edit.Shared;
+using PF_Tools.FFMpeg;
+using PF_Tools.FFMpeg.Tasks;
 
 namespace PF_Bot.Features.Edit.Filter;
 
@@ -12,21 +13,31 @@ public class Slice : AudioVideoUrlCommand
 
     protected override async Task Execute()
     {
-        var (path, waitMessage) = await DownloadFileSuperCool();
+        var (input, waitMessage) = await DownloadFileSuperCool();
+        var output = EditingHelpers.GetOutputFilePath(input, "slices", Ext);
 
         var match = _multiplier.Match(Command!);
-        var pacing = match.ExtractGroup(1, int.Parse, 5);
-        var breaks = match.ExtractGroup(2, int.Parse, pacing);
+        var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
+        var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 
         var sw = GetStartedStopwatch();
 
-        if (Type != MediaType.Audio) path = await FFMpegXD.ReduceSize(Origin, path);
+        var probe = await FFProbe.Analyze(input);
 
-        var result = await path.UseFFMpeg(Origin).SliceRandom(breaks / 5D, pacing / 5D).Out("-slices", Ext);
+        var options = new FFMpegOutputOptions().Fix_AudioVideo(probe);
+
+        var video = probe.GetPrimaryVideoStream();
+        if (video != null)
+            options.MP4_EnsureSize_Fits720p_And_Valid(video);
+
+        await new FFMpeg_Slice(input, probe)
+            .ApplyRandomSlices(breaks / 5D, pacing / 5D)
+            .Out(output, options)
+            .FFMpeg_Run();
 
         Bot.DeleteMessageAsync(Chat, waitMessage);
 
-        SendResult(result);
+        SendResult(output);
         Log($"{Title} >> SLICE [{breaks}*{pacing}] >> {sw.ElapsedShort()}");
     }
 

@@ -17,6 +17,35 @@ public static class FFMpegOptions_Extensions
         return options.VF($"crop={rect.Width}:{rect.Height}:{rect.X}:{rect.Y}");
     }
 
+    public static FFMpegOutputOptions MP4_EnsureValidSize
+        (this FFMpegOutputOptions options, FFProbeResult.Stream video)
+        => MP4_EnsureValidSize(options, video, out _);
+
+    public static FFMpegOutputOptions MP4_EnsureValidSize
+        (this FFMpegOutputOptions options, FFProbeResult.Stream video, out bool sizeIsValid)
+    {
+        var size = video.Size;
+        var sizeMp4 = size.ValidMp4Size();
+        sizeIsValid = size == sizeMp4;
+        return sizeIsValid
+            ? options
+            : options.Resize(sizeMp4);
+    }
+
+    public static FFMpegOutputOptions MP4_EnsureSize_Fits720p_And_Valid
+        (this FFMpegOutputOptions options, FFProbeResult.Stream video)
+    {
+        var size = video.Size;
+        var sizeFit  = size.FitSize(720).ValidMp4Size();
+        var sizeFits = size == sizeFit;
+        return sizeFits
+            ? options
+            : options.Resize(sizeFit);
+    }
+
+
+    // FIXES
+
     public static FFMpegOutputOptions Fix_AudioVideo
         (this FFMpegOutputOptions options, FFProbeResult probe)
     {
@@ -32,21 +61,6 @@ public static class FFMpegOptions_Extensions
         (this FFMpegOutputOptions options)
     {
         return options.Options(FFMpegOptions.Out_pix_fmt_yuv420p);
-    }
-
-    public static FFMpegOutputOptions MP4_EnsureValidSize
-        (this FFMpegOutputOptions options, FFProbeResult.Stream video)
-        => MP4_EnsureValidSize(options, video, out _);
-
-    public static FFMpegOutputOptions MP4_EnsureValidSize
-        (this FFMpegOutputOptions options, FFProbeResult.Stream video, out bool sizeIsValid)
-    {
-        var size = video.Size;
-        var sizeMp4 = size.ValidMp4Size();
-        sizeIsValid = size == sizeMp4;
-        return sizeIsValid
-            ? options
-            : options.Resize(sizeMp4);
     }
 
     /// Removes invalid video stream if audio is present.

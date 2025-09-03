@@ -1,4 +1,6 @@
 using System.Text;
+using FFMpegInput  = (string Path, PF_Tools.FFMpeg.FFMpegInputOptions  Options);
+using FFMpegOutput = (string Path, PF_Tools.FFMpeg.FFMpegOutputOptions Options);
 
 namespace PF_Tools.FFMpeg;
 
@@ -7,10 +9,10 @@ public delegate FFMpegOutputOptions FFMpegOutputPipeline(FFMpegOutputOptions opt
 
 public class FFMpegArgs
 {
-    private readonly       List<string>                      _globals = [];
-    private readonly Dictionary<string, FFMpegInputOptions>   _inputs = new();
-    private readonly       List<string>                      _filters = [];
-    private readonly Dictionary<string, FFMpegOutputOptions> _outputs = new();
+    private readonly List<string>       _globals = [];
+    private readonly List<FFMpegInput>   _inputs = [];
+    private readonly List<string>       _filters = [];
+    private readonly List<FFMpegOutput> _outputs = [];
 
     //
 
@@ -20,15 +22,15 @@ public class FFMpegArgs
 
     public FFMpegArgs Input
         (string path)
-        => this.Fluent(() => _inputs.Add(path, new FFMpegInputOptions()));
+        => this.Fluent(() => _inputs.Add((path, new FFMpegInputOptions())));
 
     public FFMpegArgs Input
         (string path, FFMpegInputOptions options)
-        => this.Fluent(() => _inputs.Add(path, options));
+        => this.Fluent(() => _inputs.Add((path, options)));
 
     public FFMpegArgs Input
         (string path, FFMpegInputPipeline options)
-        => this.Fluent(() => _inputs.Add(path, options));
+        => this.Fluent(() => _inputs.Add((path, options)));
 
     public FFMpegArgs Filter
         (string filter)
@@ -36,15 +38,15 @@ public class FFMpegArgs
 
     public FFMpegArgs Out
         (string path)
-        => this.Fluent(() => _outputs.Add(path, new FFMpegOutputOptions()));
+        => this.Fluent(() => _outputs.Add((path, new FFMpegOutputOptions())));
 
     public FFMpegArgs Out
         (string path, FFMpegOutputOptions options)
-        => this.Fluent(() => _outputs.Add(path, options));
+        => this.Fluent(() => _outputs.Add((path, options)));
 
     public FFMpegArgs Out
         (string path, FFMpegOutputPipeline options)
-        => this.Fluent(() => _outputs.Add(path, options));
+        => this.Fluent(() => _outputs.Add((path, options)));
 
     public string Build()
     {
@@ -52,7 +54,7 @@ public class FFMpegArgs
 
         foreach (var input in _inputs)
         {
-            input.Deconstruct(out var path, out var options);
+            var (path, options) = input;
 
             sb.AppendSpaceSeparator();
             var optionsSb = options.Build();
@@ -68,7 +70,7 @@ public class FFMpegArgs
 
         foreach (var output in _outputs)
         {
-            output.Deconstruct(out var path, out var options);
+            var (path, options) = output;
 
             sb.AppendSpaceSeparator();
             var optionsSb = options.Build();

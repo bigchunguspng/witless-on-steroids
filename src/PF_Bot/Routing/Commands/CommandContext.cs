@@ -1,4 +1,5 @@
-﻿using PF_Bot.Core.Chats;
+﻿using System.Text.Json.Serialization;
+using PF_Bot.Core.Chats;
 using PF_Bot.Core.Generation;
 using PF_Bot.Telegram;
 using Telegram.Bot.Types;
@@ -82,8 +83,9 @@ public class WitlessContext : CommandContext
 {
     public ChatSettings Settings { get; }
 
-    private Copypaster?        _baka;
+    [JsonIgnore]
     public  Copypaster Baka => _baka ??= ChatManager.GetBaka(Chat);
+    private Copypaster?        _baka;
 
 
     public static WitlessContext From(CommandContext context, ChatSettings baka) => new(context, baka);

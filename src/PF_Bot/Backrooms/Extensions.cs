@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using PF_Bot.Tools_Legacy.FFMpeg;
 
 namespace PF_Bot.Backrooms;
 
@@ -32,9 +31,6 @@ public static partial class Extensions
     }
 
     // COMFIES
-
-    [Obsolete]
-    public static F_Process UseFFMpeg(this string path, MessageOrigin origin) => new(path, origin);
 
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {

@@ -1,11 +1,12 @@
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
+using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 
 namespace PF_Bot.Core.FFMpeg;
 
-public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest memeFileRequest, Tools_Legacy.FFMpeg.VideoMemeRequest request)
+public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest memeFileRequest, VideoMemeRequest request)
 {
     private readonly string  _input = memeFileRequest.SourcePath;
     private readonly string _output = memeFileRequest.TargetPath;

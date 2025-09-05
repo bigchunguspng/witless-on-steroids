@@ -1,6 +1,5 @@
 using PF_Bot.Core.FFMpeg;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
@@ -52,7 +51,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
     {
         FetchVideoSize(request);
         SetUp();
-        SetCaptionColor(CustomColorText.ByCoords ? request.GetVideoSnapshot() : null);
+        SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var caption = DrawText(text);
         var probe = await request.ProbeSource();

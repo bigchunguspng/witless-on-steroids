@@ -1,9 +1,11 @@
 ﻿using System.Text;
+using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
+using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Tools_Legacy.YtDlp;
+namespace PF_Bot.Core.YtDlp;
 
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f ba -k -x --audio-format mp3 -I 1 "URL" -o "%(artist)s - %(title)s xd.%(ext)s"
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f "bv*[height<=720]" -k -I 1 "URL" -o "video.%(ext)s"
@@ -119,24 +121,81 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var resize = CropSquare || ArtAttached || thumbPath.Value.Contains("maxres");
 
-        var img = thumbSource.UseFFMpeg(context.Origin);
-        var imgProcess = ExtractThumb
-            ? img.ExportThumbnail(CropSquare)
-            : resize
-                ? img.ResizeThumbnail(CropSquare)
-                : img.CompressJpeg(2);
-        var art = await imgProcess.OutAs($"{directory}/art.jpg");
-        var mp3 = audioFile.UseFFMpeg(context.Origin).AddTrackMetadata(art, Artist, Title!);
-        var jpg = art      .UseFFMpeg(context.Origin).MakeThumb(7).OutAs($"{directory}/jpg.jpg"); // telegram preview
+        var art = directory.Combine("art.jpg");
+        var jpg = directory.Combine("jpg.jpg");
+        var mp3 = GetSongName(audioFile, Artist, Title!);
 
-        await Task.WhenAll(mp3, jpg);
+        await PF_Tools.FFMpeg.FFMpeg.Command(thumbSource, art, GetThumbSourceOptions(resize)).FFMpeg_Run();
+
+        var taskMp3 = FFMpeg_AddArtAndMetadata(audioFile, mp3, art, Artist, Title!);
+        var taskJpg = FFMpeg_CompressArt(art, jpg); // telegram preview
+
+        await Task.WhenAll(taskMp3, taskJpg);
 
         // SEND THE RESULT todo move to bot
 
         Bot.DeleteMessageAsync(context.Chat, messageToDelete);
 
-        await using var stream = File.OpenRead(mp3.Result);
-        Bot.SendAudio(context.Origin, InputFile.FromStream(stream, mp3.Result), jpg.Result);
+        await using var stream = File.OpenRead(mp3);
+        Bot.SendAudio(context.Origin, InputFile.FromStream(stream, mp3), jpg);
         Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", LogLevel.Info, LogColor.Yellow);
+    }
+
+    private string GetSongName(FilePath audioFile, string? artist, string title)
+    {
+        var artist_or_empty = artist == null
+            ? ""
+            : $"{artist} - ";
+        var name = $"{artist_or_empty}{title}";
+        var validName = name.ValidFileName('#');
+        return Path.Combine(audioFile.DirectoryName!, $"{validName}.mp3");
+    }
+
+    private async Task FFMpeg_AddArtAndMetadata(FilePath audioFile, FilePath output, FilePath art, string? artist, string title)
+    {
+        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
+            .Map("0:0")
+            .Map("1:0")
+            .Options("-c copy")
+            .Options("-id3v2_version 3")
+            .Options("-metadata:s:v title=\"Album cover\"")
+            .Options("-metadata:s:v comment=\"Cover (front)\"")
+            .Options($"-metadata title=\"{title}\"");
+        if (artist != null) options.Options($"-metadata artist=\"{artist}\"");
+
+        await PF_Tools.FFMpeg.FFMpeg.Command(audioFile, output, options)
+            .Input(art)
+            .FFMpeg_Run();
+    }
+
+    private async Task FFMpeg_CompressArt(FilePath art, FilePath output)
+    {
+        var probe = await FFProbe.Analyze(art);
+        var size = probe.GetVideoStream().Size.FitSize(320);
+        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
+            .Options("-qscale:v 7")
+            .Resize(size);
+        await PF_Tools.FFMpeg.FFMpeg.Command(art, output, options).FFMpeg_Run();
+    }
+
+    private FFMpegOutputOptions GetThumbSourceOptions(bool resize)
+    {
+        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
+            .Options("-qscale:v 2");
+
+        if (ExtractThumb)
+            options.Options("-ss 1 -frames:v 1");
+
+        if (ExtractThumb || resize)
+        {
+            _ = CropSquare
+                ? options
+                    .VF("crop='min(iw,ih)':'min(iw,ih)'")
+                    .VF("scale=640:640")
+                : options
+                    .VF("scale=640:-1");
+        }
+
+        return options;
     }
 }

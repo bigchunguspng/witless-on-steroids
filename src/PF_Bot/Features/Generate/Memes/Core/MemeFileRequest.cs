@@ -1,4 +1,4 @@
-﻿using PF_Bot.Tools_Legacy.FFMpeg;
+﻿using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -41,11 +41,11 @@ public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, FilePath
     public async Task<FFProbeResult> ProbeSource
         () => await FFProbe.Analyze(SourcePath);
 
-    public F_Process UseFFMpeg() => new(SourcePath, Origin);
-
-    public Image<Rgba32> GetVideoSnapshot()
+    public async Task<Image<Rgba32>> GetVideoSnapshot()
     {
-        return Image.Load<Rgba32>(FFMpegXD.Snapshot(SourcePath));
+        var temp = ImageSaver.GetTempPicName();
+        await FFMpeg.Command(path, temp, o => o.Options("-frames:v 1")).FFMpeg_Run();
+        return Image.Load<Rgba32>(temp);
     }
 }
 

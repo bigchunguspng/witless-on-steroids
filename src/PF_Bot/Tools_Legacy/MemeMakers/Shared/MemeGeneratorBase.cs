@@ -1,5 +1,5 @@
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
+using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -19,7 +19,8 @@ public abstract class MemeGeneratorBase
 
     protected void FetchVideoSize(MemeFileRequest request)
     {
-        _sourceSizeOG = FFMpegXD.GetPictureSize(request.SourcePath);
+        // todo task
+        _sourceSizeOG = FFProbe.Analyze(request.SourcePath).Result.GetVideoStream().Size;
         _sourceSizeAdjusted = AdjustImageSize(request).ValidMp4Size();
     }
 

@@ -1,6 +1,5 @@
 ﻿using PF_Bot.Core.FFMpeg;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
@@ -67,12 +66,13 @@ namespace PF_Bot.Tools_Legacy.MemeMakers // ReSharper disable InconsistentNaming
             text = ArrangeText(text, out var emojiPngs);
 
             SetUpFrameSize(request);
-            SetColor(CustomColor.ByCoords ? request.GetVideoSnapshot() : null);
+            SetColor(CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
 
             using var frame = DrawFrame(text, emojiPngs);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
-            var full_size = FFMpegXD.GetPictureSize(frameAsFile);//.FitSize(720);
+            // todo task
+            var full_size = FFProbe.Analyze(frameAsFile).Result.GetVideoStream().Size; //.FitSize(720);
 
             var probe = await request.ProbeSource();
             await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, frameAsFile))

@@ -2,7 +2,7 @@
 
 #pragma warning disable SYSLIB0014
 
-namespace PF_Bot.Tools_Legacy.YtDlp
+namespace PF_Bot.Core.YtDlp
 {
     public static class YouTubePreviewFetcher
     {

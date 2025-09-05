@@ -20,7 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FFMpegCore" Version="5.1.0"/>
         <PackageReference Include="Telegram.Bot" Version="22.5.1"/>
     </ItemGroup>
 

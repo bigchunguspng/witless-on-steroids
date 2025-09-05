@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.FFMpeg;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;

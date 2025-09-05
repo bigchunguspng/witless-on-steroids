@@ -1,5 +1,5 @@
-﻿using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.YtDlp;
+﻿using PF_Bot.Core.YtDlp;
+using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Edit.Core;

@@ -1,7 +1,7 @@
 using PF_Bot.Features.Edit.Shared;
 using PF_Tools.FFMpeg;
 
-namespace PF_Bot.Core.FFMpeg;
+namespace PF_Bot.Core.Editing;
 
 public static class FFMpeg_Compression
 {

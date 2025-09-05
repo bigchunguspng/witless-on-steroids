@@ -1,5 +1,5 @@
 ﻿using ColorHelper;
-using PF_Bot.Core.FFMpeg;
+using PF_Bot.Core.Editing;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Bot.Tools_Legacy.Technical;

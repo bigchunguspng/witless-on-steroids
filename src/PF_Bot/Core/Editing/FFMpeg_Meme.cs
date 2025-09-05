@@ -4,7 +4,7 @@ using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 
-namespace PF_Bot.Core.FFMpeg;
+namespace PF_Bot.Core.Editing;
 
 public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest memeFileRequest, VideoMemeRequest request)
 {

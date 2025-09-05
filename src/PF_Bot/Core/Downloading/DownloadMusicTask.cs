@@ -3,9 +3,10 @@ using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
 using PF_Tools.FFMpeg;
+using PF_Tools.YtDlp;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Core.YtDlp;
+namespace PF_Bot.Core.Downloading;
 
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f ba -k -x --audio-format mp3 -I 1 "URL" -o "%(artist)s - %(title)s xd.%(ext)s"
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f "bv*[height<=720]" -k -I 1 "URL" -o "video.%(ext)s"
@@ -38,23 +39,23 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private string GetAudioArgs(string url, string output)
     {
-        var builder = new StringBuilder(PF_Tools.YtDlp.YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         if (HighQuality)
             builder.Append("--audio-quality 0 ");
         if (!youTube && !ExtractThumb && !ArtAttached)
             builder.Append("--write-thumbnail ");
         builder.Append("-f ba -k -x --audio-format mp3 ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
-        builder.Append(url.Quote()).Append(" -o ").Append(output.Quote());
+        builder.AppendInQuotes(url).Append(" -o ").AppendInQuotes(output);
         return builder.ToString();
     }
 
     private string GetVideoArgs(string url)
     {
-        var builder = new StringBuilder(PF_Tools.YtDlp.YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
         builder.Append("-f \"bv*[height<=720]\" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
-        builder.Append(url.Quote()).Append(" -o ").Append("video.%(ext)s".Quote());
+        builder.AppendInQuotes(url).Append(" -o ").AppendInQuotes("video.%(ext)s");
         return builder.ToString();
     }
 
@@ -83,9 +84,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
-        var taskA = PF_Tools.YtDlp.YtDlp.Run(GetAudioArgs(url, output), directory);
+        var taskA = YtDlp.Run(GetAudioArgs(url, output), directory);
         var taskV = ExtractThumb
-            ? PF_Tools.YtDlp.YtDlp.Run(GetVideoArgs(url), directory)
+            ? YtDlp.Run(GetVideoArgs(url), directory)
             : ArtAttached
                 ? Bot.DownloadFile(Cover!, thumbPath, context.Origin)
                 : youTube
@@ -125,7 +126,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         var jpg = directory.Combine("jpg.jpg");
         var mp3 = GetSongName(audioFile, Artist, Title!);
 
-        await PF_Tools.FFMpeg.FFMpeg.Command(thumbSource, art, GetThumbSourceOptions(resize)).FFMpeg_Run();
+        await FFMpeg.Command(thumbSource, art, GetThumbSourceOptions(resize)).FFMpeg_Run();
 
         var taskMp3 = FFMpeg_AddArtAndMetadata(audioFile, mp3, art, Artist, Title!);
         var taskJpg = FFMpeg_CompressArt(art, jpg); // telegram preview
@@ -153,7 +154,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     private async Task FFMpeg_AddArtAndMetadata(FilePath audioFile, FilePath output, FilePath art, string? artist, string title)
     {
-        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
+        var options = FFMpeg.OutputOptions()
             .Map("0:0")
             .Map("1:0")
             .Options("-c copy")
@@ -163,7 +164,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
             .Options($"-metadata title=\"{title}\"");
         if (artist != null) options.Options($"-metadata artist=\"{artist}\"");
 
-        await PF_Tools.FFMpeg.FFMpeg.Command(audioFile, output, options)
+        await FFMpeg.Command(audioFile, output, options)
             .Input(art)
             .FFMpeg_Run();
     }
@@ -172,30 +173,23 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
     {
         var probe = await FFProbe.Analyze(art);
         var size = probe.GetVideoStream().Size.FitSize(320);
-        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
+        var options = FFMpeg.OutputOptions()
             .Options("-qscale:v 7")
             .Resize(size);
-        await PF_Tools.FFMpeg.FFMpeg.Command(art, output, options).FFMpeg_Run();
+        await FFMpeg.Command(art, output, options).FFMpeg_Run();
     }
 
     private FFMpegOutputOptions GetThumbSourceOptions(bool resize)
     {
-        var options = PF_Tools.FFMpeg.FFMpeg.OutputOptions()
-            .Options("-qscale:v 2");
+        var options = FFMpeg.OutputOptions().Options("-qscale:v 2");
 
         if (ExtractThumb)
             options.Options("-ss 1 -frames:v 1");
 
-        if (ExtractThumb || resize)
-        {
-            _ = CropSquare
-                ? options
-                    .VF("crop='min(iw,ih)':'min(iw,ih)'")
-                    .VF("scale=640:640")
-                : options
-                    .VF("scale=640:-1");
-        }
-
-        return options;
+        return ExtractThumb || resize
+            ? CropSquare
+                ? options.VF("crop='min(iw,ih)':'min(iw,ih)',scale=640:640")
+                : options.VF("scale=640:-1")
+            : options;
     }
 }

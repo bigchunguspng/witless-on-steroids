@@ -73,10 +73,11 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         var output = $"{artist} - {title} xd.%(ext)s";
 
-        var directory = Path.Combine(Dir_Temp, $"song-{DateTime.Now.Ticks}");
-        var thumbPath = Path.Combine(directory, "thumb.jpg");
+        var directory = Dir_Temp
+            .Combine($"song-{DateTime.Now.Ticks}")
+            .EnsureDirectoryExist();
 
-        Directory.CreateDirectory(directory);
+        var thumbPath = directory.Combine("thumb.jpg");
 
         // DOWNLOAD AUDIO + THUMB SOURCE
 
@@ -116,7 +117,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         // COMBINE ALL TOGETHER
 
-        var resize = CropSquare || ArtAttached || thumbPath.Contains("maxres");
+        var resize = CropSquare || ArtAttached || thumbPath.Value.Contains("maxres");
 
         var img = thumbSource.UseFFMpeg(context.Origin);
         var imgProcess = ExtractThumb

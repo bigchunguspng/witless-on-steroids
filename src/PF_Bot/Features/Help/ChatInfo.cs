@@ -12,7 +12,7 @@ namespace PF_Bot.Features.Help
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
-            var size = PackPath.FileSizeInBytes();
+            var size = PackPath.FileSizeInBytes;
             var icon = size switch
             {
                 <      2_000 => "🗒",

@@ -23,7 +23,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string Log_STR => "NUKED";
         protected override string Command => "/nuke";
-        protected override string Suffix  => "-Nuked"; // Needs more nuking!
+        protected override string Suffix  => "Nuked"; // Needs more nuking!
 
         protected override string? DefaultOptions => Data.Options?.Nuke;
 

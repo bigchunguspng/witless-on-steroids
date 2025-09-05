@@ -54,7 +54,7 @@ namespace PF_Bot.Features.Edit.Filter
                 var scaleArgs = string.Join(':', args);
 
                 var input = await DownloadFile();
-                var output = EditingHelpers.GetOutputFilePath(input, "scale", Ext);
+                var output = input.GetOutputFilePath("scale", Ext);
 
                 await FFMpeg.Args()
                     .Input(input)

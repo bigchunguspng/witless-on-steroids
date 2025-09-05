@@ -2,6 +2,7 @@
 
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Shared;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Types;
 
@@ -64,11 +65,9 @@ public class UseMagick : PhotoCommand
         return Command!.Length > 3 && Command.AsSpan()[3..].Contains(option);
     }
 
-    private async Task<string> ProcessImage(string path, string options, string extension)
+    private async Task<string> ProcessImage(FilePath path, string options, string extension)
     {
-        var directory = Path.GetDirectoryName(path);
-        var name = Path.GetFileNameWithoutExtension(path);
-        var output = UniquePath(directory, name + $"-Mgk.{extension}");
+        var output = path.GetOutputFilePath("Mgk", extension);
         var processResult = await ProcessRunner.Run(MAGICK, $"\"{path}\" {options} \"{output}\"");
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
 

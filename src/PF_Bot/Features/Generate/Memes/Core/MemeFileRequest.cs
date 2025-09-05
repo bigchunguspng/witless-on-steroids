@@ -5,12 +5,12 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace PF_Bot.Features.Generate.Memes.Core;
 
-public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, string path, string outputEnding, int quality, float press)
+public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, FilePath path, string outputEnding, int quality, float press)
 {
     public MessageOrigin Origin { get; }      = origin;
     public MemeSourceType  Type { get; }      = type;
-    public string    SourcePath { get; set; } = path;
-    public string    TargetPath { get; }      = path.ReplaceExtension(outputEnding);
+    public FilePath  SourcePath { get; set; } = path;
+    public FilePath  TargetPath { get; }      = path.ChangeEnding(outputEnding);
     public int          Quality { get; }      = quality.Clamp(0, 100);
     public float          Press { get; }      = Math.Clamp(press, 0, 1);
 

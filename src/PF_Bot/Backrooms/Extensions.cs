@@ -20,40 +20,6 @@ public static partial class Extensions
 
     // PATH
 
-    // TODO: REFACTOR
-    // TODO:    don't allocate strings if name is already unique (file don't exists)
-    // TODO:    move Directory.CreateDirectory() outta here ?
-
-    public static string UniquePath(string path, bool extraCondition = false)
-    {
-        return UniquePath(Path.GetDirectoryName(path), Path.GetFileName(path), extraCondition);
-    }
-
-    public static string UniquePath(string? directory, string file, bool extraCondition = false)
-    {
-        // dir/file.txt
-        // dir/file_A8.txt
-        // dir/file_A8_62.txt
-
-        var path = directory is null ? file : Path.Combine(directory, file);
-
-        if (directory is not null) Directory.CreateDirectory(directory);
-
-        if (!File.Exists(path) && extraCondition is false) return path;
-
-        do
-        {
-            var index = path.LastIndexOf('.');
-            var part1 = path.Remove(index); // directory/name
-            var part2 = path.Substring(index); // .txt
-
-            var xx = Random.Shared.Next(256).ToString("X2");
-            path = $"{part1}_{xx}{part2}";
-            if (!File.Exists(path)) return path;
-        }
-        while (true);
-    }
-
     public static string ValidFileName(this string text, char x = '_')
     {
         var chars = Path.GetInvalidFileNameChars();
@@ -67,6 +33,7 @@ public static partial class Extensions
 
     // COMFIES
 
+    [Obsolete]
     public static F_Process UseFFMpeg(this string path, MessageOrigin origin) => new(path, origin);
 
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
@@ -120,9 +87,6 @@ public static partial class Extensions
                     ? $"{kbs:F0} КБ"
                     : $"{bytes} байт";
     }
-
-    public static string ReadableFileSize
-        (this string path) => path.FileSizeInBytes().ReadableFileSize();
 
     public static FileInfo[] GetFilesInfo(string path, bool recursive = false)
     {

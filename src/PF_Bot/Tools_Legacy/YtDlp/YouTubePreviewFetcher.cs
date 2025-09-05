@@ -6,9 +6,9 @@ namespace PF_Bot.Tools_Legacy.YtDlp
 {
     public static class YouTubePreviewFetcher
     {
-        public static Task<string> DownloadPreview(string id, string directory) => Task.Run(() =>
+        public static Task<FilePath> DownloadPreview(string id, FilePath directory) => Task.Run(() =>
         {
-            string path = null!;
+            var path = File_DefaultAlbumCover;
             var urls = new[]
             {
                 $"https://i1.ytimg.com/vi_webp/{id}/maxresdefault.webp",
@@ -20,7 +20,7 @@ namespace PF_Bot.Tools_Legacy.YtDlp
             {
                 try
                 {
-                    path = Path.Combine(directory, Path.GetFileName(urls[i]));
+                    path = directory.Combine(Path.GetFileName(urls[i]));
                     client.DownloadFile(urls[i], path);
                     break;
                 }

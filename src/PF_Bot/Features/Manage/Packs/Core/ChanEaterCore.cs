@@ -88,7 +88,7 @@ public abstract class ChanEaterCore : Fuse
 
             Bot.EditMessage(Chat, message, text);
 
-            var size = ChatManager.GetPackPath(Chat).FileSizeInBytes();
+            var size = ChatManager.GetPackPath(Chat).FileSizeInBytes;
             var lines = threads.SelectMany(s => s).ToList();
 
             await EatMany(lines, size, Limit);

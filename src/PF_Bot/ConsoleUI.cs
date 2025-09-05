@@ -142,7 +142,7 @@ namespace PF_Bot
         {
             ChatManager.SettingsDB.ForEachKey(chat =>
             {
-                if (ChatManager.GetPackPath(chat).FileSizeInBytes() > size) return;
+                if (ChatManager.GetPackPath(chat).FileSizeInBytes > size) return;
 
                 ChatManager.RemoveChat(chat);
                 ChatManager.DeletePack(chat);

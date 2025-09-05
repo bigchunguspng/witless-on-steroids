@@ -99,9 +99,10 @@ public abstract class MediaDB<T> where T : FileBase
 
     public async Task UploadSingle(string fileId, string fileName, MessageOrigin origin)
     {
-        var path = Path.Combine(Dir_Temp, $"{WhatSingle}-{DateTime.Now.Ticks}");
-        var file = Path.Combine(path, fileName);
-        Directory.CreateDirectory(path);
+        var path = Dir_Temp
+            .Combine($"{WhatSingle}-{DateTime.Now.Ticks}")
+            .EnsureDirectoryExist();
+        var file = path.Combine(fileName);
         await Bot.Instance.DownloadFile(fileId, file, origin);
         await UploadMany(path);
     }
@@ -115,7 +116,7 @@ public abstract class MediaDB<T> where T : FileBase
         foreach (var file in files)
         {
             var name = Path.GetFileName(file);
-            var text = Path.GetFileNameWithoutExtension(name);
+            var text = Path.GetFileNameWithoutExtension(file);
             try
             {
                 var tgFile = await UploadFile(file, Config.SoundChannel);
@@ -137,7 +138,7 @@ public abstract class MediaDB<T> where T : FileBase
     /// <summary>
     /// Uploads file to Telegram server and returns its ID.
     /// </summary>
-    protected abstract Task<T> UploadFile(string path, long channel);
+    protected abstract Task<T> UploadFile(FilePath path, long channel);
 
 
     // META

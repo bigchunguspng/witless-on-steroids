@@ -16,7 +16,7 @@ namespace PF_Bot.Tools_Legacy.FFMpeg
             o.DisableChannel(Channel.Audio).FixPlayback();
 
             var v = GetVideoStream(Input)!;
-            if (v.Width.IsOdd() || v.Height.IsOdd() || Input.GetExtension(".mp4") == ".gif")
+            if (v.Width.IsOdd() || v.Height.IsOdd() || Input.GetExtension_Or(".mp4") == ".gif")
             {
                 var size = new Size(v.Width, v.Height).Ok();
                 o.Resize(size.Ok().FitSize().ValidMp4Size().Ok());

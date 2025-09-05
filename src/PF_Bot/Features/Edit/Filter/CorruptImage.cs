@@ -22,11 +22,11 @@ public class CorruptImage : PhotoCommand
         var g = Context.Command!.Contains('g');
 
         var input = await DownloadFile();
-        var jpeg = EditingHelpers.GetOutputFilePath(input, "jpeg", ".jpg");
+        var jpeg = input.GetOutputFilePath("JPEG", ".jpg");
 
         await JpegImage(input, output: jpeg, g);
 
-        _name = jpeg.RemoveExtension();
+        _name = jpeg.ToString().RemoveExtension();
         _jpegBytes = await System.IO.File.ReadAllBytesAsync(jpeg);
 
         if (g) await HexVid();

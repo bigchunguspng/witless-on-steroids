@@ -31,7 +31,7 @@ public class ToGIF : VideoPhotoCommand
             options.MP4_EnsureValidSize(video, out var sizeIsValid);
 
             // video of valid size -> copy codec
-            var copyCodec = sizeIsValid && photo == false && input.GetExtension(".mp4") != ".gif";
+            var copyCodec = sizeIsValid && photo == false && input.Extension != ".gif";
             _ = copyCodec
                 ? options
                     .Options(FFMpegOptions.Out_cv_copy)
@@ -49,7 +49,7 @@ public class ToGIF : VideoPhotoCommand
             : FFMpeg.Args().Input(input);
 
         var suffix = photo ? "loop" : "GIF";
-        var output = EditingHelpers.GetOutputFilePath(input, suffix, ".mp4");
+        var output = input.GetOutputFilePath(suffix, ".mp4");
 
         await args.Out(output, options).FFMpeg_Run();
 

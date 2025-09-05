@@ -11,7 +11,7 @@ namespace PF_Bot.Features.Edit.Convert
         {
             var input = await DownloadFile();
 
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "stick", ".webp");
+            var (output, probe, options) = await input.InitEditing("stick", ".webp");
 
             var video = probe.GetVideoStream();
             var size = video.Size.Normalize();

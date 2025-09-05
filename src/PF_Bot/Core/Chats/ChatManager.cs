@@ -18,7 +18,7 @@ public static class ChatManager
 
     // PATHS
 
-    public static string GetPackPath
+    public static FilePath GetPackPath
         (long chat) => Path.Combine(Dir_Chat, $"{chat}{Ext_Pack}");
 
 
@@ -101,11 +101,10 @@ public static class ChatManager
     {
         if (!baka.IsDirty) return;
 
-        var path = GetPackPath(chat);
-        var temp = $"{path}~";
         lock (baka)
         {
-            GenerationPackIO.Save(baka.Pack, path, temp);
+            Dir_Chat.EnsureDirectoryExist();
+            GenerationPackIO.Save_WithTemp(baka.Pack, GetPackPath(chat));
             baka.ResetDirty();
         }
         Log($"DIC SAVE << {chat}", LogLevel.Info, LogColor.Lime);

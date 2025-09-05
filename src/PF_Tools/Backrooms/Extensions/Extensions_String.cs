@@ -29,27 +29,12 @@ public static class Extensions_String
         (this string text) => 1 + text.Count(x => x == '\n');
 
     // PATH
-
+    
     public static string RemoveExtension
         (this string path) => path.Remove(path.LastIndexOf('.'));
 
-    public static string ReplaceExtension
-        (this string path, string newExtension) => Regex.Replace(path, @"\.\S+$", newExtension);
-
-    public static string GetExtension
+    public static string GetExtension_Or
         (this string? path, string fallback) => path != null ? Path.GetExtension(path) : fallback;
-
-    public static long FileSizeInBytes
-        (this string path) => File.Exists(path) ? new FileInfo(path).Length : 0;
-
-    public static bool FileIsEmptyOrNotExist
-        (this string path) => !File.Exists(path) || path.FileSizeInBytes() == 0;
-
-    public static bool IsNestedPath
-        (this string path) => path.Contains(Path.PathSeparator);
-
-    public static void CreateParentDirectory
-        (this string path) => Path.GetDirectoryName(path).CreateDirectory();
 
     public static void CreateDirectory
         (this string? directory)

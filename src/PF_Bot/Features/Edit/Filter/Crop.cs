@@ -64,7 +64,7 @@ namespace PF_Bot.Features.Edit.Filter
                 var cropArgs = string.Join(':', args);
 
                 var input = await DownloadFile();
-                var output = EditingHelpers.GetOutputFilePath(input, "crop", Ext);
+                var output = input.GetOutputFilePath("crop", Ext);
 
                 await FFMpeg.Args()
                     .Input(input)

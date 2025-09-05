@@ -68,7 +68,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         return true;
     }
 
-    protected async Task<(string path, int waitMessage)> DownloadFileSuperCool()
+    protected async Task<(FilePath path, int waitMessage)> DownloadFileSuperCool()
     {
         if (Url != null)
         {
@@ -85,7 +85,7 @@ public abstract class AudioVideoUrlCommand : FileEditingCommand
         {
             var path = await DownloadFile();
 
-            var waitMessage = path.FileSizeInBytes() > 4_000_000
+            var waitMessage = path.FileSizeInBytes > 4_000_000
                 ? Bot.PingChat(Origin, PROCESSING.PickAny().XDDD())
                 : -1;
 

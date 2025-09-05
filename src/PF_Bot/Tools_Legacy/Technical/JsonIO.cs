@@ -18,9 +18,9 @@ namespace PF_Bot.Tools_Legacy.Technical
             Converters = { new TransitionTableConverter() }
         };
 
-        public static T LoadData<T>(string path) where T : new()
+        public static T LoadData<T>(FilePath path) where T : new()
         {
-            if (path.FileIsEmptyOrNotExist()) return NewT<T>(path);
+            if (path.File_DoNotExist_Or_Empty) return NewT<T>(path);
 
             var serializer = SerializerDefault;
             using var stream = File.OpenText(path);
@@ -37,9 +37,9 @@ namespace PF_Bot.Tools_Legacy.Technical
             serializer.Serialize(writer, db);
         }
 
-        private static T NewT<T>(string path) where T : new()
+        private static T NewT<T>(FilePath path) where T : new()
         {
-            if (path.IsNestedPath()) path.CreateParentDirectory();
+            if (path.IsNested) path.EnsureParentDirectoryExist();
 
             T result = new();
             SaveData(result, path);

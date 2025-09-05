@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
 using PF_Bot.Features.Manage.Settings;
+using PF_Tools.Backrooms.Helpers;
 
 namespace PF_Bot.Features.Manage.Packs
 {
@@ -46,17 +47,19 @@ namespace PF_Bot.Features.Manage.Packs
             }
         }
 
-        private void Publish(string name, string directory, string[] x)
+        private void Publish(string name, FilePath directory, string[] x)
         {
-            var file = Path.Combine(directory, Chat.ToString(), $"{name}{Ext_Pack}");
-            if (File.Exists(file) == false)
+            var filename = $"{name}{Ext_Pack}";
+            var fileSource = directory.Combine(Chat.ToString(), filename);
+            if (fileSource.FileExists == false)
             {
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
                 Bot.SendMessage(Origin, text);
                 return;
             }
 
-            File.Move(file, UniquePath(directory, $"{name}{Ext_Pack}"));
+            var fileTarget = directory.Combine(filename).MakeUnique();
+            File.Move(fileSource, fileTarget);
             Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
@@ -71,15 +74,24 @@ namespace PF_Bot.Features.Manage.Packs
 
             File.Copy(PackPath, path);
 
-            var result = Path.GetFileNameWithoutExtension(path);
+            var result = path.FileNameWithoutExtension;
             Log($"{Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, LogColor.Fuchsia);
             return result;
         }
 
-        public static string GetUniqueExtraPackPath(string name, long chat = 0)
+        public static FilePath GetUniqueExtraPackPath(string name, long chat = 0)
         {
-            var path = chat == 0 ? Dir_Fuse : Path.Combine(Dir_Fuse, chat.ToString());
-            return UniquePath(path, $"{name}{Ext_Pack}", name is "info" or "his");
+            var directory = chat == 0
+                ? Dir_Fuse
+                : Dir_Fuse.Combine(chat.ToString());
+            var suffix =  name is "info" or "his" // todo update - his is not used, test !@*
+                ? Desert.GetSand(2)
+                : null;
+
+            return directory
+                .EnsureDirectoryExist()
+                .Combine($"{name}{suffix}{Ext_Pack}")
+                .MakeUnique();
         }
     }
 

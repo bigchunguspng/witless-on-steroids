@@ -75,7 +75,7 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         // EXECUTE
 
         var input = await DownloadFile();
-        var output = EditingHelpers.GetOutputFilePath(input, "Edit", $".{extension}");
+        var output = input.GetOutputFilePath("Edit", $".{extension}");
 
         options = options.Replace("THIS", input);
 
@@ -110,14 +110,14 @@ public class UseFFMpeg : AudioVideoPhotoCommand
     protected override bool MessageContainsFile(Message m)
     {
         if      (m.Photo     != null) (File, Ext) = (m.Photo[^1], ".jpg");
-        else if (m.Audio     != null) (File, Ext) = (m.Audio    , m.Audio   .FileName.GetExtension(".mp3"));
+        else if (m.Audio     != null) (File, Ext) = (m.Audio    , m.Audio   .FileName.GetExtension_Or(".mp3"));
         else if (m.Video     != null) (File, Ext) = (m.Video    , ".mp4");
         else if (m.Animation != null) (File, Ext) = (m.Animation, ".mp4");
         else if (m.HasImageSticker()) (File, Ext) = (m.Sticker! , ".webp");
         else if (m.HasVideoSticker()) (File, Ext) = (m.Sticker! , ".webm");
         else if (m.Voice     != null) (File, Ext) = (m.Voice    , ".ogg");
         else if (m.VideoNote != null) (File, Ext) = (m.VideoNote, ".mp4");
-        else if (m.Document  != null) (File, Ext) = (m.Document , m.Document.FileName.GetExtension(".png"));
+        else if (m.Document  != null) (File, Ext) = (m.Document , m.Document.FileName.GetExtension_Or(".png"));
         else return false;
 
         return true;

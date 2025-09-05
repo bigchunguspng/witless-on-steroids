@@ -10,7 +10,7 @@ namespace PF_Bot.Features.Edit.Convert
         protected override async Task Execute()
         {
             var input = await DownloadFile();
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "vn", ".mp4");
+            var (output, probe, options) = await input.InitEditing("note", ".mp4");
 
             var video = probe.GetVideoStream();
             var size = video.Size;

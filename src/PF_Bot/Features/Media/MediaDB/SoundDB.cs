@@ -15,7 +15,7 @@ public class SoundDB : MediaDB<Voice>
     protected override string WhatSingle { get; } = "sound";
     protected override string DB_Path { get; } = File_Sounds;
 
-    protected override async Task<Voice> UploadFile(string path, long channel)
+    protected override async Task<Voice> UploadFile(FilePath path, long channel)
     {
         var temp = Path.Combine(Dir_Temp, $"{Guid.NewGuid()}.ogg");
 

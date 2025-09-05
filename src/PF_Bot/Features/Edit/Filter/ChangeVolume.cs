@@ -21,7 +21,7 @@ namespace PF_Bot.Features.Edit.Filter
                 _arg = Args.Split(' ', 2)[0];
 
                 var input = await DownloadFile();
-                var output = EditingHelpers.GetOutputFilePath(input, "vol", Ext);
+                var output = input.GetOutputFilePath("vol", Ext);
 
                 await FFMpeg.Args()
                     .Input(input)

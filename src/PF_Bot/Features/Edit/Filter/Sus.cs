@@ -26,7 +26,7 @@ namespace PF_Bot.Features.Edit.Filter
             var (_, start, length) = parsing;
 
             var input = await DownloadFile();
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Sus", Ext);
+            var (output, probe, options) = await input.InitEditing("Sus", Ext);
 
             length = argless                  ? probe.Duration / 2D
                 : (start + length).Ticks <= 0 ? probe.Duration

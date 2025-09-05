@@ -1,11 +1,12 @@
 using System.Runtime.CompilerServices;
+using PF_Tools.Backrooms.Types;
 
 namespace PF_Tools.Logging;
 
 /// Stores logs and write them to a file in batches (hardcoded to 32).
-public class FileLogger_Batch(string filePath)
+public class FileLogger_Batch(FilePath filePath)
 {
-    private readonly string?  _directory = Path.GetDirectoryName(filePath);
+    private readonly string?  _directory = filePath.DirectoryName;
     private readonly string[] _buffer    = new string[32];
 
     private int _head;

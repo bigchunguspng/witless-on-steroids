@@ -21,7 +21,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string Log_STR => "DEMOTIVATOR-B";
         protected override string Command => "/dp";
-        protected override string Suffix  => "-Dp";
+        protected override string Suffix  =>  "Dp";
 
         protected override string? DefaultOptions => Data.Options?.Dp;
 

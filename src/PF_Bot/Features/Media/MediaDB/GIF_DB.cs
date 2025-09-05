@@ -15,9 +15,9 @@ public class GIF_DB : MediaDB<Animation>
     protected override string WhatSingle { get; } = "GIF";
     protected override string DB_Path { get; } = File_GIFs;
 
-    protected override async Task<Animation> UploadFile(string path, long channel)
+    protected override async Task<Animation> UploadFile(FilePath path, long channel)
     {
-        var name = Path.GetFileNameWithoutExtension(path);
+        var name = path.FileNameWithoutExtension;
         var temp = Path.Combine(Dir_Temp, $"{name}.mp4");
 
         await FFMpeg_VideoToGIF(path, temp);
@@ -28,7 +28,7 @@ public class GIF_DB : MediaDB<Animation>
     }
 
     // todo partitial duplicate from ToGIF! - split image/video ToGIF
-    private async Task FFMpeg_VideoToGIF(string input, string output)
+    private async Task FFMpeg_VideoToGIF(FilePath input, string output)
     {
         var options = FFMpeg.OutputOptions().FixVideo_Playback();
 
@@ -36,7 +36,7 @@ public class GIF_DB : MediaDB<Animation>
         options.MP4_EnsureValidSize(video, out var sizeIsValid);
 
         // video of valid size -> copy codec
-        var copyCodec = sizeIsValid && input.GetExtension(".mp4") != ".gif";
+        var copyCodec = sizeIsValid && input.Extension != ".gif";
         _ = copyCodec
             ? options
                 .Options(FFMpegOptions.Out_cv_copy)

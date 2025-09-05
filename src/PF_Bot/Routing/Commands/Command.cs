@@ -82,7 +82,7 @@ namespace PF_Bot.Routing.Commands
         public ChatSettings Data => Context.Settings;
         public Copypaster   Baka => Context.Baka;
 
-        public string PackPath => ChatManager.GetPackPath(Chat);
+        public FilePath PackPath => ChatManager.GetPackPath(Chat);
     }
 
     public abstract class WitlessAsyncCommand : AnyAsyncCommand<WitlessContext>
@@ -90,7 +90,7 @@ namespace PF_Bot.Routing.Commands
         public ChatSettings Data => Context.Settings;
         public Copypaster   Baka => Context.Baka;
 
-        public string PackPath => ChatManager.GetPackPath(Chat);
+        public FilePath PackPath => ChatManager.GetPackPath(Chat);
     }
 
     // ROUTING

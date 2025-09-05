@@ -22,7 +22,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string Log_STR => "DEMOTIVATOR";
         protected override string Command => _mode == Square ? "/dg" : "/dv";
-        protected override string Suffix  => _mode == Square ? "-Dg" : "-Dv";
+        protected override string Suffix  => _mode == Square ?  "Dg" :  "Dv";
 
         protected override string? DefaultOptions => Data.Options?.Dg;
 

@@ -31,9 +31,9 @@ namespace PF_Bot.Features.Edit.Filter
             Log($"{Title} >> DAMN [*]");
         }
 
-        private async Task<string> CompressVideoAudio(string input)
+        private async Task<string> CompressVideoAudio(FilePath input)
         {
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "DAMN", Ext);
+            var (output, probe, options) = await input.InitEditing("DAMN", Ext);
 
             if (probe.HasVideo)
             {
@@ -69,12 +69,8 @@ namespace PF_Bot.Features.Edit.Filter
             return output;
         }
 
-        private string GetOutPath(string input)
-        {
-            var dir  = Path.GetDirectoryName           (input);
-            var name = Path.GetFileNameWithoutExtension(input);
-            return UniquePath(dir, name + "-DAMN.jpg");
-        }
+        private string GetOutPath
+            (FilePath input) => input.GetOutputFilePath("DAMN", "jpg");
 
         // QUALITY
         // value = [0..21]

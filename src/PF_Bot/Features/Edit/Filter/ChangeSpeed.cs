@@ -26,7 +26,7 @@ namespace PF_Bot.Features.Edit.Filter
 
             var input = await DownloadFile();
 
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Speed", Ext);
+            var (output, probe, options) = await input.InitEditing("Speed", Ext);
 
             if (probe.HasVideo)
             {

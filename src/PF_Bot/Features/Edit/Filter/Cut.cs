@@ -23,7 +23,7 @@ namespace PF_Bot.Features.Edit.Filter
             var (_, start, length) = parsing;
 
             var (input, waitMessage) = await DownloadFileSuperCool();
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Cut", Ext);
+            var (output, probe, options) = await input.InitEditing("Cut", Ext);
 
             if (start == TimeSpan.Zero && length > probe.Duration)
             {

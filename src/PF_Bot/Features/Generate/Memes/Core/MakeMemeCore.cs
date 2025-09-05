@@ -2,7 +2,6 @@
 using PF_Bot.Backrooms.Types.SerialQueue;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
@@ -120,7 +119,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             var path = await DownloadFileAndParseOptions(file, extension);
             if (round && CropVideoNotes)
             {
-                var crop = EditingHelpers.GetOutputFilePath(path, "crop", ".mp4");
+                var crop = path.GetOutputFilePath("crop", ".mp4");
                 await FFMpeg.Command(path, crop, o => o.Crop(FFMpegOptions.VIDEONOTE_CROP)).FFMpeg_Run();
                 path = crop;
             }
@@ -139,7 +138,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
         }
 
-        private Task<string> DownloadFileAndParseOptions(FileBase file, string extension)
+        private Task<FilePath> DownloadFileAndParseOptions(FileBase file, string extension)
         {
             Request = GetRequestData();
             ParseOptions();
@@ -148,7 +147,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         }
 
         private MemeFileRequest GetMemeFileRequest
-            (MemeSourceType type, string path, string outputEnding)
+            (MemeSourceType type, FilePath path, string outputEnding)
             => new(Origin, type, path, outputEnding, Data.Quality, Pressure);
 
         private T GetText() => GetMemeText(GetTextBase());
@@ -182,7 +181,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             if (request.JpegSticker)
             {
                 var input = request.SourcePath;
-                var output = EditingHelpers.GetOutputFilePath(input, "jpeg-stick", ".jpg");
+                var output = input.GetOutputFilePath("stick-JPEG", ".jpg");
 
                 await FFMpeg.Command(input, output, "").FFMpeg_Run();
 
@@ -199,7 +198,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
                 var sw = GetStartedStopwatch();
                 await MemeMaker.GenerateVideoMeme(request, text);
                 sw.Log(Command + " video");
-                return request.TargetPath;
+                return request.TargetPath.ToString();
             });
         }
 

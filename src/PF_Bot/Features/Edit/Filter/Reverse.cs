@@ -10,7 +10,7 @@ namespace PF_Bot.Features.Edit.Filter
         {
             var input = await DownloadFile();
 
-            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Reverse", Ext);
+            var (output, probe, options) = await input.InitEditing("Reverse", Ext);
 
             if (probe.HasVideo) options.VF( "reverse");
             if (probe.HasAudio) options.AF("areverse");

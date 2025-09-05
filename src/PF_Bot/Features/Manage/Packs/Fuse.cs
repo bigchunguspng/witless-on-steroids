@@ -31,7 +31,7 @@ namespace PF_Bot.Features.Manage.Packs
         protected void MeasureDick() // 😂🤣🤣🤣👌
         {
             ChatManager.SaveBaka(Chat, Baka);
-            Size = PackPath.FileSizeInBytes();
+            Size = PackPath.FileSizeInBytes;
             Count = Baka.VocabularyCount;
         }
 
@@ -125,7 +125,10 @@ namespace PF_Bot.Features.Manage.Packs
 
         private async Task ProcessTextFile()
         {
-            var path = UniquePath(Dir_Temp, _document!.FileName ?? "fuse.txt");
+            var path = Dir_Temp
+                .EnsureDirectoryExist()
+                .Combine(_document!.FileName ?? "fuse.txt")
+                .MakeUnique();
             await Bot.DownloadFile(_document.FileId, path, Origin);
 
             await EatFromTextFile(path);
@@ -134,7 +137,10 @@ namespace PF_Bot.Features.Manage.Packs
 
         private async Task ProcessJsonFile()
         {
-            var path = UniquePath(GetPrivateFilesFolder(Chat), _document!.FileName ?? "fuse.json");
+            var path = GetPrivateFilesFolder(Chat)
+                .EnsureDirectoryExist()
+                .Combine(_document!.FileName ?? "fuse.json")
+                .MakeUnique();
             await Bot.DownloadFile(_document.FileId, path, Origin);
 
             try
@@ -163,13 +169,12 @@ namespace PF_Bot.Features.Manage.Packs
             SaveJsonCopy(path, lines);
         }
 
-        private void SaveJsonCopy(string path, string[] lines)
+        private void SaveJsonCopy(FilePath path, string[] lines)
         {
-            var directory = GetPrivateFilesFolder(Chat);
-            Directory.CreateDirectory(directory);
-
-            var name = Path.GetFileNameWithoutExtension(path);
-            var save = UniquePath(directory, $"{name}.json");
+            var save = GetPrivateFilesFolder(Chat)
+                .EnsureDirectoryExist()
+                .Combine(path.ChangeExtension(".json"))
+                .MakeUnique();
             JsonIO.SaveData(lines.ToList(), save);
         }
 
@@ -202,7 +207,7 @@ namespace PF_Bot.Features.Manage.Packs
 
         protected static string FUSION_SUCCESS_REPORT(Copypaster baka, long chat, long size, int count, string title)
         {
-            var newSize = ChatManager.GetPackPath(chat).FileSizeInBytes();
+            var newSize = ChatManager.GetPackPath(chat).FileSizeInBytes;
             var newCount = baka.VocabularyCount;
             var deltaSize = newSize - size;
             var deltaCount = newCount - count;
@@ -270,7 +275,7 @@ namespace PF_Bot.Features.Manage.Packs
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = ChatManager.GetPackPath(origin.Chat);
             if (File.Exists(path))
-                sb.Append("весит ").Append(path.ReadableFileSize());
+                sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
             else
                 sb.Append("пуст");
 
@@ -299,8 +304,8 @@ namespace PF_Bot.Features.Manage.Packs
         #endregion
 
 
-        private static string GetPrivatePacksFolder(long chat) => Path.Combine(Dir_Fuse,    chat.ToString());
-        private static string GetPrivateFilesFolder(long chat) => Path.Combine(Dir_History, chat.ToString());
+        private static FilePath GetPrivatePacksFolder(long chat) => Dir_Fuse   .Combine(chat.ToString());
+        private static FilePath GetPrivateFilesFolder(long chat) => Dir_History.Combine(chat.ToString());
 
         private static string GetPacksFolder
             (long chat, bool @private) => @private ? GetPrivatePacksFolder(chat) : Dir_Fuse;

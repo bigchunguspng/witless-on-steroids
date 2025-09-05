@@ -21,7 +21,7 @@ public class Slice : AudioVideoUrlCommand
 
         var sw = GetStartedStopwatch();
 
-        var (output, probe, options) = await EditingHelpers.InitEditing(input, "Slice", Ext);
+        var (output, probe, options) = await input.InitEditing("Slice", Ext);
 
         var video = probe.GetPrimaryVideoStream();
         if (video != null)

@@ -21,7 +21,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string Log_STR => "MEME";
         protected override string Command => "/meme";
-        protected override string Suffix  => "-Meme";
+        protected override string Suffix  => "Meme";
 
         protected override string? DefaultOptions => Data.Options?.Meme;
 

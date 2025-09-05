@@ -16,7 +16,7 @@ public class ToVoiceMessage : AudioVideoCommand
         var probe = await FFProbe.Analyze(input);
         if (probe.HasAudio)
         {
-            output = EditingHelpers.GetOutputFilePath(input, "voice", ".ogg");
+            output = input.GetOutputFilePath("voice", ".ogg");
 
             await FFMpeg.Command(input, output, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
         }

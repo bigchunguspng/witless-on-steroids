@@ -5,19 +5,18 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    /// <summary>
     /// Downloads a file to the <b>Pics</b> directory if it's not there already.
     /// <br/>To be used with media files attached to commands.
-    /// </summary>
-    public async Task<string> Download(FileBase file, MessageOrigin origin, string extension)
+    public async Task<FilePath> Download(FileBase file, MessageOrigin origin, string extension)
     {
-        var directory = Path.Combine(Dir_Pics, origin.Chat.ToString());
-        Directory.CreateDirectory(directory);
+        var directory = Dir_Pics
+            .Combine(origin.Chat.ToString())
+            .EnsureDirectoryExist();
 
         var hash = GetCapitalizationHash(file.FileUniqueId).ToString("X");
         var name = $"{file.FileUniqueId}+{hash}{extension}";
-        var path = Path.Combine(directory, name);
-        if (File.Exists(path))
+        var path = directory.Combine(name);
+        if (path.FileExists)
         {
             while (FileIsLocked(path)) await Task.Delay(250);
         }
@@ -29,10 +28,8 @@ public partial class Bot
         return path;
     }
 
-    /// <summary>
     /// Downloads a file or send a message if the exception is thrown.
     /// <br/>Make sure provided path is unique and directory is created!
-    /// </summary>
     public async Task DownloadFile(string fileId, string path, MessageOrigin origin)
     {
         try
@@ -67,7 +64,7 @@ public partial class Bot
         return false;
     }
 
-    /// <summary> Certified Windows™ moment. </summary>
+    /// Certified Windows™ moment.
     private static int GetCapitalizationHash(string id)
     {
         var result = 0;

@@ -3,7 +3,6 @@ using System.Text;
 using PF_Bot.Core.Chats;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.RedditSearch;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using PF_Tools.FFMpeg;
@@ -211,7 +210,7 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
             {
                 var input = DownloadMeme(post, gif ? ".gif" : ".png");
 
-                var (output, probe, options) = await EditingHelpers.InitEditing(input, "small", gif ? ".mp4" : ".jpg");
+                var (output, probe, options) = await input.InitEditing("small", gif ? ".mp4" : ".jpg");
 
                 options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
 
@@ -240,9 +239,12 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private static string DownloadMeme(PostData post, string extension)
+        private static FilePath DownloadMeme(PostData post, string extension)
         {
-            var name = UniquePath(Dir_Pics, $"{post.Fullname}{extension}");
+            var name = Dir_RedditMemes
+                .EnsureDirectoryExist()
+                .Combine($"{post.Fullname}{extension}")
+                .MakeUnique();
             using var web = new WebClient();
             web.DownloadFile(post.URL, name);
 

@@ -24,7 +24,7 @@ namespace PF_Bot.Features.Edit.Filter
                 var w = double.TryParse(args.Length > 2 ? args[2] : "", out var v3) ? v3 : 2000;
 
                 var input = await DownloadFile();
-                var output = EditingHelpers.GetOutputFilePath(input, "EQ", Ext);
+                var output = input.GetOutputFilePath("EQ", Ext);
 
                 await FFMpeg.Args()
                     .Input(input)

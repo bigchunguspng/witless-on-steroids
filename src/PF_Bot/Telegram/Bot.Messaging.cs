@@ -195,9 +195,10 @@ namespace PF_Bot.Telegram
 
         public void SendErrorDetails(ProcessException e, MessageOrigin origin)
         {
-            var random = RandomStringGenerator.GenerateRandomString();
-            var fileName = $"{DateTime.Now:yyyy-MM-dd}-{e.File}-{origin.Chat}-{random}.txt";
-            var path = UniquePath(Path.Combine(Dir_Reports, fileName));
+            var path = Dir_Reports
+                .EnsureDirectoryExist()
+                .Combine($"{DateTime.Now:yyyy-MM-dd_HH-mm}-{e.File}-{origin.Chat}-{Desert.GetSand()}.txt")
+                .MakeUnique();
             var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
             var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
             File.WriteAllText(path, text);
@@ -208,9 +209,10 @@ namespace PF_Bot.Telegram
         [Obsolete]
         public void SendErrorDetails(MessageOrigin origin, string file, string command, string errorMessage)
         {
-            var random = RandomStringGenerator.GenerateRandomString();
-            var fileName = $"{DateTime.Now:yyyy-MM-dd}-{file}-{origin.Chat}-{random}.txt";
-            var path = UniquePath(Path.Combine(Dir_Reports, fileName));
+            var path = Dir_Reports
+                .EnsureDirectoryExist()
+                .Combine($"{DateTime.Now:yyyy-MM-dd_HH-mm}-{file}-{origin.Chat}-{Desert.GetSand()}.txt")
+                .MakeUnique();
             var text = string.Format(FF_ERROR_REPORT, file, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);

@@ -21,7 +21,7 @@ public class Snap : MakeMemeCore<string>
 
     protected override string Log_STR => "SNAP";
     protected override string Command => "/snap";
-    protected override string Suffix  => "-Snap";
+    protected override string Suffix  => "Snap";
 
     protected override string? DefaultOptions => Data.Options?.Snap;
 

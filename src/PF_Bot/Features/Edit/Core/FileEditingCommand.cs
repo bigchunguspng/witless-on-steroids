@@ -53,8 +53,8 @@ namespace PF_Bot.Features.Edit.Core
             else if (m.Animation  != null) (Type, File, Ext) = (MediaType.Anime, m.Animation, ".mp4" );
             else if (m.VideoNote  != null) (Type, File, Ext) = (MediaType.Round, m.VideoNote, ".mp4" );
             else if (m.HasVideoSticker ()) (Type, File, Ext) = (MediaType.Anime, m.Sticker !, ".webm");
-            else if (m.HasAnimeDocument()) (Type, File, Ext) = (MediaType.Anime, m.Document!, m.Document!.FileName.GetExtension(".gif"));
-            else if (m.HasVideoDocument()) (Type, File, Ext) = (MediaType.Video, m.Document!, m.Document!.FileName.GetExtension(".webm"));
+            else if (m.HasAnimeDocument()) (Type, File, Ext) = (MediaType.Anime, m.Document!, m.Document!.FileName.GetExtension_Or(".gif"));
+            else if (m.HasVideoDocument()) (Type, File, Ext) = (MediaType.Video, m.Document!, m.Document!.FileName.GetExtension_Or(".webm"));
             else return false;
 
             return true;
@@ -62,9 +62,9 @@ namespace PF_Bot.Features.Edit.Core
 
         protected bool GetAudioFileID(Message m)
         {
-            if      (m.Audio      != null) (Type, File, Ext) = (MediaType.Audio, m.Audio    , m.Audio    .FileName.GetExtension(".mp3"));
+            if      (m.Audio      != null) (Type, File, Ext) = (MediaType.Audio, m.Audio    , m.Audio    .FileName.GetExtension_Or(".mp3"));
             else if (m.Voice      != null) (Type, File, Ext) = (MediaType.Audio, m.Voice    , ".ogg");
-            else if (m.HasAudioDocument()) (Type, File, Ext) = (MediaType.Audio, m.Document!, m.Document!.FileName.GetExtension(".wav"));
+            else if (m.HasAudioDocument()) (Type, File, Ext) = (MediaType.Audio, m.Document!, m.Document!.FileName.GetExtension_Or(".wav"));
             else return false;
 
             return true;
@@ -74,13 +74,13 @@ namespace PF_Bot.Features.Edit.Core
         {
             if      (m.Photo      != null) (Type, File, Ext) = (MediaType.Photo, m.Photo[^1], ".jpg");
             else if (m.HasImageSticker ()) (Type, File, Ext) = (MediaType.Stick, m.Sticker !, ".webp");
-            else if (m.HasImageDocument()) (Type, File, Ext) = (MediaType.Photo, m.Document!, m.Document!.FileName.GetExtension(".png"));
+            else if (m.HasImageDocument()) (Type, File, Ext) = (MediaType.Photo, m.Document!, m.Document!.FileName.GetExtension_Or(".png"));
             else return false;
 
             return true;
         }
 
-        protected Task<string> DownloadFile() => Bot.Download(File, Origin, Ext);
+        protected Task<FilePath> DownloadFile() => Bot.Download(File, Origin, Ext);
 
         // SEND
 

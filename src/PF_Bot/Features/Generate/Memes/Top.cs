@@ -21,7 +21,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string Log_STR => "TOP";
         protected override string Command => "/top";
-        protected override string Suffix  => "-Top";
+        protected override string Suffix  => "Top";
 
         protected override string? DefaultOptions => Data.Options?.Top;
 

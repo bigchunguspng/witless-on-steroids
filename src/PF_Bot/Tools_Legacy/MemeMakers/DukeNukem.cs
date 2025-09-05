@@ -1,6 +1,9 @@
+using PF_Bot.Core.FFMpeg;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Tools.Backrooms.Helpers.ProcessRunning;
+using PF_Tools.FFMpeg;
+using PF_Tools.FFMpeg.Tasks;
 
 namespace PF_Bot.Tools_Legacy.MemeMakers;
 
@@ -8,38 +11,33 @@ public class DukeNukem : IMemeGenerator<int>
 {
     public static int Depth = 1;
 
+    // todo make it Task<string>
     public string GenerateMeme(MemeFileRequest request, int text)
     {
-        var path = request.SourcePath;
+        var (input, output) = (request.SourcePath, request.TargetPath);
 
-        for (var i = 0; i < Depth; i++)
-        {
-            var process = request.UseFFMpeg();
-            path = process
-                .Nuke(request.GetQscale())
-                .OutAs(UniquePath(request.TargetPath)).Result;
-            LogNuke(process, request);
-        }
+        var probe = FFProbe.Analyze(input).Result;
+        var args = new FFMpeg_Nuke(input, probe)
+            .Nuke(Depth)
+            .Out(output, o => o.ApplyPostNuking(probe, request.GetQscale()));
+        var result = args.FFMpeg_Run().Result;
 
-        return path;
+        LogNuke(result, request);
+
+        return input;
     }
 
-    public async Task<string> GenerateVideoMeme(MemeFileRequest request, int text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, int text)
     {
-        var size = FFMpegXD.GetPictureSize(request.SourcePath).GrowSize().ValidMp4Size();
+        var (input, output) = (request.SourcePath, request.TargetPath);
 
-        var path = request.SourcePath;
+        var probe = await FFProbe.Analyze(input);
+        var result = await new FFMpeg_Nuke(input, probe)
+            .Nuke(Depth.Clamp(3), isVideo: true)
+            .Out(output, o => o.ApplyPostNuking(probe, request.GetCRF(), isVideo: true))
+            .FFMpeg_Run();
 
-        for (var i = 0; i < Depth.Clamp(3); i++)
-        {
-            var process = request.UseFFMpeg();
-            path = await process
-                .NukeVideo(size, request.GetCRF())
-                .OutAs(UniquePath(request.TargetPath));
-            LogNuke(process, request);
-        }
-
-        return path;
+        LogNuke(result, request);
     }
 
     // LOGS
@@ -47,13 +45,13 @@ public class DukeNukem : IMemeGenerator<int>
     public static readonly object LogsLock = new();
     public static readonly Dictionary<long, List<NukeLogEntry>> Logs = new();
 
-    private readonly Regex _nukeFilter = new(@"-filter_complex ""\[v:0\](.+)"" """);
+    private readonly Regex _nukeFilter = new(@"-filter_complex ""\[v:0\](.+?)"" ");
 
     // private readonly Regex _noAmplify = new("amplify=.+?,");
     // If you gonna implement presets (/anuke? /nuke info?),
     // remove this regex from preset filter when applying it to image (works only with videos) 
 
-    private void LogNuke(F_Process process, MemeFileRequest request)
+    private void LogNuke(ProcessResult process, MemeFileRequest request)
     {
         var chat = request.Origin.Chat;
         var time = DateTime.UtcNow;
@@ -61,7 +59,7 @@ public class DukeNukem : IMemeGenerator<int>
         {
             if (!Logs.ContainsKey(chat)) Logs.Add(chat, []);
 
-            var command = _nukeFilter.ExtractGroup(1, process.ArgumentsText, s => s, "[null]");
+            var command = _nukeFilter.ExtractGroup(1, process.Arguments, s => s, "[null]");
             Logs[chat].Add(new NukeLogEntry(time, request.Type, command));
         }
     }

@@ -180,7 +180,15 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         private async Task<string> MakeMemeStick(MemeFileRequest request, T text)
         {
             if (request.JpegSticker)
-                request.SourcePath = await Origin.Convert(request.SourcePath, ".jpg");
+            {
+                var input = request.SourcePath;
+                var output = EditingHelpers.GetOutputFilePath(input, "jpeg-stick", ".jpg");
+
+                await FFMpeg.Command(input, output, "").FFMpeg_Run();
+
+                request.SourcePath = output;
+            }
+
             return await MakeMemeImage(request, text);
         }
 
@@ -189,9 +197,9 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             return Queue.Enqueue(async () =>
             {
                 var sw = GetStartedStopwatch();
-                var result = await MemeMaker.GenerateVideoMeme(request, text);
+                await MemeMaker.GenerateVideoMeme(request, text);
                 sw.Log(Command + " video");
-                return result;
+                return request.TargetPath;
             });
         }
 

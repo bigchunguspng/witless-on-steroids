@@ -28,10 +28,12 @@ public static class FFMpeg
     // RUN
 
     /// Use this to automaticaly throw <see cref="ProcessException"/> on failure.
-    public static async Task FFMpeg_Run(this FFMpegArgs args)
+    public static async Task<ProcessResult> FFMpeg_Run(this FFMpegArgs args)
     {
         var result = await Run(args);
         if (result.Failure) throw new ProcessException(FFMPEG, result);
+
+        return result;
     }
 
     /// Priority of the process is reduced over time.

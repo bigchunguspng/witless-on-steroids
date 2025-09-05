@@ -1,10 +1,12 @@
 ﻿using System.Net;
 using System.Text;
 using PF_Bot.Core.Chats;
+using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.RedditSearch;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
+using PF_Tools.FFMpeg;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 
@@ -197,7 +199,7 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private void SendSingleFilePost(PostData post)
+        private async Task SendSingleFilePost(PostData post)
         {
             var gif = post.URL.EndsWith(".gif");
             try
@@ -207,13 +209,27 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
             }
             catch
             {
-                var meme = DownloadMeme(post, gif ? ".gif" : ".png");
-                var process = meme.UseFFMpeg(Origin);
-                var path = gif
-                    ? process.CompressGIF().Result
-                    : process.Compress   ().Result;
-                
-                using var stream = File.OpenRead(path);
+                var input = DownloadMeme(post, gif ? ".gif" : ".png");
+
+                var (output, probe, options) = await EditingHelpers.InitEditing(input, "small", gif ? ".mp4" : ".jpg");
+
+                options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
+
+                if (gif)
+                {
+                    options
+                        .Options("-vn")
+                        .FixVideo_Playback()
+                        .Options(FFMpegOptions.Out_crf_30)
+                        .Options(FFMpegOptions.Out_cv_libx264);
+                }
+                else
+                    options
+                        .Options("-qscale:v 5");
+
+                await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+                await using var stream = File.OpenRead(output);
                 SendPicOrAnimation(InputFile.FromStream(stream, $"r-{post.Subreddit}.mp4"));
             }
 

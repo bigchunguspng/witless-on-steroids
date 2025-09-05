@@ -1,7 +1,9 @@
-﻿using PF_Bot.Features.Generate.Memes.Core;
+﻿using PF_Bot.Core.FFMpeg;
+using PF_Bot.Features.Generate.Memes.Core;
 using PF_Bot.Tools_Legacy.FFMpeg;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
@@ -57,7 +59,7 @@ namespace PF_Bot.Tools_Legacy.MemeMakers // ReSharper disable InconsistentNaming
             return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
         }
 
-        public Task<string> GenerateVideoMeme(MemeFileRequest request, string text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, string text)
         {
             FetchVideoSize(request);
             SetUp();
@@ -72,9 +74,10 @@ namespace PF_Bot.Tools_Legacy.MemeMakers // ReSharper disable InconsistentNaming
 
             var full_size = FFMpegXD.GetPictureSize(frameAsFile);//.FitSize(720);
 
-            return request.UseFFMpeg()
-                .D300(VideoMemeRequest.From(request, frameAsFile), _sourceSizeAdjusted, _imageOrigin, full_size)
-                .OutAs(request.TargetPath);
+            var probe = await request.ProbeSource();
+            await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, frameAsFile))
+                .D300(_sourceSizeAdjusted, _imageOrigin, full_size)
+                .FFMpeg_Run();
         }
 
         private void SetUp()

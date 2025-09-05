@@ -11,7 +11,8 @@ public class ToVoiceMessage : AudioVideoCommand
     {
         var input = await DownloadFile();
 
-        string output;
+        var output = File_DefaultVoiceMessage;
+
         var probe = await FFProbe.Analyze(input);
         if (probe.HasAudio)
         {
@@ -19,8 +20,6 @@ public class ToVoiceMessage : AudioVideoCommand
 
             await FFMpeg.Command(input, output, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
         }
-        else
-            output = File_DefaultVoiceMessage;
 
         await using var stream = System.IO.File.OpenRead(output);
         Bot.SendVoice(Origin, InputFile.FromStream(stream, "balls.ogg"));

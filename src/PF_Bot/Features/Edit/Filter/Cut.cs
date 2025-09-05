@@ -23,11 +23,8 @@ namespace PF_Bot.Features.Edit.Filter
             var (_, start, length) = parsing;
 
             var (input, waitMessage) = await DownloadFileSuperCool();
-            var output = EditingHelpers.GetOutputFilePath(input, "Cut", Ext);
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Cut", Ext);
 
-            var options = FFMpeg.OutputOptions();
-
-            var probe = await FFProbe.Analyze(input);
             if (start == TimeSpan.Zero && length > probe.Duration)
             {
                 options.Options("-c copy");

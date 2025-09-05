@@ -9,11 +9,9 @@ namespace PF_Bot.Features.Edit.Filter
         protected override async Task Execute()
         {
             var input = await DownloadFile();
-            var output = EditingHelpers.GetOutputFilePath(input, "Reverse", Ext);
 
-            var options = FFMpeg.OutputOptions();
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Reverse", Ext);
 
-            var probe = await FFProbe.Analyze(input);
             if (probe.HasVideo) options.VF( "reverse");
             if (probe.HasAudio) options.AF("areverse");
 

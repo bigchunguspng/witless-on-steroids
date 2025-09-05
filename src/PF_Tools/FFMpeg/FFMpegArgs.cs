@@ -11,7 +11,7 @@ public class FFMpegArgs
 {
     private readonly List<string>       _globals = [];
     private readonly List<FFMpegInput>   _inputs = [];
-    private readonly List<string>       _filters = [];
+    private readonly StringBuilder       _filter = new();
     private readonly List<FFMpegOutput> _outputs = [];
 
     //
@@ -32,9 +32,28 @@ public class FFMpegArgs
         (string path, FFMpegInputPipeline options)
         => this.Fluent(() => _inputs.Add((path, options)));
 
+    /// Arg is auto-prepended by ';' if filtergraph is not empty.
     public FFMpegArgs Filter
         (string filter)
-        => this.Fluent(() => _filters.Add(filter));
+        => this.Fluent(() => _filter.AppendSeparator(';').Append(filter));
+
+    /// Arg is auto-prepended by ',' if filtergraph is not empty,
+    /// except when filtergraph ends with ']' or arg starts with ':', '=' or '+'.
+    /// Don't pass empty strings!
+    public FFMpegArgs FilterAppend
+        (string filter)
+        => this.Fluent(() =>
+        {
+            if (_filter.Length is not 0)
+            {
+                var ending = _filter[^1];
+                var start  =  filter[0];
+                var insertComma = false == (ending is ']' || start is ':' or '=' or '+');
+                if (insertComma)
+                    _filter.Append(',');
+            }
+            _filter.Append(filter);
+        });
 
     public FFMpegArgs Out
         (string path)
@@ -62,10 +81,10 @@ public class FFMpegArgs
             sb.Append("-i ").AppendInQuotes(path);
         }
 
-        if (_filters.Count > 0)
+        if (_filter.Length > 0)
         {
             sb.AppendSpaceSeparator();
-            sb.Append("-filter_complex ").AppendInQuotes(_filters, ';');
+            sb.Append("-filter_complex ").AppendInQuotes(_filter);
         }
 
         foreach (var output in _outputs)

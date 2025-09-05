@@ -10,12 +10,13 @@ namespace PF_Bot.Features.Edit.Convert
         protected override async Task Execute()
         {
             var input = await DownloadFile();
-            var output = EditingHelpers.GetOutputFilePath(input, "stick", ".webp");
 
-            var video = await FFProbe.GetVideoStream(input);
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "stick", ".webp");
+
+            var video = probe.GetVideoStream();
             var size = video.Size.Normalize();
 
-            await FFMpeg.Command(input, output, o => o.Resize(size)).FFMpeg_Run();
+            await FFMpeg.Command(input, output, options.Resize(size)).FFMpeg_Run();
 
             await using var stream = System.IO.File.OpenRead(output);
             Bot.SendSticker(Origin, InputFile.FromStream(stream));

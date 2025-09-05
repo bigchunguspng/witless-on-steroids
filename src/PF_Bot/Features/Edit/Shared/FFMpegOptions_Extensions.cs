@@ -32,11 +32,11 @@ public static class FFMpegOptions_Extensions
             : options.Resize(sizeMp4);
     }
 
-    public static FFMpegOutputOptions MP4_EnsureSize_Fits720p_And_Valid
-        (this FFMpegOutputOptions options, FFProbeResult.Stream video)
+    public static FFMpegOutputOptions MP4_EnsureSize_Valid_And_Fits
+        (this FFMpegOutputOptions options, FFProbeResult.Stream video, int maxSize)
     {
         var size = video.Size;
-        var sizeFit  = size.FitSize(720).ValidMp4Size();
+        var sizeFit  = size.FitSize(maxSize).ValidMp4Size();
         var sizeFits = size == sizeFit;
         return sizeFits
             ? options

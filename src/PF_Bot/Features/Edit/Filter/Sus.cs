@@ -26,17 +26,13 @@ namespace PF_Bot.Features.Edit.Filter
             var (_, start, length) = parsing;
 
             var input = await DownloadFile();
-            var output = EditingHelpers.GetOutputFilePath(input, "Sus", Ext);
-
-            var probe = await FFProbe.Analyze(input);
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Sus", Ext);
 
             length = argless                  ? probe.Duration / 2D
                 : (start + length).Ticks <= 0 ? probe.Duration
                 : length;
 
-            var options = FFMpeg.OutputOptions().Fix_AudioVideo(probe);
-
-            var args = FFMpeg.Command(input, output, options);
+            var args = FFMpeg.Command(input, output, options.Fix_AudioVideo(probe));
 
             if (probe.HasVideo) AddSusFilter(args, start, length, "v",  "", "v=1");
             if (probe.HasAudio) AddSusFilter(args, start, length, "a", "a", "v=0:a=1");

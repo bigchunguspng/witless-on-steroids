@@ -25,11 +25,9 @@ namespace PF_Bot.Features.Edit.Filter
             _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
 
             var input = await DownloadFile();
-            var output = EditingHelpers.GetOutputFilePath(input, "Speed", Ext);
 
-            var options = FFMpeg.OutputOptions();
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "Speed", Ext);
 
-            var probe = await FFProbe.Analyze(input);
             if (probe.HasVideo)
             {
                 var video = probe.GetVideoStream();

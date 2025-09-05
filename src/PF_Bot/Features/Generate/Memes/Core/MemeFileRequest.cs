@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Tools_Legacy.FFMpeg;
+using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -36,6 +37,9 @@ public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, string p
     {
         return 31 - (int)(0.29 * Quality); // 2 - 31
     }
+
+    public async Task<FFProbeResult> ProbeSource
+        () => await FFProbe.Analyze(SourcePath);
 
     public F_Process UseFFMpeg() => new(SourcePath, Origin);
 

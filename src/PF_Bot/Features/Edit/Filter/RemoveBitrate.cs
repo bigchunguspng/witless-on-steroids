@@ -33,10 +33,8 @@ namespace PF_Bot.Features.Edit.Filter
 
         private async Task<string> CompressVideoAudio(string input)
         {
-            var output = EditingHelpers.GetOutputFilePath(input, "DAMN", Ext);
-            var options = FFMpeg.OutputOptions();
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "DAMN", Ext);
 
-            var probe = await FFProbe.Analyze(input);
             if (probe.HasVideo)
             {
                 options

@@ -10,17 +10,18 @@ namespace PF_Bot.Features.Edit.Convert
         protected override async Task Execute()
         {
             var input = await DownloadFile();
-            var output = EditingHelpers.GetOutputFilePath(input, "vn", ".mp4");
+            var (output, probe, options) = await EditingHelpers.InitEditing(input, "vn", ".mp4");
 
-            var video = await FFProbe.GetVideoStream(input);
+            var video = probe.GetVideoStream();
             var size = video.Size;
             var diameter = Math.Min(size.Width, size.Height).ToEven();
             var x = (size.Width  - diameter) / 2;
             var y = (size.Height - diameter) / 2;
 
-            var options = FFMpeg.OutputOptions()
+            options
                 .VF($"crop={diameter}:{diameter}:{x}:{y}")
-                .Resize(FFMpegOptions.VIDEONOTE_SIZE).FixVideo_Playback();
+                .Resize(FFMpegOptions.VIDEONOTE_SIZE)
+                .FixVideo_Playback();
 
             await FFMpeg.Command(input, output, options).FFMpeg_Run();
 

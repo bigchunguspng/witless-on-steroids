@@ -8,7 +8,7 @@ public interface IMemeGenerator<in T>
         GenerateMeme
         (MemeFileRequest request, T text);
 
-    Task<string>
+    Task
         GenerateVideoMeme
         (MemeFileRequest request, T text);
 }

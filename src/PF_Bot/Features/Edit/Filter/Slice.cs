@@ -14,7 +14,6 @@ public class Slice : AudioVideoUrlCommand
     protected override async Task Execute()
     {
         var (input, waitMessage) = await DownloadFileSuperCool();
-        var output = EditingHelpers.GetOutputFilePath(input, "slices", Ext);
 
         var match = _multiplier.Match(Command!);
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
@@ -22,17 +21,15 @@ public class Slice : AudioVideoUrlCommand
 
         var sw = GetStartedStopwatch();
 
-        var probe = await FFProbe.Analyze(input);
-
-        var options = new FFMpegOutputOptions().Fix_AudioVideo(probe);
+        var (output, probe, options) = await EditingHelpers.InitEditing(input, "Slice", Ext);
 
         var video = probe.GetPrimaryVideoStream();
         if (video != null)
-            options.MP4_EnsureSize_Fits720p_And_Valid(video);
+            options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
         await new FFMpeg_Slice(input, probe)
             .ApplyRandomSlices(breaks / 5D, pacing / 5D)
-            .Out(output, options)
+            .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
 
         Bot.DeleteMessageAsync(Chat, waitMessage);

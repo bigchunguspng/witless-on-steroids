@@ -3,6 +3,7 @@ using PF_Bot.Backrooms.Types.SerialQueue;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -81,7 +82,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         {
             var path = await DownloadFileAndParseOptions(file, ".jpg");
 
-            var request = GetMemeFileRequest(MemeSourceType.Image, path, Suffix + ".jpg");
+            var request = GetMemeFileRequest(MemeSourceType.Image, path, ".jpg");
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
@@ -98,7 +99,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             var sticker = SendAsSticker;
             var extension = sticker ? ".webp" : ".jpg";
 
-            var request = GetMemeFileRequest(MemeSourceType.Sticker, path, Suffix + extension);
+            var request = GetMemeFileRequest(MemeSourceType.Sticker, path, extension);
             request.ExportAsSticker = sticker;
             request.JpegSticker = JpegSticker;
             var repeats = GetRepeatCount();
@@ -126,7 +127,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
             var note = round && !CropVideoNotes;
 
-            var request = GetMemeFileRequest(MemeSourceType.Video, path, Suffix + ".mp4");
+            var request = GetMemeFileRequest(MemeSourceType.Video, path, ".mp4");
             var repeats = GetRepeatCount().Clamp(3);
             for (var i = 0; i < repeats; i++)
             {
@@ -147,8 +148,11 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         }
 
         private MemeFileRequest GetMemeFileRequest
-            (MemeSourceType type, FilePath path, string outputEnding)
-            => new(Origin, type, path, outputEnding, Data.Quality, Pressure);
+            (MemeSourceType type, FilePath path, string extension)
+        {
+            var ending = $"{Suffix}-{Desert.GetSilt(3)}{extension}";
+            return new MemeFileRequest(Origin, type, path, ending, Data.Quality, Pressure);
+        }
 
         private T GetText() => GetMemeText(GetTextBase());
 

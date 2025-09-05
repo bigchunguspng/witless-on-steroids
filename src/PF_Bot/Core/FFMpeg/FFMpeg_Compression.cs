@@ -15,9 +15,10 @@ public static class FFMpeg_Compression
                 : Math.Min(31, compression + RandomInt(0, 10));
 
         // todo dedup: RemoveBitrate.CompressVideoAudio
-        if (probe.HasVideo)
+        if (probe.HasVideo && isVideo)
         {
             options
+                .FixVideo_Playback()
                 .Options(FFMpegOptions.Out_cv_libx264)
                 .Options($"-crf {factor}");
         }
@@ -26,11 +27,12 @@ public static class FFMpeg_Compression
         {
             var audio = probe.GetAudioStream();
             var bitrate = GetAudioBitrate(audio.Bitrate, factor);
-            options.Options($"-b:a {bitrate}");
+            options
+                .Options($"-b:a {bitrate}")
+                .FixAudio_InvalidVideo(probe);
             if (probe.HasVideo == false) options.Options("-f mp3");
         }
 
-        options.Fix_AudioVideo(probe);
         options.Options($"-qscale:v {factor}");
 
         return options;

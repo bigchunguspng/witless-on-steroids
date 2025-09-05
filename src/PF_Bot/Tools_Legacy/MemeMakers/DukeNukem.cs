@@ -24,7 +24,7 @@ public class DukeNukem : IMemeGenerator<int>
 
         LogNuke(result, request);
 
-        return input;
+        return output;
     }
 
     public async Task GenerateVideoMeme(MemeFileRequest request, int text)

@@ -197,7 +197,7 @@ namespace PF_Bot.Telegram
         {
             var path = Dir_Reports
                 .EnsureDirectoryExist()
-                .Combine($"{DateTime.Now:yyyy-MM-dd_HH-mm}-{e.File}-{origin.Chat}-{Desert.GetSand()}.txt")
+                .Combine($"{DateTime.Now:yyyy-MM-dd}-{e.File}-{origin.Chat}-{Desert.GetSilt(11)}.txt")
                 .MakeUnique();
             var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
             var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
@@ -211,7 +211,7 @@ namespace PF_Bot.Telegram
         {
             var path = Dir_Reports
                 .EnsureDirectoryExist()
-                .Combine($"{DateTime.Now:yyyy-MM-dd_HH-mm}-{file}-{origin.Chat}-{Desert.GetSand()}.txt")
+                .Combine($"{DateTime.Now:yyyy-MM-dd}-{file}-{origin.Chat}-{Desert.GetSilt(11)}.txt")
                 .MakeUnique();
             var text = string.Format(FF_ERROR_REPORT, file, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);

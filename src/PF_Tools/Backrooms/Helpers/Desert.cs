@@ -5,13 +5,25 @@ namespace PF_Tools.Backrooms.Helpers;
 /// Random string generator.
 public static class Desert
 {
-    // 32 chars long (excluded: IOMW).
-    private static readonly string _chars =
+    private static readonly string _chars32 =
         "0123456789ABCDEFGHJKLNPQRSTUVXYZ";
+
+    private static readonly string _chars64 =
+        "0123456789"
+      + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      + "abcdefghijklmnopqrstuvwxyz_-";
 
     /// Get a random char sequence of given length. <br/>
     /// Number of possible values = 32 ^ length.
-    public static string GetSand(int length = 4)
+    public static string GetSand
+        (int length = 4) => GetSoil(length, 0b00011111, _chars32);
+
+    /// Get a random char sequence of given length. <br/>
+    /// Number of possible values = 64 ^ length.
+    public static string GetSilt
+        (int length = 4) => GetSoil(length, 0b00111111, _chars64);
+
+    private static string GetSoil(int length, byte mask, string alphabet)
     {
         Span<char> chars = stackalloc char[length];
         Span<byte> bytes = stackalloc byte[length];
@@ -20,12 +32,13 @@ public static class Desert
 
         for (var i = 0; i < length; i++)
         {
-            var index = bytes[i] & 0b00011111; // same as % 32
-            chars[i] = _chars[index];
+            var index = bytes[i] & mask;
+            chars[i] = alphabet[index];
         }
 
         return new string(chars);
     }
+
 }
 
 /*  .    _    +     .  ______   .          .

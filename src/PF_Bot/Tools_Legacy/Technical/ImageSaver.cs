@@ -22,13 +22,13 @@ namespace PF_Bot.Tools_Legacy.Technical // ReSharper disable MemberCanBePrivate.
         {
             if (quality <= 25)
             {
-                var sw = GetStartedStopwatch();
+                var sw = Stopwatch_StartNew();
                 using var memory = new MemoryStream();
                 image.SaveAsJpeg(memory, GetJpegEncoder(quality));
                 memory.Position = 0;
                 var jpeg = Image.Load<Rgb24>(memory);
                 image.ApplyQuality(jpeg);
-                sw.Log("+compression");
+                sw.Log("SaveImageWebp -> Apply JPEG compression");
             }
 
             path = path.MakeUnique();

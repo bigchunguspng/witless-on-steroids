@@ -59,9 +59,9 @@ namespace PF_Bot.Features.Manage.Packs
 
         private async Task EatComments(RedditQuery query, long size, int limit)
         {
-            var sw = GetStartedStopwatch();
+            var sw = Stopwatch_StartNew();
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
-            Log($"COMMENTS FETCHED >> {sw.ElapsedShort()}");
+            Log($"COMMENTS FETCHED >> {sw.ElapsedReadable()}");
 
             var count = Baka.VocabularyCount;
 

@@ -17,7 +17,7 @@ public abstract class MediaDB<T> where T : FileBase
 
     protected R LoadDB<R>() where R : MediaDB<T>
     {
-        var sw = GetStartedStopwatch();
+        var sw = Stopwatch_StartNew();
 
         if (File.Exists(DB_Path) == false)
         {
@@ -36,7 +36,7 @@ public abstract class MediaDB<T> where T : FileBase
             _files.Add((args[0], args[1], args[2], args[2].ToLower()));
         }
 
-        Log($"[{Name}] >> LOADED ({sw.Elapsed.ReadableTimeShort()})", color: LogColor.Yellow);
+        Log($"[{Name}] >> LOADED ({sw.Elapsed.ReadableTime()})", color: LogColor.Yellow);
 
         return (R)this;
     }

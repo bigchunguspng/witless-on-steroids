@@ -30,7 +30,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
-        var sw = GetStartedStopwatch();
+        var sw = Stopwatch_StartNew();
 
         var directory = Path.Combine(Dir_Temp, $"vid-{DateTime.Now.Ticks}");
         Directory.CreateDirectory(directory);
@@ -43,7 +43,7 @@ public class DownloadVideoTask(string id, CommandContext context)
         }
 
         await YtDlp.Run(GetDownloadCommand(id), directory);
-        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedShort()}", LogLevel.Info, LogColor.Yellow);
+        Log($"{context.Title} >> VIDEO DOWNLOADED >> TIME: {sw.ElapsedReadable()}", LogLevel.Info, LogColor.Yellow);
 
         var directoryInfo = new DirectoryInfo(directory);
         var files = directoryInfo.GetFiles("video.mp4");

@@ -19,7 +19,7 @@ public class Slice : AudioVideoUrlCommand
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
         var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 
-        var sw = GetStartedStopwatch();
+        var sw = Stopwatch_StartNew();
 
         var (output, probe, options) = await input.InitEditing("Slice", Ext);
 
@@ -35,7 +35,7 @@ public class Slice : AudioVideoUrlCommand
         Bot.DeleteMessageAsync(Chat, waitMessage);
 
         SendResult(output);
-        Log($"{Title} >> SLICE [{breaks}*{pacing}] >> {sw.ElapsedShort()}");
+        Log($"{Title} >> SLICE [{breaks}*{pacing}] >> {sw.ElapsedReadable()}");
     }
 
     protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";

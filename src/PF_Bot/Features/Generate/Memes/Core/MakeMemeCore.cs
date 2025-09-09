@@ -115,7 +115,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
         public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
         {
-            var sw = GetStartedStopwatch();
+            var sw = Stopwatch_StartNew();
 
             var path = await DownloadFileAndParseOptions(file, extension);
             if (round && CropVideoNotes)
@@ -136,7 +136,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
                 if (note) Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
                 else      Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoName));
             }
-            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedShort()}");
+            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedReadable()}");
         }
 
         private Task<FilePath> DownloadFileAndParseOptions(FileBase file, string extension)
@@ -173,7 +173,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         {
             return Queue.Enqueue(() =>
             {
-                var sw = GetStartedStopwatch();
+                var sw = Stopwatch_StartNew();
                 var result = MemeMaker.GenerateMeme(request, text);
                 sw.Log(Command);
                 return result;
@@ -199,7 +199,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         {
             return Queue.Enqueue(async () =>
             {
-                var sw = GetStartedStopwatch();
+                var sw = Stopwatch_StartNew();
                 await MemeMaker.GenerateVideoMeme(request, text);
                 sw.Log(Command + " video");
                 return request.TargetPath.ToString();

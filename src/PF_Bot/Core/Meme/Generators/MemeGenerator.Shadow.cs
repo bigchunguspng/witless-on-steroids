@@ -22,7 +22,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
 
-        var sw = GetStartedStopwatch();
+        var sw = Stopwatch_StartNew();
 
         if (top.height > 0)
         {
@@ -36,7 +36,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
             ShadowImagePart(bottom.fontSize, area);
         }
 
-        sw.Log("DrawShadow");
+        sw.Log("/meme -> DrawShadow");
 
         shadowRealm.Mutate(x => x.DrawImage(textLayer));
         textLayer.Dispose();

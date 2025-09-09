@@ -61,7 +61,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     public async Task RunAsync()
     {
-        var sw = GetStartedStopwatch();
+        var sw = Stopwatch_StartNew();
 
         // GET READY
 
@@ -139,7 +139,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         await using var stream = File.OpenRead(mp3);
         Bot.SendAudio(context.Origin, InputFile.FromStream(stream, mp3), jpg);
-        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedShort()}", LogLevel.Info, LogColor.Yellow);
+        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedReadable()}", LogLevel.Info, LogColor.Yellow);
     }
 
     private string GetSongName(FilePath audioFile, string? artist, string title)

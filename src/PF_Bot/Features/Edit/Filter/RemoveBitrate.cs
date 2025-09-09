@@ -12,7 +12,8 @@ namespace PF_Bot.Features.Edit.Filter
 {
     public class RemoveBitrate : AudioVideoPhotoCommand
     {
-        private int _value;
+        private int    _value;
+        private Quality ValueAsQuality => new ((byte)(100 - _value * 100 / 21F));
 
         protected override async Task Execute()
         {
@@ -38,16 +39,15 @@ namespace PF_Bot.Features.Edit.Filter
             if (probe.HasVideo)
             {
                 options
-                    .Options(FFMpegOptions.Out_cv_libx264)
-                    .Options($"-crf {GetVideoCRF()}")
+                    .SetCRF(GetVideoCRF())
                     .MP4_EnsureValidSize(probe.GetVideoStream());
             }
 
             if (probe.HasAudio)
             {
                 var audio = probe.GetAudioStream();
-                var bitrate = GetAudioBitrate(audio.Bitrate);
-                options.Options($"-b:a {bitrate}");
+                var bitrate = ValueAsQuality.GetAudioBitrate_kbps(audio.Bitrate);
+                options.Options($"-b:a {bitrate}k");
                 if (probe.HasVideo == false) options.Options("-f mp3");
             }
 
@@ -74,14 +74,6 @@ namespace PF_Bot.Features.Edit.Filter
 
         // QUALITY
         // value = [0..21]
-
-        private int GetAudioBitrate(int bitrate)            //  OG - COMPRESSED
-        {
-            if (bitrate <= 0) return 154 - 3 * _value;      // 154 - 91     bitrate
-
-            var quality = (21 - _value) / 21F;
-            return Math.Max((int)(bitrate * quality), 91);  //  OG - 91     bitrate
-        }
 
         private int GetVideoCRF   () => _value + 30;        //  30 - 51     crf: 0 lossless - 51 lowest quality
         private int GetJpegQuality() => 22 - _value;        //  22 -  1     quality: 1 - 100

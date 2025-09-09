@@ -17,6 +17,15 @@ public static class FFMpegOptions_Extensions
         return options.VF($"crop={rect.Width}:{rect.Height}:{rect.X}:{rect.Y}");
     }
 
+
+    // MP4 SPECIFIC
+
+    public static FFMpegOutputOptions SetCRF
+        (this FFMpegOutputOptions options, int crf) =>
+        options
+            .Options(FFMpegOptions.Out_cv_libx264)
+            .Options($"-crf {crf}");
+
     public static FFMpegOutputOptions MP4_EnsureValidSize
         (this FFMpegOutputOptions options, FFProbeResult.Stream video)
         => MP4_EnsureValidSize(options, video, out _);

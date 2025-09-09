@@ -16,10 +16,12 @@ public class DukeNukem : IMemeGenerator<int>
     {
         var (input, output) = (request.SourcePath, request.TargetPath);
 
+        var isSticker = request is { IsSticker: true, ExportAsSticker: true };
+
         var probe = FFProbe.Analyze(input).Result;
         var args = new FFMpeg_Nuke(input, probe)
             .Nuke(Depth)
-            .Out(output, o => o.ApplyPostNuking(probe, request.GetQscale()));
+            .Out(output, o => o.ApplyPostNuking(probe, request.Quality, isSticker: isSticker));
         var result = args.FFMpeg_Run().Result;
 
         LogNuke(result, request);
@@ -34,7 +36,7 @@ public class DukeNukem : IMemeGenerator<int>
         var probe = await FFProbe.Analyze(input);
         var result = await new FFMpeg_Nuke(input, probe)
             .Nuke(Depth.Clamp(3), isVideo: true)
-            .Out(output, o => o.ApplyPostNuking(probe, request.GetCRF(), isVideo: true))
+            .Out(output, o => o.ApplyPostNuking(probe, request.Quality, isVideo: true))
             .FFMpeg_Run();
 
         LogNuke(result, request);

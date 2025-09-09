@@ -86,10 +86,15 @@ public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest memeFileRequest, V
 
     private void Compress()
     {
-        _options.FixVideo_Playback();
+        _options
+            .FixVideo_Playback()
+            .SetCRF(request.Quality.GetCRF());
 
-        var factor = request.Quality;
-        if (factor >  0) _options.Options(FFMpegOptions.Out_cv_libx264).Options($"-crf {factor}");
-        if (factor > 23) _options.Options($"-b:a {154 - 3 * factor}k"); // todo relative bitrate
+        if (probe.HasAudio)
+        {
+            var audio = probe.GetAudioStream();
+            var bitrate = request.Quality.GetAudioBitrate_kbps(audio.Bitrate);
+            _options.Options($"-b:a {bitrate}k");
+        }
     }
 }

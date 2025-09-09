@@ -33,11 +33,8 @@ public class ToGIF : VideoPhotoCommand
             // video of valid size -> copy codec
             var copyCodec = sizeIsValid && photo == false && input.Extension != ".gif";
             _ = copyCodec
-                ? options
-                    .Options(FFMpegOptions.Out_cv_copy)
-                : options
-                    .Options(FFMpegOptions.Out_cv_libx264)
-                    .Options(FFMpegOptions.Out_crf_30);
+                ? options.Options(FFMpegOptions.Out_cv_copy)
+                : options.SetCRF(30);
         }
 
         _ = photo

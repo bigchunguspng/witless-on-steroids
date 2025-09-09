@@ -217,10 +217,9 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
                 if (gif)
                 {
                     options
-                        .Options("-vn")
+                        .Options("-an")
                         .FixVideo_Playback()
-                        .Options(FFMpegOptions.Out_crf_30)
-                        .Options(FFMpegOptions.Out_cv_libx264);
+                        .SetCRF(30);
                 }
                 else
                     options

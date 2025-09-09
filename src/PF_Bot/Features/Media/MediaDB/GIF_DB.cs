@@ -38,11 +38,8 @@ public class GIF_DB : MediaDB<Animation>
         // video of valid size -> copy codec
         var copyCodec = sizeIsValid && input.Extension != ".gif";
         _ = copyCodec
-            ? options
-                .Options(FFMpegOptions.Out_cv_copy)
-            : options
-                .Options(FFMpegOptions.Out_cv_libx264)
-                .Options(FFMpegOptions.Out_crf_30);
+            ? options.Options(FFMpegOptions.Out_cv_copy)
+            : options.SetCRF(30);
 
         await FFMpeg.Command(input, output, options.Options("-an")).FFMpeg_Run();
     }

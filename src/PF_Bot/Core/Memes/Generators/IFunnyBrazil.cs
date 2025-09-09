@@ -1,7 +1,6 @@
 ﻿using ColorHelper;
 using PF_Bot.Core.Editing;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
@@ -10,7 +9,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers; // ReSharper disable InconsistentNaming
+namespace PF_Bot.Core.Memes.Generators; // ReSharper disable InconsistentNaming
 
 public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 {
@@ -59,10 +58,11 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
         using var card = DrawText(text);
         using var frame = Combine(null, card);
+        var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
         var probe = await request.ProbeSource();
-        await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, frame))
-            .When(_sourceSizeAdjusted, Cropping, Location)
+        await new FFMpeg_Meme(probe, request, frameAsFile)
+            .Top(_sourceSizeAdjusted, Cropping, Location)
             .FFMpeg_Run();
     }
 

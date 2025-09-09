@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers;
+namespace PF_Bot.Core.Memes.Generators;
 
 public partial class IFunnyBrazil
 {

@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Editing;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
@@ -12,7 +11,7 @@ using SixLabors.ImageSharp.Processing;
 using Random = System.Random;
 using Logo = (SixLabors.ImageSharp.Image Image, SixLabors.ImageSharp.Point Point);
 
-namespace PF_Bot.Tools_Legacy.MemeMakers
+namespace PF_Bot.Core.Memes.Generators
 {
     public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
@@ -76,9 +75,10 @@ namespace PF_Bot.Tools_Legacy.MemeMakers
         public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
+            var frameAsFile = ImageSaver.SaveImageTemp(frame);
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, frame))
-                .Demo(ImagePlacement.Size, ImagePlacement.Location)
+            await new FFMpeg_Meme(probe, request, frameAsFile)
+                .Demotivator(ImagePlacement.Size, ImagePlacement.Location)
                 .FFMpeg_Run();
         }
 

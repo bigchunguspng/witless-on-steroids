@@ -1,6 +1,5 @@
 ﻿using PF_Bot.Core.Editing;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
@@ -8,7 +7,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers // ReSharper disable InconsistentNaming
+namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
 {
     public partial class DynamicDemotivatorDrawer : MemeGeneratorBase, IMemeGenerator<string>
     {
@@ -71,12 +70,9 @@ namespace PF_Bot.Tools_Legacy.MemeMakers // ReSharper disable InconsistentNaming
             using var frame = DrawFrame(text, emojiPngs);
             var frameAsFile = ImageSaver.SaveImageTemp(frame);
 
-            // todo task
-            var full_size = FFProbe.Analyze(frameAsFile).Result.GetVideoStream().Size; //.FitSize(720);
-
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, frameAsFile))
-                .D300(_sourceSizeAdjusted, _imageOrigin, full_size)
+            await new FFMpeg_Meme(probe, request, frameAsFile)
+                .Demotivator(_sourceSizeAdjusted, _imageOrigin)
                 .FFMpeg_Run();
         }
 

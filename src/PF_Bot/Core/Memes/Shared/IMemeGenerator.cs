@@ -1,6 +1,6 @@
 ﻿using PF_Bot.Features.Generate.Memes.Core;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers.Shared;
+namespace PF_Bot.Core.Memes.Shared;
 
 public interface IMemeGenerator<in T>
 {

@@ -5,7 +5,7 @@ using PF_Bot.Features.Generate.Memes.Core;
 using SixLabors.Fonts;
 using FontSpecificData = (float size, float offset, float caps);
 
-namespace PF_Bot.Tools_Legacy.MemeMakers.Shared
+namespace PF_Bot.Core.Memes.Shared
 {
     public class FontWizard
     {

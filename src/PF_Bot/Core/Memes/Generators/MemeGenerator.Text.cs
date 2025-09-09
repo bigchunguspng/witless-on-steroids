@@ -1,10 +1,10 @@
 ﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers;
+namespace PF_Bot.Core.Memes.Generators;
 
 public partial class MemeGenerator
 {

@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers;
+namespace PF_Bot.Core.Memes.Generators;
 
 public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FORM)
 {

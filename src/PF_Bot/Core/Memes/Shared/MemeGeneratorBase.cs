@@ -4,7 +4,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers.Shared; // ReSharper disable InconsistentNaming
+namespace PF_Bot.Core.Memes.Shared; // ReSharper disable InconsistentNaming
 
 public abstract class MemeGeneratorBase
 {

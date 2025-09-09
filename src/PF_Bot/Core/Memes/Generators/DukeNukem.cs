@@ -1,11 +1,10 @@
 using PF_Bot.Core.Editing;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using PF_Tools.FFMpeg;
 using PF_Tools.FFMpeg.Tasks;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers;
+namespace PF_Bot.Core.Memes.Generators;
 
 public class DukeNukem : IMemeGenerator<int>
 {

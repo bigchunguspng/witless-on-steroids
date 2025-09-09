@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers.Shared
+namespace PF_Bot.Core.Memes.Shared
 {
     public static class EmojiTool
     {

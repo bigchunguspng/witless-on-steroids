@@ -3,7 +3,7 @@ using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace PF_Bot.Features.Generate.Memes.Core;
+namespace PF_Bot.Core.Memes.Shared;
 
 public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, FilePath path, string outputEnding, byte quality, float press)
 {

@@ -1,7 +1,6 @@
 ﻿using ColorHelper;
 using PF_Bot.Core.Editing;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Tools_Legacy.MemeMakers.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
@@ -9,7 +8,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Bot.Tools_Legacy.MemeMakers
+namespace PF_Bot.Core.Memes.Generators
 {
     public partial class MemeGenerator : MemeGeneratorBase, IMemeGenerator<TextPair>
     {
@@ -66,8 +65,9 @@ namespace PF_Bot.Tools_Legacy.MemeMakers
             SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
             using var caption = DrawCaption(text);
+            var captionAsFile = ImageSaver.SaveImageTemp(caption);
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, VideoMemeRequest.From(request, caption))
+            await new FFMpeg_Meme(probe, request, captionAsFile)
                 .Meme(_sourceSizeAdjusted)
                 .FFMpeg_Run();
         }

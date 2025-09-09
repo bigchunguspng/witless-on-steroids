@@ -1,10 +1,10 @@
-using PF_Bot.Core.Memes.Shared;
-using PF_Bot.Features.Edit.Shared;
+using PF_Bot.Core.Meme.Shared;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 
 namespace PF_Bot.Core.Editing;
 
+/// Videomemes are assembled here.
 public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest request, FilePath caption)
 {
     private readonly string  _input = request.SourcePath;
@@ -52,8 +52,8 @@ public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest request, FilePath 
     private FFMpegArgs AddArguments_And_Press()
     {
         AddArguments();
-        HydraulicPress(request.Press);
-        AV_Compression(request.Quality);
+        _args.Meme_HydraulicPress(request.Press);
+        _options.Meme_Compression(request.Quality, probe);
 
         return _args;
     }
@@ -63,27 +63,5 @@ public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest request, FilePath 
         _args.Input(_input);
         _args.Input(caption);
         _args.Out(_output, _options);
-    }
-
-    private void HydraulicPress(float press)
-    {
-        if (press == 0) return;
-
-        _args.FilterAppend($"scale=ceil((iw*{press})/2)*2:ceil((ih*{press})/2)*2");
-        _args.FilterAppend($"scale=ceil((iw/{press})/2)*2:ceil((ih/{press})/2)*2");
-    }
-
-    private void AV_Compression(Quality quality)
-    {
-        _options
-            .FixVideo_Playback()
-            .SetCRF(quality.GetCRF());
-
-        if (probe.HasAudio)
-        {
-            var audio = probe.GetAudioStream();
-            var bitrate = quality.GetAudioBitrate_kbps(audio.Bitrate);
-            _options.Options($"-b:a {bitrate}k");
-        }
     }
 }

@@ -1,7 +1,7 @@
-﻿using PF_Bot.Features.Edit.Core;
+﻿using PF_Bot.Core.Editing;
+using PF_Bot.Features.Edit.Core;
 using PF_Bot.Features.Edit.Shared;
 using PF_Tools.FFMpeg;
-using PF_Tools.FFMpeg.Tasks;
 
 namespace PF_Bot.Features.Edit.Filter;
 

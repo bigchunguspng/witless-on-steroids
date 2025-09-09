@@ -1,5 +1,5 @@
 ﻿using PF_Bot.Core.Chats;
-using PF_Bot.Core.Generation;
+using PF_Bot.Core.Text;
 using PF_Bot.Telegram;
 using PF_Tools.Backrooms.Helpers.ProcessRunning;
 using Telegram.Bot.Types;

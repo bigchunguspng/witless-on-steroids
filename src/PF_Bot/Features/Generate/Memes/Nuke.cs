@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Backrooms.Types.SerialQueue;
-using PF_Bot.Core.Memes.Generators;
-using PF_Bot.Core.Memes.Shared;
+using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Bot.Features.Manage.Packs;
 using Telegram.Bot.Types;

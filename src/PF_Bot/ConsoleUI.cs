@@ -1,6 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
-using PF_Bot.Core.Generation;
+using PF_Bot.Core.Text;
 using PF_Bot.Features.Media.MediaDB;
 using PF_Bot.Tools_Legacy.RedditSearch;
 using PF_Bot.Tools_Legacy.Technical;

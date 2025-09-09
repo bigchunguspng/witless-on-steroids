@@ -114,4 +114,30 @@ public readonly struct FilePath(string value)
         Directory.CreateDirectory(_path);
         return this;
     }
+
+    // GET FILES
+
+    /// Makes sure directory exists.
+    /// <inheritdoc cref="DirectoryInfo.GetFiles(string, SearchOption)"/>>
+    public FileInfo[] GetFilesInfo
+        (string pattern = "*", bool recursive = false)
+    {
+        Directory.CreateDirectory(_path);
+        return  new DirectoryInfo(_path).GetFiles(pattern, GetSearchOption(recursive));
+    }
+
+    /// Makes sure directory exists.
+    /// <inheritdoc cref="Directory.GetFiles(string, string, SearchOption)"/>
+    public string[] GetFiles
+        (string pattern = "*", bool recursive = false)
+    {
+        Directory.CreateDirectory(_path);
+        return Directory.GetFiles(_path,          pattern, GetSearchOption(recursive));
+    }
+
+    private static SearchOption GetSearchOption
+        (bool recursive) => recursive
+        ? SearchOption.AllDirectories
+        : SearchOption.TopDirectoryOnly;
+
 }

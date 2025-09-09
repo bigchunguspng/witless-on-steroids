@@ -1,4 +1,4 @@
-namespace PF_Tools.Backrooms.Helpers.ProcessRunning;
+namespace PF_Tools.ProcessRunning;
 
 public static class ProcessRunner
 {

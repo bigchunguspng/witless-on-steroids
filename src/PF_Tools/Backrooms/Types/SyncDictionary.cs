@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace PF_Bot.Backrooms.Types
+namespace PF_Tools.Backrooms.Types
 {
     public class SyncDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
     {

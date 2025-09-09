@@ -95,7 +95,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     private Image<Rgba32> DrawText(string text)
     {
-        var emoji = EmojiRegex.Matches(text);
+        var emoji = EmojiTool.FindEmoji(text);
         var plain = emoji.Count == 0;
 
         var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);

@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Backrooms.Types.SerialQueue
+﻿namespace PF_Tools.Backrooms.Types.SerialQueue
 {
     /// <summary>
     /// https://github.com/gentlee/SerialQueue

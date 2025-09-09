@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace PF_Bot.Backrooms.Types;
+namespace PF_Tools.Backrooms.Types;
 
 public class LimitedCache<TKey, TValue> where TKey : notnull
 {

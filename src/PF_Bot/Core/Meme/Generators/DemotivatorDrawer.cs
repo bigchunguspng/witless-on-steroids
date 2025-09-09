@@ -113,7 +113,7 @@ namespace PF_Bot.Core.Meme.Generators
         private void DrawText(Image image, string text, TextType type)
         {
             var options = GetTextOptions(type, text, out var offset, out var fontOffset, out var caseOffset);
-            var emoji = EmojiRegex.Matches(text);
+            var emoji = EmojiTool.FindEmoji(text);
             var lines = type != TextType.Lower || BottomTextIsGenerated ? 1 : emoji.Count > 0 ? -1 : 2;
             if (emoji.Count == 0)
             {
@@ -147,9 +147,9 @@ namespace PF_Bot.Core.Meme.Generators
 
         private static Logo PickRandomLogo() => Logos[Random.Shared.Next(Logos.Count)];
 
-        private static void LoadLogos(string path)
+        private static void LoadLogos(FilePath path)
         {
-            var files = GetFilesInfo(path, recursive: true);
+            var files = path.GetFilesInfo(recursive: true);
             foreach (var file in files)
             {
                 var coords = file.Name.Replace(file.Extension, "").Split(' ');

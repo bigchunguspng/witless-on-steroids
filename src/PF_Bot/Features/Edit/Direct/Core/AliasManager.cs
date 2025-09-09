@@ -11,7 +11,8 @@ public abstract class AliasManager : SyncCommand
     protected abstract string CMD       { get; }
     protected abstract string Code      { get; }
     protected abstract string Tool      { get; }
-    protected abstract string Directory { get; }
+
+    protected abstract FilePath Directory { get; }
 
     // /a{cmd} [code] [options] // ALIAS CREATION
     // /a{cmd} [code] 0         // ALIAS DELETION (admin only)
@@ -33,7 +34,7 @@ public abstract class AliasManager : SyncCommand
             var name = args[0].ValidFileName();
 
             var admin = Message.SenderIsBotAdmin();
-            var files = GetFiles(Directory, $"{name}.*");
+            var files = Directory.GetFiles($"{name}.*");
             if (files.Length > 0 && !admin)
             {
                 var content = File.ReadAllText(files[0]);
@@ -41,7 +42,7 @@ public abstract class AliasManager : SyncCommand
             }
             else
             {
-                var path = Path.Combine(Directory, $"{name}.txt");
+                var path = Directory.Combine($"{name}.txt");
 
                 var options = Regex.Replace(args[1], @"\s+", " ");
                 if (options == "0" && admin)
@@ -70,7 +71,7 @@ public abstract class AliasManager : SyncCommand
     {
         var (origin, messageId, page, perPage) = pagination;
 
-        var files = GetFiles(Directory);
+        var files = Directory.GetFiles();
 
         var single = files.Length <= perPage;
 

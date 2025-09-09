@@ -113,7 +113,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
     private Image DrawText(string text)
     {
-        var emoji = EmojiRegex.Matches(text);
+        var emoji = EmojiTool.FindEmoji(text);
         var plain = emoji.Count == 0;
 
         var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace PF_Tools.Backrooms.Helpers.ProcessRunning;
+namespace PF_Tools.ProcessRunning;
 
 /// Helper class to start processes with output redirection.
 public static class ProcessStarter

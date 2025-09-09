@@ -6,6 +6,8 @@ namespace PF_Bot.Backrooms.Helpers;
 
 public static class BoardHelpers
 {
+    private static readonly Regex _rgx_URL = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
+
     public static void Print4chan() => PrintMenu(new BoardService().GetBoardList(File_4chanHtmlPage));
     public static void Print2chan() => PrintMenu(new PlankService().GetBoardList(File_2chanHtmlPage));
 
@@ -56,7 +58,7 @@ public static class BoardHelpers
         var post = serializer.Deserialize<List<string>>(reader)!.First();
 
         post = HtmlText.Escape(post);
-        post = URL_Regex.Replace(post, match => $"<a href=\"{match.Value}\">[deleted]</a>");
+        post = _rgx_URL.Replace(post, match => $"<a href=\"{match.Value}\">[deleted]</a>");
 
         if (post.Contains(": "))
         {

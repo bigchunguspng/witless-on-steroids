@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.Copypaster;
 
 namespace PF_Bot.Core.Text;

@@ -12,10 +12,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="../PF_Tools/PF_Tools.csproj"/>
     </ItemGroup>
 

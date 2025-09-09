@@ -41,7 +41,7 @@ public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest request, FilePath 
     }
 
     private string GetFpsFixFilter
-        () => $"[1:v]fps={GetFramerate().Format()}[pic]";
+        () => $"[1:v]fps={GetFramerate()}[pic]";
 
     private double GetFramerate()
     {

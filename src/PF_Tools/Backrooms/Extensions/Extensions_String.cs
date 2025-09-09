@@ -43,6 +43,17 @@ public static class Extensions_String
             Directory.CreateDirectory(directory);
     }
 
+    public static string ValidFileName(this string text, char x = '_')
+    {
+        var chars = Path.GetInvalidFileNameChars();
+        return chars.Aggregate(text, (current, c) => current.Replace(c, x));
+    }
+
+    public static bool FileNameIsInvalid(this string text)
+    {
+        return Path.GetInvalidFileNameChars().Any(text.Contains);
+    }
+
     // LANGUAGE DETECTION
 
     private static readonly Regex _lat = new("[A-Za-z]"), _cyr = new("[Ѐ-ӿ]");

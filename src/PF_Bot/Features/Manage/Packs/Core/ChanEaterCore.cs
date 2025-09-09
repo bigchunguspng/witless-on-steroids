@@ -2,14 +2,15 @@ using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
 using PF_Bot.Tools_Legacy.BoardScrappers;
-using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Manage.Packs.Core;
 
 public abstract class ChanEaterCore : Fuse
 {
-    protected abstract string ArchivePath { get; }
+    protected abstract FilePath ArchivePath { get; }
+
     protected abstract string CallbackKey { get; }
     protected abstract string CommandName { get; }
     protected abstract string BoardsTitle { get; }
@@ -63,7 +64,7 @@ public abstract class ChanEaterCore : Fuse
 
     private async Task EatJsonFile()
     {
-        var files = GetFiles(ArchivePath, $"{Args}.json");
+        var files = ArchivePath.GetFiles($"{Args}.json");
         if (files.Length > 0)
         {
             await EatFromJsonFile(files[0]);
@@ -118,14 +119,14 @@ public abstract class ChanEaterCore : Fuse
 
     private string GetFileSavePath()
     {
-        Directory.CreateDirectory(ArchivePath);
-
         var thread = BoardHelpers.FileNameIsThread(FileName);
         var date = thread
             ? $"{DateTime.Now:yyyy'-'MM'-'dd}"
             : $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
 
-        return Path.Combine(ArchivePath, $"{date} {FileName.Replace(' ', '-')}.json");
+        return ArchivePath
+            .EnsureDirectoryExist()
+            .Combine($"{date} {FileName.Replace(' ', '-')}.json");
     }
 
     protected Uri UrlOrBust(ref string url)
@@ -186,7 +187,9 @@ public abstract class ChanEaterCore : Fuse
     {
         var (origin, messageId, page, perPage) = pagination;
 
-        var files = GetFilesInfo(ArchivePath).Where(x => x.Length > 2).OrderByDescending(x => x.Name).ToArray();
+        var files = ArchivePath.GetFilesInfo()
+            .Where(x => x.Length > 2)
+            .OrderByDescending(x => x.Name).ToArray();
 
         var paginated = files.Length > perPage;
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;

@@ -133,7 +133,7 @@ namespace PF_Bot.Core.Meme.Generators
 
             text = text.Trim('\n');
 
-            var emoji = EmojiRegex.Matches(text);
+            var emoji = EmojiTool.FindEmoji(text);
             var plain = emoji.Count == 0;
             
             var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);

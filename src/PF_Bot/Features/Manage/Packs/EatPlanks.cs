@@ -18,7 +18,8 @@ public class EatPlanks : ChanEaterCore
     private string _name = default!;
     private Uri? _uri;
 
-    protected override string ArchivePath => Dir_Plank;
+    protected override FilePath ArchivePath => Dir_Plank;
+
     protected override string CallbackKey => "p";
     protected override string CommandName => "plank";
     protected override string BoardsTitle => BOARDS_2CHAN;

@@ -18,7 +18,8 @@ public class EatBoards : ChanEaterCore
     private string _name = default!;
     private Uri     _uri = default!;
 
-    protected override string ArchivePath => Dir_Board;
+    protected override FilePath ArchivePath => Dir_Board;
+
     protected override string CallbackKey => "b";
     protected override string CommandName => "board";
     protected override string BoardsTitle => BOARDS_4CHAN;

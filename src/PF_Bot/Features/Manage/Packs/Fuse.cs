@@ -4,7 +4,7 @@ using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Features.Manage.Settings;
 using PF_Bot.Features.Media.Reddit;
-using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Manage.Packs
@@ -91,7 +91,7 @@ namespace PF_Bot.Features.Manage.Packs
 
                 await FuseWithOtherPack(ChatManager.GetPackPath(chat));
             }
-            else if (GetFiles(GetPacksFolder(Chat, @private), $"{arg}{Ext_Pack}") is { Length: > 0 } files)
+            else if (GetPacksFolder(Chat, @private).GetFiles($"{arg}{Ext_Pack}") is { Length: > 0 } files)
             {
                 await FuseWithOtherPack(files[0]);
             }
@@ -111,7 +111,7 @@ namespace PF_Bot.Features.Manage.Packs
             var @private = _source is FuseSource.FilePrivate;
             var name = string.Join(' ', args.Skip(1));
 
-            var files = GetFiles(GetFilesFolder(Chat, @private), $"{name}.json");
+            var files = GetFilesFolder(Chat, @private).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
                 SendFileList(new ListPagination(Origin), fail: true, @private);
@@ -255,12 +255,12 @@ namespace PF_Bot.Features.Manage.Packs
 
         private static void SendFilesList
         (
-            FusionListData data, string directory, ListPagination pagination, bool fail = false
+            FusionListData data, FilePath directory, ListPagination pagination, bool fail = false
         )
         {
             var (origin, messageId, page, perPage) = pagination;
 
-            var files = GetFilesInfo(directory);
+            var files = directory.GetFilesInfo();
             var oneshot = files.Length < perPage;
 
             var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
@@ -307,10 +307,10 @@ namespace PF_Bot.Features.Manage.Packs
         private static FilePath GetPrivatePacksFolder(long chat) => Dir_Fuse   .Combine(chat.ToString());
         private static FilePath GetPrivateFilesFolder(long chat) => Dir_History.Combine(chat.ToString());
 
-        private static string GetPacksFolder
+        private static FilePath GetPacksFolder
             (long chat, bool @private) => @private ? GetPrivatePacksFolder(chat) : Dir_Fuse;
 
-        private static string GetFilesFolder
+        private static FilePath GetFilesFolder
             (long chat, bool @private) => @private ? GetPrivateFilesFolder(chat) : Dir_History;
 
         private string GetJsonFormatExample()

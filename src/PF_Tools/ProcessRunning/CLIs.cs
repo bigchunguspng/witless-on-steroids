@@ -1,4 +1,4 @@
-namespace PF_Tools.Backrooms.Static;
+namespace PF_Tools.ProcessRunning;
 
 public static class CLIs
 {

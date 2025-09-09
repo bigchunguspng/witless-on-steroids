@@ -49,6 +49,6 @@ public static class Responses
 
     public static string GetRandomASCII()
     {
-        return File.ReadAllText(GetFiles(Dir_ASCII).PickAny());
+        return File.ReadAllText(Dir_ASCII.GetFiles().PickAny());
     }
 }

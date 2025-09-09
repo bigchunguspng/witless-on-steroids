@@ -1,52 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace PF_Bot.Backrooms;
 
 public static partial class Extensions
 {
-    [StringSyntax("Regex")] private const string EMOJI_REGEX
-        = @"((\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)\ufe0f|([\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])\ufe0f*\u200d*|[\d*#]\ufe0f\u20e3)+";
-
-    public static readonly Regex EmojiRegex = new(EMOJI_REGEX);
-    public static readonly Regex FFmpeg = new("ffmpeg|ffprobe", RegexOptions.IgnoreCase);
-    public static readonly Regex URL_Regex = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
-
-    // FORMAT
-
-    public static string Format(this double value) => value.ToString(CultureInfo.InvariantCulture);
-    public static string Format(this float  value) => value.ToString(CultureInfo.InvariantCulture);
-
-    // PATH
-
-    public static string ValidFileName(this string text, char x = '_')
-    {
-        var chars = Path.GetInvalidFileNameChars();
-        return chars.Aggregate(text, (current, c) => current.Replace(c, x));
-    }
-
-    public static bool FileNameIsInvalid(this string text)
-    {
-        return Path.GetInvalidFileNameChars().Any(text.Contains);
-    }
-
-    // COMFIES
-
-    public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
-    {
-        foreach (var element in source) action(element);
-    }
-
-    public static T GetRandomMemeber<T>() where T : Enum
-    {
-        var values = Enum.GetValues(typeof(T));
-        return (T)values.GetValue(Random.Shared.Next(values.Length))!;
-    }
-
-    // MEDIA
-
-    public static string ShortID(string id) => id.Remove(56).Remove(0, 23);
-
     //
 
     public static string HOURS_ED(int hours) => ED(hours, "", "а", "ов");
@@ -69,33 +26,20 @@ public static partial class Extensions
         return Errors.ExtractGroup(1, message, s => s, message)!;
     }
 
-    // FILE
+    // UI
 
     public static string ReadableFileSize(this long bytes)
     {
         var kbs = bytes / 1024F;
         var mbs = kbs   / 1024F;
-        return mbs >= 100
-            ? $"{mbs:F1} МБ"
-            : mbs >= 1
-                ? $"{mbs:F2} МБ"
-                : kbs >= 1
-                    ? $"{kbs:F0} КБ"
-                    : $"{bytes} байт";
+        return mbs >= 100 ? UI($"{mbs:F1} МБ")
+            :  mbs >=   1 ? UI($"{mbs:F2} МБ")
+            :  kbs >=   1 ? UI($"{kbs:F0} КБ")
+            :                  $"{bytes} байт";
     }
 
-    public static FileInfo[] GetFilesInfo(string path, bool recursive = false)
-    {
-        Directory.CreateDirectory(path);
-        return new DirectoryInfo(path).GetFiles("*", recursive.ToSearchOption());
-    }
+    private static readonly CultureInfo _culture_UI = CultureInfo.GetCultureInfo("fi"/*nna jerk it))*/);
 
-    public static string[] GetFiles(string path, string pattern = "*", bool recursive = false)
-    {
-        Directory.CreateDirectory(path);
-        return Directory.GetFiles(path, pattern, recursive.ToSearchOption());
-    }
-
-    private static SearchOption ToSearchOption
-        (this bool recursive) => recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+    public static string UI
+        (this FormattableString formattable) => formattable.ToString(_culture_UI);
 }

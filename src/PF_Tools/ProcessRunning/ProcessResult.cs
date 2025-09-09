@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace PF_Tools.Backrooms.Helpers.ProcessRunning;
+namespace PF_Tools.ProcessRunning;
 
 public class ProcessResult(string arguments, StartedProcess process)
 {

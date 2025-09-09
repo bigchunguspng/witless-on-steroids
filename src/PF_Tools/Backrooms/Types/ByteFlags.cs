@@ -1,15 +1,14 @@
-﻿namespace PF_Bot.Backrooms.Types;
+﻿namespace PF_Tools.Backrooms.Types;
 
-/// <summary>
-/// Use this struct to store up to 8 bool values in a single byte.
-/// </summary>
+/// Struct salesman: *slaps docstring* <br/>
+/// This bad boy can fit up to 8 booleans in a single byte.
+/// Usage example:
+/// <code> public bool Real { get => _flags[3]; set => _flags[3] = value; } </code>
 public struct ByteFlags
 {
     private byte _data;
 
-    /// <summary>
     /// Don't pass anything >= 8 here.
-    /// </summary>
     public bool this[byte index]
     {
         get => (_data & (1 << index)) != 0;

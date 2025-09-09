@@ -92,7 +92,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
         private string ArrangeText(string text, out EmojiPngList? pngs)
         {
-            var emoji = EmojiRegex.Matches(text);
+            var emoji = EmojiTool.FindEmoji(text);
             var plain = emoji.Count == 0;
             pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
             text = plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs);

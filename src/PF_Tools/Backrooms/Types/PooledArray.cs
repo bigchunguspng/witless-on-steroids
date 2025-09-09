@@ -3,20 +3,12 @@ using System.Buffers;
 namespace PF_Tools.Backrooms.Types;
 
 /// Use it only on the stack!
-public readonly struct PooledArray<T> : IDisposable
+public readonly struct PooledArray<T> (int length) : IDisposable
 {
-    private readonly ArrayPool<T> _pool;
-
-    public T[] Array { get; }
-
-    public PooledArray(int length)
-    {
-        _pool = ArrayPool<T>.Shared;
-        Array = _pool.Rent(length);
-    }
+    public T[] Array { get; } = ArrayPool<T>.Shared.Rent(length);
 
     public void Dispose()
     {
-        _pool.Return(Array);
+        ArrayPool<T>.Shared.Return(Array);
     }
 }

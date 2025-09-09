@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Backrooms.Types;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -12,6 +12,27 @@ namespace PF_Bot.Core.Meme.Shared
 {
     public static class EmojiTool
     {
+        [StringSyntax("Regex")] private const string EMOJI_REGEX =
+            """
+            (?:
+            (?:\u00a9|\u00ae|\u203c|\u2049|\u2122|[\u2139-\u21aa]|\u3297|\u3299)
+            \ufe0f
+            |
+            (?:[\u231a-\u303d]|(\ud83c|\ud83d|\ud83e)[\ud000-\udfff])
+            \ufe0f*\u200d*
+            |
+            [\d*#]
+            \ufe0f\u20e3
+            )+
+            """;
+
+        private static readonly Regex _rgx_Emoji = new(EMOJI_REGEX, RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
+
+        public static MatchCollection FindEmoji(string text)
+        {
+            return _rgx_Emoji.Matches(text);
+        }
+
         public record Options
         (
             SolidBrush Color,
@@ -65,8 +86,8 @@ namespace PF_Bot.Core.Meme.Shared
             string paragraph, RichTextOptions rto, Options options, Queue<string> pngs
         )
         {
-            var  textChunks = EmojiRegex.Replace(paragraph, "\t").Split('\t');
-            var emojiChunks = GetEmojiPngs(EmojiRegex.Matches(paragraph));
+            var  textChunks = _rgx_Emoji.Replace(paragraph, "\t").Split('\t');
+            var emojiChunks = GetEmojiPngs(_rgx_Emoji.Matches(paragraph));
 
             var width  = options.Width;
             var height = rto.Font.Size * rto.LineSpacing;
@@ -150,7 +171,7 @@ namespace PF_Bot.Core.Meme.Shared
             string text, string ok, MatchCollection? matches = null, List<List<string>>? pngs = null
         )
         {
-            matches ??= EmojiRegex.Matches(text);
+            matches ??= _rgx_Emoji.Matches(text);
             if (matches.Count == 0) return text;
 
             pngs ??= GetEmojiPngs(matches);

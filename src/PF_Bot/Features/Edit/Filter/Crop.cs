@@ -46,7 +46,7 @@ namespace PF_Bot.Features.Edit.Filter
                 {
                     var match = _tlbr.Match(args[0].ToLower());
                     var a0 = match.Value;
-                    var a1 = (int.Parse(args[1]) / 100F).Format();
+                    var a1 = int.Parse(args[1]) / 100F;
                     if      (a0 == "t") args = ["iw", $"(1-{a1})*ih", "0", $"ih*{a1}"];
                     else if (a0 == "l") args = [$"(1-{a1})*iw", "ih", $"iw*{a1}", "0"];
                     else if (a0 == "b") args = ["iw", $"(1-{a1})*ih", "0", "0"];

@@ -23,9 +23,16 @@ namespace PF_Bot.Telegram
 
         private Bot(CommandAndCallbackRouter command)
         {
-            var httpClient = new HttpClient() { Timeout = TimeSpan.FromMinutes(5) };
+            var options = new TelegramBotClientOptions(Config.TelegramToken)
+            {
+                RetryThreshold = 300,
+                RetryCount = 5,
+            };
 
-            Client = new TelegramBotClient(Config.TelegramToken, httpClient);
+            Client = new TelegramBotClient(options)
+            {
+                Timeout = TimeSpan.FromMinutes(5),
+            };
             Me       = GetMe();
             Username = $"@{Me.Username!.ToLower()}";
             Instance = this;

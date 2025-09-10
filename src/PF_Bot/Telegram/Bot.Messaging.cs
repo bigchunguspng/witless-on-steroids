@@ -141,9 +141,7 @@ namespace PF_Bot.Telegram
         }
 
 
-        private static readonly Regex _retryAfter = new(@"retry after (\d+)");
-
-        private static T? TrySend<T>(long chat, Task<T> task, string what, string action = "send", int patience = 5)
+        private static T? TrySend<T>(long chat, Task<T> task, string what, string action = "send")
         {
             var result = default(T);
             try
@@ -153,15 +151,7 @@ namespace PF_Bot.Telegram
             }
             catch (Exception e)
             {
-                var reason = e.GetErrorMessage();
-                LogError($"{chat} >> Can't {action} {what} | {reason}");
-                if (patience > 0)
-                {
-                    var serverError = reason.Contains("Server Error");
-                    var retryDelay = serverError ? 0 : _retryAfter.ExtractGroup(1, reason, int.Parse, 0);
-                    if (retryDelay > 0) Task.Delay(retryDelay * 250).Wait();
-                    if (retryDelay > 0 || serverError) return TrySend(chat, task, what, action, patience - 1);
-                }
+                LogError($"{chat} >> Can't {action} {what} | {e.GetErrorMessage()}");
             }
 
             return result;
@@ -202,19 +192,6 @@ namespace PF_Bot.Telegram
                 .MakeUnique();
             var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
             var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
-            File.WriteAllText(path, text);
-            using var stream = File.OpenRead(path);
-            SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));
-        }
-
-        [Obsolete]
-        public void SendErrorDetails(MessageOrigin origin, string file, string command, string errorMessage)
-        {
-            var path = Dir_Reports
-                .EnsureDirectoryExist()
-                .Combine($"{DateTime.Now:yyyy-MM-dd}-{file}-{origin.Chat}-{Desert.GetSilt(11)}.txt")
-                .MakeUnique();
-            var text = string.Format(FF_ERROR_REPORT, file, command, GetRandomASCII(), errorMessage);
             File.WriteAllText(path, text);
             using var stream = File.OpenRead(path);
             SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));

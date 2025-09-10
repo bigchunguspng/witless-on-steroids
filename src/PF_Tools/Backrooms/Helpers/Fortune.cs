@@ -1,5 +1,6 @@
 namespace PF_Tools.Backrooms.Helpers;
 
+/// 🎲 I'm Feeling Lucky 🎲
 public static class Fortune
 {
     public static bool IsOneIn(int x)

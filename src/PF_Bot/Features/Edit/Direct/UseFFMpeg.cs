@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
 using PF_Bot.Features.Edit.Shared;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -97,7 +98,7 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         Bot.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
         if (extensionInvalid)
         {
-            await Task.Delay(RandomInt(900, 1100));
+            await Task.Delay(Fortune.RandomInt(900, 1100));
             Bot.SendMessage(origin, PEG_EXTENSION_MISSING);
         }
     }

@@ -10,8 +10,14 @@ using SixLabors.ImageSharp.Processing;
 
 namespace PF_Tools.Backrooms.Helpers;
 
+/// Can be used to:
+/// <li>Render text with emoji.</li>
+/// <li>Find or replace emoji in text.</li>
+/// <li>Get emoji PNGs from a <see cref="Directory_EmojiPNGs">folder</see>.</li>
 public static class EmojiTool
 {
+    public static FilePath Directory_EmojiPNGs;
+
     [StringSyntax("Regex")] private const string EMOJI_REGEX_PATTERN =
         """
         (?:
@@ -150,7 +156,7 @@ public static class EmojiTool
                 Origin = GetDrawingOffsetTxt()
             }.WithDefaultAlignment();
 
-            var textSize = TextMeasuring.MeasureTextSize(text, optionsW, out _);
+            var textSize = Ruler.MeasureTextSize(text, optionsW, out _);
             canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
             MoveX((int)textSize.Width);
         }
@@ -254,8 +260,6 @@ public static class EmojiTool
 
         return pngs;
     }
-
-    public static FilePath Directory_EmojiPNGs;
 
     private static readonly LimitedCache<string, string[]> _emojiCache = new(128);
 

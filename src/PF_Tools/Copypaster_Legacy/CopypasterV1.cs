@@ -246,7 +246,7 @@ namespace PF_Tools.Copypaster_Legacy
                     {
                         var a = Convert.ToInt32(match.Groups[1].Value);
                         var b = Convert.ToInt32(match.Groups[2].Value);
-                        word = RandomInt(a, b).ToString();
+                        word = Fortune.RandomInt(a, b).ToString();
                     }
 
                     words.AddLast(word);

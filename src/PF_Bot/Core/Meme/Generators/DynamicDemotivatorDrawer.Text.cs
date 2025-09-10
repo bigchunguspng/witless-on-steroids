@@ -43,7 +43,7 @@ public partial class DynamicDemotivatorDrawer
 
     private string MakeTextFitCard(string text)
     {
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
+        var textChunks = Ruler.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
         var lineHeight = FontSize * FontOption.GetRelativeSize() * GetLineSpacing();
         var textWidthLimit = (Minimalist ? 0.8F : 1.1F) * imageW;

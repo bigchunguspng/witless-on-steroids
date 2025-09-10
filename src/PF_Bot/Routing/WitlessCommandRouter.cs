@@ -8,6 +8,7 @@ using PF_Bot.Features.Manage.Packs;
 using PF_Bot.Features.Manage.Settings;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing;
@@ -102,7 +103,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         void TryLuckForFunnyText()
         {
-            if (!LuckyFor(Data.Speech)) return;
+            if (!Fortune.LuckyFor(Data.Speech)) return;
 
             Telemetry.LogAuto(Context.Chat, Data.Speech, "FUNNY");
 
@@ -134,7 +135,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             return mematic;
         }
 
-        bool HaveToMeme       () => LuckyFor(Data.Pics) && !Message.ContainsSpoilers();
+        bool HaveToMeme       () => Fortune.LuckyFor(Data.Pics) && !Message.ContainsSpoilers();
         bool HaveToMemeSticker() => Data.Stickers && HaveToMeme();
     }
 

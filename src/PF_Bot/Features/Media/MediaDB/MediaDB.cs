@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using PF_Bot.Core;
 using PF_Bot.Telegram;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 using MediaFile = (string Id, string FileId, string Text, string LowercaseText);
 
@@ -72,7 +73,7 @@ public abstract class MediaDB<T> where T : FileBase
     private IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> GetRandomFiles()
     {
         var pickChance = Math.Max(1, 5000 / _files.Count);
-        return _files.Where(_ => LuckyFor(pickChance));
+        return _files.Where(_ => Fortune.LuckyFor(pickChance));
     }
 
     private IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> GetFilesByQuery(string query)

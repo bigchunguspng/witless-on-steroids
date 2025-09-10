@@ -42,7 +42,7 @@ public partial class MemeGenerator
     private string MakeTextFitCard(string text)
     {
         var options = GetDefaultTextOptions(PointF.Empty);
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, options, GetEmojiSize());
+        var textChunks = Ruler.MeasureTextSuperCool(text, options, GetEmojiSize());
 
         var lineHeight = FontSize * GetLineSpacing();
 

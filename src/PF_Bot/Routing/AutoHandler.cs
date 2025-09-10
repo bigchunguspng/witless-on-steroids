@@ -1,6 +1,7 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
 using PF_Bot.Routing.Commands;
+using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing;
@@ -27,7 +28,7 @@ public static class AutoHandler
 
         foreach (var type in handlers.Keys)
         {
-            var handler = handlers[type].FirstOrDefault(x => LuckyFor(x.Percent));
+            var handler = handlers[type].FirstOrDefault(x => Fortune.LuckyFor(x.Percent));
             if (handler != default && MessageMatches(type, context.Message))
             {
                 if (type is not 'u')

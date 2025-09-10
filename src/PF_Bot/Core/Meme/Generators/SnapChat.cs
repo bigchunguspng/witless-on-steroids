@@ -67,7 +67,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         _w = _sourceSizeAdjusted.Width;
         _h = _sourceSizeAdjusted.Height;
 
-        var offsetBase = RandomOffset ? RandomInt(25, 75) : CardOffset;
+        var offsetBase = RandomOffset ? Fortune.RandomInt(25, 75) : CardOffset;
         _offsetY = _h * offsetBase / 100;
         _marginX = Math.Max(_w / 20, 10);
 

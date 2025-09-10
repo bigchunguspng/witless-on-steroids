@@ -116,7 +116,7 @@ namespace PF_Bot.Core.Meme.Generators
             if (emoji.Count == 0)
             {
                 options.Origin = GetTextOrigin(() => text, type, options.Font.Size, out _, out _, out _);
-                var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
+                var lineBreak = Ruler.DetectLineBreak(text, options, lines);
                 var textToRender = lineBreak == -1 ? text : text[..lineBreak];
 
                 image.Mutate(x => x.DrawText(_textOptions, options, textToRender, brush: _heisenberg, pen: null));

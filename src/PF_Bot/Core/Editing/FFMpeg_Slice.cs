@@ -1,5 +1,6 @@
 using System.Text;
 using PF_Tools.FFMpeg;
+using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Core.Editing;
 

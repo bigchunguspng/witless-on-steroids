@@ -38,7 +38,7 @@ public partial class SnapChat
 
     private string MakeTextFitCard(string text)
     {
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
+        var textChunks = Ruler.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
         var lineHeight = FontSize * GetLineSpacing();
         var textWidthLimit = _w - 2 * _marginX;

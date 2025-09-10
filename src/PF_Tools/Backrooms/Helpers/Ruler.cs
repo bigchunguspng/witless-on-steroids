@@ -5,7 +5,8 @@ using SixLabors.ImageSharp;
 
 namespace PF_Tools.Backrooms.Helpers;
 
-public static class TextMeasuring
+/// Use this to measure and distribute text.
+public static class Ruler
 {
     /// Returns index of last character before line break,
     /// or <b>-1</b> if text fits into one line.

@@ -42,7 +42,7 @@ public partial class IFunnyBrazil
     /// <li>Redistributes the text.</li>
     private string MakeTextFitCard(string text)
     {
-        var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
+        var textChunks = Ruler.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
         var lineHeight = FontSize * GetLineSpacing();
         var textWidthLimit = 0.9F * _w;

@@ -28,6 +28,6 @@ public static class LetterCaseHelpers
         _   => LetterCase.Upper,
     };
 
-    public static LetterCase GetUpperOrLowerLetterCase() => IsOneIn(2) ? LetterCase.Upper : LetterCase.Lower;
+    public static LetterCase GetUpperOrLowerLetterCase() => Fortune.IsOneIn(2) ? LetterCase.Upper : LetterCase.Lower;
 
 }

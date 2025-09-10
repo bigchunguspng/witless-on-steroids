@@ -84,7 +84,7 @@ namespace PF_Bot.Core.Meme.Generators
 
             if (CustomOffsetMode)
             {
-                var offset = RandomOffset ? RandomInt(15, 85) : TextOffset;
+                var offset = RandomOffset ? Fortune.RandomInt(15, 85) : TextOffset;
                 _marginY = _h * offset / 100;
             }
 

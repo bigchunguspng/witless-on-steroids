@@ -24,9 +24,9 @@ namespace PF_Bot.Features.Generate.Text
             {
                 foreach (var line in lines) sb.Append('>').AppendLine(line);
 
-                if (IsOneIn(3))
+                if (Fortune.IsOneIn(3))
                 {
-                    if (IsOneIn(2)) sb.Append('\n').Append(GenerateLine());
+                    if (Fortune.IsOneIn(2)) sb.Append('\n').Append(GenerateLine());
                     else sb.Append(GenerateLine().InLetterCase(LetterCase.Sentence));
                 }
             }

@@ -116,11 +116,16 @@ public partial class Bot
             var json = JsonSerializer.Serialize(context, DebugMessage.JsonOptions);
             var entry =
                 $"""
-                 # [{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}]
+                 # {DateTime.Now:MMM' 'dd', 'HH:mm:ss.fff}
+
                  ## Error
+                 ```c#
                  {e}
+                 ```
                  ## Context
+                 ```json
                  {json}
+                 ```
 
 
                  """;

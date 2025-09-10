@@ -88,8 +88,8 @@ public static class Paths
     public static FilePath File_Sounds { get; } = Dir_DB.Combine("sounds.txt");
 
     public static FilePath Dir_Reports { get; } = Dir_Log.Combine("Reports");
+    public static FilePath File_Errors { get; } = Dir_Log.Combine("err.mkd");
     public static FilePath File_Log    { get; } = Dir_Log.Combine("log.txt");
-    public static FilePath File_Errors { get; } = Dir_Log.Combine("errors.txt");
 
     public static FilePath Dir_Alias_Peg { get; } = Dir_Alias.Combine("Peg");
     public static FilePath Dir_Alias_Im  { get; } = Dir_Alias.Combine("Im");

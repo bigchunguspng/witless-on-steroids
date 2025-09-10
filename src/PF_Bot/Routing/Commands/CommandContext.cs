@@ -12,6 +12,7 @@ public class CommandContext
     private static readonly Regex _command = new(@"^\/\S+");
     private static readonly string _botUsernameStart = Bot.Username.Remove(7);
 
+    [JsonPropertyOrder(-1)]
     public Message Message      { get; }
     public string  Title        { get; }
     public string? Text         { get; private set; }
@@ -81,6 +82,7 @@ public class CommandContext
 
 public class WitlessContext : CommandContext
 {
+    [JsonPropertyOrder(100)]
     public ChatSettings Settings { get; }
 
     [JsonIgnore]

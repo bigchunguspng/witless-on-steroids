@@ -16,15 +16,15 @@ public class CommandContext
     public Message Message      { get; }
     public string  Title        { get; }
     public string? Text         { get; private set; }
-    /// <summary> Lowercase command with "/" symbol and bot username removed. </summary>
+    /// Lowercase command with "/" symbol and bot username removed.
     public string? Command      { get; private set; }
-    /// <summary> All text excluding the command and the following " " or "\n". </summary>
+    /// All text excluding the command and the following " " or "\n".
     public string? Args         { get; private set; }
 
     // todo remove 2 below - needed only in router
-    /// <summary> Whether THIS bot was mentioned in the command explicitly or NO BOTS were mentioned. </summary>
+    /// Whether THIS bot was mentioned in the command explicitly or NO BOTS were mentioned.
     public bool    IsForMe      { get; private set; }
-    /// <summary> Whether SOME bot was mentioned in the command explicitly. </summary>
+    /// Whether SOME bot was mentioned in the command explicitly.
     public bool    BotMentioned { get; private set; }
 
     public long    Chat => Message.Chat.Id;

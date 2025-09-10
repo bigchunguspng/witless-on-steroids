@@ -2,10 +2,8 @@
 
 namespace PF_Bot.Features.Manage.Settings;
 
-/// <summary>
 /// Use this class as a base for the commands
 /// that can be restricted to admins only.
-/// </summary>
 public abstract class SettingsCommand : WitlessSyncCommand
 {
     private bool /* when the */ SenderIsSus() // !😳
@@ -23,7 +21,7 @@ public abstract class SettingsCommand : WitlessSyncCommand
     protected abstract void RunAuthorized();
 }
 
-/// <summary> <inheritdoc cref="SettingsCommand"/> </summary>
+/// <inheritdoc cref="SettingsCommand"/>
 public abstract class AsyncSettingsCommand : WitlessAsyncCommand
 {
     private async Task<bool> SenderIsSus()

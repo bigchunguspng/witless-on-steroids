@@ -75,9 +75,7 @@ public static class OptionsParsing
         request.Dummy = new string(destination);
     }
 
-    /// <summary>
     /// Use UPPERCASE if text is generated or option provided via commnand (ignore default options).
-    /// </summary>
     public static bool CheckCaps(MemeRequest request, Regex caps, bool generate)
     {
         return Check(request, caps) && (generate || caps.IsMatch(request.Command));

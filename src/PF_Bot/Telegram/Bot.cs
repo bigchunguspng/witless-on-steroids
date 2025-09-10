@@ -12,7 +12,7 @@ namespace PF_Bot.Telegram
         public readonly TelegramBotClient Client;
         public readonly User Me;
 
-        /// <summary> Lowercase bot username with "@" symbol. </summary>
+        /// Lowercase bot username with "@" symbol.
         public static string Username { get; private set; } = null!;
         public static Bot    Instance { get; private set; } = null!;
 

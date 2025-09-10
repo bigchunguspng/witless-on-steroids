@@ -1,13 +1,13 @@
 namespace PF_Bot.Tools_Legacy.RedditSearch;
 
 #pragma warning disable CS8524
-/// <summary> Used to store upcoming posts for a single <see cref="RedditQuery"/>. </summary>
+/// Used to store upcoming posts for a single <see cref="RedditQuery"/>.
 public class RedditQueryCache
 {
-    /// <summary> DateTime by which the cache is relevant. </summary>
+    /// DateTime by which the cache is relevant.
     public DateTime RefreshDate;
 
-    /// <summary> True if posts in queue AIN'T the last ones for the query. </summary>
+    /// True if posts in queue AIN'T the last ones for the query.
     public bool HasEnoughPosts;
 
     public readonly Queue<PostData> Posts = new(RedditTool.POST_LIMIT);

@@ -5,9 +5,7 @@ using PF_Tools.Copypaster.Extensions;
 
 namespace PF_Bot.Features.Manage.Packs
 {
-    /// <summary>
     /// Post Id Easy Channel Exporter™? Maybe.
-    /// </summary>
     public class Piece : SyncCommand
     {
         private static readonly Regex _args = new(@"t.me\/[a-z0-9_]{5,32}\/(\d+)\s(\S+)");

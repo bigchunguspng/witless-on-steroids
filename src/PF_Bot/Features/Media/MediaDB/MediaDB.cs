@@ -135,9 +135,7 @@ public abstract class MediaDB<T> where T : FileBase
         SaveData(buffer);
     }
 
-    /// <summary>
     /// Uploads file to Telegram server and returns its ID.
-    /// </summary>
     protected abstract Task<T> UploadFile(FilePath path, long channel);
 
 

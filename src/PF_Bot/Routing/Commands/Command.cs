@@ -24,10 +24,8 @@ namespace PF_Bot.Routing.Commands
         public abstract void Execute(TContext context);
     }
 
-    /// <summary>
     /// Blocking command. Should be used for short simple actions!
     /// The same instance can be used unlimited amount of times.
-    /// </summary>
     public abstract class AnySyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext
     {
         public sealed override void Execute(TContext context)

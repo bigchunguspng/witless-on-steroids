@@ -4,7 +4,7 @@ namespace PF_Bot.Tools_Legacy.RedditSearch;
 
 public interface RedditQuery { List<Post> GetPosts(string? after = null); }
 
-/// <summary> Uses <b>searchbar</b> on the main page or on a <b>subreddit</b>. </summary>
+/// Uses <b>searchbar</b> on the main page or on a <b>subreddit</b>.
 public record SearchQuery(string? Subreddit, string Q, string Sort, string Time) : RedditQuery
 {
     public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
@@ -16,7 +16,7 @@ public record SearchQuery(string? Subreddit, string Q, string Sort, string Time)
     }
 }
 
-/// <summary> Opens subreddit and <b>scrolls</b> for some posts. </summary>
+/// Opens subreddit and <b>scrolls</b> for some posts.
 public record ScrollQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
 {
     public List<Post> GetPosts(string? after = null) => RedditTool.Instance.GetPosts(this, after);

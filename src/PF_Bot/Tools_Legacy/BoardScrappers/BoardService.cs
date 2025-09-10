@@ -34,7 +34,7 @@ namespace PF_Bot.Tools_Legacy.BoardScrappers
         public Task<List<string>> GetThreadDiscussionAsync
             (string url) => Task.Run(() => GetThreadDiscussion(url).ToList());
 
-        /// <summary> Returns every single line of a thread. </summary>
+        /// Returns every single line of a thread.
         /// <param name="url">thread URL, like https://boards.4channel.org/a/thread/XXX</param>
         public IEnumerable<string> GetThreadDiscussion(string url)
         {
@@ -107,12 +107,12 @@ namespace PF_Bot.Tools_Legacy.BoardScrappers
             }
         }
 
-        /// <summary> Returns ARCHIVED thread URLs (local paths) from a board ARCHIVE page. </summary>
+        /// Returns ARCHIVED thread URLs (local paths) from a board ARCHIVE page.
         /// <param name="url">board archive URL, like https://boards.4channel.org/a/archive</param>
         public IEnumerable<string> GetAllArchivedThreads
             (string url) => GetHrefs(url, ARCHIVE_THREAD);
 
-        /// <summary> Returns thread URLs from the first page of https://desuarchive.org search. </summary>
+        /// Returns thread URLs from the first page of https://desuarchive.org search.
         /// <param name="url"> use <see cref="GetDesuSearchURLText"/> to obtain.</param>
         public IEnumerable<string> GetSearchResults
             (string url) => GetHrefs(url, SEARCH_THREAD).Select(x => x.Remove(x.LastIndexOf('/')));

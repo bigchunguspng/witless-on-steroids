@@ -37,11 +37,9 @@ public partial class IFunnyBrazil
     }
 
 
-    /// <summary>
     /// Does the following things if there is a need:
     /// <li>Changes font size and card height.</li>
     /// <li>Redistributes the text.</li>
-    /// </summary>
     private string MakeTextFitCard(string text)
     {
         var textChunks = TextMeasuring.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());

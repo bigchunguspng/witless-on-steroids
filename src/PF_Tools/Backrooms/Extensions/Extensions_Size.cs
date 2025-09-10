@@ -14,9 +14,7 @@ public static class Extensions_Size
         return size.Normalize(limit, reduce: wide);
     }
 
-    /// <summary>
     /// Makes sure image can go through a square hole with a side = <b>max</b>.
-    /// </summary>
     public static Size FitSize(this Size size, int max = 1280)
     {
         var tooBig = size.Width > max || size.Height > max;

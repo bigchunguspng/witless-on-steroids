@@ -31,7 +31,7 @@ namespace PF_Bot.Tools_Legacy.RedditSearch
 
         private const int EXCLUDED_CAPACITY = 256;
 
-        /// <summary> Posts that were sent to users recently, so they are no longer relevant. </summary>
+        /// Posts that were sent to users recently, so they are no longer relevant.
         private readonly Queue<string> Excluded;
 
         private void Exclude(string fullname)
@@ -69,7 +69,7 @@ namespace PF_Bot.Tools_Legacy.RedditSearch
 
         #region LAST QUERIES
 
-        /// <summary> Last queries by chat. </summary>
+        /// Last queries by chat.
         private readonly Dictionary<long, RedditQuery> LastQueries = new();
 
         private void SetLastQuery(long chat, RedditQuery query)
@@ -129,9 +129,7 @@ namespace PF_Bot.Tools_Legacy.RedditSearch
             while (ThisQueryCache is { HasEnoughPosts: true, Posts.Count: > 0 } && Excluded.Contains(_post.Fullname));
         }
 
-        /// <summary>
         /// Refills <see cref="Cache"/> with new posts if needed.
-        /// </summary>
         private void UpdateCache()
         {
             if (Cache.ContainsKey(ThisQuery)) // query has been used already
@@ -223,7 +221,7 @@ namespace PF_Bot.Tools_Legacy.RedditSearch
             return posts[^1].Fullname;
         }
 
-        /// <summary> Collects text from the comment and all its replies. </summary>
+        /// Collects text from the comment and all its replies.
         private void GetCommentTexts(Comment comment, List<string> list)
         {
             if (comment.Body is not null) list.Add(comment.Body);

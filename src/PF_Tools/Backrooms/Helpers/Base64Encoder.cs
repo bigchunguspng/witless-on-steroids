@@ -1,6 +1,5 @@
 ﻿namespace PF_Tools.Backrooms.Helpers;
 
-/// <summary>
 /// Converts <see cref="int"/> into <see cref="string"/> and back using base 64 number system.
 /// <code>
 /// -5928-> -1Se -> -5928
@@ -9,7 +8,6 @@
 ///   420->   6a ->   420
 ///  1337->   Kv ->  1337
 /// </code>
-/// </summary>
 public static class Base64Encoder
 {
     private const string BASE_64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_#";

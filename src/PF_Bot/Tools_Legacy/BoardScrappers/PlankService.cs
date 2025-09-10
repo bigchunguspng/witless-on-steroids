@@ -21,7 +21,7 @@ public class PlankService
     public Task<List<string>> GetThreadDiscussionAsync
         (string url) => Task.Run(() => GetThreadDiscussion(url).ToList());
 
-    /// <summary> Returns every single line of a thread. </summary>
+    /// Returns every single line of a thread.
     /// <param name="url">thread URL, like https://2ch.hk/a/res/XXX.html</param>
     public IEnumerable<string> GetThreadDiscussion(string url)
     {
@@ -65,7 +65,7 @@ public class PlankService
         return _board_thread.Matches(html).Select(x => x.Groups[1].Value).Select(x => $"{BASE_URL}{x}");
     }
 
-    /// <summary> Returns unique URLs of threads found on a board by a text. </summary>
+    /// Returns unique URLs of threads found on a board by a text.
     public IEnumerable<string> GetSearchResults(string board, string text)
     {
         var request = new RestRequest($"{BASE_URL}/user/search", Method.POST) { AlwaysMultipartFormData = true };

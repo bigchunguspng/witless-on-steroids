@@ -6,9 +6,7 @@ public static class ArgumentParsing
 {
     private static readonly char[] _separators = [' ', '\n'];
 
-    /// <summary>
     /// Splits arguments by whitespaces and line breaks.
-    /// </summary>
     public static string[] SplitN(this string? arguments, int count = int.MaxValue)
     {
         return arguments is null ? [] : arguments.Split(_separators, count, StringSplitOptions.RemoveEmptyEntries);

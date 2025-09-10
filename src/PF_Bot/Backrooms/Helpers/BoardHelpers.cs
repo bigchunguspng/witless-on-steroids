@@ -23,11 +23,11 @@ public static class BoardHelpers
         }
     }
 
-    /// <summary> Checks if the filename describes a <b>single thread</b> discussion. </summary>
+    /// Checks if the filename describes a <b>single thread</b> discussion.
     /// <param name="name">filename part without date and time</param>
     public static bool FileNameIsThread(string name) => name.Contains('.') && !name.Contains(".zip");
 
-    /// <summary> Returns a page view of JSON files of previously eaten threads. </summary>
+    /// Returns a page view of JSON files of previously eaten threads.
     public static IEnumerable<string> GetJsonList(FileInfo[] files, int page = 0, int perPage = 10)
     {
         if (files.Length == 0)

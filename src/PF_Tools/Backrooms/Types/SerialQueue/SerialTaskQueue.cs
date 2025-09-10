@@ -2,9 +2,7 @@
 
 namespace PF_Tools.Backrooms.Types.SerialQueue
 {
-    /// <summary>
     /// Sauce: https://github.com/gentlee/SerialQueue
-    /// </summary>
     public class SerialTaskQueue
     {
         private readonly object _lock = new();

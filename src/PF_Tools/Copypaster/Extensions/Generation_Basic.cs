@@ -39,9 +39,7 @@ public static class Generation_Basic
         return ids;
     }
 
-    /// <summary>
     /// Finds all word ids, that has given word id in their transition table
-    /// </summary>
     private static TransitionTable GetWordsBefore
         (this GenerationPack pack, int wordId)
     {

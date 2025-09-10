@@ -1,7 +1,9 @@
 ﻿using ColorHelper;
 using PF_Bot.Core.Editing;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -15,7 +17,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 {
     // OPTIONS
 
-    public static bool PreferSegoe, UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
+    public static bool UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
     public static bool PickColor, ForceCenter, BackInBlack;
     public static int CropPercent = 0;
     public static int MinSizeMultiplier = 10, FontSizeMultiplier = 100;
@@ -154,7 +156,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
         // actual font size (same for same pic*text)
         var w = _w * 0.75F;
         var x = _w.Gap(w.RoundInt());
-        var fs = FontSize * FontWizard.GetRelativeSize();
+        var fs = FontSize * FontOption.GetRelativeSize();
         var rect2 = new RectangleF(x, options.Origin.Y - _textOffset - fs / 2F, w, fs);
         image.Mutate(ctx => ctx.Fill(new SolidBrush(Color.Orange), rect2));
     }

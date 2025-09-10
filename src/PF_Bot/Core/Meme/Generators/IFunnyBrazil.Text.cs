@@ -1,5 +1,5 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core.Meme.Shared;
+﻿using PF_Bot.Core.Meme.Options;
+using PF_Tools.Backrooms.Helpers;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -8,7 +8,7 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class IFunnyBrazil
 {
-    public static readonly FontWizard FontWizard = new("top");
+    public static FontOption FontOption;
 
     private static Font _font = default!;
     private static FontFamily _fontFamily;
@@ -19,8 +19,8 @@ public partial class IFunnyBrazil
 
     private void SetUpFonts()
     {
-        _fontFamily = FontWizard.GetFontFamily(PreferSegoe ? "sg" : "ft");
-        _fontStyle = FontWizard.GetFontStyle(_fontFamily);
+        _fontFamily = FontOption.GetFontFamily();
+        _fontStyle = FontOption.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -33,7 +33,7 @@ public partial class IFunnyBrazil
         var multiplier = FontSizeMultiplier / 100F;
         var multiplierM = MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontWizard.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontOption.GetSizeMultiplier();
     }
 
 
@@ -142,7 +142,7 @@ public partial class IFunnyBrazil
     {
         var k2 = UltraThinCard ? 0.1F : 1F;
         var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(FontSize * k * k2, min) * FontWizard.GetRelativeSize();
+        var extra = Math.Max(FontSize * k * k2, min) * FontOption.GetRelativeSize();
         return (textHeight * k + extra).CeilingInt();
     }
 
@@ -158,12 +158,12 @@ public partial class IFunnyBrazil
         Origin = GetTextOrigin(),
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = FontWizard.GetFallbackFamilies(),
+        FallbackFontFamilies = FontOption.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => FontWizard.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => FontOption.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -186,8 +186,8 @@ public partial class IFunnyBrazil
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * FontWizard.GetFontDependentOffset();
-        _caseOffset = FontSize * FontWizard.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * FontOption.GetFontDependentOffset();
+        _caseOffset = FontSize * FontOption.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         LogDebug($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}");

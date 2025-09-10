@@ -1,4 +1,6 @@
-﻿using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Fonts;
+using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Tools.Backrooms.Helpers;
@@ -10,9 +12,17 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Demotivate : MakeMemeCore<TextPair>
     {
-        private static readonly DemotivatorDrawer[] _drawers = [new DemotivatorDrawer(), new DemotivatorDrawer(1280)];
-        private static readonly SerialTaskQueue  [] _queues  = [new SerialTaskQueue(), new SerialTaskQueue()];
+        public static readonly FontWizard FontWizardL = new("ro", "d[vg]", "(?![-bi*])");
+        public static readonly FontWizard FontWizardS = new("ro", "dg",    "(?![-bi*])");
+        public static readonly FontWizard FontWizardA = new("ro", "dg",   "(&)");
+        public static readonly FontWizard FontWizardB = new("co", "dg", @"(\*)");
 
+        private FontOption _fontOptionA, _fontOptionB;
+
+        private static readonly DemotivatorDrawer[] _drawers = [new (), new (1280)];
+        private static readonly SerialTaskQueue  [] _queues  = [new (), new ()];
+
+        
         protected override SerialTaskQueue          Queue     => _queues [(int)_mode];
         protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int)_mode];
 
@@ -35,12 +45,10 @@ namespace PF_Bot.Features.Generate.Memes
             || !Check(Request, _one_line) && !Args!.Contains('\n');
 
         private bool RandomFontIsUsed
-            => _mode == Wide
-                ? DemotivatorDrawer.FontWizardL.UseRandom
-                : DemotivatorDrawer.SingleLine
-                    ? DemotivatorDrawer.FontWizardS.UseRandom
-                    : DemotivatorDrawer.FontWizardA.UseRandom
-                   || DemotivatorDrawer.FontWizardB.UseRandom;
+            => _mode == Wide || DemotivatorDrawer.SingleLine
+                ? _fontOptionA.IsRandom
+                : _fontOptionA.IsRandom
+               || _fontOptionB.IsRandom;
 
         protected override void ParseOptions()
         {
@@ -48,16 +56,16 @@ namespace PF_Bot.Features.Generate.Memes
 
             if (_mode == Wide)
             {
-                DemotivatorDrawer.FontWizardL.CheckAndCut(Request);
+                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardL.CheckAndCut(Request);
             }
             else if (DemotivatorDrawer.SingleLine)
             {
-                DemotivatorDrawer.FontWizardS.CheckAndCut(Request);
+                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardS.CheckAndCut(Request);
             }
             else
             {
-                DemotivatorDrawer.FontWizardA.CheckAndCut(Request);
-                DemotivatorDrawer.FontWizardB.CheckAndCut(Request);
+                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardA.CheckAndCut(Request);
+                DemotivatorDrawer.FontOptionB = _fontOptionB = FontWizardB.CheckAndCut(Request);
             }
 
             DemotivatorDrawer.AddLogo = !Check(Request, _no_logo);

@@ -1,7 +1,8 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core.Editing;
+﻿using PF_Bot.Core.Editing;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -18,10 +19,7 @@ namespace PF_Bot.Core.Meme.Generators
         public static bool SingleLine, AddLogo = true;
         public static bool BottomTextIsGenerated;
 
-        public static readonly FontWizard FontWizardL = new("d[vg]", "(?![-bi*])");
-        public static readonly FontWizard FontWizardS = new("dg",    "(?![-bi*])");
-        public static readonly FontWizard FontWizardA = new("dg",   "(&)");
-        public static readonly FontWizard FontWizardB = new("dg", @"(\*)");
+        public static FontOption FontOptionA, FontOptionB;
 
         private static readonly List<Logo> Logos = [];
 
@@ -112,11 +110,12 @@ namespace PF_Bot.Core.Meme.Generators
 
         private void DrawText(Image image, string text, TextType type)
         {
-            var options = GetTextOptions(type, text, out var offset, out var fontOffset, out var caseOffset);
+            var options = GetTextOptions(type);
             var emoji = EmojiTool.FindEmoji(text);
             var lines = type != TextType.Lower || BottomTextIsGenerated ? 1 : emoji.Count > 0 ? -1 : 2;
             if (emoji.Count == 0)
             {
+                options.Origin = GetTextOrigin(() => text, type, options.Font.Size, out _, out _, out _);
                 var lineBreak = TextMeasuring.DetectLineBreak(text, options, lines);
                 var textToRender = lineBreak == -1 ? text : text[..lineBreak];
 
@@ -124,13 +123,16 @@ namespace PF_Bot.Core.Meme.Generators
             }
             else
             {
-                var pngs = EmojiTool.GetEmojiPngs(emoji).AsQueue();
+                var pngs = EmojiTool.GetEmojiPngs(emoji);
+                options.Origin = GetTextOrigin(GetCaseOffsetText, type, options.Font.Size, out var offset, out var fontOffset, out var caseOffset);
                 var optionsE = new EmojiTool.Options(_heisenberg, _w, GetEmojiSize(type), fontOffset, lines);
-                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs);
+                var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs.AsQueue());
                 var x = _w.Gap(textLayer.Width);
                 var y = offset - textLayer.Height / 2F + caseOffset;
                 var point = new Point(x.RoundInt(), y.RoundInt());
                 image.Mutate(ctx => ctx.DrawImage(textLayer, point));
+
+                string GetCaseOffsetText() => EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs);
             }
         }
 
@@ -164,60 +166,61 @@ namespace PF_Bot.Core.Meme.Generators
 
         // TEXT
 
-        private RichTextOptions GetTextOptions
-        (
-            TextType type, string text,
-            out float offset, out float fontOffset, out float caseOffset
-        )
+        private RichTextOptions GetTextOptions(TextType type)
         {
             var lower = type is TextType.Lower;
-            var extraFonts = type switch
-            {
-                TextType.Lower => FontWizardB,
-                TextType.Upper => FontWizardA,
-                TextType.Large => FontWizardL,
-                _              => FontWizardS,
-            };
-            var family = extraFonts.GetFontFamily(lower ? "co" : "ro");
-            var style = extraFonts.GetFontStyle(family);
+            var fontOption = lower ? FontOptionB : FontOptionA;
+            var family = fontOption.GetFontFamily();
+            var style = fontOption.GetFontStyle(family);
 
             var baseFontSize = type switch
             {
                 TextType.Lower => 26.4696F, // 24
                 TextType.Large => 59.8208F, // 64
-                _              => 44.8656F  // 48
+                _              => 44.8656F, // 48
             };
-            var fontSize = baseFontSize * extraFonts.GetSizeMultiplier();
-
-            offset = 650 + type switch
-            {
-                TextType.Upper => -25.15F,
-                TextType.Lower =>  31.50F,
-                _ => 0
-            };
-            fontOffset = fontSize * extraFonts.GetFontDependentOffset();
-            caseOffset = _square && !SingleLine
-                ? 0
-                : fontSize * extraFonts.GetCaseDependentOffset(EmojiTool.ReplaceEmoji(text, "👌"));
-            var y = offset + fontOffset - caseOffset;
+            var fontSize = baseFontSize * fontOption.GetSizeMultiplier();
 
             return new RichTextOptions(family.CreateFont(fontSize, style))
             {
                 TextAlignment = TextAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Origin = new PointF(_w / 2F, y),
                 WrappingLength = _textW,
-                LineSpacing = extraFonts.GetLineSpacing() * (lower ? 1.39F : 1.2F),
-                FallbackFontFamilies = extraFonts.GetFallbackFamilies()
+                LineSpacing = fontOption.GetLineSpacing() * (lower ? 1.39F : 1.2F),
+                FallbackFontFamilies = fontOption.GetFallbackFamilies(),
             };
+        }
+
+        private PointF GetTextOrigin
+        (
+            Func<string> getCaseOffsetText, TextType type, float fontSize,
+            out float offset, out float fontOffset, out float caseOffset
+        )
+        {
+            var lower = type is TextType.Lower;
+            var fontOption = lower ? FontOptionB : FontOptionA;
+
+            offset = 650 + type switch
+            {
+                TextType.Upper => -25.15F,
+                TextType.Lower =>  31.50F,
+                _              =>   0,
+            };
+            fontOffset = fontSize * fontOption.GetFontDependentOffset();
+            caseOffset = _square && !SingleLine
+                ? 0
+                : fontSize * fontOption.GetCaseDependentOffset(getCaseOffsetText());
+            var y = offset + fontOffset - caseOffset;
+
+            return new PointF(_w / 2F, y);
         }
 
         private int GetEmojiSize(TextType type) => type switch
         {
             TextType.Lower => 34,
             TextType.Large => 72,
-            _              => 54
+            _              => 54,
         };
 
         private enum TextType

@@ -1,4 +1,6 @@
-﻿using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Fonts;
+using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Tools.Backrooms.Helpers;
@@ -9,8 +11,11 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Demotivate3000 : MakeMemeCore<string>
     {
+        private static readonly FontWizard _fontWizard = new ("rg", "snap");
         private static readonly DynamicDemotivatorDrawer _dp = new();
         private static readonly SerialTaskQueue _queue = new();
+
+        private FontOption _fontOption;
 
         protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<string> MemeMaker => _dp;
@@ -28,7 +33,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override Task Run() => RunInternal("dp");
 
-        protected override bool ResultsAreRandom => DynamicDemotivatorDrawer.FontWizard.UseRandom;
+        protected override bool ResultsAreRandom => _fontOption.IsRandom;
 
         protected override void ParseOptions()
         {
@@ -36,7 +41,7 @@ namespace PF_Bot.Features.Generate.Memes
             DynamicDemotivatorDrawer.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
             DynamicDemotivatorDrawer.CustomColor.CheckAndCut(Request);
-            DynamicDemotivatorDrawer.FontWizard .CheckAndCut(Request);
+            DynamicDemotivatorDrawer.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             DynamicDemotivatorDrawer.WrapText   = !CheckAndCut(Request, _nowrap);
             DynamicDemotivatorDrawer.Minimalist =  CheckAndCut(Request, _small);

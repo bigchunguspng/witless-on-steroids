@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+using PF_Bot.Core.Meme.Fonts;
 using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Tools.Backrooms.Types.SerialQueue;
@@ -9,8 +11,11 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class MakeMeme : MakeMemeCore<TextPair>
     {
+        private static readonly FontWizard _fontWizard = new ("im", "meme");
         private static readonly MemeGenerator _imgflip = new();
         private static readonly SerialTaskQueue _queue = new();
+
+        private FontOption _fontOption;
 
         protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
@@ -30,14 +35,14 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override bool ResultsAreRandom
             => MemeGenerator.RandomTextColor
-            || MemeGenerator.FontWizard.UseRandom
+            || _fontOption.IsRandom
             || Check(Request, _add_bottom) && !Args!.Contains('\n');
 
         protected override void ParseOptions()
         {
             MemeGenerator.CustomColorBack.CheckAndCut(Request);
             MemeGenerator.CustomColorText.CheckAndCut(Request);
-            MemeGenerator.FontWizard     .CheckAndCut(Request);
+            MemeGenerator.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 100);
             MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);

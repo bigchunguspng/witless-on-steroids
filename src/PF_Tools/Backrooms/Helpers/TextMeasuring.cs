@@ -3,14 +3,12 @@ using System.Text;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 
-namespace PF_Bot.Backrooms.Helpers;
+namespace PF_Tools.Backrooms.Helpers;
 
 public static class TextMeasuring
 {
-    /// <returns>
-    /// Index of last character before line break,
+    /// Returns index of last character before line break,
     /// or <b>-1</b> if text fits into one line.
-    /// </returns>
     public static int DetectLineBreak(string text, TextOptions options, int lines)
     {
         TextMeasurer.TryMeasureCharacterBounds(text, options, out var bounds);
@@ -105,9 +103,7 @@ public static class TextMeasuring
         }
     }
 
-    /// <summary>
     /// Replace all emoji in the text with "👌" before calling this method!
-    /// </summary>
     public static LinkedList<TextChunk> MeasureTextSuperCool
     (
         string text, TextOptions options, float emojiSize, int start = 0, bool cloneOptions = true
@@ -139,7 +135,7 @@ public static class TextMeasuring
             {
                 0x20    => CharType.Spaces,
                 0x1F44C => CharType.Emoji,
-                _       => CharType.Text
+                _       => CharType.Text,
             };
             MoveForward(advance, chunkType);
         }
@@ -218,11 +214,9 @@ public static class TextMeasuring
             .OrderByDescending(x => x.Width).FirstOrDefault().Width;
     }
 
-    // DISSTRIBUTE
+    // DISTRIBUTE
 
-    /// <summary>
     /// Use this with MULTI-LINE text.
-    /// </summary>
     public static void RedistributeText(this LinkedList<TextChunk> chunks, float widthLimit)
     {
         var currentLineWidth = 0F;
@@ -260,9 +254,7 @@ public static class TextMeasuring
         }
     }
 
-    /// <summary>
     /// Use this with SINGLE LINE text.
-    /// </summary>
     public static void RedistributeText(this LinkedList<TextChunk> chunks, int lines)
     {
         var widthTotal = chunks.Sum(x => x.Width);
@@ -403,5 +395,5 @@ public enum CharType
     Text,       // can't be broken (unless it's hella long)
     Emoji,      // can   be broken
     Spaces,     // can be used as a line break
-    LineBreak   // mandatory        line break
+    LineBreak,  // mandatory        line break
 }

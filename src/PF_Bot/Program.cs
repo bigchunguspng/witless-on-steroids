@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Globalization;
 using PF_Bot.Core;
 using PF_Bot.Core.Text;
 using PF_Bot.Telegram;
@@ -10,8 +9,7 @@ namespace PF_Bot
     {
         private static void Main(string[] args)
         {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            Config.ReadFromFile();
+            Setup.Run();
             Bot.LaunchInstance(args.FirstOrDefault());
         }
     }

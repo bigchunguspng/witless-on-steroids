@@ -1,4 +1,6 @@
-﻿using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Fonts;
+using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Tools.Backrooms.Helpers;
@@ -9,8 +11,11 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Top : MakeMemeCore<string>
     {
+        private static readonly FontWizard _fontWizard = new ("ft", "snap");
         private static readonly IFunnyBrazil _ifunny = new();
         private static readonly SerialTaskQueue _queue = new();
+
+        private FontOption _fontOption;
 
         protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<string> MemeMaker => _ifunny;
@@ -28,12 +33,12 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override Task Run() => RunInternal("top");
 
-        protected override bool ResultsAreRandom => IFunnyBrazil.FontWizard.UseRandom;
+        protected override bool ResultsAreRandom => _fontOption.IsRandom;
 
         protected override void ParseOptions()
         {
             IFunnyBrazil.CustomColor.CheckAndCut(Request);
-            IFunnyBrazil.FontWizard .CheckAndCut(Request);
+            IFunnyBrazil.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             IFunnyBrazil.CropPercent        = GetInt(Request, _crop,     0);
             IFunnyBrazil.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
@@ -55,7 +60,10 @@ namespace PF_Bot.Features.Generate.Memes
 
             var caption = generate ? Baka.Generate() : text!;
 
-            IFunnyBrazil.PreferSegoe = caption.IsMostlyCyrillic();
+            if (_fontOption.IsDefault)
+            {
+                _fontOption.FontKey = caption.IsMostlyCyrillic() ? "sg" : "ft";
+            }
 
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }

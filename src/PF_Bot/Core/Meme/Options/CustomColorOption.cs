@@ -5,7 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SpectreColor = Spectre.Console.Color;
 
-namespace PF_Bot.Core.Meme.Shared;
+namespace PF_Bot.Core.Meme.Options;
 
 public struct CustomColorOption([StringSyntax("Regex")] string mark)
 {

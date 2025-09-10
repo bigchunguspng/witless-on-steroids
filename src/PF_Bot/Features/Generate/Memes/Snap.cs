@@ -1,4 +1,6 @@
+using PF_Bot.Core.Meme.Fonts;
 using PF_Bot.Core.Meme.Generators;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Tools.Backrooms.Helpers;
@@ -9,8 +11,11 @@ namespace PF_Bot.Features.Generate.Memes;
 
 public class Snap : MakeMemeCore<string>
 {
+    private static readonly FontWizard _fontWizard = new ("rg", "snap");
     private static readonly SnapChat _snapChat = new();
     private static readonly SerialTaskQueue _queue = new();
+
+    private FontOption _fontOption;
 
     protected override SerialTaskQueue Queue => _queue;
     protected override IMemeGenerator<string> MemeMaker => _snapChat;
@@ -28,7 +33,7 @@ public class Snap : MakeMemeCore<string>
 
     protected override Task Run() => RunInternal("snap");
 
-    protected override bool ResultsAreRandom => SnapChat.RandomOffset || SnapChat.FontWizard.UseRandom;
+    protected override bool ResultsAreRandom => SnapChat.RandomOffset || _fontOption.IsRandom;
 
     protected override void ParseOptions()
     {
@@ -36,7 +41,7 @@ public class Snap : MakeMemeCore<string>
 
         SnapChat.CustomColorBack.CheckAndCut(Request);
         SnapChat.CustomColorText.CheckAndCut(Request);
-        SnapChat.FontWizard     .CheckAndCut(Request);
+        SnapChat.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
         SnapChat.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
         SnapChat.FontSizeMultiplier = GetInt(Request, _fontSM, 100);

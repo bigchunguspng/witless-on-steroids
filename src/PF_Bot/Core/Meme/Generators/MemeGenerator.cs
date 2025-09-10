@@ -1,7 +1,9 @@
 ﻿using ColorHelper;
 using PF_Bot.Core.Editing;
+using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Tools_Legacy.Technical;
+using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -149,7 +151,7 @@ namespace PF_Bot.Core.Meme.Generators
             }
             else
             {
-                var pixelate = FontWizard.FontIsPixelated();
+                var pixelate = FontOption.FontIsPixelated();
                 var optionsE = new EmojiTool.Options(_textBrush, _w, GetEmojiSize(), _fontOffset, Pixelate: pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue());
                 var point = GetFunnyOrigin(textLayer.Size, options, top, caseOffset);

@@ -91,7 +91,7 @@ public static class Texts
     public const string FUSE_SOURCE =
         """
 
-        Откуда: <b><a href='{0}'>{1}</a></b>
+        Источник: <b><a href='{0}'>{1}</a></b>
         """;
 
     public const string MOVING_DONE =
@@ -874,7 +874,7 @@ public static class Texts
         <code>p</code> → only <u><b>p</b></u>rivate chats
 
         📆 Last <u><b>a</b></u>ctivity, days ago
-        <blockquote><code>a[&gt;|&lt;|&gt;=|&lt;=:]?[int]</code>
+        <blockquote><code>a[&gt;|&lt;|&gt;=|&lt;=]?[int]</code>
         <i>Examples</i>:
         - <code>a&lt;30</code> → some activity in last 30 days
         - <code>a&gt;7 </code> → no activity in last 7 days</blockquote>

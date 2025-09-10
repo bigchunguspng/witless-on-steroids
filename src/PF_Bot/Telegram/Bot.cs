@@ -44,7 +44,7 @@ namespace PF_Bot.Telegram
             ClearTempFiles();
 
             if (listen) StartListening();
-            ChatManager.StartAutoSaveAsync(TimeSpan.FromMinutes(2));
+            ChatManager.StartAutoSaveThread(TimeSpan.FromMinutes(2));
 
             new ConsoleUI().EnterConsoleLoop();
         }

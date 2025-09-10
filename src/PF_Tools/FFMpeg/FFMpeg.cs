@@ -21,7 +21,7 @@ public static class FFMpeg
         => Args().Input(input).Out(output, options);
     
     public static FFMpegArgs Command
-        (string input, string output, FFMpegOutputPipeline options)
+        (string input, string output, FFMpegOutputOptionsModifier options)
         => Args().Input(input).Out(output, options);
 
 

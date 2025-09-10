@@ -37,5 +37,5 @@ public class FFMpegOutputOptions
         (string options) => new FFMpegOutputOptions().Options(options);
 
     public static implicit operator FFMpegOutputOptions
-        (FFMpegOutputPipeline options) => options(new FFMpegOutputOptions());
+        (FFMpegOutputOptionsModifier options) => options(new FFMpegOutputOptions());
 }

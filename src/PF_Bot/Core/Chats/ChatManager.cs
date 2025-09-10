@@ -59,7 +59,7 @@ public static class ChatManager
         return LoadedBakas.TryGetValue(chat, out var baka) ? baka : LoadBaka(chat);
     }
 
-    public static void StartAutoSaveAsync(TimeSpan interval)
+    public static void StartAutoSaveThread(TimeSpan interval)
     {
         var thread = new Thread(() => AutoSaveLoop(interval))
         {

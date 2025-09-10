@@ -20,5 +20,5 @@ public class FFMpegInputOptions
         (string options) => new FFMpegInputOptions().Options(options);
 
     public static implicit operator FFMpegInputOptions
-        (FFMpegInputPipeline options) => options(new FFMpegInputOptions());
+        (FFMpegInputOptionsModifier options) => options(new FFMpegInputOptions());
 }

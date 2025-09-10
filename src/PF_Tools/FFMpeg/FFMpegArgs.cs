@@ -4,8 +4,8 @@ using FFMpegOutput = (string Path, PF_Tools.FFMpeg.FFMpegOutputOptions Options);
 
 namespace PF_Tools.FFMpeg;
 
-public delegate FFMpegInputOptions  FFMpegInputPipeline (FFMpegInputOptions  opts);
-public delegate FFMpegOutputOptions FFMpegOutputPipeline(FFMpegOutputOptions opts);
+public delegate FFMpegInputOptions  FFMpegInputOptionsModifier (FFMpegInputOptions  opts);
+public delegate FFMpegOutputOptions FFMpegOutputOptionsModifier(FFMpegOutputOptions opts);
 
 public class FFMpegArgs
 {
@@ -29,7 +29,7 @@ public class FFMpegArgs
         => this.Fluent(() => _inputs.Add((path, options)));
 
     public FFMpegArgs Input
-        (string path, FFMpegInputPipeline options)
+        (string path, FFMpegInputOptionsModifier options)
         => this.Fluent(() => _inputs.Add((path, options)));
 
     /// Arg is auto-prepended by ';' if filtergraph is not empty.
@@ -64,7 +64,7 @@ public class FFMpegArgs
         => this.Fluent(() => _outputs.Add((path, options)));
 
     public FFMpegArgs Out
-        (string path, FFMpegOutputPipeline options)
+        (string path, FFMpegOutputOptionsModifier options)
         => this.Fluent(() => _outputs.Add((path, options)));
 
     public string Build()

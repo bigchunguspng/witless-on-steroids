@@ -80,25 +80,18 @@ public abstract class ChanEaterCore : Fuse
     protected async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks)
     {
         var message = Bot.PingChat(Origin, BOARD_START);
-        try
-        {
-            var threads = await Task.WhenAll(tasks);
 
-            var text = string.Format(BOARD_START_EDIT, threads.Length);
-            if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
+        var threads = await Task.WhenAll(tasks);
 
-            Bot.EditMessage(Chat, message, text);
+        var text = string.Format(BOARD_START_EDIT, threads.Length);
+        if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
 
-            var size = ChatManager.GetPackPath(Chat).FileSizeInBytes;
-            var lines = threads.SelectMany(s => s).ToList();
+        Bot.EditMessage(Chat, message, text);
 
-            await EatMany(lines, size, Limit);
-        }
-        catch (Exception e)
-        {
-            LogError(e.Message);
-            Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
-        }
+        var size = ChatManager.GetPackPath(Chat).FileSizeInBytes;
+        var lines = threads.SelectMany(s => s).ToList();
+
+        await EatMany(lines, size, Limit);
     }
 
     protected async Task EatMany(List<string> lines, long size, int limit)

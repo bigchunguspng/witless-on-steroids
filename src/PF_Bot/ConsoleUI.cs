@@ -39,7 +39,7 @@ namespace PF_Bot
                 }
                 catch (Exception e)
                 {
-                    LogError($"[Console] >> BRUH -> {e.Message}");
+                    LogError($"[Console] >> BRUH | {e.GetErrorMessage()}");
                 }
             }
             while (_input != "s");

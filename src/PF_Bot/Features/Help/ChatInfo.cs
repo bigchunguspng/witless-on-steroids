@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PF_Bot.Core.Chats;
-using PF_Bot.Features.Media.Reddit;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features.Help
@@ -20,14 +19,14 @@ namespace PF_Bot.Features.Help
                 <    800_000 => "📗",
                 <  4_000_000 => "📙",
                 < 16_000_000 => "📔",
-                _            => "📚"
+                _            => "📚",
             };
 
             sb.Append("\nВес словаря: ").Append(size.ReadableFileSize()).Append(' ').Append(icon);
             if (ChatManager.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
-                    .Append(BrowseReddit.FormatSubs(Baka.VocabularyCount, "💨")).Append(' ');
+                    .Append(Baka.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
             if (!Context.ChatIsPrivate)

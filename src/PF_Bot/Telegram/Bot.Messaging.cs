@@ -81,7 +81,7 @@ namespace PF_Bot.Telegram
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't set reaction --> {e.GetFixedMessage()}");
+                LogError($"{chat} >> Can't set reaction | {e.GetErrorMessage()}");
             }
         }
 
@@ -108,14 +108,15 @@ namespace PF_Bot.Telegram
 
         public async void DeleteMessageAsync(long chat, int id)
         {
-            if (id <= 0) return;
             try
             {
+                if (id <= 0) return;
+
                 await Client.DeleteMessage(chat, id);
             }
             catch (Exception e)
             {
-                LogError($"{chat} >> Can't delete message --> {e.GetFixedMessage()}");
+                LogError($"{chat} >> Can't delete message | {e.GetErrorMessage()}");
             }
         }
 
@@ -152,8 +153,8 @@ namespace PF_Bot.Telegram
             }
             catch (Exception e)
             {
-                var reason = e.GetFixedMessage();
-                LogError($"{chat} >> Can't {action} {what} --> {reason}");
+                var reason = e.GetErrorMessage();
+                LogError($"{chat} >> Can't {action} {what} | {reason}");
                 if (patience > 0)
                 {
                     var serverError = reason.Contains("Server Error");
@@ -238,7 +239,7 @@ namespace PF_Bot.Telegram
             }
             catch (Exception e)
             {
-                LogError($"{origin.Chat} >> Can't ping --> " + e.Message);
+                LogError($"{origin.Chat} >> Can't ping | {e.GetErrorMessage()}");
                 return ChatCanBeRemoved(e) ? -1 : -2;
             }
         }

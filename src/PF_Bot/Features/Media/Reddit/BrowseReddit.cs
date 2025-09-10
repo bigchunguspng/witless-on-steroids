@@ -256,27 +256,14 @@ namespace PF_Bot.Features.Media.Reddit // ReSharper disable InconsistentNaming
 
         private static string SubredditList(string q, List<Subreddit> subs)
         {
-            var sb = new StringBuilder(string.Format(SEARCH_HEADER, q, subs.Count, Ending(subs.Count)));
-            foreach (var s in subs) sb.Append(string.Format(SUBS_LI, s.Name, FormatSubs(s.Subscribers ?? 0)));
+            var sb = new StringBuilder(string.Format(SEARCH_HEADER, q, subs.Count, subs.Count.ED("о", "а", "")));
+            foreach (var s in subs) sb.Append(string.Format(SUBS_LI, s.Name, (s.Subscribers ?? 0).Format_bruh_1k_100k_1M()));
             return sb.Append(string.Format(SEARCH_FOOTER, Bot.Me.FirstName)).ToString();
         }
 
         private const string SEARCH_HEADER = "По запросу <b>{0}</b> найдено <b>{1}</b> сообществ{2}:\n";
         private const string SUBS_LI       = "\n<code>{0}</code> - <i>{1}</i>";
         public  const string SEARCH_FOOTER = "\n\nБлагодарим за использование поисковика {0}";
-
-        public  static string FormatSubs(int x, string bruh = "💀") => x switch
-        {
-            < 1000      =>  x + bruh,
-            < 100_000   => (x / 1000D).ToString("0.#") + "k👌",
-            < 1_000_000 =>  x / 1000      + "k👌",
-            _           =>  x / 1_000_000 + "M 🤯"
-        };
-        private static string Ending(int x)
-        {
-            if (x is > 4 and < 21) return "";
-            return (x % 10) switch { 1 => "o", 2 or 3 or 4 => "а", _ => ""};
-        }
 
         #endregion
     }

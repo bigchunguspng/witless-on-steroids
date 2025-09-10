@@ -26,7 +26,7 @@
                 if (match.Success) action(match.Groups[1].Value);
                 else
                 {
-                    LogError($"Please add \"{propertyName}\" to \"{File_Config}\" and restart the app.");
+                    Print($@"CAN'T CONFIGURE BOT | Add ""{propertyName}"" to ""{File_Config}"" and restart the bot.", ConsoleColor.Red);
                     Console.ReadKey();
                 }
             }

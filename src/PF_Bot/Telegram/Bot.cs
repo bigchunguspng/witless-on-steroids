@@ -53,7 +53,7 @@ namespace PF_Bot.Telegram
                 }
                 catch (Exception e)
                 {
-                    LogError("NO INTERNET? >> " + e.GetFixedMessage());
+                    LogError($"NO INTERNET? | {e.GetErrorMessage()}");
                     Task.Delay(5000).Wait();
                 }
             }

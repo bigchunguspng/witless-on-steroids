@@ -6,29 +6,34 @@ public static partial class Extensions
 {
     //
 
-    public static string HOURS_ED(int hours) => ED(hours, "", "а", "ов");
-    public static string  MINS_ED(int mins ) => ED(mins,  "у", "ы", "");
+    public static string HOURS_ED(int hours) => hours.ED( "", "а", "ов");
+    public static string  MINS_ED(int mins ) => mins. ED("у", "ы",   "");
 
-    private static string ED(int x, string one, string twoFour, string any)
-    {
-        if (x % 10 > 4 || x % 10 == 0 || x is > 10 and < 15) return any;
-        else if (x % 10 > 1) return twoFour;
-        else return one;
-    }
+    public static string ED(this int x, string x1, string x234, string xAny) =>
+        x is 0
+          or >= 5 and <= 20
+            ? xAny
+            : (x % 10) switch
+            {
+                1   => x1,
+                < 5 => x234,
+                _   => xAny,
+            };
 
     //
 
-    private static readonly Regex Errors = new(@"One or more errors occurred. \((\S*(\s*\S)*)\)");
+    public static string GetErrorMessage
+        (this Exception e) => e is AggregateException a 
+        ? a.InnerException!.GetErrorMessage_Internal() 
+        : e                .GetErrorMessage_Internal();
 
-    public static string GetFixedMessage(this Exception e)
-    {
-        var message = e.Message;
-        return Errors.ExtractGroup(1, message, s => s, message)!;
-    }
+    private static string GetErrorMessage_Internal
+        (this Exception e) => $"{e.GetType().Name} >> {e.Message}\n{(e.StackTrace ?? "").SubstringTill('\n')}";
 
     // UI
 
-    public static string ReadableFileSize(this long bytes)
+    public static string ReadableFileSize
+        (this long bytes)
     {
         var kbs = bytes / 1024F;
         var mbs = kbs   / 1024F;
@@ -38,8 +43,17 @@ public static partial class Extensions
             :                  $"{bytes} байт";
     }
 
-    private static readonly CultureInfo _culture_UI = CultureInfo.GetCultureInfo("fi"/*nna jerk it))*/);
+    public static string Format_bruh_1k_100k_1M
+        (this int x, string bruh = "💀") => x switch
+    {
+        < 1000      =>        x + bruh,
+        < 100_000   => UI($@"{x / 1000D:0.#}k👌"),
+        < 1_000_000 =>    $@"{x / 1000}k👌",
+        _           =>    $@"{x / 1_000_000}M 🤯",
+    };
+
+    public static readonly CultureInfo Culture_UI = CultureInfo.GetCultureInfo("fi"/*nna jerk it))*/);
 
     public static string UI
-        (this FormattableString formattable) => formattable.ToString(_culture_UI);
+        (this FormattableString formattable) => formattable.ToString(Culture_UI);
 }

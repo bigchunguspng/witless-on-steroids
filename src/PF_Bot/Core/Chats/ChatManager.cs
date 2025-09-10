@@ -81,7 +81,7 @@ public static class ChatManager
             }
             catch (Exception e)
             {
-                LogError($"AUTOSAVE >> FAIL >> {e}");
+                LogError($"AUTOSAVE FAIL | {e.GetErrorMessage()}");
             }
         }
     }

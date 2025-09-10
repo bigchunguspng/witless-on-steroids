@@ -28,6 +28,15 @@ public static class Extensions_String
     public static int GetLineCount
         (this string text) => 1 + text.Count(x => x == '\n');
 
+    public static ReadOnlySpan<char> SubstringTill
+        (this string text, char c)
+    {
+        var index = text.IndexOf(c);
+        return index >= 0 
+            ? text.AsSpan(0, index)
+            : text.AsSpan();
+    }
+
     // PATH
     
     public static string RemoveExtension

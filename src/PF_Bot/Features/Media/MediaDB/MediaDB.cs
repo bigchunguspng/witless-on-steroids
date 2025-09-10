@@ -128,7 +128,7 @@ public abstract class MediaDB<T> where T : FileBase
             catch (Exception e)
             {
                 total--;
-                LogError($"[{Name}] >> Can't have [{name}] in Detroit X_X --> {e.Message}");
+                LogError($"[{Name}] >> Can't have [{name}] in Detroit X_X --> {e.GetErrorMessage()}");
             }
         }
 

@@ -77,7 +77,7 @@ namespace PF_Bot.Tools_Legacy.BoardScrappers
                 var response = _rest.Get(new RestRequest(threadURL, Method.GET));
                 if (response.StatusCode == HttpStatusCode.OK) return response.Content;
 
-                LogError($"Board Service -> TryGetThreadHtml -> {response.StatusCode}");
+                LogDebug($"Board Service -> TryGetThreadHtml -> StatusCode: {response.StatusCode}");
                 Task.Delay(5000).Wait();
             }
             while (patience-- > 0);

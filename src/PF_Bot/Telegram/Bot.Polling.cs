@@ -43,10 +43,12 @@ public partial class Bot
         };
     }
 
-    private Task HandlePollingError(ITelegramBotClient bot, Exception exception, CancellationToken token)
+    // todo: moving average and dynamic delay: 1s -> 5s -> 15s
+    private async Task HandlePollingError(ITelegramBotClient bot, Exception exception, CancellationToken token)
     {
-        LogError($"Telegram API Error x_x --> {exception.Message}\n{exception.StackTrace}");
-        return Task.CompletedTask;
+        LogError($"Telegram API | {exception.GetErrorMessage()}");
+
+        await Task.Delay(1000, token);
     }
 
     private Task OnMessage(Message message)
@@ -95,16 +97,20 @@ public partial class Bot
         return Task.CompletedTask;
     }
 
-    public static void HandleCommandException(Exception e, CommandContext? context)
+    public void HandleCommandException(Exception e, CommandContext? context)
     {
         HandleError(e, context, context?.Title ?? "[unknown]");
+        if (context != null)
+        {
+            SendMessage(context.Origin, GetSillyErrorMessage());
+        }
     }
 
     private static readonly FileLogger_Simple _errorLogger = new (File_Errors);
 
     private static void HandleError(Exception e, object? context, string title)
     {
-        LogError($"{title} >> BRUH -> {e.GetFixedMessage()}");
+        LogError($"{title} >> BRUH | {e.GetErrorMessage()}");
         try
         {
             var json = JsonSerializer.Serialize(context, DebugMessage.JsonOptions);

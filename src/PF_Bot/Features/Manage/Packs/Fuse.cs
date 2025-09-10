@@ -3,7 +3,6 @@ using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Features.Manage.Settings;
-using PF_Bot.Features.Media.Reddit;
 using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
@@ -213,7 +212,7 @@ namespace PF_Bot.Features.Manage.Packs
             var deltaCount = newCount - count;
             var ns = newSize.ReadableFileSize();
             var ds = deltaSize.ReadableFileSize();
-            var dc = BrowseReddit.FormatSubs(deltaCount, "💨");
+            var dc = deltaCount.Format_bruh_1k_100k_1M("💨");
             return string.Format(FUSE_SUCCESS_RESPONSE, title, ns, ds, dc);
         }
 

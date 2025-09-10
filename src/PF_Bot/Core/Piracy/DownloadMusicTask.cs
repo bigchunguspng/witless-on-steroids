@@ -61,7 +61,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
     public async Task RunAsync()
     {
-        var sw = Stopwatch_StartNew();
+        var sw = Stopwatch.StartNew();
 
         // GET READY
 

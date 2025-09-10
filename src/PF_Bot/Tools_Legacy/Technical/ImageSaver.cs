@@ -1,5 +1,4 @@
-﻿using PF_Tools.Backrooms.Helpers;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -22,7 +21,7 @@ namespace PF_Bot.Tools_Legacy.Technical // ReSharper disable MemberCanBePrivate.
         {
             if (quality <= 25)
             {
-                var sw = Stopwatch_StartNew();
+                var sw = Stopwatch.StartNew();
                 using var memory = new MemoryStream();
                 image.SaveAsJpeg(memory, GetJpegEncoder(quality));
                 memory.Position = 0;

@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using PF_Bot.Core;
 using PF_Bot.Telegram;
-using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 using MediaFile = (string Id, string FileId, string Text, string LowercaseText);
 
@@ -18,7 +17,7 @@ public abstract class MediaDB<T> where T : FileBase
 
     protected R LoadDB<R>() where R : MediaDB<T>
     {
-        var sw = Stopwatch_StartNew();
+        var sw = Stopwatch.StartNew();
 
         if (File.Exists(DB_Path) == false)
         {

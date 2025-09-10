@@ -1,7 +1,8 @@
 using System.Buffers;
 
-namespace PF_Tools.Backrooms.Types;
+namespace PF_Tools.Backrooms.Types.Collections;
 
+/// Wrapper for shared <see cref="ArrayPool&lt;T&gt;"/>.
 /// Use it only on the stack!
 public readonly struct PooledArray<T> (int length) : IDisposable
 {

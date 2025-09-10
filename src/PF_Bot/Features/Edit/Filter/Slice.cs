@@ -19,7 +19,7 @@ public class Slice : AudioVideoUrlCommand
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
         var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 
-        var sw = Stopwatch_StartNew();
+        var sw = Stopwatch.StartNew();
 
         var (output, probe, options) = await input.InitEditing("Slice", Ext);
 

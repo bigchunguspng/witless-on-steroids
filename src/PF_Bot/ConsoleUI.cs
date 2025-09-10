@@ -76,7 +76,7 @@ namespace PF_Bot
         private void SetActiveChat()
         {
             var shit = _input![1..];
-            var found = ChatManager.SettingsDB.Do(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
+            var found = ChatManager.SettingsDB.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
             if (found != 0)
             {
                 _activeChat = found;
@@ -116,7 +116,7 @@ namespace PF_Bot
 
         private void DeleteBlockers()
         {
-            var save = ChatManager.SettingsDB.Do(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
+            var save = ChatManager.SettingsDB.Lock(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
             if (save)  ChatManager.SaveChatsDB();
         }
 

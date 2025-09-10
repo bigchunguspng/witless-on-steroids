@@ -4,19 +4,6 @@ namespace PF_Tools.Backrooms.Extensions;
 
 public static class Extensions_Time
 {
-    public static T MeasureTime<T>(Func<T> func, string caption)
-    {
-        var sw = Stopwatch_StartNew();
-        var result = func.Invoke();
-        sw.Log(caption);
-        return result;
-    }
-
-    public static Stopwatch Stopwatch_StartNew()
-    {
-        return Stopwatch.StartNew();
-    }
-
     public static void Log(this Stopwatch sw, string message)
     {
         Print($" [  T  I  M  E  ]  -  {sw.ElapsedReadable()} -> {message}", ConsoleColor.DarkGray);

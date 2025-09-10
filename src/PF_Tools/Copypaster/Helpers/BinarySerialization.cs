@@ -1,5 +1,4 @@
 using System.Text;
-using PF_Tools.Backrooms.Types;
 using PF_Tools.Copypaster.TransitionTables;
 
 namespace PF_Tools.Copypaster.Helpers;

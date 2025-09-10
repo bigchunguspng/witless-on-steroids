@@ -22,7 +22,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
 
-        var sw = Stopwatch_StartNew();
+        var sw = Stopwatch.StartNew();
 
         if (top.height > 0)
         {

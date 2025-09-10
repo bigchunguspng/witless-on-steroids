@@ -1,10 +1,10 @@
 ﻿namespace PF_Tools.Backrooms.Types;
 
 /// Struct salesman: *slaps docstring* <br/>
-/// This bad boy can fit up to 8 booleans in a single byte.
+/// This bad boy can fit up to 8 bool flags in a single byte.
 /// Usage example:
 /// <code> public bool Real { get => _flags[3]; set => _flags[3] = value; } </code>
-public struct ByteFlags
+public struct FlagSet_8
 {
     private byte _data;
 
@@ -19,13 +19,3 @@ public struct ByteFlags
         }
     }
 }
-
-/*
-
-USAGE EXAMPLE:
-
-private ByteFlags _flags;
-
-[JsonProperty] public bool Stickers { get => _flags[1]; set => _flags[1] = value; }
-
-*/

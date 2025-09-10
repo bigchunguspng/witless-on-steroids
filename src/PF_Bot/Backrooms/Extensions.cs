@@ -20,7 +20,7 @@ public static partial class Extensions
                 _   => xAny,
             };
 
-    //
+    // EXCEPTIONS
 
     public static string GetErrorMessage
         (this Exception e) => e is AggregateException a 

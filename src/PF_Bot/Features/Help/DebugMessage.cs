@@ -8,7 +8,6 @@ using PF_Bot.Core.Chats;
 using PF_Bot.Features.Media.MediaDB;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Tools_Legacy.RedditSearch;
-using PF_Tools.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Help;

@@ -1,6 +1,4 @@
-﻿using PF_Tools.Backrooms.Helpers;
-
-namespace PF_Bot.Core.Text;
+﻿namespace PF_Bot.Core.Text;
 
 public static class DefaultTextProvider
 {

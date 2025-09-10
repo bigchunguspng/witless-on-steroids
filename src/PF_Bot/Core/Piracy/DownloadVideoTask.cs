@@ -29,7 +29,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     public async Task<string> RunAsync()
     {
-        var sw = Stopwatch_StartNew();
+        var sw = Stopwatch.StartNew();
 
         var directory = Path.Combine(Dir_Temp, $"vid-{DateTime.Now.Ticks}");
         Directory.CreateDirectory(directory);

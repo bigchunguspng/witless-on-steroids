@@ -2,7 +2,6 @@
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
-using PF_Tools.Backrooms.Helpers;
 using PF_Tools.Backrooms.Types.SerialQueue;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
@@ -115,7 +114,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
         public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
         {
-            var sw = Stopwatch_StartNew();
+            var sw = Stopwatch.StartNew();
 
             var path = await DownloadFileAndParseOptions(file, extension);
             if (round && CropVideoNotes)
@@ -173,7 +172,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         {
             return Queue.Enqueue(() =>
             {
-                var sw = Stopwatch_StartNew();
+                var sw = Stopwatch.StartNew();
                 var result = MemeMaker.GenerateMeme(request, text);
                 sw.Log(Command);
                 return result;
@@ -199,7 +198,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         {
             return Queue.Enqueue(async () =>
             {
-                var sw = Stopwatch_StartNew();
+                var sw = Stopwatch.StartNew();
                 await MemeMaker.GenerateVideoMeme(request, text);
                 sw.Log(Command + " video");
                 return request.TargetPath.ToString();

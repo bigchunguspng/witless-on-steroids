@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace PF_Tools.Backrooms.Types;
+namespace PF_Tools.Backrooms.Types.Collections;
 
+/// Cache of a limited size.
+/// When it becomes full and a new item is added, it replaces the oldest one.
 public class LimitedCache<TKey, TValue> where TKey : notnull
 {
     private readonly int _limit;

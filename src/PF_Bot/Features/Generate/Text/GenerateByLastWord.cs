@@ -1,6 +1,4 @@
-﻿using PF_Tools.Backrooms.Helpers;
-
-namespace PF_Bot.Features.Generate.Text
+﻿namespace PF_Bot.Features.Generate.Text
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {

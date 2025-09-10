@@ -77,7 +77,7 @@ public class Spam : SyncCommand
 
     private static IEnumerable<long> GetChats(GetChatsType type, ComparisonExpression size, ComparisonExpression days)
     {
-        return ChatManager.SettingsDB.Do(x => x.Keys.Where(chat =>
+        return ChatManager.SettingsDB.Lock(x => x.Keys.Where(chat =>
         {
             var path = ChatManager.GetPackPath(chat);
             if (File.Exists(path))

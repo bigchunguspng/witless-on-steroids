@@ -1,6 +1,5 @@
 ﻿using PF_Bot.Features.Media.Reddit;
 using PF_Bot.Tools_Legacy.RedditSearch;
-using PF_Tools.Backrooms.Helpers;
 
 #pragma warning disable CS4014
 
@@ -59,7 +58,7 @@ namespace PF_Bot.Features.Manage.Packs
 
         private async Task EatComments(RedditQuery query, long size, int limit)
         {
-            var sw = Stopwatch_StartNew();
+            var sw = Stopwatch.StartNew();
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
             Log($"COMMENTS FETCHED >> {sw.ElapsedReadable()}");
 

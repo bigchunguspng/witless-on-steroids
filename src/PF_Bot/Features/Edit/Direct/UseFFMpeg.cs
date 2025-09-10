@@ -1,7 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Direct.Core;
 using PF_Bot.Features.Edit.Shared;
-using PF_Tools.Backrooms.Helpers;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -32,17 +32,8 @@ public class UseFFMpeg : AudioVideoPhotoCommand
 
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
-        if (options.Contains('!'))
-        {
-            // APPLY ALIASES
-            while (true)
-            {
-                var match = AliasRegex.Match(options);
-                if (match.Success == false) break;
-                
-                if (!Context.ApplyAlias(match, ref options, Dir_Alias_Peg)) return;
-            }
-        }
+
+        if (Context.ApplyAliases(ref options, Dir_Alias_Peg) == false) return;
 
         // PROCESS OTHER OPTIONS
         var vf = OptionUsed('v');
@@ -67,9 +58,9 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         else if (extension == "w") extension = "webp";
 
         var extensionInvalid = extension.FileNameIsInvalid();
-        if (extensionInvalid || OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
+        if (extensionInvalid || DirectEditingHelpers.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
-            await SendTrollface(Origin, extensionInvalid);
+            await DirectEditingHelpers.SendTrollface(Origin, extensionInvalid);
             return;
         }
 
@@ -86,26 +77,12 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 
-    public static bool OptionsMentionsPrivateFile(string options) =>
-        options.Contains(File_Config, StringComparison.OrdinalIgnoreCase)
-     || options.Contains(File_Log,    StringComparison.OrdinalIgnoreCase);
-
     private bool PixelThiefDetected(string options) =>
         !Message.SenderIsBotAdmin() && (options.Contains("gdigrab") || options.Contains("x11grab"));
 
-    public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
-    {
-        Bot.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
-        if (extensionInvalid)
-        {
-            await Task.Delay(Fortune.RandomInt(900, 1100));
-            Bot.SendMessage(origin, PEG_EXTENSION_MISSING);
-        }
-    }
-
     private bool OptionUsed(char option)
     {
-        return Command!.Length > 4 && Command.AsSpan()[4..].Contains(option);
+        return Command!.Length > 4 && Command.IndexOf(option, 4) > 0;
     }
 
     protected override bool MessageContainsFile(Message m)

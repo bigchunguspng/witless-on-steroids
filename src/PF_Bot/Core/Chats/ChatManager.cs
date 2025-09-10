@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using PF_Bot.Core.Text;
-using PF_Tools.Backrooms.Helpers;
 using PF_Tools.Copypaster;
 
 namespace PF_Bot.Core.Chats;
@@ -37,7 +36,7 @@ public static class ChatManager
 
     public static void SaveChatsDB()
     {
-        lock (SettingsDB.Sync) JsonIO.SaveData(SettingsDB, File_Chats);
+        SettingsDB.Lock(x => JsonIO.SaveData(x, File_Chats));
         Log("CHATLIST SAVED", LogLevel.Info, LogColor.Lime);
     }
 

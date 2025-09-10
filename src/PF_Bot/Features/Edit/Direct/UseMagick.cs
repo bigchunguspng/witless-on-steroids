@@ -2,6 +2,7 @@
 
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features.Edit.Core;
+using PF_Bot.Features.Edit.Direct.Core;
 using PF_Bot.Features.Edit.Shared;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
@@ -26,15 +27,8 @@ public class UseMagick : PhotoCommand
 
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
-        if (options.Contains('!'))
-        {
-            // APPLY ALIASES
-            var matches = AliasRegex.Matches(options);
-            foreach (var match in matches.OfType<Match>())
-            {
-                if (!Context.ApplyAlias(match, ref options, Dir_Alias_Im)) return;
-            }
-        }
+
+        if (Context.ApplyAliases(ref options, Dir_Alias_Im) == false) return;
 
         // GET EXTENSION
         var extension = args[^1];
@@ -44,9 +38,9 @@ public class UseMagick : PhotoCommand
         else if (extension == "w") extension = "webp";
 
         var extensionInvalid = extension.FileNameIsInvalid();
-        if (extensionInvalid || UseFFMpeg.OptionsMentionsPrivateFile(options))
+        if (extensionInvalid || DirectEditingHelpers.OptionsMentionsPrivateFile(options))
         {
-            await UseFFMpeg.SendTrollface(Origin, extensionInvalid);
+            await DirectEditingHelpers.SendTrollface(Origin, extensionInvalid);
             return;
         }
 
@@ -62,7 +56,7 @@ public class UseMagick : PhotoCommand
 
     private bool OptionUsed(char option)
     {
-        return Command!.Length > 3 && Command.AsSpan()[3..].Contains(option);
+        return Command!.Length > 3 && Command.IndexOf(option, 3) > 0;
     }
 
     private async Task<string> ProcessImage(FilePath path, string options, string extension)

@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using PF_Tools.Backrooms.Types;
 
 namespace PF_Tools.Logging;
 

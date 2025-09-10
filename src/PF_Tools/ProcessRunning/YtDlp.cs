@@ -1,6 +1,6 @@
-using PF_Tools.ProcessRunning;
+using PF_Tools.Backrooms.Types;
 
-namespace PF_Tools.YtDlp;
+namespace PF_Tools.ProcessRunning;
 
 public static class YtDlp
 {
@@ -10,7 +10,7 @@ public static class YtDlp
 
     /// If the process fails, updates yt-dlp and tries once more.
     /// <br/> WARNING! Run only in a temporary directory - it can be deleted during retry!
-    public static async Task Run(string args, string directory, bool firstTime = true)
+    public static async Task Run(string args, FilePath directory, bool firstTime = true)
     {
         using var memory = new MemoryStream();
 
@@ -23,8 +23,9 @@ public static class YtDlp
                 if (updated)
                 {
                     // todo test if deletion is nesessary
-                    Directory.Delete(directory, recursive: true);
-                    Directory.CreateDirectory(directory);
+                    directory
+                        .Delete(recursive: true)
+                        .EnsureDirectoryExist();
 
                     await Run(args, directory, firstTime: false);
 

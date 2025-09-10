@@ -1,5 +1,9 @@
 namespace PF_Tools.Backrooms.Helpers;
 
+// TODO cleanup + BTFO
+// destination: bot/core/text
+// reason: rigged random, used only in text & memes
+
 public enum LetterCase
 {
     Lower, Upper, Sentence,

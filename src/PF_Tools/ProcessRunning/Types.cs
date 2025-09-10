@@ -1,12 +1,19 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace PF_Tools.ProcessRunning;
 
+public class StartedProcess(Process process)
+{
+    public Process       Process { get; } = process;
+    public StringBuilder Output  { get; } = new();
+}
+
 public class ProcessResult(string arguments, StartedProcess process)
 {
-    public string        Arguments { get; } = arguments;
-    public StringBuilder Output    { get; } = process.Output;
-    public int           ExitCode  { get; } = process.Process.ExitCode;
+    public string        Arguments => arguments;
+    public StringBuilder Output    => process.Output;
+    public int           ExitCode  => process.Process.ExitCode;
 
     public bool WasKilled { get; set; }
 

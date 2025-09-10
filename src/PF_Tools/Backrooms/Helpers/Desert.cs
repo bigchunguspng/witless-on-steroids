@@ -14,11 +14,13 @@ public static class Desert
       + "abcdefghijklmnopqrstuvwxyz_-";
 
     /// Get a random char sequence of given length. <br/>
+    /// Style: numbers, uppercase. <br/>
     /// Number of possible values = 32 ^ length.
     public static string GetSand
         (int length = 4) => GetSoil(length, 0b00011111, _chars32);
 
     /// Get a random char sequence of given length. <br/>
+    /// Style: numbers, uppercase, lowercase, _, -. <br/>
     /// Number of possible values = 64 ^ length.
     public static string GetSilt
         (int length = 4) => GetSoil(length, 0b00111111, _chars64);

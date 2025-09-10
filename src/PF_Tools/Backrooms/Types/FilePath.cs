@@ -115,6 +115,14 @@ public readonly struct FilePath(string value)
         return this;
     }
 
+    // DELETE DIRECTORY
+
+    public FilePath Delete(bool recursive)
+    {
+        if (DirectoryExists) Directory.Delete(_path, recursive);
+        return this;
+    }
+
     // GET FILES
 
     /// Makes sure directory exists.

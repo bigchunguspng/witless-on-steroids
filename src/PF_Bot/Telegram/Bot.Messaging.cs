@@ -190,10 +190,20 @@ namespace PF_Bot.Telegram
                 .EnsureDirectoryExist()
                 .Combine($"{DateTime.Now:yyyy-MM-dd}-{e.File}-{origin.Chat}-{Desert.GetSilt(11)}.txt")
                 .MakeUnique();
-            var output = e.Result.Output.Length > 0 ? e.Result.Output.ToString() : "*пусто*";
+
+            var output = "*пусто*";
+            var sbOutput = e.Result.Output;
+            if (sbOutput.Length > 0)
+            {
+                if (e.Result.WasKilled)
+                    sbOutput.Append("\n[I KILLED THE PROCESS :3]");
+
+                output = sbOutput.ToString();
+            }
+
             var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
             File.WriteAllText(path, text);
-            using var stream = File.OpenRead(path);
+            using var stream = new MemoryStream(text.GetBytes_UTF8());
             SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));
         }
 

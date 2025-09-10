@@ -13,6 +13,10 @@ public static class Extensions_String
 
     // OTHER
 
+    public static byte[] GetBytes_UTF8
+        (this string text) =>
+        System.Text.Encoding.UTF8.GetBytes(text);
+
     public static string? MakeNull_IfEmpty
         (this string? text) => string.IsNullOrEmpty(text) ? null : text;
 

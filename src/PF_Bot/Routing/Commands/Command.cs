@@ -54,13 +54,15 @@ namespace PF_Bot.Routing.Commands
     {
         public sealed override async void Execute(TContext context)
         {
-            Context = context;
             try
             {
+                Context = context;
+
                 await Run();
             }
             catch (ProcessException e)
             {
+                LogError($"{Context.Title} >> PROCESS FAILED | {e.File} / {e.Result.ExitCode}");
                 Bot.SendErrorDetails(e, Context.Origin);
             }
             catch (Exception e)

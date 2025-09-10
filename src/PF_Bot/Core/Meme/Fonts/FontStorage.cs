@@ -19,31 +19,26 @@ public static class FontStorage
 
     static FontStorage()
     {
-        var collectionMain     = new FontCollection();
-        var collectionFallback = new FontCollection();
+        var families_main = LoadFontFamilies(Dir_Fonts,          out var files_main);
+        var families_fall = LoadFontFamilies(Dir_Fonts_Fallback, out _);
 
-        var fontFiles = Dir_Fonts.GetFiles()
-            .OrderBy(x => x).ToArray();
-        var familyCodes = fontFiles
+        Families = files_main
             .Select(Path.GetFileNameWithoutExtension).OfType<string>()
-            .Where(x => x.Contains('-') == false).ToArray();
+            .Where(key => key.Contains('-') == false)
+            .Zip(families_main, (key, font) => new KeyValuePair<string, FontFamily>(key, font))
+            .ToDictionary();
 
-        fontFiles
-            .ForEach(x => collectionMain.Add(x));
-        var families    = collectionMain.Families.ToArray();
-
-        Families = new Dictionary<string, FontFamily>(familyCodes.Length);
-        for (var i = 0; i < familyCodes.Length; i++)
-        {
-            Families.Add(familyCodes[i], families[i]);
-        }
-
-        Dir_Fonts_Fallback.GetFiles()
-            .OrderBy(x => x)
-            .ForEach(x =>  collectionFallback.Add(x));
-        Fallback_Default = collectionFallback.Families.ToList();
+        Fallback_Default = families_fall.ToArray();
         Fallback_Regular = new[] { Families["sg"] }.Concat(Fallback_Default).ToList();
         Fallback_Comic   = new[] { Families["co"] }.Concat(Fallback_Regular).ToList();
+    }
+
+    private static IEnumerable<FontFamily> LoadFontFamilies(FilePath directory, out string[] fontFiles)
+    {
+        var collection = new FontCollection();
+        fontFiles = directory.GetFiles().OrderBy(x => x).ToArray();
+        fontFiles.ForEach(x => collection.Add(x));
+        return collection.Families;
     }
 
     public static void Debug_GetFontData()

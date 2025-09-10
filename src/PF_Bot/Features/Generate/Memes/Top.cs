@@ -55,7 +55,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override string GetMemeText(string? text)
         {
-            var generate = string.IsNullOrEmpty(text);
+            var generate = text.IsNull_OrEmpty();
             var capitalize = CheckCaps(Request, _caps, generate);
 
             var caption = generate ? Baka.Generate() : text!;

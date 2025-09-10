@@ -76,7 +76,7 @@ namespace PF_Bot.Features.Generate.Memes
             DemotivatorDrawer.BottomTextIsGenerated = true;
 
             string a, b;
-            var generate = string.IsNullOrEmpty(text);
+            var generate = text.IsNull_OrEmpty();
             if (generate)
             {
                 a = Baka.Generate();

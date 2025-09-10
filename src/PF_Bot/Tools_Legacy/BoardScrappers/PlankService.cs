@@ -31,7 +31,7 @@ public class PlankService
         var replyIndicator = "<a";
 
         var subject = _thread_subject.Match(html).Groups[1].Value;
-        var subjectPending = !string.IsNullOrWhiteSpace(subject);
+        var subjectPending = subject.IsNotNull_NorWhiteSpace();
 
         var posts = _thread_post.Matches(html).Select(x => x.Groups[1].Value);
         foreach (var post in posts)

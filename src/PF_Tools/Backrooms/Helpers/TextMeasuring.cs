@@ -31,7 +31,7 @@ public static class TextMeasuring
     {
         linesFilled = 0;
 
-        if (string.IsNullOrEmpty(text)) return Size.Empty;
+        if (text.IsNull_OrEmpty()) return Size.Empty;
 
         var ops = new TextOptions(options).WithDefaultAlignment();
 
@@ -109,7 +109,7 @@ public static class TextMeasuring
         string text, TextOptions options, float emojiSize, int start = 0, bool cloneOptions = true
     )
     {
-        if (string.IsNullOrEmpty(text))
+        if (text.IsNull_OrEmpty())
             return [];
 
 

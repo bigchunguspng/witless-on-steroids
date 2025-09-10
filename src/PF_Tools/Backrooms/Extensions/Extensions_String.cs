@@ -11,17 +11,32 @@ public static class Extensions_String
         return s.Length > 1 && s.Skip(1).Any(char.IsUpper) ? s[0] + s[1..].ToLower() : s;
     }
 
+    // The NULL The SPACE and The EMPTY
+    // todo ensure text is not whitespace where *empties are checked
+
+    public static bool IsNull_OrEmpty
+        ([NotNullWhen(false)] this string? text) => string.IsNullOrEmpty(text);
+
+    public static bool IsNotNull_NorEmpty
+        ([NotNullWhen(true )] this string? text) => string.IsNullOrEmpty(text) == false;
+
+    public static bool IsNull_OrWhiteSpace
+        ([NotNullWhen(false)] this string? text) => string.IsNullOrWhiteSpace(text);
+
+    public static bool IsNotNull_NorWhiteSpace
+        ([NotNullWhen(true )] this string? text) => string.IsNullOrWhiteSpace(text) == false;
+
+    public static string? MakeNull_IfEmpty
+        (this string? text) => string.IsNullOrEmpty     (text) ? null : text;
+
+    public static string? MakeNull_IfWhiteSpace
+        (this string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
+
     // OTHER
 
     public static byte[] GetBytes_UTF8
         (this string text) =>
         System.Text.Encoding.UTF8.GetBytes(text);
-
-    public static string? MakeNull_IfEmpty
-        (this string? text) => string.IsNullOrEmpty(text) ? null : text;
-
-    public static bool IsNullOrEmpty
-        (this string? text) => string.IsNullOrEmpty(text);
 
     public static string Quote
         (this string text) => $"\"{text}\"";
@@ -52,7 +67,7 @@ public static class Extensions_String
     public static void CreateDirectory
         (this string? directory)
     {
-        if (string.IsNullOrWhiteSpace(directory) == false)
+        if (directory.IsNotNull_NorWhiteSpace())
             Directory.CreateDirectory(directory);
     }
 

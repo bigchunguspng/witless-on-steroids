@@ -57,7 +57,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override TextPair GetMemeText(string? text)
         {
-            var generate = text.IsNullOrEmpty();
+            var generate = text.IsNull_OrEmpty();
             var capitalize = CheckCaps(Request, _caps, generate);
 
             var lowerCase      = Check(Request,   _lowerCase);

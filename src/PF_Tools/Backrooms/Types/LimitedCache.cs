@@ -29,7 +29,7 @@ public class LimitedCache<TKey, TValue> where TKey : notnull
         _paths.TryAdd(id, value);
     }
 
-    public bool Contains(TKey id, [NotNullWhen(true)] out TValue? value)
+    public bool Contains(TKey id, [MaybeNullWhen(false)] out TValue value)
     {
         return _paths.TryGetValue(id, out value);
     }

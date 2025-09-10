@@ -30,7 +30,7 @@ namespace PF_Tools.Backrooms.Types
         public void Add    (TKey key, TValue value) { lock (this)        _dictionary.   Add(key, value); }
         public bool TryAdd (TKey key, TValue value) { lock (this) return _dictionary.TryAdd(key, value); }
 
-        public bool TryGetValue (TKey key, [NotNullWhen(true)] out TValue? value)
+        public bool TryGetValue (TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             lock (this) return _dictionary.TryGetValue(key, out value);
         }

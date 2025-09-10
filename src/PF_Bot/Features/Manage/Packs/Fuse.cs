@@ -183,7 +183,7 @@ namespace PF_Bot.Features.Manage.Packs
             var linesConsumed = 0;
             await Task.Run(() =>
             {
-                foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)))
+                foreach (var line in lines.Where(x => x.IsNotNull_NorWhiteSpace()))
                 {
                     if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
                     if (baka.Eat(line)) linesConsumed++;

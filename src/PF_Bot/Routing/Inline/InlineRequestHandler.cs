@@ -28,7 +28,7 @@ public class InlineRequestHandler
             caption = captionMatch.ExtractGroup(2, s => s);
         }
 
-        var sound_mode = !string.IsNullOrWhiteSpace(query) && _sound_mode.IsMatch(query);
+        var sound_mode = query.IsNotNull_NorWhiteSpace() && _sound_mode.IsMatch(query);
         if (sound_mode)
         {
             query = query!.Length < 3
@@ -42,8 +42,8 @@ public class InlineRequestHandler
 
         var title = inline.From.GetFullNameTruncated();
         var mode = sound_mode ? "a" : "g";
-        var   query_log = string.IsNullOrWhiteSpace(query)   ? "[empty]"    :       query;
-        var caption_log = string.IsNullOrWhiteSpace(caption) ? string.Empty : $" | {caption}";
+        var   query_log = query  .IsNull_OrWhiteSpace() ? "[empty]"    :       query;
+        var caption_log = caption.IsNull_OrWhiteSpace() ? string.Empty : $" | {caption}";
         Log($"[@inline-{mode}] {title} >> {query_log}{caption_log}");
     }
 

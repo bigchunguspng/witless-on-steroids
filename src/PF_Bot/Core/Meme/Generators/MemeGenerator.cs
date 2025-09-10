@@ -131,7 +131,7 @@ namespace PF_Bot.Core.Meme.Generators
 
         private (float height, float fontSize) AddText(Image<Rgba32> background, string text, bool top)
         {
-            if (string.IsNullOrEmpty(text)) return (0, 0);
+            if (text.IsNull_OrEmpty()) return (0, 0);
 
             text = text.Trim('\n');
 

@@ -35,11 +35,11 @@ public class RunProcess : AsyncCommand
     private static string FormatProcessOutputs(string stdout, string stderr)
     {
         var sb = new StringBuilder();
-        if (string.IsNullOrWhiteSpace(stdout) == false)
+        if (stdout.IsNotNull_NorWhiteSpace())
         {
             sb.Append("<u>OUT</u>:\n<pre>").Append(HtmlText.Escape(stdout)).Append("</pre>");
         }
-        if (string.IsNullOrWhiteSpace(stderr) == false)
+        if (stderr.IsNotNull_NorWhiteSpace())
         {
             sb.Append("<u>ERR</u>:\n<pre>").Append(HtmlText.Escape(stderr)).Append("</pre>");
         }

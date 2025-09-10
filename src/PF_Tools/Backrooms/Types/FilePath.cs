@@ -4,9 +4,8 @@ namespace PF_Tools.Backrooms.Types;
 public readonly struct FilePath(string value)
 {
     private readonly string _path
-        = string.IsNullOrWhiteSpace(value)
-            ? throw new ArgumentNullException(nameof(value))
-            : value;
+        = value.MakeNull_IfWhiteSpace()
+       ?? throw new ArgumentNullException(nameof(value));
 
     public          string Value      => _path;
     public override string ToString() => _path;

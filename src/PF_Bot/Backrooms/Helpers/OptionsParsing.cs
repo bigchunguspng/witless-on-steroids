@@ -41,7 +41,7 @@ public static class OptionsParsing
     public static int GetInt(MemeRequest request, Regex regex, int @default, int group = 1)
     {
         var value = GetValue(request, regex, group);
-        if (string.IsNullOrEmpty(value)) return @default;
+        if (value.IsNull_OrEmpty()) return @default;
 
         return int.Parse(value);
     }
@@ -51,7 +51,7 @@ public static class OptionsParsing
         if (Check(request, regex) == false) return 0;
 
         var value = GetValue(request, regex, group);
-        var (number, text) = string.IsNullOrEmpty(value) ? (@default, @default.ToString()) : (int.Parse(value), value);
+        var (number, text) = value.IsNull_OrEmpty() ? (@default, @default.ToString()) : (int.Parse(value), value);
         return number / MathF.Pow(10, text.Length);
     }
 

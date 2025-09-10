@@ -45,7 +45,7 @@ namespace PF_Bot.Tools_Legacy.BoardScrappers
             var replyIndicator = desu ? " <span class=\"greentext\"><a" : "<a";
 
             var subject = GetRegexForSubject(desu).Matches(html)[desu ? 0 : ^1].Groups[1].Value;
-            var subjectPending = !string.IsNullOrWhiteSpace(subject);
+            var subjectPending = subject.IsNotNull_NorWhiteSpace();
 
             var posts = GetRegexForPosts(desu).Matches(html).Select(x => x.Groups[1].Value);
             foreach (var post in posts)

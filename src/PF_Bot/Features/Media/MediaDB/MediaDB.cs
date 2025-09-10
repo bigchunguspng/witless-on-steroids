@@ -63,7 +63,7 @@ public abstract class MediaDB<T> where T : FileBase
     [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> Search(string? query)
     {
-        var filtered = string.IsNullOrWhiteSpace(query)
+        var filtered = query.IsNull_OrWhiteSpace()
             ? GetRandomFiles()
             : GetFilesByQuery(query);
         return filtered.Take(50);

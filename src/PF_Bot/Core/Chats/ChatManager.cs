@@ -50,9 +50,7 @@ public static class ChatManager
     public static bool BakaIsLoaded(long chat, [NotNullWhen(true)] out Copypaster? baka)
         => LoadedBakas.TryGetValue(chat, out baka);
 
-    /// <summary>
-    /// <b>HIGH MEMORY USAGE!</b> Use only when you actually need the <see cref="GenerationPack"/>.
-    /// </summary>
+    /// <b>HIGH MEMORY USAGE!</b> Call this to load <see cref="GenerationPack"/> into memory.
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static Copypaster GetBaka(long chat)
     {

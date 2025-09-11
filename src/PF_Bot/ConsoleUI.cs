@@ -31,7 +31,7 @@ namespace PF_Bot
                 _input = Console.ReadLine();
                 try
                 {
-                    if (_input != null && !_input.EndsWith("_"))
+                    if (_input != null && _input.EndsWith("_").Janai())
                     {
                         if      (_input.StartsWith("+") && _input.Length > 1) SetActiveChat();
                         else if (_input.StartsWith("/")                     ) DoConsoleCommands();
@@ -87,7 +87,7 @@ namespace PF_Bot
         private void BreakFourthWall()
         {
             var arg = _input!.Split (' ', 2)[1];
-            if (!ChatManager.KnownsChat(_activeChat)) return;
+            if (ChatManager.KnownsChat(_activeChat).Janai()) return;
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {

@@ -87,7 +87,7 @@ public class Help : SyncCommand
             keyboard.Add([buttons[start + i], buttons[start + i + rows]]);
         }
 
-        if (!isMainPage)
+        if (isMainPage.Janai())
         {
             var data = address.Length == 1 ? "0" : address[..^1];
             var button = InlineKeyboardButton.WithCallbackData("Назад", CallbackData(data));

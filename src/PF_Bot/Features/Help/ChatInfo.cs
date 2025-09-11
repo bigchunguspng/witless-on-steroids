@@ -29,7 +29,7 @@ namespace PF_Bot.Features.Help
                     .Append(Baka.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
-            if (!Context.ChatIsPrivate)
+            if (Context.ChatIsPrivate.Janai())
                 sb.Append("\nМогут 🔩⚙️: ").Append(Data.AdminsOnly ? "только админы 😎" : "все 🤠");
 
             sb.Append("\n\n<u>Авто-мемы:</u>");

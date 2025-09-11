@@ -57,7 +57,8 @@ public static class AutoHandler
             var command = match.Groups[3].Value;
             foreach (var type in types)
             {
-                if (!handlers.TryGetValue(type, out _)) handlers[type] = [];
+                if (handlers.ContainsKey(type).Janai())
+                    handlers[type] = [];
 
                 handlers[type].Add((percent, $"/{command}"));
             }

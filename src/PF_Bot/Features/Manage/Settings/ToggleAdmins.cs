@@ -13,7 +13,7 @@ namespace PF_Bot.Features.Manage.Settings
             }
             else if (Message.SenderIsAdmin().Result)
             {
-                Data.AdminsOnly = !Data.AdminsOnly;
+                Data.AdminsOnly = Data.AdminsOnly.Janai();
                 ChatManager.SaveChatsDB();
                 var text = string.Format(ADMINS_RESPONSE, Data.AdminsOnly ? "только админы 😎" : "все участники 😚");
                 Bot.SendMessage(Origin, text);

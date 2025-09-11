@@ -36,7 +36,7 @@ namespace PF_Bot.Features.Generate.Memes
         protected override bool ResultsAreRandom
             => MemeGenerator.RandomTextColor
             || _fontOption.IsRandom
-            || Check(Request, _add_bottom) && !Args!.Contains('\n');
+            || Check(Request, _add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
 
         protected override void ParseOptions()
         {
@@ -44,15 +44,15 @@ namespace PF_Bot.Features.Generate.Memes
             MemeGenerator.CustomColorText.CheckAndCut(Request);
             MemeGenerator.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
-            MemeGenerator.FontMultiplier =  GetInt(Request, _fontSM, 100);
-            MemeGenerator.ShadowOpacity  =  GetInt(Request, _shadow, 100).Clamp(0, 100);
-            MemeGenerator.TextOffset     =  GetInt(Request, _offset, -1);
+            MemeGenerator.FontMultiplier = GetInt(Request, _fontSM, 100);
+            MemeGenerator.ShadowOpacity  = GetInt(Request, _shadow, 100).Clamp(0, 100);
+            MemeGenerator.TextOffset     = GetInt(Request, _offset, -1);
 
-            MemeGenerator.RandomOffset       =  CheckAndCut(Request, _randomOffset);
-            MemeGenerator.WrapText           = !CheckAndCut(Request, _nowrap);
-            MemeGenerator.RandomTextColor    =  CheckAndCut(Request, _colorText);
-            MemeGenerator.AbsolutelyNoMargin =  CheckAndCut(Request, _noMarginDude);
-            MemeGenerator.NoMargin           =  CheckAndCut(Request, _noMargin);
+            MemeGenerator.RandomOffset       = CheckAndCut(Request, _randomOffset);
+            MemeGenerator.WrapText           = CheckAndCut(Request, _nowrap).Failed();
+            MemeGenerator.RandomTextColor    = CheckAndCut(Request, _colorText);
+            MemeGenerator.AbsolutelyNoMargin = CheckAndCut(Request, _noMarginDude);
+            MemeGenerator.NoMargin           = CheckAndCut(Request, _noMargin);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -86,7 +86,7 @@ namespace PF_Bot.Features.Generate.Memes
                 a = genA ? Baka.Generate() : "";
                 b = genB ? Baka.Generate() : "";
 
-                if (genA && !onlyTopText && (genB ? a.Length > b.Length : a.Length > 64))
+                if (genA && onlyTopText.Janai() && (genB ? a.Length > b.Length : a.Length > 64))
                 {
                     // bigger text (or big enough one) should be at the bottom
                     (a, b) = (b, a);

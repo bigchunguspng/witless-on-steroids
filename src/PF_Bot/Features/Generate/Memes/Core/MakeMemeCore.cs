@@ -124,7 +124,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
                 path = crop;
             }
 
-            var note = round && !CropVideoNotes;
+            var note = round && CropVideoNotes.IsOff();
 
             var request = GetMemeFileRequest(MemeSourceType.Video, path, ".mp4");
             var repeats = GetRepeatCount().Clamp(3);
@@ -149,7 +149,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
         private MemeFileRequest GetMemeFileRequest
             (MemeSourceType type, FilePath path, string extension)
         {
-            var ending = $"{Suffix}-{Desert.GetSilt(3)}{extension}";
+            var ending = $"{Suffix}-{Desert.GetSilt()}{extension}";
             return new MemeFileRequest(Origin, type, path, ending, Data.Quality, Pressure);
         }
 
@@ -216,7 +216,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             var options = default(string);
             var empty = Text is null && defaults is null;
 
-            if (!empty)
+            if (empty.Janai())
             {
                 options = _cmd.ExtractGroup(1, command, s => s.MakeNull_IfEmpty());
                 var combine = options != null && defaults != null && (options.Contains('+') || defaults.Contains('+'));
@@ -243,7 +243,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
         private bool CheckOptionsFor(Predicate<string> condition)
         {
-            return !Request.Empty && _cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
+            return Request.Empty.Janai() && _cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
         }
     }
 }

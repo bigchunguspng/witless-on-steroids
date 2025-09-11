@@ -49,7 +49,7 @@ public partial class IFunnyBrazil
         var k = 1F;
         float textHeight;
 
-        if (text.Contains('\n') || !WrapText) // ww OR custom breaks
+        if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
         {
             EnsureLongestLineFits();
 

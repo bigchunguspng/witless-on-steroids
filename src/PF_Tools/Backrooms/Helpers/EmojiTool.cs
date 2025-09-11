@@ -264,7 +264,7 @@ public static class EmojiTool
 
     private static string[] GetEmojiFiles_Cached(string name)
     {
-        if (!_emojiCache.Contains(name, out var files))
+        if (_emojiCache.Contains_No(name, out var files))
         {
             files = Directory_EmojiPNGs.GetFiles(name + "*.png");
             _emojiCache.Add(name, files);

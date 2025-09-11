@@ -101,7 +101,7 @@ namespace PF_Bot.Core.Meme.Generators
             DrawText(background, text.A, typeA);
 
             // LOWER TEXT
-            if (_square && !SingleLine)
+            if (_square && SingleLine.Janai())
                 DrawText(background, text.B, TextType.Lower);
 
             return background;
@@ -207,7 +207,7 @@ namespace PF_Bot.Core.Meme.Generators
                 _              =>   0,
             };
             fontOffset = fontSize * fontOption.GetFontDependentOffset();
-            caseOffset = _square && !SingleLine
+            caseOffset = _square && SingleLine.Janai()
                 ? 0
                 : fontSize * fontOption.GetCaseDependentOffset(getCaseOffsetText());
             var y = offset + fontOffset - caseOffset;

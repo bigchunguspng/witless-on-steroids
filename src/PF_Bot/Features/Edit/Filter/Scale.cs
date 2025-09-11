@@ -48,7 +48,7 @@ namespace PF_Bot.Features.Edit.Filter
                     args[i] = $"min({(w ? "1920" : "1080")},ceil(({args[i]})/2)*2)";
                 }
 
-                if (args.Length == 3 && !args[2].StartsWith("flags="))
+                if (args.Length == 3  && args[2].StartsWith("flags=").Janai())
                     args[2] = "flags=" + args[2];
 
                 var scaleArgs = string.Join(':', args);

@@ -57,7 +57,7 @@ public partial class MemeGenerator
             return text; // OK - don't change anything!
         }
 
-        if (text.Contains('\n') || !WrapText) // ww
+        if (text.Contains('\n') || WrapText.IsOff()) // ww
         {
             var textRatio = textWidth / textHeight;
             var areaRatio = textWidthLimit / textHeightLimit;

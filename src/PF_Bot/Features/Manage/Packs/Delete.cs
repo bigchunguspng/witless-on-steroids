@@ -126,8 +126,8 @@ namespace PF_Bot.Features.Manage.Packs
 
             // MATCH RESULTS
 
-            var noHousing = !objects.Contains(_house);
-            var noTractor = !objects.Contains(_tractor);
+            var noHousing = objects.Contains(_house  ).Janai();
+            var noTractor = objects.Contains(_tractor).Janai();
 
             if (noHousing || noTractor)
             {

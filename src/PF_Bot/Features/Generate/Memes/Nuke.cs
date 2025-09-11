@@ -64,7 +64,7 @@ namespace PF_Bot.Features.Generate.Memes
 
             lock (DukeNukem.LogsLock)
             {
-                if (!DukeNukem.Logs.TryGetValue(pagination.Origin.Chat, out var entries))
+                if (DukeNukem.Logs.TryGetValue_Failed(pagination.Origin.Chat, out var entries))
                 {
                     Bot.SendMessage(pagination.Origin, NUKE_LOG_EXPLANATION);
                     return;
@@ -74,10 +74,10 @@ namespace PF_Bot.Features.Generate.Memes
 
                 var lastPage = (int)Math.Ceiling(entries.Count / (double)perPage) - 1;
                 var sb = new StringBuilder("🍤 <b>Последние вариации /nuke:</b>");
-                if (!single) sb.Append($" 📃{page + 1}/{lastPage + 1}");
+                if (single.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
                 sb.Append("\n\n").AppendJoin('\n', GetNukeLog(entries, page, perPage));
                 sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
-                if (!single) sb.Append(USE_ARROWS);
+                if (single.Janai()) sb.Append(USE_ARROWS);
                 
                 var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "nl");
                 Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);

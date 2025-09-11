@@ -268,7 +268,7 @@ namespace PF_Bot.Features.Manage.Packs
                 sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
             }
             sb.Append("<b>").Append(data.Title).Append(":</b>");
-            if (!oneshot) sb.Append($" 📃{page + 1}/{lastPage + 1}");
+            if (oneshot.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
             sb.Append("\n\n").AppendJoin('\n', ListFiles(files, data.Marker, page, perPage));
             sb.Append("\n\nСловарь <b>этой беседы</b> ");
             var path = ChatManager.GetPackPath(origin.Chat);
@@ -277,7 +277,7 @@ namespace PF_Bot.Features.Manage.Packs
             else
                 sb.Append("пуст");
 
-            if (!oneshot) sb.Append(USE_ARROWS);
+            if (oneshot.Janai()) sb.Append(USE_ARROWS);
 
             var buttons = oneshot ? null : GetPaginationKeyboard(page, perPage, lastPage, data.Key);
             Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);

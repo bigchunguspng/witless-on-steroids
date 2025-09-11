@@ -31,15 +31,15 @@ public static class DirectEditingHelpers
 
     public static bool ApplyAliases(this CommandContext context, ref string options, FilePath directory)
     {
-        var noAliases = options.Contains('!') == false;
+        var noAliases = options.Contains('!').Janai();
         if (noAliases) return true;
 
         while (true)
         {
             var match = _rgx_Alias.Match(options);
-            if (match.Success == false) break;
+            if (match.Failed()) break;
                 
-            if (context.ApplyAlias(match, ref options, directory) == false) return false;
+            if (context.ApplyAlias(match, ref options, directory).Failed()) return false;
         }
 
         return true;

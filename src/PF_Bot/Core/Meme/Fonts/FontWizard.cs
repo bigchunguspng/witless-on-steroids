@@ -32,7 +32,7 @@ public class FontWizard
 
         var match = _regex.Match(request.Dummy);
 
-        var success = !request.Empty && match.Success;
+        var success = request.Empty.Janai() && match.Success;
         if (success)
         {
             fontKeyIsDefault = false;

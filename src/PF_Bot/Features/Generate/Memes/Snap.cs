@@ -47,7 +47,7 @@ public class Snap : MakeMemeCore<string>
         SnapChat.CardOpacity        = GetInt(Request, _opacity, 62);
         SnapChat.CardOffset         = GetInt(Request, _offset,  50);
 
-        SnapChat.WrapText = !CheckAndCut(Request, _nowrap);
+        SnapChat.WrapText = CheckAndCut(Request, _nowrap).Failed();
     }
 
     protected override string GetMemeText(string? text)

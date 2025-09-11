@@ -13,7 +13,7 @@ public class GIF_DB : MediaDB<Animation>
     protected override string Name { get; } = "GIF_DB";
     protected override string What { get; } = "GIFS";
     protected override string WhatSingle { get; } = "GIF";
-    protected override string DB_Path { get; } = File_GIFs;
+    protected override FilePath DB_Path { get; } = File_GIFs;
 
     protected override async Task<Animation> UploadFile(FilePath path, long channel)
     {

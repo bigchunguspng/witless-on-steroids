@@ -19,7 +19,7 @@ namespace PF_Bot.Features.Manage.Packs
             var sub = _sub.Match(args);
             var ops = _ops.Match(args);
 
-            var queSuccess = que.Success && !string.IsNullOrWhiteSpace(que.Groups[1].Value);
+            var queSuccess = que.Success && que.Groups[1].Value.IsNotNull_NorWhiteSpace();
 
             if (Args != null && (queSuccess || sub.Success))
             {

@@ -9,7 +9,7 @@ public class Tell : SyncCommand
 {
     protected override void Run()
     {
-        if (!Message.SenderIsBotAdmin())
+        if (Message.SenderIsBotAdmin().Janai())
         {
             Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;

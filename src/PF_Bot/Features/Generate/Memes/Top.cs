@@ -43,13 +43,13 @@ namespace PF_Bot.Features.Generate.Memes
             IFunnyBrazil.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
             IFunnyBrazil.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            IFunnyBrazil.WrapText         = !CheckAndCut(Request, _nowrap );
-            IFunnyBrazil.BackInBlack      =  CheckAndCut(Request, _blackBG);
-            IFunnyBrazil.ForceCenter      =  CheckAndCut(Request, _colorPC);
-            IFunnyBrazil.PickColor        =  CheckAndCut(Request, _colorPP);
-            IFunnyBrazil.UseLeftAlignment =  CheckAndCut(Request, _left   );
-            IFunnyBrazil.UltraThinCard    =  CheckAndCut(Request, _thinner);
-            IFunnyBrazil.ThinCard         =  CheckAndCut(Request, _thin   );
+            IFunnyBrazil.WrapText         = CheckAndCut(Request, _nowrap ).Failed();
+            IFunnyBrazil.BackInBlack      = CheckAndCut(Request, _blackBG);
+            IFunnyBrazil.ForceCenter      = CheckAndCut(Request, _colorPC);
+            IFunnyBrazil.PickColor        = CheckAndCut(Request, _colorPP);
+            IFunnyBrazil.UseLeftAlignment = CheckAndCut(Request, _left   );
+            IFunnyBrazil.UltraThinCard    = CheckAndCut(Request, _thinner);
+            IFunnyBrazil.ThinCard         = CheckAndCut(Request, _thin   );
         }
 
         protected override string GetMemeText(string? text)

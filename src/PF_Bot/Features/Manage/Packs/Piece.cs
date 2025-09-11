@@ -13,7 +13,7 @@ namespace PF_Bot.Features.Manage.Packs
 
         protected override void Run()
         {
-            if (Args == null || !_args.IsMatch(Args))
+            if (Args == null || _args.IsMatch(Args).Janai())
             {
                 Bot.SendMessage(Origin, PIECE_MANUAL);
             }

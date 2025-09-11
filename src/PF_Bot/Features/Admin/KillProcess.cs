@@ -17,7 +17,7 @@ public class KillProcess : AsyncCommand
 
     protected override async Task Run()
     {
-        if (Message.SenderIsBotAdmin() == false) return;
+        if (Message.SenderIsBotAdmin().Janai()) return;
 
         var name = Args ?? FFMPEG;
         var process = Process.GetProcessesByName(name).FirstOrDefault();

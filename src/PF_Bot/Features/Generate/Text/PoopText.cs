@@ -29,7 +29,7 @@ public class PoopText : WitlessAsyncCommand
 
     public static void Enqueue(long chat, string text)
     {
-        if (!_queues.TryGetValue(chat, out var queue))
+        if (_queues.TryGetValue_Failed(chat, out var queue))
         {
             queue = new Queue<string>();
             _queues[chat] = queue;
@@ -41,7 +41,7 @@ public class PoopText : WitlessAsyncCommand
 
     private static string? TryDequeue(long chat)
     {
-        if (!_queues.TryGetValue(chat, out var queue))
+        if (_queues.TryGetValue_Failed(chat, out var queue))
             return null;
 
         _pendingTexts--;

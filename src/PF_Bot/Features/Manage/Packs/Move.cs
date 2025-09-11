@@ -50,7 +50,7 @@ namespace PF_Bot.Features.Manage.Packs
         {
             var filename = $"{name}{Ext_Pack}";
             var fileSource = directory.Combine(Chat.ToString(), filename);
-            if (fileSource.FileExists == false)
+            if (fileSource.FileExists.Janai())
             {
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
                 Bot.SendMessage(Origin, text);

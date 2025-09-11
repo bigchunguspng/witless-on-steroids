@@ -24,7 +24,7 @@ public static class FontStorage
 
         Families = files_main
             .Select(Path.GetFileNameWithoutExtension).OfType<string>()
-            .Where(key => key.Contains('-') == false)
+            .Where(key => key.Contains('-').Janai())
             .Zip(families_main, (key, font) => new KeyValuePair<string, FontFamily>(key, font))
             .ToDictionary();
 

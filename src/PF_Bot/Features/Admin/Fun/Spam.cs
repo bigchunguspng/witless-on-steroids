@@ -9,7 +9,7 @@ public class Spam : SyncCommand
 
     protected override void Run()
     {
-        if (!Message.SenderIsBotAdmin())
+        if (Message.SenderIsBotAdmin().Janai())
         {
             Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;
@@ -85,8 +85,8 @@ public class Spam : SyncCommand
                 var file = new FileInfo(path);
                 var typeMathes
                     = type is GetChatsType.All
-                   || type is GetChatsType.OnlyPrivates &&  chat.ChatIsPrivate()
-                   || type is GetChatsType.OnlyGroups   && !chat.ChatIsPrivate();
+                   || type is GetChatsType.OnlyPrivates && chat.ChatIsPrivate()
+                   || type is GetChatsType.OnlyGroups   && chat.ChatIsPrivate().Janai();
                 var sizeMathces = size.Operator switch
                 {
                     ">"  => file.Length >  size.Value,

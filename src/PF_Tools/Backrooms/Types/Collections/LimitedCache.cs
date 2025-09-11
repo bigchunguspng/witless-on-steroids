@@ -31,8 +31,15 @@ public class LimitedCache<TKey, TValue> where TKey : notnull
         _paths.TryAdd(id, value);
     }
 
-    public bool Contains(TKey id, [MaybeNullWhen(false)] out TValue value)
+    public bool Contains
+        (TKey id, [MaybeNullWhen(false)] out TValue value)
     {
         return _paths.TryGetValue(id, out value);
+    }
+
+    public bool Contains_No
+        (TKey id, [MaybeNullWhen(true)] out TValue value)
+    {
+        return Contains(id, out value).Janai();
     }
 }

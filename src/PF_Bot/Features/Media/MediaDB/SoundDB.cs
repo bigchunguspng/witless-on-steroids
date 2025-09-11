@@ -13,7 +13,7 @@ public class SoundDB : MediaDB<Voice>
     protected override string Name { get; } = "SoundDB";
     protected override string What { get; } = "SOUNDS";
     protected override string WhatSingle { get; } = "sound";
-    protected override string DB_Path { get; } = File_Sounds;
+    protected override FilePath DB_Path { get; } = File_Sounds;
 
     protected override async Task<Voice> UploadFile(FilePath path, long channel)
     {

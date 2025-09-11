@@ -95,7 +95,7 @@ public static class ChatManager
     /// Saves <see cref="baka"/> if it's dirty.
     public static void SaveBaka(long chat, Copypaster baka)
     {
-        if (!baka.IsDirty) return;
+        if (baka.IsDirty.Janai()) return;
 
         lock (baka)
         {

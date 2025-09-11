@@ -60,7 +60,7 @@ public static class ArgumentParsing
         text = text.TrimStart('-');
 
         var match = Regex.Match(text, @"^(?:(\d+)[:;^Жж])?(\d+(?:[.,юб]\d+)?)$");
-        if (match.Success == false) return false;
+        if (match.Failed()) return false;
 
         var s = Regex.Replace(match.Groups[2].Value, "[,юб]", ".");
         var m = match.GroupOrNull(1) ?? "0";

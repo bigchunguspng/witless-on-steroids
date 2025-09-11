@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PF_Tools.Backrooms.Extensions;
 
 public static class Extensions_Generic
@@ -7,6 +9,16 @@ public static class Extensions_Generic
     {
         action();
         return obj;
+    }
+
+    public static bool TryGetValue_Failed<TKey,TValue>
+    (
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        [MaybeNullWhen(true)] out TValue value
+    ) where TKey : notnull
+    {
+        return dictionary.TryGetValue(key, out value);
     }
 
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)

@@ -3,7 +3,7 @@ using PF_Tools.Copypaster.TransitionTables;
 
 namespace PF_Tools.Copypaster.Helpers;
 
-/// Serializes/deserializes <see cref="GenerationPack"/> into/from a binaty file.
+/// Serializes/deserializes <see cref="GenerationPack"/> into/from a binary file.
 /// <code>
 /// ┌─0B─────────────────────┬─4B─────────────────────┐
 /// │ SpecialCount        4B │ VocabularyCount     4B │ # Headers

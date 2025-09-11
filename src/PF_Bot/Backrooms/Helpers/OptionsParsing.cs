@@ -6,7 +6,7 @@ public static class OptionsParsing
 {
     public static bool Check(MemeRequest request, Regex regex)
     {
-        return !request.Empty && regex.IsMatch(request.Dummy);
+        return request.Empty.Janai() && regex.IsMatch(request.Dummy);
     }
 
     public static bool CheckAndCut(MemeRequest request, Regex regex)
@@ -27,7 +27,7 @@ public static class OptionsParsing
         if (request.Empty) return null;
 
         var match = regex.Match(request.Dummy);
-        if (match.Success == false) return null;
+        if (match.Failed()) return null;
 
         var value = match.Groups[group].Value;
         for (var i = match.Groups.Count - 1; i > 0; i--)
@@ -48,7 +48,7 @@ public static class OptionsParsing
 
     public static float GetFraction(MemeRequest request, Regex regex, int @default, int group = 1)
     {
-        if (Check(request, regex) == false) return 0;
+        if (Check(request, regex).Failed()) return 0;
 
         var value = GetValue(request, regex, group);
         var (number, text) = value.IsNull_OrEmpty() ? (@default, @default.ToString()) : (int.Parse(value), value);

@@ -13,13 +13,13 @@ public abstract class MediaDB<T> where T : FileBase
     protected abstract string Name { get; }
     protected abstract string What { get; }
     protected abstract string WhatSingle { get; }
-    protected abstract string DB_Path { get; }
+    protected abstract FilePath DB_Path { get; }
 
     protected R LoadDB<R>() where R : MediaDB<T>
     {
         var sw = Stopwatch.StartNew();
 
-        if (File.Exists(DB_Path) == false)
+        if (DB_Path.FileExists.Janai())
         {
             using var _ = File.Create(DB_Path);
         }
@@ -150,7 +150,7 @@ public abstract class MediaDB<T> where T : FileBase
             var tags = file.LowercaseText.Split();
             foreach (var tag in tags)
             {
-                if (tagCounts.TryAdd(tag, 1) == false) tagCounts[tag]++;
+                if (tagCounts.TryAdd(tag, 1).Failed()) tagCounts[tag]++;
             }
         }
 

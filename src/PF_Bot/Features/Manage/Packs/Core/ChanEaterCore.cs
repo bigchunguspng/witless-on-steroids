@@ -125,7 +125,7 @@ public abstract class ChanEaterCore : Fuse
     {
         try
         {
-            if (url.Contains('/') == false) // is a board code e.g. "a" or "b"
+            if (url.Contains('/').Janai()) // is a board code e.g. "a" or "b"
             {
                 var key = url;
                 var match = Boards.SelectMany(x => x.Boards).FirstOrDefault(x => x.Key == key);

@@ -33,7 +33,7 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
 
-        if (Context.ApplyAliases(ref options, Dir_Alias_Peg) == false) return;
+        if (Context.ApplyAliases(ref options, Dir_Alias_Peg).Failed()) return;
 
         // PROCESS OTHER OPTIONS
         var vf = OptionUsed('v');
@@ -78,7 +78,9 @@ public class UseFFMpeg : AudioVideoPhotoCommand
     }
 
     private bool PixelThiefDetected(string options) =>
-        !Message.SenderIsBotAdmin() && (options.Contains("gdigrab") || options.Contains("x11grab"));
+        Message.SenderIsBotAdmin().Janai()
+     && (options.Contains("gdigrab")
+      || options.Contains("x11grab"));
 
     private bool OptionUsed(char option)
     {

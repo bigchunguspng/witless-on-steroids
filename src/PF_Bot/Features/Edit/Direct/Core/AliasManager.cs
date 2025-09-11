@@ -24,7 +24,7 @@ public abstract class AliasManager : SyncCommand
         {
             SendAliasList(new ListPagination(Origin, PerPage: 10));
         }
-        else if (Args is null || !Regex.IsMatch(Args, @"\s"))
+        else if (Args is null || Regex.IsMatch(Args, @"\s").Janai())
         {
             Bot.SendMessage(Origin, string.Format(ALIAS_SYNTAX, CMD, Tool));
         }
@@ -35,7 +35,7 @@ public abstract class AliasManager : SyncCommand
 
             var admin = Message.SenderIsBotAdmin();
             var files = Directory.GetFiles($"{name}.*");
-            if (files.Length > 0 && !admin)
+            if (files.Length > 0 && admin.Janai())
             {
                 var content = File.ReadAllText(files[0]);
                 Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI.PickAny()));
@@ -77,9 +77,9 @@ public abstract class AliasManager : SyncCommand
 
         var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
         var sb = new StringBuilder("🔥 <b>Ярлыки команды /").Append(CMD).Append(":</b>");
-        if (!single) sb.Append($" 📃{page + 1}/{lastPage + 1}");
+        if (single.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
         sb.Append("\n\n").AppendJoin('\n', AliasList(files, page, perPage));
-        if (!single) sb.Append(USE_ARROWS);
+        if (single.Janai()) sb.Append(USE_ARROWS);
 
         var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, Code);
         Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);

@@ -65,7 +65,7 @@ public static class Consuming_Advanced
             var a = token.Value;
             var b =  next.Value;
 
-            if (a.Length == length && !_regexA.IsMatch(a) && !_regexB.IsMatch(b))
+            if (a.Length == length && _regexA.IsMatch(a).Janai() && _regexB.IsMatch(b).Janai())
             {
                 token.Value = $"{a} {b}";
                 tokens.Remove(next);

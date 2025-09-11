@@ -52,7 +52,7 @@ public partial class DynamicDemotivatorDrawer
 
         try
         {
-            if (text.Contains('\n') || !WrapText) // ww OR custom breaks
+            if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
             {
                 FitLongestLine();
 
@@ -70,7 +70,7 @@ public partial class DynamicDemotivatorDrawer
             else // le "most cases" branch
             {
                 var textWidth = textChunks.Sum(x => x.Width);
-                if (textWidth * 2F < imageW && !Minimalist && text == text.ToUpper())
+                if (textWidth * 2F < imageW && Minimalist.IsOff() && text == text.ToUpper())
                 {
                     k = 2;
                     return text; // Make it bigger!

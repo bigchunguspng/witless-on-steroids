@@ -79,7 +79,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             if (Context is { Command: not null, IsForMe: true })
             {
-                if (!_parent.HandleSimpleCommands()) HandleWitlessCommands(Data);
+                if (_parent.HandleSimpleCommands().Failed()) HandleWitlessCommands(Data);
                 return;
             }
             else if (Baka.Eat(Text, out var eaten))
@@ -90,7 +90,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         if (Data.Type is MemeType.Auto)
         {
-            if (Data.Options != null && TryAutoHandleMessage() == false) TryLuckForFunnyText();
+            if (Data.Options != null && TryAutoHandleMessage().Failed()) TryLuckForFunnyText();
         }
         else if (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1);
         else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2);
@@ -102,7 +102,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         void TryLuckForFunnyText()
         {
-            if (!Fortune.LuckyFor(Data.Speech)) return;
+            if (Fortune.LuckyFor(Data.Speech).Janai()) return;
 
             Telemetry.LogAuto(Context.Chat, Data.Speech, "FUNNY");
 
@@ -134,7 +134,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             return mematic;
         }
 
-        bool HaveToMeme       () => Fortune.LuckyFor(Data.Pics) && !Message.ContainsSpoilers();
+        bool HaveToMeme       () => Fortune.LuckyFor(Data.Pics) && Message.ContainsSpoilers().Janai();
         bool HaveToMemeSticker() => Data.Stickers && HaveToMeme();
     }
 

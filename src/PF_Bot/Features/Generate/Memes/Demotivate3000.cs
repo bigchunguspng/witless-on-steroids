@@ -42,8 +42,8 @@ namespace PF_Bot.Features.Generate.Memes
             DynamicDemotivatorDrawer.CustomColor.CheckAndCut(Request);
             DynamicDemotivatorDrawer.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
-            DynamicDemotivatorDrawer.WrapText   = !CheckAndCut(Request, _nowrap);
-            DynamicDemotivatorDrawer.Minimalist =  CheckAndCut(Request, _small);
+            DynamicDemotivatorDrawer.WrapText   = CheckAndCut(Request, _nowrap).Failed();
+            DynamicDemotivatorDrawer.Minimalist = CheckAndCut(Request, _small);
         }
 
         protected override string GetMemeText(string? text)

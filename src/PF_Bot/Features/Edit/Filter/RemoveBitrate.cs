@@ -48,7 +48,7 @@ namespace PF_Bot.Features.Edit.Filter
                 var audio = probe.GetAudioStream();
                 var bitrate = ValueAsQuality.GetAudioBitrate_kbps(audio.Bitrate);
                 options.Options($"-b:a {bitrate}k");
-                if (probe.HasVideo == false) options.Options("-f mp3");
+                if (probe.HasVideo.Janai()) options.Options("-f mp3");
             }
 
             options.Fix_AudioVideo(probe);

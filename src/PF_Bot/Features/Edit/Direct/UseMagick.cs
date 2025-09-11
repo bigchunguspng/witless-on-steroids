@@ -28,7 +28,7 @@ public class UseMagick : PhotoCommand
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
 
-        if (Context.ApplyAliases(ref options, Dir_Alias_Im) == false) return;
+        if (Context.ApplyAliases(ref options, Dir_Alias_Im).Failed()) return;
 
         // GET EXTENSION
         var extension = args[^1];

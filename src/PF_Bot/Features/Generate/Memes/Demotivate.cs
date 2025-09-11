@@ -41,7 +41,7 @@ namespace PF_Bot.Features.Generate.Memes
         protected override bool ResultsAreRandom
             => DemotivatorDrawer.AddLogo
             || RandomFontIsUsed
-            || !Check(Request, _one_line) && !Args!.Contains('\n');
+            || Check(Request, _one_line).Failed() && Args!.Contains('\n').Janai(); // (random bottom text)
 
         private bool RandomFontIsUsed
             => _mode == Wide || DemotivatorDrawer.SingleLine
@@ -67,7 +67,7 @@ namespace PF_Bot.Features.Generate.Memes
                 DemotivatorDrawer.FontOptionB = _fontOptionB = FontWizardB.CheckAndCut(Request);
             }
 
-            DemotivatorDrawer.AddLogo = !Check(Request, _no_logo);
+            DemotivatorDrawer.AddLogo = Check(Request, _no_logo).Failed();
         }
 
         protected override TextPair GetMemeText(string? text)

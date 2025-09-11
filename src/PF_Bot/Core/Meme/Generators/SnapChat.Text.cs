@@ -47,7 +47,7 @@ public partial class SnapChat
 
         SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
 
-        if (text.Contains('\n') || !WrapText) // ww OR custom breaks
+        if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
         {
             EnsureLongestLineFits();
 

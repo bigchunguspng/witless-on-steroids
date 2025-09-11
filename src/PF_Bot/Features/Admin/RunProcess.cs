@@ -10,7 +10,7 @@ public class RunProcess : AsyncCommand
 {
     protected override async Task Run()
     {
-        if (!Message.SenderIsBotAdmin())
+        if (Message.SenderIsBotAdmin().Janai())
         {
             Bot.SendMessage(Origin, FORBIDDEN.PickAny());
             return;

@@ -49,7 +49,7 @@ public class DukeNukem : IMemeGenerator<int>
         var time = DateTime.UtcNow;
         lock (LogsLock)
         {
-            if (!Logs.ContainsKey(chat)) Logs.Add(chat, []);
+            if (Logs.ContainsKey(chat).Janai()) Logs.Add(chat, []);
 
             var command = _nukeFilter.ExtractGroup(1, process.Arguments, s => s, "[null]");
             Logs[chat].Add(new NukeLogEntry(time, request.Type, command));

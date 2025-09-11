@@ -10,7 +10,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
 
     public FFMpegArgs ApplyRandomSlices(double breaks, double pacing)
     {
-        var soundOnly = probe.HasAudio && (probe.HasVideo == false || probe.GetVideoStream().IsLikelyImage);
+        var soundOnly = probe.HasAudio && (probe.HasVideo.Janai() || probe.GetVideoStream().IsLikelyImage);
         var seconds = probe.Duration.TotalSeconds;
         var minutes = seconds / 60;
 
@@ -31,7 +31,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
     {
         var sb = new StringBuilder();
         var count = timecodes.Count;
-        var video = probe.HasVideo && !soundOnly;
+        var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
         for (var i = 0; i < count; i++)
         {

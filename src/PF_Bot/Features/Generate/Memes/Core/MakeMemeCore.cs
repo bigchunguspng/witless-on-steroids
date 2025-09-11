@@ -2,6 +2,7 @@
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
+using PF_Tools.Backrooms.Types.SerialQueue;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -18,6 +19,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
+        protected static readonly SerialTaskQueue _queue = new();
         protected static readonly Regex _repeat = new("[2-9]");
         protected static readonly Regex   _caps = new(@"\S*(up)\S*");
         protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
@@ -48,12 +50,12 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             Context = context;
         }
 
-        protected async Task RunInternal(string? options)
+        protected Task RunInternal(string? options) => _queue.Enqueue(async () =>
         {
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
             Bot.SendMessage(Origin, string.Format(MEME_MANUAL, options));
-        }
+        });
 
         private async Task<bool> ProcessMessage(Message? message)
         {

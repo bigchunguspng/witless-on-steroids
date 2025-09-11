@@ -1,5 +1,6 @@
 ﻿using PF_Bot.Features.Edit.Core;
 using PF_Bot.Features.Edit.Shared;
+using PF_Bot.Routing.Commands;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features.Edit.Filter
@@ -56,12 +57,11 @@ namespace PF_Bot.Features.Edit.Filter
                 var input = await DownloadFile();
                 var output = input.GetOutputFilePath("scale", Ext);
 
-                await FFMpeg.Args()
-                    .Input(input)
-                    .Out(output, o => o
-                        .FixVideo_Playback()
-                        .VF($"scale='{scaleArgs}'"))
-                    .FFMpeg_Run();
+                var options = FFMpeg.OutputOptions().VF($"scale='{scaleArgs}'");
+                var motionPicture = Type is MediaType.Video or MediaType.Anime;
+                if (motionPicture) options.FixVideo_Playback();
+
+                await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
                 SendResult(output);
                 Log($"{Title} >> SCALE [{scaleArgs}]");

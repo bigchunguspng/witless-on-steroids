@@ -1,7 +1,7 @@
-﻿using PF_Bot.Core.Editing;
+﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core.Editing;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
-using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -61,20 +61,20 @@ namespace PF_Bot.Core.Meme.Generators
 
         // LOGIC
 
-        public string GenerateMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateMeme(MemeFileRequest request, FilePath output, TextPair text)
         {
             using var frame = DrawFrame(text);
             InsertImage(frame, request);
             frame.ApplyPressure(request.Press);
-            return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
+            await ImageSaver.SaveImageJpeg(frame, output, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, TextPair text)
         {
             using var frame = DrawFrame(text);
-            var frameAsFile = ImageSaver.SaveImageTemp(frame);
+            var frameAsFile = await ImageSaver.SaveImageTemp(frame);
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, frameAsFile)
+            await new FFMpeg_Meme(probe, request, output, frameAsFile)
                 .Demotivator(ImagePlacement.Size, ImagePlacement.Location)
                 .FFMpeg_Run();
         }

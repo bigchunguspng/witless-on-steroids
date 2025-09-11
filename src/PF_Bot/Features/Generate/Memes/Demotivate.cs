@@ -3,7 +3,6 @@ using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Tools.Backrooms.Types.SerialQueue;
 using static PF_Bot.Backrooms.Helpers.OptionsParsing;
 using static PF_Bot.Features.Generate.Memes.Demotivate.Mode;
 
@@ -11,18 +10,15 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Demotivate : MakeMemeCore<TextPair>
     {
-        public static readonly FontWizard FontWizardL = new("ro", "d[vg]", "(?![-bi*])");
-        public static readonly FontWizard FontWizardS = new("ro", "dg",    "(?![-bi*])");
-        public static readonly FontWizard FontWizardA = new("ro", "dg",   "(&)");
-        public static readonly FontWizard FontWizardB = new("co", "dg", @"(\*)");
-
-        private FontOption _fontOptionA, _fontOptionB;
+        private static readonly FontWizard FontWizardL = new("ro", "d[vg]", "(?![-bi*])");
+        private static readonly FontWizard FontWizardS = new("ro", "dg",    "(?![-bi*])");
+        private static readonly FontWizard FontWizardA = new("ro", "dg",   "(&)");
+        private static readonly FontWizard FontWizardB = new("co", "dg", @"(\*)");
 
         private static readonly DemotivatorDrawer[] _drawers = [new (), new (1280)];
-        private static readonly SerialTaskQueue  [] _queues  = [new (), new ()];
 
+        private FontOption _fontOptionA, _fontOptionB;
         
-        protected override SerialTaskQueue          Queue     => _queues [(int)_mode];
         protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int)_mode];
 
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features.Admin;

@@ -1,8 +1,8 @@
 ﻿using ColorHelper;
+using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Editing;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
-using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -34,7 +34,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
     // LOGIC
 
-    public string GenerateMeme(MemeFileRequest request, string text)
+    public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
     {
         FetchImageSize(request);
         SetUp();
@@ -48,10 +48,10 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
         meme.ApplyPressure(request.Press);
 
-        return ImageSaver.SaveImage(meme, request.TargetPath, request.Quality);
+        await ImageSaver.SaveImageJpeg(meme, output, request.Quality);
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
     {
         FetchVideoSize(request);
         SetUp();
@@ -59,10 +59,10 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
         using var card = DrawText(text);
         using var frame = Combine(null, card);
-        var frameAsFile = ImageSaver.SaveImageTemp(frame);
+        var frameAsFile = await ImageSaver.SaveImageTemp(frame);
 
         var probe = await request.ProbeSource();
-        await new FFMpeg_Meme(probe, request, frameAsFile)
+        await new FFMpeg_Meme(probe, request, output, frameAsFile)
             .Top(_sourceSizeAdjusted, Cropping, Location)
             .FFMpeg_Run();
     }

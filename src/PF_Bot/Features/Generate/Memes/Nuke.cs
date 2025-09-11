@@ -4,7 +4,6 @@ using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
 using PF_Bot.Features.Manage.Packs;
-using PF_Tools.Backrooms.Types.SerialQueue;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features.Generate.Memes
@@ -12,9 +11,7 @@ namespace PF_Bot.Features.Generate.Memes
     public class Nuke : MakeMemeCore<int>
     {
         private static readonly DukeNukem _nukem = new();
-        private static readonly SerialTaskQueue _queue = new();
 
-        protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<int> MemeMaker => _nukem;
 
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");

@@ -10,22 +10,21 @@ public class DukeNukem : IMemeGenerator<int>
     public static int Depth = 1;
 
     // todo make it Task<string>
-    public string GenerateMeme(MemeFileRequest request, int text)
+    public async Task GenerateMeme(MemeFileRequest request, FilePath output, int text)
     {
-        var probe = FFProbe.Analyze(request.SourcePath).Result;
-        var result = new FFMpeg_Nuke(probe, request)
+        //throw new InvalidOperationException($"Surprize mazafaka! {DateTime.Now.Ticks}");
+        var probe = await FFProbe.Analyze(request.SourcePath);
+        var result = await new FFMpeg_Nuke(probe, request, output)
             .Nuke(Depth)
-            .FFMpeg_Run().Result;
+            .FFMpeg_Run();
 
         LogNuke(result, request);
-
-        return request.TargetPath;
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, int text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, int text)
     {
         var probe = await FFProbe.Analyze(request.SourcePath);
-        var result = await new FFMpeg_Nuke(probe, request)
+        var result = await new FFMpeg_Nuke(probe, request, output)
             .Nuke(Depth.Clamp(3))
             .FFMpeg_Run();
 

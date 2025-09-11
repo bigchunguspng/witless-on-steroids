@@ -3,7 +3,6 @@ using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
-using PF_Tools.Backrooms.Types.SerialQueue;
 using static PF_Bot.Backrooms.Helpers.OptionsParsing;
 
 namespace PF_Bot.Features.Generate.Memes
@@ -12,11 +11,9 @@ namespace PF_Bot.Features.Generate.Memes
     {
         private static readonly FontWizard _fontWizard = new ("rg", "snap");
         private static readonly DynamicDemotivatorDrawer _dp = new();
-        private static readonly SerialTaskQueue _queue = new();
 
         private FontOption _fontOption;
 
-        protected override SerialTaskQueue Queue { get; } = _queue;
         protected override IMemeGenerator<string> MemeMaker => _dp;
 
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");

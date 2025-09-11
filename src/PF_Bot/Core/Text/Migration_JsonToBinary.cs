@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PF_Tools.Copypaster;
 
 namespace PF_Bot.Core.Text;

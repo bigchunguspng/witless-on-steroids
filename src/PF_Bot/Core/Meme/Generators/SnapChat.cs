@@ -1,7 +1,7 @@
+using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Editing;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
-using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -29,7 +29,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     private readonly SolidBrush _white = new(Color.White);
 
-    public string GenerateMeme(MemeFileRequest request, string text)
+    public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
     {
         FetchImageSize(request);
         SetUp();
@@ -42,21 +42,23 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
         meme.ApplyPressure(request.Press);
 
-        return request.ExportAsSticker
-            ? ImageSaver.SaveImageWebp(meme, request.TargetPath, request.Quality)
-            : ImageSaver.SaveImage    (meme, request.TargetPath, request.Quality);
+        var saveImageTask = request.ExportAsSticker
+            ? ImageSaver.SaveImageWebp(meme, output, request.Quality)
+            : ImageSaver.SaveImageJpeg(meme, output, request.Quality);
+
+        await saveImageTask;
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
     {
         FetchVideoSize(request);
         SetUp();
         SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var caption = DrawText(text);
-        var captionAsFile = ImageSaver.SaveImageTemp(caption);
+        var captionAsFile = await ImageSaver.SaveImageTemp(caption);
         var probe = await request.ProbeSource();
-        await new FFMpeg_Meme(probe, request, captionAsFile)
+        await new FFMpeg_Meme(probe, request, output, captionAsFile)
             .Meme(_sourceSizeAdjusted)
             .FFMpeg_Run();
     }

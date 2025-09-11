@@ -110,6 +110,13 @@ public static class Paths
     public static FilePath File_DefaultTexts        { get; } = Dir_Static.Combine("texts.json");
     public static FilePath File_DefaultVoiceMessage { get; } = Dir_Static.Combine("voice.ogg");
 
+    //
+
+    public static string GetTempFileName
+        (string extension) => Dir_Temp
+        .EnsureDirectoryExist()
+        .Combine($"{Desert.GetSand(8)}.{extension}")
+        .MakeUnique();
 
     // TODO: MOVE TFO
 

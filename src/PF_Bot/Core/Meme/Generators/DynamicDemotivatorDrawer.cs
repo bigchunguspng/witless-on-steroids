@@ -1,7 +1,7 @@
-﻿using PF_Bot.Core.Editing;
+﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core.Editing;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
-using PF_Bot.Tools_Legacy.Technical;
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -38,7 +38,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
         // LOGIC
 
-        public string GenerateMeme(MemeFileRequest request, string text)
+        public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
         {
             FetchImageSize(request);
             SetUp();
@@ -55,10 +55,10 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
             frame.ApplyPressure(request.Press);
 
-            return ImageSaver.SaveImage(frame, request.TargetPath, request.Quality);
+            await ImageSaver.SaveImageJpeg(frame, output, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
         {
             FetchVideoSize(request);
             SetUp();
@@ -69,10 +69,10 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
             SetColor(CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
 
             using var frame = DrawFrame(text, emojiPngs);
-            var frameAsFile = ImageSaver.SaveImageTemp(frame);
+            var frameAsFile = await ImageSaver.SaveImageTemp(frame);
 
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, frameAsFile)
+            await new FFMpeg_Meme(probe, request, output, frameAsFile)
                 .Demotivator(_sourceSizeAdjusted, _imageOrigin)
                 .FFMpeg_Run();
         }

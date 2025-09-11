@@ -2,13 +2,11 @@
 
 public interface IMemeGenerator<in T>
 {
-    string
-        GenerateMeme
-        (MemeFileRequest request, T text);
+    Task GenerateMeme
+        (MemeFileRequest request, FilePath output, T text);
 
-    Task
-        GenerateVideoMeme
-        (MemeFileRequest request, T text);
+    Task GenerateVideoMeme
+        (MemeFileRequest request, FilePath output, T text);
 }
 
 public record TextPair(string A, string B);

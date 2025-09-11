@@ -59,10 +59,10 @@ public class UseMagick : PhotoCommand
         return Command!.Length > 3 && Command.IndexOf(option, 3) > 0;
     }
 
-    private async Task<string> ProcessImage(FilePath path, string options, string extension)
+    private async Task<string> ProcessImage(FilePath input, string options, string extension)
     {
-        var output = path.GetOutputFilePath("Mgk", extension);
-        var processResult = await ProcessRunner.Run(MAGICK, $"\"{path}\" {options} \"{output}\"");
+        var output = input.GetOutputFilePath("Mgk", $".{extension}");
+        var processResult = await ProcessRunner.Run(MAGICK, $"\"{input}\" {options} \"{output}\"");
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
 
         return output;

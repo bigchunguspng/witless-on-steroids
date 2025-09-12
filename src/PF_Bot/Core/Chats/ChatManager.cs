@@ -56,6 +56,8 @@ public static class ChatManager
         return LoadedBakas.TryGetValue(chat, out var baka) ? baka : LoadBaka(chat);
     }
 
+    // SAVE ALL
+
     public static void StartAutoSaveThread(TimeSpan interval)
     {
         var thread = new Thread(() => AutoSaveLoop(interval))
@@ -92,38 +94,68 @@ public static class ChatManager
     public static void Bakas_SaveDirty
         () => LoadedBakas.ForEachPair(x => SaveBaka(x.Key, x.Value));
 
+    // SAVE / LOAD
+
     /// Saves <see cref="baka"/> if it's dirty.
     public static void SaveBaka(long chat, Copypaster baka)
     {
         if (baka.IsDirty.Janai()) return;
 
-        lock (baka)
+        var log = PackIO_MeasureSpeed(chat, path =>
         {
-            Dir_Chat.EnsureDirectoryExist();
-            GenerationPackIO.Save_WithTemp(baka.Pack, GetPackPath(chat));
-            baka.ResetDirty();
-        }
-        Log($"DIC SAVE << {chat}", LogLevel.Info, LogColor.Lime);
-    }
+            lock (baka)
+            {
+                Dir_Chat.EnsureDirectoryExist();
+                GenerationPackIO.Save_WithTemp(baka.Pack, path);
+                baka.ResetDirty();
+            }
+        });
 
-    // LOAD / UNLOAD
+        Log($"DIC SAVE | {chat,14} | {log}", LogLevel.Info, LogColor.Lime);
+    }
 
     private static Copypaster LoadBaka(long chat)
     {
         try
         {
-            var baka = new Copypaster(GenerationPackIO.Load(GetPackPath(chat)));
-            LoadedBakas.Add(chat, baka);
-            Log($"DIC LOAD >> {chat}", LogLevel.Info, LogColor.Fuchsia);
+            Copypaster baka = null!;
+
+            var log = PackIO_MeasureSpeed(chat, path =>
+            {
+                baka = new Copypaster(GenerationPackIO.Load(path));
+                LoadedBakas.Add(chat, baka);
+            });
+
+            Log($"DIC LOAD | {chat,14} | {log}", LogLevel.Info, LogColor.Fuchsia);
 
             return baka;
         }
         catch
         {
-            LogError($"CAN'T LOAD DIC >> {chat}");
+            LogError($"CAN'T LOAD DIC | {chat,14}");
             throw;
         }
     }
+
+    private static string
+        PackIO_MeasureSpeed
+        (long chat, Action<string> packIO_action)
+    {
+        var sw = Stopwatch.StartNew();
+        var path = GetPackPath(chat);
+
+        packIO_action(path);
+
+        var elapsed = sw.Elapsed;
+        var bytes = path.FileSizeInBytes;
+        var bytes_ps = bytes / elapsed.TotalSeconds;
+        var size  = bytes   .ReadableFileSize();
+        var speed = bytes_ps.ReadableFileSpeed();
+
+        return $"{elapsed.ReadableTime(),10} | {size,9} | {speed,10}";
+    }
+
+    // UNLOAD
 
     private static void Bakas_UnloadIdle
         () => LoadedBakas.ForEachPair(x => UnloadBaka_IfIdle(x.Key, x.Value));
@@ -138,11 +170,10 @@ public static class ChatManager
     private static void UnloadBaka(long chat)
     {
         LoadedBakas.Remove(chat);
-        Log($"DIC DROP << {chat}", LogLevel.Info, LogColor.Yellow);
+        Log($"DIC DROP | {chat,14}", LogLevel.Info, LogColor.Yellow);
     }
 
     // CLEAR / DELETE
-
 
     public static void ClearPack(long chat, Copypaster baka)
     {

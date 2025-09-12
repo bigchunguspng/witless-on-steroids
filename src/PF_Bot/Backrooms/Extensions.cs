@@ -39,8 +39,21 @@ public static partial class Extensions
         var mbs = kbs   / 1024F;
         return mbs >= 100 ? UI($"{mbs:F1} МБ")
             :  mbs >=   1 ? UI($"{mbs:F2} МБ")
+            :  kbs >= 100 ? UI($"{kbs:F1} КБ")
             :  kbs >=   1 ? UI($"{kbs:F0} КБ")
             :                  $"{bytes} байт";
+    }
+
+    public static string ReadableFileSpeed
+        (this double bytesPerSecond)
+    {
+        var kbs = bytesPerSecond / 1024F;
+        var mbs = kbs   / 1024F;
+        return mbs >= 100 ? UI($"{mbs:F1} МБ/с")
+            :  mbs >=   1 ? UI($"{mbs:F2} МБ/с")
+            :  kbs >= 100 ? UI($"{kbs:F1} КБ/c")
+            :  kbs >=   1 ? UI($"{kbs:F2} КБ/с")
+            :       $"{bytesPerSecond:F2} байт/с";
     }
 
     public static string Format_bruh_1k_100k_1M

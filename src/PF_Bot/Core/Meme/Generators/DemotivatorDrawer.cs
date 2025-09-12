@@ -64,7 +64,7 @@ namespace PF_Bot.Core.Meme.Generators
         public async Task GenerateMeme(MemeFileRequest request, FilePath output, TextPair text)
         {
             using var frame = DrawFrame(text);
-            InsertImage(frame, request);
+            await InsertImage(frame, request);
             frame.ApplyPressure(request.Press);
             await ImageSaver.SaveImageJpeg(frame, output, request.Quality);
         }
@@ -135,9 +135,9 @@ namespace PF_Bot.Core.Meme.Generators
             }
         }
 
-        private void InsertImage(Image frame, MemeFileRequest request)
+        private async Task InsertImage(Image frame, MemeFileRequest request)
         {
-            using var image = Image.Load(request.SourcePath);
+            using var image = await Image.LoadAsync(request.SourcePath);
 
             image.Mutate(x => x.Resize(ImagePlacement.Size));
             frame.Mutate(x => x.DrawImage(image, ImagePlacement.Location, _anyGraphicsOptions));

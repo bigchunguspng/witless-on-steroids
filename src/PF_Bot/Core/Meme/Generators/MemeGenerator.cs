@@ -43,10 +43,10 @@ namespace PF_Bot.Core.Meme.Generators
 
         public async Task GenerateMeme(MemeFileRequest request, FilePath output, TextPair text)
         {
-            FetchImageSize(request);
+            await FetchImageSize(request);
             SetUp();
 
-            using var image = GetImage(request);
+            using var image = await GetImage(request);
 
             SetCaptionColor(image);
             using var caption = DrawCaption(text);
@@ -63,7 +63,7 @@ namespace PF_Bot.Core.Meme.Generators
 
         public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, TextPair text)
         {
-            FetchVideoSize(request);
+            await FetchVideoSize(request);
             SetUp();
             SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
@@ -92,11 +92,11 @@ namespace PF_Bot.Core.Meme.Generators
             SetUpFonts();
         }
 
-        private Image<Rgba32> GetImage(MemeFileRequest request)
+        private async Task<Image<Rgba32>> GetImage(MemeFileRequest request)
         {
             if (request is { IsSticker: true, ExportAsSticker: false })
             {
-                using var image = GetImage(request.SourcePath);
+                using var image = await GetImage(request.SourcePath);
 
                 var color = CustomColorBack.GetColor(image) ?? Color.Black;
                 var background = new Image<Rgba32>(_w, _h, color);
@@ -105,7 +105,7 @@ namespace PF_Bot.Core.Meme.Generators
                 return background;
             }
             else
-                return GetImage(request.SourcePath);
+                return await GetImage(request.SourcePath);
         }
 
         private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)

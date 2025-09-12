@@ -31,10 +31,10 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
     {
-        FetchImageSize(request);
+        await FetchImageSize(request);
         SetUp();
 
-        using var image = GetImage(request);
+        using var image = await GetImage(request);
 
         SetCaptionColor(image);
         using var card = DrawText(text);
@@ -51,7 +51,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
     {
-        FetchVideoSize(request);
+        await FetchVideoSize(request);
         SetUp();
         SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
@@ -80,11 +80,11 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         _cardHeight = x.ToEven();
     }
 
-    private Image<Rgba32> GetImage(MemeFileRequest request)
+    private async Task<Image<Rgba32>> GetImage(MemeFileRequest request)
     {
         if (request is { IsSticker: true, ExportAsSticker: false })
         {
-            using var image = GetImage(request.SourcePath);
+            using var image = await GetImage(request.SourcePath);
 
             var color = CustomColorBack.GetColor(image) ?? Color.Black;
             var background = new Image<Rgba32>(_w, _h, color);
@@ -93,7 +93,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
             return background;
         }
         else
-            return GetImage(request.SourcePath);
+            return await GetImage(request.SourcePath);
     }
 
     private Image<Rgba32> DrawText(string text)

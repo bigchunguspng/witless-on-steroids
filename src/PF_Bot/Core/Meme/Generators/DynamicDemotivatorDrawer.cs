@@ -40,13 +40,13 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
         public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
         {
-            FetchImageSize(request);
+            await FetchImageSize(request);
             SetUp();
 
             text = ArrangeText(text, out var emojiPngs);
 
             SetUpFrameSize(request);
-            using var image = GetImage(request.SourcePath);
+            using var image = await GetImage(request.SourcePath);
 
             SetColor(image);
             using var frame = DrawFrame(text, emojiPngs);
@@ -60,7 +60,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
         public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
         {
-            FetchVideoSize(request);
+            await FetchVideoSize(request);
             SetUp();
 
             text = ArrangeText(text, out var emojiPngs);

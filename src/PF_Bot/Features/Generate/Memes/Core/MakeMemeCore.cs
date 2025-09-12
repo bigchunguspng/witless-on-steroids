@@ -19,7 +19,6 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
-        protected static readonly SerialTaskQueue _queue = new();
         protected static readonly Regex _repeat = new("[2-9]");
         protected static readonly Regex   _caps = new(@"\S*(up)\S*");
         protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
@@ -50,12 +49,12 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
             Context = context;
         }
 
-        protected Task RunInternal(string? options) => _queue.Enqueue(async () =>
+        protected async Task RunInternal(string? options)
         {
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage)) return;
 
             Bot.SendMessage(Origin, string.Format(MEME_MANUAL, options));
-        });
+        }
 
         private async Task<bool> ProcessMessage(Message? message)
         {

@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Features.Generate.Memes;
 using PF_Bot.Features.Generate.Memes.Core;
@@ -7,7 +8,6 @@ using PF_Bot.Features.Help;
 using PF_Bot.Features.Manage.Packs;
 using PF_Bot.Features.Manage.Settings;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Tools_Legacy.Technical;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing;

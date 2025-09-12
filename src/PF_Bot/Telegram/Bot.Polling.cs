@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using PF_Bot.Core;
 using PF_Bot.Features.Help;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Inline;
@@ -23,11 +24,12 @@ public partial class Bot
                 UpdateType.Message,
                 UpdateType.EditedMessage,
                 UpdateType.CallbackQuery,
-                UpdateType.InlineQuery
-            ]
+                UpdateType.InlineQuery,
+            ],
         };
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
+        Telemetry.Log_START(Me);
         Print(string.Format(BUENOS_DIAS, Username, Me.FirstName), ConsoleColor.Yellow);
     }
 

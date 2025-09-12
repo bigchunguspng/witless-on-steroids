@@ -1,9 +1,9 @@
 ﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Features.Media.MediaDB;
 using PF_Bot.Tools_Legacy.RedditSearch;
-using PF_Bot.Tools_Legacy.Technical;
 using Telegram.Bot;
 using Exception = System.Exception;
 
@@ -48,6 +48,7 @@ namespace PF_Bot
         private void SaveAndExit()
         {
             Print("На выход…", ConsoleColor.Yellow);
+            Telemetry.Log_EXIT(Bot.Me);
             Telemetry.Write();
             ChatManager.Bakas_SaveDirty();
             if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();

@@ -1,6 +1,6 @@
+using PF_Bot.Core;
 using PF_Bot.Features.Media.MediaDB;
 using PF_Bot.Telegram;
-using PF_Bot.Tools_Legacy.Technical;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;

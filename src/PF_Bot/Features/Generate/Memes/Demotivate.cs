@@ -14,11 +14,12 @@ namespace PF_Bot.Features.Generate.Memes
         private static readonly FontWizard FontWizardA = new("ro", "dg",   "(&)");
         private static readonly FontWizard FontWizardB = new("co", "dg", @"(\*)");
 
-        private static readonly DemotivatorDrawer[] _drawers = [new (), new (1280)];
+        private MemeOptions_Dg _options;
 
-        private FontOption _fontOptionA, _fontOptionB;
-        
-        protected override IMemeGenerator<TextPair> MemeMaker => _drawers[(int)_mode];
+        protected override IMemeGenerator<TextPair> MemeMaker =>
+            _mode == Square
+                ? new DemotivatorDrawer(_options)
+                : new DemotivatorDrawer(_options, 1280);
 
         protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
 
@@ -34,40 +35,40 @@ namespace PF_Bot.Features.Generate.Memes
         protected override Task Run() => RunInternal("dg");
 
         protected override bool ResultsAreRandom
-            => DemotivatorDrawer.AddLogo
+            => _options.AddLogo
             || RandomFontIsUsed
             || Check(Request, _one_line).Failed() && Args!.Contains('\n').Janai(); // (random bottom text)
 
         private bool RandomFontIsUsed
-            => _mode == Wide || DemotivatorDrawer.SingleLine
-                ? _fontOptionA.IsRandom
-                : _fontOptionA.IsRandom
-               || _fontOptionB.IsRandom;
+            => _mode == Wide || _options.SingleLine
+                ? _options.FontOptionA.IsRandom
+                : _options.FontOptionA.IsRandom
+               || _options.FontOptionB.IsRandom;
 
         protected override void ParseOptions()
         {
-            DemotivatorDrawer.SingleLine = CheckAndCut(Request, _one_line);
+            _options.SingleLine = CheckAndCut(Request, _one_line);
 
             if (_mode == Wide)
             {
-                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardL.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardL.CheckAndCut(Request);
             }
-            else if (DemotivatorDrawer.SingleLine)
+            else if (_options.SingleLine)
             {
-                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardS.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardS.CheckAndCut(Request);
             }
             else
             {
-                DemotivatorDrawer.FontOptionA = _fontOptionA = FontWizardA.CheckAndCut(Request);
-                DemotivatorDrawer.FontOptionB = _fontOptionB = FontWizardB.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardA.CheckAndCut(Request);
+                _options.FontOptionB = FontWizardB.CheckAndCut(Request);
             }
 
-            DemotivatorDrawer.AddLogo = Check(Request, _no_logo).Failed();
+            _options.AddLogo = Check(Request, _no_logo).Failed();
         }
 
         protected override TextPair GetMemeText(string? text)
         {
-            DemotivatorDrawer.BottomTextIsGenerated = true;
+            _options.BottomTextIsGenerated = true;
 
             string a, b;
             var generate = text.IsNull_OrEmpty();
@@ -84,7 +85,7 @@ namespace PF_Bot.Features.Generate.Memes
                     a = split[0];
                     b = split[1];
 
-                    DemotivatorDrawer.BottomTextIsGenerated = false;
+                    _options.BottomTextIsGenerated = false;
                 }
                 else
                 {

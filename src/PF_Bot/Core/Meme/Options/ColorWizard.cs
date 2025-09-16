@@ -29,19 +29,19 @@ public class ColorWizard([StringSyntax("Regex")] string marker)
     {
         var value = OptionsParsing.GetValue(request, _rgx_color);
         if (value == null)
-            return new ColorOption(ColorOptionMode.Off, default, 0);
+            return new ColorOption(ColorOptionMode.Off);
 
         if (_rgx_hex   .IsMatch(value) && Rgba32.TryParseHex(value, out var color))
-            return new ColorOption(ColorOptionMode.Color, color, 0);
+            return ColorOption.FromColor(color);
 
         if (_rgx_coords.IsMatch(value))
-            return new ColorOption(ColorOptionMode.Coords, default, byte.Parse(value));
+            return ColorOption.FromCoords(byte.Parse(value));
 
         var              index = _colorNames.IndexOf(value);
         if (index == -1) index = _colorNames.IndexOf(value + "1");
         if (index == -1)
-            return new ColorOption(ColorOptionMode.Off, default, 0);
+            return new ColorOption(ColorOptionMode.Off);
 
-        return new ColorOption(ColorOptionMode.Color, Color.FromInt32(index).ToRgba32(), 0);
+        return ColorOption.FromColor(Color.FromInt32(index).ToRgba32());
     }
 }

@@ -13,14 +13,21 @@ using Logo = (SixLabors.ImageSharp.Image Image, SixLabors.ImageSharp.Point Point
 
 namespace PF_Bot.Core.Meme.Generators
 {
+    public struct MemeOptions_Dg()
+    {
+        public FontOption FontOptionA;
+        public FontOption FontOptionB;
+
+        public bool SingleLine;
+        public bool AddLogo = true;
+        public bool BottomTextIsGenerated;
+    }
+
     public class DemotivatorDrawer : IMemeGenerator<TextPair>
     {
-        public static bool SingleLine, AddLogo = true;
-        public static bool BottomTextIsGenerated;
-
-        public static FontOption FontOptionA, FontOptionB;
-
         private static readonly List<Logo> Logos = [];
+
+        private readonly MemeOptions_Dg op;
 
         private readonly int _w, _h, _textW;
         private readonly bool _square;
@@ -38,8 +45,10 @@ namespace PF_Bot.Core.Meme.Generators
 
         static DemotivatorDrawer() => LoadLogos(Dir_Water);
 
-        public DemotivatorDrawer(int width = 720, int height = 720)
+        public DemotivatorDrawer(MemeOptions_Dg options, int width = 720, int height = 720)
         {
+            op = options;
+
             _square = width == 720;
 
             _w = width;
@@ -86,7 +95,7 @@ namespace PF_Bot.Core.Meme.Generators
 
             background.DrawFrame(ImagePlacement, _square ? 2 : 3, _square ? 4 : 5, Color.White);
 
-            if (_square && AddLogo)
+            if (_square && op.AddLogo)
             {
                 var logo = PickRandomLogo();
                 background.Mutate(x => x.DrawImage(logo.Image, logo.Point, _anyGraphicsOptions));
@@ -94,14 +103,14 @@ namespace PF_Bot.Core.Meme.Generators
 
             // UPPER TEXT
             var typeA = _square
-                ? SingleLine
+                ? op.SingleLine
                     ? TextType.Single
                     : TextType.Upper
                 : TextType.Large;
             DrawText(background, text.A, typeA);
 
             // LOWER TEXT
-            if (_square && SingleLine.Janai())
+            if (_square && op.SingleLine.Janai())
                 DrawText(background, text.B, TextType.Lower);
 
             return background;
@@ -111,7 +120,7 @@ namespace PF_Bot.Core.Meme.Generators
         {
             var options = GetTextOptions(type);
             var emoji = EmojiTool.FindEmoji(text);
-            var lines = type != TextType.Lower || BottomTextIsGenerated ? 1 : emoji.Count > 0 ? -1 : 2;
+            var lines = type != TextType.Lower || op.BottomTextIsGenerated ? 1 : emoji.Count > 0 ? -1 : 2;
             if (emoji.Count == 0)
             {
                 options.Origin = GetTextOrigin(() => text, type, options.Font.Size, out _, out _, out _);
@@ -168,7 +177,7 @@ namespace PF_Bot.Core.Meme.Generators
         private RichTextOptions GetTextOptions(TextType type)
         {
             var lower = type is TextType.Lower;
-            var fontOption = lower ? FontOptionB : FontOptionA;
+            var fontOption = lower ? op.FontOptionB : op.FontOptionA;
             var family = fontOption.GetFontFamily();
             var style = fontOption.GetFontStyle(family);
 
@@ -198,7 +207,7 @@ namespace PF_Bot.Core.Meme.Generators
         )
         {
             var lower = type is TextType.Lower;
-            var fontOption = lower ? FontOptionB : FontOptionA;
+            var fontOption = lower ? op.FontOptionB : op.FontOptionA;
 
             offset = 650 + type switch
             {
@@ -207,7 +216,7 @@ namespace PF_Bot.Core.Meme.Generators
                 _              =>   0,
             };
             fontOffset = fontSize * fontOption.GetFontDependentOffset();
-            caseOffset = _square && SingleLine.Janai()
+            caseOffset = _square && op.SingleLine.Janai()
                 ? 0
                 : fontSize * fontOption.GetCaseDependentOffset(getCaseOffsetText());
             var y = offset + fontOffset - caseOffset;

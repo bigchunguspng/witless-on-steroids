@@ -11,11 +11,10 @@ namespace PF_Bot.Features.Generate.Memes
         private static readonly FontWizard _fontWizard = new ("im", "meme");
         private static readonly ColorWizard _colorWizardBack = new ("_");
         private static readonly ColorWizard _colorWizardText = new ("#");
-        private static readonly MemeGenerator _imgflip = new();
 
-        private FontOption _fontOption;
+        private MemeOptions_Meme _options;
 
-        protected override IMemeGenerator<TextPair> MemeMaker => _imgflip;
+        protected override IMemeGenerator<TextPair> MemeMaker => new MemeGenerator(_options);
 
         protected override Regex _cmd { get; } = new(@"^\/meme(\S*)");
 
@@ -31,25 +30,26 @@ namespace PF_Bot.Features.Generate.Memes
         protected override Task Run() => RunInternal("meme");
 
         protected override bool ResultsAreRandom
-            => MemeGenerator.RandomTextColor
-            || _fontOption.IsRandom
+            => _options.RandomTextColor
+            || _options.FontOption.IsRandom
             || Check(Request, _add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
 
         protected override void ParseOptions()
         {
-            MemeGenerator.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
-            MemeGenerator.CustomColorText = _colorWizardText.CheckAndCut(Request);
-            MemeGenerator.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
+            _options.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
+            _options.CustomColorText = _colorWizardText.CheckAndCut(Request);
 
-            MemeGenerator.FontMultiplier = GetInt(Request, _fontSM, 100);
-            MemeGenerator.ShadowOpacity  = GetInt(Request, _shadow, 100).Clamp(0, 100);
-            MemeGenerator.TextOffset     = GetInt(Request, _offset, -1);
+            _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-            MemeGenerator.RandomOffset       = CheckAndCut(Request, _randomOffset);
-            MemeGenerator.WrapText           = CheckAndCut(Request, _nowrap).Failed();
-            MemeGenerator.RandomTextColor    = CheckAndCut(Request, _colorText);
-            MemeGenerator.AbsolutelyNoMargin = CheckAndCut(Request, _noMarginDude);
-            MemeGenerator.NoMargin           = CheckAndCut(Request, _noMargin);
+            _options.FontMultiplier = GetInt(Request, _fontSM, 100);
+            _options.ShadowOpacity  = GetInt(Request, _shadow, 100).Clamp(0, 100).ClampByte();
+            _options.TextOffset     = GetInt(Request, _offset, -1);
+
+            _options.RandomOffset       = CheckAndCut(Request, _randomOffset);
+            _options.WrapText           = CheckAndCut(Request, _nowrap).Failed();
+            _options.RandomTextColor    = CheckAndCut(Request, _colorText);
+            _options.AbsolutelyNoMargin = CheckAndCut(Request, _noMarginDude);
+            _options.NoMargin           = CheckAndCut(Request, _noMargin);
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -64,7 +64,7 @@ namespace PF_Bot.Features.Generate.Memes
 
             string a, b;
 
-            if (MemeGenerator.CustomOffsetMode)
+            if (_options.CustomOffsetMode)
             {
                 a = generate ? Baka.Generate() : text!;
                 b = "";

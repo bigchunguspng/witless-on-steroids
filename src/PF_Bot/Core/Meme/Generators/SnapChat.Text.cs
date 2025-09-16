@@ -7,8 +7,6 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class SnapChat
 {
-    public static FontOption FontOption;
-
     private static Font _font = default!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
@@ -18,8 +16,8 @@ public partial class SnapChat
 
     private void SetUpFonts()
     {
-        _fontFamily = FontOption.GetFontFamily();
-        _fontStyle = FontOption.GetFontStyle(_fontFamily);
+        _fontFamily = op.FontOption.GetFontFamily();
+        _fontStyle = op.FontOption.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -29,10 +27,10 @@ public partial class SnapChat
     private float GetStartingFontSize()
     {
         var defaultFontSize = Math.Min(_w, 3F * _h) * 0.052F;
-        var multiplier = FontSizeMultiplier / 100F;
-        var multiplierM = MinSizeMultiplier / 100F;
+        var multiplier = op.FontSizeMultiplier / 100F;
+        var multiplierM = op.MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontOption.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }
 
     private string MakeTextFitCard(string text)
@@ -47,7 +45,7 @@ public partial class SnapChat
 
         SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
 
-        if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
+        if (text.Contains('\n') || op.WrapText.IsOff()) // ww OR custom breaks
         {
             EnsureLongestLineFits();
 
@@ -130,7 +128,7 @@ public partial class SnapChat
 
     private int GetHeightWithPadding(float textHeight, float k)
     {
-        var extra = Math.Max(FontSize * k * 0.9, 8) * FontOption.GetRelativeSize();
+        var extra = Math.Max(FontSize * k * 0.9, 8) * op.FontOption.GetRelativeSize();
         return (textHeight * k + extra).CeilingInt();
     }
 
@@ -142,12 +140,12 @@ public partial class SnapChat
         Origin = GetTextOrigin(),
         WrappingLength = _w - 2 * _marginX,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = FontOption.GetFallbackFamilies(),
+        FallbackFontFamilies = op.FontOption.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => FontOption.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => op.FontOption.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -170,8 +168,8 @@ public partial class SnapChat
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * FontOption.GetFontDependentOffset();
-        _caseOffset = FontSize * FontOption.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * op.FontOption.GetFontDependentOffset();
+        _caseOffset = FontSize * op.FontOption.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         LogDebug($"/snap >> font size: {FontSize:F2}, min: {_minFontSize:F2}");

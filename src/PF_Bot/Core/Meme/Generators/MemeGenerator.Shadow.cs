@@ -15,9 +15,9 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
     {
         var shadowRealm = new Image<Rgba32>(textLayer.Width, textLayer.Height);
 
-        var pixelated = FontOption.FontIsPixelated();
+        var pixelated = op.FontOption.FontIsPixelated();
 
-        var opacity = ShadowOpacity / 100F;
+        var opacity = op.ShadowOpacity / 100F;
         var maxOpacity = (255 * opacity).RoundInt().ClampByte();
 
         Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
@@ -26,7 +26,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         if (top.height > 0)
         {
-            var area = new Rectangle(0, 0, _w, CustomOffsetMode ? _h : _h / 2);
+            var area = new Rectangle(0, 0, _w, op.CustomOffsetMode ? _h : _h / 2);
             ShadowImagePart(top.fontSize, area);
         }
 

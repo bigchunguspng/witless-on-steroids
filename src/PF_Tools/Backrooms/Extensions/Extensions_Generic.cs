@@ -13,7 +13,7 @@ public static class Extensions_Generic
 
     public static bool TryGetValue_Failed<TKey,TValue>
     (
-        this Dictionary<TKey, TValue> dictionary,
+        this IDictionary<TKey, TValue> dictionary,
         TKey key,
         [MaybeNullWhen(true)] out TValue value
     ) where TKey : notnull

@@ -7,8 +7,6 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class IFunnyBrazil
 {
-    public static FontOption FontOption;
-
     private static Font _font = default!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
@@ -18,8 +16,8 @@ public partial class IFunnyBrazil
 
     private void SetUpFonts()
     {
-        _fontFamily = FontOption.GetFontFamily();
-        _fontStyle = FontOption.GetFontStyle(_fontFamily);
+        _fontFamily = op.FontOption.GetFontFamily();
+        _fontStyle = op.FontOption.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -29,10 +27,10 @@ public partial class IFunnyBrazil
     private float GetStartingFontSize()
     {
         var defaultFontSize = Math.Max(24, _cardHeight / 3.75F);
-        var multiplier = FontSizeMultiplier / 100F;
-        var multiplierM = MinSizeMultiplier / 100F;
+        var multiplier = op.FontSizeMultiplier / 100F;
+        var multiplierM = op.MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontOption.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }
 
 
@@ -49,7 +47,7 @@ public partial class IFunnyBrazil
         var k = 1F;
         float textHeight;
 
-        if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
+        if (text.Contains('\n') || op.WrapText.IsOff()) // ww OR custom breaks
         {
             EnsureLongestLineFits();
 
@@ -69,7 +67,7 @@ public partial class IFunnyBrazil
             var textWidth = textChunks.Sum(x => x.Width);
             if (textWidth < textWidthLimit)
             {
-                if (ThinCard) SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
+                if (op.ThinCard) SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
                 return text; // OK - don't change anything!
             }
 
@@ -108,7 +106,7 @@ public partial class IFunnyBrazil
         var ratioC = _w / (float)_cardHeight;
         var textIsTall = ratioC > ratioT;
         var height = GetHeightWithPadding(textHeight, k);
-        if (ThinCard || textIsTall && height > _cardHeight) SetCardHeight(height);
+        if (op.ThinCard || textIsTall && height > _cardHeight) SetCardHeight(height);
 
         ResizeFont(FontSize * k);
 
@@ -137,41 +135,41 @@ public partial class IFunnyBrazil
 
     private int GetHeightWithPadding(float textHeight, float k)
     {
-        var k2 = UltraThinCard ? 0.1F : 1F;
-        var min = UltraThinCard ? 8 : 16;
-        var extra = Math.Max(FontSize * k * k2, min) * FontOption.GetRelativeSize();
+        var k2 = op.UltraThinCard ? 0.1F : 1F;
+        var min = op.UltraThinCard ? 8 : 16;
+        var extra = Math.Max(FontSize * k * k2, min) * op.FontOption.GetRelativeSize();
         return (textHeight * k + extra).CeilingInt();
     }
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)
     {
-        TextAlignment = UseLeftAlignment
+        TextAlignment = op.UseLeftAlignment
             ? TextAlignment.Start
             : TextAlignment.Center,
-        HorizontalAlignment = UseLeftAlignment
+        HorizontalAlignment = op.UseLeftAlignment
             ? HorizontalAlignment.Left
             : HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
         Origin = GetTextOrigin(),
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = FontOption.GetFallbackFamilies(),
+        FallbackFontFamilies = op.FontOption.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => FontOption.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => op.FontOption.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
-        var x = UseLeftAlignment ? _marginLeft : _w / 2F;
+        var x = op.UseLeftAlignment ? _marginLeft : _w / 2F;
         var y = _cardHeight / 2F + _textOffset;
         return new PointF(x, y);
     }
 
     private Point GetOriginFunny(Size textLayer)
     {
-        var x = UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
+        var x = op.UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
         var y = _cardHeight.Gap(textLayer.Height) - _caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());
     }
@@ -183,8 +181,8 @@ public partial class IFunnyBrazil
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * FontOption.GetFontDependentOffset();
-        _caseOffset = FontSize * FontOption.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * op.FontOption.GetFontDependentOffset();
+        _caseOffset = FontSize * op.FontOption.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         LogDebug($"/top >> font size: {FontSize:F2}, min: {_minFontSize:F2}");

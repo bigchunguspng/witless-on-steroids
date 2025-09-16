@@ -10,11 +10,10 @@ namespace PF_Bot.Features.Generate.Memes
     {
         private static readonly FontWizard _fontWizard = new ("rg", "snap");
         private static readonly ColorWizard _colorWizard = new ("#");
-        private static readonly DynamicDemotivatorDrawer _dp = new();
 
-        private FontOption _fontOption;
+        private MemeOptions_Dp _options;
 
-        protected override IMemeGenerator<string> MemeMaker => _dp;
+        protected override IMemeGenerator<string> MemeMaker => new DynamicDemotivatorDrawer(_options);
 
         protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");
 
@@ -29,18 +28,18 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override Task Run() => RunInternal("dp");
 
-        protected override bool ResultsAreRandom => _fontOption.IsRandom;
+        protected override bool ResultsAreRandom => _options.FontOption.IsRandom;
 
         protected override void ParseOptions()
         {
-            DynamicDemotivatorDrawer.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-            DynamicDemotivatorDrawer.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+            _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+            _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            DynamicDemotivatorDrawer.CustomColor = _colorWizard.CheckAndCut(Request);
-            DynamicDemotivatorDrawer.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
+            _options.CustomColor = _colorWizard.CheckAndCut(Request);
+            _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-            DynamicDemotivatorDrawer.WrapText   = CheckAndCut(Request, _nowrap).Failed();
-            DynamicDemotivatorDrawer.Minimalist = CheckAndCut(Request, _small);
+            _options.WrapText   = CheckAndCut(Request, _nowrap).Failed();
+            _options.Minimalist = CheckAndCut(Request, _small);
         }
 
         protected override string GetMemeText(string? text)

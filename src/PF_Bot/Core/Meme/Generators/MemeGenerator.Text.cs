@@ -7,8 +7,6 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class MemeGenerator
 {
-    public static FontOption FontOption;
-
     private static Font _font = default!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
@@ -17,8 +15,8 @@ public partial class MemeGenerator
 
     private void SetUpFonts()
     {
-        _fontFamily = FontOption.GetFontFamily();
-        _fontStyle = FontOption.GetFontStyle(_fontFamily);
+        _fontFamily = op.FontOption.GetFontFamily();
+        _fontStyle = op.FontOption.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -26,15 +24,15 @@ public partial class MemeGenerator
     private void ResizeFont(float size)
     {
         _font = _fontFamily.CreateFont(size, _fontStyle);
-        _fontOffset = FontSize * FontOption.GetFontDependentOffset();
+        _fontOffset = FontSize * op.FontOption.GetFontDependentOffset();
     }
 
     private float GetDefaultFontFize () => Math.Min(_w, 1.5F * _h) / 10F;
 
     private float GetStartingFontSize()
     {
-        var multiplier = FontMultiplier / 100F;
-        return Math.Max(GetDefaultFontFize() * multiplier, 15) * FontOption.GetSizeMultiplier();
+        var multiplier = op.FontMultiplier / 100F;
+        return Math.Max(GetDefaultFontFize() * multiplier, 15) * op.FontOption.GetSizeMultiplier();
     }
 
 
@@ -57,7 +55,7 @@ public partial class MemeGenerator
             return text; // OK - don't change anything!
         }
 
-        if (text.Contains('\n') || WrapText.IsOff()) // ww
+        if (text.Contains('\n') || op.WrapText.IsOff()) // ww
         {
             var textRatio = textWidth / textHeight;
             var areaRatio = textWidthLimit / textHeightLimit;
@@ -106,7 +104,7 @@ public partial class MemeGenerator
     {
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = CustomOffsetMode
+        VerticalAlignment = op.CustomOffsetMode
             ? VerticalAlignment.Center
             : top
                 ? VerticalAlignment.Top
@@ -114,16 +112,16 @@ public partial class MemeGenerator
         Origin = origin,
         WrappingLength = _w,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = FontOption.GetFallbackFamilies()
+        FallbackFontFamilies = op.FontOption.GetFallbackFamilies()
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => FontOption.GetLineSpacing();
+    private float GetLineSpacing() => op.FontOption.GetLineSpacing();
 
     private PointF GetTextOrigin(string text, bool top, out float caseOffset)
     {
-        caseOffset = FontSize * FontOption.GetCaseDependentOffset(text);
+        caseOffset = FontSize * op.FontOption.GetCaseDependentOffset(text);
         var marginY = top ? _marginY : _h - _marginY;
         return new PointF(_w / 2F, marginY + _fontOffset - caseOffset);
     }
@@ -131,7 +129,7 @@ public partial class MemeGenerator
     private Point GetFunnyOrigin(Size textArea, RichTextOptions options, bool top, float caseOffset)
     {
         var space = 0.25F * options.Font.Size * options.LineSpacing;
-        var marginY = CustomOffsetMode
+        var marginY = op.CustomOffsetMode
             ? _marginY - 0.5 * textArea.Height
             : top
                 ? _marginY - space

@@ -10,13 +10,22 @@ using SixLabors.ImageSharp.Processing;
 
 namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 {
-    public partial class DynamicDemotivatorDrawer : MemeGeneratorBase, IMemeGenerator<string>
+    public struct MemeOptions_Dp()
     {
-        // OPTIONS
+        public FontOption FontOption;
 
-        public static ColorOption CustomColor;
-        public static bool Minimalist, WrapText;
-        public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
+        public ColorOption CustomColor;
+
+        public float  MinSizeMultiplier =  10;
+        public float FontSizeMultiplier = 100;
+
+        public bool WrapText = true;
+        public bool Minimalist;
+    }
+
+    public partial class DynamicDemotivatorDrawer(MemeOptions_Dp options) : MemeGeneratorBase, IMemeGenerator<string>
+    {
+        private MemeOptions_Dp op = options;
 
         // SIZE
 
@@ -66,7 +75,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
             text = ArrangeText(text, out var emojiPngs);
 
             SetUpFrameSize(request);
-            SetColor(CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
+            SetColor(op.CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
 
             using var frame = DrawFrame(text, emojiPngs);
             var frameAsFile = await ImageSaver.SaveImageTemp(frame);
@@ -84,7 +93,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
             _ratio = _sourceSizeAdjusted.AspectRatio();
 
-            if (_ratio > 3) Minimalist = true;
+            if (_ratio > 3) op.Minimalist = true;
 
             SetUpFonts();
         }
@@ -105,11 +114,11 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
             var space = Math.Max(imageH / 30F, 4);
             var lineHeight = FontSize * GetLineSpacing();
             var textHeight = _textHeight + 0.5F * lineHeight;
-            var n = Minimalist ? 2 : 3;
+            var n = op.Minimalist ? 2 : 3;
             fullH = (imageH + textHeight + n * space).RoundInt().ToEven();
-            fullW = Minimalist ? imageW : (fullH * _ratio).RoundInt().ToEven();
+            fullW = op.Minimalist ? imageW : (fullH * _ratio).RoundInt().ToEven();
 
-            marginTop = Minimalist ? 0 : (2 * space).RoundInt();
+            marginTop = op.Minimalist ? 0 : (2 * space).RoundInt();
 
             var targetSize = request.IsVideo ? new Size(1280, 720) : new Size(1280, 800);
             var size = new Size(fullW, fullH).FitSize(targetSize);
@@ -127,7 +136,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
                 ResizeFont(FontSize * k);
             }
 
-            _imageOrigin = Minimalist ? Point.Empty : new Point((fullW - imageW) / 2, marginTop);
+            _imageOrigin = op.Minimalist ? Point.Empty : new Point((fullW - imageW) / 2, marginTop);
 
             _frameMargin = imageW + imageH > 800 ? 5 : 3;
             _frameWidth  = imageW + imageH > 800 ? 3 : 2;
@@ -182,7 +191,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
 
         private void SetColor(Image<Rgba32>? image)
         {
-            var color = CustomColor.GetColor(image);
+            var color = op.CustomColor.GetColor(image);
             FrameColor = color?.Rgb ?? Color.White;
             TextBrush = color is null ? WhiteBrush : new SolidBrush(color.Value);
         }

@@ -3,19 +3,23 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace PF_Bot.Core.Meme.Options;
 
-public enum ColorOptionMode
+public enum ColorOptionMode : byte
 {
     Off,
     Color,
     Coords,
 }
 
-public readonly record struct ColorOption
-(
-    ColorOptionMode Mode, Rgba32 Color, byte Coords
-)
+public readonly struct ColorOption(ColorOptionMode mode, Rgba32 color = default, byte coords = 0)
 {
+    public Rgba32         Color { get; } = color;
+    public ColorOptionMode Mode { get; } = mode;
+    public byte          Coords { get; } = coords;
+
     public bool ByCoords => Mode == ColorOptionMode.Coords;
+
+    public static ColorOption FromColor(Rgba32 color) => new(ColorOptionMode.Color, color);
+    public static ColorOption FromCoords(byte coords) => new(ColorOptionMode.Coords, coords: coords);
 
     public Rgba32? GetColor(Image<Rgba32>? image) => Mode switch
     {

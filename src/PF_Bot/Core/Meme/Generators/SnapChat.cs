@@ -10,15 +10,25 @@ using SixLabors.ImageSharp.Processing;
 
 namespace PF_Bot.Core.Meme.Generators;
 
-public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
+public struct MemeOptions_Snap()
 {
-    // OPTIONS
+    public FontOption FontOption;
 
-    public static bool WrapText = true, RandomOffset;
-    public static int CardOpacity = 62, CardOffset = 50;
-    public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
-    public static ColorOption CustomColorBack, CustomColorText;
+    public ColorOption CustomColorBack;
+    public ColorOption CustomColorText;
 
+    public int CardOffset  = 50;
+    public int CardOpacity = 62;
+
+    public float  MinSizeMultiplier =  10;
+    public float FontSizeMultiplier = 100;
+
+    public bool WrapText     = true;
+    public bool RandomOffset;
+}
+
+public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGenerator<string>
+{
     // SIZE
 
     private int _w, _h, _marginX, _offsetY, _cardHeight;
@@ -53,7 +63,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
     {
         await FetchVideoSize(request);
         SetUp();
-        SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
+        SetCaptionColor(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var caption = DrawText(text);
         var captionAsFile = await ImageSaver.SaveImageTemp(caption);
@@ -68,7 +78,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         _w = _sourceSizeAdjusted.Width;
         _h = _sourceSizeAdjusted.Height;
 
-        var offsetBase = RandomOffset ? Fortune.RandomInt(25, 75) : CardOffset;
+        var offsetBase = op.RandomOffset ? Fortune.RandomInt(25, 75) : op.CardOffset;
         _offsetY = _h * offsetBase / 100;
         _marginX = Math.Max(_w / 20, 10);
 
@@ -86,7 +96,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         {
             using var image = await GetImage(request.SourcePath);
 
-            var color = CustomColorBack.GetColor(image) ?? Color.Black;
+            var color = op.CustomColorBack.GetColor(image) ?? Color.Black;
             var background = new Image<Rgba32>(_w, _h, color);
 
             background.Mutate(x => x.DrawImage(image));
@@ -113,7 +123,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
         {
             var y = (_offsetY - 0.5 * _cardHeight).RoundInt();
             var rect = new Rectangle(0, y, _w, _cardHeight);
-            var color = new Rgba32(0, 0, 0, CardOpacity / 100F);
+            var color = new Rgba32(0, 0, 0, op.CardOpacity / 100F);
             x.Fill(color, rect);
         });
 
@@ -146,7 +156,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
 
     private void SetCaptionColor(Image<Rgba32>? image)
     {
-        var color = CustomColorText.GetColor(image);
+        var color = op.CustomColorText.GetColor(image);
         _textBrush = color is null
             ? _white
             : new SolidBrush(color.Value);

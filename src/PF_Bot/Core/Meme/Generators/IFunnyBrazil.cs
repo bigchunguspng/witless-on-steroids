@@ -12,16 +12,27 @@ using SixLabors.ImageSharp.Processing;
 
 namespace PF_Bot.Core.Meme.Generators; // ReSharper disable InconsistentNaming
 
-public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
+public struct MemeOptions_Top()
 {
-    // OPTIONS
+    public FontOption FontOption;
 
-    public static bool UseLeftAlignment, ThinCard, UltraThinCard, WrapText = true;
-    public static bool PickColor, ForceCenter, BackInBlack;
-    public static int CropPercent = 0;
-    public static int MinSizeMultiplier = 10, FontSizeMultiplier = 100;
-    public static ColorOption CustomColor;
+    public ColorOption CustomColor;
 
+    public int CropPercent        =   0;
+    public int MinSizeMultiplier  =  10;
+    public int FontSizeMultiplier = 100;
+
+    public bool WrapText = true;
+    public bool UseLeftAlignment;
+    public bool ThinCard;
+    public bool UltraThinCard;
+    public bool PickColor;
+    public bool ForceCenter;
+    public bool BackInBlack;
+}
+
+public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMemeGenerator<string>
+{
     // SIZE
 
     private int _w, _h; // <-- of the image
@@ -55,7 +66,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
     {
         await FetchVideoSize(request);
         SetUp();
-        SetColor(PickColor || CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
+        SetColor(op.PickColor || op.CustomColor.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var card = DrawText(text);
         using var frame = Combine(null, card);
@@ -69,14 +80,14 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
 
     private void SetUp()
     {
-        var crop = (100F - Math.Abs(CropPercent)) / 100F;
+        var crop = (100F - Math.Abs(op.CropPercent)) / 100F;
 
         _w =  _sourceSizeAdjusted.Width;
         _h = (_sourceSizeAdjusted.Height * crop).RoundInt().ToEven();
 
         _marginLeft = 0.025F * _w;
         _cropOffset = _sourceSizeAdjusted.Height - _h;
-        if (CropPercent < 0) _cropOffset = _cropOffset / 2;
+        if (op.CropPercent < 0) _cropOffset = _cropOffset / 2;
 
         var ratio = _sourceSizeAdjusted.AspectRatio();
         var cardHeight = ratio > 1D
@@ -100,7 +111,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
     {
         var meme = new Image<Rgba32>(_w, _fullHeight);
 
-        if (sticker) meme.Mutate(x => x.Fill(BackInBlack ? Color.Black : Background));
+        if (sticker) meme.Mutate(x => x.Fill(op.BackInBlack ? Color.Black : Background));
 
         if (source is not null)
             meme.Mutate(x => x.DrawImage(source, new Point(0, _cardHeight - _cropOffset)));
@@ -155,7 +166,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
         // actual font size (same for same pic*text)
         var w = _w * 0.75F;
         var x = _w.Gap(w.RoundInt());
-        var fs = FontSize * FontOption.GetRelativeSize();
+        var fs = FontSize * op.FontOption.GetRelativeSize();
         var rect2 = new RectangleF(x, options.Origin.Y - _textOffset - fs / 2F, w, fs);
         image.Mutate(ctx => ctx.Fill(new SolidBrush(Color.Orange), rect2));
     }

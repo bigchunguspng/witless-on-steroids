@@ -10,9 +10,9 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Nuke : MakeMemeCore<int>
     {
-        private static readonly DukeNukem _nukem = new();
+        private MemeOptions_Nuke _options;
 
-        protected override IMemeGenerator<int> MemeMaker => _nukem;
+        protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options);
 
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 
@@ -40,7 +40,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override void ParseOptions()
         {
-            DukeNukem.Depth = OptionsParsing.GetInt(Request, _depth, 1);
+            _options.Depth = OptionsParsing.GetInt(Request, _depth, 1);
         }
 
         protected override int GetMemeText(string? text) => 0;
@@ -59,26 +59,23 @@ namespace PF_Bot.Features.Generate.Memes
         {
             var (origin, messageId, page, perPage) = pagination;
 
-            lock (DukeNukem.LogsLock)
+            if (DukeNukem.Logs.TryGetValue_Failed(pagination.Origin.Chat, out var entries))
             {
-                if (DukeNukem.Logs.TryGetValue_Failed(pagination.Origin.Chat, out var entries))
-                {
-                    Bot.SendMessage(pagination.Origin, NUKE_LOG_EXPLANATION);
-                    return;
-                }
-
-                var single = entries.Count <= perPage;
-
-                var lastPage = (int)Math.Ceiling(entries.Count / (double)perPage) - 1;
-                var sb = new StringBuilder("🍤 <b>Последние вариации /nuke:</b>");
-                if (single.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-                sb.Append("\n\n").AppendJoin('\n', GetNukeLog(entries, page, perPage));
-                sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
-                if (single.Janai()) sb.Append(USE_ARROWS);
-                
-                var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "nl");
-                Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
+                Bot.SendMessage(pagination.Origin, NUKE_LOG_EXPLANATION);
+                return;
             }
+
+            var single = entries.Count <= perPage;
+
+            var lastPage = (int)Math.Ceiling(entries.Count / (double)perPage) - 1;
+            var sb = new StringBuilder("🍤 <b>Последние вариации /nuke:</b>");
+            if (single.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
+            sb.Append("\n\n").AppendJoin('\n', GetNukeLog(entries, page, perPage));
+            sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
+            if (single.Janai()) sb.Append(USE_ARROWS);
+                
+            var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "nl");
+            Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
         }
 
         private static IEnumerable<string> GetNukeLog(List<DukeNukem.NukeLogEntry> entries, int page = 0, int perPage = 25)

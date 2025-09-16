@@ -10,11 +10,10 @@ namespace PF_Bot.Features.Generate.Memes
     {
         private static readonly FontWizard _fontWizard = new ("ft", "snap");
         private static readonly ColorWizard _colorWizard = new ("#");
-        private static readonly IFunnyBrazil _ifunny = new();
 
-        private FontOption _fontOption;
+        private MemeOptions_Top _options;
 
-        protected override IMemeGenerator<string> MemeMaker => _ifunny;
+        protected override IMemeGenerator<string> MemeMaker => new IFunnyBrazil(_options);
 
         protected override Regex _cmd { get; } = new(@"^\/top(\S*)");
 
@@ -29,24 +28,24 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override Task Run() => RunInternal("top");
 
-        protected override bool ResultsAreRandom => _fontOption.IsRandom;
+        protected override bool ResultsAreRandom => _options.FontOption.IsRandom;
 
         protected override void ParseOptions()
         {
-            IFunnyBrazil.CustomColor = _colorWizard.CheckAndCut(Request);
-            IFunnyBrazil.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
+            _options.CustomColor = _colorWizard.CheckAndCut(Request);
+            _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-            IFunnyBrazil.CropPercent        = GetInt(Request, _crop,     0);
-            IFunnyBrazil.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-            IFunnyBrazil.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+            _options.CropPercent        = GetInt(Request, _crop,     0);
+            _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+            _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            IFunnyBrazil.WrapText         = CheckAndCut(Request, _nowrap ).Failed();
-            IFunnyBrazil.BackInBlack      = CheckAndCut(Request, _blackBG);
-            IFunnyBrazil.ForceCenter      = CheckAndCut(Request, _colorPC);
-            IFunnyBrazil.PickColor        = CheckAndCut(Request, _colorPP);
-            IFunnyBrazil.UseLeftAlignment = CheckAndCut(Request, _left   );
-            IFunnyBrazil.UltraThinCard    = CheckAndCut(Request, _thinner);
-            IFunnyBrazil.ThinCard         = CheckAndCut(Request, _thin   );
+            _options.WrapText         = CheckAndCut(Request, _nowrap ).Failed();
+            _options.BackInBlack      = CheckAndCut(Request, _blackBG);
+            _options.ForceCenter      = CheckAndCut(Request, _colorPC);
+            _options.PickColor        = CheckAndCut(Request, _colorPP);
+            _options.UseLeftAlignment = CheckAndCut(Request, _left   );
+            _options.UltraThinCard    = CheckAndCut(Request, _thinner);
+            _options.ThinCard         = CheckAndCut(Request, _thin   );
         }
 
         protected override string GetMemeText(string? text)
@@ -56,10 +55,8 @@ namespace PF_Bot.Features.Generate.Memes
 
             var caption = generate ? Baka.Generate() : text!;
 
-            if (_fontOption.IsDefault)
-            {
-                _fontOption.FontKey = caption.IsMostlyCyrillic() ? "sg" : "ft";
-            }
+            if (_options.FontOption.IsDefault)
+                _options.FontOption.FontKey = caption.IsMostlyCyrillic() ? "sg" : "ft";
 
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }

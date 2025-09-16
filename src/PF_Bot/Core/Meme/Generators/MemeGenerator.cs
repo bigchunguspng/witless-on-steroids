@@ -11,16 +11,29 @@ using SixLabors.ImageSharp.Processing;
 
 namespace PF_Bot.Core.Meme.Generators
 {
-    public partial class MemeGenerator : MemeGeneratorBase, IMemeGenerator<TextPair>
+    public struct MemeOptions_Meme()
     {
-        // OPTIONS
+        public FontOption FontOption;
 
-        public static bool WrapText = true, RandomTextColor, RandomOffset, NoMargin, AbsolutelyNoMargin;
-        public static int FontMultiplier = 100, ShadowOpacity = 100, TextOffset = -1;
-        public static ColorOption CustomColorBack, CustomColorText;
+        public ColorOption CustomColorBack;
+        public ColorOption CustomColorText;
 
-        public static bool CustomOffsetMode => RandomOffset || TextOffset >= 0;
+        public int FontMultiplier = 100;
+        public int TextOffset     =  -1;
 
+        public byte ShadowOpacity = 100;
+
+        public bool WrapText = true;
+        public bool RandomTextColor;
+        public bool RandomOffset;
+        public bool           NoMargin;
+        public bool AbsolutelyNoMargin;
+
+        public bool CustomOffsetMode => RandomOffset || TextOffset >= 0;
+    }
+
+    public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMemeGenerator<TextPair>
+    {
         // SIZE
 
         private int _w, _h, _marginY, _marginX;
@@ -65,7 +78,7 @@ namespace PF_Bot.Core.Meme.Generators
         {
             await FetchVideoSize(request);
             SetUp();
-            SetCaptionColor(CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
+            SetCaptionColor(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
             using var caption = DrawCaption(text);
             var captionAsFile = await ImageSaver.SaveImageTemp(caption);
@@ -80,12 +93,12 @@ namespace PF_Bot.Core.Meme.Generators
             _w = _sourceSizeAdjusted.Width;
             _h = _sourceSizeAdjusted.Height;
 
-            _marginX = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _w / 20 : Math.Max(_w / 20, 10);
-            _marginY = NoMargin ? 0 : AbsolutelyNoMargin ? 0 - _h / 30 : Math.Max(_h / 30, 10);
+            _marginX = op.NoMargin ? 0 : op.AbsolutelyNoMargin ? 0 - _w / 20 : Math.Max(_w / 20, 10);
+            _marginY = op.NoMargin ? 0 : op.AbsolutelyNoMargin ? 0 - _h / 30 : Math.Max(_h / 30, 10);
 
-            if (CustomOffsetMode)
+            if (op.CustomOffsetMode)
             {
-                var offset = RandomOffset ? Fortune.RandomInt(15, 85) : TextOffset;
+                var offset = op.RandomOffset ? Fortune.RandomInt(15, 85) : op.TextOffset;
                 _marginY = _h * offset / 100;
             }
 
@@ -98,7 +111,7 @@ namespace PF_Bot.Core.Meme.Generators
             {
                 using var image = await GetImage(request.SourcePath);
 
-                var color = CustomColorBack.GetColor(image) ?? Color.Black;
+                var color = op.CustomColorBack.GetColor(image) ?? Color.Black;
                 var background = new Image<Rgba32>(_w, _h, color);
 
                 background.Mutate(x => x.DrawImage(image));
@@ -118,7 +131,7 @@ namespace PF_Bot.Core.Meme.Generators
         {
             var canvas = new Image<Rgba32>(_w, _h);
 
-            var height = CustomOffsetMode
+            var height = op.CustomOffsetMode
                 ? _h / 3
                 : _h / 3 - _marginY;
 
@@ -127,7 +140,7 @@ namespace PF_Bot.Core.Meme.Generators
             var tuple1 = AddText(canvas, text.A, top: true);
             var tuple2 = AddText(canvas, text.B, top: false);
 
-            return ShadowOpacity > 0 ? DrawShadow(canvas, tuple1, tuple2) : canvas;
+            return op.ShadowOpacity > 0 ? DrawShadow(canvas, tuple1, tuple2) : canvas;
         }
 
         private (float height, float fontSize) AddText(Image<Rgba32> background, string text, bool top)
@@ -152,7 +165,7 @@ namespace PF_Bot.Core.Meme.Generators
             }
             else
             {
-                var pixelate = FontOption.FontIsPixelated();
+                var pixelate = op.FontOption.FontIsPixelated();
                 var optionsE = new EmojiTool.Options(_textBrush, _w, GetEmojiSize(), _fontOffset, Pixelate: pixelate);
                 var textLayer = EmojiTool.DrawEmojiText(text, options, optionsE, pngs!.AsQueue());
                 var point = GetFunnyOrigin(textLayer.Size, options, top, caseOffset);
@@ -166,10 +179,10 @@ namespace PF_Bot.Core.Meme.Generators
 
         private void SetCaptionColor(Image<Rgba32>? image)
         {
-            var color = CustomColorText.GetColor(image);
+            var color = op.CustomColorText.GetColor(image);
             _textBrush = color is not null 
                 ? new SolidBrush(color.Value) 
-                : RandomTextColor ? RandomColor() : _white;
+                : op.RandomTextColor ? RandomColor() : _white;
         }
 
         private SolidBrush RandomColor()

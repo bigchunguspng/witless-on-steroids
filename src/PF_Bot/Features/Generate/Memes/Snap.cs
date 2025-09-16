@@ -11,11 +11,10 @@ public class Snap : MakeMemeCore<string>
     private static readonly FontWizard _fontWizard = new ("rg", "snap");
     private static readonly ColorWizard _colorWizardBack = new ("_");
     private static readonly ColorWizard _colorWizardText = new ("#");
-    private static readonly SnapChat _snapChat = new();
 
-    private FontOption _fontOption;
+    private MemeOptions_Snap _options;
 
-    protected override IMemeGenerator<string> MemeMaker => _snapChat;
+    protected override IMemeGenerator<string> MemeMaker => new SnapChat(_options);
 
     protected override Regex _cmd { get; } = new(@"^\/snap(\S*)");
 
@@ -30,22 +29,23 @@ public class Snap : MakeMemeCore<string>
 
     protected override Task Run() => RunInternal("snap");
 
-    protected override bool ResultsAreRandom => SnapChat.RandomOffset || _fontOption.IsRandom;
+    protected override bool ResultsAreRandom => _options.RandomOffset || _options.FontOption.IsRandom;
 
     protected override void ParseOptions()
     {
-        SnapChat.RandomOffset = CheckAndCut(Request, _random);
+        _options.RandomOffset = CheckAndCut(Request, _random);
 
-        SnapChat.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
-        SnapChat.CustomColorText = _colorWizardText.CheckAndCut(Request);
-        SnapChat.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
+        _options.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
+        _options.CustomColorText = _colorWizardText.CheckAndCut(Request);
 
-        SnapChat.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-        SnapChat.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
-        SnapChat.CardOpacity        = GetInt(Request, _opacity, 62);
-        SnapChat.CardOffset         = GetInt(Request, _offset,  50);
+        _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-        SnapChat.WrapText = CheckAndCut(Request, _nowrap).Failed();
+        _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
+        _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+        _options.CardOpacity        = GetInt(Request, _opacity, 62);
+        _options.CardOffset         = GetInt(Request, _offset,  50);
+
+        _options.WrapText = CheckAndCut(Request, _nowrap).Failed();
     }
 
     protected override string GetMemeText(string? text)

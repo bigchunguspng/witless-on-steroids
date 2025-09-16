@@ -7,8 +7,6 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class DynamicDemotivatorDrawer
 {
-    public static FontOption FontOption;
-
     private static Font _font = default!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
@@ -18,8 +16,8 @@ public partial class DynamicDemotivatorDrawer
 
     private void SetUpFonts()
     {
-        _fontFamily = FontOption.GetFontFamily();
-        _fontStyle = FontOption.GetFontStyle(_fontFamily);
+        _fontFamily = op.FontOption.GetFontFamily();
+        _fontStyle = op.FontOption.GetFontStyle(_fontFamily);
 
         ResizeFont(GetStartingFontSize());
     }
@@ -29,10 +27,10 @@ public partial class DynamicDemotivatorDrawer
     private float GetStartingFontSize()
     {
         var defaultFontSize = imageW * 0.1F;
-        var multiplier = FontSizeMultiplier / 100F;
-        var multiplierM = MinSizeMultiplier / 100F;
+        var multiplier = op.FontSizeMultiplier / 100F;
+        var multiplierM = op.MinSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * FontOption.GetSizeMultiplier();
+        return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }
 
 
@@ -44,15 +42,15 @@ public partial class DynamicDemotivatorDrawer
     {
         var textChunks = Ruler.MeasureTextSuperCool(text, GetDefaultTextOptions(), GetEmojiSize());
 
-        var lineHeight = FontSize * FontOption.GetRelativeSize() * GetLineSpacing();
-        var textWidthLimit = (Minimalist ? 0.8F : 1.1F) * imageW;
+        var lineHeight = FontSize * op.FontOption.GetRelativeSize() * GetLineSpacing();
+        var textWidthLimit = (op.Minimalist ? 0.8F : 1.1F) * imageW;
 
         var k = 1F;
         var lineCount = 1;
 
         try
         {
-            if (text.Contains('\n') || WrapText.IsOff()) // ww OR custom breaks
+            if (text.Contains('\n') || op.WrapText.IsOff()) // ww OR custom breaks
             {
                 FitLongestLine();
 
@@ -70,7 +68,7 @@ public partial class DynamicDemotivatorDrawer
             else // le "most cases" branch
             {
                 var textWidth = textChunks.Sum(x => x.Width);
-                if (textWidth * 2F < imageW && Minimalist.IsOff() && text == text.ToUpper())
+                if (textWidth * 2F < imageW && op.Minimalist.IsOff() && text == text.ToUpper())
                 {
                     k = 2;
                     return text; // Make it bigger!
@@ -93,7 +91,7 @@ public partial class DynamicDemotivatorDrawer
                 {
                     var minRatio = GetMinTextRatio(textWidth);
                     var side = (imageW + 2 * imageH) / 3;
-                    var multiplier = FontSizeMultiplier / 100;
+                    var multiplier = op.FontSizeMultiplier / 100;
                     while (true)
                     {
                         var textRatio = (textWidth / lineCount) / (lineHeight * lineCount) * multiplier;
@@ -116,7 +114,7 @@ public partial class DynamicDemotivatorDrawer
         finally
         {
             ResizeFont(FontSize * k);
-            _textHeight = k * lineHeight * lineCount * FontOption.GetSizeMultiplier();
+            _textHeight = k * lineHeight * lineCount * op.FontOption.GetSizeMultiplier();
         }
 
         return text;
@@ -150,12 +148,12 @@ public partial class DynamicDemotivatorDrawer
         Origin = GetTextOrigin(),
         WrappingLength = fullW,
         LineSpacing = GetLineSpacing(),
-        FallbackFontFamilies = FontOption.GetFallbackFamilies(),
+        FallbackFontFamilies = op.FontOption.GetFallbackFamilies(),
     };
 
     private int GetEmojiSize() => (int)(FontSize * GetLineSpacing());
 
-    private float GetLineSpacing() => FontOption.GetLineSpacing() * 1.2F;
+    private float GetLineSpacing() => op.FontOption.GetLineSpacing() * 1.2F;
 
     private PointF GetTextOrigin()
     {
@@ -180,8 +178,8 @@ public partial class DynamicDemotivatorDrawer
 
     private void AdjustTextOffset(string text)
     {
-        _fontOffset = FontSize * FontOption.GetFontDependentOffset();
-        _caseOffset = FontSize * FontOption.GetCaseDependentOffset(text);
+        _fontOffset = FontSize * op.FontOption.GetFontDependentOffset();
+        _caseOffset = FontSize * op.FontOption.GetCaseDependentOffset(text);
         _textOffset = _fontOffset - _caseOffset;
 
         LogDebug($"/dp >> font size: {FontSize:F2}");

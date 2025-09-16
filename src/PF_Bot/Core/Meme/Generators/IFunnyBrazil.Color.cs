@@ -15,16 +15,16 @@ public partial class IFunnyBrazil
 
     private void SetColor(Image<Rgba32>? image)
     {
-        var custom = CustomColor.Mode != ColorOptionMode.Off;
-        var pick = PickColor && image != null;
+        var custom = op.CustomColor.Mode != ColorOptionMode.Off;
+        var pick = op.PickColor && image != null;
 
-        Background = CustomColor.GetColor(image) ?? (pick ? PickColorFromImage(image!) : Color.White);
+        Background = op.CustomColor.GetColor(image) ?? (pick ? PickColorFromImage(image!) : Color.White);
         TextBrush  = (custom || pick) && Background.Rgb.WhiteTextIsBetter() ? _white : _black;
     }
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {
-        var xd = ForceCenter ? 2 : 0;
+        var xd = op.ForceCenter ? 2 : 0;
 
         var colors = new Rgba32[7];
         colors[0] = AverageColorOnOffset(0);
@@ -48,7 +48,7 @@ public partial class IFunnyBrazil
         Rgba32 AverageColorOnOffset(int x)
         {
             var avg = AverageColor(image, new Rectangle(x, _cropOffset, 5, 5));
-            return BackInBlack ? avg : PutOver(Color.White, avg);
+            return op.BackInBlack ? avg : PutOver(Color.White, avg);
         }
     }
 

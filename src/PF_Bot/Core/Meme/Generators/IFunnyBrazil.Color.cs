@@ -11,7 +11,7 @@ public partial class IFunnyBrazil
     private static readonly SolidBrush _black = new(Color.Black);
 
     private Rgba32     Background;
-    private SolidBrush TextBrush = default!;
+    private SolidBrush TextBrush = null!;
 
     private void SetColor(Image<Rgba32>? image)
     {

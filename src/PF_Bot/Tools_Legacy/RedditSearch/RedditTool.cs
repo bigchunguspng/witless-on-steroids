@@ -96,12 +96,12 @@ namespace PF_Bot.Tools_Legacy.RedditSearch
 
         #region PULLING POST
 
-        private PostData _post = default!;
+        private PostData _post = null!;
 
         /// <summary> Upcoming posts by query. </summary>
         private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
 
-        private RedditQuery      ThisQuery = default!;
+        private RedditQuery      ThisQuery = null!;
         private RedditQueryCache ThisQueryCache => Cache[ThisQuery];
 
         //

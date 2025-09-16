@@ -2,11 +2,11 @@
 {
     public static class Config
     {
-        public static string TelegramToken { get; private set; } = default!;
-        public static string RedditAppID   { get; private set; } = default!;
-        public static string RedditToken   { get; private set; } = default!;
-        public static string RedditSecret  { get; private set; } = default!;
-        public static long[] AdminIDs      { get; private set; } = default!;
+        public static string TelegramToken { get; private set; } = null!;
+        public static string RedditAppID   { get; private set; } = null!;
+        public static string RedditToken   { get; private set; } = null!;
+        public static string RedditSecret  { get; private set; } = null!;
+        public static long[] AdminIDs      { get; private set; } = null!;
         public static long   SoundChannel  { get; private set; }
 
         public static void ReadFromFile()

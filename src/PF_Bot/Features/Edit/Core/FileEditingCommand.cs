@@ -5,8 +5,8 @@ namespace PF_Bot.Features.Edit.Core
 {
     public abstract class FileEditingCommand : AsyncCommand
     {
-        protected FileBase File = default!;
-        protected string   Ext  = default!;
+        protected FileBase File = null!;
+        protected string   Ext  = null!;
         protected MediaType Type;
 
         // RUN

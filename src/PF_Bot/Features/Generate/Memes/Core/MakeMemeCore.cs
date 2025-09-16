@@ -2,7 +2,6 @@
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Edit.Shared;
 using PF_Bot.Routing.Commands;
-using PF_Tools.Backrooms.Types.SerialQueue;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -27,7 +26,7 @@ namespace PF_Bot.Features.Generate.Memes.Core // ReSharper disable InconsistentN
 
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static, ImageProcessor
     {
-        protected MemeRequest Request = default!;
+        protected MemeRequest Request = null!;
 
         protected abstract IMemeGenerator<T> MemeMaker { get; }
 

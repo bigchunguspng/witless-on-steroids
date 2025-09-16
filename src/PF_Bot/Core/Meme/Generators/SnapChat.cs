@@ -35,7 +35,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
 
     // DATA
 
-    private SolidBrush _textBrush = default!;
+    private SolidBrush _textBrush = null!;
 
     private readonly SolidBrush _white = new(Color.White);
 

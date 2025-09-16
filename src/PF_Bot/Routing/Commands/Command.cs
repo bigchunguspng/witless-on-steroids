@@ -10,7 +10,7 @@ namespace PF_Bot.Routing.Commands
     {
         protected static Bot Bot => Bot.Instance;
 
-        public TContext Context { get; protected set; } = default!;
+        public TContext Context { get; protected set; } = null!;
 
         public Message Message  => Context.Message;
         public long    Chat     => Context.Chat;
@@ -37,7 +37,7 @@ namespace PF_Bot.Routing.Commands
             }
             finally
             {
-                Context = default!;
+                Context = null!;
             }
         }
 

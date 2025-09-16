@@ -1,4 +1,3 @@
-using PF_Bot.Core.Meme.Options;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -7,7 +6,7 @@ namespace PF_Bot.Core.Meme.Generators;
 
 public partial class SnapChat
 {
-    private static Font _font = default!;
+    private static Font _font = null!;
     private static FontFamily _fontFamily;
     private static FontStyle  _fontStyle;
 

@@ -41,7 +41,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
         // DATA
 
         private Rgb24 FrameColor;
-        private SolidBrush TextBrush = default!;
+        private SolidBrush TextBrush = null!;
 
         private readonly SolidBrush WhiteBrush = new(Color.White);
 

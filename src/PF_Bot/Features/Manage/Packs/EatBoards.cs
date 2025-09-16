@@ -15,8 +15,8 @@ public class EatBoards : ChanEaterCore
     private static readonly BoardService _chan = new();
     private static readonly Lazy<List<BoardGroup>> _boards = new(_chan.GetBoardList(File_4chanHtmlPage));
 
-    private string _name = default!;
-    private Uri     _uri = default!;
+    private string _name = null!;
+    private Uri     _uri = null!;
 
     protected override FilePath ArchivePath => Dir_Board;
 

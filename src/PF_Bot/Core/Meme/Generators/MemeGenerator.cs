@@ -42,7 +42,7 @@ namespace PF_Bot.Core.Meme.Generators
 
         // DATA
 
-        private SolidBrush _textBrush = default!;
+        private SolidBrush _textBrush = null!;
 
         private readonly SolidBrush _white = new(Color.White);
 

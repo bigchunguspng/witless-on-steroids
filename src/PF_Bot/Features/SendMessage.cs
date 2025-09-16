@@ -4,7 +4,7 @@ namespace PF_Bot.Features;
 
 public class SendMessage : SyncCommand
 {
-    private string _text = default!;
+    private string _text = null!;
 
     public SendMessage WithText(string text)
     {

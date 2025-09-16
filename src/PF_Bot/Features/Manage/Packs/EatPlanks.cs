@@ -15,7 +15,7 @@ public class EatPlanks : ChanEaterCore
     private static readonly PlankService _chan = new();
     private static readonly Lazy<List<BoardGroup>> _boards = new(_chan.GetBoardList(File_2chanHtmlPage));
 
-    private string _name = default!;
+    private string _name = null!;
     private Uri? _uri;
 
     protected override FilePath ArchivePath => Dir_Plank;

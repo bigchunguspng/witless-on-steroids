@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using PF_Bot.Core.Text;
 using PF_Tools.Copypaster;
+using PF_Tools.Copypaster.Helpers;
 
 namespace PF_Bot.Core.Chats;
 

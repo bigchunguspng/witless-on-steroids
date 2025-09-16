@@ -1,7 +1,7 @@
-﻿using PF_Bot.Core.Text;
-using PF_Bot.Routing.Commands;
+﻿using PF_Bot.Routing.Commands;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
+using PF_Tools.Copypaster.Helpers;
 
 namespace PF_Bot.Handlers.Manage.Packs
 {

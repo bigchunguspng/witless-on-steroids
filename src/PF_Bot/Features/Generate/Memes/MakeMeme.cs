@@ -1,5 +1,4 @@
-﻿using PF_Bot.Core.Meme.Fonts;
-using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
@@ -10,6 +9,8 @@ namespace PF_Bot.Features.Generate.Memes
     public class MakeMeme : MakeMemeCore<TextPair>
     {
         private static readonly FontWizard _fontWizard = new ("im", "meme");
+        private static readonly ColorWizard _colorWizardBack = new ("_");
+        private static readonly ColorWizard _colorWizardText = new ("#");
         private static readonly MemeGenerator _imgflip = new();
 
         private FontOption _fontOption;
@@ -36,8 +37,8 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override void ParseOptions()
         {
-            MemeGenerator.CustomColorBack.CheckAndCut(Request);
-            MemeGenerator.CustomColorText.CheckAndCut(Request);
+            MemeGenerator.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
+            MemeGenerator.CustomColorText = _colorWizardText.CheckAndCut(Request);
             MemeGenerator.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             MemeGenerator.FontMultiplier = GetInt(Request, _fontSM, 100);

@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using PF_Bot.Core.Meme.Options;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -14,7 +15,7 @@ public partial class IFunnyBrazil
 
     private void SetColor(Image<Rgba32>? image)
     {
-        var custom = CustomColor.IsActive;
+        var custom = CustomColor.Mode != ColorOptionMode.Off;
         var pick = PickColor && image != null;
 
         Background = CustomColor.GetColor(image) ?? (pick ? PickColorFromImage(image!) : Color.White);

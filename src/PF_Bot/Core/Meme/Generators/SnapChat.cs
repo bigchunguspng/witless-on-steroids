@@ -17,7 +17,7 @@ public partial class SnapChat : MemeGeneratorBase, IMemeGenerator<string>
     public static bool WrapText = true, RandomOffset;
     public static int CardOpacity = 62, CardOffset = 50;
     public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
-    public static CustomColorOption CustomColorBack = new("_"), CustomColorText = new("#");
+    public static ColorOption CustomColorBack, CustomColorText;
 
     // SIZE
 

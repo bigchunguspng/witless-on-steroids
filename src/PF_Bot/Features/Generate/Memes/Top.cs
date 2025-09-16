@@ -1,5 +1,4 @@
-﻿using PF_Bot.Core.Meme.Fonts;
-using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
@@ -10,6 +9,7 @@ namespace PF_Bot.Features.Generate.Memes
     public class Top : MakeMemeCore<string>
     {
         private static readonly FontWizard _fontWizard = new ("ft", "snap");
+        private static readonly ColorWizard _colorWizard = new ("#");
         private static readonly IFunnyBrazil _ifunny = new();
 
         private FontOption _fontOption;
@@ -33,7 +33,7 @@ namespace PF_Bot.Features.Generate.Memes
 
         protected override void ParseOptions()
         {
-            IFunnyBrazil.CustomColor.CheckAndCut(Request);
+            IFunnyBrazil.CustomColor = _colorWizard.CheckAndCut(Request);
             IFunnyBrazil.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             IFunnyBrazil.CropPercent        = GetInt(Request, _crop,     0);

@@ -1,6 +1,6 @@
 using SixLabors.Fonts;
 
-namespace PF_Bot.Core.Meme.Fonts;
+namespace PF_Bot.Core.Meme.Options;
 
 /// Storage for main and fallback <see cref="FontFamily">fonts</see>.
 public static class FontStorage

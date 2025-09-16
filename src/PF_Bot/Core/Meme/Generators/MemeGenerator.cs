@@ -17,7 +17,7 @@ namespace PF_Bot.Core.Meme.Generators
 
         public static bool WrapText = true, RandomTextColor, RandomOffset, NoMargin, AbsolutelyNoMargin;
         public static int FontMultiplier = 100, ShadowOpacity = 100, TextOffset = -1;
-        public static CustomColorOption CustomColorBack = new("_"), CustomColorText = new("#");
+        public static ColorOption CustomColorBack, CustomColorText;
 
         public static bool CustomOffsetMode => RandomOffset || TextOffset >= 0;
 

@@ -1,4 +1,3 @@
-using PF_Bot.Core.Meme.Fonts;
 using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
@@ -10,6 +9,8 @@ namespace PF_Bot.Features.Generate.Memes;
 public class Snap : MakeMemeCore<string>
 {
     private static readonly FontWizard _fontWizard = new ("rg", "snap");
+    private static readonly ColorWizard _colorWizardBack = new ("_");
+    private static readonly ColorWizard _colorWizardText = new ("#");
     private static readonly SnapChat _snapChat = new();
 
     private FontOption _fontOption;
@@ -35,8 +36,8 @@ public class Snap : MakeMemeCore<string>
     {
         SnapChat.RandomOffset = CheckAndCut(Request, _random);
 
-        SnapChat.CustomColorBack.CheckAndCut(Request);
-        SnapChat.CustomColorText.CheckAndCut(Request);
+        SnapChat.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
+        SnapChat.CustomColorText = _colorWizardText.CheckAndCut(Request);
         SnapChat.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
         SnapChat.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);

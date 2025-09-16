@@ -20,7 +20,7 @@ public partial class IFunnyBrazil : MemeGeneratorBase, IMemeGenerator<string>
     public static bool PickColor, ForceCenter, BackInBlack;
     public static int CropPercent = 0;
     public static int MinSizeMultiplier = 10, FontSizeMultiplier = 100;
-    public static CustomColorOption CustomColor = new("#");
+    public static ColorOption CustomColor;
 
     // SIZE
 

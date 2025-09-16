@@ -1,5 +1,4 @@
-﻿using PF_Bot.Core.Meme.Fonts;
-using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;
@@ -10,6 +9,7 @@ namespace PF_Bot.Features.Generate.Memes
     public class Demotivate3000 : MakeMemeCore<string>
     {
         private static readonly FontWizard _fontWizard = new ("rg", "snap");
+        private static readonly ColorWizard _colorWizard = new ("#");
         private static readonly DynamicDemotivatorDrawer _dp = new();
 
         private FontOption _fontOption;
@@ -36,7 +36,7 @@ namespace PF_Bot.Features.Generate.Memes
             DynamicDemotivatorDrawer.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
             DynamicDemotivatorDrawer.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
 
-            DynamicDemotivatorDrawer.CustomColor.CheckAndCut(Request);
+            DynamicDemotivatorDrawer.CustomColor = _colorWizard.CheckAndCut(Request);
             DynamicDemotivatorDrawer.FontOption = _fontOption = _fontWizard.CheckAndCut(Request);
 
             DynamicDemotivatorDrawer.WrapText   = CheckAndCut(Request, _nowrap).Failed();

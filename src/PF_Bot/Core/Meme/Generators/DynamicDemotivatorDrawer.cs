@@ -14,7 +14,7 @@ namespace PF_Bot.Core.Meme.Generators // ReSharper disable InconsistentNaming
     {
         // OPTIONS
 
-        public static CustomColorOption CustomColor = new("#");
+        public static ColorOption CustomColor;
         public static bool Minimalist, WrapText;
         public static float MinSizeMultiplier = 10, FontSizeMultiplier = 100;
 

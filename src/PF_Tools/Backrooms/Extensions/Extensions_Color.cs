@@ -5,6 +5,8 @@ namespace PF_Tools.Backrooms.Extensions;
 
 public static class Extensions_Color
 {
+    public static Rgba32 ToRgba32(this Spectre.Console.Color color) => new (color.R, color.G, color.B);
+
     public static Rgb24 ToRgb24(this RGB color) => new(color.R, color.G, color.B);
     public static RGB   ToRGB(this Rgb24 color) => new(color.R, color.G, color.B);
 

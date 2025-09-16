@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core.Meme.Options;
 using PF_Bot.Features.Generate.Memes.Core;
 
-namespace PF_Bot.Core.Meme.Fonts;
+namespace PF_Bot.Core.Meme.Options;
 
 /// Use this to parse font option.
 /// Created once for a meme maker.

@@ -1,4 +1,3 @@
-using PF_Bot.Core.Meme.Fonts;
 using SixLabors.Fonts;
 using FontSpecificData = (float size, float offset, float caps);
 

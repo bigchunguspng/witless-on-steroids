@@ -1,5 +1,4 @@
-﻿using PF_Bot.Core.Meme.Fonts;
-using PF_Bot.Core.Meme.Generators;
+﻿using PF_Bot.Core.Meme.Generators;
 using PF_Bot.Core.Meme.Options;
 using PF_Bot.Core.Meme.Shared;
 using PF_Bot.Features.Generate.Memes.Core;

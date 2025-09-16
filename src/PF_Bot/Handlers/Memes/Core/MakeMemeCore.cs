@@ -78,14 +78,14 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
         public async Task ProcessPhoto(FileBase file)
         {
-            var path = await DownloadFileAndParseOptions(file, ".jpg");
+            var input = await DownloadFileAndParseOptions(file, ".jpg");
 
-            var request = GetMemeFileRequest(MemeSourceType.Image, path);
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(path, ".jpg");
-                await MakeMemeImage(request, output, GetText());
+                var output = GetOutputFilePath(input, ".jpg");
+                var request = GetMemeFileRequest(MemeSourceType.Image, input, output);
+                await MakeMemeImage(request, GetText());
                 await using var stream = File.OpenRead(output);
                 Bot.SendPhoto(Origin, InputFile.FromStream(stream));
             }
@@ -94,30 +94,27 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
         public async Task ProcessStick(FileBase file)
         {
-            var path = await DownloadFileAndParseOptions(file, ".webp");
+            var input = await DownloadFileAndParseOptions(file, ".webp");
 
             var jpegSticker = JpegSticker;
             if (jpegSticker)
             {
-                var input = path;
                 var output = input.GetOutputFilePath("stick-JPEG", ".jpg");
-
                 await FFMpeg.Command(input, output, "").FFMpeg_Run();
-
-                path = output;
+                input = output;
             }
 
             var sticker = SendAsSticker;
             var extension = sticker ? ".webp" : ".jpg";
 
-            var request = GetMemeFileRequest(MemeSourceType.Sticker, path);
-            request.ExportAsSticker = sticker;
-            request.JpegSticker = jpegSticker;
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(path, extension);
-                await MakeMemeImage(request, output, GetText());
+                var output = GetOutputFilePath(input, extension);
+                var request = GetMemeFileRequest(MemeSourceType.Sticker, input, output);
+                request.ExportAsSticker = sticker;
+                request.JpegSticker = jpegSticker;
+                await MakeMemeImage(request, GetText());
                 await using var stream = File.OpenRead(output);
 
                 if (sticker) Bot.SendSticker(Origin, InputFile.FromStream(stream));
@@ -130,22 +127,22 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
         {
             var sw = Stopwatch.StartNew();
 
-            var path = await DownloadFileAndParseOptions(file, extension);
+            var input = await DownloadFileAndParseOptions(file, extension);
             if (round && CropVideoNotes)
             {
-                var crop = path.GetOutputFilePath("crop", ".mp4");
-                await FFMpeg.Command(path, crop, o => o.Crop(FFMpegOptions.VIDEONOTE_CROP)).FFMpeg_Run();
-                path = crop;
+                var output = input.GetOutputFilePath("crop", ".mp4");
+                await FFMpeg.Command(input, output, o => o.Crop(FFMpegOptions.VIDEONOTE_CROP)).FFMpeg_Run();
+                input = output;
             }
 
             var note = round && CropVideoNotes.IsOff();
 
-            var request = GetMemeFileRequest(MemeSourceType.Video, path);
             var repeats = GetRepeatCount().Clamp(3);
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(path, ".mp4");
-                await MakeMemeVideo(request, output, GetText());
+                var output = GetOutputFilePath(input, ".mp4");
+                var request = GetMemeFileRequest(MemeSourceType.Video, input, output);
+                await MakeMemeVideo(request, GetText());
                 await using var stream = File.OpenRead(output);
 
                 if (note) Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
@@ -163,9 +160,9 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
         }
 
         private MemeFileRequest GetMemeFileRequest
-            (MemeSourceType type, FilePath path)
+            (MemeSourceType type, FilePath input, FilePath output)
         {
-            return new MemeFileRequest(Origin, type, path, Data.Quality, Pressure);
+            return new MemeFileRequest(type, input, output, Data.Quality, Pressure);
         }
 
         private FilePath GetOutputFilePath(FilePath input, string extension)
@@ -187,23 +184,23 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
         // MEME GENERATION
 
         private async Task MakeMemeImage
-            (MemeFileRequest request, FilePath output, T text)
+            (MemeFileRequest request, T text)
         {
             var sw = Stopwatch.StartNew();
-            await MemeMaker.GenerateMeme(request, output, text);
+            await MemeMaker.GenerateMeme(request, text);
             sw.Log(Command);
         }
 
         private async Task MakeMemeVideo
-            (MemeFileRequest request, FilePath output, T text)
+            (MemeFileRequest request, T text)
         {
             var sw = Stopwatch.StartNew();
-            await MemeMaker.GenerateVideoMeme(request, output, text);
+            await MemeMaker.GenerateVideoMeme(request, text);
             sw.Log(Command + " video");
         }
 
 
-        // OTHER
+        // OPTIONS
 
         private MemeRequest GetRequestData()
         {

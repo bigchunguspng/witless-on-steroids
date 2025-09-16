@@ -45,7 +45,7 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
 
     // LOGIC
 
-    public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
+    public async Task GenerateMeme(MemeFileRequest request, string text)
     {
         await FetchImageSize(request);
         SetUp();
@@ -59,10 +59,10 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
 
         meme.ApplyPressure(request.Press);
 
-        await ImageSaver.SaveImageJpeg(meme, output, request.Quality);
+        await ImageSaver.SaveImageJpeg(meme, request.TargetPath, request.Quality);
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
     {
         await FetchVideoSize(request);
         SetUp();
@@ -73,7 +73,7 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
         var frameAsFile = await ImageSaver.SaveImageTemp(frame);
 
         var probe = await request.ProbeSource();
-        await new FFMpeg_Meme(probe, request, output, frameAsFile)
+        await new FFMpeg_Meme(probe, request, frameAsFile)
             .Top(_sourceSizeAdjusted, Cropping, Location)
             .FFMpeg_Run();
     }

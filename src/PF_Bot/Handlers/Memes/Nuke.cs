@@ -12,7 +12,7 @@ namespace PF_Bot.Handlers.Memes
     {
         private MemeOptions_Nuke _options;
 
-        protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options);
+        protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options, Chat);
 
         protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
 

@@ -3,10 +3,10 @@
 public interface IMemeGenerator<in T>
 {
     Task GenerateMeme
-        (MemeFileRequest request, FilePath output, T text);
+        (MemeFileRequest request, T text);
 
     Task GenerateVideoMeme
-        (MemeFileRequest request, FilePath output, T text);
+        (MemeFileRequest request, T text);
 }
 
 public record TextPair(string A, string B);

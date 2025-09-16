@@ -54,7 +54,7 @@ namespace PF_Bot.Core.Memes.Generators
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, FilePath output, TextPair text)
+        public async Task GenerateMeme(MemeFileRequest request, TextPair text)
         {
             await FetchImageSize(request);
             SetUp();
@@ -68,13 +68,13 @@ namespace PF_Bot.Core.Memes.Generators
             meme.ApplyPressure(request.Press);
 
             var saveImageTask = request.ExportAsSticker
-                ? ImageSaver.SaveImageWebp(meme, output, request.Quality)
-                : ImageSaver.SaveImageJpeg(meme, output, request.Quality);
+                ? ImageSaver.SaveImageWebp(meme, request.TargetPath, request.Quality)
+                : ImageSaver.SaveImageJpeg(meme, request.TargetPath, request.Quality);
 
             await saveImageTask;
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, TextPair text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
             await FetchVideoSize(request);
             SetUp();
@@ -83,7 +83,7 @@ namespace PF_Bot.Core.Memes.Generators
             using var caption = DrawCaption(text);
             var captionAsFile = await ImageSaver.SaveImageTemp(caption);
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, output, captionAsFile)
+            await new FFMpeg_Meme(probe, request, captionAsFile)
                 .Meme(_sourceSizeAdjusted)
                 .FFMpeg_Run();
         }

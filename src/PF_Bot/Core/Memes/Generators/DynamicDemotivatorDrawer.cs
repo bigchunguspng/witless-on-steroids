@@ -47,7 +47,7 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
+        public async Task GenerateMeme(MemeFileRequest request, string text)
         {
             await FetchImageSize(request);
             SetUp();
@@ -64,10 +64,10 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
 
             frame.ApplyPressure(request.Press);
 
-            await ImageSaver.SaveImageJpeg(frame, output, request.Quality);
+            await ImageSaver.SaveImageJpeg(frame, request.TargetPath, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, string text)
         {
             await FetchVideoSize(request);
             SetUp();
@@ -81,7 +81,7 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
             var frameAsFile = await ImageSaver.SaveImageTemp(frame);
 
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, output, frameAsFile)
+            await new FFMpeg_Meme(probe, request, frameAsFile)
                 .Demotivator(_sourceSizeAdjusted, _imageOrigin)
                 .FFMpeg_Run();
         }

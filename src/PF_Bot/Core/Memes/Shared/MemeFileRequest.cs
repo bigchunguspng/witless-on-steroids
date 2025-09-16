@@ -4,13 +4,13 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace PF_Bot.Core.Memes.Shared;
 
-public class MemeFileRequest(MessageOrigin origin, MemeSourceType type, FilePath path, byte quality, float press)
+public class MemeFileRequest(MemeSourceType type, FilePath source, FilePath target, byte quality, float press)
 {
-    public MessageOrigin Origin { get; }      = origin;
-    public MemeSourceType  Type { get; }      = type;
-    public FilePath  SourcePath { get; set; } = path;
-    public Quality      Quality { get; }      = quality;
-    public float          Press { get; }      = Math.Clamp(press, 0, 1);
+    public MemeSourceType  Type { get; } = type;
+    public FilePath  SourcePath { get; } = source;
+    public FilePath  TargetPath { get; } = target;
+    public Quality      Quality { get; } = quality;
+    public float          Press { get; } = Math.Clamp(press, 0, 1);
 
     public bool ExportAsSticker { get; set; }
     public bool     JpegSticker { get; set; }

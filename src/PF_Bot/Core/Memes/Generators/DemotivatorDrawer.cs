@@ -70,20 +70,20 @@ namespace PF_Bot.Core.Memes.Generators
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, FilePath output, TextPair text)
+        public async Task GenerateMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             await InsertImage(frame, request);
             frame.ApplyPressure(request.Press);
-            await ImageSaver.SaveImageJpeg(frame, output, request.Quality);
+            await ImageSaver.SaveImageJpeg(frame, request.TargetPath, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, TextPair text)
+        public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             var frameAsFile = await ImageSaver.SaveImageTemp(frame);
             var probe = await request.ProbeSource();
-            await new FFMpeg_Meme(probe, request, output, frameAsFile)
+            await new FFMpeg_Meme(probe, request, frameAsFile)
                 .Demotivator(ImagePlacement.Size, ImagePlacement.Location)
                 .FFMpeg_Run();
         }

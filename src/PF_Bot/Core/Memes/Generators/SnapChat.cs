@@ -39,7 +39,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
 
     private readonly SolidBrush _white = new(Color.White);
 
-    public async Task GenerateMeme(MemeFileRequest request, FilePath output, string text)
+    public async Task GenerateMeme(MemeFileRequest request, string text)
     {
         await FetchImageSize(request);
         SetUp();
@@ -53,13 +53,13 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         meme.ApplyPressure(request.Press);
 
         var saveImageTask = request.ExportAsSticker
-            ? ImageSaver.SaveImageWebp(meme, output, request.Quality)
-            : ImageSaver.SaveImageJpeg(meme, output, request.Quality);
+            ? ImageSaver.SaveImageWebp(meme, request.TargetPath, request.Quality)
+            : ImageSaver.SaveImageJpeg(meme, request.TargetPath, request.Quality);
 
         await saveImageTask;
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, string text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
     {
         await FetchVideoSize(request);
         SetUp();
@@ -68,7 +68,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         using var caption = DrawText(text);
         var captionAsFile = await ImageSaver.SaveImageTemp(caption);
         var probe = await request.ProbeSource();
-        await new FFMpeg_Meme(probe, request, output, captionAsFile)
+        await new FFMpeg_Meme(probe, request, captionAsFile)
             .Meme(_sourceSizeAdjusted)
             .FFMpeg_Run();
     }

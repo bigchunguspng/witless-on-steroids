@@ -4,7 +4,7 @@ using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Core.Editing;
 
-public class FFMpeg_Nuke(FFProbeResult probe, MemeFileRequest request, FilePath output)
+public class FFMpeg_Nuke(FFProbeResult probe, MemeFileRequest request)
 {
     private readonly FFMpegArgs             _args = new();
     private readonly FFMpegOutputOptions _options = new();
@@ -12,7 +12,7 @@ public class FFMpeg_Nuke(FFProbeResult probe, MemeFileRequest request, FilePath 
     public FFMpegArgs Nuke(int depth = 1)
     {
         _args.Input(request.SourcePath);
-        _args.Out(output, _options);
+        _args.Out  (request.TargetPath, _options);
         _args.Filter("[v:0]");
 
         if (request.IsVideo)

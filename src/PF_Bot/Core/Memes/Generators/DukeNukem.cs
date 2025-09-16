@@ -10,27 +10,27 @@ public struct MemeOptions_Nuke()
     public int Depth = 1;
 }
 
-public class DukeNukem(MemeOptions_Nuke op) : IMemeGenerator<int>
+public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
 {
-    public async Task GenerateMeme(MemeFileRequest request, FilePath output, int text)
+    public async Task GenerateMeme(MemeFileRequest request, int text)
     {
         //throw new InvalidOperationException($"Surprize mazafaka! {DateTime.Now.Ticks}");
         var probe = await FFProbe.Analyze(request.SourcePath);
-        var result = await new FFMpeg_Nuke(probe, request, output)
+        var result = await new FFMpeg_Nuke(probe, request)
             .Nuke(op.Depth)
             .FFMpeg_Run();
 
-        LogNuke(result, request);
+        LogNuke(chat, result, request);
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, FilePath output, int text)
+    public async Task GenerateVideoMeme(MemeFileRequest request, int text)
     {
         var probe = await FFProbe.Analyze(request.SourcePath);
-        var result = await new FFMpeg_Nuke(probe, request, output)
+        var result = await new FFMpeg_Nuke(probe, request)
             .Nuke(op.Depth.Clamp(3))
             .FFMpeg_Run();
 
-        LogNuke(result, request);
+        LogNuke(chat, result, request);
     }
 
     // LOGS
@@ -45,14 +45,12 @@ public class DukeNukem(MemeOptions_Nuke op) : IMemeGenerator<int>
     // If you gonna implement presets (/anuke? /nuke info?),
     // remove this regex from preset filter when applying it to image (works only with videos) 
 
-    private static void LogNuke(ProcessResult process, MemeFileRequest request)
+    private static void LogNuke(long chat, ProcessResult process, MemeFileRequest request)
     {
-        var chat = request.Origin.Chat;
-        var time = DateTime.UtcNow;
-
-        if (Logs.ContainsKey(chat).Janai()) Logs.Add(chat, []);
+        if (Logs.ContainsKey(chat).Janai())
+            Logs.Add(chat, []);
 
         var command = _rgx_nukeFilter.ExtractGroup(1, process.Arguments, s => s, "[null]");
-        Logs[chat].Add(new NukeLogEntry(time, request.Type, command));
+        Logs[chat].Add(new NukeLogEntry(DateTime.UtcNow, request.Type, command));
     }
 }

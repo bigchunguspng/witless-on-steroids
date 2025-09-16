@@ -3,11 +3,11 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Terminal;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Handlers.Help;
@@ -122,7 +122,7 @@ public class DebugMessage : SyncCommand
 
     private static string GetRedditInfo()
     {
-        if (ConsoleUI.LoggedIntoReddit == false) return "😎 Not initialized 👌";
+        if (App.LoggedIntoReddit == false) return "😎 Not initialized 👌";
 
         var p = RedditTool.Instance.PostsCached;
         var q = RedditTool.Instance.QueriesCached;

@@ -23,6 +23,7 @@ global using static PF_Bot.Backrooms.Extensions;
 global using static PF_Bot.Core.Paths;
 global using static PF_Bot.Telegram.Literals.Texts;
 global using static PF_Bot.Telegram.Literals.Responses;
+global using static PF_Bot.Terminal.Texts;
 
 global using File = System.IO.File;
 global using Size = SixLabors.ImageSharp.Size;

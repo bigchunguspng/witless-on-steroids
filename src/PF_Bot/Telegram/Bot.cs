@@ -47,7 +47,7 @@ namespace PF_Bot.Telegram
             if (listen) StartListening();
             ChatManager.StartAutoSaveThread(TimeSpan.FromMinutes(2));
 
-            new ConsoleUI().EnterConsoleLoop();
+            TerminalUI.Start();
         }
 
 

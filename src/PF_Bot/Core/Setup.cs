@@ -2,6 +2,11 @@ using System.Globalization;
 
 namespace PF_Bot.Core;
 
+public static class App
+{
+    public static bool LoggedIntoReddit = false;
+}
+
 public static class Setup
 {
     // todo: maybe make it App.Setup(), and have App.Run() also.

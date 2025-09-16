@@ -178,27 +178,6 @@ public static class Texts
         Если хотите начать заново - пропишите /start{2}
         """;
 
-    public const string CONSOLE_MANUAL =
-        """
-        Console Commands:
-
-        s   - save and exit
-
-        /s  - save packs
-        /p  - packs info
-        /pp - packs info (full)
-        /cc - clear temp files
-
-        /ups - upload sounds [path]
-        /upg - upload GIFs   [path]
-
-        +55 - select active chat
-
-        /db - delete blockers
-        /DB - delete active chat if blocked
-        /ds - delete by size [max size, bytes]
-        """;
-
     public const string SET_Q_RESPONSE =
         "качество картинок будет {0}%";
 
@@ -260,13 +239,6 @@ public static class Texts
         Я храню ссылки на последние <b><i>{0} постов с реддита</i></b> которые я отослал с момента включения.
 
         Если вы за этим, пропишите /link в ответ на сообщение с постом
-        """;
-
-    public const string BUENOS_DIAS =
-        """
-        This is the certified {0} classic!
-        =======
-        {1} на связи!
         """;
 
     public const string FF_ERROR_REPORT =

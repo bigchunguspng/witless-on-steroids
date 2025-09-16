@@ -4,28 +4,39 @@ using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
+using PF_Bot.Telegram;
 using Telegram.Bot;
 using Exception = System.Exception;
 
 namespace PF_Bot.Terminal
 {
-    public class ConsoleUI
+    public class TerminalUI
     {
         private long   _activeChat;
         private string? _input;
 
-        private Telegram.Bot Bot => Telegram.Bot.Instance;
-
         private Copypaster Baka => ChatManager.GetBaka(_activeChat);
 
-        public static bool LoggedIntoReddit = false;
-
-
-        public void EnterConsoleLoop()
+        public static void Start()
         {
             Thread.CurrentThread.Name = "Console UI";
             Console.CancelKeyPress              += (_, _) => SaveAndExit();
             AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
+
+            new TerminalUI().Loop();
+        }
+
+        private static void SaveAndExit()
+        {
+            Print("На выход…", ConsoleColor.Yellow);
+            Telemetry.Log_EXIT(Bot.Instance.Me);
+            Telemetry.Write();
+            ChatManager.Bakas_SaveDirty();
+            if (App.LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
+        }
+
+        private void Loop()
+        {
             do
             {
                 _input = Console.ReadLine();
@@ -43,15 +54,6 @@ namespace PF_Bot.Terminal
                 }
             }
             while (_input != "s");
-        }
-
-        private void SaveAndExit()
-        {
-            Print("На выход…", ConsoleColor.Yellow);
-            Telemetry.Log_EXIT(Bot.Me);
-            Telemetry.Write();
-            ChatManager.Bakas_SaveDirty();
-            if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
         private void DoConsoleCommands()
@@ -96,7 +98,7 @@ namespace PF_Bot.Terminal
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.SendMessage((_activeChat, null), arg, preview: true);
+                Bot.Instance.SendMessage((_activeChat, null), arg, preview: true);
                 Baka.Eat(arg);
                 Print($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
             }
@@ -128,13 +130,13 @@ namespace PF_Bot.Terminal
 
         private bool DeleteBlocker(long chat)
         {
-            var x = Bot.PingChat((chat, null), notify: false);
+            var x = Bot.Instance.PingChat((chat, null), notify: false);
             if (x == -1)
             {
                 ChatManager.RemoveChat(chat);
                 ChatManager.DeletePack(chat);
             }
-            else Bot.Client.DeleteMessage(chat, x);
+            else Bot.Instance.Client.DeleteMessage(chat, x);
 
             return x is -1;
         }

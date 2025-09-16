@@ -1,5 +1,4 @@
-﻿using PF_Bot.Terminal;
-using PF_Tools.Backrooms.Types.SerialQueue;
+﻿using PF_Tools.Backrooms.Types.SerialQueue;
 using Reddit;
 using Reddit.Controllers;
 
@@ -22,7 +21,7 @@ namespace PF_Bot.Core.Internet.Reddit
         private RedditTool()
         {
             Excluded = JsonIO.LoadData<Queue<string>>(File_RedditPosts);
-            ConsoleUI.LoggedIntoReddit = true;
+            App.LoggedIntoReddit = true;
         }
 
 

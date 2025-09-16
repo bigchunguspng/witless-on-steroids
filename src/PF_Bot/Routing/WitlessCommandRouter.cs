@@ -1,12 +1,12 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core;
 using PF_Bot.Core.Chats;
-using PF_Bot.Features.Generate.Memes;
-using PF_Bot.Features.Generate.Memes.Core;
-using PF_Bot.Features.Generate.Text;
-using PF_Bot.Features.Help;
-using PF_Bot.Features.Manage.Packs;
-using PF_Bot.Features.Manage.Settings;
+using PF_Bot.Handlers.Help;
+using PF_Bot.Handlers.Manage.Packs;
+using PF_Bot.Handlers.Manage.Settings;
+using PF_Bot.Handlers.Memes;
+using PF_Bot.Handlers.Memes.Core;
+using PF_Bot.Handlers.Text;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 

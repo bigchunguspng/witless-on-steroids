@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using PF_Bot.Tools_Legacy.BoardScrappers;
+using PF_Bot.Core.Internet.Boards;
 using Telegram.Bot.Extensions;
 
 namespace PF_Bot.Backrooms.Helpers;

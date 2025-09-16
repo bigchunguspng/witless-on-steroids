@@ -1,5 +1,5 @@
 using PF_Bot.Core;
-using PF_Bot.Features.Media.MediaDB;
+using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Types;

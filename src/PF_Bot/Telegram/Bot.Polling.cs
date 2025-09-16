@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using PF_Bot.Core;
-using PF_Bot.Features.Help;
+using PF_Bot.Handlers.Help;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Inline;
 using Telegram.Bot;

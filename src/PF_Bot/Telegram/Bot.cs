@@ -2,6 +2,7 @@
 using PF_Bot.Core.Chats;
 using PF_Bot.Routing;
 using PF_Bot.Routing.Commands;
+using PF_Bot.Terminal;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

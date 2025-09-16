@@ -1,4 +1,4 @@
-using PF_Bot.Core.Meme.Shared;
+using PF_Bot.Core.Memes.Shared;
 using PF_Tools.FFMpeg;
 using static PF_Tools.Backrooms.Helpers.Fortune;
 

@@ -6,10 +6,9 @@ using FileEditingKit =
     PF_Tools.FFMpeg.FFMpegOutputOptions Options
 );
 
-namespace PF_Bot.Handlers.Edit.Shared;
+namespace PF_Bot.Core.Editing;
 
-// todo -> Extensions_FilePath
-public static class EditingHelpers
+public static class FilePath_Extensions
 {
     public static async Task<FileEditingKit> InitEditing
         (this FilePath inputPath, string suffix, string extension) =>

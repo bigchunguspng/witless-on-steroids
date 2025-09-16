@@ -1,9 +1,8 @@
-using PF_Bot.Handlers.Edit.Shared;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Core.Editing;
 
-public static class FFMpeg_Extensions
+public static class FFMpeg_Meme_Extensions
 {
     /// Image/video: squize and stretch back (complex filter).
     public static void Meme_HydraulicPress

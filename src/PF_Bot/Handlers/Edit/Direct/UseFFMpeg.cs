@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Handlers.Edit.Core;
+using PF_Bot.Core.Editing;
 using PF_Bot.Handlers.Edit.Direct.Core;
-using PF_Bot.Handlers.Edit.Shared;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 

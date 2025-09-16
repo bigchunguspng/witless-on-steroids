@@ -1,5 +1,3 @@
-using PF_Bot.Handlers.Edit.Core;
-
 namespace PF_Bot.Handlers.Edit.Direct;
 
 public class Load : AudioVideoPhotoCommand

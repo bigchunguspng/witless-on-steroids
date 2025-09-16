@@ -2,7 +2,7 @@
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Handlers.Edit.Core;
+namespace PF_Bot.Handlers.Edit;
 
 public abstract class VideoCommand : FileEditingCommand
 {

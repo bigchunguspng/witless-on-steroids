@@ -1,9 +1,8 @@
 // ReSharper disable InconsistentNaming
 
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Handlers.Edit.Core;
+using PF_Bot.Core.Editing;
 using PF_Bot.Handlers.Edit.Direct.Core;
-using PF_Bot.Handlers.Edit.Shared;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 

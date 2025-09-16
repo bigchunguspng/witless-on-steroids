@@ -1,5 +1,4 @@
-﻿using PF_Bot.Handlers.Edit.Core;
-using PF_Bot.Handlers.Edit.Shared;
+﻿using PF_Bot.Core.Editing;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Handlers.Edit.Filter

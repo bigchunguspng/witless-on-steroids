@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using PF_Bot.Handlers.Edit.Shared;
+using PF_Bot.Core.Editing;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
 using PF_Tools.FFMpeg;

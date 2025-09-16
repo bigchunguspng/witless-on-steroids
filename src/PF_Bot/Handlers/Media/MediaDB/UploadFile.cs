@@ -1,4 +1,4 @@
-using PF_Bot.Handlers.Edit.Core;
+using PF_Bot.Handlers.Edit;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Media.MediaDB;

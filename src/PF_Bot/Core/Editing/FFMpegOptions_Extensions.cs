@@ -1,7 +1,7 @@
 using PF_Tools.FFMpeg;
 using SixLabors.ImageSharp;
 
-namespace PF_Bot.Handlers.Edit.Shared;
+namespace PF_Bot.Core.Editing;
 
 public static class FFMpegOptions_Extensions
 {

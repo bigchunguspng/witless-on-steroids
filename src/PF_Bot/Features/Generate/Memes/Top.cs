@@ -8,7 +8,7 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Top : MakeMemeCore<string>
     {
-        private static readonly FontWizard _fontWizard = new ("ft", "snap");
+        private static readonly FontWizard _fontWizard = new ("ft", "top");
         private static readonly ColorWizard _colorWizard = new ("#");
 
         private MemeOptions_Top _options;

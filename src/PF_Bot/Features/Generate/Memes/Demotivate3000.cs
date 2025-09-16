@@ -8,7 +8,7 @@ namespace PF_Bot.Features.Generate.Memes
 {
     public class Demotivate3000 : MakeMemeCore<string>
     {
-        private static readonly FontWizard _fontWizard = new ("rg", "snap");
+        private static readonly FontWizard _fontWizard = new ("sg", "dp");
         private static readonly ColorWizard _colorWizard = new ("#");
 
         private MemeOptions_Dp _options;

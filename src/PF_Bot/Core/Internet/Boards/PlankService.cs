@@ -8,11 +8,12 @@ public class PlankService
 {
     private const string BASE_URL = "https://2ch.hk";
 
-    private static readonly Regex _thread_post    = new(@"<article id=""\S*?"" class=""post__message "">\s*(.*?)\s*<\/article>");
-    private static readonly Regex _thread_subject = new(@"<span class=""post__title"">\s*(.*?)\s*<\/span>");
-    private static readonly Regex _board_thread   = new(@"<span class=""post__detailpart desktop""><a href=""(.*?)"">Ответ");
-    private static readonly Regex _search_thread  = new(@"<span class=""reflink"">\s*Тред: <a href=""(\S*?)""");
-    private static readonly Regex _tags  = new("<.*?>");
+    private static readonly Regex
+        _rgx_thread_post    = new(@"<article id=""\S*?"" class=""post__message "">\s*(.*?)\s*<\/article>", RegexOptions.Compiled),
+        _rgx_thread_subject = new(@"<span class=""post__title"">\s*(.*?)\s*<\/span>", RegexOptions.Compiled),
+        _rgx_board_thread   = new(@"<span class=""post__detailpart desktop""><a href=""(.*?)"">Ответ", RegexOptions.Compiled),
+        _rgx_search_thread  = new(@"<span class=""reflink"">\s*Тред: <a href=""(\S*?)""", RegexOptions.Compiled),
+        _rgx_tags           = new("<.*?>", RegexOptions.Compiled);
 
     private readonly RestClient _rest = new();
 
@@ -30,10 +31,10 @@ public class PlankService
         
         var replyIndicator = "<a";
 
-        var subject = _thread_subject.Match(html).Groups[1].Value;
+        var subject = _rgx_thread_subject.Match(html).Groups[1].Value;
         var subjectPending = subject.IsNotNull_NorWhiteSpace();
 
-        var posts = _thread_post.Matches(html).Select(x => x.Groups[1].Value);
+        var posts = _rgx_thread_post.Matches(html).Select(x => x.Groups[1].Value);
         foreach (var post in posts)
         {
             var separator = "<br>";
@@ -42,7 +43,7 @@ public class PlankService
             {
                 if (line.StartsWith(replyIndicator)) continue; // skip things like ">>103424950 (OP)"
 
-                var text = _tags.Replace(line, "");
+                var text = _rgx_tags.Replace(line, "");
 
                 if (subjectPending) // add subject for the 1st line (if any)
                 {
@@ -62,7 +63,7 @@ public class PlankService
         var response = _rest.Get(new RestRequest(url));
         var html = response.Content;
 
-        return _board_thread.Matches(html).Select(x => x.Groups[1].Value).Select(x => $"{BASE_URL}{x}");
+        return _rgx_board_thread.Matches(html).Select(x => x.Groups[1].Value).Select(x => $"{BASE_URL}{x}");
     }
 
     /// Returns unique URLs of threads found on a board by a text.
@@ -76,7 +77,7 @@ public class PlankService
         var response = _rest.Execute(request);
         var html = response.Content;
 
-        return _search_thread.Matches(html)
+        return _rgx_search_thread.Matches(html)
             .Select(x => x.Groups[1].Value).Distinct()
             .Select(x => $"{BASE_URL}{x}").ToList();
     }
@@ -84,8 +85,10 @@ public class PlankService
 
     // LISTING PLANKS
 
-    private const string HOME_LI = "//ul[@class='boards__ul']/li";
-    private static readonly Regex _menu_board_item = new(@"<a.*?href=""(.*?)"">(.*?)(<span.*?span>)?<\/a>"); 
+    private const string _xp_HOME_LI = "//ul[@class='boards__ul']/li";
+
+    private static readonly Regex
+        _rgx_menu_board_item = new(@"<a.*?href=""(.*?)"">(.*?)(<span.*?span>)?<\/a>", RegexOptions.Compiled);
 
     /// <param name="path">path to a saved home page file.</param>
     public List<BoardGroup> GetBoardList(string path)
@@ -96,12 +99,12 @@ public class PlankService
         var document = new HtmlDocument();
         document.Load(path);
 
-        var items = document.DocumentNode.SelectNodes(HOME_LI).Select(x => x.InnerHtml);
+        var items = document.DocumentNode.SelectNodes(_xp_HOME_LI).Select(x => x.InnerHtml);
         foreach (var item in items)
         {
             if (item.StartsWith("<a") || item.StartsWith("<font"))
             {
-                var match = _menu_board_item.Match(item);
+                var match = _rgx_menu_board_item.Match(item);
                 var title = match.Groups[2].Value;
                 var url   = match.Groups[1].Value;
                 var nsfw  = match.Groups[3].Success;

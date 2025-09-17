@@ -6,7 +6,10 @@ namespace PF_Bot.Handlers.Edit.Filter
 {
     public class Scale : VideoPhotoCommand
     {
-        private readonly Regex _number = new(@"^\d+([\.,]\d+)?$");
+        private readonly Regex
+            _rgx_number = new(@"^\d+([\.,]\d+)?$",      RegexOptions.Compiled),
+            _rgx_iw   = new("(?<=[^io_]|^)w",           RegexOptions.Compiled),
+            _rgx_ih   = new("(?<=[^io_]|^)h(?=[^s]|$)", RegexOptions.Compiled);
 
         protected override string SyntaxManual => "/man_scale";
 
@@ -25,7 +28,7 @@ namespace PF_Bot.Handlers.Edit.Filter
 
                 void MultiplyIfArgIsNumber(int i, char side)
                 {
-                    if (args.Length > i && _number.IsMatch(args[i]))
+                    if (args.Length > i && _rgx_number.IsMatch(args[i]))
                     {
                         var d = double.TryParse(args[i].Replace(',', '.'), out var value);
                         if (d && value < 5) args[i] = $"{value}*{side}";
@@ -34,9 +37,8 @@ namespace PF_Bot.Handlers.Edit.Filter
 
                 for (var i = 0; i < Math.Min(args.Length, 2); i++)
                 {
-                    var w = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
-                    var h = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
-                    args[i] = h;
+                    args[i] = _rgx_iw.Replace(args[i], "iw");
+                    args[i] = _rgx_ih.Replace(args[i], "ih");
                 }
 
                 if (args.Length == 1) args = [args[0], "-1"];

@@ -20,7 +20,7 @@ public class FontWizard
     {
         var codes = string.Join('|', FontStorage.Families.Keys);
         _fontKeyDefault = fontKeyDefault;
-        _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes}|\^\^)(-[bi]{{1,2}})?){x}\S*", RegexOptions.IgnoreCase);
+        _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes}|\^\^)(-[bi]{{1,2}})?){x}\S*");
     }
 
     public FontOption CheckAndCut(MemeRequest request)

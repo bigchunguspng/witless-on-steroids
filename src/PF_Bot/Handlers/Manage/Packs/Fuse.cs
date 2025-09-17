@@ -60,11 +60,12 @@ namespace PF_Bot.Handlers.Manage.Packs
         }
 
         
-        private static readonly Regex _wordLimit = new(@"^\/\S+?(\d+)");
+        private static readonly Regex
+            _rgx_wordLimit = new(@"^\/\S+?(\d+)", RegexOptions.Compiled);
 
         protected void GetWordsPerLineLimit()
         {
-            Limit = _wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
+            Limit = _rgx_wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
         }
 
 

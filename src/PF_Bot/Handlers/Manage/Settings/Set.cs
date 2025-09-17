@@ -7,13 +7,14 @@ namespace PF_Bot.Handlers.Manage.Settings
 {
     public class Set : SettingsCommand
     {
-        private readonly Regex _m = new("^[mм]");
-        private readonly Regex _t = new("^[tт]");
-        private readonly Regex _g = new("^[dд][gгvв]");
-        private readonly Regex _d = new("^[dд]");
-        private readonly Regex _s = new("^[sс]");
-        private readonly Regex _n = new("^[nн]");
-        private readonly Regex _a = new("^[aа]");
+        private readonly Regex
+            _m = new("^[mм]",       RegexOptions.Compiled),
+            _t = new("^[tт]",       RegexOptions.Compiled),
+            _g = new("^[dд][gгvв]", RegexOptions.Compiled),
+            _d = new("^[dд]",       RegexOptions.Compiled),
+            _s = new("^[sс]",       RegexOptions.Compiled),
+            _n = new("^[nн]",       RegexOptions.Compiled),
+            _a = new("^[aа]",       RegexOptions.Compiled);
 
         protected override void RunAuthorized()
         {

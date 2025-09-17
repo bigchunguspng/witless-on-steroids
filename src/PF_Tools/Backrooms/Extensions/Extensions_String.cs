@@ -84,47 +84,49 @@ public static class Extensions_String
 
     // LANGUAGE DETECTION
 
-    private static readonly Regex _lat = new("[A-Za-z]"), _cyr = new("[Ѐ-ӿ]");
+    private static readonly Regex 
+        _r_lat  = new("[A-Za-z]", RegexOptions.Compiled),
+        _r_cyr  = new("[Ѐ-ӿ]",    RegexOptions.Compiled),
+        _r_ukrD = new("[ієїґ]",   RegexOptions.Compiled),
+        _r_rusD = new("[ыэъё]",   RegexOptions.Compiled),
+        _r_ukrM = new("[авдж]",   RegexOptions.Compiled),
+        _r_rusM = new("[еоть]",   RegexOptions.Compiled),
+        _r_LOWERCASE = new("[acegijm-su-zав-ух-џ]",                      RegexOptions.Compiled),
+        _r_spaces    = new(@"\s+",                                       RegexOptions.Compiled),
+        _r_brackets  = new(@"(\s?\(+([^\(]+?)\)+)|(\s?\[+([^\[]+?)\]+)", RegexOptions.Compiled);
 
     public static bool IsMostlyCyrillic(this string text)
     {
-        return _cyr.Count(text) > _lat.Count(text);
+        return _r_cyr.Count(text) > _r_lat.Count(text);
     }
-
-    private static readonly Regex _ukrD = new("[ієїґ]"), _rusD = new("[ыэъё]");
-    private static readonly Regex _ukrM = new("[авдж]"), _rusM = new("[еоть]");
 
     public static bool LooksLikeUkrainian(this string text)
     {
-        var u = _ukrD.Count(text);
-        var r = _rusD.Count(text);
+        var u = _r_ukrD.Count(text);
+        var r = _r_rusD.Count(text);
 
         return u > 0 || r > 0
             ? u > r
-            : _ukrM.Count(text) >= _rusM.Count(text);
+            : _r_ukrM.Count(text) >= _r_rusM.Count(text);
     }
 
     // CASE DETECTION
 
-    private static readonly Regex LOWERCASE = new("[acegijm-su-zав-ух-џ]");
-
     public static float GetLowercaseRatio(this string text)
     {
-        return Math.Clamp(LOWERCASE.Count(text) / (float)text.Length, 0F, 1F);
+        return Math.Clamp(_r_LOWERCASE.Count(text) / (float)text.Length, 0F, 1F);
     }
 
     //
-    
-    private static readonly Regex _spaces = new(@"\s+"), _brackets = new(@"(\s?\(+([^\(]+?)\)+)|(\s?\[+([^\[]+?)\]+)");
 
     public static string RemoveTextInBrackets(this string text)
     {
-        while (_brackets.IsMatch(text))
+        while (_r_brackets.IsMatch(text))
         {
-            text = _brackets.Replace(text, match => match.Value.StartsWith(' ') ? "" : " ");
+            text = _r_brackets.Replace(text, match => match.Value.StartsWith(' ') ? "" : " ");
         }
 
-        return _spaces.Replace(text, " ").Trim();
+        return _r_spaces.Replace(text, " ").Trim();
     }
 
     // REGEX

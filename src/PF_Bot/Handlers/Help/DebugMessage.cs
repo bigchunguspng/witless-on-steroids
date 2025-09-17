@@ -14,10 +14,11 @@ namespace PF_Bot.Handlers.Help;
 
 public class DebugMessage : SyncCommand
 {
-    private readonly Regex _jsonFileId   = new(@"""file_id"": ?""(.+?)""");
-    private readonly Regex _jsonFileName = new(@"""file_name"": ?""(.+?)""");
-    private readonly Regex _jsonFileSize = new(@"""file_size"": ?(\d+)");
-    private readonly Regex _jsonWH       = new(@"""width"": ?(\d+),\s+?""height"": ?(\d+)");
+    private readonly Regex
+        _rgx_jsonFileId   = new(@"""file_id"": ?""(.+?)""",                  RegexOptions.Compiled),
+        _rgx_jsonFileName = new(@"""file_name"": ?""(.+?)""",                RegexOptions.Compiled),
+        _rgx_jsonFileSize = new(@"""file_size"": ?(\d+)",                    RegexOptions.Compiled),
+        _rgx_jsonWH       = new(@"""width"": ?(\d+),\s+?""height"": ?(\d+)", RegexOptions.Compiled);
 
     protected override void Run()
     {
@@ -45,10 +46,10 @@ public class DebugMessage : SyncCommand
         }
 
         var json = JsonSerializer.Serialize(message, JsonOptions);
-        var id   = _jsonFileId  .Matches(json).LastOrDefault();
-        var name = _jsonFileName.Matches(json).LastOrDefault();
-        var size = _jsonFileSize.Matches(json).LastOrDefault();
-        var wh   = _jsonWH      .Matches(json);
+        var id   = _rgx_jsonFileId  .Matches(json).LastOrDefault();
+        var name = _rgx_jsonFileName.Matches(json).LastOrDefault();
+        var size = _rgx_jsonFileSize.Matches(json).LastOrDefault();
+        var wh   = _rgx_jsonWH      .Matches(json);
         if (Command!.Contains('!') && id is { Success: true } && size is { Success: true })
         {
             var fileId = id.Groups[1].Value;

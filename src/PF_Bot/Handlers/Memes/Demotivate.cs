@@ -21,7 +21,7 @@ namespace PF_Bot.Handlers.Memes
                 ? new DemotivatorDrawer(_options)
                 : new DemotivatorDrawer(_options, 1280);
 
-        protected override Regex _cmd { get; } = new(@"^\/d[vg](\S*)");
+        protected override Regex _rgx_cmd { get; } = new(@"^\/d[vg](\S*)", RegexOptions.Compiled);
 
         protected override string VideoName => $"piece_fap_bot-d{(_mode == Square ? "g" : "v")}.mp4";
 
@@ -37,7 +37,7 @@ namespace PF_Bot.Handlers.Memes
         protected override bool ResultsAreRandom
             => _options.AddLogo
             || RandomFontIsUsed
-            || Check(Request, _one_line).Failed() && Args!.Contains('\n').Janai(); // (random bottom text)
+            || Check(Request, _r_one_line).Failed() && Args!.Contains('\n').Janai(); // (random bottom text)
 
         private bool RandomFontIsUsed
             => _mode == Wide || _options.SingleLine
@@ -47,7 +47,7 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.SingleLine = CheckAndCut(Request, _one_line);
+            _options.SingleLine = CheckAndCut(Request, _r_one_line);
 
             if (_mode == Wide)
             {
@@ -63,7 +63,7 @@ namespace PF_Bot.Handlers.Memes
                 _options.FontOptionB = FontWizardB.CheckAndCut(Request);
             }
 
-            _options.AddLogo = Check(Request, _no_logo).Failed();
+            _options.AddLogo = Check(Request, _r_no_logo).Failed();
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -94,14 +94,15 @@ namespace PF_Bot.Handlers.Memes
                 }
             }
 
-            var capitalize = CheckCaps(Request, _caps, generate);
+            var capitalize = CheckCaps(Request, _r_caps, generate);
             if (capitalize) a = a.InLetterCase(LetterCase.Upper);
 
             return new TextPair(a, b);
         }
 
-        private static readonly Regex _no_logo  = new(@"^\/d[vg]\S*(nn)\S* *");
-        private static readonly Regex _one_line = new(@"^\/d[vg]\S*(ll)\S* *");
+        private static readonly Regex
+            _r_no_logo  = new(@"^\/d[vg]\S*(nn)\S* *", RegexOptions.Compiled),
+            _r_one_line = new(@"^\/d[vg]\S*(ll)\S* *", RegexOptions.Compiled);
 
 
         // MODE
@@ -118,7 +119,7 @@ namespace PF_Bot.Handlers.Memes
 
         public enum Mode
         {
-            Square, Wide
+            Square, Wide,
         }
     }
 }

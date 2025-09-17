@@ -6,7 +6,8 @@ namespace PF_Bot.Backrooms.Helpers;
 
 public static class BoardHelpers
 {
-    private static readonly Regex _rgx_URL = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
+    private static readonly Regex
+        _rgx_URL = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
 
     public static void Print4chan() => PrintMenu(new BoardService().GetBoardList(File_4chanHtmlPage));
     public static void Print2chan() => PrintMenu(new PlankService().GetBoardList(File_2chanHtmlPage));

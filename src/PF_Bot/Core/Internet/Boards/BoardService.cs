@@ -7,28 +7,29 @@ namespace PF_Bot.Core.Internet.Boards
 {
     public class BoardService
     {
-        private const string BOARD_THREAD   = "//a[@class='replylink'][. = 'Reply']";
-        private const string ARCHIVE_THREAD = "//a[@class='quotelink']";
-        private const string SEARCH_THREAD  = "//span[@class='post_controls']/a[1]";
+        private const string _xp_BOARD_THREAD   = "//a[@class='replylink'][. = 'Reply']";
+        private const string _xp_ARCHIVE_THREAD = "//a[@class='quotelink']";
+        private const string _xp_SEARCH_THREAD  = "//span[@class='post_controls']/a[1]";
 
-        private static readonly Regex _thread_post      = new(@"<blockquote.*?>(.*?)<\/blockquote>");
-        private static readonly Regex _thread_post_desu = new(@"<div class=""text"">(.*?)<\/div>");
-        private static readonly Regex _thread_subject      = new(@"<span class=""subject"">(.*?)<\/span>");
-        private static readonly Regex _thread_subject_desu = new(@"<h2 class=""post_title"">(.*?)<\/h2>");
-        private static readonly Regex _tags  = new("<.*?>");
+        private static readonly Regex
+            _rgx_thread_post         = new(@"<blockquote.*?>(.*?)<\/blockquote>", RegexOptions.Compiled),
+            _rgx_thread_post_desu    = new(@"<div class=""text"">(.*?)<\/div>", RegexOptions.Compiled),
+            _rgx_thread_subject      = new(@"<span class=""subject"">(.*?)<\/span>", RegexOptions.Compiled),
+            _rgx_thread_subject_desu = new(@"<h2 class=""post_title"">(.*?)<\/h2>", RegexOptions.Compiled),
+            _rgx_tags                = new("<.*?>", RegexOptions.Compiled);
 
         private readonly HtmlWeb _web = new();
         private readonly RestClient _rest = new();
 
         private Regex GetRegexForSubject
             (bool desu) => desu
-            ? _thread_subject_desu
-            : _thread_subject;
+            ? _rgx_thread_subject_desu
+            : _rgx_thread_subject;
 
         private Regex GetRegexForPosts
             (bool desu) => desu
-            ? _thread_post_desu
-            : _thread_post;
+            ? _rgx_thread_post_desu
+            : _rgx_thread_post;
 
         /// <inheritdoc cref="GetThreadDiscussion"/> Async version, starts immediately.
         public Task<List<string>> GetThreadDiscussionAsync
@@ -56,7 +57,7 @@ namespace PF_Bot.Core.Internet.Boards
                 {
                     if (line.StartsWith(replyIndicator)) continue; // skip things like ">>103424950 (OP)"
 
-                    var text = _tags.Replace(line, "");
+                    var text = _rgx_tags.Replace(line, "");
 
                     if (subjectPending) // add subject for the 1st line (if any)
                     {
@@ -96,7 +97,7 @@ namespace PF_Bot.Core.Internet.Boards
                 try
                 {
                     var pageURL = i == 1 ? url : url + i;
-                    hrefs = GetHrefs(pageURL, BOARD_THREAD);
+                    hrefs = GetHrefs(pageURL, _xp_BOARD_THREAD);
                 }
                 catch // board can have < 10 pages
                 {
@@ -110,12 +111,12 @@ namespace PF_Bot.Core.Internet.Boards
         /// Returns ARCHIVED thread URLs (local paths) from a board ARCHIVE page.
         /// <param name="url">board archive URL, like https://boards.4channel.org/a/archive</param>
         public IEnumerable<string> GetAllArchivedThreads
-            (string url) => GetHrefs(url, ARCHIVE_THREAD);
+            (string url) => GetHrefs(url, _xp_ARCHIVE_THREAD);
 
         /// Returns thread URLs from the first page of https://desuarchive.org search.
         /// <param name="url"> use <see cref="GetDesuSearchURLText"/> to obtain.</param>
         public IEnumerable<string> GetSearchResults
-            (string url) => GetHrefs(url, SEARCH_THREAD).Select(x => x.Remove(x.LastIndexOf('/')));
+            (string url) => GetHrefs(url, _xp_SEARCH_THREAD).Select(x => x.Remove(x.LastIndexOf('/')));
 
         /// <param name="place">board code or "_" to searh anywhere</param>
         /// <param name="query">search string</param>

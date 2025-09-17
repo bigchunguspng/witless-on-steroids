@@ -5,14 +5,15 @@ public static class Consuming_Advanced
     private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
     private const string LINK_Spaced = $" {GenerationPack.S_REMOVED} ";
 
-    private static readonly Regex _urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled);
-    private static readonly Regex _skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
+    private static readonly Regex 
+        _r_urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled),
+        _r_skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
 
     // LOGIC
 
     public static string[]? Eat_Advanced(this GenerationPack pack, string text, float chance = 0)
     {
-        if (_skip.IsMatch(text)) return null;
+        if (_r_skip.IsMatch(text)) return null;
 
         var lines = TokenizeMultiline(text);
 
@@ -36,7 +37,7 @@ public static class Consuming_Advanced
 
     private static string[][] TokenizeMultiline(string text)
     {
-        text = _urls.Replace(text.ToLower(), LINK_Spaced);
+        text = _r_urls.Replace(text.ToLower(), LINK_Spaced);
         return text.Contains("\n\n")
             ? text.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).Select(TokenizeLine).ToArray()
             : [TokenizeLine(text)];
@@ -54,8 +55,9 @@ public static class Consuming_Advanced
         tokens.CombineByLength(3);
     }
 
-    private static readonly Regex _regexA = new(@"[ \]]|[.!?]$", RegexOptions.Compiled);
-    private static readonly Regex _regexB = new(@"[ \]]",        RegexOptions.Compiled);
+    private static readonly Regex
+        _r_A = new(@"[ \]]|[.!?]$", RegexOptions.Compiled),
+        _r_B = new(@"[ \]]",        RegexOptions.Compiled);
 
     private static void CombineByLength(this LinkedList<string> tokens, int length)
     {
@@ -65,7 +67,7 @@ public static class Consuming_Advanced
             var a = token.Value;
             var b =  next.Value;
 
-            if (a.Length == length && _regexA.IsMatch(a).Janai() && _regexB.IsMatch(b).Janai())
+            if (a.Length == length && _r_A.IsMatch(a).Janai() && _r_B.IsMatch(b).Janai())
             {
                 token.Value = $"{a} {b}";
                 tokens.Remove(next);

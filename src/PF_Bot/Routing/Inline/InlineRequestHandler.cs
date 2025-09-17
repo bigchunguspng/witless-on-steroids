@@ -10,8 +10,9 @@ namespace PF_Bot.Routing.Inline;
 
 public class InlineRequestHandler
 {
-    private readonly Regex _sound_mode = new(@"^[as!*.@аз](?=[\s]|$)");
-    private readonly Regex _caption  = new(@"^(.*?)\|\s?(.*)$");
+    private readonly Regex
+        _rgx_sound_mode = new(@"^[as!*.@аз](?=[\s]|$)", RegexOptions.Compiled),
+        _rgx_caption    = new(@"^(.*?)\|\s?(.*)$",      RegexOptions.Compiled);
 
     // @bot [g!*.@гж] query[|caption]
 
@@ -21,14 +22,14 @@ public class InlineRequestHandler
 
         string? query = inline.Query, caption = null;
 
-        var captionMatch = _caption.Match(query);
+        var captionMatch = _rgx_caption.Match(query);
         if (captionMatch.Success)
         {
             query   = captionMatch.ExtractGroup(1, s => s);
             caption = captionMatch.ExtractGroup(2, s => s);
         }
 
-        var sound_mode = query.IsNotNull_NorWhiteSpace() && _sound_mode.IsMatch(query);
+        var sound_mode = query.IsNotNull_NorWhiteSpace() && _rgx_sound_mode.IsMatch(query);
         if (sound_mode)
         {
             query = query!.Length < 3

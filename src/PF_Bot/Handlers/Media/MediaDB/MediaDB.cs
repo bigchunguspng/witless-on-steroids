@@ -164,11 +164,12 @@ public abstract class MediaDB<T> where T : FileBase
 
 public static class MediaExtensions
 {
-    private static readonly Regex _tags = new(@"#\S+\s");
+    private static readonly Regex
+        _rgx_tags = new(@"#\S+\s", RegexOptions.Compiled);
 
     public static string GetTitle(this MediaFile media)
     {
         var text = media.Text;
-        return text.StartsWith('#') ? _tags.Replace(text, string.Empty) : text;
+        return text.StartsWith('#') ? _rgx_tags.Replace(text, string.Empty) : text;
     }
 }

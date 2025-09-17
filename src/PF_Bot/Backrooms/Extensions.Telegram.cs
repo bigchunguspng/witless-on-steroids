@@ -27,11 +27,12 @@ public static partial class Extensions
         return user.GetUserFullName().Truncate(32);
     }
 
-    private static readonly Regex _chatMessageURL = new(@"https:\/\/t.me\/(?:c\/(\d+)|(\S+))\/(\d+)");
+    private static readonly Regex
+        _rgx_chatMessageURL = new(@"https:\/\/t.me\/(?:c\/(\d+)|(\S+))\/(\d+)", RegexOptions.Compiled);
 
     public static (ChatId chat, int message) GetChatIdAndMessage(this string url)
     {
-        var match = _chatMessageURL.Match(url);
+        var match = _rgx_chatMessageURL.Match(url);
         var chat = match.Groups[1].Success
             ? new ChatId(long.Parse($"-100{match.Groups[1].Value}"))
             : new ChatId(              $"@{match.Groups[2].Value}");

@@ -16,8 +16,9 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
     private const string _YT_video = "https://youtu.be/";
     private const string _YT_list  = "https://www.youtube.com/playlist?list=";
 
-    private static readonly Regex _name = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3");
-    private static readonly Regex _thumb = new(".jpg$|.png$|.webp$");
+    private static readonly Regex
+        _rgx_name  = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3", RegexOptions.Compiled),
+        _rgx_thumb = new(".jpg$|.png$|.webp$", RegexOptions.Compiled);
 
     public required string? PlaylistID;
     public required string? PlayListIndex;
@@ -108,10 +109,10 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
             => directoryInfo.GetFiles(pattern)[0].FullName;
 
         string? GetThumbFile()
-            => directoryInfo.GetFiles().FirstOrDefault(x => _thumb.IsMatch(x.FullName))?.FullName;
+            => directoryInfo.GetFiles().FirstOrDefault(x => _rgx_thumb.IsMatch(x.FullName))?.FullName;
 
         // META INFORMATION
-        var meta = _name.Match(Path.GetFileName(audioFile));
+        var meta = _rgx_name.Match(Path.GetFileName(audioFile));
         Artist ??= meta.GroupOrNull(1);
         Title  ??= meta.GroupOrNull(2);
 

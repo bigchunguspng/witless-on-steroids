@@ -14,7 +14,7 @@ namespace PF_Bot.Handlers.Memes
 
         protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options, Chat);
 
-        protected override Regex _cmd { get; } = new(@"^\/nuke(\S*)");
+        protected override Regex _rgx_cmd { get; } = new(@"^\/nuke(\S*)", RegexOptions.Compiled);
 
         protected override string VideoName => "piece_fap_bot-nuke.mp4";
 
@@ -40,12 +40,13 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.Depth = OptionsParsing.GetInt(Request, _depth, 1);
+            _options.Depth = OptionsParsing.GetInt(Request, _r_depth, 1);
         }
 
         protected override int GetMemeText(string? text) => 0;
 
-        private static readonly Regex _depth = new(@"^\/nuke\S*?([1-9])("")\S*");
+        private static readonly Regex
+            _r_depth = new(@"^\/nuke\S*?([1-9])("")\S*", RegexOptions.Compiled);
         
         public static void HandleCallback(CallbackQuery query, string[] data)
         {

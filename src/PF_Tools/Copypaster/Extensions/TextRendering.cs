@@ -8,7 +8,8 @@ public static class TextRendering
     private const string LINK_en = "[deleted]", LINK_ua = "[засекречено]", LINK_ru = "[ссылка удалена]";
 
     private const string ADD   = "[+]", ADD_Spaced = "[+] ";
-    private static readonly Regex _random = new(@"\[\*(\d{1,9})..(\d{1,9})\]", RegexOptions.Compiled);
+    private static readonly Regex
+        _r_random = new(@"\[\*(\d{1,9})..(\d{1,9})\]", RegexOptions.Compiled);
 
     public static string RenderText(this GenerationPack DB, LinkedList<int> ids)
     {
@@ -19,7 +20,7 @@ public static class TextRendering
             var word = DB.GetWord(id);
             if (word is not null)
             {
-                var match = _random.Match(word); // EXAMPLE: [*0..15928]
+                var match = _r_random.Match(word); // EXAMPLE: [*0..15928]
                 if (match.Success)
                 {
                     var a = Convert.ToInt32(match.Groups[1].Value);

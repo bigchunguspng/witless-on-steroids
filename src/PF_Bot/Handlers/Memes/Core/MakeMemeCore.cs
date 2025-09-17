@@ -18,10 +18,11 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
-        protected static readonly Regex _repeat = new("[2-9]");
-        protected static readonly Regex   _caps = new(@"\S*(up)\S*");
-        protected static readonly Regex _nowrap = new(@"\S*(ww)\S*");
-        protected static readonly Regex  _press = new(@"\S*(\*)(\d{1,2})?\S*");
+        protected static readonly Regex
+            _r_repeat = new("[2-9]",                 RegexOptions.Compiled),
+            _r_caps   = new(@"\S*(up)\S*",           RegexOptions.Compiled),
+            _r_nowrap = new(@"\S*(ww)\S*",           RegexOptions.Compiled),
+            _r_press  = new(@"\S*(\*)(\d{1,2})?\S*", RegexOptions.Compiled);
     }
 
     public abstract class MakeMemeCore<T> : MakeMemeCore_Static, ImageProcessor
@@ -30,7 +31,7 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
         protected abstract IMemeGenerator<T> MemeMaker { get; }
 
-        protected abstract Regex _cmd { get; }
+        protected abstract Regex _rgx_cmd { get; }
 
         protected abstract string VideoName { get; }
 
@@ -212,7 +213,7 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
             if (empty.Janai())
             {
-                options = _cmd.ExtractGroup(1, command, s => s.MakeNull_IfEmpty());
+                options = _rgx_cmd.ExtractGroup(1, command, s => s.MakeNull_IfEmpty());
                 var combine = options != null && defaults != null && (options.Contains('+') || defaults.Contains('+'));
 
                 options = combine ? defaults + options : options ?? defaults;
@@ -225,19 +226,19 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
         private int GetRepeatCount()
         {
             var repeats = 1;
-            var hasToBeRepeated = (Args is null || ResultsAreRandom) && CheckOptionsFor(o => _repeat.IsMatch(o));
-            if (hasToBeRepeated) repeats = _repeat.ExtractGroup(0, Request.Dummy, int.Parse, repeats);
+            var hasToBeRepeated = (Args is null || ResultsAreRandom) && CheckOptionsFor(o => _r_repeat.IsMatch(o));
+            if (hasToBeRepeated) repeats = _r_repeat.ExtractGroup(0, Request.Dummy, int.Parse, repeats);
             return repeats;
         }
 
-        private float     Pressure => OptionsParsing.GetFraction(Request, _press, 75, 2);
+        private float     Pressure => OptionsParsing.GetFraction(Request, _r_press, 75, 2);
 
         private bool SendAsSticker => CheckOptionsFor(options => options.Contains('='));
         private bool   JpegSticker => CheckOptionsFor(options => options.Contains('x'));
 
         private bool CheckOptionsFor(Predicate<string> condition)
         {
-            return Request.Empty.Janai() && _cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
+            return Request.Empty.Janai() && _rgx_cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
         }
     }
 }

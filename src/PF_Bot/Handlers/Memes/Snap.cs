@@ -16,7 +16,7 @@ public class Snap : MakeMemeCore<string>
 
     protected override IMemeGenerator<string> MemeMaker => new SnapChat(_options);
 
-    protected override Regex _cmd { get; } = new(@"^\/snap(\S*)");
+    protected override Regex _rgx_cmd { get; } = new(@"^\/snap(\S*)", RegexOptions.Compiled);
 
     protected override string VideoName => "piece_fap_bot-snap.mp4";
 
@@ -33,34 +33,35 @@ public class Snap : MakeMemeCore<string>
 
     protected override void ParseOptions()
     {
-        _options.RandomOffset = CheckAndCut(Request, _random);
+        _options.RandomOffset = CheckAndCut(Request, _r_random);
 
         _options.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
         _options.CustomColorText = _colorWizardText.CheckAndCut(Request);
 
         _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-        _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-        _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
-        _options.CardOpacity        = GetInt(Request, _opacity, 62);
-        _options.CardOffset         = GetInt(Request, _offset,  50);
+        _options.MinSizeMultiplier  = GetInt(Request, _r_fontMS,  10, group: 2);
+        _options.FontSizeMultiplier = GetInt(Request, _r_fontSM, 100);
+        _options.CardOpacity        = GetInt(Request, _r_opacity, 62);
+        _options.CardOffset         = GetInt(Request, _r_offset,  50);
 
-        _options.WrapText = CheckAndCut(Request, _nowrap).Failed();
+        _options.WrapText = CheckAndCut(Request, _r_nowrap).Failed();
     }
 
     protected override string GetMemeText(string? text)
     {
         var generate = text.IsNull_OrEmpty();
-        var capitalize = CheckCaps(Request, _caps, generate);
+        var capitalize = CheckCaps(Request, _r_caps, generate);
 
         var caption = generate ? Baka.Generate() : text!;
 
         return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
     }
 
-    private static readonly Regex _random  = new(@"^\/snap\S*(!!)\S*");
-    private static readonly Regex _opacity = new(@"^\/snap\S*?(\d{1,3})(%)\S*");
-    private static readonly Regex _offset  = new(@"^\/snap\S*?(\d{1,3})(!)\S*");
-    private static readonly Regex _fontSM  = new(@"^\/snap\S*?(\d{1,3})("")\S*");
-    private static readonly Regex _fontMS  = new(@"^\/snap\S*?(min)(\d{1,3})("")\S*");
+    private static readonly Regex
+        _r_random  = new(@"^\/snap\S*(!!)\S*",           RegexOptions.Compiled),
+        _r_opacity = new(@"^\/snap\S*?(\d{1,3})(%)\S*",  RegexOptions.Compiled),
+        _r_offset  = new(@"^\/snap\S*?(\d{1,3})(!)\S*",  RegexOptions.Compiled),
+        _r_fontSM  = new(@"^\/snap\S*?(\d{1,3})("")\S*", RegexOptions.Compiled),
+        _r_fontMS  = new(@"^\/snap\S*?(min)(\d{1,3})("")\S*", RegexOptions.Compiled);
 }

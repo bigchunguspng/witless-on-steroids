@@ -15,7 +15,7 @@ namespace PF_Bot.Handlers.Memes
 
         protected override IMemeGenerator<string> MemeMaker => new IFunnyBrazil(_options);
 
-        protected override Regex _cmd { get; } = new(@"^\/top(\S*)");
+        protected override Regex _rgx_cmd { get; } = new(@"^\/top(\S*)", RegexOptions.Compiled);
 
         protected override string VideoName => "piece_fap_bot-top.mp4";
 
@@ -35,23 +35,23 @@ namespace PF_Bot.Handlers.Memes
             _options.CustomColor = _colorWizard.CheckAndCut(Request);
             _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-            _options.CropPercent        = GetInt(Request, _crop,     0);
-            _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-            _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+            _options.CropPercent        = GetInt(Request, _r_crop,     0);
+            _options.MinSizeMultiplier  = GetInt(Request, _r_fontMS,  10, group: 2);
+            _options.FontSizeMultiplier = GetInt(Request, _r_fontSM, 100);
 
-            _options.WrapText         = CheckAndCut(Request, _nowrap ).Failed();
-            _options.BackInBlack      = CheckAndCut(Request, _blackBG);
-            _options.ForceCenter      = CheckAndCut(Request, _colorPC);
-            _options.PickColor        = CheckAndCut(Request, _colorPP);
-            _options.UseLeftAlignment = CheckAndCut(Request, _left   );
-            _options.UltraThinCard    = CheckAndCut(Request, _thinner);
-            _options.ThinCard         = CheckAndCut(Request, _thin   );
+            _options.WrapText         = CheckAndCut(Request, _r_nowrap ).Failed();
+            _options.BackInBlack      = CheckAndCut(Request, _r_blackBG);
+            _options.ForceCenter      = CheckAndCut(Request, _r_colorPC);
+            _options.PickColor        = CheckAndCut(Request, _r_colorPP);
+            _options.UseLeftAlignment = CheckAndCut(Request, _r_left   );
+            _options.UltraThinCard    = CheckAndCut(Request, _r_thinner);
+            _options.ThinCard         = CheckAndCut(Request, _r_thin   );
         }
 
         protected override string GetMemeText(string? text)
         {
             var generate = text.IsNull_OrEmpty();
-            var capitalize = CheckCaps(Request, _caps, generate);
+            var capitalize = CheckCaps(Request, _r_caps, generate);
 
             var caption = generate ? Baka.Generate() : text!;
 
@@ -61,14 +61,15 @@ namespace PF_Bot.Handlers.Memes
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }
 
-        private static readonly Regex _left    = new(@"^\/top\S*(la)\S*");
-        private static readonly Regex _thinner = new(@"^\/top\S*mm(!)\S*");
-        private static readonly Regex _thin    = new(@"^\/top\S*(mm)\S*");
-        private static readonly Regex _colorPP = new(@"^\/top\S*(pp)\S*");
-        private static readonly Regex _colorPC = new(@"^\/top\S*pp(!)\S*");
-        private static readonly Regex _blackBG = new(@"^\/top\S*(ob)\S*");
-        private static readonly Regex _crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*");
-        private static readonly Regex _fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*");
-        private static readonly Regex _fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*");
+        private static readonly Regex
+            _r_left    = new(@"^\/top\S*(la)\S*",  RegexOptions.Compiled),
+            _r_thinner = new(@"^\/top\S*mm(!)\S*", RegexOptions.Compiled),
+            _r_thin    = new(@"^\/top\S*(mm)\S*",  RegexOptions.Compiled),
+            _r_colorPP = new(@"^\/top\S*(pp)\S*",  RegexOptions.Compiled),
+            _r_colorPC = new(@"^\/top\S*pp(!)\S*", RegexOptions.Compiled),
+            _r_blackBG = new(@"^\/top\S*(ob)\S*",  RegexOptions.Compiled),
+            _r_crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",     RegexOptions.Compiled),
+            _r_fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",      RegexOptions.Compiled),
+            _r_fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*", RegexOptions.Compiled);
     }
 }

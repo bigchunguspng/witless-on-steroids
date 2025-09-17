@@ -31,8 +31,9 @@ public static class EmojiTool
         )+
         """;
 
-    private static readonly Regex _rgx_Emoji
-        = new(EMOJI_REGEX_PATTERN, RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
+    private static readonly Regex
+        _rgx_Emoji = new(EMOJI_REGEX_PATTERN, RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace),
+        _rgx_Magic = new(@"[\u231a-\u303d]",  RegexOptions.Compiled);
 
     /// Finds all emojis and emoji-like characters in text using regex.
     public static MatchCollection FindEmoji(string text)
@@ -252,7 +253,7 @@ public static class EmojiTool
                 else
                 {
                     var character = char.ConvertFromUtf32(int.Parse(name, NumberStyles.HexNumber));
-                    if (Regex.IsMatch(character, @"[\u231a-\u303d]")) pngs[n].Add(character);
+                    if (_rgx_Magic.IsMatch(character)) pngs[n].Add(character);
                 }
             }
         }

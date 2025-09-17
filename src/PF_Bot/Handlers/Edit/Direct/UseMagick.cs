@@ -81,5 +81,7 @@ public class UseMagick : PhotoCommand
         InputFile InputFile_FromStream() => InputFile.FromStream(stream, name + "." + extension);
     }
 
-    private static readonly Regex _pic = new("^(png|jpe?g)$"), _gif = new("^(gif|webm|mp4)$");
+    private static readonly Regex
+        _pic = new("^(png|jpe?g)$",    RegexOptions.Compiled),
+        _gif = new("^(gif|webm|mp4)$", RegexOptions.Compiled);
 }

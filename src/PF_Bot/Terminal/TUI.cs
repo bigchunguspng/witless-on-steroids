@@ -13,7 +13,7 @@ namespace PF_Bot.Terminal
     public class TerminalUI
     {
         private long   _activeChat;
-        private string? _input;
+        private string _input = string.Empty;
 
         private Copypaster Baka => ChatManager.GetBaka(_activeChat);
 
@@ -39,10 +39,10 @@ namespace PF_Bot.Terminal
         {
             do
             {
-                _input = Console.ReadLine();
+                _input = Console.ReadLine() ?? string.Empty;
                 try
                 {
-                    if (_input != null && _input.EndsWith("_").Janai())
+                    if (_input.EndsWith("_").Janai())
                     {
                         if      (_input.StartsWith("+") && _input.Length > 1) SetActiveChat();
                         else if (_input.StartsWith("/")                     ) DoConsoleCommands();
@@ -58,8 +58,6 @@ namespace PF_Bot.Terminal
 
         private void DoConsoleCommands()
         {
-            if (_input is null) return;
-
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
             else if (_input == "/s" ) ChatManager.Bakas_SaveDirty_UnloadIdle();
@@ -74,11 +72,14 @@ namespace PF_Bot.Terminal
             else if (_input.StartsWith("/ds")  && _input.HasIntArgument(out var size)) DeleteBySize(size);
         }
 
-        private bool BotWannaSpeak() => Regex.IsMatch(_input!, @"^\/[aw] ");
+        private static readonly Regex
+            _rgx_wannaSpeak = new(@"^\/[aw] ", RegexOptions.Compiled);
+
+        private bool BotWannaSpeak() => _rgx_wannaSpeak.IsMatch(_input);
 
         private void SetActiveChat()
         {
-            var shit = _input![1..];
+            var shit = _input[1..];
             var found = ChatManager.SettingsDB.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
             if (found != 0)
             {
@@ -89,7 +90,7 @@ namespace PF_Bot.Terminal
 
         private void BreakFourthWall()
         {
-            var arg = _input!.Split (' ', 2)[1];
+            var arg = _input.Split (' ', 2)[1];
             if (ChatManager.KnownsChat(_activeChat).Janai()) return;
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add

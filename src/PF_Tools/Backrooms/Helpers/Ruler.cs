@@ -56,13 +56,16 @@ public static class Ruler
             }
         }
 
-        linesFilled += Regex.Count(text, @"\n(?=[ \t]*\n)");
+        linesFilled += _rgx_emptyLine.Count(text);
 
         var fontHeight = advances[0].Bounds.Height;
         var textHeight = fontHeight * linesFilled;
         //var lineSpacings = fontHeight * (ops.LineSpacing - 1) * (linesFilled - 1);
         return new SizeF(maxWidth, textHeight /*+ lineSpacings*/);
     }
+
+    private static readonly Regex
+        _rgx_emptyLine = new(@"\n(?=[ \t]*\n)", RegexOptions.Compiled);
 
     public static SizeF MeasureTextSizeSingleLine(string text, TextOptions options, out int charsFitted)
     {

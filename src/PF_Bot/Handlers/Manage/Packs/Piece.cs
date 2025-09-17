@@ -8,19 +8,20 @@ namespace PF_Bot.Handlers.Manage.Packs
     /// Post Id Easy Channel Exporter™? Maybe.
     public class Piece : SyncCommand
     {
-        private static readonly Regex _args = new(@"t.me\/[a-z0-9_]{5,32}\/(\d+)\s(\S+)");
-        private static readonly Regex _urls = new(@"t.me\/[a-z0-9_]{5,32}\/");
+        private static readonly Regex
+            _rgx_args = new(@"t.me\/[a-z0-9_]{5,32}\/(\d+)\s(\S+)", RegexOptions.Compiled),
+            _rgx_urls = new(@"t.me\/[a-z0-9_]{5,32}\/",             RegexOptions.Compiled);
 
         protected override void Run()
         {
-            if (Args == null || _args.IsMatch(Args).Janai())
+            if (Args == null || _rgx_args.IsMatch(Args).Janai())
             {
                 Bot.SendMessage(Origin, PIECE_MANUAL);
             }
             else
             {
-                var url  = _urls.Match(Args).Value;
-                var args = _args.Match(Args);
+                var url  = _rgx_urls.Match(Args).Value;
+                var args = _rgx_args.Match(Args);
                 var name = args.Groups[2].Value.Replace(' ', '_');
                 var post = args.Groups[1].Value;
 

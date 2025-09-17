@@ -7,7 +7,8 @@ namespace PF_Bot.Routing;
 
 public static class AutoHandler
 {
-    private static readonly Regex _handler = new(@"([pvagus]+)(\d{1,3}%)?:\s*(.+)");
+    private static readonly Regex
+        _rgx_handler = new(@"([pvagus]+)(\d{1,3}%)?:\s*(.+)", RegexOptions.Compiled);
 
     private static readonly LimitedCache<long, Dictionary<char, List<(int Percent, string Command)>>> Cache = new(32);
 
@@ -48,7 +49,7 @@ public static class AutoHandler
         var handlers = new Dictionary<char, List<(int Percent, string Command)>>();
 
         var matches = expression.Split(";", StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => _handler.Match(x.Trim())).Where(x => x.Success);
+            .Select(x => _rgx_handler.Match(x.Trim())).Where(x => x.Success);
 
         foreach (var match in matches)
         {

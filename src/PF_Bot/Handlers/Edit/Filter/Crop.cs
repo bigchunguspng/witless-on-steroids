@@ -9,7 +9,10 @@ namespace PF_Bot.Handlers.Edit.Filter
         private const string _crop  = "piece_fap_bot-crop.mp4";
         private const string _shake = "piece_fap_bot-shake.mp4";
 
-        private static readonly Regex _tlbr = new("[tlbr]", RegexOptions.IgnoreCase);
+        private static readonly Regex
+            _rgx_tlbr = new("[tlbr]",                   RegexOptions.Compiled | RegexOptions.IgnoreCase),
+            _rgx_iw   = new("(?<=[^io_]|^)w",           RegexOptions.Compiled),
+            _rgx_ih   = new("(?<=[^io_]|^)h(?=[^s]|$)", RegexOptions.Compiled);
 
         private bool _isShakeMode; 
 
@@ -42,9 +45,9 @@ namespace PF_Bot.Handlers.Edit.Filter
                     args = F_Shake(crop, speed, offset).Split();
                     log  = [crop, speed, offset];
                 }
-                else if (args?.Length == 2 && _tlbr.IsMatch(args[0]))
+                else if (args?.Length == 2 && _rgx_tlbr.IsMatch(args[0]))
                 {
-                    var match = _tlbr.Match(args[0].ToLower());
+                    var match = _rgx_tlbr.Match(args[0].ToLower());
                     var a0 = match.Value;
                     var a1 = int.Parse(args[1]) / 100F;
                     if      (a0 == "t") args = ["iw", $"(1-{a1})*ih", "0", $"ih*{a1}"];
@@ -55,8 +58,8 @@ namespace PF_Bot.Handlers.Edit.Filter
                 
                 for (var i = 0; i < Math.Min(args!.Length, 4); i++)
                 {
-                    var w   = Regex.Replace(args[i], "(?<=[^io_]|^)w",           "iw");
-                    args[i] = Regex.Replace(w,       "(?<=[^io_]|^)h(?=[^s]|$)", "ih");
+                    args[i] = _rgx_iw.Replace(args[i], "iw");
+                    args[i] = _rgx_ih.Replace(args[i], "ih");
                 }
 
                 if (args.Length > 4) args = args.Take(4).ToArray();

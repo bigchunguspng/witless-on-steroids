@@ -24,7 +24,7 @@ public abstract class AliasManager : SyncCommand
         {
             SendAliasList(new ListPagination(Origin, PerPage: 10));
         }
-        else if (Args is null || Regex.IsMatch(Args, @"\s").Janai())
+        else if (Args == null || Args.HasArguments().Janai())
         {
             Bot.SendMessage(Origin, string.Format(ALIAS_SYNTAX, CMD, Tool));
         }

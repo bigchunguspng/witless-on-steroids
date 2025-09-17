@@ -7,17 +7,18 @@ namespace PF_Bot.Handlers.Manage.Packs
 {
     public class EatReddit : Fuse
     {
-        private readonly Regex _que = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)");
-        private readonly Regex _sub = new(@"([a-z0-9_]+)\*");
-        private readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$");
+        private readonly Regex
+            _rgx_que = new(@"((?:(?:.*)(?=\s[a-z0-9_]+\*))|(?:(?:[^\*]*)(?=\s-\S+))|(?:[^\*]*))(?!\S*\*)", RegexOptions.Compiled),
+            _rgx_sub = new(@"([a-z0-9_]+)\*", RegexOptions.Compiled),
+            _rgx_ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$", RegexOptions.Compiled);
 
         // input: /xd [search query] [subreddit*] [-ops]
         protected override async Task RunAuthorized()
         {
             var args = Args ?? "";
-            var que = _que.Match(args);
-            var sub = _sub.Match(args);
-            var ops = _ops.Match(args);
+            var que = _rgx_que.Match(args);
+            var sub = _rgx_sub.Match(args);
+            var ops = _rgx_ops.Match(args);
 
             var queSuccess = que.Success && que.Groups[1].Value.IsNotNull_NorWhiteSpace();
 

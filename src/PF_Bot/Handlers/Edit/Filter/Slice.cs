@@ -5,7 +5,8 @@ namespace PF_Bot.Handlers.Edit.Filter;
 
 public class Slice : AudioVideoUrlCommand
 {
-    private static readonly Regex _multiplier = new(@"(\d+)(?:\*(\d+))?");
+    private static readonly Regex
+        _rgx_multipliers = new(@"(\d+)(?:\*(\d+))?", RegexOptions.Compiled);
 
     protected override string SyntaxManual => "/man_slice";
 
@@ -13,7 +14,7 @@ public class Slice : AudioVideoUrlCommand
     {
         var (input, waitMessage) = await DownloadFileSuperCool();
 
-        var match = _multiplier.Match(Command!);
+        var match = _rgx_multipliers.Match(Command!);
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
         var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 

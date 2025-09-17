@@ -115,5 +115,6 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         InputFile InputFile_FromStream() => InputFile.FromStream(stream, $"made with piece_fap_bot.{extension}");
     }
 
-    private static readonly Regex _pic = new("^(png|jpe?g)$");
+    private static readonly Regex
+        _pic = new("^(png|jpe?g)$", RegexOptions.Compiled);
 }

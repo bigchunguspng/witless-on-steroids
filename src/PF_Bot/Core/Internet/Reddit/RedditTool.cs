@@ -16,7 +16,8 @@ namespace PF_Bot.Core.Internet.Reddit
 
         private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken, Config.RedditSecret);
 
-        private readonly Regex _img = new(@"(\.png|\.jpg|\.jpeg|\.gif)$|(reddit\.com\/gallery\/)");
+        private readonly Regex
+            _rgx_img = new(@"(\.png|\.jpg|\.jpeg|\.gif)$|(reddit\.com\/gallery\/)", RegexOptions.Compiled);
 
         private RedditTool()
         {
@@ -186,7 +187,7 @@ namespace PF_Bot.Core.Internet.Reddit
             return posts
                 .Skip(pinned)
                 .OfType<LinkPost>()
-                .Where(post => _img.IsMatch(post.URL))
+                .Where(post => _rgx_img.IsMatch(post.URL))
                 .Select(post => new PostData(post))
                 .ToList();
         }

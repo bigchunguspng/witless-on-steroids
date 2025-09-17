@@ -21,8 +21,7 @@
 
             void GetValue(Action<string> action, string propertyName)
             {
-                var regex = new Regex($@"{propertyName}\s+=\s+(\S+)", RegexOptions.IgnoreCase);
-                var match = regex.Match(file);
+                var match = Regex.Match(file, $@"{propertyName}\s+=\s+(\S+)", RegexOptions.IgnoreCase);
                 if (match.Success) action(match.Groups[1].Value);
                 else
                 {

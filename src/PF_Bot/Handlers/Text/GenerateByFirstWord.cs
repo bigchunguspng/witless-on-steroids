@@ -4,7 +4,11 @@ namespace PF_Bot.Handlers.Text
 {
     public class GenerateByFirstWord : WitlessAsyncCommand
     {
-        private static readonly Regex _repeat = new(@"^\/a\S*([2-9])\S*");
+        // todo make _rgx_repeat command agnostic and move outta here
+        private static readonly Regex
+            _rgx_repeat = new(@"^\/a\S*([2-9])\S*", RegexOptions.Compiled),
+            _rgx_upper = new("[A-ZА-Я]", RegexOptions.Compiled),
+            _rgx_lower = new("[a-zа-я]", RegexOptions.Compiled);
 
         protected override async Task Run()
         {
@@ -22,7 +26,7 @@ namespace PF_Bot.Handlers.Text
             }
 
             var up = Command!.Contains("up");
-            var repeats = _repeat.ExtractGroup(1, Command!, int.Parse, 1);
+            var repeats = _rgx_repeat.ExtractGroup(1, Command!, int.Parse, 1);
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
@@ -40,13 +44,13 @@ namespace PF_Bot.Handlers.Text
             LogXD(Title, repeats, "FUNNY BY WORD");
         }
 
-        private static readonly Regex _upper = new("[A-ZА-Я]"), _lower = new("[a-zа-я]");
+        // todo move 2 below to some kinda helpers
 
         protected static LetterCase GetMode(string? s)
         {
             if (s is null) return LetterCaseHelpers.GetRandomLetterCase();
-            var u = _upper.Count(s);
-            var l = _lower.Count(s);
+            var u = _rgx_upper.Count(s);
+            var l = _rgx_lower.Count(s);
             var n = s.Contains("\n\n");
             return n
                 ? LetterCaseHelpers.GetUpperOrLowerLetterCase()

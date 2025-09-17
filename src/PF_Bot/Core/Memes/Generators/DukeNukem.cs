@@ -39,7 +39,8 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
 
     public static readonly SyncDictionary<long, List<NukeLogEntry>> Logs = new();
 
-    private static readonly Regex _rgx_nukeFilter = new(@"-filter_complex ""\[v:0\](.+?)"" ");
+    private static readonly Regex
+        _rgx_nukeFilter = new(@"-filter_complex ""\[v:0\](.+?)"" ", RegexOptions.Compiled);
 
     // private readonly Regex _noAmplify = new("amplify=.+?,");
     // If you gonna implement presets (/anuke? /nuke info?),

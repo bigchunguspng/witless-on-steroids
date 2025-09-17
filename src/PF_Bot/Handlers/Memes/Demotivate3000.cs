@@ -15,7 +15,7 @@ namespace PF_Bot.Handlers.Memes
 
         protected override IMemeGenerator<string> MemeMaker => new DynamicDemotivatorDrawer(_options);
 
-        protected override Regex _cmd { get; } = new(@"^\/dp(\S*)");
+        protected override Regex _rgx_cmd { get; } = new(@"^\/dp(\S*)", RegexOptions.Compiled);
 
         protected override string VideoName => "piece_fap_bot-dp.mp4";
 
@@ -32,14 +32,14 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.MinSizeMultiplier  = GetInt(Request, _fontMS,  10, group: 2);
-            _options.FontSizeMultiplier = GetInt(Request, _fontSM, 100);
+            _options.MinSizeMultiplier  = GetInt(Request, _r_fontMS,  10, group: 2);
+            _options.FontSizeMultiplier = GetInt(Request, _r_fontSM, 100);
 
             _options.CustomColor = _colorWizard.CheckAndCut(Request);
             _options.FontOption = _fontWizard.CheckAndCut(Request);
 
-            _options.WrapText   = CheckAndCut(Request, _nowrap).Failed();
-            _options.Minimalist = CheckAndCut(Request, _small);
+            _options.WrapText   = CheckAndCut(Request, _r_nowrap).Failed();
+            _options.Minimalist = CheckAndCut(Request, _r_small);
         }
 
         protected override string GetMemeText(string? text)
@@ -47,12 +47,13 @@ namespace PF_Bot.Handlers.Memes
             var generate = text.IsNull_OrEmpty();
             var caption = generate ? Baka.Generate() : text!;
 
-            var capitalize = CheckCaps(Request, _caps, generate) || generate && caption.Length <= 12;
+            var capitalize = CheckCaps(Request, _r_caps, generate) || generate && caption.Length <= 12;
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }
 
-        private static readonly Regex _small   = new(@"^\/dp\S*(xx)\S*");
-        private static readonly Regex _fontSM  = new(@"^\/dp\S*?(\d{1,3})("")\S*");
-        private static readonly Regex _fontMS  = new(@"^\/dp\S*?(min)(\d{1,3})("")\S*");
+        private static readonly Regex
+            _r_small   = new(@"^\/dp\S*(xx)\S*",                RegexOptions.Compiled),
+            _r_fontSM  = new(@"^\/dp\S*?(\d{1,3})("")\S*",      RegexOptions.Compiled),
+            _r_fontMS  = new(@"^\/dp\S*?(min)(\d{1,3})("")\S*", RegexOptions.Compiled);
     }
 }

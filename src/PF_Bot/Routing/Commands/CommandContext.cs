@@ -9,8 +9,9 @@ namespace PF_Bot.Routing.Commands;
 
 public class CommandContext
 {
-    private static readonly Regex _command = new(@"^\/\S+");
     private static readonly string _botUsernameStart = Bot.Username.Remove(7);
+    private static readonly Regex
+        _rgx_command = new(@"^\/\S+", RegexOptions.Compiled);
 
     [JsonPropertyOrder(-1)]
     public Message Message      { get; }
@@ -59,7 +60,7 @@ public class CommandContext
     {
         Text = text;
 
-        var match = _command.MatchOrNull(Text);
+        var match = _rgx_command.MatchOrNull(Text);
         if (match is { Success: true })
         {
             var command = match.Value.ToLower();

@@ -27,7 +27,8 @@ public static class DirectEditingHelpers
 
     //
 
-    private static readonly Regex _rgx_Alias = new(@"\$?([^\s\$]*)!", RegexOptions.Compiled);
+    private static readonly Regex
+        _rgx_alias = new(@"\$?([^\s\$]*)!", RegexOptions.Compiled);
 
     public static bool ApplyAliases(this CommandContext context, ref string options, FilePath directory)
     {
@@ -36,7 +37,7 @@ public static class DirectEditingHelpers
 
         while (true)
         {
-            var match = _rgx_Alias.Match(options);
+            var match = _rgx_alias.Match(options);
             if (match.Failed()) break;
                 
             if (context.ApplyAlias(match, ref options, directory).Failed()) return false;
@@ -45,9 +46,9 @@ public static class DirectEditingHelpers
         return true;
     }
 
-    private static bool ApplyAlias(this CommandContext context, Match match, ref string options, FilePath directory)
+    private static bool ApplyAlias(this CommandContext context, Match aliasMatch, ref string options, FilePath directory)
     {
-        var data = match.Groups[1].Value;
+        var data = aliasMatch.Groups[1].Value;
         var args = data.Split(':');
         var name = args[0];
         var path = directory.Combine($"{name}.txt");
@@ -56,8 +57,8 @@ public static class DirectEditingHelpers
         if (success)
         {
             var aliasRender = string.Format(File.ReadAllText(path), args.Skip(1).ToArray());
-            var regex = new Regex(Regex.Escape(match.Value));
-            options = regex.Replace(options, aliasRender, 1);
+            var aliasRegex = new Regex(Regex.Escape(aliasMatch.Value));
+            options = aliasRegex.Replace(options, aliasRender, 1);
         }
         else
             Bot.Instance.SendMessage(context.Origin, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI.PickAny()));

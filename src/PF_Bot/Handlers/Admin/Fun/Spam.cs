@@ -5,7 +5,9 @@ namespace PF_Bot.Handlers.Admin.Fun;
 
 public class Spam : SyncCommand
 {
-    private readonly Regex _days = new(@"a(>|<|>=|<=)?(\d+)"), _size = new(@"s(>|<|>=|<=)?(\d+)([km])?");
+    private readonly Regex
+        _rgx_days = new(@"a(>|<|>=|<=)?(\d+)",        RegexOptions.Compiled),
+        _rgx_size = new(@"s(>|<|>=|<=)?(\d+)([km])?", RegexOptions.Compiled);
 
     protected override void Run()
     {
@@ -34,8 +36,8 @@ public class Spam : SyncCommand
             = onlyGroups   ? GetChatsType.OnlyGroups
             : onlyPrivates ? GetChatsType.OnlyPrivates
             :                GetChatsType.All;
-        var matchDays = _days.Match(Command);
-        var matchSize = _size.Match(Command);
+        var matchDays = _rgx_days.Match(Command);
+        var matchSize = _rgx_size.Match(Command);
         var daysOperator = matchDays.ExtractGroup(1, s => s);
         var sizeOperator = matchSize.ExtractGroup(1, s => s);
         var daysValue    = matchDays.ExtractGroup(2, int.Parse);

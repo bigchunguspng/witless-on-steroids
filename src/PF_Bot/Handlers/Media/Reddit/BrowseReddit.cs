@@ -16,11 +16,12 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 {
     public class BrowseReddit : AsyncCommand
     {
-        private static readonly Regex _arg = new(@"((?:(?:.+)(?=\s[A-Za-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))");
-        private static readonly Regex _sub = new(@"([A-Za-z0-9_]+)");
-        private static readonly Regex sub_ = new(@"([A-Za-z0-9_]+)\*");
-        private static readonly Regex _ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$", RegexOptions.IgnoreCase);
-        private static readonly Regex _wtf = new(@"^\/w[^\ss_@]");
+        private static readonly Regex
+            _rgx_arg = new(@"((?:(?:.+)(?=\s[A-Za-z0-9_]+\*))|(?:(?:.+)(?=\s-\S+))|(?:.+))", RegexOptions.Compiled),
+            _rgx_sub = new(@"([A-Za-z0-9_]+)",              RegexOptions.Compiled),
+            _rgx_SUB = new(@"([A-Za-z0-9_]+)\*",            RegexOptions.Compiled),
+            _rgx_ops = new(@"(?<=-)([hntrc][hdwmya]?)\S*$", RegexOptions.Compiled | RegexOptions.IgnoreCase),
+            _rgx_wtf = new(@"^\/w[^\ss_@]",                 RegexOptions.Compiled);
 
         private static readonly RedditTool Reddit = RedditTool.Instance;
 
@@ -38,7 +39,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
                 Context = CommandContext.FromMessage(message);
                 await Run(); // RECURSIVE
             }
-            else if (_wtf.IsMatch(Command!))
+            else if (_rgx_wtf.IsMatch(Command!))
             {
                 LogDebug("LAST QUERY");
                 await RedditTool.Queue.Enqueue(() => SendPost(Reddit.GetLastOrRandomQuery(Chat)));
@@ -60,7 +61,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
             else if (Command!.StartsWith("/ws")) // [subreddit [-ops]]
             {
-                var sub = _sub.Match(Args ?? "");
+                var sub = _rgx_sub.Match(Args ?? "");
                 if (sub.Success)
                 {
                     var subreddit = sub.Groups[1].Value;
@@ -80,12 +81,12 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
             else // /w search query [subreddit*] [-ops]
             {
-                var arg = _arg.Match(Args ?? "");
+                var arg = _rgx_arg.Match(Args ?? "");
                 if (arg.Success)
                 {
                     var q = arg.Groups[1].Value;
 
-                    var subreddit = sub_.ExtractGroup(1, Args ?? "", s => s);
+                    var subreddit = _rgx_SUB.ExtractGroup(1, Args ?? "", s => s);
 
                     var options = GetOptions("ra");
 
@@ -104,7 +105,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
             bool IsCommand(string a, string b) => a.ToLower().StartsWith(b);
 
-            string GetOptions(string alt) => _ops.ExtractGroup(0, Args ?? "", s => s, alt)!;
+            string GetOptions(string alt) => _rgx_ops.ExtractGroup(0, Args ?? "", s => s, alt)!;
         }
 
         public  static string GetTime(string o, bool b) => o.Length > 1 && b ? Times[o[1]] : Times['a'];

@@ -12,6 +12,11 @@ public static class ArgumentParsing
         return arguments is null ? [] : arguments.Split(_separators, count, StringSplitOptions.RemoveEmptyEntries);
     }
 
+    public static bool HasArguments(this string text)
+    {
+        return text.Contains(' ') || text.Contains('\n');
+    }
+
     public static bool HasIntArgument(this string text, out int value)
     {
         value = 0;
@@ -54,15 +59,19 @@ public static class ArgumentParsing
         else                                                 return (true,  zero,  zero);        // [-------]
     }
 
+    private static readonly Regex
+        _rgx_seconds = new(@"^(?:(\d+)[:;^Жж])?(\d+(?:[.,юб]\d+)?)$", RegexOptions.Compiled),
+        _rgx_comma   = new("[,юб]", RegexOptions.Compiled);
+
     private static bool IsTimeSpan(this string text, out TimeSpan span)
     {
         span = TimeSpan.Zero;
         text = text.TrimStart('-');
 
-        var match = Regex.Match(text, @"^(?:(\d+)[:;^Жж])?(\d+(?:[.,юб]\d+)?)$");
+        var match = _rgx_seconds.Match(text);
         if (match.Failed()) return false;
 
-        var s = Regex.Replace(match.Groups[2].Value, "[,юб]", ".");
+        var s = _rgx_comma.Replace(match.Groups[2].Value, ".");
         var m = match.GroupOrNull(1) ?? "0";
 
         if (double.TryParse(s, out var seconds)) span  = TimeSpan.FromSeconds(seconds);

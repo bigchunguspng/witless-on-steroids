@@ -2,7 +2,8 @@
 {
     public class GenerateByLastWord : GenerateByFirstWord
     {
-        private static readonly Regex _repeat = new(@"^\/zz\S*([2-9])\S*");
+        private static readonly Regex
+            _rgx_repeat = new(@"^\/zz\S*([2-9])\S*", RegexOptions.Compiled);
 
         protected override async Task Run()
         {
@@ -20,7 +21,7 @@
             }
 
             var up = Command!.Contains("up");
-            var repeats = _repeat.ExtractGroup(1, Command!, int.Parse, 1);
+            var repeats = _rgx_repeat.ExtractGroup(1, Command!, int.Parse, 1);
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {

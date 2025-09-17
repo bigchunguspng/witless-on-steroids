@@ -1,5 +1,5 @@
+using PF_Bot.Core;
 using PF_Bot.Core.Editing;
-using PF_Bot.Telegram;
 using PF_Tools.FFMpeg;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -22,7 +22,7 @@ public class SoundDB : MediaDB<Voice>
         await FFMpeg.Command(path, temp, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
 
         await using var stream = File.OpenRead(temp);
-        var message = await Bot.Instance.Client.SendVoice(channel, stream);
+        var message = await App.Bot.Client.SendVoice(channel, stream);
         return message.Voice!;
     }
 }

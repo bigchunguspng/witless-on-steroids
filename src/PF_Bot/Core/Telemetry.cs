@@ -1,4 +1,3 @@
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Core;
@@ -17,7 +16,7 @@ public static class Telemetry
 
     public static void LogInline
         (long chat, string? text)
-        => Log(chat, $"{Bot.Username} {text}");
+        => Log(chat, $"{App.Bot.Username} {text}");
 
     public static void LogAuto
         (long chat, byte chance, string? text)

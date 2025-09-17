@@ -1,6 +1,5 @@
 using PF_Bot.Core;
 using PF_Bot.Handlers.Media.MediaDB;
-using PF_Bot.Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -39,7 +38,7 @@ public class InlineRequestHandler
 
         var results = GetResults(sound_mode, query, caption);
 
-        await Bot.Instance.Client.AnswerInlineQuery(inline.Id, results.Take(50));
+        await App.Bot.Client.AnswerInlineQuery(inline.Id, results.Take(50));
 
         var title = inline.From.GetFullNameTruncated();
         var mode = sound_mode ? "a" : "g";

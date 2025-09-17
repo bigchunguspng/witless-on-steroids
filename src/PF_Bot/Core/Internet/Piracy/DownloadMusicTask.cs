@@ -36,7 +36,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
     public string? Artist;
     public string? Title;
 
-    private Bot Bot => Bot.Instance;
+    private Bot Bot => App.Bot;
 
     private string GetAudioArgs(string url, string output)
     {

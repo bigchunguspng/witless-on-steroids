@@ -15,7 +15,7 @@ public partial class Bot
     public static CommandAndCallbackRouter Router { get; private set; } = null!;
     public static InlineRequestHandler    Inliner { get; private set; } = new();
 
-    private void StartListening()
+    public void StartListening()
     {
         var options = new ReceiverOptions
         {

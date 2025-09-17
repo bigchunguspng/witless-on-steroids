@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using PF_Bot.Core;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 using MediaFile = (string Id, string FileId, string Text, string LowercaseText);
 
@@ -103,7 +102,7 @@ public abstract class MediaDB<T> where T : FileBase
             .Combine($"{WhatSingle}-{DateTime.Now.Ticks}")
             .EnsureDirectoryExist();
         var file = path.Combine(fileName);
-        await Bot.Instance.DownloadFile(fileId, file, origin);
+        await App.Bot.DownloadFile(fileId, file, origin);
         await UploadMany(path);
     }
 

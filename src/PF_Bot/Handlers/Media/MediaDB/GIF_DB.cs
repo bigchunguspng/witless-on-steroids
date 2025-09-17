@@ -1,5 +1,5 @@
+using PF_Bot.Core;
 using PF_Bot.Core.Editing;
-using PF_Bot.Telegram;
 using PF_Tools.FFMpeg;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -23,7 +23,7 @@ public class GIF_DB : MediaDB<Animation>
         await FFMpeg_VideoToGIF(path, temp);
 
         await using var stream = File.OpenRead(temp);
-        var message = await Bot.Instance.Client.SendAnimation(channel, stream);
+        var message = await App.Bot.Client.SendAnimation(channel, stream);
         return message.Animation!;
     }
 

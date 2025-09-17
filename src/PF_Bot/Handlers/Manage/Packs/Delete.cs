@@ -1,6 +1,5 @@
 ﻿using PF_Bot.Core.Chats;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 

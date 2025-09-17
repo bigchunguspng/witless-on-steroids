@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using PF_Bot.Telegram;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 
@@ -79,7 +78,7 @@ namespace PF_Bot.Core.Text
             {
                 LogError("NO TEXT!?");
                 var response = Fortune.IsOneIn(8) ? null : DefaultTextProvider.GetRandomResponse();
-                return (response ?? Bot.Instance.Me.FirstName).ToRandomLetterCase();
+                return (response ?? App.Bot.Me.FirstName).ToRandomLetterCase();
             }
         }
 

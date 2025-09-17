@@ -1,4 +1,5 @@
-﻿using PF_Bot.Core.Chats;
+﻿using PF_Bot.Core;
+using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Telegram;
 using PF_Tools.ProcessRunning;
@@ -8,7 +9,7 @@ namespace PF_Bot.Routing.Commands
 {
     public abstract class AnyCommand<TContext> where TContext : CommandContext
     {
-        protected static Bot Bot => Bot.Instance;
+        protected static Bot Bot => App.Bot;
 
         public TContext Context { get; protected set; } = null!;
 

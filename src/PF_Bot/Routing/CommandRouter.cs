@@ -13,7 +13,6 @@ using PF_Bot.Handlers.Media;
 using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Handlers.Media.Reddit;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing

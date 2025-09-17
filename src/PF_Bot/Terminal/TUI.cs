@@ -4,7 +4,6 @@ using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
-using PF_Bot.Telegram;
 using Telegram.Bot;
 using Exception = System.Exception;
 
@@ -20,19 +19,8 @@ namespace PF_Bot.Terminal
         public static void Start()
         {
             Thread.CurrentThread.Name = "Console UI";
-            Console.CancelKeyPress              += (_, _) => SaveAndExit();
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
 
             new TerminalUI().Loop();
-        }
-
-        private static void SaveAndExit()
-        {
-            Print("На выход…", ConsoleColor.Yellow);
-            Telemetry.Log_EXIT(Bot.Instance.Me);
-            Telemetry.Write();
-            ChatManager.Bakas_SaveDirty();
-            if (App.LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
         }
 
         private void Loop()
@@ -99,7 +87,7 @@ namespace PF_Bot.Terminal
             }
             else if (_input.StartsWith("/w "))                                  // write
             {
-                Bot.Instance.SendMessage((_activeChat, null), arg, preview: true);
+                App.Bot.SendMessage((_activeChat, null), arg, preview: true);
                 Baka.Eat(arg);
                 Print($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
             }
@@ -131,13 +119,13 @@ namespace PF_Bot.Terminal
 
         private bool DeleteBlocker(long chat)
         {
-            var x = Bot.Instance.PingChat((chat, null), notify: false);
+            var x = App.Bot.PingChat((chat, null), notify: false);
             if (x == -1)
             {
                 ChatManager.RemoveChat(chat);
                 ChatManager.DeletePack(chat);
             }
-            else Bot.Instance.Client.DeleteMessage(chat, x);
+            else App.Bot.Client.DeleteMessage(chat, x);
 
             return x is -1;
         }

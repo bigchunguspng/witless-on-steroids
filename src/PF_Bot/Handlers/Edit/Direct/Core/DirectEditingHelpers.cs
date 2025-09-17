@@ -1,7 +1,7 @@
 // ReSharper disable CoVariantArrayConversion
 
+using PF_Bot.Core;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Handlers.Edit.Direct.Core;
@@ -12,11 +12,11 @@ public static class DirectEditingHelpers
 
     public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
     {
-        Bot.Instance.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
+        App.Bot.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
         if (extensionInvalid)
         {
             await Task.Delay(Fortune.RandomInt(900, 1100));
-            Bot.Instance.SendMessage(origin, PEG_EXTENSION_MISSING);
+            App.Bot.SendMessage(origin, PEG_EXTENSION_MISSING);
         }
     }
     
@@ -61,7 +61,7 @@ public static class DirectEditingHelpers
             options = aliasRegex.Replace(options, aliasRender, 1);
         }
         else
-            Bot.Instance.SendMessage(context.Origin, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI.PickAny()));
+            App.Bot.SendMessage(context.Origin, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI.PickAny()));
 
         return success;
     }

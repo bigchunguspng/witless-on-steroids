@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -9,7 +9,7 @@ namespace PF_Bot.Routing.Commands;
 
 public class CommandContext
 {
-    private static readonly string _botUsernameStart = Bot.Username.Remove(7);
+    private static readonly string _botUsernameStart = App.Bot.Username.Remove(7);
     private static readonly Regex
         _rgx_command = new(@"^\/\S+", RegexOptions.Compiled);
 
@@ -64,7 +64,7 @@ public class CommandContext
         if (match is { Success: true })
         {
             var command = match.Value.ToLower();
-            Command = command.Replace(Bot.Username, "");
+            Command = command.Replace(App.Bot.Username, "");
             var indexA = command.IndexOf('@');
             var indexB = command.LastIndexOf("bot", StringComparison.Ordinal);
             BotMentioned = indexA > 0 && indexB > 0 && indexB > indexA;

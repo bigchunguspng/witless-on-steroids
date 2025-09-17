@@ -1,5 +1,4 @@
 ﻿using PF_Bot.Core;
-using PF_Bot.Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -10,6 +9,22 @@ namespace PF_Bot.Backrooms;
 public static partial class Extensions
 {
     private const string UNKNOWN = "[UNKNOWN]";
+
+    public static async Task<User> GetMe_AtAllCost(this TelegramBotClient client)
+    {
+        while (true)
+        {
+            try
+            {
+                return await client.GetMe();
+            }
+            catch (Exception e)
+            {
+                LogError($"NO INTERNET? | {e.GetErrorMessage()}");
+                Task.Delay(5000).Wait();
+            }
+        }
+    }
 
     public static string? GetTextOrCaption(this Message message)
     {
@@ -120,11 +135,11 @@ public static partial class Extensions
         {
             if (message.SenderChat.Id == chat) return true;
 
-            Bot.Instance.SendMessage(message.GetOrigin(), UNKNOWN_CHAT.PickAny());
+            App.Bot.SendMessage(message.GetOrigin(), UNKNOWN_CHAT.PickAny());
         }
         else if (await message.From.IsAdminInChat(chat) == false)
         {
-            Bot.Instance.SendMessage(message.GetOrigin(), NOT_ADMIN.PickAny());
+            App.Bot.SendMessage(message.GetOrigin(), NOT_ADMIN.PickAny());
         }
         else return true;
 
@@ -135,7 +150,7 @@ public static partial class Extensions
     {
         if (user is null) return false;
 
-        var admins = await Bot.Instance.Client.GetChatAdministrators(chat);
+        var admins = await App.Bot.Client.GetChatAdministrators(chat);
         return admins.Any(x => x.User.Id == user.Id);
     }
 

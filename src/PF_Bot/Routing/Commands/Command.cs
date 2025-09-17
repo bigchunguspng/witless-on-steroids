@@ -31,15 +31,8 @@ namespace PF_Bot.Routing.Commands
     {
         public sealed override void Execute(TContext context)
         {
-            try
-            {
-                Context = context;
-                Run();
-            }
-            finally
-            {
-                Context = null!;
-            }
+            Context = context;
+            Run();
         }
 
         protected abstract void Run();

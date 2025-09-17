@@ -17,9 +17,17 @@ public static class LetterCaseHelpers
     {
         LetterCase.Lower    => text.ToLower(),
         LetterCase.Upper    => text.ToUpper(),
-        LetterCase.Sentence => char.ToUpper(text[0]) + text[1..].ToLower(),
+        LetterCase.Sentence => text.ToSentenseCase(),
         _ => text,
     };
+
+    private static string ToSentenseCase
+        (this string text) =>
+        text.IsNull_OrEmpty()
+            ? text
+            : text.Length == 1
+                ? text.ToUpper()
+                : char.ToUpper(text[0]) + text[1..].ToLower();
 
     public static LetterCase GetRandomLetterCase() => Random.Shared.Next(8) switch
     {

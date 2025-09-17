@@ -39,7 +39,7 @@ public class DownloadMusic : AsyncCommand
 
             var playListIndex = youTube && playlistID is null
                 ? null
-                : Regex.Match(options, @"\d+").Value.MakeNull_IfEmpty();
+                : options.MatchNumber().Value.MakeNull_IfEmpty();
 
             var message = Bot.PingChat(Origin, PLS_WAIT.PickAny());
 

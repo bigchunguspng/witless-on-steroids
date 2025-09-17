@@ -131,6 +131,11 @@ public static class Extensions_String
 
     // REGEX
 
+    private static readonly Regex
+        _rgx_number = new(@"\d+", RegexOptions.Compiled);
+
+    public static Match MatchNumber(this string text) => _rgx_number.Match(text);
+
     public static Match? MatchOrNull(this Regex regex, string? text) => text == null ? null : regex.Match(text);
     public static bool IsMatchOrNull(this Regex regex, string? text) => text != null && regex.IsMatch(text);
 

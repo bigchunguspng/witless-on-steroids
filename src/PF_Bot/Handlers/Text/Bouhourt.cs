@@ -5,11 +5,9 @@ namespace PF_Bot.Handlers.Text
 {
     public class Bouhourt : WitlessSyncCommand
     {
-        private readonly Regex _rgx_length = new(@"\d+");
-
         protected override void Run()
         {
-            var length = _rgx_length.ExtractGroup(0, Command!, int.Parse, 3);
+            var length = Command!.MatchNumber().ExtractGroup(0, int.Parse, 3);
             var start = Args;
 
             var greentext = Command!.Contains("bb");

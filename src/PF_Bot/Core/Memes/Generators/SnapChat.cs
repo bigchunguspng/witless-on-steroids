@@ -45,7 +45,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
 
     private readonly SolidBrush _white = new(Color.White);
 
-    public async Task GenerateMeme(MemeFileRequest request, string text)
+    public async Task GenerateMeme(MemeRequest request, string text)
     {
         await FetchImageSize(request);
         SetUp();
@@ -65,7 +65,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         await saveImageTask;
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+    public async Task GenerateVideoMeme(MemeRequest request, string text)
     {
         await FetchVideoSize(request);
         SetUp();
@@ -96,7 +96,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         _cardHeight = x.ToEven();
     }
 
-    private async Task<Image<Rgba32>> GetImage(MemeFileRequest request)
+    private async Task<Image<Rgba32>> GetImage(MemeRequest request)
     {
         if (request is { IsSticker: true, ExportAsSticker: false })
         {

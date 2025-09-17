@@ -63,7 +63,7 @@ namespace PF_Bot.Core.Memes.Generators
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateMeme(MemeRequest request, TextPair text)
         {
             await FetchImageSize(request);
             SetUp();
@@ -83,7 +83,7 @@ namespace PF_Bot.Core.Memes.Generators
             await saveImageTask;
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateVideoMeme(MemeRequest request, TextPair text)
         {
             await FetchVideoSize(request);
             SetUp();
@@ -114,7 +114,7 @@ namespace PF_Bot.Core.Memes.Generators
             SetUpFonts();
         }
 
-        private async Task<Image<Rgba32>> GetImage(MemeFileRequest request)
+        private async Task<Image<Rgba32>> GetImage(MemeRequest request)
         {
             if (request is { IsSticker: true, ExportAsSticker: false })
             {

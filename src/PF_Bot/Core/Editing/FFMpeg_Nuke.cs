@@ -4,7 +4,7 @@ using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Core.Editing;
 
-public class FFMpeg_Nuke(FFProbeResult probe, MemeFileRequest request)
+public class FFMpeg_Nuke(FFProbeResult probe, MemeRequest request)
 {
     private readonly FFMpegArgs             _args = new();
     private readonly FFMpegOutputOptions _options = new();

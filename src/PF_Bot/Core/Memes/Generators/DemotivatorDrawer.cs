@@ -75,7 +75,7 @@ namespace PF_Bot.Core.Memes.Generators
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateMeme(MemeRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             await InsertImage(frame, request);
@@ -83,7 +83,7 @@ namespace PF_Bot.Core.Memes.Generators
             await ImageSaver.SaveImageJpeg(frame, request.TargetPath, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, TextPair text)
+        public async Task GenerateVideoMeme(MemeRequest request, TextPair text)
         {
             using var frame = DrawFrame(text);
             var frameAsFile = await ImageSaver.SaveImageTemp(frame);
@@ -149,7 +149,7 @@ namespace PF_Bot.Core.Memes.Generators
             }
         }
 
-        private async Task InsertImage(Image frame, MemeFileRequest request)
+        private async Task InsertImage(Image frame, MemeRequest request)
         {
             using var image = await Image.LoadAsync(request.SourcePath);
 

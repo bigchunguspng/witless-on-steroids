@@ -13,7 +13,7 @@ public struct MemeOptions_Nuke()
 
 public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
 {
-    public async Task GenerateMeme(MemeFileRequest request, int text)
+    public async Task GenerateMeme(MemeRequest request, int text)
     {
         //throw new InvalidOperationException($"Surprize mazafaka! {DateTime.Now.Ticks}");
         var probe = await FFProbe.Analyze(request.SourcePath);
@@ -24,7 +24,7 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
         LogNuke(chat, result, request);
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, int text)
+    public async Task GenerateVideoMeme(MemeRequest request, int text)
     {
         var probe = await FFProbe.Analyze(request.SourcePath);
         var result = await new FFMpeg_Nuke(probe, request)
@@ -47,7 +47,7 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
     // If you gonna implement presets (/anuke? /nuke info?),
     // remove this regex from preset filter when applying it to image (works only with videos) 
 
-    private static void LogNuke(long chat, ProcessResult process, MemeFileRequest request)
+    private static void LogNuke(long chat, ProcessResult process, MemeRequest request)
     {
         if (Logs.ContainsKey(chat).Janai())
             Logs.Add(chat, []);

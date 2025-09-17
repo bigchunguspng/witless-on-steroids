@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace PF_Bot.Core.Memes.Shared;
 
-public class MemeFileRequest(MemeSourceType type, FilePath source, FilePath target, byte quality, float press)
+public class MemeRequest(MemeSourceType type, FilePath source, FilePath target, byte quality, float press)
 {
     public MemeSourceType  Type { get; } = type;
     public FilePath  SourcePath { get; } = source;

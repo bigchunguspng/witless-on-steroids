@@ -60,7 +60,7 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
 
     // LOGIC
 
-    public async Task GenerateMeme(MemeFileRequest request, string text)
+    public async Task GenerateMeme(MemeRequest request, string text)
     {
         await FetchImageSize(request);
         SetUp();
@@ -77,7 +77,7 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
         await ImageSaver.SaveImageJpeg(meme, request.TargetPath, request.Quality);
     }
 
-    public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+    public async Task GenerateVideoMeme(MemeRequest request, string text)
     {
         await FetchVideoSize(request);
         SetUp();

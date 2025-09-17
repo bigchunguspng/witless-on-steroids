@@ -51,7 +51,7 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
 
         // LOGIC
 
-        public async Task GenerateMeme(MemeFileRequest request, string text)
+        public async Task GenerateMeme(MemeRequest request, string text)
         {
             await FetchImageSize(request);
             SetUp();
@@ -71,7 +71,7 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
             await ImageSaver.SaveImageJpeg(frame, request.TargetPath, request.Quality);
         }
 
-        public async Task GenerateVideoMeme(MemeFileRequest request, string text)
+        public async Task GenerateVideoMeme(MemeRequest request, string text)
         {
             await FetchVideoSize(request);
             SetUp();
@@ -113,7 +113,7 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
             return MakeTextFitCard(text);
         }
 
-        private void SetUpFrameSize(MemeFileRequest request)
+        private void SetUpFrameSize(MemeRequest request)
         {
             var space = Math.Max(imageH / 30F, 4);
             var lineHeight = FontSize * GetLineSpacing();

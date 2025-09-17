@@ -5,7 +5,7 @@ using SixLabors.ImageSharp;
 namespace PF_Bot.Core.Editing;
 
 /// Videomemes are assembled here.
-public class FFMpeg_Meme(FFProbeResult probe, MemeFileRequest request, FilePath caption)
+public class FFMpeg_Meme(FFProbeResult probe, MemeRequest request, FilePath caption)
 {
     private readonly string  _input = request.SourcePath;
     private readonly string _output = request.TargetPath;

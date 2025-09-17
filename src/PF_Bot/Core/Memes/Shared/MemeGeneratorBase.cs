@@ -10,21 +10,21 @@ public abstract class MemeGeneratorBase
     private   Size _sourceSizeOG;
     protected Size _sourceSizeAdjusted;
 
-    protected async Task FetchImageSize(MemeFileRequest request)
+    protected async Task FetchImageSize(MemeRequest request)
     {
         var info = await Image.IdentifyAsync(request.SourcePath);
         _sourceSizeOG = info.Size;
         _sourceSizeAdjusted = AdjustImageSize(request);
     }
 
-    protected async Task FetchVideoSize(MemeFileRequest request)
+    protected async Task FetchVideoSize(MemeRequest request)
     {
         var probe = await FFProbe.Analyze(request.SourcePath);
         _sourceSizeOG = probe.GetVideoStream().Size;
         _sourceSizeAdjusted = AdjustImageSize(request).ValidMp4Size();
     }
 
-    private Size AdjustImageSize(MemeFileRequest request)
+    private Size AdjustImageSize(MemeRequest request)
     {
         var size = request.ExportAsSticker
             ? _sourceSizeOG

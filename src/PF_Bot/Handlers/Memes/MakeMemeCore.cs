@@ -167,11 +167,11 @@ namespace PF_Bot.Handlers.Memes // ReSharper disable InconsistentNaming
 
         protected abstract void ParseOptions();
 
-        private MemeFileRequest GetMemeFileRequest
+        private MemeRequest GetMemeFileRequest
             (MemeSourceType type, FilePath input, string extension)
         {
             var output = input.ChangeEnding($"{Suffix}-{Desert.GetSilt()}{extension}");
-            return new MemeFileRequest(type, input, output, Data.Quality, _pressure);
+            return new MemeRequest(type, input, output, Data.Quality, _pressure);
         }
 
         private string GetLogString(int repeats)
@@ -184,7 +184,7 @@ namespace PF_Bot.Handlers.Memes // ReSharper disable InconsistentNaming
         // MEME GENERATION
 
         private async Task MakeMemeImage
-            (MemeFileRequest request)
+            (MemeRequest request)
         {
             var sw = Stopwatch.StartNew();
             await MemeMaker.GenerateMeme(request, GetText());
@@ -192,7 +192,7 @@ namespace PF_Bot.Handlers.Memes // ReSharper disable InconsistentNaming
         }
 
         private async Task MakeMemeVideo
-            (MemeFileRequest request)
+            (MemeRequest request)
         {
             var sw = Stopwatch.StartNew();
             await MemeMaker.GenerateVideoMeme(request, GetText());

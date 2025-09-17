@@ -14,10 +14,11 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
     {
         public FontOption FontOption;
 
+        /// Color of frame and text.
         public ColorOption CustomColor;
 
-        public float  MinSizeMultiplier =  10;
-        public float FontSizeMultiplier = 100;
+        public float MinFontSizeMultiplier =  10;
+        public float    FontSizeMultiplier = 100;
 
         public bool WrapText = true;
         public bool Minimalist;

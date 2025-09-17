@@ -14,17 +14,21 @@ public struct MemeOptions_Snap()
 {
     public FontOption FontOption;
 
+    /// Color to fill sticker background with.
     public ColorOption CustomColorBack;
     public ColorOption CustomColorText;
 
-    public int CardOffset  = 50;
-    public int CardOpacity = 62;
+    // Vertical offset of text card, 0-100%.
+    public int TextOffset = 50;
 
-    public float  MinSizeMultiplier =  10;
-    public float FontSizeMultiplier = 100;
+    public float MinFontSizeMultiplier =  10;
+    public float    FontSizeMultiplier = 100;
 
-    public bool WrapText     = true;
-    public bool RandomOffset;
+    public byte CardOpacity = 62;
+
+    public bool WrapText = true;
+    /// Text is placed at random vertical offset of 25-75%.
+    public bool RandomTextOffset;
 }
 
 public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGenerator<string>
@@ -78,7 +82,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         _w = _sourceSizeAdjusted.Width;
         _h = _sourceSizeAdjusted.Height;
 
-        var offsetBase = op.RandomOffset ? Fortune.RandomInt(25, 75) : op.CardOffset;
+        var offsetBase = op.RandomTextOffset ? Fortune.RandomInt(25, 75) : op.TextOffset;
         _offsetY = _h * offsetBase / 100;
         _marginX = Math.Max(_w / 20, 10);
 

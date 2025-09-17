@@ -27,7 +27,7 @@ public partial class DynamicDemotivatorDrawer
     {
         var defaultFontSize = imageW * 0.1F;
         var multiplier = op.FontSizeMultiplier / 100F;
-        var multiplierM = op.MinSizeMultiplier / 100F;
+        var multiplierM = op.MinFontSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
         return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }

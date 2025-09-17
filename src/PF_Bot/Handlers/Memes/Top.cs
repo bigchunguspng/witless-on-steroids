@@ -33,17 +33,17 @@ namespace PF_Bot.Handlers.Memes
             _options.CustomColor = _colorWizard.CheckAndCut(Options);
             _options.FontOption = _fontWizard.CheckAndCut(Options);
 
-            _options.CropPercent        = Options.GetInt(_r_crop,     0);
-            _options.MinSizeMultiplier  = Options.GetInt(_r_fontMS,  10, group: 2);
-            _options.FontSizeMultiplier = Options.GetInt(_r_fontSM, 100);
+            _options.CropPercent           = Options.GetInt(_r_crop, 0).Clamp(-100, 100).ClampSbyte();
+            _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSizeMin, 10, group: 2);
+            _options.   FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
 
-            _options.WrapText         = Options.CheckAndCut(_r_nowrap ).Failed();
-            _options.BackInBlack      = Options.CheckAndCut(_r_blackBG);
-            _options.ForceCenter      = Options.CheckAndCut(_r_colorPC);
-            _options.PickColor        = Options.CheckAndCut(_r_colorPP);
-            _options.UseLeftAlignment = Options.CheckAndCut(_r_left   );
-            _options.UltraThinCard    = Options.CheckAndCut(_r_thinner);
-            _options.ThinCard         = Options.CheckAndCut(_r_thin   );
+            _options.WrapText             = Options.CheckAndCut(_r_nowrap).Failed();
+            _options.BackInBlack          = Options.CheckAndCut(_r_blackBg);
+            _options.PickColor_FromCenter = Options.CheckAndCut(_r_colorPPX);
+            _options.PickColor            = Options.CheckAndCut(_r_colorPP);
+            _options.TextLeftAlignment    = Options.CheckAndCut(_r_left);
+            _options.UltraThinCard        = Options.CheckAndCut(_r_thinner);
+            _options.     ThinCard        = Options.CheckAndCut(_r_thin);
         }
 
         protected override string GetMemeText(string? text)
@@ -63,13 +63,13 @@ namespace PF_Bot.Handlers.Memes
             _r_left    = "la",
             _r_thin    = "mm",
             _r_colorPP = "pp",
-            _r_blackBG = "ob";
+            _r_blackBg = "ob";
 
         private static readonly Regex
-            _r_thinner = new("mm(!)", RegexOptions.Compiled),
-            _r_colorPC = new("pp(!)", RegexOptions.Compiled),
-            _r_crop    = new(   @"(-?\d{1,2})(%)",  RegexOptions.Compiled),
-            _r_fontSM  = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
-            _r_fontMS  = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
+            _r_thinner  = new("mm(!)", RegexOptions.Compiled),
+            _r_colorPPX = new("pp(!)", RegexOptions.Compiled),
+            _r_crop        = new(   @"(-?\d{1,2})(%)",  RegexOptions.Compiled),
+            _r_fontSize    = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
+            _r_fontSizeMin = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
     }
 }

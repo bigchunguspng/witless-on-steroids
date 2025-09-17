@@ -39,11 +39,11 @@ namespace PF_Bot.Handlers.Memes
 
             _options.FontOption = _fontWizard.CheckAndCut(Options);
 
-            _options.FontMultiplier = Options.GetInt(_r_fontSM, 100);
-            _options.ShadowOpacity  = Options.GetInt(_r_shadow, 100).Clamp(0, 100).ClampByte();
-            _options.TextOffset     = Options.GetInt(_r_offset, -1);
+            _options.FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
+            _options.ShadowOpacity      = Options.GetInt(_r_shadow, 100).ClampByte().Clamp100();
+            _options.TextOffset         = Options.GetInt(_r_offset, -1);
 
-            _options.RandomOffset       = Options.CheckAndCut(_r_randomOffset);
+            _options.RandomTextOffset   = Options.CheckAndCut(_r_randomOffset);
             _options.WrapText           = Options.CheckAndCut(_r_nowrap).Failed();
             _options.RandomTextColor    = Options.CheckAndCut(_r_colorText);
             _options.AbsolutelyNoMargin = Options.CheckAndCut(_r_noMarginDude);
@@ -62,7 +62,7 @@ namespace PF_Bot.Handlers.Memes
 
             string a, b;
 
-            if (_options.CustomOffsetMode)
+            if (_options.FloatingCaptionMode)
             {
                 a = generate ? Baka.Generate() : text!;
                 b = "";
@@ -128,8 +128,8 @@ namespace PF_Bot.Handlers.Memes
             _r_noMarginDude = "mm!";
 
         private static readonly Regex
-            _r_fontSM       = new(@"(\d{1,3})("")", RegexOptions.Compiled),
-            _r_shadow       = new(@"(\d{1,3})(%)",  RegexOptions.Compiled),
-            _r_offset       = new(@"(\d{1,3})(!)",  RegexOptions.Compiled);
+            _r_fontSize = new(@"(\d{1,3})("")", RegexOptions.Compiled),
+            _r_shadow   = new(@"(\d{1,3})(%)",  RegexOptions.Compiled),
+            _r_offset   = new(@"(\d{1,3})(!)",  RegexOptions.Compiled);
     }
 }

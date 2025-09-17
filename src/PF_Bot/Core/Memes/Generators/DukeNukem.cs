@@ -7,6 +7,7 @@ namespace PF_Bot.Core.Memes.Generators;
 
 public struct MemeOptions_Nuke()
 {
+    /// Amount of dropped nukes XD.
     public int Depth = 1;
 }
 

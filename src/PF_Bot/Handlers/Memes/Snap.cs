@@ -27,21 +27,21 @@ public class Snap : MakeMemeCore<string>
 
     protected override Task Run() => RunInternal("snap");
 
-    protected override bool ResultsAreRandom => _options.RandomOffset || _options.FontOption.IsRandom;
+    protected override bool ResultsAreRandom => _options.RandomTextOffset || _options.FontOption.IsRandom;
 
     protected override void ParseOptions()
     {
-        _options.RandomOffset = Options.CheckAndCut(_r_random);
+        _options.RandomTextOffset = Options.CheckAndCut(_r_randomOffset);
 
         _options.CustomColorBack = _colorWizardBack.CheckAndCut(Options);
         _options.CustomColorText = _colorWizardText.CheckAndCut(Options);
 
         _options.FontOption = _fontWizard.CheckAndCut(Options);
 
-        _options.MinSizeMultiplier  = Options.GetInt(_r_fontMS,  10, group: 2);
-        _options.FontSizeMultiplier = Options.GetInt(_r_fontSM, 100);
-        _options.CardOpacity        = Options.GetInt(_r_opacity, 62);
-        _options.CardOffset         = Options.GetInt(_r_offset,  50);
+        _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSize, 10, group: 2);
+        _options.   FontSizeMultiplier = Options.GetInt(_r_fontSizeMin, 100);
+        _options.CardOpacity           = Options.GetInt(_r_opacity, 62).ClampByte().Clamp100();
+        _options.TextOffset            = Options.GetInt(_r_offset,  50);
 
         _options.WrapText = Options.CheckAndCut(_r_nowrap).Failed();
     }
@@ -57,11 +57,11 @@ public class Snap : MakeMemeCore<string>
     }
 
     private const string
-        _r_random  = "!!";
+        _r_randomOffset = "!!";
 
     private static readonly Regex
-        _r_opacity = new(     @"(\d{1,3})(%)",  RegexOptions.Compiled),
-        _r_offset  = new(     @"(\d{1,3})(!)",  RegexOptions.Compiled),
-        _r_fontSM  = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
-        _r_fontMS  = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
+        _r_opacity     = new(     @"(\d{1,3})(%)",  RegexOptions.Compiled),
+        _r_offset      = new(     @"(\d{1,3})(!)",  RegexOptions.Compiled),
+        _r_fontSizeMin = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
+        _r_fontSize    = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
 }

@@ -26,7 +26,7 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         if (top.height > 0)
         {
-            var area = new Rectangle(0, 0, _w, op.CustomOffsetMode ? _h : _h / 2);
+            var area = new Rectangle(0, 0, _w, op.FloatingCaptionMode ? _h : _h / 2);
             ShadowImagePart(top.fontSize, area);
         }
 

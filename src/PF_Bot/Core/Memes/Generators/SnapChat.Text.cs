@@ -26,8 +26,8 @@ public partial class SnapChat
     private float GetStartingFontSize()
     {
         var defaultFontSize = Math.Min(_w, 3F * _h) * 0.052F;
-        var multiplier = op.FontSizeMultiplier / 100F;
-        var multiplierM = op.MinSizeMultiplier / 100F;
+        var multiplier  = op.   FontSizeMultiplier / 100F;
+        var multiplierM = op.MinFontSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
         return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }

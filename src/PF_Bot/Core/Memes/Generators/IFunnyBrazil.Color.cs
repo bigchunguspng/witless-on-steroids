@@ -24,7 +24,7 @@ public partial class IFunnyBrazil
 
     private Rgba32 PickColorFromImage(Image<Rgba32> image)
     {
-        var xd = op.ForceCenter ? 2 : 0;
+        var xd = op.PickColor_FromCenter ? 2 : 0;
 
         var colors = new Rgba32[7];
         colors[0] = AverageColorOnOffset(0);
@@ -48,7 +48,7 @@ public partial class IFunnyBrazil
         Rgba32 AverageColorOnOffset(int x)
         {
             var avg = AverageColor(image, new Rectangle(x, _cropOffset, 5, 5));
-            return op.BackInBlack ? avg : PutOver(Color.White, avg);
+            return op.BackInBlack ? avg : PutOver(Color.White, avg); // todo isn't BackInBlack sticker specific?
         }
     }
 

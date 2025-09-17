@@ -30,7 +30,7 @@ public partial class MemeGenerator
 
     private float GetStartingFontSize()
     {
-        var multiplier = op.FontMultiplier / 100F;
+        var multiplier = op.FontSizeMultiplier / 100F;
         return Math.Max(GetDefaultFontFize() * multiplier, 15) * op.FontOption.GetSizeMultiplier();
     }
 
@@ -103,7 +103,7 @@ public partial class MemeGenerator
     {
         TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = op.CustomOffsetMode
+        VerticalAlignment = op.FloatingCaptionMode
             ? VerticalAlignment.Center
             : top
                 ? VerticalAlignment.Top
@@ -128,7 +128,7 @@ public partial class MemeGenerator
     private Point GetFunnyOrigin(Size textArea, RichTextOptions options, bool top, float caseOffset)
     {
         var space = 0.25F * options.Font.Size * options.LineSpacing;
-        var marginY = op.CustomOffsetMode
+        var marginY = op.FloatingCaptionMode
             ? _marginY - 0.5 * textArea.Height
             : top
                 ? _marginY - space

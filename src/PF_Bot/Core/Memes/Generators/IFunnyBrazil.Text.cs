@@ -26,8 +26,8 @@ public partial class IFunnyBrazil
     private float GetStartingFontSize()
     {
         var defaultFontSize = Math.Max(24, _cardHeight / 3.75F);
-        var multiplier = op.FontSizeMultiplier / 100F;
-        var multiplierM = op.MinSizeMultiplier / 100F;
+        var multiplier  = op.   FontSizeMultiplier / 100F;
+        var multiplierM = op.MinFontSizeMultiplier / 100F;
         _minFontSize = defaultFontSize * multiplierM;
         return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }
@@ -142,10 +142,10 @@ public partial class IFunnyBrazil
 
     private RichTextOptions GetDefaultTextOptions() => new(_font)
     {
-        TextAlignment = op.UseLeftAlignment
+        TextAlignment = op.TextLeftAlignment
             ? TextAlignment.Start
             : TextAlignment.Center,
-        HorizontalAlignment = op.UseLeftAlignment
+        HorizontalAlignment = op.TextLeftAlignment
             ? HorizontalAlignment.Left
             : HorizontalAlignment.Center,
         VerticalAlignment = VerticalAlignment.Center,
@@ -161,14 +161,14 @@ public partial class IFunnyBrazil
 
     private PointF GetTextOrigin()
     {
-        var x = op.UseLeftAlignment ? _marginLeft : _w / 2F;
+        var x = op.TextLeftAlignment ? _marginLeft : _w / 2F;
         var y = _cardHeight / 2F + _textOffset;
         return new PointF(x, y);
     }
 
     private Point GetOriginFunny(Size textLayer)
     {
-        var x = op.UseLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
+        var x = op.TextLeftAlignment ? _marginLeft : _w.Gap(textLayer.Width);
         var y = _cardHeight.Gap(textLayer.Height) - _caseOffset;
         return new Point(x.RoundInt(), y.RoundInt());
     }

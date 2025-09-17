@@ -30,8 +30,8 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.MinSizeMultiplier  = Options.GetInt(_r_fontMS,  10, group: 2);
-            _options.FontSizeMultiplier = Options.GetInt(_r_fontSM, 100);
+            _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSizeMin,  10, group: 2);
+            _options.   FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
 
             _options.CustomColor = _colorWizard.CheckAndCut(Options);
             _options.FontOption = _fontWizard.CheckAndCut(Options);
@@ -53,7 +53,7 @@ namespace PF_Bot.Handlers.Memes
             _r_small  = "xx";
 
         private static readonly Regex
-            _r_fontSM = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
-            _r_fontMS = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
+            _r_fontSize    = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
+            _r_fontSizeMin = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
     }
 }

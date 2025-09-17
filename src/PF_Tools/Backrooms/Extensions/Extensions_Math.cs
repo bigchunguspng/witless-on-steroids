@@ -8,10 +8,11 @@ public static class Extensions_Math
     public static int CeilingInt(this double x) => (int)Math.Ceiling(x);
     public static int CeilingInt(this float  x) => (int)Math.Ceiling(x);
 
-    public static byte ClampByte(this int x) => (byte)Math.Clamp(x, 0, 255);
-    public static byte Clamp100(this byte x) => Math.Min(x, (byte)100);
-    public static byte Clamp(this byte x, byte max) => Math.Min(x, max);
-    public static int  Clamp(this int  x, int  max) => Math.Min(x, max);
+    public static  byte ClampByte (this int  x) =>  (byte)Math.Clamp(x,    0, 255);
+    public static sbyte ClampSbyte(this int  x) => (sbyte)Math.Clamp(x, -128, 127);
+    public static  byte Clamp100  (this byte x) =>      Math.Min(x, (byte)100);
+    public static  byte Clamp(this byte x, byte max) => Math.Min(x, max);
+    public static  int  Clamp(this int  x, int  max) => Math.Min(x, max);
 
     public static bool IsOdd (this int x) => (x & 1) == 1;
     public static bool IsEven(this int x) => (x & 1) == 0;

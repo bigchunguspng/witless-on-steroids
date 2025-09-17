@@ -15,21 +15,28 @@ namespace PF_Bot.Core.Memes.Generators
     {
         public FontOption FontOption;
 
+        /// Color to fill sticker background with.
         public ColorOption CustomColorBack;
         public ColorOption CustomColorText;
 
-        public int FontMultiplier = 100;
-        public int TextOffset     =  -1;
+        /// Text vertical offset, 0-100%
+        /// If negative, standart 2-text meme is generated.
+        public int TextOffset         =  -1;
+        public int FontSizeMultiplier = 100;
 
         public byte ShadowOpacity = 100;
 
         public bool WrapText = true;
         public bool RandomTextColor;
-        public bool RandomOffset;
+        /// Text is placed at random vertical offset of 15-85%.
+        public bool RandomTextOffset;
+        /// Top and bottom texts are placed close to vertical borders.
         public bool           NoMargin;
+        /// Top and bottom texts cross vertical borders XD.
         public bool AbsolutelyNoMargin;
 
-        public bool CustomOffsetMode => RandomOffset || TextOffset >= 0;
+        /// Generate meme with 1 offsetable text, insead of traditional 2-text one.
+        public bool FloatingCaptionMode => RandomTextOffset || TextOffset >= 0;
     }
 
     public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMemeGenerator<TextPair>
@@ -96,9 +103,9 @@ namespace PF_Bot.Core.Memes.Generators
             _marginX = op.NoMargin ? 0 : op.AbsolutelyNoMargin ? 0 - _w / 20 : Math.Max(_w / 20, 10);
             _marginY = op.NoMargin ? 0 : op.AbsolutelyNoMargin ? 0 - _h / 30 : Math.Max(_h / 30, 10);
 
-            if (op.CustomOffsetMode)
+            if (op.FloatingCaptionMode)
             {
-                var offset = op.RandomOffset ? Fortune.RandomInt(15, 85) : op.TextOffset;
+                var offset = op.RandomTextOffset ? Fortune.RandomInt(15, 85) : op.TextOffset;
                 _marginY = _h * offset / 100;
             }
 
@@ -131,7 +138,7 @@ namespace PF_Bot.Core.Memes.Generators
         {
             var canvas = new Image<Rgba32>(_w, _h);
 
-            var height = op.CustomOffsetMode
+            var height = op.FloatingCaptionMode
                 ? _h / 3
                 : _h / 3 - _marginY;
 

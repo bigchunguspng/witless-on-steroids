@@ -16,18 +16,30 @@ public struct MemeOptions_Top()
 {
     public FontOption FontOption;
 
+    /// Background color of caption card.
     public ColorOption CustomColor;
 
-    public int CropPercent        =   0;
-    public int MinSizeMultiplier  =  10;
-    public int FontSizeMultiplier = 100;
+    public int MinFontSizeMultiplier =  10;
+    public int    FontSizeMultiplier = 100; // todo float ?
+
+    /// Percent of image height to crop.
+    /// If positive, only top is cropped.
+    /// If negative, both top and bottom are cropped.
+    public sbyte CropPercent = 0;
 
     public bool WrapText = true;
-    public bool UseLeftAlignment;
-    public bool ThinCard;
+    public bool TextLeftAlignment;
+    /// Make caption card as tall as text + some margin.
+    public bool      ThinCard;
+    /// Make caption card just as tall as text. <br/>
+    /// Matters only when <see cref="ThinCard"/> is true.
     public bool UltraThinCard;
+    /// Pick card background color from image top side.
     public bool PickColor;
-    public bool ForceCenter;
+    /// Pick card background color from image top center. <br/>
+    /// Matters only when <see cref="PickColor"/> is true.
+    public bool PickColor_FromCenter;
+    /// Fill sticker background with black (default is white).
     public bool BackInBlack;
 }
 

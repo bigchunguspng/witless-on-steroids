@@ -15,11 +15,16 @@ namespace PF_Bot.Core.Memes.Generators
 {
     public struct MemeOptions_Dg()
     {
+        /// Upper or single text font.
         public FontOption FontOptionA;
+        /// Lower text font.
         public FontOption FontOptionB;
 
+        /// Square demotivator with single line of text in the middle.
         public bool SingleLine;
+        /// Funny watermarks goes brrr...
         public bool AddLogo = true;
+        /// Generated bottom text is trimmed, unlike one provided by user.
         public bool BottomTextIsGenerated;
     }
 

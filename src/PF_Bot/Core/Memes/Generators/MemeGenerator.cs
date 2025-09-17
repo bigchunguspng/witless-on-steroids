@@ -35,6 +35,8 @@ namespace PF_Bot.Core.Memes.Generators
         /// Top and bottom texts cross vertical borders XD.
         public bool AbsolutelyNoMargin;
 
+        public float    FontSizeMultiplier_Float =>    FontSizeMultiplier / 100F;
+
         /// Generate meme with 1 offsetable text, insead of traditional 2-text one.
         public bool FloatingCaptionMode => RandomTextOffset || TextOffset >= 0;
     }

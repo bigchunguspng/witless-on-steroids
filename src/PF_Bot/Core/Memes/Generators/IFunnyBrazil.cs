@@ -20,7 +20,7 @@ public struct MemeOptions_Top()
     public ColorOption CustomColor;
 
     public int MinFontSizeMultiplier =  10;
-    public int    FontSizeMultiplier = 100; // todo float ?
+    public int    FontSizeMultiplier = 100;
 
     /// Percent of image height to crop.
     /// If positive, only top is cropped.
@@ -41,6 +41,9 @@ public struct MemeOptions_Top()
     public bool PickColor_FromCenter;
     /// Fill sticker background with black (default is white).
     public bool BackInBlack;
+
+    public float MinFontSizeMultiplier_Float => MinFontSizeMultiplier / 100F;
+    public float    FontSizeMultiplier_Float =>    FontSizeMultiplier / 100F;
 }
 
 public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMemeGenerator<string>

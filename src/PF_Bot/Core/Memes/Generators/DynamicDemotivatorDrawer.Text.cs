@@ -26,10 +26,8 @@ public partial class DynamicDemotivatorDrawer
     private float GetStartingFontSize()
     {
         var defaultFontSize = imageW * 0.1F;
-        var multiplier = op.FontSizeMultiplier / 100F;
-        var multiplierM = op.MinFontSizeMultiplier / 100F;
-        _minFontSize = defaultFontSize * multiplierM;
-        return Math.Max(defaultFontSize * multiplier, _minFontSize) * op.FontOption.GetSizeMultiplier();
+        _minFontSize = defaultFontSize * op.MinFontSizeMultiplier_Float;
+        return Math.Max(defaultFontSize * op.FontSizeMultiplier_Float, _minFontSize) * op.FontOption.GetSizeMultiplier();
     }
 
 
@@ -90,7 +88,7 @@ public partial class DynamicDemotivatorDrawer
                 {
                     var minRatio = GetMinTextRatio(textWidth);
                     var side = (imageW + 2 * imageH) / 3;
-                    var multiplier = op.FontSizeMultiplier / 100;
+                    var multiplier = op.FontSizeMultiplier_Float;
                     while (true)
                     {
                         var textRatio = (textWidth / lineCount) / (lineHeight * lineCount) * multiplier;

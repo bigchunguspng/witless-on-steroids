@@ -17,11 +17,14 @@ namespace PF_Bot.Core.Memes.Generators // ReSharper disable InconsistentNaming
         /// Color of frame and text.
         public ColorOption CustomColor;
 
-        public float MinFontSizeMultiplier =  10;
-        public float    FontSizeMultiplier = 100;
+        public int MinFontSizeMultiplier =  10;
+        public int    FontSizeMultiplier = 100;
 
         public bool WrapText = true;
         public bool Minimalist;
+
+        public float MinFontSizeMultiplier_Float => MinFontSizeMultiplier / 100F;
+        public float    FontSizeMultiplier_Float =>    FontSizeMultiplier / 100F;
     }
 
     public partial class DynamicDemotivatorDrawer(MemeOptions_Dp options) : MemeGeneratorBase, IMemeGenerator<string>

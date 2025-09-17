@@ -19,16 +19,18 @@ public struct MemeOptions_Snap()
     public ColorOption CustomColorText;
 
     // Vertical offset of text card, 0-100%.
-    public int TextOffset = 50;
-
-    public float MinFontSizeMultiplier =  10;
-    public float    FontSizeMultiplier = 100;
+    public int TextOffset            =  50;
+    public int MinFontSizeMultiplier =  10;
+    public int    FontSizeMultiplier = 100;
 
     public byte CardOpacity = 62;
 
     public bool WrapText = true;
     /// Text is placed at random vertical offset of 25-75%.
     public bool RandomTextOffset;
+
+    public float MinFontSizeMultiplier_Float => MinFontSizeMultiplier / 100F;
+    public float    FontSizeMultiplier_Float =>    FontSizeMultiplier / 100F;
 }
 
 public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGenerator<string>

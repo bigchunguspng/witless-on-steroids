@@ -105,7 +105,9 @@ public static class MemeOptions_Extensions
             .CopyTo(destination.Slice(index + 1));
 
         context.Buffer = new string(destination);
-        Log($"[CutCaptureOut {index}, {length}]: {b} -> {context.Buffer}", LogLevel.Debug);
+#if DEBUG
+        Log($"[CutCaptureOut: {index}+{length}]: {b} -> {context.Buffer}", LogLevel.Debug);
+#endif
     }
 
     /// Use UPPERCASE if text is generated or option provided via commnand (ignore default options).

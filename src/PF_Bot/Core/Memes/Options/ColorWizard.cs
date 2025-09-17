@@ -1,6 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Handlers.Memes.Core;
 using SixLabors.ImageSharp.PixelFormats;
 using Spectre.Console;
 
@@ -25,9 +23,9 @@ public class ColorWizard([StringSyntax("Regex")] string marker)
             .Select(x => x.Name.ToLower()).ToList();
     }
 
-    public ColorOption CheckAndCut(MemeRequest request)
+    public ColorOption CheckAndCut(MemeOptionsContext context)
     {
-        var value = OptionsParsing.GetValue(request, _rgx_color);
+        var value = context.GetValue(_rgx_color);
         if (value == null)
             return new ColorOption(ColorOptionMode.Off);
 

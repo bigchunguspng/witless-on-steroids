@@ -1,14 +1,12 @@
 ﻿using PF_Bot.Core.Memes.Generators;
 using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
-using PF_Bot.Handlers.Memes.Core;
-using static PF_Bot.Backrooms.Helpers.OptionsParsing;
 
 namespace PF_Bot.Handlers.Memes
 {
-    public class MakeMeme : MakeMemeCore<TextPair>
+    public class Meme : MakeMemeCore<TextPair>
     {
-        private static readonly FontWizard _fontWizard = new ("im", "meme");
+        private static readonly FontWizard _fontWizard = new ("im");
         private static readonly ColorWizard _colorWizardBack = new ("_");
         private static readonly ColorWizard _colorWizardText = new ("#");
 
@@ -21,7 +19,7 @@ namespace PF_Bot.Handlers.Memes
         protected override string VideoName => "piece_fap_bot-meme.mp4";
 
         protected override string Log_STR => "MEME";
-        protected override string Command => "/meme";
+        protected override string Log_CMD => "/meme";
         protected override string Suffix  => "Meme";
 
         protected override string? DefaultOptions => Data.Options?.Meme;
@@ -32,35 +30,35 @@ namespace PF_Bot.Handlers.Memes
         protected override bool ResultsAreRandom
             => _options.RandomTextColor
             || _options.FontOption.IsRandom
-            || Check(Request, _r_add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
+            || Options.Check(_r_add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
 
         protected override void ParseOptions()
         {
-            _options.CustomColorBack = _colorWizardBack.CheckAndCut(Request);
-            _options.CustomColorText = _colorWizardText.CheckAndCut(Request);
+            _options.CustomColorBack = _colorWizardBack.CheckAndCut(Options);
+            _options.CustomColorText = _colorWizardText.CheckAndCut(Options);
 
-            _options.FontOption = _fontWizard.CheckAndCut(Request);
+            _options.FontOption = _fontWizard.CheckAndCut(Options);
 
-            _options.FontMultiplier = GetInt(Request, _r_fontSM, 100);
-            _options.ShadowOpacity  = GetInt(Request, _r_shadow, 100).Clamp(0, 100).ClampByte();
-            _options.TextOffset     = GetInt(Request, _r_offset, -1);
+            _options.FontMultiplier = Options.GetInt(_r_fontSM, 100);
+            _options.ShadowOpacity  = Options.GetInt(_r_shadow, 100).Clamp(0, 100).ClampByte();
+            _options.TextOffset     = Options.GetInt(_r_offset, -1);
 
-            _options.RandomOffset       = CheckAndCut(Request, _r_randomOffset);
-            _options.WrapText           = CheckAndCut(Request, _r_nowrap).Failed();
-            _options.RandomTextColor    = CheckAndCut(Request, _r_colorText);
-            _options.AbsolutelyNoMargin = CheckAndCut(Request, _r_noMarginDude);
-            _options.NoMargin           = CheckAndCut(Request, _r_noMargin);
+            _options.RandomOffset       = Options.CheckAndCut(_r_randomOffset);
+            _options.WrapText           = Options.CheckAndCut(_r_nowrap).Failed();
+            _options.RandomTextColor    = Options.CheckAndCut(_r_colorText);
+            _options.AbsolutelyNoMargin = Options.CheckAndCut(_r_noMarginDude);
+            _options.NoMargin           = Options.CheckAndCut(_r_noMargin);
         }
 
         protected override TextPair GetMemeText(string? text)
         {
             var generate = text.IsNull_OrEmpty();
-            var capitalize = CheckCaps(Request, _r_caps, generate);
+            var capitalize = Options.CheckCaps(_r_caps, generate);
 
-            var lowerCase      = Check(Request,   _r_lowerCase);
-            var addBottomText  = Check(Request,  _r_add_bottom);
-            var onlyBottomText = Check(Request, _r_only_bottom);
-            var onlyTopText    = Check(Request,    _r_top_only);
+            var lowerCase      = Options.Check(_r_lowerCase);
+            var addBottomText  = Options.Check(_r_add_bottom);
+            var onlyBottomText = Options.Check(_r_only_bottom);
+            var onlyTopText    = Options.Check(_r_top_only);
 
             string a, b;
 
@@ -119,17 +117,19 @@ namespace PF_Bot.Handlers.Memes
             return separators.FirstOrDefault(text.Contains);
         }
 
+        private const string
+            _r_add_bottom   = "s",
+            _r_only_bottom  = "d",
+            _r_top_only     = "t",
+            _r_lowerCase    = "lo",
+            _r_colorText    = "cc",
+            _r_randomOffset = "!!",
+            _r_noMargin     = "mm",
+            _r_noMarginDude = "mm!";
+
         private static readonly Regex
-            _r_add_bottom   = new(@"^\/meme\S*(s)\S*",   RegexOptions.Compiled),
-            _r_only_bottom  = new(@"^\/meme\S*(d)\S*",   RegexOptions.Compiled),
-            _r_top_only     = new(@"^\/meme\S*(t)\S*",   RegexOptions.Compiled),
-            _r_lowerCase    = new(@"^\/meme\S*(lo)\S*",  RegexOptions.Compiled),
-            _r_colorText    = new(@"^\/meme\S*(cc)\S*",  RegexOptions.Compiled),
-            _r_randomOffset = new(@"^\/meme\S*(!!)\S*",  RegexOptions.Compiled),
-            _r_noMargin     = new(@"^\/meme\S*(mm)\S*",  RegexOptions.Compiled),
-            _r_noMarginDude = new(@"^\/meme\S*(mm!)\S*", RegexOptions.Compiled),
-            _r_fontSM       = new(@"^\/meme\S*?(\d{1,3})("")\S*", RegexOptions.Compiled),
-            _r_shadow       = new(@"^\/meme\S*?(\d{1,3})(%)\S*",  RegexOptions.Compiled),
-            _r_offset       = new(@"^\/meme\S*?(\d{1,3})(!)\S*",  RegexOptions.Compiled);
+            _r_fontSM       = new(@"(\d{1,3})("")", RegexOptions.Compiled),
+            _r_shadow       = new(@"(\d{1,3})(%)",  RegexOptions.Compiled),
+            _r_offset       = new(@"(\d{1,3})(!)",  RegexOptions.Compiled);
     }
 }

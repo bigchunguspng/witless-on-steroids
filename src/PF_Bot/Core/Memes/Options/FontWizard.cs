@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Handlers.Memes.Core;
 
 namespace PF_Bot.Core.Memes.Options;
 
@@ -14,24 +12,23 @@ public class FontWizard
     public FontWizard
     (
         string fontKeyDefault,
-        [StringSyntax("Regex")] string cmdRegex,
-        [StringSyntax("Regex")] string? x = null
+        [StringSyntax("Regex")] string? marker = null
     )
     {
         var codes = string.Join('|', FontStorage.Families.Keys);
         _fontKeyDefault = fontKeyDefault;
-        _regex = new Regex($@"^\/{cmdRegex}\S*(?:({codes}|\^\^)(-[bi]{{1,2}})?){x}\S*");
+        _regex = new Regex($@"(?:({codes}|\^\^)(-[bi]{{1,2}})?){marker}");
     }
 
-    public FontOption CheckAndCut(MemeRequest request)
+    public FontOption CheckAndCut(MemeOptionsContext context)
     {
         var fontKeyIsDefault = true;
         var fontKey = _fontKeyDefault;
         var styleKey = (string?)null;
 
-        var match = _regex.Match(request.Dummy);
+        var match = _regex.Match(context.Buffer);
 
-        var success = request.Empty.Janai() && match.Success;
+        var success = context.Empty.Janai() && match.Success;
         if (success)
         {
             fontKeyIsDefault = false;
@@ -43,7 +40,7 @@ public class FontWizard
 
             for (var i = match.Groups.Count - 1; i > 0; i--)
             {
-                OptionsParsing.CutCaptureOut(match.Groups[i], request);
+                context.CutCaptureOut(match.Groups[i]);
             }
         }
 

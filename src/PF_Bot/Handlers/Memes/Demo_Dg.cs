@@ -1,18 +1,17 @@
 ﻿using PF_Bot.Core.Memes.Generators;
 using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
-using PF_Bot.Handlers.Memes.Core;
-using static PF_Bot.Backrooms.Helpers.OptionsParsing;
-using static PF_Bot.Handlers.Memes.Demotivate.Mode;
+using static PF_Bot.Handlers.Memes.Demo_Dg.Mode;
 
 namespace PF_Bot.Handlers.Memes
 {
-    public class Demotivate : MakeMemeCore<TextPair>
+    public class Demo_Dg : MakeMemeCore<TextPair>
     {
-        private static readonly FontWizard FontWizardL = new("ro", "d[vg]", "(?![-bi*])");
-        private static readonly FontWizard FontWizardS = new("ro", "dg",    "(?![-bi*])");
-        private static readonly FontWizard FontWizardA = new("ro", "dg",   "(&)");
-        private static readonly FontWizard FontWizardB = new("co", "dg", @"(\*)");
+        private static readonly FontWizard
+            FontWizardL = new("ro", "(?![-bi*])"),
+            FontWizardS = new("ro", "(?![-bi*])"),
+            FontWizardA = new("ro",   "(&)"),
+            FontWizardB = new("co", @"(\*)");
 
         private MemeOptions_Dg _options;
 
@@ -26,7 +25,7 @@ namespace PF_Bot.Handlers.Memes
         protected override string VideoName => $"piece_fap_bot-d{(_mode == Square ? "g" : "v")}.mp4";
 
         protected override string Log_STR => "DEMOTIVATOR";
-        protected override string Command => _mode == Square ? "/dg" : "/dv";
+        protected override string Log_CMD => _mode == Square ? "/dg" : "/dv";
         protected override string Suffix  => _mode == Square ?  "Dg" :  "Dv";
 
         protected override string? DefaultOptions => Data.Options?.Dg;
@@ -37,7 +36,7 @@ namespace PF_Bot.Handlers.Memes
         protected override bool ResultsAreRandom
             => _options.AddLogo
             || RandomFontIsUsed
-            || Check(Request, _r_one_line).Failed() && Args!.Contains('\n').Janai(); // (random bottom text)
+            || _options.SingleLine.IsOff() && Args!.Contains('\n').Janai(); // (random bottom text)
 
         private bool RandomFontIsUsed
             => _mode == Wide || _options.SingleLine
@@ -47,23 +46,23 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.SingleLine = CheckAndCut(Request, _r_one_line);
+            _options.SingleLine = Options.CheckAndCut(_r_one_line);
 
             if (_mode == Wide)
             {
-                _options.FontOptionA = FontWizardL.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardL.CheckAndCut(Options);
             }
             else if (_options.SingleLine)
             {
-                _options.FontOptionA = FontWizardS.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardS.CheckAndCut(Options);
             }
             else
             {
-                _options.FontOptionA = FontWizardA.CheckAndCut(Request);
-                _options.FontOptionB = FontWizardB.CheckAndCut(Request);
+                _options.FontOptionA = FontWizardA.CheckAndCut(Options);
+                _options.FontOptionB = FontWizardB.CheckAndCut(Options);
             }
 
-            _options.AddLogo = Check(Request, _r_no_logo).Failed();
+            _options.AddLogo = Options.CheckAndCut(_r_no_logo).Failed();
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -94,20 +93,20 @@ namespace PF_Bot.Handlers.Memes
                 }
             }
 
-            var capitalize = CheckCaps(Request, _r_caps, generate);
+            var capitalize = Options.CheckCaps(_r_caps, generate);
             if (capitalize) a = a.InLetterCase(LetterCase.Upper);
 
             return new TextPair(a, b);
         }
 
-        private static readonly Regex
-            _r_no_logo  = new(@"^\/d[vg]\S*(nn)\S* *", RegexOptions.Compiled),
-            _r_one_line = new(@"^\/d[vg]\S*(ll)\S* *", RegexOptions.Compiled);
+        private const string
+            _r_no_logo  = "nn",
+            _r_one_line = "ll";
 
 
         // MODE
 
-        public Demotivate SetMode(Mode mode)
+        public Demo_Dg SetMode(Mode mode)
         {
             _mode = mode;
             return this;

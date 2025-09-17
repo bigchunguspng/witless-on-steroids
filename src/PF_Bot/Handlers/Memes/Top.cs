@@ -1,14 +1,12 @@
 ﻿using PF_Bot.Core.Memes.Generators;
 using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
-using PF_Bot.Handlers.Memes.Core;
-using static PF_Bot.Backrooms.Helpers.OptionsParsing;
 
 namespace PF_Bot.Handlers.Memes
 {
     public class Top : MakeMemeCore<string>
     {
-        private static readonly FontWizard _fontWizard = new ("ft", "top");
+        private static readonly FontWizard _fontWizard = new ("ft");
         private static readonly ColorWizard _colorWizard = new ("#");
 
         private MemeOptions_Top _options;
@@ -20,7 +18,7 @@ namespace PF_Bot.Handlers.Memes
         protected override string VideoName => "piece_fap_bot-top.mp4";
 
         protected override string Log_STR => "TOP";
-        protected override string Command => "/top";
+        protected override string Log_CMD => "/top";
         protected override string Suffix  => "Top";
 
         protected override string? DefaultOptions => Data.Options?.Top;
@@ -32,26 +30,26 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.CustomColor = _colorWizard.CheckAndCut(Request);
-            _options.FontOption = _fontWizard.CheckAndCut(Request);
+            _options.CustomColor = _colorWizard.CheckAndCut(Options);
+            _options.FontOption = _fontWizard.CheckAndCut(Options);
 
-            _options.CropPercent        = GetInt(Request, _r_crop,     0);
-            _options.MinSizeMultiplier  = GetInt(Request, _r_fontMS,  10, group: 2);
-            _options.FontSizeMultiplier = GetInt(Request, _r_fontSM, 100);
+            _options.CropPercent        = Options.GetInt(_r_crop,     0);
+            _options.MinSizeMultiplier  = Options.GetInt(_r_fontMS,  10, group: 2);
+            _options.FontSizeMultiplier = Options.GetInt(_r_fontSM, 100);
 
-            _options.WrapText         = CheckAndCut(Request, _r_nowrap ).Failed();
-            _options.BackInBlack      = CheckAndCut(Request, _r_blackBG);
-            _options.ForceCenter      = CheckAndCut(Request, _r_colorPC);
-            _options.PickColor        = CheckAndCut(Request, _r_colorPP);
-            _options.UseLeftAlignment = CheckAndCut(Request, _r_left   );
-            _options.UltraThinCard    = CheckAndCut(Request, _r_thinner);
-            _options.ThinCard         = CheckAndCut(Request, _r_thin   );
+            _options.WrapText         = Options.CheckAndCut(_r_nowrap ).Failed();
+            _options.BackInBlack      = Options.CheckAndCut(_r_blackBG);
+            _options.ForceCenter      = Options.CheckAndCut(_r_colorPC);
+            _options.PickColor        = Options.CheckAndCut(_r_colorPP);
+            _options.UseLeftAlignment = Options.CheckAndCut(_r_left   );
+            _options.UltraThinCard    = Options.CheckAndCut(_r_thinner);
+            _options.ThinCard         = Options.CheckAndCut(_r_thin   );
         }
 
         protected override string GetMemeText(string? text)
         {
             var generate = text.IsNull_OrEmpty();
-            var capitalize = CheckCaps(Request, _r_caps, generate);
+            var capitalize = Options.CheckCaps(_r_caps, generate);
 
             var caption = generate ? Baka.Generate() : text!;
 
@@ -61,15 +59,17 @@ namespace PF_Bot.Handlers.Memes
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }
 
+        private const string
+            _r_left    = "la",
+            _r_thin    = "mm",
+            _r_colorPP = "pp",
+            _r_blackBG = "ob";
+
         private static readonly Regex
-            _r_left    = new(@"^\/top\S*(la)\S*",  RegexOptions.Compiled),
-            _r_thinner = new(@"^\/top\S*mm(!)\S*", RegexOptions.Compiled),
-            _r_thin    = new(@"^\/top\S*(mm)\S*",  RegexOptions.Compiled),
-            _r_colorPP = new(@"^\/top\S*(pp)\S*",  RegexOptions.Compiled),
-            _r_colorPC = new(@"^\/top\S*pp(!)\S*", RegexOptions.Compiled),
-            _r_blackBG = new(@"^\/top\S*(ob)\S*",  RegexOptions.Compiled),
-            _r_crop    = new(@"^\/top\S*?(-?\d{1,2})(%)\S*",     RegexOptions.Compiled),
-            _r_fontSM  = new(@"^\/top\S*?(\d{1,3})("")\S*",      RegexOptions.Compiled),
-            _r_fontMS  = new(@"^\/top\S*?(min)(\d{1,3})("")\S*", RegexOptions.Compiled);
+            _r_thinner = new("mm(!)", RegexOptions.Compiled),
+            _r_colorPC = new("pp(!)", RegexOptions.Compiled),
+            _r_crop    = new(   @"(-?\d{1,2})(%)",  RegexOptions.Compiled),
+            _r_fontSM  = new(     @"(\d{1,3})("")", RegexOptions.Compiled),
+            _r_fontMS  = new(@"(min)(\d{1,3})("")", RegexOptions.Compiled);
     }
 }

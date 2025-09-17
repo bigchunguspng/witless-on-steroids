@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Memes.Generators;
+using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Handlers.Manage.Packs;
-using PF_Bot.Handlers.Memes.Core;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Handlers.Memes
@@ -19,7 +19,7 @@ namespace PF_Bot.Handlers.Memes
         protected override string VideoName => "piece_fap_bot-nuke.mp4";
 
         protected override string Log_STR => "NUKED";
-        protected override string Command => "/nuke";
+        protected override string Log_CMD => "/nuke";
         protected override string Suffix  => "Nuked"; // Needs more nuking!
 
         protected override string? DefaultOptions => Data.Options?.Nuke;
@@ -40,14 +40,14 @@ namespace PF_Bot.Handlers.Memes
 
         protected override void ParseOptions()
         {
-            _options.Depth = OptionsParsing.GetInt(Request, _r_depth, 1);
+            _options.Depth = Options.GetInt(_r_depth, 1);
         }
 
         protected override int GetMemeText(string? text) => 0;
 
         private static readonly Regex
-            _r_depth = new(@"^\/nuke\S*?([1-9])("")\S*", RegexOptions.Compiled);
-        
+            _r_depth = new(@"([1-9])("")", RegexOptions.Compiled);
+
         public static void HandleCallback(CallbackQuery query, string[] data)
         {
             var pagination = query.GetPagination(data);

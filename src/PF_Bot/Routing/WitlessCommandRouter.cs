@@ -5,7 +5,6 @@ using PF_Bot.Handlers.Help;
 using PF_Bot.Handlers.Manage.Packs;
 using PF_Bot.Handlers.Manage.Settings;
 using PF_Bot.Handlers.Memes;
-using PF_Bot.Handlers.Memes.Core;
 using PF_Bot.Handlers.Text;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
@@ -37,19 +36,19 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
         _mematics = new Dictionary<MemeType, Func<ImageProcessor>>
         {
-            { MemeType.Dg,   () => new Demotivate() },
-            { MemeType.Meme, () => new MakeMeme() },
+            { MemeType.Dg,   () => new Demo_Dg() },
+            { MemeType.Meme, () => new Meme() },
             { MemeType.Top,  () => new Top() },
-            { MemeType.Dp,   () => new Demotivate3000() },
+            { MemeType.Dp,   () => new Demo_Dp() },
             { MemeType.Snap, () => new Snap() },
-            { MemeType.Nuke, () => new Nuke() }
+            { MemeType.Nuke, () => new Nuke() },
         };
 
         _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
-            .Register("dp"      , () => new Demotivate3000())
-            .Register("dg"      , () => new Demotivate().SetMode(Demotivate.Mode.Square))
-            .Register("dv"      , () => new Demotivate().SetMode(Demotivate.Mode.Wide))
-            .Register("meme"    , () => new MakeMeme())
+            .Register("dp"      , () => new Demo_Dp())
+            .Register("dg"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Square))
+            .Register("dv"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Wide))
+            .Register("meme"    , () => new Meme())
             .Register("top"     , () => new Top())
             .Register("snap"    , () => new Snap())
             .Register("nuke"    , () => new Nuke())
@@ -123,7 +122,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
         {
             var mematic = _mematics[Data.Type].Invoke();
             mematic.Pass(Context);
-            if (mematic is Demotivate dg)
+            if (mematic is Demo_Dg dg)
             {
                 var (w, h) = file.TryGetSize();
                 dg.SelectMode(w, h);

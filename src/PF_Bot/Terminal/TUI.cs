@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core;
 using PF_Bot.Core.Chats;
-using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
 using Telegram.Bot;

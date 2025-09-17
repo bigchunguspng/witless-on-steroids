@@ -131,7 +131,8 @@ public static class Extensions_String
 
     // REGEX
 
-    public static Match? MatchOrNull(this Regex regex, string? text) => text is null ? null : regex.Match(text);
+    public static Match? MatchOrNull(this Regex regex, string? text) => text == null ? null : regex.Match(text);
+    public static bool IsMatchOrNull(this Regex regex, string? text) => text != null && regex.IsMatch(text);
 
     public static string? GroupOrNull
         (this Match match, int group) => match.Groups[group].Success ? match.Groups[group].Value : null;

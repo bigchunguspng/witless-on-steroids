@@ -1,11 +1,11 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core.Editing;
+﻿using PF_Bot.Core.Editing;
+using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
 using PF_Bot.Routing.Commands;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
+namespace PF_Bot.Handlers.Memes // ReSharper disable InconsistentNaming
 {
     public interface ImageProcessor
     {
@@ -18,25 +18,27 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
 
     public abstract class MakeMemeCore_Static : WitlessAsyncCommand
     {
+        protected const string
+            _r_caps   = "up",
+            _r_nowrap = "ww";
+
         protected static readonly Regex
-            _r_repeat = new("[2-9]",                 RegexOptions.Compiled),
-            _r_caps   = new(@"\S*(up)\S*",           RegexOptions.Compiled),
-            _r_nowrap = new(@"\S*(ww)\S*",           RegexOptions.Compiled),
-            _r_press  = new(@"\S*(\*)(\d{1,2})?\S*", RegexOptions.Compiled);
+            _r_repeat = new("[2-9]",           RegexOptions.Compiled),
+            _r_press  = new(@"(\*)(\d{1,2})?", RegexOptions.Compiled);
     }
 
-    public abstract class MakeMemeCore<T> : MakeMemeCore_Static, ImageProcessor
+    public abstract class MakeMemeCore<TCaption> : MakeMemeCore_Static, ImageProcessor
     {
-        protected MemeRequest Request = null!;
+        protected MemeOptionsContext Options = null!;
 
-        protected abstract IMemeGenerator<T> MemeMaker { get; }
+        protected abstract IMemeGenerator<TCaption> MemeMaker { get; }
 
         protected abstract Regex _rgx_cmd { get; }
 
         protected abstract string VideoName { get; }
 
         protected abstract string Log_STR { get; }
-        protected abstract string Command { get; }
+        protected abstract string Log_CMD { get; }
         protected abstract string Suffix  { get; }
 
         protected abstract string? DefaultOptions { get; }
@@ -84,20 +86,19 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(input, ".jpg");
-                var request = GetMemeFileRequest(MemeSourceType.Image, input, output);
-                await MakeMemeImage(request, GetText());
-                await using var stream = File.OpenRead(output);
+                var request = GetMemeFileRequest(MemeSourceType.Image, input, ".jpg");
+                await MakeMemeImage(request);
+                await using var stream = File.OpenRead(request.TargetPath);
                 Bot.SendPhoto(Origin, InputFile.FromStream(stream));
             }
-            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}]");
+            Log($"{GetLogString(repeats)} PHOTO");
         }
 
         public async Task ProcessStick(FileBase file)
         {
             var input = await DownloadFileAndParseOptions(file, ".webp");
 
-            var jpegSticker = JpegSticker;
+            var jpegSticker = OptionsContains('x');
             if (jpegSticker)
             {
                 var output = input.GetOutputFilePath("stick-JPEG", ".jpg");
@@ -105,23 +106,22 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
                 input = output;
             }
 
-            var sticker = SendAsSticker;
+            var /*send as*/ sticker = OptionsContains('=');
             var extension = sticker ? ".webp" : ".jpg";
 
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(input, extension);
-                var request = GetMemeFileRequest(MemeSourceType.Sticker, input, output);
+                var request = GetMemeFileRequest(MemeSourceType.Sticker, input, extension);
                 request.ExportAsSticker = sticker;
                 request.JpegSticker = jpegSticker;
-                await MakeMemeImage(request, GetText());
-                await using var stream = File.OpenRead(output);
+                await MakeMemeImage(request);
+                await using var stream = File.OpenRead(request.TargetPath);
 
                 if (sticker) Bot.SendSticker(Origin, InputFile.FromStream(stream));
                 else         Bot.SendPhoto  (Origin, InputFile.FromStream(stream));
             }
-            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] STICKER");
+            Log($"{GetLogString(repeats)} STICKER");
         }
 
         public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
@@ -129,6 +129,7 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
             var sw = Stopwatch.StartNew();
 
             var input = await DownloadFileAndParseOptions(file, extension);
+
             if (round && CropVideoNotes)
             {
                 var output = input.GetOutputFilePath("crop", ".mp4");
@@ -141,104 +142,112 @@ namespace PF_Bot.Handlers.Memes.Core // ReSharper disable InconsistentNaming
             var repeats = GetRepeatCount().Clamp(3);
             for (var i = 0; i < repeats; i++)
             {
-                var output = GetOutputFilePath(input, ".mp4");
-                var request = GetMemeFileRequest(MemeSourceType.Video, input, output);
-                await MakeMemeVideo(request, GetText());
-                await using var stream = File.OpenRead(output);
+                var request = GetMemeFileRequest(MemeSourceType.Video, input, ".mp4");
+                await MakeMemeVideo(request);
+                await using var stream = File.OpenRead(request.TargetPath);
 
                 if (note) Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
                 else      Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoName));
             }
-            Log($"{Title} >> {Log_STR}{REP(repeats)} [{Request.Options ?? "~"}] VID >> {sw.ElapsedReadable()}");
+            Log($"{GetLogString(repeats)} VID >> {sw.ElapsedReadable()}");
         }
+
+        //
+
+        private float _pressure;
 
         private Task<FilePath> DownloadFileAndParseOptions(FileBase file, string extension)
         {
-            Request = GetRequestData();
+            Options = GetOptionsContext();
             ParseOptions();
 
+            _pressure = Options.GetFraction(_r_press, 75, 2);
             return Bot.Download(file, Origin, extension);
         }
 
-        private MemeFileRequest GetMemeFileRequest
-            (MemeSourceType type, FilePath input, FilePath output)
-        {
-            return new MemeFileRequest(type, input, output, Data.Quality, Pressure);
-        }
-
-        private FilePath GetOutputFilePath(FilePath input, string extension)
-        {
-            return input.ChangeEnding($"{Suffix}-{Desert.GetSilt()}{extension}");
-        }
-
-        private T GetText() => GetMemeText(GetTextBase());
-
-        private string? GetTextBase() =>
-            Context.Command is not null || Data.Pics > 100 && Context.Message.ForwardFromChat is null ? Args : null;
-
         protected abstract void ParseOptions();
-        protected abstract T GetMemeText(string? text);
 
-        private string? REP(int repeats) => repeats > 1 ? $"-{repeats}" : null;
+        private MemeFileRequest GetMemeFileRequest
+            (MemeSourceType type, FilePath input, string extension)
+        {
+            var output = input.ChangeEnding($"{Suffix}-{Desert.GetSilt()}{extension}");
+            return new MemeFileRequest(type, input, output, Data.Quality, _pressure);
+        }
+
+        private string GetLogString(int repeats)
+        {
+            var repSuffix = repeats > 1 ? $"-{repeats}" : null;
+            return $"{Title} >> {Log_STR}{repSuffix} [{Options.Options ?? "~"}]";
+        }
 
 
         // MEME GENERATION
 
         private async Task MakeMemeImage
-            (MemeFileRequest request, T text)
+            (MemeFileRequest request)
         {
             var sw = Stopwatch.StartNew();
-            await MemeMaker.GenerateMeme(request, text);
-            sw.Log(Command);
+            await MemeMaker.GenerateMeme(request, GetText());
+            sw.Log(Log_CMD);
         }
 
         private async Task MakeMemeVideo
-            (MemeFileRequest request, T text)
+            (MemeFileRequest request)
         {
             var sw = Stopwatch.StartNew();
-            await MemeMaker.GenerateVideoMeme(request, text);
-            sw.Log(Command + " video");
+            await MemeMaker.GenerateVideoMeme(request, GetText());
+            sw.Log(Log_CMD + " video");
         }
+
+        private TCaption GetText()
+        {
+            var baseText
+                = Context.Command != null
+               || Data.Pics > 100 && Context.Message.IsForwarded().Janai()
+                    ? Args
+                    : null;
+            return GetMemeText(baseText);
+        }
+
+        protected abstract TCaption GetMemeText(string? text);
 
 
         // OPTIONS
 
-        private MemeRequest GetRequestData()
+        private MemeOptionsContext GetOptionsContext()
         {
-            var defaults = DefaultOptions;
-            var dummy = string.Empty;
-            var command = Context.Command ?? "";
-            var options = default(string);
-            var empty = Text is null && defaults is null;
+            var default_options = DefaultOptions;
 
-            if (empty.Janai())
-            {
-                options = _rgx_cmd.ExtractGroup(1, command, s => s.MakeNull_IfEmpty());
-                var combine = options != null && defaults != null && (options.Contains('+') || defaults.Contains('+'));
+            var empty = Text == null && default_options == null;
+            if (empty) return new MemeOptionsContext(empty, string.Empty, null, null);
 
-                options = combine ? defaults + options : options ?? defaults;
-                dummy = $"{Command}{options}";
-            }
+            var command = Context.Command ?? string.Empty;
+            var command_options = _rgx_cmd.ExtractGroup(1, command, s => s.MakeNull_IfEmpty());
 
-            return new MemeRequest(dummy, empty, command, options);
+            var combineOptions =
+                command_options != null
+             && default_options != null
+             && (command_options.Contains('+') || default_options.Contains('+'));
+
+            var options = combineOptions
+                ? default_options + command_options
+                : command_options ?? default_options;
+
+            return new MemeOptionsContext(empty, $"{options}", options, command_options);
         }
 
         private int GetRepeatCount()
         {
-            var repeats = 1;
-            var hasToBeRepeated = (Args is null || ResultsAreRandom) && CheckOptionsFor(o => _r_repeat.IsMatch(o));
-            if (hasToBeRepeated) repeats = _r_repeat.ExtractGroup(0, Request.Dummy, int.Parse, repeats);
-            return repeats;
+            var random = Args == null || ResultsAreRandom;
+            return
+                random && Options.Empty.Janai()
+                    ? _r_repeat.ExtractGroup(0, Options.Buffer, int.Parse, 1)
+                    : 1;
         }
 
-        private float     Pressure => OptionsParsing.GetFraction(Request, _r_press, 75, 2);
-
-        private bool SendAsSticker => CheckOptionsFor(options => options.Contains('='));
-        private bool   JpegSticker => CheckOptionsFor(options => options.Contains('x'));
-
-        private bool CheckOptionsFor(Predicate<string> condition)
+        private bool OptionsContains(char option)
         {
-            return Request.Empty.Janai() && _rgx_cmd.ExtractGroup(1, Request.Dummy, s => condition(s), false);
+            return Options.Buffer.Contains(option);
         }
     }
 }

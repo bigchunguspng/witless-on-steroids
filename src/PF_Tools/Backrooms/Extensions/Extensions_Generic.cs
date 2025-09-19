@@ -18,7 +18,7 @@ public static class Extensions_Generic
         [MaybeNullWhen(true)] out TValue value
     ) where TKey : notnull
     {
-        return dictionary.TryGetValue(key, out value);
+        return dictionary.TryGetValue(key, out value).Failed();
     }
 
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)

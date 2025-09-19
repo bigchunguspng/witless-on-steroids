@@ -1,3 +1,4 @@
+using PF_Bot.Core;
 using PF_Bot.Core.Internet.Boards;
 using PF_Bot.Handlers.Manage.Packs.Core;
 
@@ -12,22 +13,11 @@ public class EatPlanks : ChanEaterCore
     //      /plank [thread/board]
     //      /plank Y-M-D a.N    <- [Y-M-D a.N.json]
 
-    private static readonly PlankService _chan = new();
-    private static readonly Lazy<List<BoardGroup>> _boards = new(_chan.GetBoardList(File_2chanHtmlPage));
+    private readonly PlankService _chan = App.Chan2;
 
-    private string _name = null!;
     private Uri? _uri;
 
-    protected override FilePath ArchivePath => Dir_Plank;
-
-    protected override string CallbackKey => "p";
-    protected override string CommandName => "plank";
-    protected override string BoardsTitle => BOARDS_2CHAN;
-    protected override string Manual      => PLANK_MANUAL;
-    protected override string UnknownURL  => UNKNOWN_LINK_2CHAN;
-    protected override string EmojiLogo   => "⚡️";
-    protected override string FileName    => _name;
-    protected override List<BoardGroup> Boards => _boards.Value;
+    protected override ImageBoardContext Ctx => ImageBoardContext.Chan2;
 
     protected override string? GetSourceAnnotation()
     {
@@ -46,7 +36,7 @@ public class EatPlanks : ChanEaterCore
 
     private async Task EatSingleThread(string url, string board)
     {
-        _name = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
+        FileName = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
         try
         {
             var replies = _chan.GetThreadDiscussion(url).ToList();
@@ -60,7 +50,7 @@ public class EatPlanks : ChanEaterCore
 
     private async Task EatWholeBoard(string url, string board)
     {
-        _name = board;
+        FileName = board;
 
         var threads = _chan.GetSomeThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
@@ -70,7 +60,7 @@ public class EatPlanks : ChanEaterCore
 
     protected override async Task EatOnlineFind(string[] args)
     {
-        _name = string.Join('_', args);
+        FileName = string.Join('_', args);
 
         var threads = _chan.GetSearchResults(args[0], args[1]);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));

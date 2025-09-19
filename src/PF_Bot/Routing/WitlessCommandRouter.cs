@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Handlers.Help;
 using PF_Bot.Handlers.Manage.Packs;
@@ -142,14 +141,14 @@ public class WitlessCommandRouter : WitlessSyncCommand
         Context.UseText(command);
         Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
-        var funcS = _parent.SimpleCommands.Resolve(Command);
+        var funcS = _parent.SimpleCommands.Resolve(Command?[1..]);
         if (funcS != null)
         {
             funcS.Invoke().Execute(Context);
         }
         else
         {
-            var funcW = _witlessCommands.Resolve(Command);
+            var funcW = _witlessCommands.Resolve(Command?[1..]);
             funcW?.Invoke().Execute(WitlessContext.From(Context, settings));
         }
     }
@@ -158,24 +157,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
     {
         Telemetry.LogCommand(Context.Chat, Context.Text);
 
-        var func = _witlessCommands.Resolve(Command);
+        var func = _witlessCommands.Resolve(Command?[1..]);
         func?.Invoke().Execute(WitlessContext.From(Context, settings));
-    }
-
-    private readonly Lazy<EatBoards> _boards = new(new EatBoards());
-    private readonly Lazy<EatPlanks> _planks = new(new EatPlanks());
-
-    public void OnCallback(CallbackQuery query)
-    {
-        var data = query.GetData();
-        if      (data[0].StartsWith('b')) _boards.Value.HandleCallback(query, data);
-        if      (data[0].StartsWith('p')) _planks.Value.HandleCallback(query, data);
-        else if (data[0].StartsWith('f'))          Fuse.HandleCallback(query, data);
-        else if (data[0].StartsWith('n'))          Nuke.HandleCallback(query, data);
-        else if (data[0] == "del")
-        {
-            query.Message!.From = query.From;
-            _delete.DoGameStep(query.Message, data[1]);
-        }
     }
 }

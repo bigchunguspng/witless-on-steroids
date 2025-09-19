@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using PF_Bot.Core;
 using PF_Bot.Handlers.Help;
+using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Inline;
 using Telegram.Bot;
@@ -12,7 +13,8 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public static CommandAndCallbackRouter Router { get; private set; } = null!;
+    public static SyncCommand     Router_Command  { get; private set; } = null!;
+    public static ICallbackRouter Router_Callback { get; private set; } = null!;
     public static InlineRequestHandler    Inliner { get; private set; } = new();
 
     public void StartListening()
@@ -41,7 +43,7 @@ public partial class Bot
             { EditedMessage: { } message } => OnMessage(message),
             { CallbackQuery: { } query   } => OnCallback(query),
             { InlineQuery:   { } inline  } => OnInline(inline),
-            _ => OnUnknown()
+            _ => OnUnknown(),
         };
     }
 
@@ -57,11 +59,11 @@ public partial class Bot
     {
         try
         {
-            Router.Execute(CommandContext.FromMessage(message));
+            Router_Command.Execute(CommandContext.FromMessage(message));
         }
         catch (Exception e)
         {
-            HandleCommandException(e, Router.Context);
+            HandleCommandException(e, Router_Command.Context);
         }
 
         return Task.CompletedTask;
@@ -71,11 +73,11 @@ public partial class Bot
     {
         try
         {
-            Router.OnCallback(query);
+            Router_Callback.Route(query);
         }
         catch (Exception e)
         {
-            HandleError(e, query, "Callback");
+            LogError_ToFile(e, query, "Callback");
         }
 
         return Task.CompletedTask;
@@ -89,7 +91,7 @@ public partial class Bot
         }
         catch (Exception e)
         {
-            HandleError(e, inline, "Inline");
+            LogError_ToFile(e, inline, "Inline");
         }
     }
 
@@ -101,7 +103,7 @@ public partial class Bot
 
     public void HandleCommandException(Exception e, CommandContext? context)
     {
-        HandleError(e, context, context?.Title ?? "[unknown]");
+        LogError_ToFile(e, context, context?.Title ?? "[unknown]");
         if (context != null)
         {
             SendMessage(context.Origin, GetSillyErrorMessage());
@@ -110,7 +112,8 @@ public partial class Bot
 
     private static readonly FileLogger_Simple _errorLogger = new (File_Errors);
 
-    private static void HandleError(Exception e, object? context, string title)
+    // todo outta here
+    public static void LogError_ToFile(Exception e, object? context, string title)
     {
         LogError($"{title} >> BRUH | {e.GetErrorMessage()}");
         try

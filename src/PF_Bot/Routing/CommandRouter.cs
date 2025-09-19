@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Handlers;
 using PF_Bot.Handlers.Admin;
@@ -13,11 +12,10 @@ using PF_Bot.Handlers.Media;
 using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Handlers.Media.Reddit;
 using PF_Bot.Routing.Commands;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing
 {
-    public class CommandRouter : CommandAndCallbackRouter
+    public class CommandRouter : SyncCommand
     {
         private readonly Tell _tell = new();
         private readonly Spam _spam = new();
@@ -28,8 +26,8 @@ namespace PF_Bot.Routing
         private readonly QueueMessage _que = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
-        private readonly AliasFFMpeg _apeg = new();
-        private readonly AliasMagick _aim = new();
+        private readonly AliasManager _apeg = new(AliasContext.FFMpeg);
+        private readonly AliasManager _aim  = new(AliasContext.Magick);
         private readonly Htmlizer _html = new();
 
         private readonly WitlessCommandRouter _witlessRouter;
@@ -120,7 +118,7 @@ namespace PF_Bot.Routing
 
         public bool HandleSimpleCommands()
         {
-            var func = _simpleCommands.Resolve(Command);
+            var func = _simpleCommands.Resolve(Command?[1..]);
             if (func != null)
             {
                 Telemetry.LogCommand(Context.Chat, Context.Text);
@@ -143,18 +141,6 @@ namespace PF_Bot.Routing
                 Bot.SendMessage(Origin, START_RESPONSE);
             }
             return success;
-        }
-
-        public override void OnCallback(CallbackQuery query)
-        {
-            if (query.Data == null || query.Message == null) return;
-
-            var data = query.GetData();
-            if (data[0] == "man") _help.HandleCallback(query, data);
-            if (data[0] == "ap" ) _apeg.HandleCallback(query, data);
-            if (data[0] == "ai" ) _aim .HandleCallback(query, data);
-
-            _witlessRouter.OnCallback(query);
         }
     }
 }

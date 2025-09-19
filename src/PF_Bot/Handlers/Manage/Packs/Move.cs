@@ -1,6 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
 using PF_Bot.Handlers.Manage.Settings;
+using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Manage.Packs
 {
@@ -30,7 +31,7 @@ namespace PF_Bot.Handlers.Manage.Packs
             {
                 var name = (Args ?? Title).Replace(' ', '_').ValidFileName('-');
 
-                var newName = MoveDictionary(name, _public ? 0 : Chat);
+                var newName = MoveDictionary(Context, name, _public ? 0 : Chat);
                 if (newName == "*")
                 {
                     Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
@@ -62,19 +63,21 @@ namespace PF_Bot.Handlers.Manage.Packs
             Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
         }
 
-        protected string MoveDictionary(string name, long chat)
+        // todo move?
+        public static string MoveDictionary(WitlessContext ctx, string name, long chat)
         {
-            ChatManager.SaveBaka(Chat, Baka);
+            ChatManager.SaveBaka(ctx.Chat, ctx.Baka);
 
-            if (Baka.VocabularyCount == 0)
+            if (ctx.Baka.VocabularyCount == 0)
                 return "*"; // can't be in file name
 
-            var path = GetUniqueExtraPackPath(name, chat);
+            var source = ChatManager.GetPackPath(chat);
+            var target = GetUniqueExtraPackPath(name, chat);
 
-            File.Copy(PackPath, path);
+            File.Copy(source, target);
 
-            var result = path.FileNameWithoutExtension;
-            Log($"{Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, LogColor.Fuchsia);
+            var result = target.FileNameWithoutExtension;
+            Log($"{ctx.Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, LogColor.Fuchsia);
             return result;
         }
 

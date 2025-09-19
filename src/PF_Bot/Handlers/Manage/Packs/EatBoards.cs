@@ -1,4 +1,5 @@
-﻿using PF_Bot.Core.Internet.Boards;
+﻿using PF_Bot.Core;
+using PF_Bot.Core.Internet.Boards;
 using PF_Bot.Handlers.Manage.Packs.Core;
 
 namespace PF_Bot.Handlers.Manage.Packs;
@@ -12,22 +13,11 @@ public class EatBoards : ChanEaterCore
     //      /board [thread/board/archive]
     //      /board Y-M-D a.N    <- [Y-M-D a.N.json]
 
-    private static readonly BoardService _chan = new();
-    private static readonly Lazy<List<BoardGroup>> _boards = new(_chan.GetBoardList(File_4chanHtmlPage));
+    private readonly BoardService _chan = App.Chan4;
 
-    private string _name = null!;
-    private Uri     _uri = null!;
+    private Uri _uri = null!;
 
-    protected override FilePath ArchivePath => Dir_Board;
-
-    protected override string CallbackKey => "b";
-    protected override string CommandName => "board";
-    protected override string BoardsTitle => BOARDS_4CHAN;
-    protected override string Manual      => BOARD_MANUAL;
-    protected override string UnknownURL  => UNKNOWN_LINK_4CHAN;
-    protected override string EmojiLogo   => "🍀";
-    protected override string FileName    => _name;
-    protected override List<BoardGroup> Boards => _boards.Value;
+    protected override ImageBoardContext Ctx => ImageBoardContext.Chan4;
 
     protected override string GetSourceAnnotation()
     {
@@ -50,7 +40,7 @@ public class EatBoards : ChanEaterCore
 
     private async Task EatSingleThread(string url, string board)
     {
-        _name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
+        FileName = $"{board}.{_uri.Segments[3].Replace("/", "")}";
         try
         {
             var replies = _chan.GetThreadDiscussion(url).ToList();
@@ -64,7 +54,7 @@ public class EatBoards : ChanEaterCore
 
     private async Task EatWholeBoard(string url, string board)
     {
-        _name = board;
+        FileName = board;
 
         var threads = _chan.GetAllActiveThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(url + x));
@@ -74,7 +64,7 @@ public class EatBoards : ChanEaterCore
 
     private async Task EatArchive(string url, string board)
     {
-        _name = $"{board}.zip";
+        FileName = $"{board}.zip";
 
         var threads = _chan.GetAllArchivedThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + _uri.Host + x));
@@ -90,7 +80,7 @@ public class EatBoards : ChanEaterCore
             : _chan.GetDesuSearchURLText   (args[0],                  args[1]);
 
         _uri = new Uri(url);
-        _name = string.Join('_', args);
+        FileName = string.Join('_', args);
 
         var threads = _chan.GetSearchResults(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));

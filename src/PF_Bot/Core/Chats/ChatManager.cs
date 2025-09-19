@@ -20,6 +20,20 @@ public static class ChatManager
     public static FilePath GetPackPath
         (long chat) => Path.Combine(Dir_Chat, $"{chat}{Ext_Pack}");
 
+    public static FilePath GetPacksFolder
+        (long chat, bool @private) => @private 
+        ? GetPrivatePacksFolder(chat) 
+        : Dir_Fuse;
+    public static FilePath GetFilesFolder
+        (long chat, bool @private) => @private 
+        ? GetPrivateFilesFolder(chat) 
+        : Dir_History;
+
+    public static FilePath GetPrivatePacksFolder
+        (long chat) => Dir_Fuse   .Combine(chat.ToString());
+    public static FilePath GetPrivateFilesFolder
+        (long chat) => Dir_History.Combine(chat.ToString());
+
 
     // CHATLIST / SETTINGS
 
@@ -140,7 +154,7 @@ public static class ChatManager
 
     private static string
         PackIO_MeasureSpeed
-        (long chat, Action<string> packIO_action)
+        (long chat, Action<FilePath> packIO_action)
     {
         var sw = Stopwatch.StartNew();
         var path = GetPackPath(chat);

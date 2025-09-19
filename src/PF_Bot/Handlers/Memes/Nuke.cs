@@ -1,10 +1,9 @@
-﻿using System.Text;
-using PF_Bot.Backrooms.Helpers;
+﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Backrooms.Listing;
 using PF_Bot.Core.Memes.Generators;
 using PF_Bot.Core.Memes.Options;
 using PF_Bot.Core.Memes.Shared;
-using PF_Bot.Handlers.Manage.Packs;
-using Telegram.Bot.Types;
+using PF_Bot.Routing_New.Routers;
 
 namespace PF_Bot.Handlers.Memes
 {
@@ -28,7 +27,7 @@ namespace PF_Bot.Handlers.Memes
         protected override Task Run()
         {
             if /**/ (Args is "log" or "logs" || Context.Command!.StartsWith("/nuke_log"))
-                SendNukeLog(new ListPagination(Origin, PerPage: 5));
+                ListingNukes.SendNukeLog(new ListPagination(Origin, PerPage: 5));
             else if (Args is null)
                 return RunInternal("nuke\n⏳История фильтров: /nuke_log");
 
@@ -47,57 +46,16 @@ namespace PF_Bot.Handlers.Memes
 
         private static readonly Regex
             _r_depth = new(@"([1-9])("")", RegexOptions.Compiled);
+    }
 
-        public static void HandleCallback(CallbackQuery query, string[] data)
+    public class Nuke_Callback : CallbackHandler
+    {
+        protected override Task Run()
         {
-            var pagination = query.GetPagination(data);
+            var pagination = Query.GetPagination(Content);
 
-            if      (data[0] == "nl") SendNukeLog (pagination);
-            // else if (data[0] == "ni") SendNukeInfo(pagination); // nah, i'm lazy
-        }
-
-        private static void SendNukeLog(ListPagination pagination)
-        {
-            var (origin, messageId, page, perPage) = pagination;
-
-            if (DukeNukem.Logs.TryGetValue_Failed(pagination.Origin.Chat, out var entries))
-            {
-                Bot.SendMessage(pagination.Origin, NUKE_LOG_EXPLANATION);
-                return;
-            }
-
-            var single = entries.Count <= perPage;
-
-            var lastPage = (int)Math.Ceiling(entries.Count / (double)perPage) - 1;
-            var sb = new StringBuilder("🍤 <b>Последние вариации /nuke:</b>");
-            if (single.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-            sb.Append("\n\n").AppendJoin('\n', GetNukeLog(entries, page, perPage));
-            sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
-            if (single.Janai()) sb.Append(USE_ARROWS);
-                
-            var buttons = single ? null : GetPaginationKeyboard(page, perPage, lastPage, "nl");
-            Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
-        }
-
-        private static IEnumerable<string> GetNukeLog(List<DukeNukem.NukeLogEntry> entries, int page = 0, int perPage = 25)
-        {
-            if (entries.Count == 0)
-            {
-                yield return NUKE_LOG_EXPLANATION;
-                yield break;
-            }
-
-            foreach (var entry in entries.OrderByDescending(x => x.Time).Skip(page * perPage).Take(perPage))
-            {
-                var logo = entry.Type switch
-                {
-                    MemeSourceType.Image => "📸",
-                    MemeSourceType.Sticker => "🎟",
-                    MemeSourceType.Video => "🎬",
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                yield return $"{logo} <b>{entry.Time:MM'/'dd' 'HH:mm:ss}</b>\n<blockquote><code>{entry.Command}</code></blockquote>";
-            }
+            ListingNukes.SendNukeLog(pagination);
+            return Task.CompletedTask;
         }
     }
 }

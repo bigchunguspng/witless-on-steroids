@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Backrooms.Listing;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Manage.Settings;
+using PF_Bot.Routing_New.Routers;
 using PF_Tools.Copypaster.Helpers;
 using Telegram.Bot.Types;
 
@@ -16,6 +18,19 @@ namespace PF_Bot.Handlers.Manage.Packs
     //      * - history
     //      ! - private packs
 
+    public class Fuse_Callback : CallbackHandler
+    {
+        protected override Task Run()
+        {
+            var pagination = Query.GetPagination(Content);
+
+            if      (Key == "fi") ListingPacks.SendPackList(pagination);
+            else if (Key == "f!") ListingPacks.SendPackList(pagination, @private: true);
+            else if (Key == "f@") ListingPacks.SendFileList(pagination);
+            else          /* f**/ ListingPacks.SendFileList(pagination, @private: true);
+            return Task.CompletedTask;
+        }
+    }
     public class Fuse : AsyncSettingsCommand
     {
         protected long Size;
@@ -50,10 +65,10 @@ namespace PF_Bot.Handlers.Manage.Packs
             else if (args.Length == 0) Bot.SendMessage(Origin, FUSE_MANUAL);
             else if (args.Length  > 0 && args[^1] == "info")
             {
-                if      (_source is FuseSource.PackPublic ) SendPackList(new ListPagination(Origin));
-                else if (_source is FuseSource.PackPrivate) SendPackList(new ListPagination(Origin), @private: true);
-                else if (_source is FuseSource.FilePublic ) SendFileList(new ListPagination(Origin));
-                else if (_source is FuseSource.FilePrivate) SendFileList(new ListPagination(Origin), @private: true);
+                if      (_source is FuseSource.PackPublic ) ListingPacks.SendPackList(new ListPagination(Origin));
+                else if (_source is FuseSource.PackPrivate) ListingPacks.SendPackList(new ListPagination(Origin), @private: true);
+                else if (_source is FuseSource.FilePublic ) ListingPacks.SendFileList(new ListPagination(Origin));
+                else if (_source is FuseSource.FilePrivate) ListingPacks.SendFileList(new ListPagination(Origin), @private: true);
             }
             else if (_source is FuseSource.FilePrivate or FuseSource.FilePublic) await ProcessEatingRequest(args);
             else if (_source is FuseSource.PackPrivate or FuseSource.PackPublic) await ProcessFusionRequest(args[^1]);
@@ -91,15 +106,15 @@ namespace PF_Bot.Handlers.Manage.Packs
 
                 await FuseWithOtherPack(ChatManager.GetPackPath(chat));
             }
-            else if (GetPacksFolder(Chat, @private).GetFiles($"{arg}{Ext_Pack}") is { Length: > 0 } files)
+            else if (ChatManager.GetPacksFolder(Chat, @private).GetFiles($"{arg}{Ext_Pack}") is { Length: > 0 } files)
             {
                 await FuseWithOtherPack(files[0]);
             }
             else if (argIsChatId) Bot.SendMessage(Origin, FUSE_FAIL_CHAT);
-            else SendPackList(new ListPagination(Origin), fail: true, @private);
+            else ListingPacks.SendPackList(new ListPagination(Origin), fail: true, @private);
         }
 
-        private Task FuseWithOtherPack(string path) => Task.Run(() =>
+        private Task FuseWithOtherPack(FilePath path) => Task.Run(() =>
         {
             Baka.Fuse(GenerationPackIO.Load(path));
             GoodEnding();
@@ -111,10 +126,10 @@ namespace PF_Bot.Handlers.Manage.Packs
             var @private = _source is FuseSource.FilePrivate;
             var name = string.Join(' ', args.Skip(1));
 
-            var files = GetFilesFolder(Chat, @private).GetFiles($"{name}.json");
+            var files = ChatManager.GetFilesFolder(Chat, @private).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
-                SendFileList(new ListPagination(Origin), fail: true, @private);
+                ListingPacks.SendFileList(new ListPagination(Origin), fail: true, @private);
             }
             else
             {
@@ -137,7 +152,7 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         private async Task ProcessJsonFile()
         {
-            var path = GetPrivateFilesFolder(Chat)
+            var path = ChatManager.GetPrivateFilesFolder(Chat)
                 .EnsureDirectoryExist()
                 .Combine(_document!.FileName ?? "fuse.json")
                 .MakeUnique();
@@ -171,7 +186,7 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         private void SaveJsonCopy(FilePath path, string[] lines)
         {
-            var save = GetPrivateFilesFolder(Chat)
+            var save = ChatManager.GetPrivateFilesFolder(Chat)
                 .EnsureDirectoryExist()
                 .Combine(path.ChangeExtension(".json"))
                 .MakeUnique();
@@ -219,100 +234,6 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         #endregion
 
-
-        #region LISTING
-
-        private record FusionListData(string Title, string Object, string Key, string Marker);
-
-        private static readonly FusionListData PublicPacks  = new("📂 Общие словари" , "словаря", "fi",   "");
-        private static readonly FusionListData PrivatePacks = new("🔐 Личные словари", "словаря", "f!", "! ");
-        private static readonly FusionListData PublicFiles  = new("📂 Общие файлы" ,   "файла",   "f@", "@ ");
-        private static readonly FusionListData PrivateFiles = new("🔐 Личные файлы",   "файла",   "f*", "* ");
-
-        public static void HandleCallback(CallbackQuery query, string[] data)
-        {
-            var pagination = query.GetPagination(data);
-
-            if      (data[0] == "fi") SendPackList(pagination);
-            else if (data[0] == "f!") SendPackList(pagination, @private: true);
-            else if (data[0] == "f@") SendFileList(pagination);
-            else              /* f* */SendFileList(pagination, @private: true);
-        }
-
-        private static void SendPackList(ListPagination pagination, bool fail = false, bool @private = false)
-        {
-            var fuseList  = @private ? PrivatePacks : PublicPacks;
-            var directory = GetPacksFolder(pagination.Origin.Chat, @private);
-            SendFilesList(fuseList, directory, pagination, fail);
-        }
-
-        private static void SendFileList(ListPagination pagination, bool fail = false, bool @private = false)
-        {
-            var fuseList  = @private ? PrivateFiles : PublicFiles;
-            var directory = GetFilesFolder(pagination.Origin.Chat, @private);
-            SendFilesList(fuseList, directory, pagination, fail);
-        }
-
-        private static void SendFilesList
-        (
-            FusionListData data, FilePath directory, ListPagination pagination, bool fail = false
-        )
-        {
-            var (origin, messageId, page, perPage) = pagination;
-
-            var files = directory.GetFilesInfo();
-            var oneshot = files.Length < perPage;
-
-            var lastPage = (int)Math.Ceiling(files.Length / (double)perPage) - 1;
-            var sb = new StringBuilder();
-            if (fail)
-            {
-                sb.Append("К сожалению, я не нашёл ").Append(data.Object).Append(" с таким названием\n\n");
-            }
-            sb.Append("<b>").Append(data.Title).Append(":</b>");
-            if (oneshot.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-            sb.Append("\n\n").AppendJoin('\n', ListFiles(files, data.Marker, page, perPage));
-            sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = ChatManager.GetPackPath(origin.Chat);
-            if (File.Exists(path))
-                sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
-            else
-                sb.Append("пуст");
-
-            if (oneshot.Janai()) sb.Append(USE_ARROWS);
-
-            var buttons = oneshot ? null : GetPaginationKeyboard(page, perPage, lastPage, data.Key);
-            Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
-        }
-
-        private static IEnumerable<string> ListFiles(FileInfo[] files, string marker, int page = 0, int perPage = 25)
-        {
-            if (files.Length == 0)
-            {
-                yield return "*пусто*";
-                yield break;
-            }
-
-            foreach (var file in files.Skip(page * perPage).Take(perPage))
-            {
-                var name = Path.GetFileNameWithoutExtension(file.Name);
-                var size = file.Length.ReadableFileSize();
-                yield return $"<code>{marker}{name}</code> | {size}";
-            }
-        }
-
-        #endregion
-
-
-        private static FilePath GetPrivatePacksFolder(long chat) => Dir_Fuse   .Combine(chat.ToString());
-        private static FilePath GetPrivateFilesFolder(long chat) => Dir_History.Combine(chat.ToString());
-
-        private static FilePath GetPacksFolder
-            (long chat, bool @private) => @private ? GetPrivatePacksFolder(chat) : Dir_Fuse;
-
-        private static FilePath GetFilesFolder
-            (long chat, bool @private) => @private ? GetPrivateFilesFolder(chat) : Dir_History;
-
         private string GetJsonFormatExample()
         {
             var sb = new StringBuilder(ONLY_ARRAY_JSON);
@@ -327,6 +248,4 @@ namespace PF_Bot.Handlers.Manage.Packs
             return sb.ToString();
         }
     }
-
-    public record ListPagination(MessageOrigin Origin, int MessageId = -1, int Page = 0, int PerPage = 25);
 }

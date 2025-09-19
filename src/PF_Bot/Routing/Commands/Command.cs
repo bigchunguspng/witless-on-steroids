@@ -86,11 +86,4 @@ namespace PF_Bot.Routing.Commands
 
         public FilePath PackPath => ChatManager.GetPackPath(Chat);
     }
-
-    // ROUTING
-
-    public abstract class CommandAndCallbackRouter : SyncCommand
-    {
-        public abstract void OnCallback(CallbackQuery query);
-    }
 }

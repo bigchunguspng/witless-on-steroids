@@ -1,6 +1,6 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Editing;
-using PF_Bot.Handlers.Edit.Direct.Core;
+using PF_Bot.Handlers.Edit.Direct.Helpers;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -57,9 +57,9 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         else if (extension == "w") extension = "webp";
 
         var extensionInvalid = extension.FileNameIsInvalid();
-        if (extensionInvalid || DirectEditingHelpers.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
+        if (extensionInvalid || DirectEditing.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
-            await DirectEditingHelpers.SendTrollface(Origin, extensionInvalid);
+            await DirectEditing.SendTrollface(Origin, extensionInvalid);
             return;
         }
 

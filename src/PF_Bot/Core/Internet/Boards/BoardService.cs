@@ -136,7 +136,7 @@ namespace PF_Bot.Core.Internet.Boards
 
         private const string HOME_COLUMN = "//div[@class='column']";
 
-        /// <param name="path">path to a saved home page file, since it's more reliable to hae it this way.</param>
+        /// <param name="path">path to a saved home page file, since it's more reliable to have it this way.</param>
         public List<BoardGroup> GetBoardList(string path)
         {
             var boards = new List<BoardGroup>();

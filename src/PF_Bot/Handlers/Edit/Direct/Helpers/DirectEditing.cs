@@ -4,9 +4,9 @@ using PF_Bot.Core;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Handlers.Edit.Direct.Core;
+namespace PF_Bot.Handlers.Edit.Direct.Helpers;
 
-public static class DirectEditingHelpers
+public static class DirectEditing
 {
     private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
 

@@ -2,8 +2,10 @@ namespace PF_Tools.Copypaster.Helpers;
 
 public static class GenerationPackIO
 {
-    public static GenerationPack Load(string path)
+    public static GenerationPack Load(FilePath path)
     {
+        if (path.FileExists.Janai()) return new GenerationPack();
+
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         using var reader = new BinaryReader(fs);
         return BinarySerialization.Deserialize(reader);

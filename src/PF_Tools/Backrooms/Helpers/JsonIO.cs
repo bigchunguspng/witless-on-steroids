@@ -18,6 +18,7 @@ public static class JsonIO
         Converters = { new TransitionTableConverter() }
     };
 
+    // todo async?
     public static T LoadData<T>(FilePath path) where T : new()
     {
         if (path.File_DoNotExist_Or_Empty) return NewT<T>(path);

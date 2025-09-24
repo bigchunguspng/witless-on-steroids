@@ -10,7 +10,7 @@ public class SetQuality : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Quality = value.ClampByte();
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             Bot.SendMessage(Origin, string.Format(SET_Q_RESPONSE, Data.Quality).XDDD());
             Log($"{Title} >> QUALITY >> {Data.Quality}%");
         }

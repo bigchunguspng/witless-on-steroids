@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Core.Internet.Reddit;
+using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.Reddit;
 
 #pragma warning disable CS4014
@@ -24,9 +25,6 @@ namespace PF_Bot.Handlers.Manage.Packs
 
             if (Args != null && (queSuccess || sub.Success))
             {
-                MeasureDick();
-                GetWordsPerLineLimit();
-
                 var q = que.GroupOrNull(1);
                 var s = sub.GroupOrNull(1);
                 var o = ops.Success ? ops.Value : queSuccess ? "ra" : "ha";
@@ -49,7 +47,7 @@ namespace PF_Bot.Handlers.Manage.Packs
                 }
 
                 var message = Bot.PingChat(Origin, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                await Bot.RunOrThrow(EatComments(query, Size, Limit), Chat, message);
+                await Bot.RunOrThrow(EatComments(query), Chat, message);
             }
             else
             {
@@ -57,39 +55,41 @@ namespace PF_Bot.Handlers.Manage.Packs
             }
         }
 
-        private async Task EatComments(RedditQuery query, long size, int limit)
+        private async Task EatComments(RedditQuery query)
         {
             var sw = Stopwatch.StartNew();
             var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
             Log($"COMMENTS FETCHED >> {sw.ElapsedReadable()}");
 
-            var count = Baka.VocabularyCount;
+            await Baka_Eat_Report(comments, GetFileSavePath(query), GetDetails);
 
-            var commentsEaten = await EatAllLines(comments, Baka, limit);
-            SaveChanges(Baka, Chat, Title);
-
-            JsonIO.SaveData(comments, GetFileSavePath(query));
-
-            var report = FUSION_SUCCESS_REPORT(Baka, Chat, size, count, Title);
-            var subreddit = query is ScrollQuery sc ? sc.Subreddit : query is SearchQuery ss ? ss.Subreddit : null;
-            subreddit = subreddit is not null ? $"<b>r/{subreddit}</b>" : "разных сабреддитов";
-            var detais = $"\n\nЕго пополнили {commentsEaten} комментов с {subreddit}";
-            Bot.SendMessage(Origin, report + detais);
+            string GetDetails(FeedReport feed)
+            {
+                var subreddit = query is ScrollQuery sc
+                    ? sc.Subreddit
+                    : query is SearchQuery ss
+                        ? ss.Subreddit
+                        : null;
+                subreddit = subreddit != null 
+                    ? $"<b>r/{subreddit}</b>" 
+                    : "разных сабреддитов";
+                return $"\n\nЕго пополнили {feed.Consumed} комментов с {subreddit}";
+            }
         }
 
         private string GetFileSavePath(RedditQuery query)
         {
-            Directory.CreateDirectory(Dir_History);
-
             var date = $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
             var name = query switch
             {
                 ScrollQuery sc => $"{sc.Subreddit}",
                 SearchQuery se => $"{se.Subreddit}_{se.Q.Replace(' ', '-')}",
-                _ => throw new ArgumentOutOfRangeException(nameof(query))
+                _ => throw new ArgumentOutOfRangeException(nameof(query)),
             };
 
-            return Path.Combine(Dir_History, $"{date} {name}.json");
+            return Dir_History
+                .EnsureDirectoryExist()
+                .Combine($"{date} {name}.json");
         }
     }
 }

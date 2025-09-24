@@ -7,7 +7,7 @@ namespace PF_Bot.Handlers.Manage.Settings
         protected override void RunAuthorized()
         {
             Data.Stickers = Data.Stickers.Janai();
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             Bot.SendMessage(Origin, string.Format(STICKERS_RESPONSE, Data.Stickers ? "" : "<b>НЕ</b> ").XDDD());
             Log($"{Title} >> STICKERS >> {(Data.Stickers ? "ON" : "OFF")}");
         }

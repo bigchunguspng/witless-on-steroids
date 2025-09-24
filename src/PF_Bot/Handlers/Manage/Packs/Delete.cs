@@ -1,5 +1,6 @@
 ﻿using PF_Bot.Backrooms.Listing;
 using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
@@ -22,7 +23,7 @@ public class Delete_Callback : CallbackHandler
     protected override async Task Run()
     {
         var message  = Query.Message!;
-        var settings = ChatManager.SettingsDB[message.Chat.Id];
+        var settings = ChatManager.Chats[message.Chat.Id];
         _ctx = WitlessContext.FromMessage(message, settings);
 
         var parts = Content.Split(" - ");
@@ -62,16 +63,14 @@ public class Delete_Callback : CallbackHandler
         }
     }
 
+    // /move, /pub - just clear the pack
+    // /delete = /move + remove chat from chatlist
     private void DeleteTheDictionary()
     {
-        var name = _ctx.Title.Replace(' ', '-').ValidFileName();
-        var result = Move.MoveDictionary(_ctx, name, _ctx.Chat);
+        var result = PackManager.Move(_ctx.Chat, name: _ctx.Title, publish: false) ?? "*👊 никак*";
 
-        if (result == "*") result = "*👊 никак*";
-
-        ChatManager.RemoveChat(_ctx.Chat);
-        ChatManager.SaveChatsDB();
-        ChatManager.DeletePack(_ctx.Chat);
+        ChatManager.Remove(_ctx.Chat);
+        ChatManager.SaveChats();
 
         Log($"{_ctx.Title} >> DIC REMOVED >> {_ctx.Chat}", LogLevel.Info, LogColor.Fuchsia);
         Bot.SendMessage(_ctx.Origin, string.Format(DEL_SUCCESS_RESPONSE, _ctx.Title, result, Bot.Username));

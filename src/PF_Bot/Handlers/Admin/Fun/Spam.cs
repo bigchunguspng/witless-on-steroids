@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Admin.Fun;
@@ -79,9 +80,9 @@ public class Spam : SyncCommand
 
     private static IEnumerable<long> GetChats(GetChatsType type, ComparisonExpression size, ComparisonExpression days)
     {
-        return ChatManager.SettingsDB.Lock(x => x.Keys.Where(chat =>
+        return ChatManager.Chats.Lock(x => x.Keys.Where(chat =>
         {
-            var path = ChatManager.GetPackPath(chat);
+            var path = PackManager.GetPackPath(chat);
             if (File.Exists(path))
             {
                 var file = new FileInfo(path);

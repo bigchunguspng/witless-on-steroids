@@ -2,6 +2,8 @@ namespace PF_Tools.Copypaster.Helpers;
 
 public static class GenerationPackIO
 {
+    /// Loads pack into memory.
+    /// Or creates a new empty one, if the file doesn't exist.
     public static GenerationPack Load(FilePath path)
     {
         if (path.FileExists.Janai()) return new GenerationPack();

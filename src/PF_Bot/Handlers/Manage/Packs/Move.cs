@@ -1,14 +1,13 @@
 ﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Manage.Settings;
-using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Manage.Packs
 {
-    //      /move  [name]    PRIVATE
-    //      /pub   [name]    PUBLIC
-    //      /pub ! [name]    PRIVATE -> PUBLIC PACK
-    //      /pub * [name]    PRIVATE -> PUBLIC FILE
+    //      /move  [name]    = PACK: ACTIVE  -> PRIVATE
+    //      /pub   [name]    = PACK: ACTIVE  -> PUBLIC
+    //      /pub ! [name]    = PACK: PRIVATE -> PUBLIC
+    //      /pub * [name]    = FILE: PRIVATE -> PUBLIC
 
     public class Move : SettingsCommand
     {
@@ -25,75 +24,48 @@ namespace PF_Bot.Handlers.Manage.Packs
             var args = Args.SplitN(2);
             var publishPack = args.Length > 1 && args[0] == "!";
             var publishFile = args.Length > 1 && args[0] == "*";
-            if      (publishPack) Publish(args[^1], Dir_Fuse   , ["словарь", "!", "Словарь",   ""]);
-            else if (publishFile) Publish(args[^1], Dir_History, ["файл"   , "*", "Файл"   , "@ "]);
+            if      (publishPack) Publish(args[^1], Dir_Fuse   , _ctxFuse);
+            else if (publishFile) Publish(args[^1], Dir_History, _ctxHist);
             else
             {
-                var name = (Args ?? Title).Replace(' ', '_').ValidFileName('-');
-
-                var newName = MoveDictionary(Context, name, _public ? 0 : Chat);
-                if (newName == "*")
+                var name = PackManager.Move(Chat, name: Args ?? Title, _public);
+                if (name == null)
                 {
                     Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
                 }
                 else
                 {
-                    ChatManager.ClearPack(Chat, Baka);
-                    Log($"{Title} >> DIC CLEARED!", LogLevel.Info, LogColor.Fuchsia);
-
+                    Log($"{Title} >> DIC {(_public ? "PUBLISHED" : "MOVED")} >> {name}", LogLevel.Info, LogColor.Fuchsia);
+                    var marker = _public ? "" : "! ";
                     var result = _public ? "опубликовано" : "сохранено";
-                    Bot.SendMessage(Origin, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, newName));
+                    Bot.SendMessage(Origin, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, marker, name));
                 }
             }
         }
 
-        private void Publish(string name, FilePath directory, string[] x)
+        private record PublishContext(string What_SentenceCase, string What, string SourceMarker, string TargetMarker);
+
+        private static readonly PublishContext
+            _ctxFuse = new("Словарь", "словарь", "! ", ""  ),
+            _ctxHist = new("Файл"   , "файл"   , "* ", "@ ");
+
+        private void Publish(string name, FilePath directory, PublishContext ctx)
         {
             var filename = $"{name}{Ext_Pack}";
             var fileSource = directory.Combine(Chat.ToString(), filename);
-            if (fileSource.FileExists.Janai())
+            if (fileSource.FileExists)
             {
-                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), x[0], x[1]);
+                var fileTarget = directory.Combine(filename).MakeUnique();
+                File.Move(fileSource, fileTarget);
+
+                var text = string.Format(PUB_DONE, ctx.What_SentenceCase, name, ctx.TargetMarker);
                 Bot.SendMessage(Origin, text);
-                return;
             }
-
-            var fileTarget = directory.Combine(filename).MakeUnique();
-            File.Move(fileSource, fileTarget);
-            Bot.SendMessage(Origin, string.Format(PUB_DONE, x[2], name, x[3]));
-        }
-
-        // todo move?
-        public static string MoveDictionary(WitlessContext ctx, string name, long chat)
-        {
-            ChatManager.SaveBaka(ctx.Chat, ctx.Baka);
-
-            if (ctx.Baka.VocabularyCount == 0)
-                return "*"; // can't be in file name
-
-            var source = ChatManager.GetPackPath(chat);
-            var target = GetUniqueExtraPackPath(name, chat);
-
-            File.Copy(source, target);
-
-            var result = target.FileNameWithoutExtension;
-            Log($"{ctx.Title} >> DIC {(chat is 0 ? "PUBLISHED" : "MOVED")} >> {result}", LogLevel.Info, LogColor.Fuchsia);
-            return result;
-        }
-
-        public static FilePath GetUniqueExtraPackPath(string name, long chat = 0)
-        {
-            var directory = chat == 0
-                ? Dir_Fuse
-                : Dir_Fuse.Combine(chat.ToString());
-            var suffix =  name is "info" or "his" // todo update - his is not used, test !@*
-                ? Desert.GetSand(2)
-                : null;
-
-            return directory
-                .EnsureDirectoryExist()
-                .Combine($"{name}{suffix}{Ext_Pack}")
-                .MakeUnique();
+            else
+            {
+                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
+                Bot.SendMessage(Origin, text);
+            }
         }
     }
 

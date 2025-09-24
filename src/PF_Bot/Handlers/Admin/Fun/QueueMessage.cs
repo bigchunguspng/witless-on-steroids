@@ -1,5 +1,6 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Text;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
@@ -27,8 +28,8 @@ public class QueueMessage : SyncCommand
         var text = args[1];
 
         PoopText.Enqueue(chat, text);
-        if (ChatManager.KnownsChat(chat))
-            ChatManager.GetBaka   (chat).Eat(text);
+        if (ChatManager.Knowns (chat))
+            PackManager.GetBaka(chat).Eat(text);
         LogQueue(chat);
     }
 

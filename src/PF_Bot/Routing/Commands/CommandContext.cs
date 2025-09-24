@@ -87,7 +87,7 @@ public class WitlessContext : CommandContext
     public ChatSettings Settings { get; }
 
     [JsonIgnore]
-    public  Copypaster Baka => _baka ??= ChatManager.GetBaka(Chat);
+    public  Copypaster Baka => _baka ??= PackManager.GetBaka(Chat);
     private Copypaster?        _baka;
 
 

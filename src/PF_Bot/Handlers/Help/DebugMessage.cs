@@ -6,6 +6,7 @@ using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Reddit;
+using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
@@ -115,9 +116,9 @@ public class DebugMessage : SyncCommand
 
     private static string GetPacksInfo()
     {
-        var loaded = ChatManager.LoadedBakas.Count;
-        var total  = ChatManager.SettingsDB .Count;
-        var packs = string.Join('\n', ChatManager.LoadedBakas.Select(x => x.Key.ToString()));
+        var loaded = PackManager.Bakas.Count;
+        var total  = ChatManager.Chats.Count;
+        var packs = string.Join('\n', PackManager.Bakas.Select(x => x.Key.ToString()));
         return $"📝 <u>PACKS LOADED</u>: {loaded}/{total}\n<blockquote expandable>{packs}</blockquote>";
     }
 

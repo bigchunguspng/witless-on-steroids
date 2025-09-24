@@ -3,7 +3,7 @@
 namespace PF_Bot.Handlers.Manage.Settings;
 
 /// Use this class as a base for the commands
-/// that can be restricted to admins only.
+/// that can be restricted to chat admins only.
 public abstract class SettingsCommand : WitlessSyncCommand
 {
     private bool /* when the */ SenderIsSus() // !😳

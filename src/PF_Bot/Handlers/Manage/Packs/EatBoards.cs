@@ -40,11 +40,11 @@ public class EatBoards : ChanEaterCore
 
     private async Task EatSingleThread(string url, string board)
     {
-        FileName = $"{board}.{_uri.Segments[3].Replace("/", "")}";
+        var name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
         try
         {
             var replies = _chan.GetThreadDiscussion(url).ToList();
-            await EatMany(replies, Size, Limit);
+            await EatMany(replies, name);
         }
         catch
         {
@@ -54,22 +54,22 @@ public class EatBoards : ChanEaterCore
 
     private async Task EatWholeBoard(string url, string board)
     {
-        FileName = board;
+        var name = board;
 
         var threads = _chan.GetAllActiveThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(url + x));
 
-        await RespondAndStartEating(tasks);
+        await RespondAndStartEating(tasks, name);
     }
 
     private async Task EatArchive(string url, string board)
     {
-        FileName = $"{board}.zip";
+        var name = $"{board}.zip";
 
         var threads = _chan.GetAllArchivedThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync("https://" + _uri.Host + x));
 
-        await RespondAndStartEating(tasks);
+        await RespondAndStartEating(tasks, name);
     }
 
     protected override async Task EatOnlineFind(string[] args)
@@ -80,11 +80,11 @@ public class EatBoards : ChanEaterCore
             : _chan.GetDesuSearchURLText   (args[0],                  args[1]);
 
         _uri = new Uri(url);
-        FileName = string.Join('_', args);
+        var name = string.Join('_', args);
 
         var threads = _chan.GetSearchResults(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
 
-        await RespondAndStartEating(tasks);
+        await RespondAndStartEating(tasks, name);
     }
 }

@@ -1,7 +1,7 @@
 using System.Globalization;
-using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Boards;
 using PF_Bot.Core.Internet.Reddit;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing;
 using PF_Bot.Telegram;
@@ -39,7 +39,7 @@ public static class App
         if (tg_HandleUpdates)
             Bot.StartListening();
 
-        ChatManager.StartAutoSaveThread(TimeSpan.FromMinutes(2));
+        PackManager.StartAutoSaveThread(TimeSpan.FromMinutes(2));
 
         Console.CancelKeyPress              += (_, _) => SaveAndExit();
         AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
@@ -53,7 +53,7 @@ public static class App
         Telemetry.Log_EXIT(Bot.Me);
         Telemetry.Write();
 
-        ChatManager.Bakas_SaveDirty();
+        PackManager.Bakas_SaveDirty();
         if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
     }
 }

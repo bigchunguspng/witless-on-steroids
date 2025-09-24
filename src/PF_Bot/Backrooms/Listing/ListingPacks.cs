@@ -1,6 +1,6 @@
 using System.Text;
 using PF_Bot.Core;
-using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing_New.Routers;
 
 namespace PF_Bot.Backrooms.Listing;
@@ -15,17 +15,17 @@ public static class ListingPacks // Did someone said Linkin' Park?
         PublicFiles  = new("📂 Общие файлы" ,   "файла",   $"{CallbackRouter_Default.Key_Fuse}@", "@ "),
         PrivateFiles = new("🔐 Личные файлы",   "файла",   $"{CallbackRouter_Default.Key_Fuse}*", "* ");
 
-    public static void SendPackList(ListPagination pagination, bool fail = false, bool @private = false)
+    public static void SendPackList(ListPagination pagination, bool fail = false, bool isPrivate = false)
     {
-        var fuseList  = @private ? PrivatePacks : PublicPacks;
-        var directory = ChatManager.GetPacksFolder(pagination.Origin.Chat, @private);
+        var fuseList  = isPrivate ? PrivatePacks : PublicPacks;
+        var directory = PackManager.GetPacksFolder(pagination.Origin.Chat, isPrivate);
         SendFilesList(fuseList, directory, pagination, fail);
     }
 
-    public static void SendFileList(ListPagination pagination, bool fail = false, bool @private = false)
+    public static void SendFileList(ListPagination pagination, bool fail = false, bool isPrivate = false)
     {
-        var fuseList  = @private ? PrivateFiles : PublicFiles;
-        var directory = ChatManager.GetFilesFolder(pagination.Origin.Chat, @private);
+        var fuseList  = isPrivate ? PrivateFiles : PublicFiles;
+        var directory = PackManager.GetFilesFolder(pagination.Origin.Chat, isPrivate);
         SendFilesList(fuseList, directory, pagination, fail);
     }
 
@@ -50,7 +50,7 @@ public static class ListingPacks // Did someone said Linkin' Park?
         if (oneshot.Janai()) sb.Append($" 📃{page + 1}/{lastPage + 1}");
         sb.Append("\n\n").AppendJoin('\n', ListFiles(files, ctx.Marker, page, perPage));
         sb.Append("\n\nСловарь <b>этой беседы</b> ");
-        var path = ChatManager.GetPackPath(origin.Chat);
+        var path = PackManager.GetPackPath(origin.Chat);
         if (File.Exists(path))
             sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
         else

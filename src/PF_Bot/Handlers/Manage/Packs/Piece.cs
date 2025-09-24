@@ -1,4 +1,5 @@
-﻿using PF_Bot.Routing.Commands;
+﻿using PF_Bot.Core.Text;
+using PF_Bot.Routing.Commands;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 using PF_Tools.Copypaster.Helpers;
@@ -22,7 +23,7 @@ namespace PF_Bot.Handlers.Manage.Packs
             {
                 var url  = _rgx_urls.Match(Args).Value;
                 var args = _rgx_args.Match(Args);
-                var name = args.Groups[2].Value.Replace(' ', '_');
+                var name = args.Groups[2].Value;
                 var post = args.Groups[1].Value;
 
                 var sandwich = $"{url}[+] [*1..{post}]";
@@ -31,7 +32,7 @@ namespace PF_Bot.Handlers.Manage.Packs
                 var pack = new GenerationPack();
                 pack.Eat_Advanced(sandwich, chance);
 
-                var path = Move.GetUniqueExtraPackPath(name);
+                var path = PackManager.GetExtraPackPath(name);
                 GenerationPackIO.Save(pack, path);
 
                 Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));

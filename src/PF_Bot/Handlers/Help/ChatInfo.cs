@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PF_Bot.Core.Chats;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Help
@@ -23,7 +24,7 @@ namespace PF_Bot.Handlers.Help
             };
 
             sb.Append("\nВес словаря: ").Append(size.ReadableFileSize()).Append(' ').Append(icon);
-            if (ChatManager.BakaIsLoaded(Chat))
+            if (PackManager.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
                     .Append(Baka.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');

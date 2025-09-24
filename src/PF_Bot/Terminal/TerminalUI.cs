@@ -13,11 +13,11 @@ namespace PF_Bot.Terminal
         private long   _activeChat;
         private string _input = string.Empty;
 
-        private Copypaster Baka => ChatManager.GetBaka(_activeChat);
+        private Copypaster Baka => PackManager.GetBaka(_activeChat);
 
         public static void Start()
         {
-            Thread.CurrentThread.Name = "Console UI";
+            Thread.CurrentThread.Name = "Terminal UI";
 
             new TerminalUI().Loop();
         }
@@ -47,7 +47,7 @@ namespace PF_Bot.Terminal
         {
             if      (BotWannaSpeak()) BreakFourthWall();
             else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) ChatManager.Bakas_SaveDirty_UnloadIdle();
+            else if (_input == "/s" ) PackManager.Bakas_SaveDirty_DropIdle();
             else if (_input == "/p" ) PacksInfo();
             else if (_input == "/pp") PacksInfoFull();
             else if (_input == "/cc") ClearTempFiles();
@@ -67,7 +67,7 @@ namespace PF_Bot.Terminal
         private void SetActiveChat()
         {
             var shit = _input[1..];
-            var found = ChatManager.SettingsDB.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
+            var found = ChatManager.Chats.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
             if (found != 0)
             {
                 _activeChat = found;
@@ -78,7 +78,7 @@ namespace PF_Bot.Terminal
         private void BreakFourthWall()
         {
             var arg = _input.Split (' ', 2)[1];
-            if (ChatManager.KnownsChat(_activeChat).Janai()) return;
+            if (ChatManager.Knowns(_activeChat).Janai()) return;
 
             if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
             {
@@ -94,26 +94,26 @@ namespace PF_Bot.Terminal
 
         private void PacksInfo()
         {
-            var loaded = ChatManager.LoadedBakas.Count;
-            var total  = ChatManager.SettingsDB .Count;
+            var loaded = PackManager.Bakas.Count;
+            var total  = ChatManager.Chats.Count;
             Print($"PACKS: {loaded} LOADED / {total} TOTAL", ConsoleColor.Yellow);
         }
 
         private void PacksInfoFull()
         {
             PacksInfo();
-            ChatManager.LoadedBakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
+            PackManager.Bakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
         }
 
         private void DeleteBlockers()
         {
-            var save = ChatManager.SettingsDB.Lock(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
-            if (save)  ChatManager.SaveChatsDB();
+            var save = ChatManager.Chats.Lock(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
+            if (save)  ChatManager.SaveChats();
         }
 
         private void DeleteBlocker()
         {
-            if (DeleteBlocker(_activeChat)) ChatManager.SaveChatsDB();
+            if (DeleteBlocker(_activeChat)) ChatManager.SaveChats();
         }
 
         private bool DeleteBlocker(long chat)
@@ -121,8 +121,8 @@ namespace PF_Bot.Terminal
             var x = App.Bot.PingChat((chat, null), notify: false);
             if (x == -1)
             {
-                ChatManager.RemoveChat(chat);
-                ChatManager.DeletePack(chat);
+                ChatManager.Remove(chat);
+                PackManager.Delete(chat);
             }
             else App.Bot.Client.DeleteMessage(chat, x);
 
@@ -131,14 +131,14 @@ namespace PF_Bot.Terminal
 
         private void DeleteBySize(int size = 34)
         {
-            ChatManager.SettingsDB.ForEachKey(chat =>
+            ChatManager.Chats.ForEachKey(chat =>
             {
-                if (ChatManager.GetPackPath(chat).FileSizeInBytes > size) return;
+                if (PackManager.GetPackPath(chat).FileSizeInBytes > size) return;
 
-                ChatManager.RemoveChat(chat);
-                ChatManager.DeletePack(chat);
+                ChatManager.Remove(chat);
+                PackManager.Delete(chat);
             });
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
         }
 
         private void UploadSounds(string path) => Task.Run(() => SoundDB.Instance.UploadMany(path));

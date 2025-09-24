@@ -93,7 +93,7 @@ namespace PF_Bot.Handlers.Manage.Settings
 
         private void ReportTypeSet(string command)
         {
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             var message = command == "*"
                 ? string.Format(SET_AUTO_HANDLER_RESPONSE, GetAutoHandlerTip())
                 : string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]);
@@ -111,14 +111,14 @@ namespace PF_Bot.Handlers.Manage.Settings
 
         private void ReportOptionsSet(string command, string result)
         {
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
             Log($"{Title} >> MEMES OPTIONS >> {result}");
         }
                 
         private void ReportAutoHandlerSet(string? handler)
         {
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             if (handler != null)
             {
                 Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());

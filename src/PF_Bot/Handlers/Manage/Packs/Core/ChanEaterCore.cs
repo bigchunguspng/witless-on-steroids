@@ -1,7 +1,6 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Backrooms.Listing;
 using PF_Bot.Core;
-using PF_Bot.Core.Chats;
 using PF_Bot.Core.Internet.Boards;
 using PF_Bot.Routing_New.Routers;
 
@@ -68,8 +67,6 @@ public abstract class ChanEaterCore : Fuse
     private string      UnknownURL  => Ctx.UnknownURL;
     private List<BoardGroup> Boards => Ctx.Boards;
 
-    protected string FileName;
-
     protected abstract string? GetSourceAnnotation();
 
     protected override async Task RunAuthorized()
@@ -92,9 +89,6 @@ public abstract class ChanEaterCore : Fuse
 
     private async Task EatBoard()
     {
-        MeasureDick();
-        GetWordsPerLineLimit();
-
         var args = Args.SplitN(2);
         var pair = args.Length > 1;
         var json = pair && args[0].Contains('-');
@@ -109,7 +103,6 @@ public abstract class ChanEaterCore : Fuse
         if (files.Length > 0)
         {
             await EatFromJsonFile(files[0]);
-            GoodEnding();
         }
         else
             Bot.SendMessage(Origin, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
@@ -118,7 +111,7 @@ public abstract class ChanEaterCore : Fuse
     protected abstract Task EatOnlineData(string url);
     protected abstract Task EatOnlineFind(string[] args);
 
-    protected async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks)
+    protected async Task RespondAndStartEating(IEnumerable<Task<List<string>>> tasks, string name)
     {
         var message = Bot.PingChat(Origin, BOARD_START);
 
@@ -129,38 +122,26 @@ public abstract class ChanEaterCore : Fuse
 
         Bot.EditMessage(Chat, message, text);
 
-        var size = ChatManager.GetPackPath(Chat).FileSizeInBytes;
         var lines = threads.SelectMany(s => s).ToList();
 
-        await EatMany(lines, size, Limit);
+        await EatMany(lines, name);
     }
 
-    protected async Task EatMany(List<string> lines, long size, int limit)
+    protected async Task EatMany(List<string> lines, string name)
     {
-        var count = Baka.VocabularyCount;
-
-        await EatAllLines(lines, Baka, limit);
-        SaveChanges(Baka, Chat, Title);
-
-        JsonIO.SaveData(lines, GetFileSavePath());
-
-        var report = FUSION_SUCCESS_REPORT(Baka, Chat, size, count, Title);
-        var source = GetSourceAnnotation();
-        if (source != null) report += source;
-
-        Bot.SendMessage(Origin, report);
+        await Baka_Eat_Report(lines, GetFileSavePath(name), _ => GetSourceAnnotation());
     }
 
-    private string GetFileSavePath()
+    private string GetFileSavePath(string name)
     {
-        var thread = BoardHelpers.FileNameIsThread(FileName);
+        var thread = BoardHelpers.FileNameIsThread(name);
         var date = thread
             ? $"{DateTime.Now:yyyy'-'MM'-'dd}"
             : $"{DateTime.Now:yyyy'-'MM'-'dd' 'HH'.'mm}";
 
         return ArchivePath
             .EnsureDirectoryExist()
-            .Combine($"{date} {FileName.Replace(' ', '-')}.json");
+            .Combine($"{date} {name.Replace(' ', '-')}.json");
     }
 
     protected Uri UrlOrBust(ref string url)

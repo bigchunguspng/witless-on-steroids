@@ -10,7 +10,7 @@ public class SetSpeech : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Speech = value.ClampByte();
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             Bot.SendMessage(Origin, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
             Log($"{Title} >> SPEECH >> {Data.Speech}");
         }

@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Text;
-using PF_Bot.Core.Chats;
 using PF_Bot.Core.Editing;
 using PF_Bot.Core.Internet.Reddit;
+using PF_Bot.Core.Text;
 using PF_Bot.Routing.Commands;
 using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
@@ -129,11 +129,12 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             var post = GetPostOrBust(query);
             if (post == null) return;
 
-            var a = post.URL.Contains("/gallery/");
-            if (a)  await SendGalleryPost(post);
-            else       SendSingleFilePost(post);
+            var task = post.URL.Contains("/gallery/")
+                ? SendGalleryPost   (post)
+                : SendSingleFilePost(post);
+            await task;
 
-            if (ChatManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
+            if (PackManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
 
             Log($"{Title} >> r/{post.Subreddit} (Q:{Reddit.QueriesCached} P:{Reddit.PostsCached})");
         }

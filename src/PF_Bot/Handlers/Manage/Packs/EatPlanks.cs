@@ -36,11 +36,11 @@ public class EatPlanks : ChanEaterCore
 
     private async Task EatSingleThread(string url, string board)
     {
-        FileName = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
+        var name = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
         try
         {
             var replies = _chan.GetThreadDiscussion(url).ToList();
-            await EatMany(replies, Size, Limit);
+            await EatMany(replies, name);
         }
         catch
         {
@@ -50,21 +50,21 @@ public class EatPlanks : ChanEaterCore
 
     private async Task EatWholeBoard(string url, string board)
     {
-        FileName = board;
+        var name = board;
 
         var threads = _chan.GetSomeThreads(url);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
 
-        await RespondAndStartEating(tasks);
+        await RespondAndStartEating(tasks, name);
     }
 
     protected override async Task EatOnlineFind(string[] args)
     {
-        FileName = string.Join('_', args);
+        var name = string.Join('_', args);
 
         var threads = _chan.GetSearchResults(args[0], args[1]);
         var tasks = threads.Select(x => _chan.GetThreadDiscussionAsync(x));
 
-        await RespondAndStartEating(tasks);
+        await RespondAndStartEating(tasks, name);
     }
 }

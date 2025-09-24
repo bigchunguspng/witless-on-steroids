@@ -45,7 +45,7 @@ public class SyncDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey
 
     [MethodImpl(Synchronized)] public T    Lock<T> (Func<Dictionary<TKey, TValue>, T>  func) => func  (_dic);
     [MethodImpl(Synchronized)] public void Lock    (Action<Dictionary<TKey, TValue>> action) => action(_dic);
-    [MethodImpl(Synchronized)] public void ForEachPair    (Action<KeyValuePair<TKey, TValue>> action) => this.ForEach(action);
+    [MethodImpl(Synchronized)] public void ForEachPair    (Action<TKey, TValue> action) => this.ForEach(x => action(x.Key, x.Value));
     [MethodImpl(Synchronized)] public void ForEachKey     (Action<TKey>   action) => Keys  .ForEach(action);
     [MethodImpl(Synchronized)] public void ForEachValue   (Action<TValue> action) => Values.ForEach(action);
 }

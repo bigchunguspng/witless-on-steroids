@@ -10,7 +10,7 @@ public class SetPics : SettingsCommand
         if (Args is not null && Context.HasIntArgument(out var value))
         {
             Data.Pics = value.ClampByte();
-            ChatManager.SaveChatsDB();
+            ChatManager.SaveChats();
             Bot.SendMessage(Origin, string.Format(SET_P_RESPONSE, Data.Pics).XDDD());
             Log($"{Title} >> MEME CHANCE >> {Data.Pics}%");
         }

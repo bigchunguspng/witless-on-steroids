@@ -25,143 +25,135 @@ namespace PF_Bot.Handlers.Manage.Packs
             var pagination = Query.GetPagination(Content);
 
             if      (Key == "fi") ListingPacks.SendPackList(pagination);
-            else if (Key == "f!") ListingPacks.SendPackList(pagination, @private: true);
+            else if (Key == "f!") ListingPacks.SendPackList(pagination, isPrivate: true);
             else if (Key == "f@") ListingPacks.SendFileList(pagination);
-            else          /* f**/ ListingPacks.SendFileList(pagination, @private: true);
+            else          /* f**/ ListingPacks.SendFileList(pagination, isPrivate: true);
             return Task.CompletedTask;
         }
     }
+
     public class Fuse : AsyncSettingsCommand
     {
-        protected long Size;
-        private   int Count;
-        protected int Limit = int.MaxValue;
-
-        private Document? _document;
-
-        private      FuseSource _source;
-        private enum FuseSource { PackPublic, PackPrivate, FilePublic, FilePrivate }
-
-        protected void MeasureDick() // 😂🤣🤣🤣👌
+        [Flags]
+        private enum FuseSource
         {
-            ChatManager.SaveBaka(Chat, Baka);
-            Size = PackPath.FileSizeInBytes;
-            Count = Baka.VocabularyCount;
+            Pack    = 1,
+            File    = 2,
+            Public  = 4,
+            Private = 8,
+            PackPublic  = Pack | Public,
+            PackPrivate = Pack | Private,
+            FilePublic  = File | Public,
+            FilePrivate = File | Private,
         }
 
         protected override async Task RunAuthorized()
         {
-            MeasureDick();
-            GetWordsPerLineLimit();
-
             var args = Args.SplitN(2);
-            _source =
-                args.Length > 1 && args[0] == "!" ? FuseSource.PackPrivate :
-                args.Length > 1 && args[0] == "*" ? FuseSource.FilePrivate :
-                args.Length > 1 && args[0] == "@" ? FuseSource.FilePublic : FuseSource.PackPublic;
 
-            if      (Message.ProvidesFile("text/plain",       out _document)) await ProcessTextFile();
-            else if (Message.ProvidesFile("application/json", out _document)) await ProcessJsonFile();
+            if      (Message.ProvidesFile("text/plain",   out var document)) await ProcessTextAttachment(document);
+            else if (Message.ProvidesFile("application/json", out document)) await ProcessJsonAttachment(document);
             else if (args.Length == 0) Bot.SendMessage(Origin, FUSE_MANUAL);
-            else if (args.Length  > 0 && args[^1] == "info")
+            else
             {
-                if      (_source is FuseSource.PackPublic ) ListingPacks.SendPackList(new ListPagination(Origin));
-                else if (_source is FuseSource.PackPrivate) ListingPacks.SendPackList(new ListPagination(Origin), @private: true);
-                else if (_source is FuseSource.FilePublic ) ListingPacks.SendFileList(new ListPagination(Origin));
-                else if (_source is FuseSource.FilePrivate) ListingPacks.SendFileList(new ListPagination(Origin), @private: true);
+                var _source = args[0] switch
+                {
+                    "!" => FuseSource.PackPrivate,
+                    "*" => FuseSource.FilePrivate,
+                    "@" => FuseSource.FilePublic,
+                    _   => FuseSource.PackPublic,
+                };
+
+                var pack = (_source & FuseSource.Pack) == FuseSource.Pack;
+                var file = (_source & FuseSource.File) == FuseSource.File;
+
+                var isPrivate = (_source & FuseSource.Private) == FuseSource.Private;
+
+                if (args.Length > 0 && args[^1] == "info")
+                {
+                    var pagination = new ListPagination(Origin);
+                    if      (pack) ListingPacks.SendPackList(pagination, isPrivate);
+                    else if (file) ListingPacks.SendFileList(pagination, isPrivate);
+                }
+                else if (pack) await ProcessFusionRequest(isPrivate, args[^1]);
+                else if (file) await ProcessEatingRequest(isPrivate, args);
             }
-            else if (_source is FuseSource.FilePrivate or FuseSource.FilePublic) await ProcessEatingRequest(args);
-            else if (_source is FuseSource.PackPrivate or FuseSource.PackPublic) await ProcessFusionRequest(args[^1]);
-        }
-
-        
-        private static readonly Regex
-            _rgx_wordLimit = new(@"^\/\S+?(\d+)", RegexOptions.Compiled);
-
-        protected void GetWordsPerLineLimit()
-        {
-            Limit = _rgx_wordLimit.ExtractGroup(1, Command!, int.Parse, int.MaxValue);
         }
 
 
-        #region FUSION
+        private const string
+            HOLY_MOLY = "CAACAgIAAxkBAAI062a2Yi7myiBzNob7ftdyivXXEdJjAAKYDAACjdb4SeqLf5UfqK3dNQQ";
 
-        private const string HOLY_MOLY = "CAACAgIAAxkBAAI062a2Yi7myiBzNob7ftdyivXXEdJjAAKYDAACjdb4SeqLf5UfqK3dNQQ";
-
-        private async Task ProcessFusionRequest(string arg)
+        private async Task ProcessFusionRequest(bool isPrivate, string arg)
         {
-            var @private = _source is FuseSource.PackPrivate;
+            var c = long.TryParse(arg, out var chat);
+            if (c) await FuseWithChat(chat);
+            else   await FuseWithPack(isPrivate, arg);
+        }
 
-            var argIsChatId = long.TryParse(arg, out var chat);
+        private async Task FuseWithChat(long chat)
+        {
             if (chat == Chat)
             {
                 Bot.SendSticker(Origin, InputFile.FromFileId(HOLY_MOLY));
-                return;
             }
-
-            if (argIsChatId && ChatManager.KnownsChat(chat))
+            else if (ChatManager.Knowns(chat))
             {
-                if (ChatManager.BakaIsLoaded(chat, out var baka))
-                    ChatManager.SaveBaka(chat, baka);
+                if (PackManager.BakaIsLoaded(chat, out var otherBaka))
+                    PackManager.Save(chat, otherBaka);
 
-                await FuseWithOtherPack(ChatManager.GetPackPath(chat));
+                await Baka_Fuse_Report(PackManager.GetPackPath(chat));
             }
-            else if (ChatManager.GetPacksFolder(Chat, @private).GetFiles($"{arg}{Ext_Pack}") is { Length: > 0 } files)
-            {
-                await FuseWithOtherPack(files[0]);
-            }
-            else if (argIsChatId) Bot.SendMessage(Origin, FUSE_FAIL_CHAT);
-            else ListingPacks.SendPackList(new ListPagination(Origin), fail: true, @private);
+            else
+                Bot.SendMessage(Origin, FUSE_CHAT_NOT_FOUND);
         }
 
-        private Task FuseWithOtherPack(FilePath path) => Task.Run(() =>
+        private async Task FuseWithPack(bool isPrivate, string arg)
         {
-            Baka.Fuse(GenerationPackIO.Load(path));
-            GoodEnding();
-        });
+            var files = PackManager.GetPacksFolder(Chat, isPrivate).GetFiles($"{arg}{Ext_Pack}");
+            if (files.Length > 0)
+                await Baka_Fuse_Report(files[0]);
+            else
+                ListingPacks.SendPackList(new ListPagination(Origin), fail: true, isPrivate);
+        }
 
-
-        private async Task ProcessEatingRequest(string[] args)
+        private async Task ProcessEatingRequest(bool isPrivate, string[] args)
         {
-            var @private = _source is FuseSource.FilePrivate;
             var name = string.Join(' ', args.Skip(1));
 
-            var files = ChatManager.GetFilesFolder(Chat, @private).GetFiles($"{name}.json");
+            var files = PackManager.GetFilesFolder(Chat, isPrivate).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
-                ListingPacks.SendFileList(new ListPagination(Origin), fail: true, @private);
+                ListingPacks.SendFileList(new ListPagination(Origin), fail: true, isPrivate);
             }
             else
             {
                 await EatFromJsonFile(files[0]);
-                GoodEnding();
             }
         }
 
-        private async Task ProcessTextFile()
+        // PROCESS FILE
+
+        private async Task ProcessTextAttachment(Document document)
         {
             var path = Dir_Temp
                 .EnsureDirectoryExist()
-                .Combine(_document!.FileName ?? "fuse.txt")
+                .Combine(document.FileName ?? "fuse.txt")
                 .MakeUnique();
-            await Bot.DownloadFile(_document.FileId, path, Origin);
-
+            await Bot.DownloadFile(document.FileId, path, Origin);
             await EatFromTextFile(path);
-            GoodEnding();
         }
 
-        private async Task ProcessJsonFile()
+        private async Task ProcessJsonAttachment(Document document)
         {
-            var path = ChatManager.GetPrivateFilesFolder(Chat)
+            var path = PackManager.GetPrivateFilesFolder(Chat)
                 .EnsureDirectoryExist()
-                .Combine(_document!.FileName ?? "fuse.json")
+                .Combine(document.FileName ?? "fuse.json")
                 .MakeUnique();
-            await Bot.DownloadFile(_document.FileId, path, Origin);
-
+            await Bot.DownloadFile(document.FileId, path, Origin);
             try
             {
                 await EatFromJsonFile(path);
-                GoodEnding();
             }
             catch // wrong format
             {
@@ -170,82 +162,77 @@ namespace PF_Bot.Handlers.Manage.Packs
             }
         }
 
+        private string GetJsonFormatExample()
+        {
+            var count = Random.Shared.Next(3, 7);
+            var sb = new StringBuilder(ONLY_ARRAY_JSON).Append("\n\n<pre>[");
+            for (var i = 0; i < count; i++)
+                sb.Append("\n    ").AppendInQuotes(Baka.Generate()).Append(",");
+            return sb.Remove(sb.Length - 1, 1).Append("\n]</pre>").ToString();
+        }
+
+        // EAT FROM FILE
+
         protected async Task EatFromJsonFile(string path)
         {
             var lines = JsonIO.LoadData<List<string>>(path);
-            await EatAllLines(lines);
+            await Baka_Eat_Report(lines);
         }
 
         private async Task EatFromTextFile(string path)
         {
             var lines = await File.ReadAllLinesAsync(path);
-            await EatAllLines(lines);
+            await Baka_Eat_Report(lines);
 
             SaveJsonCopy(path, lines);
         }
 
         private void SaveJsonCopy(FilePath path, string[] lines)
         {
-            var save = ChatManager.GetPrivateFilesFolder(Chat)
+            var save = PackManager.GetPrivateFilesFolder(Chat)
                 .EnsureDirectoryExist()
                 .Combine(path.ChangeExtension(".json"))
                 .MakeUnique();
-            JsonIO.SaveData(lines.ToList(), save);
+            JsonIO.SaveData(lines.ToList(), save); // todo test w/o ToList()
         }
 
-        private                Task      EatAllLines(IEnumerable<string> lines) => EatAllLines(lines, Baka, Limit);
-        protected static async Task<int> EatAllLines(IEnumerable<string> lines, Copypaster baka, int limit)
+        // CORE + LOGS
+
+        private async Task Baka_Fuse_Report(FilePath path)
         {
-            var linesConsumed = 0;
-            await Task.Run(() =>
-            {
-                foreach (var line in lines.Where(x => x.IsNotNull_NorWhiteSpace()))
-                {
-                    if (line.Count(c => c == ' ' || c == '\n') >= limit) continue;
-                    if (baka.Eat(line)) linesConsumed++;
-                }
-            });
-            return linesConsumed;
+            var report = await PackManager.Fuse(Chat, GenerationPackIO.Load(path));
+            LogAndSave();
+            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(report));
         }
 
-        protected void GoodEnding()
+        private async Task Baka_Eat_Report(IEnumerable<string> lines)
         {
-            SaveChanges(Baka, Chat, Title);
-            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(Baka, Chat, Size, Count, Title));
+            var feed = await PackManager.Feed(Chat, lines, GetWordsPerLineLimit());
+            LogAndSave();
+            Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(feed.Report));
         }
 
-        protected static void SaveChanges(Copypaster baka, long chat, string title)
+        protected async Task Baka_Eat_Report(List<string> lines, string path, Func<FeedReport, string?> getDetails)
         {
-            Log($"{title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
-            ChatManager.SaveBaka(chat, baka);
+            var feed = await PackManager.Feed(Chat, lines, GetWordsPerLineLimit());
+            LogAndSave();
+
+            JsonIO.SaveData(lines, path);
+
+            var report = FUSION_SUCCESS_REPORT(feed.Report);
+            Bot.SendMessage(Origin, $"{report}{getDetails(feed)}");
         }
 
-        protected static string FUSION_SUCCESS_REPORT(Copypaster baka, long chat, long size, int count, string title)
+        private int GetWordsPerLineLimit
+            () => Command!.MatchNumber().ExtractGroup(0, int.Parse, int.MaxValue);
+
+        private void LogAndSave()
         {
-            var newSize = ChatManager.GetPackPath(chat).FileSizeInBytes;
-            var newCount = baka.VocabularyCount;
-            var deltaSize = newSize - size;
-            var deltaCount = newCount - count;
-            var ns = newSize.ReadableFileSize();
-            var ds = deltaSize.ReadableFileSize();
-            var dc = deltaCount.Format_bruh_1k_100k_1M("💨");
-            return string.Format(FUSE_SUCCESS_RESPONSE, title, ns, ds, dc);
+            Log($"{Title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
+            PackManager.Save(Chat, Baka);
         }
 
-        #endregion
-
-        private string GetJsonFormatExample()
-        {
-            var sb = new StringBuilder(ONLY_ARRAY_JSON);
-            var count = Random.Shared.Next(3, 7);
-            sb.Append("\n\n<pre>[");
-            for (var i = 0; i < count; i++)
-            {
-                sb.Append("\n    \"").Append(Baka.Generate()).Append("\"");
-                if (i < count - 1) sb.Append(",");
-            }
-            sb.Append("\n]</pre>");
-            return sb.ToString();
-        }
+        private string FUSION_SUCCESS_REPORT
+            (FuseReport r) => string.Format(FUSE_SUCCESS_RESPONSE, Title, r.NewSize, r.DeltaSize, r.DeltaCount);
     }
 }

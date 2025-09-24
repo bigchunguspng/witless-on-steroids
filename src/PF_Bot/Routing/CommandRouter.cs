@@ -101,7 +101,7 @@ namespace PF_Bot.Routing
 
         protected override void Run()
         {
-            if (ChatManager.KnownsChat(Chat, out var settings))
+            if (ChatManager.Knowns(Chat, out var settings))
             {
                 _witlessRouter.Execute(WitlessContext.From(Context, settings));
             }
@@ -131,12 +131,12 @@ namespace PF_Bot.Routing
 
         private bool HandleStartCommand()
         {
-            var success = Command == "/start" && ChatManager.TryAddChat(Chat, Context.ChatIsPrivate);
+            var success = Command == "/start" && ChatManager.TryAdd(Chat, Context.ChatIsPrivate);
             if (success)
             {
                 Telemetry.LogCommand(Context.Chat, Context.Text);
 
-                ChatManager.SaveChatsDB();
+                ChatManager.SaveChats();
                 Log($"{Title} >> DIC CREATED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
                 Bot.SendMessage(Origin, START_RESPONSE);
             }

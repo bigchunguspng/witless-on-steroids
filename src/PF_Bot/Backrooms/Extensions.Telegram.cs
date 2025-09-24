@@ -1,8 +1,8 @@
-﻿using PF_Bot.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+using PF_Bot.Core;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Backrooms;
 
@@ -117,10 +117,10 @@ public static partial class Extensions
 
     // MEDIA …
 
-    public static bool ProvidesFile(this Message message, string type, out Document? document)
+    public static bool ProvidesFile(this Message message, string type, [MaybeNullWhen(false)] out Document document)
     {
         document = message.GetDocument(type) ?? message.ReplyToMessage.GetDocument(type);
-        return document is not null;
+        return document != null;
     }
 
     public static Document? GetDocument(this Message? message, string type)

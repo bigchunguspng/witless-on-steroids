@@ -1,13 +1,14 @@
 ﻿using PF_Bot.Backrooms.Listing;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
+using PF_Bot.Handlers.Manage.Settings;
 using PF_Bot.Routing_New.Routers;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Handlers.Manage.Packs;
 
-public class Delete : Move
+public class Delete : SettingsCommand
 {
     protected override void RunAuthorized()
     {
@@ -26,7 +27,7 @@ public class Delete_Callback : CallbackHandler
         var y = int.Parse(xy[1]);
 
         var input = new TractorGame.StepInput(obj, x, y);
-        var game  = new TractorGame(TractorGame.Games[Chat]);
+        var game  = new TractorGame(GetGameBoard());
 
         void UpdateGameKeyboard(InlineKeyboardMarkup buttons)
             => Bot.EditMessage(Chat, Message.Id, TRACTOR_GAME_RULES, buttons);
@@ -41,19 +42,33 @@ public class Delete_Callback : CallbackHandler
         {
             Bot.SendSticker(Origin, InputFile.FromFileId(GG));
             Bot.SendMessage(Origin, "НИЧЬЯ");
+            Log($"{Title} >> DELETE >> 1:1");
         }
         else if (result == TractorGame.StepResult.LOSE)
         {
             Bot.SendSticker(Origin, InputFile.FromFileId(I_WIN));
             Bot.SendMessage(Origin, "RIP 🤣😭😂👌");
+            Log($"{Title} >> DELETE >> RIP BOZO LMAO");
         }
         else
         {
             Bot.SendSticker(Origin, InputFile.FromFileId(U_WIN));
             Bot.SendSticker(Origin, InputFile.FromFileId(D_100));
+            Log($"{Title} >> DELETE >> IT'S OVER :(");
 
             DeleteChat();
         }
+    }
+
+    private List<List<InlineKeyboardButton>> GetGameBoard()
+    {
+        if (TractorGame.Games.TryGetValue_Failed(Chat, out var board))
+        {
+            board = Message.ReplyMarkup!.InlineKeyboard.Select(x => x.ToList()).ToList();
+            TractorGame.Games.Add(Chat, board);
+        }
+
+        return board;
     }
 
     // /move, /pub - just clear the pack

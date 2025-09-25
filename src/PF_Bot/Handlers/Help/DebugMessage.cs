@@ -84,10 +84,10 @@ public class DebugMessage : SyncCommand
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Encoder = NewtonsoftJsonCompatibleEncoder.Encoder,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        WriteIndented = true
+        WriteIndented = true,
     };
 
     private static string GetFileSizeEmoji(long size) => size switch

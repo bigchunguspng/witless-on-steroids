@@ -53,7 +53,11 @@ namespace PF_Bot.Handlers.Manage.Packs
 
             if      (Message.ProvidesFile("text/plain",   out var document)) await ProcessTextAttachment(document);
             else if (Message.ProvidesFile("application/json", out document)) await ProcessJsonAttachment(document);
-            else if (args.Length == 0) Bot.SendMessage(Origin, FUSE_MANUAL);
+            else if (args.Length == 0)
+            {
+                Bot.SendMessage(Origin, FUSE_MANUAL);
+                Log($"{Title} >> FUSE ?");
+            }
             else
             {
                 var _source = args[0] switch
@@ -65,18 +69,19 @@ namespace PF_Bot.Handlers.Manage.Packs
                 };
 
                 var pack = (_source & FuseSource.Pack) == FuseSource.Pack;
-                var file = (_source & FuseSource.File) == FuseSource.File;
 
                 var isPrivate = (_source & FuseSource.Private) == FuseSource.Private;
 
                 if (args.Length > 0 && args[^1] == "info")
                 {
                     var pagination = new ListPagination(Origin);
-                    if      (pack) ListingPacks.SendPackList(pagination, isPrivate);
-                    else if (file) ListingPacks.SendFileList(pagination, isPrivate);
+                    if (pack) ListingPacks.SendPackList(pagination, isPrivate);
+                    else      ListingPacks.SendFileList(pagination, isPrivate);
+
+                    Log($"{Title} >> FUSE INFO {(_source == FuseSource.PackPublic ? "" : args[0])}");
                 }
                 else if (pack) await ProcessFusionRequest(isPrivate, args[^1]);
-                else if (file) await ProcessEatingRequest(isPrivate, args);
+                else           await ProcessEatingRequest(isPrivate, args);
             }
         }
 

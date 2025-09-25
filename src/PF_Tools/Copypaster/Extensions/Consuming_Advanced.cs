@@ -53,7 +53,8 @@ public static class Consuming_Advanced
 
     private static string[] TokenizeLine(string text)
         => text
-            .Trim( ' ', '\n').Replace("\n", LINE_BREAK_Spaced)
+            .Replace('\0', ' ') // '\0' = string separator in the file.
+            .Trim (' ', '\n').Replace("\n", LINE_BREAK_Spaced)
             .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
     private static void CombineSomeTokens(this LinkedList<string> tokens)

@@ -1,4 +1,5 @@
-﻿using PF_Bot.Core.Editing;
+﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core.Editing;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Handlers.Edit.Filter
@@ -18,9 +19,9 @@ namespace PF_Bot.Handlers.Edit.Filter
             {
                 var args = Args.Split(' ').Take(3).ToArray();
 
-                var f = double.TryParse(args[0], out var v1) ? v1 : 100;
-                var g = double.TryParse(args.Length > 1 ? args[1] : "", out var v2) ? v2 : 15;
-                var w = double.TryParse(args.Length > 2 ? args[2] : "", out var v3) ? v3 : 2000;
+                var f =                    args[0].TryParseF64_Invariant(out var v1) ? v1 : 100;
+                var g = args.Length > 1 && args[1].TryParseF64_Invariant(out var v2) ? v2 : 15;
+                var w = args.Length > 2 && args[2].TryParseF64_Invariant(out var v3) ? v3 : 2000;
 
                 var input = await DownloadFile();
                 var output = input.GetOutputFilePath("EQ", Ext);

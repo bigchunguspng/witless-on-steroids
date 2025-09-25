@@ -1,4 +1,5 @@
-﻿using PF_Bot.Core.Editing;
+﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core.Editing;
 using PF_Bot.Routing.Commands;
 using PF_Tools.FFMpeg;
 
@@ -30,7 +31,7 @@ namespace PF_Bot.Handlers.Edit.Filter
                 {
                     if (args.Length > i && _rgx_number.IsMatch(args[i]))
                     {
-                        var d = double.TryParse(args[i].Replace(',', '.'), out var value);
+                        var d = args[i].TryParseF64_Invariant(out var value);
                         if (d && value < 5) args[i] = $"{value}*{side}";
                     }
                 }

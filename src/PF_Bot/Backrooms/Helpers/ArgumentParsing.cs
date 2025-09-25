@@ -36,11 +36,14 @@ public static class ArgumentParsing
     public static bool HasDoubleArgument(this CommandContext c, out double value)
     {
         value = 0;
-        if (c.Args is null) return false;
-
-        var arg = c.Args.SplitN(2)[0];
-        return double.TryParse(arg.Replace(',', '.'), out value);
+        return c.Args != null && c.Args.SplitN(2)[0].TryParseF64_Invariant(out value);
     }
+
+    /// Tryies to parse string as <see cref="double"/>.
+    /// Both ',' and '.' are valid fraction separators.
+    public static bool TryParseF64_Invariant
+        (this string text, out double value)
+        => double.TryParse(text.Replace(',', '.'), out value);
 
     public static (bool Failed, TimeSpan Start, TimeSpan Length) GetCutTimecodes(string[]? s)
     {

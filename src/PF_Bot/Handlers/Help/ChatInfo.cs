@@ -27,7 +27,7 @@ namespace PF_Bot.Handlers.Help
             if (PackManager.BakaIsLoaded(Chat))
                 sb
                     .Append("\nСлов в запасе: ")
-                    .Append(Baka.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');
+                    .Append(Baka.Pack.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
             if (Context.ChatIsPrivate.Janai())

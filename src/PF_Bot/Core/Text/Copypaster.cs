@@ -9,22 +9,13 @@ namespace PF_Bot.Core.Text
     /// Tracks changes and usage.
     public class Copypaster(GenerationPack pack) // 32 (26) bytes
     {
-        public GenerationPack Pack { get; private set; } = pack;
+        public GenerationPack Pack { get; } = pack;
 
         /// True if <see cref="Pack"/> content was modified.
         public bool IsDirty { get; private set; }
 
         /// Resets to 0 after every usage (read or write).
         public byte Idle    { get; private set; }
-
-        public int  VocabularyCount => Pack.VocabularyCount;
-
-        /// Replaces wrapped <see cref="Pack"/> with a new empty one.
-        public void ClearPack()
-        {
-            Pack = new GenerationPack();
-            IsDirty = true;
-        }
 
         public void ResetDirty() => IsDirty = false;
         public void BumpIdle  () => Idle++;

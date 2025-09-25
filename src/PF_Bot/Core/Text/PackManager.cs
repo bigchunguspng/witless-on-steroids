@@ -209,7 +209,7 @@ public static class PackManager
         (long chat, Copypaster baka, FilePath path)
     {
         Save(chat, baka);
-        return (path.FileSizeInBytes, baka.VocabularyCount);
+        return (path.FileSizeInBytes, baka.Pack.VocabularyCount);
     }
 
     private static FuseReport GetReport(PackProps a, PackProps b) => new

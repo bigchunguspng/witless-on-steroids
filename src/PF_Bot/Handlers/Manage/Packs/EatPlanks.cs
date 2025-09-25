@@ -41,7 +41,7 @@ public class EatPlanks : ChanEaterCore
         try
         {
             var replies = await _chan.GetThreadDiscussionAsync(url);
-            EatMany(replies, name);
+            await EatMany(replies, name);
         }
         catch
         {

@@ -124,12 +124,12 @@ public abstract class ChanEaterCore : Fuse
 
         var lines = threads.SelectMany(s => s).ToList();
 
-        EatMany(lines, name);
+        await EatMany(lines, name);
     }
 
-    protected void EatMany(List<string> lines, string name)
+    protected async Task EatMany(List<string> lines, string name)
     {
-        Baka_Eat_Report(lines, GetFileSavePath(name), _ => GetSourceAnnotation());
+        await Baka_Eat_Report(lines, GetFileSavePath(name), _ => GetSourceAnnotation());
     }
 
     private string GetFileSavePath(string name)

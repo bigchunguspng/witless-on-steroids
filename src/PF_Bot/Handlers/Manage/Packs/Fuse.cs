@@ -183,17 +183,16 @@ namespace PF_Bot.Handlers.Manage.Packs
         {
             var lines = await File.ReadAllLinesAsync(path);
             await Baka_Eat_Report(lines);
-
-            SaveJsonCopy(path, lines);
+            await SaveJsonCopy(path, lines);
         }
 
-        private void SaveJsonCopy(FilePath path, string[] lines)
+        private async Task SaveJsonCopy(FilePath path, string[] lines)
         {
             var save = PackManager.GetPrivateFilesFolder(Chat)
                 .EnsureDirectoryExist()
-                .Combine(path.ChangeExtension(".json"))
+                .Combine($"{path.FileNameWithoutExtension}.json")
                 .MakeUnique();
-            JsonIO.SaveData(lines.ToList(), save); // todo test w/o ToList()
+            await JsonIO.SaveDataAsync(lines, save);
         }
 
         // CORE + LOGS

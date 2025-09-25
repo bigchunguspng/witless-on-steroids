@@ -38,7 +38,8 @@ public static partial class Extensions
 
     public static string GetChatTitle(this Message message)
     {
-        var title = message.Chat.Title ?? message.From?.GetUserFullName() ?? UNKNOWN;
+        var chat = message.Chat;
+        var title = chat.Title ?? chat.GetUserFullName();
         return title.Truncate(32);
     }
 
@@ -59,6 +60,13 @@ public static partial class Extensions
         var message = int.Parse(match.Groups[3].Value);
 
         return (chat, message);
+    }
+
+    public static string GetUserFullName(this Chat chat)
+    {
+        var name = chat.FirstName!;
+        var last = chat.LastName;
+        return last is null ? name : $"{name} {last}";
     }
 
     public static string GetUserFullName(this User user)

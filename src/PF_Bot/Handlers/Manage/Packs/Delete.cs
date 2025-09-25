@@ -2,7 +2,6 @@
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Routing_New.Routers;
-using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -18,14 +17,8 @@ public class Delete : Move
 
 public class Delete_Callback : CallbackHandler
 {
-    private WitlessContext _ctx = null!;
-
     protected override async Task Run()
     {
-        var message  = Query.Message!;
-        var settings = ChatManager.Chats[message.Chat.Id];
-        _ctx = WitlessContext.FromMessage(message, settings);
-
         var parts = Content.Split(" - ");
         var obj = parts[0];
         var xy  = parts[1].Split(':');
@@ -33,47 +26,47 @@ public class Delete_Callback : CallbackHandler
         var y = int.Parse(xy[1]);
 
         var input = new TractorGame.StepInput(obj, x, y);
-        var game  = new TractorGame(TractorGame.Games[_ctx.Chat]);
+        var game  = new TractorGame(TractorGame.Games[Chat]);
 
         void UpdateGameKeyboard(InlineKeyboardMarkup buttons)
-            => Bot.EditMessage(_ctx.Chat, _ctx.Message.Id, TRACTOR_GAME_RULES, buttons);
+            => Bot.EditMessage(Chat, Message.Id, TRACTOR_GAME_RULES, buttons);
 
         var result = await game.DoStep(input, UpdateGameKeyboard);
         if (result == TractorGame.StepResult.PASS) return;
 
         await Task.Delay(1000);
-        TractorGame.Games.Remove(_ctx.Chat);
+        TractorGame.Games.Remove(Chat);
 
         if      (result == TractorGame.StepResult.DRAW)
         {
-            Bot.SendSticker(_ctx.Origin, InputFile.FromFileId(GG));
-            Bot.SendMessage(_ctx.Origin, "НИЧЬЯ");
+            Bot.SendSticker(Origin, InputFile.FromFileId(GG));
+            Bot.SendMessage(Origin, "НИЧЬЯ");
         }
         else if (result == TractorGame.StepResult.LOSE)
         {
-            Bot.SendSticker(_ctx.Origin, InputFile.FromFileId(I_WIN));
-            Bot.SendMessage(_ctx.Origin, "RIP 🤣😭😂👌");
+            Bot.SendSticker(Origin, InputFile.FromFileId(I_WIN));
+            Bot.SendMessage(Origin, "RIP 🤣😭😂👌");
         }
         else
         {
-            Bot.SendSticker(_ctx.Origin, InputFile.FromFileId(U_WIN));
-            Bot.SendSticker(_ctx.Origin, InputFile.FromFileId(D_100));
+            Bot.SendSticker(Origin, InputFile.FromFileId(U_WIN));
+            Bot.SendSticker(Origin, InputFile.FromFileId(D_100));
 
-            DeleteTheDictionary();
+            DeleteChat();
         }
     }
 
     // /move, /pub - just clear the pack
     // /delete = /move + remove chat from chatlist
-    private void DeleteTheDictionary()
+    private void DeleteChat()
     {
-        var result = PackManager.Move(_ctx.Chat, name: _ctx.Title, publish: false) ?? "*👊 никак*";
+        var result = PackManager.Move(Chat, name: Title, publish: false) ?? "*👊 никак*";
 
-        ChatManager.Remove(_ctx.Chat);
+        ChatManager.Remove(Chat);
         ChatManager.SaveChats();
 
-        Log($"{_ctx.Title} >> DIC REMOVED >> {_ctx.Chat}", LogLevel.Info, LogColor.Fuchsia);
-        Bot.SendMessage(_ctx.Origin, string.Format(DEL_SUCCESS_RESPONSE, _ctx.Title, result, Bot.Username));
+        Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
+        Bot.SendMessage(Origin, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
     }
 
     private const string

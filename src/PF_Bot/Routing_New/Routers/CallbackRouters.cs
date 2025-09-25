@@ -5,6 +5,7 @@ using PF_Bot.Handlers.Manage.Packs;
 using PF_Bot.Handlers.Manage.Packs.Core;
 using PF_Bot.Handlers.Memes;
 using PF_Bot.Routing;
+using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing_New.Routers;
@@ -46,7 +47,7 @@ public class CallbackRouter_Default : ICallbackRouter
     {
         if (query.Data == null) return;
 
-        LogDebug($"[Callback] {query.From.Id,14} @ {query.Message!.Chat.Id,14} : {query.Message.Id,8} >> {query.Data}");
+        LogDebug($"[Callback] {query.From.Id,14}.u {query.Message!.Chat.Id,14}.c {query.Message.Id,8}.M  |  {query.Data}");
 
         var (key, content) = query.ParseData();
 
@@ -54,7 +55,7 @@ public class CallbackRouter_Default : ICallbackRouter
 
         var handler = _registry.Resolve(key);
         if (handler != null)
-            handler.Invoke().Handle(query, key, content);
+            handler.Invoke().Handle(new CallbackContext(query, key, content));
     }
 }
 

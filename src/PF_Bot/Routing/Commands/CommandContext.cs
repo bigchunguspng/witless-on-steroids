@@ -7,6 +7,34 @@ using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Routing.Commands;
 
+public class CallbackContext
+{
+    [JsonPropertyOrder(-1)]
+    public CallbackQuery Query   { get; }
+    [JsonIgnore]
+    public Message       Message { get; }
+
+    public string        Key     { get; }
+    public string        Content { get; }
+    public string        Title   { get; }
+
+    public MessageOrigin Origin => (Chat, Thread);
+
+    public long    Chat => Message.Chat.Id;
+    private int? Thread => Message.IsAutomaticForward  ? Message.Id              // channel post
+                         : Message.IsTopicMessage      ? Message.MessageThreadId // forum thread message
+                         : Message.ReplyToMessage?.Id ?? Message.MessageThreadId;
+
+    public CallbackContext(CallbackQuery query, string key, string content)
+    {
+        Key = key;
+        Content = content;
+        Query = query;
+        Message = query.Message!;
+        Title = Message.GetChatTitle();
+    }
+}
+
 public class CommandContext
 {
     private static readonly string _botUsernameStart = App.Bot.Username.Remove(7);
@@ -28,14 +56,14 @@ public class CommandContext
     /// Whether SOME bot was mentioned in the command explicitly.
     public bool    BotMentioned { get; private set; }
 
+    public MessageOrigin Origin => (Chat, Thread);
+
     public long    Chat => Message.Chat.Id;
     private int? Thread => Message.IsAutomaticForward  ? Message.Id              // channel post
                          : Message.IsTopicMessage      ? Message.MessageThreadId // forum thread message
                          : Message.ReplyToMessage?.Id ?? Message.MessageThreadId;
 
     public bool ChatIsPrivate => Message.Chat.Type == ChatType.Private;
-
-    public MessageOrigin Origin => (Chat, Thread);
 
     protected CommandContext(CommandContext context)
     {

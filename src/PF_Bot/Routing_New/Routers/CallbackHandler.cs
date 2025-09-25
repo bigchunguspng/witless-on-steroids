@@ -1,4 +1,5 @@
 using PF_Bot.Core;
+using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
@@ -8,24 +9,27 @@ public abstract class CallbackHandler
 {
     protected static Bot Bot => App.Bot;
 
-    // todo: 1. make it a context, 2. move GetPagination() here
-    protected CallbackQuery Query   { get; private set; } = null!;
-    protected string        Key     { get; private set; } = null!;
-    protected string        Content { get; private set; } = null!;
+    private CallbackContext Context { get;  set; } = null!;
 
-    public async void Handle(CallbackQuery query, string key, string content)
+    protected CallbackQuery Query   => Context.Query;
+    protected Message       Message => Context.Message;
+    protected long          Chat    => Context.Chat;
+    protected string        Title   => Context.Title;
+    protected string        Key     => Context.Key;
+    protected string        Content => Context.Content;
+
+    protected MessageOrigin Origin => Context.Origin;
+
+    public async void Handle(CallbackContext context)
     {
         try
         {
-            Query = query;
-            Key = key;
-            Content = content;
-
+            Context = context;
             await Run();
         }
         catch (Exception e)
         {
-            Bot.LogError_ToFile(e, query, "Callback");
+            Bot.LogError_ToFile(e, Context, "Callback");
         }
     }
 

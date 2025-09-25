@@ -43,8 +43,8 @@ public class EatBoards : ChanEaterCore
         var name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
         try
         {
-            var replies = _chan.GetThreadDiscussion(url).ToList();
-            await EatMany(replies, name);
+            var replies = await _chan.GetThreadDiscussionAsync(url);
+            EatMany(replies, name);
         }
         catch
         {

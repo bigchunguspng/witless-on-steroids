@@ -123,7 +123,7 @@ public static class PackManager
         }
         catch
         {
-            LogError($"CAN'T LOAD DIC | {chat,14}");
+            LogError($"DIC LOAD | {chat,14} | FAILED");
             throw;
         }
     }
@@ -172,38 +172,40 @@ public static class PackManager
 
     // FUSE / FEED
 
-    public static async Task<FuseReport> Fuse
-        (long chat, GenerationPack pack)
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public static FuseReport Fuse
+        (long chat, Copypaster baka, GenerationPack pack)
     {
-        var (baka, path) = (GetBaka(chat), GetPackPath(chat));
+        var path = GetPackPath(chat);
 
         var a = MeasureDick(chat, baka, path);
-        await Task.Run(() => baka.Fuse(pack));
+        var sw = Stopwatch.StartNew();
+        baka.Fuse(pack);
+        sw.Log("/fuse (pack)");
         var b = MeasureDick(chat, baka, path);
 
         return GetReport(a, b);
     }
 
-    public static async Task<FeedReport> Feed
-        (long chat, IEnumerable<string> texts, int wordLimit)
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public static FeedReport Feed
+        (long chat, Copypaster baka, IEnumerable<string> texts, int wordLimit)
     {
-        var (baka, path) = (GetBaka(chat), GetPackPath(chat));
+        var path = GetPackPath(chat);
 
         var a = MeasureDick(chat, baka, path);
-
-        var consumed = await Task.Run(() => texts
+        var sw = Stopwatch.StartNew();
+        var consumed = texts
             .Where(text => text.IsNotNull_NorWhiteSpace()
-                        && text.Count(c => c == ' ' || c == '\n') >= wordLimit)
-            .Select(text => baka.Eat(text))
-            .Count(x => x));
-
+                        && text.Count(c => c == ' ' || c == '\n') < wordLimit)
+            .Count(baka.Eat);
+        sw.Log("/fuse (file)");
         var b = MeasureDick(chat, baka, path);
 
         return new FeedReport(GetReport(a, b), consumed);
     }
 
-    private static PackProps
-        MeasureDick // 😂🤣🤣🤣👌
+    private static PackProps MeasureDick // 😂🤣🤣🤣👌
         (long chat, Copypaster baka, FilePath path)
     {
         Save(chat, baka);

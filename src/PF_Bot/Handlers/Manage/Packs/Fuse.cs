@@ -114,7 +114,7 @@ namespace PF_Bot.Handlers.Manage.Packs
             if (files.Length > 0)
                 await Baka_Fuse_Report(files[0]);
             else
-                ListingPacks.SendPackList(new ListPagination(Origin), fail: true, isPrivate);
+                ListingPacks.SendPackList(new ListPagination(Origin), isPrivate, fail: true);
         }
 
         private async Task ProcessEatingRequest(bool isPrivate, string[] args)
@@ -124,7 +124,7 @@ namespace PF_Bot.Handlers.Manage.Packs
             var files = PackManager.GetFilesFolder(Chat, isPrivate).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
-                ListingPacks.SendFileList(new ListPagination(Origin), fail: true, isPrivate);
+                ListingPacks.SendFileList(new ListPagination(Origin), isPrivate, fail: true);
             }
             else
             {
@@ -175,7 +175,7 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         protected async Task EatFromJsonFile(string path)
         {
-            var lines = JsonIO.LoadData<List<string>>(path);
+            var lines = await JsonIO.LoadDataAsync<List<string>>(path);
             await Baka_Eat_Report(lines);
         }
 
@@ -200,24 +200,24 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         private async Task Baka_Fuse_Report(FilePath path)
         {
-            var report = await PackManager.Fuse(Chat, GenerationPackIO.Load(path));
-            LogAndSave();
+            var report = await Task.Run(() => PackManager.Fuse(Chat, Baka, GenerationPackIO.Load(path)));
+            Log_FUSION();
             Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(report));
         }
 
         private async Task Baka_Eat_Report(IEnumerable<string> lines)
         {
-            var feed = await PackManager.Feed(Chat, lines, GetWordsPerLineLimit());
-            LogAndSave();
+            var feed = await Task.Run(() => PackManager.Feed(Chat, Baka, lines, GetWordsPerLineLimit()));
+            Log_FUSION();
             Bot.SendMessage(Origin, FUSION_SUCCESS_REPORT(feed.Report));
         }
 
         protected async Task Baka_Eat_Report(List<string> lines, string path, Func<FeedReport, string?> getDetails)
         {
-            var feed = await PackManager.Feed(Chat, lines, GetWordsPerLineLimit());
-            LogAndSave();
+            var feed = await Task.Run(() => PackManager.Feed(Chat, Baka, lines, GetWordsPerLineLimit()));
+            Log_FUSION();
 
-            JsonIO.SaveData(lines, path);
+            await JsonIO.SaveDataAsync(lines, path);
 
             var report = FUSION_SUCCESS_REPORT(feed.Report);
             Bot.SendMessage(Origin, $"{report}{getDetails(feed)}");
@@ -226,11 +226,8 @@ namespace PF_Bot.Handlers.Manage.Packs
         private int GetWordsPerLineLimit
             () => Command!.MatchNumber().ExtractGroup(0, int.Parse, int.MaxValue);
 
-        private void LogAndSave()
-        {
-            Log($"{Title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
-            PackManager.Save(Chat, Baka);
-        }
+        private void Log_FUSION
+            () => Log($"{Title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
 
         private string FUSION_SUCCESS_REPORT
             (FuseReport r) => string.Format(FUSE_SUCCESS_RESPONSE, Title, r.NewSize, r.DeltaSize, r.DeltaCount);

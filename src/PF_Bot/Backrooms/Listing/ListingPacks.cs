@@ -15,14 +15,14 @@ public static class ListingPacks // Did someone said Linkin' Park?
         PublicFiles  = new("📂 Общие файлы" ,   "файла",   $"{CallbackRouter_Default.Key_Fuse}@", "@ "),
         PrivateFiles = new("🔐 Личные файлы",   "файла",   $"{CallbackRouter_Default.Key_Fuse}*", "* ");
 
-    public static void SendPackList(ListPagination pagination, bool fail = false, bool isPrivate = false)
+    public static void SendPackList(ListPagination pagination, bool isPrivate = false, bool fail = false)
     {
         var fuseList  = isPrivate ? PrivatePacks : PublicPacks;
         var directory = PackManager.GetPacksFolder(pagination.Origin.Chat, isPrivate);
         SendFilesList(fuseList, directory, pagination, fail);
     }
 
-    public static void SendFileList(ListPagination pagination, bool fail = false, bool isPrivate = false)
+    public static void SendFileList(ListPagination pagination, bool isPrivate = false, bool fail = false)
     {
         var fuseList  = isPrivate ? PrivateFiles : PublicFiles;
         var directory = PackManager.GetFilesFolder(pagination.Origin.Chat, isPrivate);

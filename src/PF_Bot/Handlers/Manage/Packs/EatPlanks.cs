@@ -30,8 +30,9 @@ public class EatPlanks : ChanEaterCore
 
         var board = _uri.Segments[1].Replace("/", "");
 
-        if      (url.Contains("/res/")) await EatSingleThread(url, board);
-        else                            await EatWholeBoard  (url, board);
+        var res = url.Contains("/res/");
+        if (res) await EatSingleThread(url, board);
+        else     await EatWholeBoard  (url, board);
     }
 
     private async Task EatSingleThread(string url, string board)
@@ -39,8 +40,8 @@ public class EatPlanks : ChanEaterCore
         var name = $"{board}.{_uri!.Segments[3].Replace("/", "")}".Replace(".html", "");
         try
         {
-            var replies = _chan.GetThreadDiscussion(url).ToList();
-            await EatMany(replies, name);
+            var replies = await _chan.GetThreadDiscussionAsync(url);
+            EatMany(replies, name);
         }
         catch
         {

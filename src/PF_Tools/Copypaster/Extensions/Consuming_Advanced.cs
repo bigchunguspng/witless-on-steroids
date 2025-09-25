@@ -5,15 +5,19 @@ public static class Consuming_Advanced
     private const string LINE_BREAK = "[N]", LINE_BREAK_Spaced = $" {LINE_BREAK} ";
     private const string LINK_Spaced = $" {GenerationPack.S_REMOVED} ";
 
-    private static readonly Regex 
-        _r_urls = new(            @"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)",  RegexOptions.Compiled),
-        _r_skip = new(@"^(?:\/|\.)|^(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)$", RegexOptions.Compiled);
+    private static readonly Regex
+        // Message PROBABLY contains ULRs and HTML tags.
+        _r_URLs_AndTags_Prob = new(@"[\/\\]", RegexOptions.Compiled),
+        // Message contains ULRs and HTML tags.
+        _r_URLs_AndTags      = new(@"(\S+(:[\/\\])\S+)|(<.+\/.*>)",   RegexOptions.Compiled | RegexOptions.ExplicitCapture),
+        // Message starts with '/' or '.' or the whole message is ULR or HTML tag.
+        _r_Skip   = new(@"^(\/|\.)|^((\S+(:[\/\\])\S+)|(<.+\/.*>))$", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
     // LOGIC
 
     public static string[]? Eat_Advanced(this GenerationPack pack, string text, float chance = 0)
     {
-        if (_r_skip.IsMatch(text)) return null;
+        if (_r_Skip.IsMatch(text)) return null;
 
         var lines = TokenizeMultiline(text);
 
@@ -37,7 +41,11 @@ public static class Consuming_Advanced
 
     private static string[][] TokenizeMultiline(string text)
     {
-        text = _r_urls.Replace(text.ToLower(), LINK_Spaced);
+        text = text.ToLower();
+        if (_r_URLs_AndTags_Prob.IsMatch(text))
+        {
+            text = _r_URLs_AndTags.Replace(text, LINK_Spaced);
+        }
         return text.Contains("\n\n")
             ? text.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).Select(TokenizeLine).ToArray()
             : [TokenizeLine(text)];
@@ -45,7 +53,7 @@ public static class Consuming_Advanced
 
     private static string[] TokenizeLine(string text)
         => text
-            .Trim([' ', '\n']).Replace("\n", LINE_BREAK_Spaced)
+            .Trim( ' ', '\n').Replace("\n", LINE_BREAK_Spaced)
             .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
     private static void CombineSomeTokens(this LinkedList<string> tokens)

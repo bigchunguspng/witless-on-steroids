@@ -8,8 +8,8 @@ public class TransitionTableV8(IEnumerable<Transition> transitions) : Transition
     public             Transition this[int index]  => _transitions[index];
     public IEnumerable<Transition> AsIEnumerable() => _transitions;
 
-    public int   Count       => _transitions.Length;
-    public float TotalChance => MathF.Round(_transitions.Sum(x => x.Chance), 1);
+    public int Count       => _transitions.Length;
+    public int TotalChance => _transitions.Sum(x => x.Chance);
 
     public bool ShouldBeUpgradedToPut(int wordId)
     {
@@ -21,7 +21,7 @@ public class TransitionTableV8(IEnumerable<Transition> transitions) : Transition
         return Array.FindIndex(_transitions, x => x.WordId == wordId);
     }
 
-    protected override void Update(int index, float chance)
+    protected override void Update(int index, int chance)
     {
         _transitions[index] = _transitions[index].WithChanceIncreasedBy(chance);
     }

@@ -4,7 +4,7 @@ namespace PF_Tools.Copypaster.Extensions;
 
 public static class Consuming_Basic
 {
-    public static void Eat(this GenerationPack pack, IEnumerable<string> words, float chance)
+    public static void Eat(this GenerationPack pack, IEnumerable<string> words, int chance)
     {
         // update vocabulary
         var tokens = new LinkedList<IConsumableToken>();

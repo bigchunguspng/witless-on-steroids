@@ -1,18 +1,18 @@
 ﻿namespace PF_Tools.Copypaster;
 
 /// Transition chance [from one word] to another word.
-public readonly struct Transition(int wordId, float chance)
+public readonly struct Transition(int wordId, int chance)
 {
     // DATA
 
-    public int   WordId { get; }               = wordId;
-    public float Chance { get; private init; } = chance;
+    public int WordId { get; }               = wordId;
+    public int Chance { get; private init; } = chance;
 
     // LOGIC
 
-    public Transition WithChanceIncreasedBy(float value)
+    public Transition WithChanceIncreasedBy(int value)
     {
-        return this with { Chance = Chance.CombineRound(value, 1) };
+        return this with { Chance = Chance + value };
     }
 
     public bool CanBeUsedFor(int wordId) => WordId == wordId || IsEmpty();

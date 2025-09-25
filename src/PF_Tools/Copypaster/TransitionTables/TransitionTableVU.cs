@@ -15,17 +15,14 @@ public class TransitionTableVU : TransitionTableV, TransitionTable // 128+B
     {
         _transitions = transitions.OrderBy(x => x.WordId).ToArray();
         Count = _transitions.Length;
-        TotalChance = MathF.Round(_transitions.Sum(x => x.Chance), 1);
+        TotalChance = _transitions.Sum(x => x.Chance);
     }
 
     public             Transition this[int index]  => _transitions[index];
     public IEnumerable<Transition> AsIEnumerable() => _transitions.Take(Count);
 
-    public int   Count       { get; private set; }
-    public float TotalChance { get; private set; }
-
-    private void IncreaseTotalChanceBy(float value)
-        => TotalChance = TotalChance.CombineRound(value, 1);
+    public int Count       { get; private set; }
+    public int TotalChance { get; private set; }
 
     public bool ShouldBeUpgradedToPut(int wordId) => false;
 
@@ -34,17 +31,17 @@ public class TransitionTableVU : TransitionTableV, TransitionTable // 128+B
         return Array.BinarySearch(_transitions, 0, Count, new Transition(wordId, 0), _comparer);
     }
 
-    protected override void Update(int index, float chance)
+    protected override void Update(int index, int chance)
     {
         _transitions[index] = _transitions[index].WithChanceIncreasedBy(chance);
-        IncreaseTotalChanceBy(chance);
+        TotalChance += chance;
     }
 
     protected override void Add(Transition transition)
     {
         if (Count >= Capacity) IncreaseCapacity();
         _transitions[Count] = transition;
-        IncreaseTotalChanceBy(transition.Chance);
+        TotalChance += transition.Chance;
         Count++;
 
         var shouldBeSorted = Count >= 2 && transition.WordId < _transitions[Count - 2].WordId;

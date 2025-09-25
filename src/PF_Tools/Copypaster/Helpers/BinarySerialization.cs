@@ -95,7 +95,7 @@ public static class BinarySerialization
             var transitions = new List<Transition>(count);
             for (var i = 0; i < count; i++)
             {
-                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadSingle()));
+                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadInt32()));
             }
 
             transitionsSpecial.Add(pair.Key, GetTransitionTable(transitions));
@@ -105,7 +105,7 @@ public static class BinarySerialization
             var transitions = new List<Transition>(count);
             for (var i = 0; i < count; i++)
             {
-                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadSingle()));
+                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadInt32()));
             }
 
             transitionsById.Add(GetTransitionTable(transitions));

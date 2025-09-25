@@ -24,15 +24,15 @@ public class TransitionTableC2 : TransitionTable // 32B
         if (_transition2.IsNotEmpty()) yield return _transition2;
     }
 
-    public int   Count       => _transition2.IsEmpty() ? 1 : 2;
-    public float TotalChance => _transition1.Chance.CombineRound(_transition2.Chance, 1);
+    public int Count       => _transition2.IsEmpty() ? 1 : 2;
+    public int TotalChance => _transition1.Chance + _transition2.Chance;
 
     public bool ShouldBeUpgradedToPut(int wordId)
     {
         return AsIEnumerable().Any(x => x.CanBeUsedFor(wordId)) == false;
     }
 
-    public void Put(int wordId, float chance)
+    public void Put(int wordId, int chance)
     {
         if /**/ (_transition1.IsEmpty())        _transition1 = new Transition(wordId, chance);
         else if (_transition1.WordId == wordId) _transition1 = _transition1.WithChanceIncreasedBy(chance);

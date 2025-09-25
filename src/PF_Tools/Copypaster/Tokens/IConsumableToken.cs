@@ -2,14 +2,14 @@ namespace PF_Tools.Copypaster.Tokens;
 
 public interface IConsumableToken
 {
-    void RememberTransition(GenerationPack db, IConsumableToken next, float chance);
+    void RememberTransition(GenerationPack db, IConsumableToken next, int chance);
 
     //
 
-    public static (float low, float high) SplitChance(float chance)
+    public static (int low, int high) SplitChance(int chance)
     {
-        var l = MathF.Round(chance * 0.2F, 1);
-        var h = MathF.Round(chance - l,    1);
+        var l = chance / 5;
+        var h = chance - l;
         return (l, h);
     }
 }

@@ -7,7 +7,7 @@ public readonly struct TokenDouble(int id1, int id2, int idC) : IConsumableToken
     private int ID2 { get; } = id2; // 2nd word
     public  int IDC { get; } = idC; // Combination
 
-    public void RememberTransition(GenerationPack db, IConsumableToken next, float chance)
+    public void RememberTransition(GenerationPack db, IConsumableToken next, int chance)
     {
         db.PutTransition(ID1, ID2, chance);
 

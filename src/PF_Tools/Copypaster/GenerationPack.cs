@@ -108,7 +108,7 @@ public class GenerationPack
     }
 
     /// Increases transition between two words by a given chance. 
-    public void PutTransition(int fromId, int toId, float chance)
+    public void PutTransition(int fromId, int toId, int chance)
     {
         var table = GetTransitionTableOrNull(fromId);
         if (table is null)

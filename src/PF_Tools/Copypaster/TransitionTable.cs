@@ -8,13 +8,13 @@ public interface TransitionTable
     Transition this[int index] { get; }
     IEnumerable<Transition> AsIEnumerable();
 
-    int   Count       { get; }
-    float TotalChance { get; }
+    int Count       { get; }
+    int TotalChance { get; }
 
     bool ShouldBeUpgradedToPut(int wordId);
 
     /// Increases transition chance to given word.
-    void Put(int wordId, float chance);
+    void Put(int wordId, int chance);
 
     /// Returns -1 if given word is not in the table.
     int IndexOfWordId(int wordId);

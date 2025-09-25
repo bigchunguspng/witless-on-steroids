@@ -15,7 +15,7 @@ public static class Consuming_Advanced
 
     // LOGIC
 
-    public static string[]? Eat_Advanced(this GenerationPack pack, string text, float chance = 0)
+    public static string[]? Eat_Advanced(this GenerationPack pack, string text, int chance = 0)
     {
         if (_r_Skip.IsMatch(text)) return null;
 
@@ -26,8 +26,8 @@ public static class Consuming_Advanced
         for (var i = 0; i < lines.Length; i++)
         {
             var tokens = new LinkedList<string>(lines[i]);
-            if (chance == 0)
-                chance = Math.Max(0.3F, MathF.Round(2 - MathF.Log10(tokens.Count), 1));
+            if (chance == 0) // tokens -> chance: 1 -> 20, 3 -> 15, 10 -> 10, 30+ -> 5
+                chance = Math.Max(5, 20 - 10 * MathF.Log10(tokens.Count)).RoundInt();
 
             tokens.CombineSomeTokens();
             tokens.RemoveLineBreaks();

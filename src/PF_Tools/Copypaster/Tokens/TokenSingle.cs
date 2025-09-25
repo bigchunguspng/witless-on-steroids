@@ -5,7 +5,7 @@ public readonly struct TokenSingle(int id) : IConsumableToken
 {
     public int ID { get; } = id;
 
-    public void RememberTransition(GenerationPack db, IConsumableToken next, float chance)
+    public void RememberTransition(GenerationPack db, IConsumableToken next, int chance)
     {
         if (next is TokenSingle simple)
         {

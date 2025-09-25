@@ -3,7 +3,7 @@ namespace PF_Tools.Copypaster.TransitionTables;
 /// V = Variable size.
 public abstract class TransitionTableV
 {
-    public void Put(int wordId, float chance)
+    public void Put(int wordId, int chance)
     {
         var index = IndexOfWordId(wordId);
         if (index >= 0) Update(index, chance);
@@ -12,7 +12,7 @@ public abstract class TransitionTableV
 
     public abstract int IndexOfWordId(int wordId);
 
-    protected abstract void Update(int index, float chance);
+    protected abstract void Update(int index, int chance);
 
     protected abstract void Add(Transition transition);
 }

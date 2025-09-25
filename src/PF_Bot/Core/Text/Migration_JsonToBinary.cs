@@ -7,13 +7,12 @@ public static class Migration_JsonToBinary
 {
     public static void MigrateAll()
     {
-        string[] dirs = [Dir_Chat, Dir_Fuse];
-        var options = new EnumerationOptions { RecurseSubdirectories = true };
+        var dir_json = new FilePath("Json").EnsureDirectoryExist();
+        FilePath[] dirs = [Dir_Chat, Dir_Fuse];
         foreach (var dir in dirs)
         {
             Log($"Migrating {dir}");
-            var files = Directory.GetFiles(dir, "*.json", options);
-            foreach (var file in files)
+            foreach (var file in dir.GetFiles("*.json", recursive: true))
             {
                 var sw = Stopwatch.StartNew();
 
@@ -25,7 +24,9 @@ public static class Migration_JsonToBinary
                 var newFileName = $"{name}{Ext_Pack}";
                 var path = Path.Combine(dir, newFileName);
                 GenerationPackIO.Save(bakaV2, path);
-                
+
+                File.Move(file, dir_json.Combine(dir).EnsureDirectoryExist().Combine(Path.GetFileName(file)));
+
                 sw.Log($"Migrated {file}");
             }
         }
@@ -43,7 +44,7 @@ public static class Migration_JsonToBinary
             foreach (var transition in table.Value.AsIEnumerable())
             {
                 var toId = GetNewId(transition.WordID);
-                target.PutTransition(fromId, toId, transition.Chance);
+                target.PutTransition(fromId, toId, (transition.Chance * 10).RoundInt());
             }
         }
 

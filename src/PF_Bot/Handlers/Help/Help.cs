@@ -27,5 +27,6 @@ public class Help : SyncCommand
     {
         var args = Args ?? (Command!.Contains('_') ? Command.Substring(Command.IndexOf('_') + 1) : "");
         RTFM.SendManualPage(Origin, args);
+        Log($"{Title} >> MAN {args}");
     }
 }

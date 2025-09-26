@@ -44,7 +44,7 @@ public static class App
         Console.CancelKeyPress              += (_, _) => SaveAndExit();
         AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveAndExit();
 
-        TerminalUI.Start();
+        AdminConsole.Start();
     }
 
     private static void SaveAndExit()

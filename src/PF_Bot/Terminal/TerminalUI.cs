@@ -3,6 +3,7 @@ using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
+using PF_Tools.Copypaster.Helpers;
 using Telegram.Bot;
 using Exception = System.Exception;
 
@@ -57,7 +58,8 @@ namespace PF_Bot.Terminal
             else if (_input == "/mg") Migration_JsonToBinary.MigrateAll();
             else if (_input.StartsWith("/ups") && _input.Contains(' ')) UploadSounds(_input.Split(' ', 2)[1]);
             else if (_input.StartsWith("/upg") && _input.Contains(' ')) UploadGIFs  (_input.Split(' ', 2)[1]);
-            else if (_input.StartsWith("/ds")  && _input.HasIntArgument(out var size)) DeleteBySize(size);
+            else if (_input.StartsWith("/xp")  && _input.HasLongArgument(out var chat)) PackCopyJson(chat);
+            else if (_input.StartsWith("/ds")  && _input.HasIntArgument (out var size)) DeleteBySize(size);
         }
 
         private static readonly Regex
@@ -104,6 +106,15 @@ namespace PF_Bot.Terminal
         {
             PacksInfo();
             PackManager.Bakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
+        }
+
+        private void PackCopyJson(long chat)
+        {
+            var path = PackManager.GetPackPath(chat);
+            var pack = GenerationPackIO.Load(path);
+            var save = path.Suffix($"{DateTime.Now:yyyy-MM-dd--hh-mm-ss}", ".json");
+            GenerationPackIO.Save_Json(pack, save).Wait();
+            Print($"PACK EXPORTED >> {save}", ConsoleColor.Yellow);
         }
 
         private void DeleteBlockers()

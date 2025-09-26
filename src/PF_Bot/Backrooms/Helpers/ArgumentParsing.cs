@@ -17,6 +17,13 @@ public static class ArgumentParsing
         return text.Contains(' ') || text.Contains('\n');
     }
 
+    public static bool HasLongArgument(this string text, out long value)
+    {
+        value = 0;
+        var words = text.Split();
+        return words.Length > 1 && long.TryParse(words[1], out value);
+    }
+
     public static bool HasIntArgument(this string text, out int value)
     {
         value = 0;

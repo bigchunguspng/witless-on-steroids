@@ -25,6 +25,9 @@ public static class Texts
 
         +55 - select active chat
 
+        /mg - JSON -> TGP migration (temporary)
+        /xp - save pack JSON copy [chat]
+
         /db - delete blockers
         /DB - delete active chat if blocked
         /ds - delete by size [max size, bytes]

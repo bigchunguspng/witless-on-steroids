@@ -1,7 +1,12 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace PF_Tools.Copypaster.Helpers;
 
 public static class GenerationPackIO
 {
+    // BINARY
+
     /// Loads pack into memory.
     /// Or creates a new empty one, if the file doesn't exist.
     public static GenerationPack Load(FilePath path)
@@ -30,4 +35,22 @@ public static class GenerationPackIO
         using var writer = new BinaryWriter(fs);
         BinarySerialization.Serialize(writer, pack);
     }
+
+    // JSON
+
+    /// Saves pack to a json file.
+    /// Intended to be used for pack inspection.
+    public static async Task Save_Json(GenerationPack pack, FilePath path)
+    {
+        await using var stream = File.Create(path);
+        await JsonSerializer.SerializeAsync(stream, pack, _options);
+    }
+
+    private static readonly JsonSerializerOptions _options = new()
+    {
+        WriteIndented = true,
+        Converters = { new GenerationPackJsonConverter() },
+        Encoder = NewtonsoftJsonCompatibleEncoder.Encoder,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+    };
 }

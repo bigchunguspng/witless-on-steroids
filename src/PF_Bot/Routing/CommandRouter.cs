@@ -32,14 +32,14 @@ namespace PF_Bot.Routing
 
         private readonly WitlessCommandRouter _witlessRouter;
 
-        private readonly CommandRegistry<AnyCommand<CommandContext>> _simpleCommands;
-        public           CommandRegistry<AnyCommand<CommandContext>>  SimpleCommands => _simpleCommands;
+        private readonly CommandRegistry<Func<AnyCommand<CommandContext>>> _simpleCommands;
+        public           CommandRegistry<Func<AnyCommand<CommandContext>>>  SimpleCommands => _simpleCommands;
 
         public CommandRouter()
         {
             _witlessRouter = new WitlessCommandRouter(this);
 
-            _simpleCommands = new CommandRegistry<AnyCommand<CommandContext>>()
+            _simpleCommands = new CommandRegistry<Func<AnyCommand<CommandContext>>>.Builder()
                 .Register("fast"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Fast))
                 .Register("slow"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Slow))
                 .Register("crop"   , () => new Crop().UseDefaultMode())

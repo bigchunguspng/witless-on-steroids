@@ -17,8 +17,6 @@ public interface ICallbackRouter
 
 public class CallbackRouter_Default : ICallbackRouter
 {
-    private readonly CommandRegistry<CallbackHandler> _registry = new ();
-
     public const string
         Key_Manual = "man",
         Key_Fuse   = "f", // i@!*
@@ -29,9 +27,8 @@ public class CallbackRouter_Default : ICallbackRouter
         Key_Nukes  = "n", // l
         Key_Delete = "del";
 
-    public CallbackRouter_Default()
-    {
-        _registry
+    private readonly    CommandRegistry<Func<CallbackHandler>>
+        _registry = new CommandRegistry<Func<CallbackHandler>>.Builder()
             .Register(Key_Manual, () => new Help_Callback())
             .Register(Key_Fuse,   () => new Fuse_Callback())
             .Register(Key_AliasP, () => new AliasManager_Callback(AliasContext.FFMpeg))
@@ -41,7 +38,6 @@ public class CallbackRouter_Default : ICallbackRouter
             .Register(Key_Nukes,  () => new Nuke_Callback())
             .Register(Key_Delete, () => new Delete_Callback())
             .Build();
-    }
 
     public void Route(CallbackQuery query)
     {

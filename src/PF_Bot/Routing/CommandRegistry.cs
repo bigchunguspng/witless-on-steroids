@@ -1,36 +1,39 @@
 ﻿namespace PF_Bot.Routing;
 
-public class CommandRegistry<T>
+public record struct CommandMapping<T>(string Command, T Handler);
+
+public class CommandRegistry<T>(Dictionary<char, List<CommandMapping<T>>> registry)
 {
-    private                  List<(string Command, Func<T> Function)>  _lobby = [];
-    private Dictionary<char, List<(string Command, Func<T> Function)>> _dictionary = new();
-
-    public CommandRegistry<T> Register(string command, Func<T> function)
+    public T? Resolve(string? command)
     {
-        _lobby.Add((command, function));
+        if (command is null) return default;
 
-        return this;
-    }
-
-    public CommandRegistry<T> Build()
-    {
-        _dictionary = _lobby
-            .GroupBy(x => x.Command[0])
-            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x).ToList());
-        _lobby = null!;
-
-        return this;
-    }
-
-    public Func<T>? Resolve(string? command)
-    {
-        if (command is null) return null;
-
-        if (_dictionary.TryGetValue(command[0], out var list))
+        if (registry.TryGetValue(command[0], out var list))
         {
-            return list.FirstOrDefault(x => command.StartsWith(x.Command)).Function;
+            return list.FirstOrDefault(x => command.StartsWith(x.Command)).Handler;
         }
 
-        return null;
+        return default;
+    }
+
+    public class Builder
+    {
+        private readonly List<CommandMapping<T>> _lobby = [];
+
+        public Builder Register(string command, T handler)
+        {
+            _lobby.Add(new CommandMapping<T>(command, handler));
+
+            return this;
+        }
+
+        public CommandRegistry<T> Build()
+        {
+            var registry = _lobby
+                    .GroupBy(x => x.Command[0])
+                    .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Command).ToList());
+
+            return new CommandRegistry<T>(registry);
+        }
     }
 }

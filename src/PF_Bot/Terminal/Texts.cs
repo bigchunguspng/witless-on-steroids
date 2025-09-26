@@ -15,21 +15,25 @@ public static class Texts
 
         s   - save and exit
 
+        +55 - select active chat
+
+        /a  -  add [text] to active chat pack
+        /w  - send [text] to active chat + /a
+
         /s  - save packs
         /p  - packs info
         /pp - packs info (full)
         /cc - clear temp files
 
-        /ups - upload sounds [path]
-        /upg - upload GIFs   [path]
-
-        +55 - select active chat
-
         /mg - JSON -> TGP migration (temporary)
-        /xp - save pack JSON copy [chat]
+        /xp - [chat/+] export pack to JSON
+
+        /US - [path] upload sounds
+        /UG - [path] upload GIFs
 
         /db - delete blockers
         /DB - delete active chat if blocked
-        /ds - delete by size [max size, bytes]
+
+        End input with '_' to discard it.
         """;
 }

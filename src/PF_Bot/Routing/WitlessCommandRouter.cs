@@ -27,7 +27,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
 
     private readonly Dictionary<MemeType, Func<ImageProcessor>> _mematics;
 
-    private readonly CommandRegistry<AnyCommand<WitlessContext>> _witlessCommands;
+    private readonly CommandRegistry<Func<AnyCommand<WitlessContext>>> _witlessCommands;
 
     public WitlessCommandRouter(CommandRouter parent)
     {
@@ -43,7 +43,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             { MemeType.Nuke, () => new Nuke() },
         };
 
-        _witlessCommands = new CommandRegistry<AnyCommand<WitlessContext>>()
+        _witlessCommands = new CommandRegistry<Func<AnyCommand<WitlessContext>>>.Builder()
             .Register("dp"      , () => new Demo_Dp())
             .Register("dg"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Square))
             .Register("dv"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Wide))

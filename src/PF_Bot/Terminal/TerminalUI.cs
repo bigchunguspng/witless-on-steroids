@@ -1,8 +1,8 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Core.Chats;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
+using PF_Bot.Routing;
 using PF_Tools.Copypaster.Helpers;
 using Telegram.Bot;
 using Exception = System.Exception;
@@ -11,10 +11,9 @@ namespace PF_Bot.Terminal
 {
     public class TerminalUI
     {
-        private long   _activeChat;
-        private string _input = string.Empty;
-
-        private Copypaster Baka => PackManager.GetBaka(_activeChat);
+        private readonly CommandRegistry<Action> _registry;
+        private          TerminalContext?        _ctx;
+        private          long                    _chat;
 
         public static void Start()
         {
@@ -23,77 +22,113 @@ namespace PF_Bot.Terminal
             new TerminalUI().Loop();
         }
 
+        private TerminalUI
+            () => _registry = new CommandRegistry<Action>.Builder()
+            .Register("?",  PrintManual)
+            .Register("a",    AddTextToPack)
+            .Register("w",  WriteTextToChat)
+            .Register("s",  PackManager.Bakas_SaveDirty_DropIdle)
+            .Register("p",  PacksInfo)
+            .Register("pp", PacksInfoFull)
+            .Register("xp", PackCopyJson)
+            .Register("mg", Migration_JsonToBinary.MigrateAll)
+            .Register("cc", ClearTempFiles)
+            .Register("UG", UploadGIFs)
+            .Register("US", UploadSounds)
+            .Register("db", DeleteBlockers_SaveChats)
+            .Register("DB", DeleteBlocker__SaveChats)
+            .Build();
+
+        private void PrintManual() => Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
+
         private void Loop()
         {
+            string? input;
             do
             {
-                _input = Console.ReadLine() ?? string.Empty;
-                try
-                {
-                    if (_input.EndsWith("_").Janai())
-                    {
-                        if      (_input.StartsWith("+") && _input.Length > 1) SetActiveChat();
-                        else if (_input.StartsWith("/")                     ) DoConsoleCommands();
-                    }
-                }
-                catch (Exception e)
-                {
-                    LogError($"[Console] >> BRUH | {e.GetErrorMessage()}");
-                }
+                input = Console.ReadLine();
+                HandleInput(input);
             }
-            while (_input != "s");
+            while (input != "s");
         }
 
-        private void DoConsoleCommands()
+        private void HandleInput(string? input)
         {
-            if      (BotWannaSpeak()) BreakFourthWall();
-            else if (_input == "/"  ) Print(CONSOLE_MANUAL, ConsoleColor.Yellow);
-            else if (_input == "/s" ) PackManager.Bakas_SaveDirty_DropIdle();
-            else if (_input == "/p" ) PacksInfo();
-            else if (_input == "/pp") PacksInfoFull();
-            else if (_input == "/cc") ClearTempFiles();
-            else if (_input == "/db") DeleteBlockers();
-            else if (_input == "/DB") DeleteBlocker();
-            else if (_input == "/ds") DeleteBySize();
-            else if (_input == "/mg") Migration_JsonToBinary.MigrateAll();
-            else if (_input.StartsWith("/ups") && _input.Contains(' ')) UploadSounds(_input.Split(' ', 2)[1]);
-            else if (_input.StartsWith("/upg") && _input.Contains(' ')) UploadGIFs  (_input.Split(' ', 2)[1]);
-            else if (_input.StartsWith("/xp")  && _input.HasLongArgument(out var chat)) PackCopyJson(chat);
-            else if (_input.StartsWith("/ds")  && _input.HasIntArgument (out var size)) DeleteBySize(size);
+            try
+            {
+                if (input.IsNull_OrWhiteSpace() || input.EndsWith("_")) return;
+
+                if      (input.StartsWith("/")) ResolveCommand(input);
+                else if (input.StartsWith("+")) SetActiveChat (input);
+            }
+            catch (Exception e)
+            {
+                LogError($"[Console] >> BRUH | {e.GetErrorMessage()}");
+            }
         }
 
-        private static readonly Regex
-            _rgx_wannaSpeak = new(@"^\/[aw] ", RegexOptions.Compiled);
-
-        private bool BotWannaSpeak() => _rgx_wannaSpeak.IsMatch(_input);
-
-        private void SetActiveChat()
+        private void ResolveCommand(string input)
         {
-            var shit = _input[1..];
-            var found = ChatManager.Chats.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
-            if (found != 0)
+            var context = new TerminalContext(input);
+            var handler = _registry.Resolve(context.Command);
+            if (handler != null)
             {
-                _activeChat = found;
-                Print($"ACTIVE CHAT >> {_activeChat}");
+                _ctx = context;
+                handler.Invoke();
+                _ctx = null;
             }
         }
 
-        private void BreakFourthWall()
+        private void SetActiveChat(string input)
         {
-            var arg = _input.Split (' ', 2)[1];
-            if (ChatManager.Knowns(_activeChat).Janai()) return;
+            if (input.Length < 2) return;
 
-            if      (_input.StartsWith("/a ") && Baka.Eat(arg, out var eaten)) // add
+            var shit = input[1..];
+            var chat = ChatManager.Chats.Lock(x => x.Keys.FirstOrDefault(chat => $"{chat}".EndsWith(shit)));
+            if (chat != 0)
             {
-                foreach (var line in eaten) Print($"{_activeChat} += {line}", ConsoleColor.Yellow);
+                _chat = chat;
+                Print($"ACTIVE CHAT >> {_chat}", ConsoleColor.Yellow);
             }
-            else if (_input.StartsWith("/w "))                                  // write
-            {
-                App.Bot.SendMessage((_activeChat, null), arg, preview: true);
-                Baka.Eat(arg);
-                Print($"{_activeChat} >> {arg}", ConsoleColor.Yellow);
-            }
+            else
+                Print("CHAT NOT FOUND :(", ConsoleColor.Red);
         }
+
+        // ADIDAS IS TYPING...
+
+        private void   AddTextToPack() => BreakFourthWall((baka, text) =>
+        {
+            if (baka.Eat(text, out var eaten) == false) return;
+
+            eaten.ForEach(line => Print($"{_chat} += {line}", ConsoleColor.Yellow));
+        });
+
+        private void WriteTextToChat() => BreakFourthWall((baka, text) =>
+        {
+            App.Bot.SendMessage((_chat, null), text, preview: true);
+            baka.Eat(text);
+            Print($"{_chat} >> {text}", ConsoleColor.Yellow);
+        });
+
+        private void BreakFourthWall(Action<Copypaster, string> doSomeFunnyShit)
+        {
+            var text = _ctx!.Args;
+            if (text == null)
+            {
+                Print("NO TEXT?", ConsoleColor.Red);
+                return;
+            }
+
+            if (ChatManager.Knowns(_chat).Janai())
+            {
+                Print(_chat == 0 ? "CHAT NOT SELECTED" : "UNKNOWN CHAT", ConsoleColor.Red);
+                return;
+            }
+
+            doSomeFunnyShit(PackManager.GetBaka(_chat), text);
+        }
+
+        // PACKS
 
         private void PacksInfo()
         {
@@ -108,8 +143,9 @@ namespace PF_Bot.Terminal
             PackManager.Bakas.ForEachKey(chat => Print($"{chat}", ConsoleColor.DarkYellow));
         }
 
-        private void PackCopyJson(long chat)
+        private void PackCopyJson()
         {
+            var chat = long.TryParse(_ctx?.Args, out var value) ? value : _chat;
             var path = PackManager.GetPackPath(chat);
             var pack = GenerationPackIO.Load(path);
             var save = path.Suffix($"{DateTime.Now:yyyy-MM-dd--hh-mm-ss}", ".json");
@@ -117,43 +153,47 @@ namespace PF_Bot.Terminal
             Print($"PACK EXPORTED >> {save}", ConsoleColor.Yellow);
         }
 
-        private void DeleteBlockers()
+        // UPLOAD
+
+        private void UploadGIFs()
+        {
+            var path = _ctx?.Args;
+            if (path == null) Print("NO PATH?", ConsoleColor.Red);
+            else Task.Run(() => GIF_DB .Instance.UploadMany(path));
+        }
+
+        private void UploadSounds()
+        {
+            var path = _ctx?.Args;
+            if (path == null) Print("NO PATH?", ConsoleColor.Red);
+            else Task.Run(() => SoundDB.Instance.UploadMany(path));
+        }
+
+        // DELETE
+
+        private void DeleteBlockers_SaveChats()
         {
             var save = ChatManager.Chats.Lock(x => x.Keys.Aggregate(false, (b, chat) => b || DeleteBlocker(chat)));
             if (save)  ChatManager.SaveChats();
         }
 
-        private void DeleteBlocker()
+        private void DeleteBlocker__SaveChats()
         {
-            if (DeleteBlocker(_activeChat)) ChatManager.SaveChats();
+            if (DeleteBlocker(_chat)) ChatManager.SaveChats();
         }
 
         private bool DeleteBlocker(long chat)
         {
-            var x = App.Bot.PingChat((chat, null), notify: false);
-            if (x == -1)
+            var messageId = App.Bot.PingChat((chat, null), notify: false);
+            var delete = messageId == -1;
+            if (delete)
             {
                 ChatManager.Remove(chat);
                 PackManager.Delete(chat);
             }
-            else App.Bot.Client.DeleteMessage(chat, x);
+            else App.Bot.Client.DeleteMessage(chat, messageId);
 
-            return x is -1;
+            return delete;
         }
-
-        private void DeleteBySize(int size = 34)
-        {
-            ChatManager.Chats.ForEachKey(chat =>
-            {
-                if (PackManager.GetPackPath(chat).FileSizeInBytes > size) return;
-
-                ChatManager.Remove(chat);
-                PackManager.Delete(chat);
-            });
-            ChatManager.SaveChats();
-        }
-
-        private void UploadSounds(string path) => Task.Run(() => SoundDB.Instance.UploadMany(path));
-        private void UploadGIFs  (string path) => Task.Run(() => GIF_DB .Instance.UploadMany(path));
     }
 }

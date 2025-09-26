@@ -9,31 +9,31 @@ public static class GenerationPackIO
 
     /// Loads pack into memory.
     /// Or creates a new empty one, if the file doesn't exist.
-    public static GenerationPack Load(FilePath path)
+    public static GenerationPack Load(FilePath path, bool nbz = false)
     {
         if (path.FileExists.Janai()) return new GenerationPack();
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var reader = new BinaryReader(fs);
-        return BinarySerialization.Deserialize(reader);
+        return BinarySerialization.Deserialize(reader, nbz);
     }
 
     /// Saves pack to a temp~ file first, then copies it to given path.
     /// Make sure directory exist!
-    public static void Save_WithTemp(GenerationPack pack, FilePath path)
+    public static void Save_WithTemp(GenerationPack pack, FilePath path, bool nbz = false)
     {
         var temp = $"{path}~";
-        Save(pack, temp);
+        Save(pack, temp, nbz);
         File.Move(temp, path, overwrite: true);
     }
 
     /// Saves pack directly to a file.
     /// Make sure directory exist!
-    public static void Save(GenerationPack pack, FilePath path)
+    public static void Save(GenerationPack pack, FilePath path, bool nbz = false)
     {
         using var fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
         using var writer = new BinaryWriter(fs);
-        BinarySerialization.Serialize(writer, pack);
+        BinarySerialization.Serialize(writer, pack, nbz);
     }
 
     // JSON

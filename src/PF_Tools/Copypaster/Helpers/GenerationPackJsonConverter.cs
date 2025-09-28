@@ -13,10 +13,11 @@ public class GenerationPackJsonConverter : JsonConverter<GenerationPack>
         writer.WriteObject(() =>
         {
             writer.WriteNumber("count_special",    pack.SpecialCount);
+            writer.WriteNumber("count_ordinal",    pack.OrdinalCount);
             writer.WriteNumber("count_vocabulary", pack.VocabularyCount);
             writer.WriteArray ("vocabulary", () => pack.Vocabulary.ForEach(writer.WriteStringValue));
             writer.WriteObject("transitions_special", () => pack.TransitionsSpecial.ForEach(WriteTransitionTable_Special));
-            writer.WriteArray ("transitions_ordinal", () => pack.TransitionsById   .ForEach(WriteTransitionTable_Ordinal));
+            writer.WriteArray ("transitions_ordinal", () => pack.TransitionsOrdinal.ForEach(WriteTransitionTable_Ordinal));
         });
 
         void WriteTransitionTable_Special(KeyValuePair<int, TransitionTable> table)

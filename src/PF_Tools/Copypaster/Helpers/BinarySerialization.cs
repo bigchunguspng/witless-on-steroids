@@ -7,7 +7,7 @@ namespace PF_Tools.Copypaster.Helpers;
 /// Serializes/deserializes <see cref="GenerationPack"/> into/from a binary file.
 /// <code>
 /// ┌─0B─────────────────────┬─4B─────────────────────┐
-/// │ SpecialCount        4B │ VocabularyCount     4B │ # Headers
+/// │ SpecialCount        4B │ OrdinalCount        4B │ # Headers
 /// ├────────────────────────┼────────────────────────┤
 /// ║ WordId                 ┊ Count              x8B ║ # Headers > Transitions tables / Special | 8B x    SpecialCount
 /// ├────────────────────────┼────────────────────────┤
@@ -27,7 +27,7 @@ public static class BinarySerialization
     public static void Serialize(BinaryWriter writer, GenerationPack pack, bool nbz = false)
     {
         writer.Write(pack.SpecialCount);
-        writer.Write(pack.VocabularyCount);
+        writer.Write(pack.OrdinalCount);
 
         // Lengths (and names) of transition tables
         foreach (var pair in pack.TransitionsSpecial)
@@ -41,7 +41,7 @@ public static class BinarySerialization
         }
 
         // Padding
-        if (pack.VocabularyCount.IsOdd())
+        if (pack.OrdinalCount.IsOdd())
         {
             writer.Write(0xB0BA_0000);
         }
@@ -70,7 +70,7 @@ public static class BinarySerialization
     private static void WriteTransitions(BinaryWriter writer, GenerationPack pack)
     {
         writer.WriteTransitions(pack.TransitionsSpecial.SelectMany(x => x.Value.AsIEnumerable()));
-        writer.WriteTransitions(pack.TransitionsById   .SelectMany(x => x      .AsIEnumerable()));
+        writer.WriteTransitions(pack.TransitionsOrdinal.SelectMany(x => x      .AsIEnumerable()));
     }
 
     private static void WriteTransitions(this BinaryWriter writer, IEnumerable<Transition> transitions)
@@ -86,37 +86,37 @@ public static class BinarySerialization
 
     public static GenerationPack Deserialize(BinaryReader reader, bool nbz = false)
     {
-        var countSpecial    = reader.ReadInt32();
-        var countVocabulary = reader.ReadInt32();
+        var countSpecial = reader.ReadInt32();
+        var countOrdinal = reader.ReadInt32();
 
         // Lengths (and names) of transition tables
         var transitionsSpecialCounts = new Dictionary<int, int>(countSpecial);
-        var transitionsByIdCounts = new List<int>(countVocabulary);
+        var transitionsOrdinalCounts = new List           <int>(countOrdinal);
         for (var i = 0; i < countSpecial; i++)
         {
             transitionsSpecialCounts.Add(reader.ReadInt32(), reader.ReadInt32());
         }
-        for (var i = 0; i < countVocabulary; i++)
+        for (var i = 0; i < countOrdinal; i++)
         {
-            transitionsByIdCounts.Add(reader.ReadInt32());
+            transitionsOrdinalCounts.Add(reader.ReadInt32());
         }
 
         // Padding
-        if (countVocabulary.IsOdd())
+        if (countOrdinal.IsOdd())
         {
             reader.ReadInt32();
         }
 
-        var (transitionsSpecial, transitionsById) = nbz
-            ? ReadTransitionTables_NZB(reader.BaseStream, countSpecial, countVocabulary, transitionsSpecialCounts, transitionsByIdCounts)
-            : ReadTransitionTables    (reader,            countSpecial, countVocabulary, transitionsSpecialCounts, transitionsByIdCounts);
+        var (transitionsSpecial, transitionsOrdinal) = nbz
+            ? ReadTransitionTables_NZB(reader.BaseStream, countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts)
+            : ReadTransitionTables    (reader,            countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts);
 
-        var vocabulary  = ReadVocabulary(reader, countVocabulary);
+        var vocabulary  = ReadVocabulary(reader, countOrdinal);
 
-        return new GenerationPack(vocabulary, transitionsById, transitionsSpecial);
+        return new GenerationPack(vocabulary, transitionsOrdinal, transitionsSpecial);
     }
 
-    private record TransitionTables(Dictionary<int, TransitionTable> transitionsSpecial, List<TransitionTable> transitionsById);
+    private record TransitionTables(Dictionary<int, TransitionTable> transitionsSpecial, List<TransitionTable> transitionsOrdinal);
 
     private static TransitionTables ReadTransitionTables_NZB
     (
@@ -124,14 +124,14 @@ public static class BinarySerialization
         int countSpecial,
         int countVocabulary,
         Dictionary<int, int> transitionsSpecialCounts,
-        List           <int> transitionsByIdCounts
+        List           <int> transitionsOrdinalCounts
     )
     {
         using var target = new MemoryStream();
         using var reader = new BinaryReader(target);
 
-        NZB.Decode(source, target, 2 * (transitionsSpecialCounts.Values.Sum() + transitionsByIdCounts.Sum()));
-        return ReadTransitionTables(reader, countSpecial, countVocabulary, transitionsSpecialCounts, transitionsByIdCounts);
+        NZB.Decode(source, target, 2 * (transitionsSpecialCounts.Values.Sum() + transitionsOrdinalCounts.Sum()));
+        return ReadTransitionTables(reader, countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts);
     }
 
     private static TransitionTables ReadTransitionTables
@@ -140,11 +140,11 @@ public static class BinarySerialization
         int countSpecial,
         int countVocabulary,
         Dictionary<int, int> transitionsSpecialCounts,
-        List           <int> transitionsByIdCounts
+        List           <int> transitionsOrdinalCounts
     )
     {
         var transitionsSpecial = new Dictionary<int, TransitionTable>(countSpecial);
-        var transitionsById = new List<TransitionTable>(countVocabulary);
+        var transitionsOrdinal = new List           <TransitionTable>(countOrdinal);
         foreach (var pair in transitionsSpecialCounts)
         {
             var count = pair.Value;
@@ -156,7 +156,7 @@ public static class BinarySerialization
 
             transitionsSpecial.Add(pair.Key, GetTransitionTable(transitions));
         }
-        foreach (var count in transitionsByIdCounts)
+        foreach (var count in transitionsOrdinalCounts)
         {
             var transitions = new List<Transition>(count);
             for (var i = 0; i < count; i++)

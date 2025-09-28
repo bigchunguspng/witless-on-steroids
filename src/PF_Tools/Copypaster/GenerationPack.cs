@@ -13,39 +13,40 @@ public class GenerationPack
 
     // DATA
 
-    private readonly List                    <string> _vocabulary = [];
-    private readonly List           <TransitionTable> _transitionsById = [];
-    private readonly Dictionary<int, TransitionTable> _transitionsSpecial = new();
+    private readonly List                    <string> _vocabulary         = [];    // list index is word id
+    private readonly List           <TransitionTable> _transitionsOrdinal = [];    // list index is word id
+    private readonly Dictionary<int, TransitionTable> _transitionsSpecial = new(); //        key is word id
 
-    private Dictionary<string, int>? _wordIds;
+    private Dictionary<string, int>? _wordIds; // index of word ids by the word itself // todo have this instead of vocab?
 
     public GenerationPack() { }
     public GenerationPack
     (
         List<string> vocabulary,
-        List           <TransitionTable> transitionsById,
+        List           <TransitionTable> transitionsOrdinal,
         Dictionary<int, TransitionTable> transitionsSpecial
     )
     {
         _vocabulary = vocabulary;
-        _transitionsById    = transitionsById;
+        _transitionsOrdinal = transitionsOrdinal;
         _transitionsSpecial = transitionsSpecial;
     }
 
     // READS (simple)
 
     public int  VocabularyCount => _vocabulary.Count;
-    public int TransitionsCount => _transitionsSpecial.Count + _transitionsById.Count;
+    public int TransitionsCount => _transitionsSpecial.Count + _transitionsOrdinal.Count;
     public int     SpecialCount => _transitionsSpecial.Count;
+    public int     OrdinalCount => _transitionsOrdinal.Count; // should be equal to VocabularyCount
 
     public IEnumerable<string>
         Vocabulary => _vocabulary.AsEnumerable();
 
     public IEnumerable<KeyValuePair<int, TransitionTable>>
         Transitions => _transitionsSpecial.Concat
-        (_transitionsById.Select((table, i) => new KeyValuePair<int, TransitionTable>(i, table)));
+        (_transitionsOrdinal.Select((table, i) => new KeyValuePair<int, TransitionTable>(i, table)));
 
-    public IEnumerable                  <TransitionTable>  TransitionsById    => _transitionsById;
+    public IEnumerable                  <TransitionTable>  TransitionsOrdinal => _transitionsOrdinal;
     public IEnumerable<KeyValuePair<int, TransitionTable>> TransitionsSpecial => _transitionsSpecial;
 
     // READS
@@ -66,7 +67,7 @@ public class GenerationPack
     {
         return id < 0
             ? _transitionsSpecial[id]
-            : _transitionsById   [id];
+            : _transitionsOrdinal[id];
     }
 
     /// Returns <see cref="NO_WORD"/> if the word doesn't exist.
@@ -129,8 +130,8 @@ public class GenerationPack
     {
         return id < 0
             ? _transitionsSpecial.GetValueOrDefault(id)
-            : id < _transitionsById.Count
-                ? _transitionsById[id]
+            : id < _transitionsOrdinal.Count
+                ?  _transitionsOrdinal[id]
                 : null;
     }
 
@@ -138,9 +139,9 @@ public class GenerationPack
     {
         if      (id < 0)
             _transitionsSpecial[id] = table;
-        else if (id < _transitionsById.Count)
-            _transitionsById   [id] = table;
+        else if (id < _transitionsOrdinal.Count)
+            _transitionsOrdinal[id] = table;
         else
-            _transitionsById.Add(table);
+            _transitionsOrdinal.Add(table);
     }
 }

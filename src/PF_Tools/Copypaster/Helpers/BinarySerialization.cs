@@ -1,5 +1,6 @@
 using System.Text;
 using PF_Tools.Copypaster.TransitionTables;
+using PF_Tools.NZB;
 using BinaryReader = System.IO.BinaryReader;
 
 namespace PF_Tools.Copypaster.Helpers;
@@ -24,7 +25,7 @@ public static class BinarySerialization
 {
     // WRITE
 
-    public static void Serialize(BinaryWriter writer, GenerationPack pack, bool nbz = false)
+    public static void Serialize(BinaryWriter writer, GenerationPack pack, bool nzb = false)
     {
         writer.Write(pack.SpecialCount);
         writer.Write(pack.OrdinalCount);
@@ -35,8 +36,9 @@ public static class BinarySerialization
             writer.Write(pair.Key);
             writer.Write(pair.Value.Count);
         }
-        foreach (var table in pack.TransitionsById)
+        foreach (var table in pack.TransitionsOrdinal)
         {
+            // todo, use nzb here too
             writer.Write(table.Count);
         }
 
@@ -47,8 +49,11 @@ public static class BinarySerialization
         }
 
         // Transitions
-        if (nbz) WriteTransitions_NZB(writer.BaseStream, pack);
-        else     WriteTransitions    (writer,            pack);
+        I32BitWriter writer_32b = nzb
+            ? new    NzbWriter              (writer.BaseStream)
+            : new BinaryWriter_NzbCompatible(writer.BaseStream);
+
+        using (writer_32b) writer_32b.WriteTransitions(pack);
 
         // Vocabulary
         foreach (var word in pack.Vocabulary)
@@ -58,47 +63,38 @@ public static class BinarySerialization
         }
     }
 
-    private static void WriteTransitions_NZB(Stream target, GenerationPack pack)
-    {
-        using var source = new MemoryStream();
-        using var writer = new BinaryWriter(source);
-
-        WriteTransitions(writer, pack);
-        NZB.Encode(source, target, (int)(source.Position / 4));
-    }
-
-    private static void WriteTransitions(BinaryWriter writer, GenerationPack pack)
+    private static void WriteTransitions(this I32BitWriter writer, GenerationPack pack)
     {
         writer.WriteTransitions(pack.TransitionsSpecial.SelectMany(x => x.Value.AsIEnumerable()));
         writer.WriteTransitions(pack.TransitionsOrdinal.SelectMany(x => x      .AsIEnumerable()));
     }
 
-    private static void WriteTransitions(this BinaryWriter writer, IEnumerable<Transition> transitions)
+    private static void WriteTransitions(this I32BitWriter writer, IEnumerable<Transition> transitions)
     {
         foreach (var transition in transitions)
         {
-            writer.Write(transition.WordId);
-            writer.Write(transition.Chance);
+            writer.WriteI32(transition.WordId);
+            writer.WriteI32(transition.Chance);
         }
     }
 
     // READ
 
-    public static GenerationPack Deserialize(BinaryReader reader, bool nbz = false)
+    public static GenerationPack Deserialize(BinaryReader reader, bool nzb = false)
     {
         var countSpecial = reader.ReadInt32();
         var countOrdinal = reader.ReadInt32();
 
         // Lengths (and names) of transition tables
-        var transitionsSpecialCounts = new Dictionary<int, int>(countSpecial);
-        var transitionsOrdinalCounts = new List           <int>(countOrdinal);
+        var       transitionsSpecialCounts = new Dictionary<int, int>(countSpecial);
+        using var transitionsOrdinalCounts = new PooledArray    <int>(countOrdinal);
         for (var i = 0; i < countSpecial; i++)
         {
             transitionsSpecialCounts.Add(reader.ReadInt32(), reader.ReadInt32());
         }
         for (var i = 0; i < countOrdinal; i++)
         {
-            transitionsOrdinalCounts.Add(reader.ReadInt32());
+            transitionsOrdinalCounts.Array[i] = reader.ReadInt32();
         }
 
         // Padding
@@ -107,67 +103,57 @@ public static class BinarySerialization
             reader.ReadInt32();
         }
 
-        var (transitionsSpecial, transitionsOrdinal) = nbz
-            ? ReadTransitionTables_NZB(reader.BaseStream, countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts)
-            : ReadTransitionTables    (reader,            countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts);
+        // Transitions
+        var transitionsSpecialTables = new Dictionary<int, TransitionTable>(countSpecial);
+        var transitionsOrdinalTables = new List           <TransitionTable>(countOrdinal);
 
-        var vocabulary  = ReadVocabulary(reader, countOrdinal);
+        using I32BitReader reader_32b = nzb
+            ? new    NzbReader              (reader.BaseStream)
+            : new BinaryReader_NzbCompatible(reader.BaseStream);
+        reader_32b.ReadTransitionTables
+        (
+            transitionsSpecialCounts,
+            transitionsOrdinalCounts.Array.AsSpan(0, countOrdinal),
+            transitionsSpecialTables,
+            transitionsOrdinalTables
+        );
 
-        return new GenerationPack(vocabulary, transitionsOrdinal, transitionsSpecial);
+        // Vocabulary
+        var vocabulary = reader.ReadVocabulary(countOrdinal);
+
+        return new GenerationPack(vocabulary, transitionsOrdinalTables, transitionsSpecialTables);
     }
 
-    private record TransitionTables(Dictionary<int, TransitionTable> transitionsSpecial, List<TransitionTable> transitionsOrdinal);
-
-    private static TransitionTables ReadTransitionTables_NZB
+    private static void ReadTransitionTables
     (
-        Stream source,
-        int countSpecial,
-        int countVocabulary,
-        Dictionary<int, int> transitionsSpecialCounts,
-        List           <int> transitionsOrdinalCounts
+        this I32BitReader reader,
+        Dictionary<int, int>             transitionsSpecialCounts,
+        Span           <int>             transitionsOrdinalCounts,
+        Dictionary<int, TransitionTable> transitionsSpecialTables, 
+        List           <TransitionTable> transitionsOrdinalTables
     )
     {
-        using var target = new MemoryStream();
-        using var reader = new BinaryReader(target);
-
-        NZB.Decode(source, target, 2 * (transitionsSpecialCounts.Values.Sum() + transitionsOrdinalCounts.Sum()));
-        return ReadTransitionTables(reader, countSpecial, countOrdinal, transitionsSpecialCounts, transitionsOrdinalCounts);
+        foreach (var (wordId, count) in transitionsSpecialCounts)
+        {
+            var table = reader.ReadTransitions(count);
+            transitionsSpecialTables.Add(wordId, table);
+        }
+        foreach (var          count  in transitionsOrdinalCounts)
+        {
+            var table = reader.ReadTransitions(count);
+            transitionsOrdinalTables.Add(table);
+        }
     }
 
-    private static TransitionTables ReadTransitionTables
-    (
-        BinaryReader reader,
-        int countSpecial,
-        int countVocabulary,
-        Dictionary<int, int> transitionsSpecialCounts,
-        List           <int> transitionsOrdinalCounts
-    )
+    private static TransitionTable ReadTransitions(this I32BitReader reader, int count)
     {
-        var transitionsSpecial = new Dictionary<int, TransitionTable>(countSpecial);
-        var transitionsOrdinal = new List           <TransitionTable>(countOrdinal);
-        foreach (var pair in transitionsSpecialCounts)
+        var transitions = new List<Transition>(count);
+        for (var i = 0; i < count; i++)
         {
-            var count = pair.Value;
-            var transitions = new List<Transition>(count);
-            for (var i = 0; i < count; i++)
-            {
-                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadInt32()));
-            }
-
-            transitionsSpecial.Add(pair.Key, GetTransitionTable(transitions));
-        }
-        foreach (var count in transitionsOrdinalCounts)
-        {
-            var transitions = new List<Transition>(count);
-            for (var i = 0; i < count; i++)
-            {
-                transitions.Add(new Transition(reader.ReadInt32(), reader.ReadInt32()));
-            }
-
-            transitionsById.Add(GetTransitionTable(transitions));
+            transitions.Add(new Transition(reader.ReadI32(), reader.ReadI32()));
         }
 
-        return new TransitionTables(transitionsSpecial, transitionsById);
+        return GetTransitionTable(transitions);
     }
 
     private static TransitionTable GetTransitionTable(List<Transition> transitions) => transitions.Count switch
@@ -178,7 +164,7 @@ public static class BinarySerialization
         _    => new TransitionTableVU(transitions),
     };
 
-    private static List<string> ReadVocabulary(BinaryReader reader, int countVocabulary)
+    private static List<string> ReadVocabulary(this BinaryReader reader, int countVocabulary)
     {
         var wordLengths = new List<int>   (countVocabulary);
         var vocabulary  = new List<string>(countVocabulary);

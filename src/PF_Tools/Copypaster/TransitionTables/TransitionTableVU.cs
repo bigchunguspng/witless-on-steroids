@@ -5,17 +5,20 @@ public class TransitionTableVU : TransitionTableV, TransitionTable // 128+B
 {
     private Transition[] _transitions;
 
-    public TransitionTableVU()
+    public TransitionTableVU(int capacity = 4)
     {
-        _transitions = new Transition[4];
+        _transitions = new Transition[capacity];
         Count = 0;
     }
 
-    public TransitionTableVU(IEnumerable<Transition> transitions)
+    public TransitionTableVU(IEnumerable<Transition>  transitions) : this(transitions.ToArray()) { }
+    public TransitionTableVU(            Transition[] transitions)
     {
-        _transitions = transitions.OrderBy(x => x.WordId).ToArray();
-        Count = _transitions.Length;
-        TotalChance = _transitions.Sum(x => x.Chance);
+        Array.Sort(transitions, _comparer);
+
+        _transitions = transitions;
+        Count = transitions.Length;
+        TotalChance = transitions.Sum(x => x.Chance);
     }
 
     public             Transition this[int index]  => _transitions[index];
@@ -67,5 +70,5 @@ public class TransitionTableVU : TransitionTableV, TransitionTable // 128+B
 
     private void IncreaseCapacity() => Capacity = Math.Max(Capacity * 5 >> 2, Capacity + 1);
 
-    private static readonly Comparer<Transition> _comparer = Comparer<Transition>.Create ((a, b) => a.WordId.CompareTo(b.WordId));
+    private static readonly Comparer<Transition> _comparer = Comparer<Transition>.Create((a, b) => a.WordId.CompareTo(b.WordId));
 }

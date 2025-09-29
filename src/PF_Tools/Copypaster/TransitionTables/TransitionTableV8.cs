@@ -1,9 +1,11 @@
 ﻿namespace PF_Tools.Copypaster.TransitionTables;
 
 /// V8 = Variable size of up to 8 elements.
-public class TransitionTableV8(IEnumerable<Transition> transitions) : TransitionTableV, TransitionTable // 72-112B
+public class TransitionTableV8 (Transition[] transitions) : TransitionTableV, TransitionTable // 72-112B
 {
-    private Transition[] _transitions = transitions.ToArray();
+    private Transition[] _transitions = transitions;
+
+    public TransitionTableV8(IEnumerable<Transition> transitions) : this(transitions.ToArray()) { }
 
     public             Transition this[int index]  => _transitions[index];
     public IEnumerable<Transition> AsIEnumerable() => _transitions;

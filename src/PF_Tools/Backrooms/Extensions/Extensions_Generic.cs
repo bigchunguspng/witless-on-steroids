@@ -21,6 +21,11 @@ public static class Extensions_Generic
         return dictionary.TryGetValue(key, out value).Failed();
     }
 
+    public static Span<T> Slice<T>(this T[] array, int length)
+    {
+        return array.AsSpan(0, length);
+    }
+
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {
         foreach (var element in source) action(element);

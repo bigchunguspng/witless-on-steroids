@@ -72,7 +72,7 @@ public struct NzbWriter(Stream stream) : I32BitWriter
     private void Reset()
     {
         itemsWritten = bytesWritten = 0;
-        _zbcs.Array.AsSpan(0, NZB.ZBCS_BUFFER_LENGTH).Clear();
+        _zbcs.Array.Slice(NZB.ZBCS_BUFFER_LENGTH).Clear();
     }
 
     public void Dispose()

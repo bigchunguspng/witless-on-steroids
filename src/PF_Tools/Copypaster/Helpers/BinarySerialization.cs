@@ -25,8 +25,10 @@ public static class BinarySerialization
 {
     // WRITE
 
-    public static void Serialize(BinaryWriter writer, GenerationPack pack, bool nzb = false)
+    public static void Serialize(Stream output, GenerationPack pack, bool nzb = false)
     {
+        using var writer = new BinaryWriter(output);
+
         writer.Write(pack.SpecialCount);
         writer.Write(pack.OrdinalCount);
 
@@ -80,8 +82,10 @@ public static class BinarySerialization
 
     // READ
 
-    public static GenerationPack Deserialize(BinaryReader reader, bool nzb = false)
+    public static GenerationPack Deserialize(Stream input, bool nzb = false)
     {
+        using var reader = new BinaryReader(input);
+
         var countSpecial = reader.ReadInt32();
         var countOrdinal = reader.ReadInt32();
 

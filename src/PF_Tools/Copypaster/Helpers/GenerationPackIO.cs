@@ -14,8 +14,7 @@ public static class GenerationPackIO
         if (path.FileExists.Janai()) return new GenerationPack();
 
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var reader = new BinaryReader(fs);
-        return BinarySerialization.Deserialize(reader, nzb);
+        return BinarySerialization.Deserialize(fs, nzb);
     }
 
     /// Saves pack to a temp~ file first, then copies it to given path.
@@ -32,8 +31,7 @@ public static class GenerationPackIO
     public static void Save(GenerationPack pack, FilePath path, bool nzb = false)
     {
         using var fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-        using var writer = new BinaryWriter(fs);
-        BinarySerialization.Serialize(writer, pack, nzb);
+        BinarySerialization.Serialize(fs, pack, nzb);
     }
 
     // JSON

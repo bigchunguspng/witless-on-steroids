@@ -30,6 +30,7 @@ public static class Migration_JsonToBinary
                 sw.Log($"Migrated {file}");
             }
         }
+        Log("Migration complete!", color: LogColor.Lime);
     }
 
     public static void FuseMigrate(this GenerationPack target, PF_Tools.Copypaster_Legacy.Pack.GenerationPack source)

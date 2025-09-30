@@ -64,8 +64,11 @@ public partial class AdminConsole
         var path = PackManager.GetPackPath(chat);
         var pack = GenerationPackIO.Load(path);
         var save = path.Suffix($"{DateTime.Now:yyyy-MM-dd--hh-mm-ss}", ".json");
-        GenerationPackIO.Save_Json(pack, save).Wait();
-        Print($"PACK EXPORTED >> {save}", ConsoleColor.Yellow);
+        _ = Task.Run(async () =>
+        {
+            await GenerationPackIO.Save_Json(pack, save);
+            Print($"PACK EXPORTED >> {save}", ConsoleColor.Yellow);
+        });
     }
 
     // UPLOAD

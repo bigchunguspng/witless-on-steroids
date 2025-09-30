@@ -68,8 +68,7 @@ namespace PF_Bot.Handlers.Manage.Packs
                     _   => FuseSource.PackPublic,
                 };
 
-                var pack = (_source & FuseSource.Pack) == FuseSource.Pack;
-
+                var pack      = (_source & FuseSource.Pack)    == FuseSource.Pack;
                 var isPrivate = (_source & FuseSource.Private) == FuseSource.Private;
 
                 if (args.Length > 0 && args[^1] == "info")

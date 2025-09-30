@@ -29,8 +29,8 @@ public readonly struct FilePath(string value)
         =>     Path.Combine([_path, ..others]);
 
     /// <inheritdoc cref="Path.ChangeExtension(string?, string?)"/>
-    public FilePath ChangeExtension(string extension)
-        =>     Path.ChangeExtension(_path, extension);
+    public FilePath ChangeExtension(string? extension)
+        =>     Path.ChangeExtension(_path,  extension);
 
     // PARTS
 

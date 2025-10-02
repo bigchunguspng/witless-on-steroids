@@ -1,37 +1,63 @@
-using Reddit.Controllers;
-
 namespace PF_Bot.Core.Internet.Reddit;
 
-public interface RedditQuery { List<Post> GetPosts(string? after = null); }
+public interface RedditQuery;
 
 /// Uses <b>searchbar</b> on the main page or on a <b>subreddit</b>.
-public record SearchQuery(string? Subreddit, string Q, string Sort, string Time) : RedditQuery
+public record SearchQuery
+(
+    string? Subreddit,
+    string Text,
+    Reddit_SearchSort Sort,
+    Reddit_TimeOption Time
+)
+    : RedditQuery
 {
-    public List<Post> GetPosts(string? after = null) => RedditTool.Instance.SearchPosts(this, after);
-
     public override string ToString()
     {
         var sub = Subreddit is null ? "" : $" {Subreddit}*";
-        return $"/w {Q}{sub} -{Sort.ToLower()[0]}{Time[0]}";
+        return $"SEARCH {Text}{sub} -{(char)Sort}{(char)Time}";
     }
 }
 
 /// Opens subreddit and <b>scrolls</b> for some posts.
-public record ScrollQuery(string Subreddit, SortingMode Sort = SortingMode.Hot, string Time = "all") : RedditQuery
+public record ScrollQuery
+(
+    string Subreddit,
+    Reddit_ScrollSort Sort = Reddit_ScrollSort.Hot,
+    Reddit_TimeOption Time = Reddit_TimeOption.All
+)
+    : RedditQuery
 {
-    public List<Post> GetPosts(string? after = null) => RedditTool.Instance.GetPosts(this, after);
-
     public override string ToString()
     {
-        return $"/ws {Subreddit} -{(char)Sort}{Time[0]}";
+        return $"SCROLL {Subreddit} -{(char)Sort}{(char)Time}";
     }
 }
 
-public enum SortingMode
+public enum Reddit_TimeOption
+{
+    All           = 'a',
+    Hour          = 'h',
+    Day           = 'd',
+    Week          = 'w',
+    Month         = 'm',
+    Year          = 'y',
+};
+
+public enum Reddit_SearchSort
+{
+    Hot           = 'h',
+    New           = 'n',
+    Top           = 't',
+    Relevance     = 'r',
+    Comments      = 'c',
+};
+
+public enum Reddit_ScrollSort
 {
     Hot           = 'h',
     New           = 'n',
     Top           = 't',
     Rising        = 'r',
-    Controversial = 'c'
+    Controversial = 'c',
 }

@@ -4,11 +4,9 @@ namespace PF_Bot.Core.Internet.Reddit;
 
 public class PostData(LinkPost post)
 {
-    public string Fullname  { get; } = post.Fullname;
-    public string URL       { get; } = post.URL; // .png .jpg .gif
-    public string Title     { get; } = post.Title.Trim();
-    public string Subreddit { get; } = post.Subreddit;
-
-    private readonly string _permalink = post.Permalink;
-    public string Permalink => $"https://www.reddit.com{_permalink}";
+    public readonly string Fullname  = post.Fullname;
+    public readonly string URL       = post.URL; // .png .jpg .gif
+    public readonly string Title     = post.Title.Trim();
+    public readonly string Subreddit = post.Subreddit;
+    public readonly string Permalink = post.Permalink;
 }

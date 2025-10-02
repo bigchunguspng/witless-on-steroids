@@ -16,12 +16,9 @@ namespace PF_Bot.Core.Internet.Reddit
 
         private readonly RedditClient client = new(Config.RedditAppID, Config.RedditToken, Config.RedditSecret);
 
-        private readonly Regex
-            _rgx_img = new(@"(\.png|\.jpg|\.jpeg|\.gif)$|(reddit\.com\/gallery\/)", RegexOptions.Compiled);
-
         private RedditTool()
         {
-            Excluded = JsonIO.LoadData<Queue<string>>(File_RedditPosts);
+            ExcludedPosts = JsonIO.LoadData<Queue<string>>(File_RedditPosts);
             App.LoggedIntoReddit = true;
         }
 
@@ -31,17 +28,22 @@ namespace PF_Bot.Core.Internet.Reddit
         private const int EXCLUDED_CAPACITY = 256;
 
         /// Posts that were sent to users recently, so they are no longer relevant.
-        private readonly Queue<string> Excluded;
+        private readonly Queue<string> ExcludedPosts;
 
-        private void Exclude(string fullname)
+        private void Exclude(PostData post)
         {
-            if (Excluded.Count == EXCLUDED_CAPACITY) Excluded.Dequeue();
-            Excluded.Enqueue(fullname);
+            if (ExcludedPosts.Count == EXCLUDED_CAPACITY) ExcludedPosts.Dequeue();
+            ExcludedPosts.Enqueue(post.Fullname);
+        }
+
+        private bool PostIsNotExcluded(PostData post)
+        {
+            return ExcludedPosts.Contains(post.Fullname).Janai();
         }
 
         public void SaveExcluded()
         {
-            JsonIO.SaveData(Excluded, File_RedditPosts);
+            JsonIO.SaveData(ExcludedPosts, File_RedditPosts);
         }
 
         #endregion
@@ -49,18 +51,19 @@ namespace PF_Bot.Core.Internet.Reddit
 
         #region LAST POSTS
 
-        /// <summary> Used specifically for "/link" command. </summary>
-        private readonly Queue<PostData> LastSent = new(KEEP_POSTS);
+        /// Used specifically for "/link" command.
+        private readonly Queue<PostData> LastSentPosts = new(KEEP_POSTS);
 
-        private void Retain(PostData post)
+        private void Remember(PostData post)
         {
-            if (LastSent.Count == KEEP_POSTS) LastSent.Dequeue();
-            LastSent.Enqueue(post);
+            if (LastSentPosts.Count == KEEP_POSTS) LastSentPosts.Dequeue();
+            LastSentPosts.Enqueue(post);
         }
 
+        // todo - use cache <(chat, message), post data>
         public PostData? Recognize(string title)
         {
-            return LastSent.FirstOrDefault(x => x.Title == title);
+            return LastSentPosts.FirstOrDefault(x => x.Title == title);
         }
 
         #endregion
@@ -71,24 +74,18 @@ namespace PF_Bot.Core.Internet.Reddit
         /// Last queries by chat.
         private readonly Dictionary<long, RedditQuery> LastQueries = new();
 
-        private void SetLastQuery(long chat, RedditQuery query)
-        {
-            LastQueries[chat] = query;
-        }
+        public RedditQuery GetLastOrRandomQuery
+            (long chat) => LastQueries.TryGetValue(chat, out var query)
+            ? query
+            : RandomSubredditQuery;
 
-        public RedditQuery GetLastOrRandomQuery(long chat)
-        {
-            return LastQueries.TryGetValue(chat, out var query) ? query : RandomSubredditQuery;
-        }
-
-        public ScrollQuery RandomSubredditQuery => new(RandomSubreddit);
-        private string RandomSubreddit => subreddits[Random.Shared.Next(subreddits.Length)];
+        public ScrollQuery RandomSubredditQuery => new(subreddits.PickAny());
 
         private readonly string[] subreddits =
         [
             "comedynecrophilia", "okbuddybaka", "comedycemetery", "okbuddyretard",
             "dankmemes", "memes", "funnymemes", "doodoofard", "21stcenturyhumour",
-            "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe"
+            "breakingbadmemes", "minecraftmemes", "shitposting", "whenthe",
         ];
 
         #endregion
@@ -96,101 +93,116 @@ namespace PF_Bot.Core.Internet.Reddit
 
         #region PULLING POST
 
-        private PostData _post = null!;
-
-        /// <summary> Upcoming posts by query. </summary>
+        /// Upcoming posts by query.
         private readonly Dictionary<RedditQuery, RedditQueryCache> Cache = new();
-
-        private RedditQuery      ThisQuery = null!;
-        private RedditQueryCache ThisQueryCache => Cache[ThisQuery];
 
         //
 
         public PostData PullPost(RedditQuery query, long chat)
         {
-            ThisQuery = query;
-            
-            GetLatestRelevantPost();
+            var post = GetRelevantPost(query);
 
-            Exclude(_post.Fullname);
-            SetLastQuery(chat, query);
-            Retain(_post);
-            return _post;
+            Exclude (post);
+            Remember(post);
+
+            LastQueries[chat] = query;
+
+            return post;
         }
 
-        private void GetLatestRelevantPost()
+        private PostData GetRelevantPost(RedditQuery query)
         {
-            do
+            while (true)
             {
-                UpdateCache();
-                _post = ThisQueryCache.Posts.Dequeue();
-            }
-            while (ThisQueryCache is { HasEnoughPosts: true, Posts.Count: > 0 } && Excluded.Contains(_post.Fullname));
-        }
+                EnsureCacheIsNotEmpty(query);
+                var cache = Cache[query];
+                var post  = cache.ImagePosts.Dequeue(); // throws on empty!
 
-        /// Refills <see cref="Cache"/> with new posts if needed.
-        private void UpdateCache()
-        {
-            if (Cache.ContainsKey(ThisQuery)) // query has been used already
-            {
-                var posts = ThisQueryCache.Posts;
-                if (ThisQueryCache.RefreshDate < DateTime.Now) // time to clear queue and load new posts
+                var relevant = cache.EndOfQueryResults || PostIsNotExcluded(post);
+                if (relevant)
                 {
-                    ThisQueryCache.UpdateRefreshDate();
+                    LogDebug($"Reddit > POST {post.Fullname} | Query cache: {cache.ImagePosts.Count,2} posts");
+                    return post;
+                }
+            }
+        }
+
+        // todo scroll after last post async ?
+        /// Refills query cache with new posts if needed.
+        /// Cache still can end up being empty if no posts were found.
+        private void EnsureCacheIsNotEmpty(RedditQuery query)
+        {
+            if (Cache.TryGetValue(query, out var cache))
+            {
+                var posts = cache.ImagePosts;
+                if (cache.IsOutdated)
+                {
+                    cache.DelayRefreshDate();
                     posts.Clear();
-                    LogDebug("ScrollReddit (old posts)");
-                    ScrollReddit();
+                    Scroll_Logged("outdated posts");
                 }
-                else if (posts.Count == 1) // last post >> load next
-                {
-                    LogDebug("ScrollReddit (1 post)");
-                    ScrollReddit(posts.Peek().Fullname);
-                }
-                else if (posts.Count == 0) // no posts in queue
-                {
-                    LogDebug("ScrollReddit (0 posts)");
-                    ScrollReddit();
-                }
+                else if (posts.Count == 1) Scroll_Logged("last post", posts.Peek().Fullname);
+                else if (posts.Count == 0) Scroll_Logged("0 posts");
+                //       posts.Count >  1  ?  return;
             }
-            else // no posts in queue (and no queue too)
+            else
             {
-                Cache.Add(ThisQuery, new RedditQueryCache());
-
-                LogDebug("ScrollReddit (new Q)");
-                ScrollReddit();
+                cache = new RedditQueryCache();
+                Cache.Add(query, cache);
+                Scroll_Logged("0 posts, new Query");
             }
-        }
 
-        /// <summary>
-        /// Gets the actual posts using <see cref="ThisQuery"/> and adds them to <see cref="ThisQueryCache"/>.
-        /// </summary>
-        private void ScrollReddit(string? after = null, int patience = 3)
-        {
-            var posts = ThisQuery.GetPosts(after);
-            ThisQueryCache.HasEnoughPosts = posts.Count >= POST_LIMIT;
-
-            var acceptable = GetOnlyImagePosts(posts);
-            foreach (var post in acceptable) ThisQueryCache.Posts.Enqueue(post);
-            
-            Log($"Posts: {acceptable.Count}/{posts.Count}");
-
-            // (there ARE posts, but NONE of them is an image)
-            if (ThisQueryCache.Posts.Count == 0 && posts.Count > 0 && patience > 0 && ThisQueryCache.HasEnoughPosts)
+            void Scroll_Logged(string comment, string? after = null)
             {
-                ScrollReddit(posts[^1].Fullname, --patience);
+                var where = after == null ? "start," : "after";
+                LogDebug($"Reddit > Scroll | {where} {comment}");
+
+                Scroll(query, cache, after);
             }
         }
 
-        private List<PostData> GetOnlyImagePosts(ICollection<Post> posts)
+        /// Gets posts by query and adds them to cache.
+        /// Or doesn't if nothing's found.
+        private void Scroll
+        (
+            RedditQuery query, RedditQueryCache cache,
+            string? after = null, int patience = 3
+        )
         {
-            var pinned = Math.Max(0, posts.Count - POST_LIMIT);
-            return posts
-                .Skip(pinned)
-                .OfType<LinkPost>()
-                .Where(post => _rgx_img.IsMatch(post.URL))
-                .Select(post => new PostData(post))
-                .ToList();
+            for (var i = 0; i < patience; i++)
+            {
+                if (ScrollOnce(query, cache, after)) return;
+            }
         }
+
+        /// Returns true if image posts OR last posts were reached.
+        private bool ScrollOnce
+            (RedditQuery query, RedditQueryCache cache, string? after = null)
+        {
+            var allPosts = GetPosts(query, after);
+
+            cache.EndOfQueryResults = allPosts.Count < POST_LIMIT;
+
+            var imagePosts = TakeOnlyImagePosts(allPosts);
+            foreach (var post in imagePosts) cache.ImagePosts.Enqueue(post);
+
+            LogDebug($"Reddit > Scroll | Posts (img/all): {imagePosts.Count}/{allPosts.Count}");
+
+            var success = imagePosts.Count >  0;
+            var useless =   allPosts.Count == 0 || cache.EndOfQueryResults;
+
+            return success || useless;
+        }
+
+        private readonly Regex
+            _r_imagePost = new(@"\.(png|jpg|jpeg|gif)$|(reddit\.com\/gallery\/)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        private List<PostData> TakeOnlyImagePosts
+            (ICollection<Post> posts) => posts
+            .Skip(Math.Max(0, posts.Count - POST_LIMIT)) // skip pinned posts
+            .OfType<LinkPost>()                          // skip text posts
+            .Where (post => _r_imagePost.IsMatch(post.URL))
+            .Select(post => new PostData(post)).ToList();
 
         #endregion
 
@@ -199,32 +211,32 @@ namespace PF_Bot.Core.Internet.Reddit
 
         public Task<List<string>> GetComments(RedditQuery query, int count = POST_LIMIT) => Task.Run(() =>
         {
-            var texts = new List<string>(count);
-            string? after = null;
+            var texts = new List<string>();
+            var after = (string?)null;
             for (var i = 0; i < count; i += POST_LIMIT)
             {
-                after = ScrollForComments(query, texts, after);
+                var posts = GetPosts(query, after);
+
+                foreach (var post    in posts)
+                foreach (var comment in post.Comments.GetTop())
+                {
+                    CollectCommentThread(comment, texts);
+                }
+
+                after = posts[^1].Fullname;
             }
 
             return texts;
         });
 
-        private string ScrollForComments(RedditQuery query, List<string> list, string? after)
+        private void CollectCommentThread(Comment comment, List<string> texts)
         {
-            var posts = query.GetPosts(after);
-            foreach (var post    in posts)
-            foreach (var comment in post.Comments.GetTop())
-            {
-                GetCommentTexts(comment, list);
-            }
-            return posts[^1].Fullname;
-        }
+            if (comment.Body != null) texts.Add(comment.Body);
 
-        /// Collects text from the comment and all its replies.
-        private void GetCommentTexts(Comment comment, List<string> list)
-        {
-            if (comment.Body is not null) list.Add(comment.Body);
-            foreach (var reply in comment.Replies) GetCommentTexts(reply, list);
+            foreach (var reply in comment.Replies)
+            {
+                CollectCommentThread(reply, texts);
+            }
         }
 
         #endregion
@@ -232,47 +244,53 @@ namespace PF_Bot.Core.Internet.Reddit
 
         #region GETTING POSTS
 
-        public List<Post> GetPosts(ScrollQuery query, string? after = null)
+        private List<Post> GetPosts(RedditQuery query, string? after = null)
+            =>    query is ScrollQuery scroll ?    GetPosts(scroll, after)
+                : query is SearchQuery search ? SearchPosts(search, after)
+                : throw new ArgumentException("Bro added a new reddit query...");
+
+        private List<Post> GetPosts(ScrollQuery query, string? after = null)
         {
-             
             var sub = client.Subreddit(query.Subreddit).Posts;
             return query.Sort switch
             {
-                SortingMode.Hot           => sub.GetHot          (after: after, limit: POST_LIMIT),
-                SortingMode.New           => sub.GetNew          (after: after, limit: POST_LIMIT),
-                SortingMode.Top           => sub.GetTop          (after: after, limit: POST_LIMIT, t: query.Time),
-                SortingMode.Rising        => sub.GetRising       (after: after, limit: POST_LIMIT),
-                SortingMode.Controversial => sub.GetControversial(after: after, limit: POST_LIMIT, t: query.Time)
+                Reddit_ScrollSort.Hot           => sub.GetHot          (after: after, limit: POST_LIMIT),
+                Reddit_ScrollSort.New           => sub.GetNew          (after: after, limit: POST_LIMIT),
+                Reddit_ScrollSort.Top           => sub.GetTop          (after: after, limit: POST_LIMIT, t: query.Time.ToLower()),
+                Reddit_ScrollSort.Rising        => sub.GetRising       (after: after, limit: POST_LIMIT),
+                Reddit_ScrollSort.Controversial => sub.GetControversial(after: after, limit: POST_LIMIT, t: query.Time.ToLower()),
             };
         }
 
-        public List<Post> SearchPosts(SearchQuery s, string? after = null)
+        private List<Post> SearchPosts(SearchQuery s, string? after = null)
         {
-            if (s.Subreddit is null)
-                return client.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
-
-            var subreddit = client.Subreddit(s.Subreddit);
-            return  subreddit.Search(s.Q, sort: s.Sort, t: s.Time, after: after, limit: POST_LIMIT);
+            return s.Subreddit == null
+                ? client
+                    .Search(s.Text, sort: s.Sort.ToLower(), t: s.Time.ToLower(), after: after, limit: POST_LIMIT)
+                : client
+                    .Subreddit(s.Subreddit)
+                    .Search(s.Text, sort: s.Sort.ToLower(), t: s.Time.ToLower(), after: after, limit: POST_LIMIT);
         }
 
         #endregion
 
 
+        // DEBUG INFO
+
         public int QueriesCached => Cache.Count;
-        public int   PostsCached => Cache.Values.Sum(c => c.Posts.Count);
+        public int   PostsCached => Cache.Values.Sum(c => c.ImagePosts.Count);
 
-        public string DebugCache()
-        {
-            var rows = Cache
-                .OrderByDescending(x => x.Value.Posts.Count)
-                .Select(x => $"{x.Value.Posts.Count} - <code>{x.Key}</code>");
+        public IEnumerable<(int Count, RedditQuery Query)> DebugCache
+            () => Cache
+            .OrderByDescending(x => x.Value.ImagePosts.Count)
+            .Select(x => (x.Value.ImagePosts.Count, x.Key));
 
-            return string.Join('\n', rows);
-        }
+        // FIND SUBREDDITS
 
-        public List<Subreddit> FindSubreddits(string search)
-        {
-            return client.SearchSubreddits(search).Where(s => s.Subscribers > 0).ToList();
-        }
+        public List<Subreddit> FindSubreddits
+            (string search) => client
+            .SearchSubreddits(search)
+            .Where(s => s.Subscribers > 0)
+            .ToList();
     }
 }

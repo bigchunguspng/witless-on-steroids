@@ -34,7 +34,7 @@ public static class ProcessStarter
         (string file, string arguments, string directory = "") =>
         StartProcess_WithOutputHandler(file, arguments, directory, Output_SaveAndPrint);
 
-    private static StartedProcess StartProcess_WithOutputHandler
+    public static StartedProcess StartProcess_WithOutputHandler
         (string file, string arguments, string directory, ProcessOutputHandler handler)
     {
 #if DEBUG
@@ -56,7 +56,7 @@ public static class ProcessStarter
 
     // OUTPUT HANDLERS
 
-    private delegate void ProcessOutputHandler(string? data, StringBuilder output);
+    public delegate void ProcessOutputHandler(string? data, StringBuilder output);
 
     private static void Output_Save
         (string? data, StringBuilder output)

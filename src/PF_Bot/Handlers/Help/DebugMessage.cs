@@ -126,10 +126,12 @@ public class DebugMessage : SyncCommand
     {
         if (App.LoggedIntoReddit == false) return "😎 Not initialized 👌";
 
-        var p = RedditTool.Instance.PostsCached;
-        var q = RedditTool.Instance.QueriesCached;
-        var c = RedditTool.Instance.DebugCache();
-        return $"🛒 <u>REDDIT CACHE</u>: {p} POSTS, {q} QUERIES\n<blockquote expandable>{c}</blockquote>";
+        var posts   = RedditTool.Instance.PostsCached;
+        var queries = RedditTool.Instance.QueriesCached;
+        var cache   = RedditTool.Instance.DebugCache();
+
+        var list = string.Join('\n', cache.Select(x => $"{x.Count} - <code>{x.Query}</code>"));
+        return $"🛒 <u>REDDIT CACHE</u>: {posts} POSTS, {queries} QUERIES\n<blockquote expandable>{list}</blockquote>";
     }
 
     private string GetEmojiInfo()

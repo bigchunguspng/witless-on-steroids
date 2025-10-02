@@ -31,6 +31,11 @@ public static class Extensions_Generic
         foreach (var element in source) action(element);
     }
 
+    public static string? ToLower<T>(this T obj)
+    {
+        return obj?.ToString()?.ToLower();
+    }
+
     public static T GetRandomMemeber<T>() where T : struct, Enum
     {
         var values = Enum.GetValues<T>();

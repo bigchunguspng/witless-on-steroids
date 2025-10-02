@@ -140,14 +140,17 @@ public static class Extensions_String
     public static bool IsMatchOrNull(this Regex regex, string? text) => text != null && regex.IsMatch(text);
 
     public static string? GroupOrNull
-        (this Match match, int group) => match.Groups[group].Success ? match.Groups[group].Value : null;
+        (this Match match, int group)
+    {
+        var g = match.Groups[group];
+        return g.HasValue() ? g.Value : null;
+    }
 
     [return: NotNullIfNotNull(nameof(fallback))]
     public static T? ExtractGroup<T>
         (this Regex regex, int group, string input, Func<string, T> convert, T? fallback = default)
     {
-        var match = regex.Match(input);
-        return match.Success ? convert(match.Groups[group].Value) : fallback;
+        return ExtractGroup(regex.Match(input), group, convert, fallback);
     }
 
     [return: NotNullIfNotNull(nameof(fallback))]
@@ -155,6 +158,11 @@ public static class Extensions_String
         (this Match match, int group, Func<string, T> convert, T? fallback = default)
     {
         var g = match.Groups[group];
-        return g.Success ? convert(g.Value) : fallback;
+        return g.HasValue() ? convert(g.Value) : fallback;
     }
+
+    public static bool HasValue
+        (this Group group)
+        => group.Success
+        && group.Value.IsNotNull_NorEmpty();
 }

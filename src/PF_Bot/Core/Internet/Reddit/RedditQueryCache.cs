@@ -1,18 +1,17 @@
 namespace PF_Bot.Core.Internet.Reddit;
 
-#pragma warning disable CS8524
 /// Used to store upcoming posts for a single <see cref="RedditQuery"/>.
 public class RedditQueryCache
 {
-    /// DateTime by which the cache is relevant.
-    public DateTime RefreshDate;
+    public readonly Queue<PostData> ImagePosts = new(RedditTool.POST_LIMIT);
 
-    /// True if posts in queue AIN'T the last ones for the query.
-    public bool HasEnoughPosts;
+    /// Whether posts in <see cref="ImagePosts"/> are the last ones for the query.
+    public bool EndOfQueryResults;
 
-    public readonly Queue<PostData> Posts = new(RedditTool.POST_LIMIT);
+    public bool IsOutdated => _bestBy < DateTime.Now;
 
-    public RedditQueryCache() => UpdateRefreshDate();
+    private DateTime                   _bestBy = GetDate_2H_Later();
+    public  void DelayRefreshDate() => _bestBy = GetDate_2H_Later();
 
-    public void UpdateRefreshDate() => RefreshDate = DateTime.Now + TimeSpan.FromHours(2);
+    private static DateTime GetDate_2H_Later() => DateTime.Now + TimeSpan.FromHours(2);
 }

@@ -12,7 +12,6 @@ using PF_Tools.Reddit;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 
-#pragma warning disable CS8509
 #pragma warning disable SYSLIB0014
 
 namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
@@ -53,7 +52,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         private async Task Scroll()
         {
-            LogDebug("Reddit > LAST QUERY");
+            RedditApp.Log("LAST QUERY");
             await SendPost(Reddit.GetLastOrRandomQuery(Chat));
         }
 
@@ -61,7 +60,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         {
             if (Args != null)
             {
-                LogDebug("Reddit > FIND SUBS");
+                RedditApp.Log("FIND SUBS");
                 await SendSubredditList(Args);
             }
             else
@@ -75,7 +74,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         {
             if (RedditHelpers.ParseArgs_ScrollQuery(Args) is { } query)
             {
-                LogDebug("Reddit > SUBREDDIT");
+                RedditApp.Log("SUBREDDIT");
                 await SendPost(query);
             }
             else
@@ -89,12 +88,12 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         {
             if (RedditHelpers.ParseArgs_SearchQuery(Args) is { } query)
             {
-                LogDebug("Reddit > SEARCH");
+                RedditApp.Log("SEARCH");
                 await SendPost(query);
             }
             else
             {
-                LogDebug("Reddit > DEFAULT (RANDOM)");
+                RedditApp.Log("DEFAULT (RANDOM)");
                 await SendPost(Reddit.RandomSubredditQuery);
             }
         }
@@ -153,8 +152,8 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         private async Task SendGalleryPost(RedditPost post)
         {
-            LogDebug($"Reddit > GALLERY | {post.URL}");
-            var urls = await Run_GalleryDl($"{post.URL} -g");
+            RedditApp.Log($"GALLERY | {post.URL}");
+            var urls = await GalleryDl.Run($"{post.URL} -g");
 
             var origin = Origin;
             for (var i = 0; i < 5; i++)
@@ -180,37 +179,6 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private static async Task<List<Uri>> Run_GalleryDl
-            (string arguments, string directory = "")
-        {
-            var urls = new List<Uri>();
-            var startedProcess =
-                ProcessStarter.StartProcess_WithOutputHandler
-                    (GALLERY_DL, arguments, directory, Output_Handler);
-
-            await startedProcess.Process.WaitForExitAsync();
-
-            var result = new ProcessResult(arguments, startedProcess);
-            if (result.Failure) 
-                throw new ProcessException(GALLERY_DL, result);
-
-            return urls;
-
-            void Output_Handler(string? data, StringBuilder output)
-            {
-                output.Append(data).Append('\n');
-
-                if (data.IsNull_OrWhiteSpace()) return;
-
-                Print(data);
-
-                if (Uri.TryCreate(data, UriKind.Absolute, out var url))
-                {
-                    urls.Add(url);
-                }
-            }
-        }
-
         private async Task SendSingleFilePost(RedditPost post)
         {
             var gif = post.URL.EndsWith(".gif");
@@ -221,26 +189,13 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
             catch
             {
-                var input = DownloadMeme(post, gif ? ".gif" : ".png");
+                var input  =       DownloadMeme(post,  gif ? ".gif" : ".png");
+                var output = await CompressMeme(input, gif);
 
-                var (output, probe, options) = await input.InitEditing("small", gif ? ".mp4" : ".jpg");
+                var filename = gif
+                    ? $"r-{post.Subreddit}.mp4"
+                    : null;
 
-                options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
-
-                if (gif)
-                {
-                    options
-                        .Options("-an")
-                        .FixVideo_Playback()
-                        .SetCRF(30);
-                }
-                else
-                    options
-                        .Options("-qscale:v 5");
-
-                await FFMpeg.Command(input, output, options).FFMpeg_Run();
-
-                var filename = gif ? $"r-{post.Subreddit}.mp4" : null;
                 await using var stream = File.OpenRead(output);
                 await SendPicOrAnimation(InputFile.FromStream(stream, filename));
             }
@@ -265,6 +220,25 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             web.DownloadFile(post.URL, name);
 
             return name;
+        }
+
+        private static async Task<FilePath> CompressMeme(FilePath input, bool gif)
+        {
+            var (output, probe, options) = await input.InitEditing("small", gif ? ".mp4" : ".jpg");
+
+            options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
+
+            _ = gif
+                ? options
+                    .Options("-an")
+                    .FixVideo_Playback()
+                    .SetCRF(30)
+                : options
+                    .Options("-qscale:v 5");
+
+            await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+            return output;
         }
 
         #endregion

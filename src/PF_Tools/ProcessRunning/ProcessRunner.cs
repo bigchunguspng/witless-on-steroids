@@ -5,9 +5,8 @@ public static class ProcessRunner
     public static async Task<ProcessResult> Run
         (string file, string arguments, string directory = "")
     {
-        var startedProcess =
-            ProcessStarter.StartProcess
-                (file, arguments, directory);
+        var startedProcess = ProcessStarter.StartProcess
+            (file, arguments, directory);
         await startedProcess.Process.WaitForExitAsync();
         return new ProcessResult(arguments, startedProcess);
     }
@@ -15,9 +14,8 @@ public static class ProcessRunner
     public static async Task<ProcessResult> Run_WithEcho
         (string file, string arguments, string directory = "")
     {
-        var startedProcess =
-            ProcessStarter.StartProcess_WithEcho
-                (file, arguments, directory);
+        var startedProcess = ProcessStarter.StartProcess_WithEcho
+            (file, arguments, directory);
         await startedProcess.Process.WaitForExitAsync();
         return new ProcessResult(arguments, startedProcess);
     }

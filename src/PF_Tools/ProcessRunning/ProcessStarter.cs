@@ -58,13 +58,13 @@ public static class ProcessStarter
 
     public delegate void ProcessOutputHandler(string? data, StringBuilder output);
 
-    private static void Output_Save
+    public static void Output_Save
         (string? data, StringBuilder output)
     {
         output.Append(data).Append('\n');
     }
 
-    private static void Output_SaveAndPrint
+    public static void Output_SaveAndPrint
         (string? data, StringBuilder output)
     {
         output.Append(data).Append('\n');

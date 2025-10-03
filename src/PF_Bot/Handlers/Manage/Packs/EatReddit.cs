@@ -22,10 +22,10 @@ namespace PF_Bot.Handlers.Manage.Packs
 
         private async Task EatComments(RedditQuery query)
         {
-            LogDebug("Reddit > EAT COMMENTS");
+            RedditApp.Log("GET COMMENTS");
             var sw = Stopwatch.StartNew();
             var comments = await App.Reddit.GetComments(query);
-            Log($"Reddit > COMMENTS FETCHED >> {sw.ElapsedReadable()}");
+            RedditApp.Log($"GET COMMENTS >> {sw.ElapsedReadable()}");
 
             await Baka_Eat_Report(comments, GetFileSavePath(query), report => GetDetails(report, query));
         }

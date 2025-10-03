@@ -8,8 +8,8 @@ namespace PF_Bot.Core.Internet.Reddit;
 
 public class RedditApp
 {
-    public  const int KEEP_POSTS = 50;
-    private const int POST_LIMIT = 32, EXCLUDED_CAPACITY = 256;
+    public  const int KEEP_POSTS = 256;
+    private const int POST_LIMIT =  32, EXCLUDED_CAPACITY = 256;
 
     private readonly RedditTool _client = new
     (
@@ -21,6 +21,8 @@ public class RedditApp
         ),
         POST_LIMIT
     );
+
+    public static void Log(string text) => LogDebug($"Reddit > {text}");
 
     // OTHER WRAPPERS
 
@@ -110,8 +112,7 @@ public class RedditApp
             var relevant = cache.EndOfQueryResults || PostIsNotExcluded(post);
             if (relevant)
             {
-                // todo Reddit.Log()
-                LogDebug($"Reddit > POST {post.Fullname} | Query cache: {cache.ImagePosts.Count,2} posts");
+                Log($"POST {post.Fullname} | Query cache: {cache.ImagePosts.Count,2} posts");
                 return post;
             }
         }
@@ -145,7 +146,7 @@ public class RedditApp
         void Scroll_Logged(string comment, string? after = null)
         {
             var where = after == null ? "start," : "after";
-            LogDebug($"Reddit > Scroll | {where} {comment}");
+            Log($"Scroll | {where} {comment}");
 
             Scroll(query, cache, after);
         }
@@ -176,7 +177,7 @@ public class RedditApp
         var imagePosts = TakeOnlyImagePosts(allPosts);
         foreach (var post in imagePosts) cache.ImagePosts.Enqueue(post);
 
-        LogDebug($"Reddit > Scroll | Posts (img/all): {imagePosts.Count}/{allPosts.Count}");
+        Log($"Scroll | Posts (img/all): {imagePosts.Count}/{allPosts.Count}");
 
         var success = imagePosts.Count >  0;
         var useless =   allPosts.Count == 0 || cache.EndOfQueryResults;

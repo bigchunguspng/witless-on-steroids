@@ -1,34 +1,30 @@
+using PF_Bot.Core;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Handlers.Media.Reddit;
 
-public class GetRedditLink : AsyncCommand
+public class GetRedditLink : SyncCommand
 {
-    protected override async Task Run()
+    protected override void Run()
     {
         var message = Message.ReplyToMessage;
         if (message != null)
         {
-            await TrySendLink(message.GetTextOrCaption());
+            var key = message.MediaGroupId ?? message.Format_ChatMessage();
+            var post = App.Reddit.LastPosts_TryGet(key);
+            if (post != null)
+            {
+                Bot.SendMessage(Origin, FormatPost(post));
+                Log($"{Title} >> LINK TO r/{post.Subreddit}");
+            }
+            else
+                Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
         }
         else
-            Bot.SendMessage(Origin, string.Format(LINK_MANUAL, RedditTool.KEEP_POSTS));
+            Bot.SendMessage(Origin, string.Format(LINK_MANUAL, RedditApp.KEEP_POSTS));
     }
 
-    private async Task TrySendLink(string? text)
-    {
-        if (text != null && await CanRecognize(text) is { } post)
-        {
-            Bot.SendMessage(Origin, $"<b><a href='https://www.reddit.com{post.Permalink}'>r/{post.Subreddit}</a></b>");
-            Log($"{Title} >> LINK TO r/{post.Subreddit}");
-        }
-        else
-            Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
-    }
-
-    private Task<PostData?> CanRecognize(string text)
-    {
-        return RedditTool.Queue.Enqueue(() => RedditTool.Instance.Recognize(text));
-    }
+    private static string FormatPost(RedditPost p)
+        => $"<b><a href='https://www.reddit.com{p.Permalink}'>r/{p.Subreddit}</a></b>";
 }

@@ -21,4 +21,10 @@
         <PackageReference Include="Spectre.Console" Version="0.49.1"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="Reddit.NET">
+            <HintPath>$(SolutionDir)/lib/Reddit.NET.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

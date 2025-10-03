@@ -11,13 +11,17 @@ namespace PF_Bot.Core;
 
 public static class App
 {
-    public  static Bot  Bot              = null!;
-    public  static bool LoggedIntoReddit = false;
+    public  static Bot Bot = null!;
 
-    private static readonly Lazy<BoardService> _chan4 = new();
-    public  static               BoardService   Chan4 => _chan4.Value;
-    private static readonly Lazy<PlankService> _chan2 = new();
-    public  static               PlankService   Chan2 => _chan2.Value;
+    private static readonly Lazy   <RedditApp>          Reddit_Lazy = new();
+    public  static                  RedditApp Reddit => Reddit_Lazy.Value;
+
+    private static readonly Lazy<BoardService>         Chan4_Lazy = new();
+    public  static               BoardService Chan4 => Chan4_Lazy.Value;
+    private static readonly Lazy<PlankService>         Chan2_Lazy = new();
+    public  static               PlankService Chan2 => Chan2_Lazy.Value;
+
+    public static bool LoggedIntoReddit => Reddit_Lazy.IsValueCreated;
 
     public static async Task Run(string? args)
     {
@@ -54,6 +58,6 @@ public static class App
         Telemetry.Write();
 
         PackManager.Bakas_SaveDirty();
-        if (LoggedIntoReddit) RedditTool.Instance.SaveExcluded();
+        if (LoggedIntoReddit) Reddit.SaveExcluded();
     }
 }

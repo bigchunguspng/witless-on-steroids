@@ -1,12 +1,14 @@
 ﻿using System.Net;
 using System.Text;
 using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core;
 using PF_Bot.Core.Editing;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
 using PF_Bot.Routing.Commands;
 using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
+using PF_Tools.Reddit;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
 
@@ -20,7 +22,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         private static readonly Regex
             _rgx_wtf = new(@"^\/w[^s_@]", RegexOptions.Compiled);
 
-        private static readonly RedditTool Reddit = RedditTool.Instance;
+        private static readonly RedditApp Reddit = App.Reddit;
 
         // input: /w {reply message}
         // input: /ww
@@ -52,7 +54,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         private async Task Scroll()
         {
             LogDebug("Reddit > LAST QUERY");
-            await RedditTool.Queue.Enqueue(() => SendPost(Reddit.GetLastOrRandomQuery(Chat)));
+            await SendPost(Reddit.GetLastOrRandomQuery(Chat));
         }
 
         private async Task LookForSubreddits()
@@ -60,7 +62,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             if (Args != null)
             {
                 LogDebug("Reddit > FIND SUBS");
-                await RedditTool.Queue.Enqueue(() => SendSubredditList(Args));
+                await SendSubredditList(Args);
             }
             else
             {
@@ -74,7 +76,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             if (RedditHelpers.ParseArgs_ScrollQuery(Args) is { } query)
             {
                 LogDebug("Reddit > SUBREDDIT");
-                await RedditTool.Queue.Enqueue(() => SendPost(query));
+                await SendPost(query);
             }
             else
             {
@@ -88,12 +90,12 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             if (RedditHelpers.ParseArgs_SearchQuery(Args) is { } query)
             {
                 LogDebug("Reddit > SEARCH");
-                await RedditTool.Queue.Enqueue(() => SendPost(query));
+                await SendPost(query);
             }
             else
             {
                 LogDebug("Reddit > DEFAULT (RANDOM)");
-                await RedditTool.Queue.Enqueue(() => SendPost(Reddit.RandomSubredditQuery));
+                await SendPost(Reddit.RandomSubredditQuery);
             }
         }
 
@@ -101,24 +103,26 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         private async Task SendPost(RedditQuery query)
         {
-            var post = GetPostOrBust(query);
+            var post = await GetPostOrBust(query);
             if (post == null) return;
 
-            var task = post.URL.Contains("/gallery/")
+            var sendPost = post.URL.Contains("/gallery/")
                 ? SendGalleryPost   (post)
                 : SendSingleFilePost(post);
-            await task;
+
+            await sendPost;
+            Reddit.Exclude(post);
 
             if (PackManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
 
             Log($"{Title} >> r/{post.Subreddit} <- {query}");
         }
 
-        private PostData? GetPostOrBust(RedditQuery query)
+        private async Task<RedditPost?> GetPostOrBust(RedditQuery query)
         {
             try
             {
-                return Reddit.PullPost(query, Chat);
+                return await Reddit.PullPost(query, Chat);
             }
             catch
             {
@@ -147,7 +151,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private async Task SendGalleryPost(PostData post)
+        private async Task SendGalleryPost(RedditPost post)
         {
             LogDebug($"Reddit > GALLERY | {post.URL}");
             var urls = await Run_GalleryDl($"{post.URL} -g");
@@ -165,7 +169,13 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
                 if (i == 0) album[0].Caption = post.Title;
 
                 var messages = Bot.SendAlbum(origin, album);
-                if (messages?.Length > 0)    origin = (Chat, messages[0].Id);
+                if (messages?.Length > 0)
+                {
+                    var message = messages[0];
+                    origin = (Chat, message.Id);
+
+                    Reddit.LastPosts_Remember(message.MediaGroupId!, post);
+                }
                 else break;
             }
         }
@@ -201,13 +211,13 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
             }
         }
 
-        private async Task SendSingleFilePost(PostData post)
+        private async Task SendSingleFilePost(RedditPost post)
         {
             var gif = post.URL.EndsWith(".gif");
             try
             {
                 // todo fix bug: some gifs are sent as "fgsfds.gif.jpg" image document for no reason
-                SendPicOrAnimation(InputFile.FromUri(post.URL));
+                await SendPicOrAnimation(InputFile.FromUri(post.URL));
             }
             catch
             {
@@ -230,20 +240,22 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
                 await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
+                var filename = gif ? $"r-{post.Subreddit}.mp4" : null;
                 await using var stream = File.OpenRead(output);
-                SendPicOrAnimation(InputFile.FromStream(stream, $"r-{post.Subreddit}.mp4"));
+                await SendPicOrAnimation(InputFile.FromStream(stream, filename));
             }
 
-            return;
-
-            void SendPicOrAnimation(InputFile file)
+            async Task SendPicOrAnimation(InputFile file)
             {
-                if (gif) Bot.SendAnimaXD(Origin, file, post.Title);
-                else     Bot.SendPhotoXD(Origin, file, post.Title);
+                var message = gif
+                    ? await Bot.SendAnima_OrThrow(Origin, file, post.Title)
+                    : await Bot.SendPhoto_OrThrow(Origin, file, post.Title);
+
+                Reddit.LastPosts_Remember(message.Format_ChatMessage(), post);
             }
         }
 
-        private static FilePath DownloadMeme(PostData post, string extension)
+        private static FilePath DownloadMeme(RedditPost post, string extension)
         {
             var name = Dir_RedditMemes
                 .EnsureDirectoryExist()
@@ -259,9 +271,9 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         #region LOOKING FOR SUBREDDITS
 
-        private void SendSubredditList(string query)
+        private async Task SendSubredditList(string query)
         {
-            var subs = Reddit.FindSubreddits(query);
+            var subs = await Reddit.FindSubreddits(query);
             var text = subs.Count > 0 
                 ? GetSubredditList(query, subs) 
                 : "<b>*пусто*</b>";

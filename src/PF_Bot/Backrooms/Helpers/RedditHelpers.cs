@@ -1,4 +1,4 @@
-using PF_Bot.Core.Internet.Reddit;
+using PF_Tools.Reddit;
 
 namespace PF_Bot.Backrooms.Helpers;
 

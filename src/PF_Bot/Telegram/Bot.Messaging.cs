@@ -156,17 +156,11 @@ namespace PF_Bot.Telegram
             return result;
         }
 
-        public void SendPhotoXD(MessageOrigin og, InputFile photo, string caption)
-            => SendOrThrow(Client.SendPhoto    (og.Chat, photo, caption, replyParameters: og.Thread));
+        public async Task<Message> SendPhoto_OrThrow(MessageOrigin og, InputFile photo, string caption)
+            => await Client.SendPhoto    (og.Chat, photo, caption, replyParameters: og.Thread);
 
-        public void SendAnimaXD(MessageOrigin og, InputFile anima, string caption)
-            => SendOrThrow(Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread));
-
-        private static void SendOrThrow(Task task)
-        {
-            task.Wait();
-            if (task.IsFaulted) throw new Exception();
-        }
+        public async Task<Message> SendAnima_OrThrow(MessageOrigin og, InputFile anima, string caption)
+            => await Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread);
 
         public async Task RunOrThrow(Task task, long chat, int message)
         {

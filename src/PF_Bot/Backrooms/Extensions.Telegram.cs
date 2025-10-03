@@ -26,15 +26,14 @@ public static partial class Extensions
         }
     }
 
-    public static bool IsForwarded(this Message message)
-    {
-        return message.ForwardFromChat == null;
-    }
+    public static string Format_ChatMessage
+        (this Message message) => $"{message.Chat.Id}-{message.Id}";
 
-    public static string? GetTextOrCaption(this Message message)
-    {
-        return message.Caption ?? message.Text;
-    }
+    public static bool IsForwarded
+        (this Message message) => message.ForwardFromChat == null;
+
+    public static string? GetTextOrCaption
+        (this Message message) => message.Caption ?? message.Text;
 
     public static string GetChatTitle(this Message message)
     {

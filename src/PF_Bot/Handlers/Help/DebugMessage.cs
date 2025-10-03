@@ -1,11 +1,9 @@
 ﻿using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core;
 using PF_Bot.Core.Chats;
-using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
 using PF_Bot.Handlers.Media.MediaDB;
 using PF_Bot.Routing.Commands;
@@ -124,11 +122,11 @@ public class DebugMessage : SyncCommand
 
     private static string GetRedditInfo()
     {
-        if (App.LoggedIntoReddit == false) return "😎 Not initialized 👌";
+        if (App.LoggedIntoReddit.Janai()) return "😎 Not initialized 👌";
 
-        var posts   = RedditTool.Instance.PostsCached;
-        var queries = RedditTool.Instance.QueriesCached;
-        var cache   = RedditTool.Instance.DebugCache();
+        var posts   = App.Reddit.PostsCached;
+        var queries = App.Reddit.QueriesCached;
+        var cache   = App.Reddit.DebugCache();
 
         var list = string.Join('\n', cache.Select(x => $"{x.Count} - <code>{x.Query}</code>"));
         return $"🛒 <u>REDDIT CACHE</u>: {posts} POSTS, {queries} QUERIES\n<blockquote expandable>{list}</blockquote>";

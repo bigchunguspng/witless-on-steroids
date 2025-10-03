@@ -4,29 +4,21 @@ namespace PF_Tools.Backrooms.Types.Collections;
 
 /// Cache of a limited size.
 /// When it becomes full and a new item is added, it replaces the oldest one.
-public class LimitedCache<TKey, TValue> where TKey : notnull
+public class LimitedCache<TKey, TValue> (int limit)
+    where TKey : notnull
 {
-    private readonly int _limit;
-
-    private readonly Queue<TKey> _keys;
-    private readonly Dictionary<TKey, TValue> _paths;
-
-    public LimitedCache(int limit)
-    {
-        _limit = limit;
-        _keys = new Queue<TKey>(_limit);
-        _paths = new Dictionary<TKey, TValue>(_limit);
-    }
+    private readonly LimitedQueue<TKey>          _keys = new(limit);
+    private readonly Dictionary  <TKey, TValue> _paths = new(limit);
 
     public int Count => _keys.Count;
 
     public void Add(TKey id, TValue value)
     {
-        if (_keys.Count == _limit)
+        if (_keys.Enqueue(id) is { } key)
         {
-            var key = _keys.Dequeue();
             _paths.Remove(key);
         }
+
         _keys.Enqueue(id);
         _paths.TryAdd(id, value);
     }

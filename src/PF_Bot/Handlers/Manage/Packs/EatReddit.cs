@@ -1,6 +1,8 @@
 ﻿using PF_Bot.Backrooms.Helpers;
+using PF_Bot.Core;
 using PF_Bot.Core.Internet.Reddit;
 using PF_Bot.Core.Text;
+using PF_Tools.Reddit;
 
 namespace PF_Bot.Handlers.Manage.Packs
 {
@@ -22,7 +24,7 @@ namespace PF_Bot.Handlers.Manage.Packs
         {
             LogDebug("Reddit > EAT COMMENTS");
             var sw = Stopwatch.StartNew();
-            var comments = await RedditTool.Queue.Enqueue(() => RedditTool.Instance.GetComments(query));
+            var comments = await App.Reddit.GetComments(query);
             Log($"Reddit > COMMENTS FETCHED >> {sw.ElapsedReadable()}");
 
             await Baka_Eat_Report(comments, GetFileSavePath(query), report => GetDetails(report, query));

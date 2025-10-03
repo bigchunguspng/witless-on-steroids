@@ -52,7 +52,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         private async Task Scroll()
         {
-            RedditApp.Log("LAST QUERY");
+            RedditApp.Log("/ww -> LAST QUERY");
             await SendPost(Reddit.GetLastOrRandomQuery(Chat));
         }
 
@@ -60,7 +60,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         {
             if (Args != null)
             {
-                RedditApp.Log("FIND SUBS");
+                RedditApp.Log("/wss -> FIND SUBREDDITS");
                 await SendSubredditList(Args);
             }
             else
@@ -74,7 +74,7 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
         {
             if (RedditHelpers.ParseArgs_ScrollQuery(Args) is { } query)
             {
-                RedditApp.Log("SUBREDDIT");
+                RedditApp.Log("/ws -> SUBREDDIT");
                 await SendPost(query);
             }
             else
@@ -86,14 +86,14 @@ namespace PF_Bot.Handlers.Media.Reddit // ReSharper disable InconsistentNaming
 
         private async Task RedditSearch_OrOpenRandom()
         {
-            if (RedditHelpers.ParseArgs_SearchQuery(Args) is { } query)
+            if (RedditHelpers.ParseArgs_SearchOrScroll(Args) is { } query)
             {
-                RedditApp.Log("SEARCH");
+                RedditApp.Log(query is SearchQuery ? "/w -> SEARCH" : "/w -> SUBREDDIT");
                 await SendPost(query);
             }
             else
             {
-                RedditApp.Log("DEFAULT (RANDOM)");
+                RedditApp.Log("/w -> RANDOM SUBREDDIT");
                 await SendPost(Reddit.RandomSubredditQuery);
             }
         }

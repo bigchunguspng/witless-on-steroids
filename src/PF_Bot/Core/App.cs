@@ -1,7 +1,8 @@
 using System.Globalization;
-using PF_Bot.Core.Internet.Boards;
-using PF_Bot.Core.Internet.Reddit;
-using PF_Bot.Core.Text;
+using PF_Bot.Features_Aux.Packs.Core;
+using PF_Bot.Features_Main.Text.Core;
+using PF_Bot.Features_Web.Boards.Core;
+using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing;
 using PF_Bot.Telegram;
@@ -12,6 +13,8 @@ namespace PF_Bot.Core;
 public static class App
 {
     public  static Bot Bot = null!;
+
+    public  static readonly MessageQueue FunnyMessages = new();
 
     private static readonly Lazy   <RedditApp>          Reddit_Lazy = new();
     public  static                  RedditApp Reddit => Reddit_Lazy.Value;

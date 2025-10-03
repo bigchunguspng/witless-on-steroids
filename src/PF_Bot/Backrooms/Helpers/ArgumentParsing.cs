@@ -2,6 +2,7 @@
 
 namespace PF_Bot.Backrooms.Helpers;
 
+// todo make it extension class
 public static class ArgumentParsing
 {
     private static readonly char[] _separators = [' ', '\n'];

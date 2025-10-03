@@ -1,10 +1,11 @@
 ﻿using PF_Bot.Core;
-using PF_Bot.Core.Chats;
-using PF_Bot.Handlers.Help;
-using PF_Bot.Handlers.Manage.Packs;
-using PF_Bot.Handlers.Manage.Settings;
-using PF_Bot.Handlers.Memes;
-using PF_Bot.Handlers.Text;
+using PF_Bot.Features_Aux.Packs.Commands;
+using PF_Bot.Features_Aux.Settings.Commands;
+using PF_Bot.Features_Aux.Settings.Core;
+using PF_Bot.Features_Main.Memes.Commands;
+using PF_Bot.Features_Main.Text.Commands;
+using PF_Bot.Features_Web.Boards.Commands;
+using PF_Bot.Features_Web.Reddit.Commands;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
@@ -13,7 +14,7 @@ namespace PF_Bot.Routing;
 public class WitlessCommandRouter : WitlessSyncCommand
 {
     private readonly ChatInfo _chat = new();
-    private readonly Bouhourt _bouhourt = new();
+    private readonly Baguette _baguette = new();
     private readonly Move _move = new();
     private readonly Set _set = new();
     private readonly SetSpeech _speech = new();
@@ -57,7 +58,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("board"   , () => new EatBoards())
             .Register("plank"   , () => new EatPlanks())
             .Register("xd"      , () => new EatReddit())
-            .Register("b"       , () => _bouhourt)
+            .Register("b"       , () => _baguette)
             .Register("set"     , () => _set)
             .Register("speech"  , () => _speech)
             .Register("quality" , () => _quality)

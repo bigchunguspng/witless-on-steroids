@@ -1,9 +1,9 @@
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Handlers.Edit.Direct;
-using PF_Bot.Handlers.Help;
-using PF_Bot.Handlers.Manage.Packs;
-using PF_Bot.Handlers.Manage.Packs.Core;
-using PF_Bot.Handlers.Memes;
+using PF_Bot.Features_Aux.Help.Commands;
+using PF_Bot.Features_Aux.Packs.Commands;
+using PF_Bot.Features_Main.Edit.Commands.Manual;
+using PF_Bot.Features_Main.Memes.Commands;
+using PF_Bot.Features_Web.Boards.Commands;
 using PF_Bot.Routing;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
@@ -31,8 +31,8 @@ public class CallbackRouter_Default : ICallbackRouter
         _registry = new CommandRegistry<Func<CallbackHandler>>.Builder()
             .Register(Key_Manual, () => new Help_Callback())
             .Register(Key_Fuse,   () => new Fuse_Callback())
-            .Register(Key_AliasP, () => new AliasManager_Callback(AliasContext.FFMpeg))
-            .Register(Key_AliasI, () => new AliasManager_Callback(AliasContext.Magick))
+            .Register(Key_AliasP, () => new Alias_Callback(AliasContext.FFMpeg))
+            .Register(Key_AliasI, () => new Alias_Callback(AliasContext.Magick))
             .Register(Key_Boards, () => new ChanEaterCore_Callback(ImageBoardContext.Chan4))
             .Register(Key_Planks, () => new ChanEaterCore_Callback(ImageBoardContext.Chan2))
             .Register(Key_Nukes,  () => new Nuke_Callback())

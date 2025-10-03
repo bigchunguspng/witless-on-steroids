@@ -1,16 +1,18 @@
-﻿using PF_Bot.Core;
-using PF_Bot.Core.Chats;
-using PF_Bot.Handlers;
-using PF_Bot.Handlers.Admin;
-using PF_Bot.Handlers.Admin.Fun;
-using PF_Bot.Handlers.Edit.Convert;
-using PF_Bot.Handlers.Edit.Direct;
-using PF_Bot.Handlers.Edit.Filter;
-using PF_Bot.Handlers.Help;
-using PF_Bot.Handlers.Manage.Packs;
-using PF_Bot.Handlers.Media;
-using PF_Bot.Handlers.Media.MediaDB;
-using PF_Bot.Handlers.Media.Reddit;
+﻿using PF_Bot.Commands;
+using PF_Bot.Commands.Admin.Fun;
+using PF_Bot.Commands.Admin.System;
+using PF_Bot.Commands.Debug;
+using PF_Bot.Core;
+using PF_Bot.Features_Aux.Help.Commands;
+using PF_Bot.Features_Aux.Packs.Commands;
+using PF_Bot.Features_Aux.Settings.Core;
+using PF_Bot.Features_Main.Edit.Commands.Convert;
+using PF_Bot.Features_Main.Edit.Commands.Direct;
+using PF_Bot.Features_Main.Edit.Commands.Filter;
+using PF_Bot.Features_Main.Edit.Commands.Manual;
+using PF_Bot.Features_Main.Media.Commands;
+using PF_Bot.Features_Web.Piracy.Commands;
+using PF_Bot.Features_Web.Reddit.Commands;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Routing
@@ -26,8 +28,8 @@ namespace PF_Bot.Routing
         private readonly QueueMessage _que = new();
         private readonly SendMessage _mail = new();
         private readonly DebugMessage _debug = new();
-        private readonly AliasManager _apeg = new(AliasContext.FFMpeg);
-        private readonly AliasManager _aim  = new(AliasContext.Magick);
+        private readonly Alias _apeg = new(AliasContext.FFMpeg);
+        private readonly Alias _aim  = new(AliasContext.Magick);
         private readonly Htmlizer _html = new();
 
         private readonly WitlessCommandRouter _witlessRouter;
@@ -40,8 +42,8 @@ namespace PF_Bot.Routing
             _witlessRouter = new WitlessCommandRouter(this);
 
             _simpleCommands = new CommandRegistry<Func<AnyCommand<CommandContext>>>.Builder()
-                .Register("fast"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Fast))
-                .Register("slow"   , () => new ChangeSpeed().SetMode(ChangeSpeed.Mode.Slow))
+                .Register("fast"   , () => new Speed().SetMode(Speed.Mode.Fast))
+                .Register("slow"   , () => new Speed().SetMode(Speed.Mode.Slow))
                 .Register("crop"   , () => new Crop().UseDefaultMode())
                 .Register("shake"  , () => new Crop().UseShakeMode())
                 .Register("scale"  , () => new Scale())
@@ -49,15 +51,15 @@ namespace PF_Bot.Routing
                 .Register("cut"    , () => new Cut())
                 .Register("sus"    , () => new Sus())
                 .Register("song"   , () => new DownloadMusic())
-                .Register("damn"   , () => new RemoveBitrate())
+                .Register("damn"   , () => new Damn())
                 .Register("reverse", () => new Reverse())
                 .Register("eq"     , () => new Equalize())
-                .Register("vol"    , () => new ChangeVolume())
+                .Register("vol"    , () => new Volume())
                 .Register("g"      , () => new ToGIF())
                 .Register("sex"    , () => new ToSticker())
-                .Register("hex"    , () => new CorruptImage())
+                .Register("hex"    , () => new Hex())
                 .Register("note"   , () => new ToVideoNote())
-                .Register("vova"   , () => new ToVoiceMessage())
+                .Register("vova"   , () => new ToVoice())
                 .Register("load"   , () => new Load())
                 .Register("upload" , () => new UploadFile())
                 .Register("im"     , () => new UseMagick())

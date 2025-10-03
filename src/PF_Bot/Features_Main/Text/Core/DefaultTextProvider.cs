@@ -1,0 +1,14 @@
+﻿namespace PF_Bot.Features_Main.Text.Core;
+
+public static class DefaultTextProvider
+{
+    private static readonly List<string>? _defaultTexts =
+        JsonIO.LoadData<List<string>>(File_DefaultTexts);
+
+    public static string? GetRandomResponse()
+    {
+        if (_defaultTexts is null || _defaultTexts.Count == 0) return null;
+        var index = Random.Shared.Next(_defaultTexts.Count);
+        return _defaultTexts[index];
+    }
+}

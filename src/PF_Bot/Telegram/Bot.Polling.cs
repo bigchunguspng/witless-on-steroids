@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
+using PF_Bot.Commands.Debug;
 using PF_Bot.Core;
-using PF_Bot.Handlers.Help;
 using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Inline;

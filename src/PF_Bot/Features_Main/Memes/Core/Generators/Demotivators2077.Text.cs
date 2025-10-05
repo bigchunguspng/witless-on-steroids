@@ -6,12 +6,12 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators;
 
 public partial class Demotivators2077
 {
-    private static Font _font = null!;
-    private static FontFamily _fontFamily;
-    private static FontStyle  _fontStyle;
+    private Font _font = null!;
+    private FontFamily _fontFamily;
+    private FontStyle  _fontStyle;
 
-    private static float _minFontSize;
-    private static float FontSize => _font.Size;
+    private float _minFontSize;
+    private float FontSize => _font.Size;
 
     private void SetUpFonts()
     {

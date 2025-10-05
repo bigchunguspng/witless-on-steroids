@@ -7,8 +7,9 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators;
 
 public partial class IFunnyBrazil
 {
-    private static readonly SolidBrush _white = new(Color.White);
-    private static readonly SolidBrush _black = new(Color.Black);
+    private static readonly SolidBrush
+        _white = new(Color.White),
+        _black = new(Color.Black);
 
     private Rgba32     Background;
     private SolidBrush TextBrush = null!;

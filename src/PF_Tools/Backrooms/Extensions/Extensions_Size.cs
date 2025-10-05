@@ -15,7 +15,7 @@ public static class Extensions_Size
     }
 
     /// Makes sure image can go through a square hole with a side = <b>max</b>.
-    public static Size FitSize(this Size size, int max = 1280)
+    public static Size FitSize(this Size size, int max)
     {
         var tooBig = size.Width > max || size.Height > max;
         return tooBig ? size.Normalize(max) : size;
@@ -41,7 +41,7 @@ public static class Extensions_Size
             : new Size((int)(size.Width / (size.Height / lim)), limit);
     }*/
 
-    public static Size Normalize(this Size size, int limit = 512, bool reduce = true)
+    public static Size Normalize(this Size size, int limit, bool reduce = true)
     {
         double lim = limit;
         var wide = size.Width > size.Height;
@@ -50,7 +50,7 @@ public static class Extensions_Size
             : new Size((int)(size.Width / (size.Height / lim)), limit);
     }
 
-    public static Size EnureIsWideEnough(this Size size, int width = 240)
+    public static Size EnureIsWideEnough(this Size size, int width)
     {
         if (size.Width >= width) return size;
 
@@ -65,7 +65,4 @@ public static class Extensions_Size
     public static Size ValidMp4Size(this Size size) => new(size.Width.ToEven(), size.Height.ToEven());
 
     public static Size CeilingInt(this SizeF size) => new(size.Width.CeilingInt(), size.Height.CeilingInt());
-
-    public static System.Drawing.Size Ok(this Size size) => new(size.Width, size.Height);
-    public static Size Ok(this System.Drawing.Size size) => new(size.Width, size.Height);
 }

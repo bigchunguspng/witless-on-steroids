@@ -13,7 +13,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Convert
             var (output, probe, options) = await input.InitEditing("stick", ".webp");
 
             var video = probe.GetVideoStream();
-            var size = video.Size.Normalize();
+            var size = video.Size.Normalize(512);
 
             await FFMpeg.Command(input, output, options.Resize(size)).FFMpeg_Run();
 

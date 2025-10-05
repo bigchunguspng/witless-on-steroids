@@ -181,7 +181,7 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators // ReSharper disable Incons
         {
             background.Mutate(x => x.DrawImage(image, _imageOrigin));
 
-            var size = FitSize(background.Size, 1280);
+            var size  = background.Size.FitSize(1280);
             if (size != background.Size)
             {
                 background.Mutate(x => x.Resize(size));
@@ -190,8 +190,6 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators // ReSharper disable Incons
 
 
         // OTHER STUFF I GUESS
-
-        private static Size FitSize(Size size, int max = 720) => size.FitSize(max);
 
         private void SetColor(Image<Rgba32>? image)
         {

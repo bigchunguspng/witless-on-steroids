@@ -28,7 +28,7 @@ public abstract class MemeGeneratorBase
     {
         var size = request.ExportAsSticker
             ? _sourceSizeOG
-            : _sourceSizeOG.EnureIsWideEnough();
+            : _sourceSizeOG.EnureIsWideEnough(240);
         return size.FitSize(new Size(1280, 720));
     }
 

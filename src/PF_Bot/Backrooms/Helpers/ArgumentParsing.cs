@@ -1,6 +1,4 @@
-﻿using PF_Bot.Routing.Commands;
-
-namespace PF_Bot.Backrooms.Helpers;
+﻿namespace PF_Bot.Backrooms.Helpers;
 
 // todo make it extension class
 public static class ArgumentParsing
@@ -13,38 +11,31 @@ public static class ArgumentParsing
         return arguments is null ? [] : arguments.Split(_separators, count, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    public static bool HasArguments(this string text)
+    /// <seealso cref="SplitN"/>
+    public static bool CanBeSplitN(this string text)
     {
-        return text.Contains(' ') || text.Contains('\n');
+        return text.IndexOfAny(_separators) >= 0;
     }
 
-    public static bool HasLongArgument(this string text, out long value)
+    public static bool TryParseAsLong
+        (this string? text, out long value)
     {
         value = 0;
-        var words = text.Split();
-        return words.Length > 1 && long.TryParse(words[1], out value);
+        return text != null && long.TryParse(text, out value);
     }
 
-    public static bool HasIntArgument(this string text, out int value)
+    public static bool TryParseAsInt
+        (this string? text, out int value)
     {
         value = 0;
-        var words = text.Split();
-        return words.Length > 1 && int.TryParse(words[1], out value);
+        return text != null && int.TryParse(text, out value);
     }
 
-    public static bool HasIntArgument(this CommandContext c, out int value)
+    public static bool TryParseAsDouble
+        (this string? text, out double value)
     {
         value = 0;
-        if (c.Args is null) return false;
-
-        var arg = c.Args.SplitN(2)[0];
-        return int.TryParse(arg, out value);
-    }
-
-    public static bool HasDoubleArgument(this CommandContext c, out double value)
-    {
-        value = 0;
-        return c.Args != null && c.Args.SplitN(2)[0].TryParseF64_Invariant(out value);
+        return text != null && text.TryParseF64_Invariant(out value);
     }
 
     /// Tryies to parse string as <see cref="double"/>.

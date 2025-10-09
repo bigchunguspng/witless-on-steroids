@@ -4,7 +4,7 @@ using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Web.Reddit.Commands;
 
-public class GetRedditLink : SyncCommand
+public class GetRedditLink : CommandHandlerBlocking
 {
     protected override void Run()
     {
@@ -19,10 +19,13 @@ public class GetRedditLink : SyncCommand
                 Log($"{Title} >> LINK TO r/{post.Subreddit}");
             }
             else
+            {
+                Status = CommandResultStatus.BAD;
                 Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
+            }
         }
         else
-            Bot.SendMessage(Origin, string.Format(LINK_MANUAL, RedditApp.KEEP_POSTS));
+            SendManual(string.Format(LINK_MANUAL, RedditApp.KEEP_POSTS));
     }
 
     private static string FormatPost(RedditPost p)

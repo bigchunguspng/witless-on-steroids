@@ -1,14 +1,14 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Convert;
 
-public class ToVoice : AudioVideoCommand
+public class ToVoice : FileEditor_AudioVideo
 {
     protected override async Task Execute()
     {
-        var input = await DownloadFile();
+        var input = await GetFile();
 
         var output = File_DefaultVoiceMessage;
 
@@ -20,8 +20,7 @@ public class ToVoice : AudioVideoCommand
             await FFMpeg.Command(input, output, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
         }
 
-        await using var stream = System.IO.File.OpenRead(output);
-        Bot.SendVoice(Origin, InputFile.FromStream(stream, "balls.ogg"));
+        SendFile(output, MediaType.Voice, "balls.ogg");
         Log($"{Title} >> VOICE ~|||~");
     }
 }

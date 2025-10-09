@@ -1,11 +1,11 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Scale : VideoPhotoCommand
+    public class Scale : FileEditor_VideoPhoto
     {
         private readonly Regex
             _rgx_number = new(@"^\d+([\.,]\d+)?$",      RegexOptions.Compiled),
@@ -16,11 +16,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            if (Args is null)
-            {
-                Bot.SendMessage(Origin, SCALE_MANUAL);
-            }
-            else
+            if (Args != null)
             {
                 var args = Args.Split(' ').ToArray();
 
@@ -56,7 +52,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
                 var scaleArgs = string.Join(':', args);
 
-                var input = await DownloadFile();
+                var input = await GetFile();
                 var output = input.GetOutputFilePath("scale", Ext);
 
                 var options = FFMpeg.OutputOptions().VF($"scale='{scaleArgs}'");
@@ -68,6 +64,8 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
                 SendResult(output);
                 Log($"{Title} >> SCALE [{scaleArgs}]");
             }
+            else
+                SendManual(SCALE_MANUAL);
         }
 
         protected override string VideoFileName { get; } = "piece_fap_bot-scale.mp4";

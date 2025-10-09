@@ -18,4 +18,13 @@ public static class ChatSettingsFactory
         2 => MemeType.Dg,
         _ => MemeType.Dp,
     };
+
+    public static ChatSettings GetTemporary() => new()
+    {
+        Type     = GetRandomMemeType(),
+        Quality  = 45,
+        Speech   = 0,
+        Pics     = 0,
+        Stickers = false,
+    };
 }

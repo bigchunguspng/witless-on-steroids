@@ -1,13 +1,12 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 
-public class Hex : PhotoCommand
+public class Hex : FileEditor_Photo
 {
     //      /hex  N
     //      /hexg N
@@ -18,9 +17,9 @@ public class Hex : PhotoCommand
 
     protected override async Task Execute()
     {
-        var g = Context.Command!.Contains('g');
+        var g = Options.Contains('g');
 
-        var input = await DownloadFile();
+        var input = await GetFile();
         var jpeg = input.GetOutputFilePath("JPEG", ".jpg");
 
         await JpegImage(input, output: jpeg, g);
@@ -46,7 +45,7 @@ public class Hex : PhotoCommand
 
     private async Task HexVid()
     {
-        var corruptionCount = Context.HasIntArgument(out var x) 
+        var corruptionCount = Args.TryParseAsInt(out var x) 
             ? Math.Max(x, 0) 
             : (_jpegBytes.Length / 1500F).CeilingInt();
 
@@ -68,14 +67,13 @@ public class Hex : PhotoCommand
         var processResult = await ProcessRunner.Run(MAGICK, args);
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
 
-        await using var stream = System.IO.File.OpenRead(result);
-        Bot.SendAnimation(Origin, InputFile.FromStream(stream, "piece_fap_bot-hex.mp4"));
+        SendFile(result, MediaType.Anime, "piece_fap_bot-hex.mp4");
         Log($"{Title} >> HEX [#{corruptionCount}] VID");
     }
 
     private async Task HexPic()
     {
-        var corruptionCount = Context.HasIntArgument(out var x) 
+        var corruptionCount = Args.TryParseAsInt(out var x) 
             ? Math.Max(x, 0) 
             : (_jpegBytes.Length / 1500F).CeilingInt();
 
@@ -101,7 +99,7 @@ public class Hex : PhotoCommand
 
         for (var i = 0; i < end; i++)
         {
-            // find START OF SCAN marker FFDA
+            // find START_OF_SCAN marker (FFDA)
             if (bytes[i] == 0xFF && bytes[i + 1] == 0xDA)
             {
                 start = i + 2 + bytes[i + 3];
@@ -114,11 +112,12 @@ public class Hex : PhotoCommand
 
         for (var i = 0; i < corruptionCount; i++)
         {
-            // don't put END OF IMAGE marker FFD9 in the IMAGE DATA segment
-            if (glitches[i] is 0xFF or 0xD9) glitches[i] = 0x11;
+            var glitch = glitches[i];
+            if (glitch is 0xFF or 0xD9)
+                glitch =  0x11; // don't put END_OF_IMAGE marker (FFD9) in the IMAGE_DATA segment
 
             var offset = Random.Shared.Next(start, end);
-            bytes[offset] = glitches[i];
+            bytes[offset] = glitch;
         }
     }
 }

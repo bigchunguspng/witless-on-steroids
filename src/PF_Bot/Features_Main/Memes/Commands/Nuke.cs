@@ -3,7 +3,7 @@ using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Main.Memes.Core.Generators;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing.Callbacks;
 
 namespace PF_Bot.Features_Main.Memes.Commands
 {
@@ -26,9 +26,9 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override Task Run()
         {
-            if /**/ (Args is "log" or "logs" || Context.Command!.StartsWith("/nuke_log"))
+            if /**/ (Args is "log" or "logs" || (Options != null && Options.StartsWith("_log")))
                 ListingNukes.SendNukeLog(new ListPagination(Origin, PerPage: 5));
-            else if (Args is null)
+            else
                 return RunInternal("nuke\n⏳История фильтров: /nuke_log");
 
             return Task.CompletedTask;
@@ -39,7 +39,7 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override void ParseOptions()
         {
-            _options.Depth = Options.GetInt(_r_depth, 1);
+            _options.Depth = MemeOptions.GetInt(_r_depth, 1);
         }
 
         protected override int GetMemeText(string? text) => 0;

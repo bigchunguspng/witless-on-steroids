@@ -4,7 +4,7 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Cut : AudioVideoUrlCommand
+    public class Cut : FileEditor_AudioVideoUrl
     {
         protected override string SyntaxManual => "/man_cut";
 
@@ -15,13 +15,14 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             var parsing = ArgumentParsing.GetCutTimecodes(args);
             if (parsing.Failed)
             {
-                Bot.SendMessage(Origin, CUT_MANUAL);
+                SendManual(CUT_MANUAL);
                 return;
             }
 
             var (_, start, length) = parsing;
 
-            var (input, waitMessage) = await DownloadFileSuperCool();
+            var input = await GetFile();
+
             var (output, probe, options) = await input.InitEditing("Cut", Ext);
 
             if (start == TimeSpan.Zero && length > probe.Duration)
@@ -40,8 +41,6 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             }
 
             await FFMpeg.Command(input, output, options).FFMpeg_Run();
-
-            Bot.DeleteMessageAsync(Chat, waitMessage);
 
             SendResult(output);
             Log($"{Title} >> CUT [8K-]");

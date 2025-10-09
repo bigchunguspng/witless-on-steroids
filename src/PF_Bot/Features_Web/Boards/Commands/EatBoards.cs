@@ -40,15 +40,8 @@ public class EatBoards : EatBoard_Core
     private async Task EatSingleThread(string url, string board)
     {
         var name = $"{board}.{_uri.Segments[3].Replace("/", "")}";
-        try
-        {
-            var replies = await _chan.GetThreadDiscussionAsync(url);
-            await EatMany(replies, name);
-        }
-        catch
-        {
-            Bot.SendMessage(Origin, Bot.GetSillyErrorMessage());
-        }
+        var replies = await _chan.GetThreadDiscussionAsync(url);
+        await EatMany(replies, name);
     }
 
     private async Task EatWholeBoard(string url, string board)

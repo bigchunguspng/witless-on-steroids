@@ -1,13 +1,13 @@
 ﻿using PF_Bot.Commands;
 using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing.Callbacks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Features_Aux.Packs.Commands;
 
-public class Delete : SettingsCommand
+public class Delete : CommandHandlerAsync_SettingsBlocking
 {
     protected override void RunAuthorized()
     {

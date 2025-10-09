@@ -30,26 +30,26 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override void ParseOptions()
         {
-            _options.CustomColor = _colorWizard.CheckAndCut(Options);
-            _options.FontOption = _fontWizard.CheckAndCut(Options);
+            _options.CustomColor = _colorWizard.CheckAndCut(MemeOptions);
+            _options.FontOption  =  _fontWizard.CheckAndCut(MemeOptions);
 
-            _options.CropPercent           = Options.GetInt(_r_crop, 0).Clamp(-100, 100).ClampSbyte();
-            _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSizeMin, 10, group: 2);
-            _options.   FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
+            _options.CropPercent           = MemeOptions.GetInt(_r_crop, 0).Clamp(-100, 100).ClampSbyte();
+            _options.MinFontSizeMultiplier = MemeOptions.GetInt(_r_fontSizeMin, 10, group: 2);
+            _options.   FontSizeMultiplier = MemeOptions.GetInt(_r_fontSize, 100);
 
-            _options.WrapText             = Options.CheckAndCut(_r_nowrap).Failed();
-            _options.BackInBlack          = Options.CheckAndCut(_r_blackBg);
-            _options.PickColor_FromCenter = Options.CheckAndCut(_r_colorPPX);
-            _options.PickColor            = Options.CheckAndCut(_r_colorPP);
-            _options.TextLeftAlignment    = Options.CheckAndCut(_r_left);
-            _options.UltraThinCard        = Options.CheckAndCut(_r_thinner);
-            _options.     ThinCard        = Options.CheckAndCut(_r_thin);
+            _options.WrapText             = MemeOptions.CheckAndCut(_r_nowrap).Failed();
+            _options.BackInBlack          = MemeOptions.CheckAndCut(_r_blackBg);
+            _options.PickColor_FromCenter = MemeOptions.CheckAndCut(_r_colorPPX);
+            _options.PickColor            = MemeOptions.CheckAndCut(_r_colorPP);
+            _options.TextLeftAlignment    = MemeOptions.CheckAndCut(_r_left);
+            _options.UltraThinCard        = MemeOptions.CheckAndCut(_r_thinner);
+            _options.     ThinCard        = MemeOptions.CheckAndCut(_r_thin);
         }
 
         protected override string GetMemeText(string? text)
         {
             var generate = text.IsNull_OrEmpty();
-            var capitalize = Options.CheckCaps(_r_caps, generate);
+            var capitalize = MemeOptions.CheckCaps(_r_caps, generate);
 
             var caption = generate ? Baka.Generate() : text!;
 

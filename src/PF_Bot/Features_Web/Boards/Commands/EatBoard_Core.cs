@@ -3,7 +3,8 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Packs.Commands;
 using PF_Bot.Features_Web.Boards.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
+using PF_Bot.Routing.Callbacks;
 
 namespace PF_Bot.Features_Web.Boards.Commands;
 
@@ -24,7 +25,7 @@ public class ImageBoardContext
     public static readonly ImageBoardContext Chan2 = new()
     {
         ArchivePath = Dir_Plank,
-        CallbackKey = CallbackRouter_Default.Key_Planks,
+        CallbackKey = Registry.CallbackKey_Planks,
         CommandName = "plank",
         BoardsTitle = BOARDS_2CHAN,
         Manual      = PLANK_MANUAL,
@@ -36,7 +37,7 @@ public class ImageBoardContext
     public static readonly ImageBoardContext Chan4 = new()
     {
         ArchivePath = Dir_Board,
-        CallbackKey = CallbackRouter_Default.Key_Boards,
+        CallbackKey = Registry.CallbackKey_Boards,
         CommandName = "board",
         BoardsTitle = BOARDS_4CHAN,
         Manual      = BOARD_MANUAL,
@@ -74,10 +75,10 @@ public abstract class EatBoard_Core : Fuse
     {
         if (Args is null)
         {
-            if (Command!.StartsWith($"/{CommandName}s"))
+            if (Options.StartsWith('s'))
                 ListingBoards.SendBoardList(Ctx, new ListPagination(Origin, PerPage: 2), Boards);
             else
-                Bot.SendMessage(Origin, Manual);
+                SendManual(Manual);
         }
         else
         {
@@ -101,12 +102,13 @@ public abstract class EatBoard_Core : Fuse
     private async Task EatJsonFile()
     {
         var files = ArchivePath.GetFiles($"{Args}.json");
-        if (files.Length > 0)
+        if (files.Length == 0)
         {
-            await EatFromJsonFile(files[0]);
+            Status = CommandResultStatus.BAD;
+            Bot.SendMessage(Origin, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
         }
         else
-            Bot.SendMessage(Origin, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
+            await EatFromJsonFile(files[0]);
     }
 
     protected abstract Task EatOnlineData(string url);

@@ -7,7 +7,7 @@ using PF_Tools.Copypaster.Helpers;
 namespace PF_Bot.Features_Aux.Packs.Commands
 {
     /// Post Id Easy Channel Exporter™? Maybe.
-    public class Piece : SyncCommand
+    public class Piece : CommandHandlerBlocking
     {
         private static readonly Regex
             _rgx_args = new(@"t.me\/[a-z0-9_]{5,32}\/(\d+)\s(\S+)", RegexOptions.Compiled),
@@ -15,11 +15,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
 
         protected override void Run()
         {
-            if (Args == null || _rgx_args.IsMatch(Args).Janai())
-            {
-                Bot.SendMessage(Origin, PIECE_MANUAL);
-            }
-            else
+            if (Args != null && _rgx_args.IsMatch(Args))
             {
                 var url  = _rgx_urls.Match(Args).Value;
                 var args = _rgx_args.Match(Args);
@@ -38,6 +34,8 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
                 Log($"{Title} >> THE ONE PIECE IS REAL!!!");
             }
+            else
+                SendManual(PIECE_MANUAL);
         }
     }
 }

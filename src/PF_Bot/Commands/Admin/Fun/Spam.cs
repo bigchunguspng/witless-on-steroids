@@ -1,23 +1,16 @@
 ﻿using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Commands.Admin.Fun;
 
-public class Spam : SyncCommand
+public class Spam : CommandHandlerBlocking_Admin
 {
     private readonly Regex
         _rgx_days = new(@"a(>|<|>=|<=)?(\d+)",        RegexOptions.Compiled),
         _rgx_size = new(@"s(>|<|>=|<=)?(\d+)([km])?", RegexOptions.Compiled);
 
-    protected override void Run()
+    protected override void RunAuthourized()
     {
-        if (Message.SenderIsBotAdmin().Janai())
-        {
-            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
-            return;
-        }
-
         var messageId = Message.ReplyToMessage is { } reply ? reply.Id : -1;
 
         var textProvided = Args is not null;
@@ -25,20 +18,19 @@ public class Spam : SyncCommand
 
         if (!textProvided && !copyProvided)
         {
-            Bot.SendMessage(Origin, SPAM_MANUAL);
+            SendManual(SPAM_MANUAL);
             return;
         }
 
-        var options = Command!.Substring(5);
-        var onlyGroups   = options.Contains('g');
-        var onlyPrivates = options.Contains('p');
+        var onlyGroups   = Options.Contains('g');
+        var onlyPrivates = Options.Contains('p');
 
         var type
             = onlyGroups   ? GetChatsType.OnlyGroups
             : onlyPrivates ? GetChatsType.OnlyPrivates
             :                GetChatsType.All;
-        var matchDays = _rgx_days.Match(Command);
-        var matchSize = _rgx_size.Match(Command);
+        var matchDays = _rgx_days.Match(Options);
+        var matchSize = _rgx_size.Match(Options);
         var daysOperator = matchDays.ExtractGroup(1, s => s);
         var sizeOperator = matchSize.ExtractGroup(1, s => s);
         var daysValue    = matchDays.ExtractGroup(2, int.Parse);

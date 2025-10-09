@@ -2,7 +2,7 @@ using System.Text;
 using PF_Bot.Core;
 using PF_Bot.Features_Main.Memes.Core.Generators;
 using PF_Bot.Features_Main.Memes.Core.Shared;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
 
 namespace PF_Bot.Features_Aux.Listing;
 
@@ -27,7 +27,7 @@ public static class ListingNukes // List of nuclear weapons tests - Wikipedia
         sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
         if (single.Janai()) sb.Append(USE_ARROWS);
 
-        var buttons = single ? null : Listing.GetPaginationKeyboard(page, perPage, lastPage, $"{CallbackRouter_Default.Key_Nukes}l");
+        var buttons = single ? null : Listing.GetPaginationKeyboard(page, perPage, lastPage, $"{Registry.CallbackKey_Nukes}l");
         App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
     }
 

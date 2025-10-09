@@ -1,14 +1,14 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Convert
 {
-    public class ToSticker : PhotoCommand
+    public class ToSticker : FileEditor_Photo
     {
         protected override async Task Execute()
         {
-            var input = await DownloadFile();
+            var input = await GetFile();
 
             var (output, probe, options) = await input.InitEditing("stick", ".webp");
 
@@ -17,9 +17,8 @@ namespace PF_Bot.Features_Main.Edit.Commands.Convert
 
             await FFMpeg.Command(input, output, options.Resize(size)).FFMpeg_Run();
 
-            await using var stream = System.IO.File.OpenRead(output);
-            Bot.SendSticker(Origin, InputFile.FromStream(stream));
-            if (Command![^1] is 's') Bot.SendMessage(Origin, "@Stickers");
+            SendFile(output, MediaType.Stick);
+            if (Options.EndsWith('s')) Bot.SendMessage(Origin, "@Stickers");
             Log($"{Title} >> STICK [!]");
         }
     }

@@ -1,18 +1,26 @@
-﻿namespace PF_Bot.Routing;
+﻿namespace PF_Bot.Routing_Legacy;
 
 public record struct CommandMapping<T>(string Command, T Handler);
 
 public class CommandRegistry<T>(Dictionary<char, List<CommandMapping<T>>> registry)
 {
-    public T? Resolve(string? command)
-    {
-        if (command is null) return default;
+    public T? Resolve
+        (string? text, int offset = 0) =>
+        text != null && registry.TryGetValue(text[offset], out var mappings)
+            ? mappings.FirstOrDefault(x => text.AsSpan(offset).StartsWith(x.Command)).Handler
+            : default;
 
-        if (registry.TryGetValue(command[0], out var list))
+    public T? Resolve
+        (string? text, out string? command, int offset = 0)
+    {
+        if (text != null && registry.TryGetValue(text[offset], out var mappings))
         {
-            return list.FirstOrDefault(x => command.StartsWith(x.Command)).Handler;
+            var mapping = mappings.FirstOrDefault(x => text.AsSpan(offset).StartsWith(x.Command));
+            command = mapping.Command;
+            return    mapping.Handler;
         }
 
+        command = null;
         return default;
     }
 

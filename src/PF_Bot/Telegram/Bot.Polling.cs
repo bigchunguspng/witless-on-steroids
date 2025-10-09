@@ -1,9 +1,11 @@
 ﻿using System.Text.Json;
-using PF_Bot.Commands.Debug;
+using System.Text.Json.Serialization;
 using PF_Bot.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing_Legacy.Commands;
+using PF_Bot.Routing_Legacy.Inline;
+using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Routing.Inline;
+using PF_Bot.Routing.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -13,7 +15,7 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public static SyncCommand     Router_Command  { get; private set; } = null!;
+    public static IMessageRouter  Router_Message  { get; private set; } = null!;
     public static ICallbackRouter Router_Callback { get; private set; } = null!;
     public static InlineRequestHandler    Inliner { get; private set; } = new();
 
@@ -59,11 +61,11 @@ public partial class Bot
     {
         try
         {
-            Router_Command.Execute(CommandContext.FromMessage(message));
+            Router_Message.Route(message);
         }
         catch (Exception e)
         {
-            HandleCommandException(e, Router_Command.Context);
+            HandleMessageRoutingException(e, message);
         }
 
         return Task.CompletedTask;
@@ -101,7 +103,7 @@ public partial class Bot
         return Task.CompletedTask;
     }
 
-    public void HandleCommandException(Exception e, CommandContext? context)
+    public void HandleCommandException(Exception e, CommandContext_Legacy? context)
     {
         LogError_ToFile(e, context, context?.Title ?? "[unknown]");
         if (context != null)
@@ -110,7 +112,26 @@ public partial class Bot
         }
     }
 
+    public void HandleMessageRoutingException(Exception e, Message message)
+    {
+        LogError_ToFile(e, message, $"Message router ({message.Format_ChatMessage()})");
+        SendMessage(message.GetOrigin(), GetSillyErrorMessage());
+    }
+
     private static readonly FileLogger_Simple _errorLogger = new (File_Errors);
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        Encoder = NewtonsoftJsonCompatibleEncoder.Encoder,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        WriteIndented = true,
+        Converters =
+        {
+            new CommandHandler.JsonConverter(),
+            new CallbackContextJsonConverter(),
+        },
+    };
 
     // todo outta here
     public static void LogError_ToFile(Exception e, object? context, string title)
@@ -118,7 +139,7 @@ public partial class Bot
         LogError($"{title} >> BRUH | {e.GetErrorMessage()}");
         try
         {
-            var json = JsonSerializer.Serialize(context, DebugMessage.JsonOptions);
+            var json = JsonSerializer.Serialize(context, JsonOptions);
             var entry =
                 $"""
                  # {DateTime.Now:MMM' 'dd', 'HH:mm:ss.fff}

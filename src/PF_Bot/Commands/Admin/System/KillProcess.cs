@@ -1,8 +1,6 @@
-using PF_Bot.Routing.Commands;
-
 namespace PF_Bot.Commands.Admin.System;
 
-public class KillProcess : AsyncCommand
+public class KillProcess : CommandHandlerAsync_Admin
 {
     private const    string   NO = "CAACAgIAAxkBAAEEc-dndmzvTuVEQMtDmz7U_q3LfYPIzwACxh0AAuCjggeATxF6DmwtYDYE";
     private const    string  BYE = "CAACAgQAAxkBAAJUGGd2cY6smcUDFpl8WjPfVmaAUnp4AAJYDwACR7e5UyHNO_PeWgkcNgQ";
@@ -14,10 +12,8 @@ public class KillProcess : AsyncCommand
         "CAACAgIAAxkBAAEEc-NndmyzLg5EMR1QRcKa8G2McNLe6AACCSMAAlmMaEgeI5p8MZXe5zYE",
     ];
 
-    protected override async Task Run()
+    protected override async Task RunAuthourized()
     {
-        if (Message.SenderIsBotAdmin().Janai()) return;
-
         var name = Args ?? FFMPEG;
         var process = Process.GetProcessesByName(name).FirstOrDefault();
         if (process != null)
@@ -34,6 +30,7 @@ public class KillProcess : AsyncCommand
         }
         else
         {
+            Status = CommandResultStatus.BAD;
             Bot.SendSticker(Origin, NO);
         }
     }

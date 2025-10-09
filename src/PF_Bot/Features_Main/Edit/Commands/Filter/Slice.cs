@@ -3,7 +3,7 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 
-public class Slice : AudioVideoUrlCommand
+public class Slice : FileEditor_AudioVideoUrl
 {
     private static readonly Regex
         _rgx_multipliers = new(@"(\d+)(?:\*(\d+))?", RegexOptions.Compiled);
@@ -12,9 +12,9 @@ public class Slice : AudioVideoUrlCommand
 
     protected override async Task Execute()
     {
-        var (input, waitMessage) = await DownloadFileSuperCool();
+        var input = await GetFile();
 
-        var match = _rgx_multipliers.Match(Command!);
+        var match = _rgx_multipliers.Match(Options);
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
         var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 
@@ -30,8 +30,6 @@ public class Slice : AudioVideoUrlCommand
             .ApplyRandomSlices(breaks / 5D, pacing / 5D)
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
-
-        Bot.DeleteMessageAsync(Chat, waitMessage);
 
         SendResult(output);
         Log($"{Title} >> SLICE [{breaks}*{pacing}] >> {sw.ElapsedReadable()}");

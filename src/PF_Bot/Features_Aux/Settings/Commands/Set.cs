@@ -1,11 +1,11 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Commands;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing;
+using PF_Bot.Routing_Legacy;
 
 namespace PF_Bot.Features_Aux.Settings.Commands
 {
-    public class Set : SettingsCommand
+    public class Set : CommandHandlerAsync_SettingsBlocking
     {
         private readonly Regex
             _m = new("^[mм]",       RegexOptions.Compiled),
@@ -18,7 +18,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
 
         protected override void RunAuthorized()
         {
-            if (Args is not null)
+            if (Args != null)
             {
                 var args = Args.ToLower().Split();
                 var w = args[0];
@@ -29,7 +29,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
                 else if (_s.IsMatch(w)) Set(MemeType.Snap, "/snap");
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
                 else if (_a.IsMatch(w)) Set(MemeType.Auto, "*");
-                else Bot.SendMessage(Origin, string.Format(SET_MEME_TYPE_MANUAL, w));
+                else SendManual(string.Format(SET_MEME_TYPE_MANUAL, w));
 
                 void Set(MemeType type, string command)
                 {
@@ -73,7 +73,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
                 }
             }
             else
-                Bot.SendMessage(Origin, SET_MANUAL);
+                SendManual(SET_MANUAL);
         }
 
         private string? SetOrClearOptions(MemeType type, string[] args)

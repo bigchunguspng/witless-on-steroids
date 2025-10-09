@@ -30,14 +30,14 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override void ParseOptions()
         {
-            _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSizeMin,  10, group: 2);
-            _options.   FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
+            _options.MinFontSizeMultiplier = MemeOptions.GetInt(_r_fontSizeMin,  10, group: 2);
+            _options.   FontSizeMultiplier = MemeOptions.GetInt(_r_fontSize, 100);
 
-            _options.CustomColor = _colorWizard.CheckAndCut(Options);
-            _options.FontOption = _fontWizard.CheckAndCut(Options);
+            _options.CustomColor = _colorWizard.CheckAndCut(MemeOptions);
+            _options.FontOption  =  _fontWizard.CheckAndCut(MemeOptions);
 
-            _options.WrapText   = Options.CheckAndCut(_r_nowrap).Failed();
-            _options.Minimalist = Options.CheckAndCut(_r_small);
+            _options.WrapText   = MemeOptions.CheckAndCut(_r_nowrap).Failed();
+            _options.Minimalist = MemeOptions.CheckAndCut(_r_small);
         }
 
         protected override string GetMemeText(string? text)
@@ -45,7 +45,7 @@ namespace PF_Bot.Features_Main.Memes.Commands
             var generate = text.IsNull_OrEmpty();
             var caption = generate ? Baka.Generate() : text!;
 
-            var capitalize = Options.CheckCaps(_r_caps, generate) || generate && caption.Length <= 12;
+            var capitalize = MemeOptions.CheckCaps(_r_caps, generate) || generate && caption.Length <= 12;
             return capitalize ? caption.InLetterCase(LetterCase.Upper) : caption;
         }
 

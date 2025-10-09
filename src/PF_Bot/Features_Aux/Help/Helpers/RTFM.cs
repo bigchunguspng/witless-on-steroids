@@ -1,6 +1,6 @@
 using System.Text;
 using PF_Bot.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Features_Aux.Help.Helpers;
@@ -82,6 +82,6 @@ public static class RTFM
         }
         return new InlineKeyboardMarkup(keyboard);
 
-        string CallbackData(string code) => $"{CallbackRouter_Default.Key_Manual} - {code}";
+        string CallbackData(string code) => $"{Registry.CallbackKey_Manual} - {code}";
     }
 }

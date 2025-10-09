@@ -1,4 +1,4 @@
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Features_Aux.Packs.Core;
@@ -157,7 +157,7 @@ public class TractorGame(List<List<InlineKeyboardButton>> game)
 
     private static InlineKeyboardButton NewButton
         (string obj, int x, int y)
-        => InlineKeyboardButton.WithCallbackData(obj, $"{CallbackRouter_Default.Key_Delete} - {obj} - {x}:{y}");
+        => InlineKeyboardButton.WithCallbackData(obj, $"{Registry.CallbackKey_Delete} - {obj} - {x}:{y}");
 
     private string GetCell
         (int x, int y)

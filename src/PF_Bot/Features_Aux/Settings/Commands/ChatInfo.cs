@@ -6,13 +6,17 @@ using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Aux.Settings.Commands
 {
-    public class ChatInfo : WitlessSyncCommand
+    public class ChatInfo : CommandHandlerBlocking
     {
+        protected override CommandRequirements Requirements
+            => CommandRequirements.Settings
+             | CommandRequirements.Copypaster; // todo check: really ?
+
         protected override void Run()
         {
             var sb = new StringBuilder("<b>").Append(Title).Append("</b>\n");
 
-            var size = PackPath.FileSizeInBytes;
+            var size = PackManager.GetPackPath(Chat).FileSizeInBytes;
             var icon = size switch
             {
                 <      2_000 => "🗒",
@@ -30,7 +34,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
                     .Append(Baka.Pack.VocabularyCount.Format_bruh_1k_100k_1M("💨")).Append(' ');
             sb.Append("\nВероятность ответа: ").Append(Data.Speech).Append('%');
             sb.Append("\nКачество графики: ").Append(Data.Quality).Append('%');
-            if (Context.ChatIsPrivate.Janai())
+            if (Chat.ChatIsPrivate().Janai())
                 sb.Append("\nМогут 🔩⚙️: ").Append(Data.AdminsOnly ? "только админы 😎" : "все 🤠");
 
             sb.Append("\n\n<u>Авто-мемы:</u>");
@@ -87,7 +91,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
             { MemeType.Dp,   "демотиваторы👌"   },
             { MemeType.Snap, "снапчаты 😭"      },
             { MemeType.Nuke, "ядерные отходы🍤" },
-            { MemeType.Auto, "авто-обработка 👾"}
+            { MemeType.Auto, "авто-обработка 👾"},
         };
     }
 }

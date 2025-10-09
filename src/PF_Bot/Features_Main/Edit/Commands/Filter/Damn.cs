@@ -1,7 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
 using SixLabors.ImageSharp;
@@ -9,16 +9,16 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Damn : AudioVideoPhotoCommand
+    public class Damn : FileEditor_AudioVideoPhoto
     {
         private int    _value;
         private Quality ValueAsQuality => new ((byte)(100 - _value * 100 / 21F));
 
         protected override async Task Execute()
         {
-            _value = Context.HasIntArgument(out var x) ? Math.Clamp(x, 0, 21) : 21;
+            _value = Args.TryParseAsInt(out var x) ? Math.Clamp(x, 0, 21) : 21;
 
-            var input = await DownloadFile();
+            var input = await GetFile();
             var output = input.GetOutputFilePath("DAMN", Type is MediaType.Photo ? "jpg" : Ext);
 
             var compressTask = Type switch

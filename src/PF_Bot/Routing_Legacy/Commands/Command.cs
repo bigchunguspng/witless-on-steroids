@@ -6,9 +6,9 @@ using PF_Bot.Telegram;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing.Commands
+namespace PF_Bot.Routing_Legacy.Commands
 {
-    public abstract class AnyCommand<TContext> where TContext : CommandContext
+    public abstract class AnyCommand<TContext> where TContext : CommandContext_Legacy
     {
         protected static Bot Bot => App.Bot;
 
@@ -28,7 +28,7 @@ namespace PF_Bot.Routing.Commands
 
     /// Blocking command. Should be used for short simple actions!
     /// The same instance can be used unlimited amount of times.
-    public abstract class AnySyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext
+    public abstract class AnySyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext_Legacy
     {
         public sealed override void Execute(TContext context)
         {
@@ -43,7 +43,7 @@ namespace PF_Bot.Routing.Commands
     /// Non-blocking command. Should be used for time consuming actions!
     /// A new instance should be created every time!
     /// </summary>
-    public abstract class AnyAsyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext
+    public abstract class AnyAsyncCommand<TContext> : AnyCommand<TContext> where TContext : CommandContext_Legacy
     {
         public sealed override async void Execute(TContext context)
         {
@@ -69,8 +69,8 @@ namespace PF_Bot.Routing.Commands
 
     // SIMPLE / WITLESS
 
-    public abstract class  SyncCommand :  AnySyncCommand<CommandContext>;
-    public abstract class AsyncCommand : AnyAsyncCommand<CommandContext>;
+    public abstract class  SyncCommand :  AnySyncCommand<CommandContext_Legacy>;
+    public abstract class AsyncCommand : AnyAsyncCommand<CommandContext_Legacy>;
 
     public abstract class  WitlessSyncCommand :  AnySyncCommand<WitlessContext>
     {

@@ -3,12 +3,12 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.ProcessRunning;
-using Telegram.Bot.Types;
 
-namespace PF_Bot.Features_Main.Edit.Commands.Direct;
+namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
-public class UseMagick : PhotoCommand
+public class UseMagick : FileEditor_Photo
 {
     protected override string SyntaxManual => $"/man_43\n{ALIAS_INFO}/aim_info";
 
@@ -27,7 +27,11 @@ public class UseMagick : PhotoCommand
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
 
-        if (Context.ApplyAliases(ref options, Dir_Alias_Im).Failed()) return;
+        if (Context.ApplyAliases(ref options, Dir_Alias_Im).Failed())
+        {
+            Status = CommandResultStatus.BAD;
+            return;
+        }
 
         // GET EXTENSION
         var extension = args[^1];
@@ -39,23 +43,19 @@ public class UseMagick : PhotoCommand
         var extensionInvalid = extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options))
         {
+            Status = CommandResultStatus.BAD;
             await ManualEditing.SendTrollface(Origin, extensionInvalid);
             return;
         }
 
         // EXECUTE
 
-        var path = await DownloadFile();
+        var path = await GetFile();
         options = options.Replace("THIS", path);
 
         var output = await ProcessImage(path, options, extension);
-        SendResult(output, extension, sendDocument: OptionUsed('g'));
+        SendResult(output, extension, sendDocument: Options.Contains('g'));
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
-    }
-
-    private bool OptionUsed(char option)
-    {
-        return Command!.Length > 3 && Command.IndexOf(option, 3) > 0;
     }
 
     private async Task<string> ProcessImage(FilePath input, string options, string extension)
@@ -69,16 +69,16 @@ public class UseMagick : PhotoCommand
 
     private void SendResult(string result, string extension, bool sendDocument = false)
     {
-        var name = "made with piece_fap_bot";
+        var type =     sendDocument ? MediaType.Other :
+            extension     == "webp" ? MediaType.Stick :
+            _pic.IsMatch(extension) ? MediaType.Photo :
+            _gif.IsMatch(extension) ? MediaType.Anime : MediaType.Other;
 
-        using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Origin, InputFile_FromStream());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Origin, InputFile.FromStream(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Origin, InputFile.FromStream(stream));
-        else if (_gif.IsMatch(extension)) Bot.SendAnimation(Origin, InputFile_FromStream());
-        else                              Bot.SendDocument (Origin, InputFile_FromStream());
+        var name = type is MediaType.Photo or MediaType.Stick
+            ? null
+            : $"made with piece_fap_bot.{extension}";
 
-        InputFile InputFile_FromStream() => InputFile.FromStream(stream, name + "." + extension);
+        SendFile(result, type, name);
     }
 
     private static readonly Regex

@@ -5,14 +5,13 @@ using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
 using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Web.Piracy.Core;
 
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f ba -k -x --audio-format mp3 -I 1 "URL" -o "%(artist)s - %(title)s xd.%(ext)s"
 // yt-dlp --no-mtime --no-warnings --cookies-from-browser firefox -f "bv*[height<=720]" -k -I 1 "URL" -o "video.%(ext)s"
 
-public class DownloadMusicTask(string id, bool youTube, CommandContext context, int messageToDelete)
+public class DownloadMusicTask(string id, bool youTube, CommandContext context)
 {
     private const string _YT_video = "https://youtu.be/";
     private const string _YT_list  = "https://www.youtube.com/playlist?list=";
@@ -61,10 +60,8 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
         return builder.ToString();
     }
 
-    public async Task RunAsync()
+    public async Task<(string MP3, FilePath JPG)> RunAsync()
     {
-        var sw = Stopwatch.StartNew();
-
         // GET READY
 
         var url = youTube
@@ -135,13 +132,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context, 
 
         await Task.WhenAll(taskMp3, taskJpg);
 
-        // SEND THE RESULT todo move to bot
-
-        Bot.DeleteMessageAsync(context.Chat, messageToDelete);
-
-        await using var stream = File.OpenRead(mp3);
-        Bot.SendAudio(context.Origin, InputFile.FromStream(stream, mp3), jpg);
-        Log($"{context.Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedReadable()}", LogLevel.Info, LogColor.Yellow);
+        return (mp3, jpg);
     }
 
     private string GetSongName(FilePath audioFile, string? artist, string title)

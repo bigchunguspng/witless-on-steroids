@@ -6,6 +6,20 @@ using PF_Tools.Copypaster.Extensions;
 
 namespace PF_Bot.Features_Main.Text.Core
 {
+    public class DementiaCopypaster() : Copypaster(new GenerationPack())
+    {
+        public static readonly DementiaCopypaster Instance = new();
+
+        public override bool Eat(string text) => false;
+        public override bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
+        {
+            eaten = null;
+            return false;
+        }
+
+        // todo - invent something better
+    }
+
     /// Thread safe <see cref="GenerationPack"/> wrapper.
     /// Tracks changes and usage.
     public class Copypaster(GenerationPack pack) // 32 (26) bytes
@@ -24,11 +38,11 @@ namespace PF_Bot.Features_Main.Text.Core
         // EAT
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public bool Eat(string text)
+        public virtual bool Eat(string text)
             => EatIfTasty(() => Pack.Eat_Advanced(text), out _);
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
+        public virtual bool Eat(string text, [NotNullWhen(true)] out string[]? eaten)
             => EatIfTasty(() => Pack.Eat_Advanced(text), out eaten);
 
         private bool EatIfTasty(Func<string[]?> eat, out string[]? eaten)

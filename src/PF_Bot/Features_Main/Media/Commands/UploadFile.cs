@@ -1,10 +1,10 @@
 using PF_Bot.Features_Main.Edit.Commands;
 using PF_Bot.Features_Main.Media.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 
 namespace PF_Bot.Features_Main.Media.Commands;
 
-public class UploadFile : AudioVideoCommand
+public class UploadFile : FileEditor_AudioVideo
 {
     protected override string SyntaxManual => "/man_7";
 

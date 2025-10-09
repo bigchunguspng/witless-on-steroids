@@ -1,8 +1,8 @@
 ﻿using PF_Bot.Routing.Commands;
 
-namespace PF_Bot.Routing;
+namespace PF_Bot.Routing_Legacy;
 
-public class Skip : SyncCommand
+public class Skip : CommandHandlerBlocking
 {
     protected override void Run()
     {

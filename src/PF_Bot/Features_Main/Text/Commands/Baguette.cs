@@ -3,14 +3,14 @@ using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Main.Text.Commands
 {
-    public class Baguette : WitlessSyncCommand
+    public class Baguette : CommandHandlerBlocking
     {
         protected override void Run()
         {
-            var length = Command!.MatchNumber().ExtractGroup(0, int.Parse, 3);
+            var length = Options.MatchNumber().ExtractGroup(0, int.Parse, 3);
             var start = Args;
 
-            var greentext = Command!.Contains("bb");
+            var greentext = Options.Contains("b");
             var sign = greentext ? '>' : '@';
 
             var lines = new List<string>(length) { start ?? GenerateLine() };

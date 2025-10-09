@@ -1,24 +1,17 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Admin.Fun;
 
-public class Reply : SyncCommand
+public class Reply : CommandHandlerBlocking_Admin
 {
-    protected override void Run()
+    protected override void RunAuthourized()
     {
-        if (Message.SenderIsBotAdmin().Janai())
-        {
-            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
-            return;
-        }
-
         if (Args is null)
         {
-            Bot.SendMessage(Origin, "<code>/rep [message_url] [text|message]</code>");
+            SendManual("<code>/rep [message_url] [text|message]</code>");
             return;
         }
 

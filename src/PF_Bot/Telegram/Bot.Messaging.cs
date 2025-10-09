@@ -162,21 +162,6 @@ namespace PF_Bot.Telegram
         public async Task<Message> SendAnima_OrThrow(MessageOrigin og, InputFile anima, string caption)
             => await Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread);
 
-        public async Task RunOrThrow(Task task, long chat, int message)
-        {
-            try
-            {
-                await task;
-            }
-            catch
-            {
-                EditMessage(chat, message, GetSillyErrorMessage());
-                throw;
-            }
-        }
-
-        public string GetSillyErrorMessage() => $"произошла ашыпка {FAIL_EMOJI.PickAny()}";
-
         public void SendErrorDetails(ProcessException e, MessageOrigin origin)
         {
             var path = Dir_Reports

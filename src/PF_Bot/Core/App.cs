@@ -3,8 +3,9 @@ using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Features_Web.Boards.Core;
 using PF_Bot.Features_Web.Reddit.Core;
-using PF_Bot.Routing_New.Routers;
 using PF_Bot.Routing;
+using PF_Bot.Routing.Callbacks;
+using PF_Bot.Routing.Messages;
 using PF_Bot.Telegram;
 using PF_Bot.Terminal;
 
@@ -36,8 +37,8 @@ public static class App
 
         Bot = await Bot.Create
         (
-            args == null ? new CommandRouter() : new Skip(),
-            args == null ? new CallbackRouter_Default() : new CallbackRouter_Skip()
+            args == null ? new  MessageRouter_Default(Registry. CommandHandlers) : new  MessageRouter_Skip(),
+            args == null ? new CallbackRouter_Default(Registry.CallbackHandlers) : new CallbackRouter_Skip()
         );
 
         ClearTempFiles();

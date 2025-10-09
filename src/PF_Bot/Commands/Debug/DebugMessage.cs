@@ -11,7 +11,7 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Debug;
 
-public class DebugMessage : SyncCommand
+public class DebugMessage : CommandHandlerBlocking
 {
     private readonly Regex
         _rgx_jsonFileId   = new(@"""file_id"": ?""(.+?)""",                  RegexOptions.Compiled),
@@ -40,7 +40,7 @@ public class DebugMessage : SyncCommand
         var message = Message.ReplyToMessage;
         if (message == null)
         {
-            Bot.SendMessage(Origin, DEBUG_MANUAL);
+            SendManual(DEBUG_MANUAL);
             return;
         }
 
@@ -49,7 +49,7 @@ public class DebugMessage : SyncCommand
         var name = _rgx_jsonFileName.Matches(json).LastOrDefault();
         var size = _rgx_jsonFileSize.Matches(json).LastOrDefault();
         var wh   = _rgx_jsonWH      .Matches(json);
-        if (Command!.Contains('!') && id is { Success: true } && size is { Success: true })
+        if (Options.Contains('!') && id is { Success: true } && size is { Success: true })
         {
             var fileId = id.Groups[1].Value;
             var fileSize = long.Parse(size.Groups[1].Value);
@@ -73,14 +73,14 @@ public class DebugMessage : SyncCommand
 
             Directory.CreateDirectory(Dir_Temp);
             File.WriteAllText(path, json);
-            using var stream = File.OpenRead(path);
 
+            using var stream = File.OpenRead(path);
             Bot.SendDocument(Origin, InputFile.FromStream(stream, fileName.Replace("--", "-")));
             Log($"{Title} >> DEBUG");
         }
     }
 
-    public static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
         Encoder = NewtonsoftJsonCompatibleEncoder.Encoder,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,

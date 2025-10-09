@@ -1,24 +1,12 @@
-﻿using PF_Bot.Commands;
-using PF_Bot.Commands.Admin.Fun;
-using PF_Bot.Commands.Admin.System;
-using PF_Bot.Commands.Debug;
-using PF_Bot.Core;
-using PF_Bot.Features_Aux.Help.Commands;
-using PF_Bot.Features_Aux.Packs.Commands;
+﻿using PF_Bot.Core;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Features_Main.Edit.Commands.Convert;
-using PF_Bot.Features_Main.Edit.Commands.Direct;
-using PF_Bot.Features_Main.Edit.Commands.Filter;
-using PF_Bot.Features_Main.Edit.Commands.Manual;
-using PF_Bot.Features_Main.Media.Commands;
-using PF_Bot.Features_Web.Piracy.Commands;
-using PF_Bot.Features_Web.Reddit.Commands;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 
-namespace PF_Bot.Routing
+namespace PF_Bot.Routing_Legacy
 {
     public class CommandRouter : SyncCommand
     {
+        /*
         private readonly Tell _tell = new();
         private readonly Spam _spam = new();
         private readonly Help _help = new();
@@ -31,17 +19,19 @@ namespace PF_Bot.Routing
         private readonly Alias _apeg = new(AliasContext.FFMpeg);
         private readonly Alias _aim  = new(AliasContext.Magick);
         private readonly Htmlizer _html = new();
+        */
 
         private readonly WitlessCommandRouter _witlessRouter;
 
-        private readonly CommandRegistry<Func<AnyCommand<CommandContext>>> _simpleCommands;
-        public           CommandRegistry<Func<AnyCommand<CommandContext>>>  SimpleCommands => _simpleCommands;
+        private readonly CommandRegistry<Func<AnyCommand<CommandContext_Legacy>>> _simpleCommands;
+        public           CommandRegistry<Func<AnyCommand<CommandContext_Legacy>>>  SimpleCommands => _simpleCommands;
 
         public CommandRouter()
         {
             _witlessRouter = new WitlessCommandRouter(this);
 
-            _simpleCommands = new CommandRegistry<Func<AnyCommand<CommandContext>>>.Builder()
+            _simpleCommands = new CommandRegistry<Func<AnyCommand<CommandContext_Legacy>>>.Builder()
+                /*
                 .Register("fast"   , () => new Speed().SetMode(Speed.Mode.Fast))
                 .Register("slow"   , () => new Speed().SetMode(Speed.Mode.Slow))
                 .Register("crop"   , () => new Crop().UseDefaultMode())
@@ -98,6 +88,7 @@ namespace PF_Bot.Routing
                 .Register("man_sus"  , () => _mail.WithText(SUS_MANUAL))
                 .Register("man_eq"   , () => _mail.WithText(EQ_MANUAL))
                 .Register("man_vol"  , () => _mail.WithText(VOLUME_MANUAL))
+                */
                 .Build();
         }
 

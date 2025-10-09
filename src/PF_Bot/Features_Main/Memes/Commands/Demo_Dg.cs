@@ -46,23 +46,23 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override void ParseOptions()
         {
-            _options.SingleLine = Options.CheckAndCut(_r_one_line);
+            _options.SingleLine = MemeOptions.CheckAndCut(_r_one_line);
 
             if (_mode == Wide)
             {
-                _options.FontOptionA = FontWizardL.CheckAndCut(Options);
+                _options.FontOptionA = FontWizardL.CheckAndCut(MemeOptions);
             }
             else if (_options.SingleLine)
             {
-                _options.FontOptionA = FontWizardS.CheckAndCut(Options);
+                _options.FontOptionA = FontWizardS.CheckAndCut(MemeOptions);
             }
             else
             {
-                _options.FontOptionA = FontWizardA.CheckAndCut(Options);
-                _options.FontOptionB = FontWizardB.CheckAndCut(Options);
+                _options.FontOptionA = FontWizardA.CheckAndCut(MemeOptions);
+                _options.FontOptionB = FontWizardB.CheckAndCut(MemeOptions);
             }
 
-            _options.AddLogo = Options.CheckAndCut(_r_no_logo).Failed();
+            _options.AddLogo = MemeOptions.CheckAndCut(_r_no_logo).Failed();
         }
 
         protected override TextPair GetMemeText(string? text)
@@ -93,7 +93,7 @@ namespace PF_Bot.Features_Main.Memes.Commands
                 }
             }
 
-            var capitalize = Options.CheckCaps(_r_caps, generate);
+            var capitalize = MemeOptions.CheckCaps(_r_caps, generate);
             if (capitalize) a = a.InLetterCase(LetterCase.Upper);
 
             return new TextPair(a, b);

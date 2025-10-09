@@ -1,6 +1,7 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Listing;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
+using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
@@ -15,7 +16,7 @@ public class AliasContext
     public static readonly AliasContext FFMpeg = new()
     {
         CommandName = "peg",
-        CallbackKey = CallbackRouter_Default.Key_AliasP,
+        CallbackKey = Registry.CallbackKey_AliasP,
         Tool = "FFMpeg",
         Directory = Dir_Alias_Peg,
     };
@@ -23,7 +24,7 @@ public class AliasContext
     public static readonly AliasContext Magick = new()
     {
         CommandName = "im",
-        CallbackKey = CallbackRouter_Default.Key_AliasI,
+        CallbackKey = Registry.CallbackKey_AliasI,
         Tool = "ImageMagick",
         Directory = Dir_Alias_Im,
     };
@@ -38,7 +39,7 @@ public class Alias_Callback(AliasContext ctx) : CallbackHandler
     }
 }
 
-public class Alias(AliasContext ctx) : SyncCommand
+public class Alias(AliasContext ctx) : CommandHandlerBlocking
 {
     // /a{cmd} [code] [options] // ALIAS CREATION
     // /a{cmd} [code] 0         // ALIAS DELETION (admin only)
@@ -46,15 +47,11 @@ public class Alias(AliasContext ctx) : SyncCommand
 
     protected override void Run()
     {
-        if (Args != null && Args.EndsWith("info") || Command != null && Command.StartsWith($"/a{ctx.CommandName}_info"))
+        if (Args != null && Args.EndsWith("info") || Options.StartsWith("_info"))
         {
             ListingAliases.SendList(ctx, new ListPagination(Origin, PerPage: 10));
         }
-        else if (Args == null || Args.HasArguments().Janai())
-        {
-            Bot.SendMessage(Origin, string.Format(ALIAS_SYNTAX, ctx.CommandName, ctx.Tool));
-        }
-        else
+        else if (Args != null && Args.CanBeSplitN())
         {
             var args = Args!.SplitN(2);
             var name = args[0].ValidFileName();
@@ -63,6 +60,7 @@ public class Alias(AliasContext ctx) : SyncCommand
             var files = Directory.GetFiles($"{name}.*");
             if (files.Length > 0 && admin.Janai())
             {
+                Status = CommandResultStatus.BAD;
                 var content = File.ReadAllText(files[0]);
                 Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI.PickAny()));
             }
@@ -85,5 +83,7 @@ public class Alias(AliasContext ctx) : SyncCommand
                 }
             }
         }
+        else
+            SendManual(string.Format(ALIAS_SYNTAX, ctx.CommandName, ctx.Tool));
     }
 }

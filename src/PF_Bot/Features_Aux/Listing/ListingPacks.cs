@@ -1,7 +1,7 @@
 using System.Text;
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing;
 
 namespace PF_Bot.Features_Aux.Listing;
 
@@ -10,10 +10,10 @@ public static class ListingPacks // Did someone said Linkin' Park?
     private record FusionListContext(string Title, string Object_Accusative, string CallbackKey, string Marker);
 
     private static readonly FusionListContext
-        PublicPacks  = new("📂 Общие словари" , "словаря", $"{CallbackRouter_Default.Key_Fuse}i",   ""),
-        PrivatePacks = new("🔐 Личные словари", "словаря", $"{CallbackRouter_Default.Key_Fuse}!", "! "),
-        PublicFiles  = new("📂 Общие файлы" ,   "файла",   $"{CallbackRouter_Default.Key_Fuse}@", "@ "),
-        PrivateFiles = new("🔐 Личные файлы",   "файла",   $"{CallbackRouter_Default.Key_Fuse}*", "* ");
+        PublicPacks  = new("📂 Общие словари" , "словаря", $"{Registry.CallbackKey_Fuse}i",   ""),
+        PrivatePacks = new("🔐 Личные словари", "словаря", $"{Registry.CallbackKey_Fuse}!", "! "),
+        PublicFiles  = new("📂 Общие файлы" ,   "файла",   $"{Registry.CallbackKey_Fuse}@", "@ "),
+        PrivateFiles = new("🔐 Личные файлы",   "файла",   $"{Registry.CallbackKey_Fuse}*", "* ");
 
     public static void SendPackList(ListPagination pagination, bool isPrivate = false, bool fail = false)
     {

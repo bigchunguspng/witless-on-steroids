@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Debug;
 
-public class Htmlizer : SyncCommand
+public class Htmlizer : CommandHandlerBlocking
 {
     private Mode _mode;
 
@@ -20,9 +20,11 @@ public class Htmlizer : SyncCommand
         var htmlize = _mode is Mode.ToHtml;
         var message = Message.ReplyToMessage ?? Message;
 
+        // todo bug: /text {no file} => FAIL
         var text = htmlize ? HtmlText.Escape(message.ToHtml()) : message.GetTextOrCaption();
         if (text is null)
         {
+            Status = CommandResultStatus.BAD;
             Bot.SendSticker(Origin, InputFile.FromFileId(LOL.PickAny()));
         }
         else
@@ -46,6 +48,6 @@ public class Htmlizer : SyncCommand
     public enum Mode
     {
         ToHtml,
-        FromHtml
+        FromHtml,
     }
 }

@@ -1,24 +1,17 @@
 using System.Text;
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Routing.Commands;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Extensions;
 
 namespace PF_Bot.Commands.Admin.System;
 
-public class RunProcess : AsyncCommand
+public class RunProcess : CommandHandlerAsync_Admin
 {
-    protected override async Task Run()
+    protected override async Task RunAuthourized()
     {
-        if (Message.SenderIsBotAdmin().Janai())
-        {
-            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
-            return;
-        }
-
         if (Args is null)
         {
-            Bot.SendMessage(Origin, "<code>/run [exe] [args]</code>");
+            SendManual("<code>/run [exe] [args]</code>");
             return;
         }
 

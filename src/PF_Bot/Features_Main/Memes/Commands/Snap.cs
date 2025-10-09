@@ -31,25 +31,25 @@ public class Snap : Meme_Core<string>
 
     protected override void ParseOptions()
     {
-        _options.RandomTextOffset = Options.CheckAndCut(_r_randomOffset);
+        _options.RandomTextOffset = MemeOptions.CheckAndCut(_r_randomOffset);
 
-        _options.CustomColorBack = _colorWizardBack.CheckAndCut(Options);
-        _options.CustomColorText = _colorWizardText.CheckAndCut(Options);
+        _options.CustomColorBack = _colorWizardBack.CheckAndCut(MemeOptions);
+        _options.CustomColorText = _colorWizardText.CheckAndCut(MemeOptions);
 
-        _options.FontOption = _fontWizard.CheckAndCut(Options);
+        _options.FontOption = _fontWizard.CheckAndCut(MemeOptions);
 
-        _options.MinFontSizeMultiplier = Options.GetInt(_r_fontSize, 10, group: 2);
-        _options.   FontSizeMultiplier = Options.GetInt(_r_fontSizeMin, 100);
-        _options.CardOpacity           = Options.GetInt(_r_opacity, 62).ClampByte().Clamp100();
-        _options.TextOffset            = Options.GetInt(_r_offset,  50);
+        _options.MinFontSizeMultiplier = MemeOptions.GetInt(_r_fontSize, 10, group: 2);
+        _options.   FontSizeMultiplier = MemeOptions.GetInt(_r_fontSizeMin, 100);
+        _options.CardOpacity           = MemeOptions.GetInt(_r_opacity, 62).ClampByte().Clamp100();
+        _options.TextOffset            = MemeOptions.GetInt(_r_offset,  50);
 
-        _options.WrapText = Options.CheckAndCut(_r_nowrap).Failed();
+        _options.WrapText = MemeOptions.CheckAndCut(_r_nowrap).Failed();
     }
 
     protected override string GetMemeText(string? text)
     {
         var generate = text.IsNull_OrEmpty();
-        var capitalize = Options.CheckCaps(_r_caps, generate);
+        var capitalize = MemeOptions.CheckCaps(_r_caps, generate);
 
         var caption = generate ? Baka.Generate() : text!;
 

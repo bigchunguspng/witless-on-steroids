@@ -2,14 +2,8 @@
 
 namespace PF_Bot.Features_Main.Text.Commands
 {
-    public class GenerateByFirstWord : WitlessAsyncCommand
+    public class GenerateByFirstWord : CommandHandlerAsync
     {
-        // todo make _rgx_repeat command agnostic and move outta here
-        private static readonly Regex
-            _rgx_repeat = new(@"^\/a\S*([2-9])\S*", RegexOptions.Compiled),
-            _rgx_upper = new("[A-ZА-Я]", RegexOptions.Compiled),
-            _rgx_lower = new("[a-zа-я]", RegexOptions.Compiled);
-
         protected override async Task Run()
         {
             string word = null!, opening = null!;
@@ -25,8 +19,8 @@ namespace PF_Bot.Features_Main.Text.Commands
                 opening = Args.Remove(Args.Length - word.Length);
             }
 
-            var up = Command!.Contains("up");
-            var repeats = _rgx_repeat.ExtractGroup(1, Command!, int.Parse, 1);
+            var up = Options.Contains("up");
+            var repeats = _rgx_repeat.ExtractGroup(0, Options, int.Parse, 1);
             var texts = new string[repeats];
             for (var i = 0; i < repeats; i++)
             {
@@ -44,7 +38,13 @@ namespace PF_Bot.Features_Main.Text.Commands
             LogXD(Title, repeats, "FUNNY BY WORD");
         }
 
-        // todo move 2 below to some kinda helpers
+        // todo move stuff below to some kinda helpers
+        // todo move _rgx_repeat outta here
+        protected static readonly Regex
+            _rgx_repeat = new("[2-9]",   RegexOptions.Compiled);
+        private static readonly Regex
+            _rgx_upper  = new("[A-ZА-Я]", RegexOptions.Compiled),
+            _rgx_lower  = new("[a-zа-я]", RegexOptions.Compiled);
 
         protected static LetterCase GetMode(string? s)
         {

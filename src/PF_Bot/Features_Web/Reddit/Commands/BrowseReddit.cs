@@ -15,11 +15,8 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentNaming
 {
-    public class BrowseReddit : AsyncCommand
+    public class BrowseReddit : CommandHandlerAsync
     {
-        private static readonly Regex
-            _rgx_wtf = new(@"^\/w[^s_@]", RegexOptions.Compiled);
-
         private static readonly RedditApp Reddit = App.Reddit;
 
         // input: /w {reply message}
@@ -29,11 +26,12 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
         // input: /w search query [subreddit*] [-ops]   (ops: -h/-n/-t/-c/-ta/...)
         protected override async Task Run()
         {
-            if        (MessageRepliesToRequest()) await Run();
-            else if (_rgx_wtf.IsMatch (Command!)) await Scroll();
-            else if (Command!.StartsWith("/wss")) await LookForSubreddits();
-            else if (Command!.StartsWith("/ws" )) await OpenSubreddit();
-            else /*                       /w   */ await RedditSearch_OrOpenRandom();
+            if     (MessageRepliesToRequest())            await Run();
+            else if (Options.Length == 0)      /* /w   */ await SearchPosts();
+            else if (Options.StartsWith('s'))
+                if  (Options.StartsWith("ss")) /* /wss */ await FindSubreddits();
+                else                           /* /ws  */ await OpenSubreddit();
+            else                               /* /ww  */ await Scroll();
         }
 
         private bool MessageRepliesToRequest()
@@ -44,7 +42,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             var text = message.GetTextOrCaption();
             var success = text?.StartsWith("/w", StringComparison.OrdinalIgnoreCase) ?? false;
             if (success)
-                Context = CommandContext.FromMessage(message);
+                Context = new CommandContext(message, Command);
 
             return success;
         }
@@ -55,7 +53,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             await SendPost(Reddit.GetLastOrRandomQuery(Chat));
         }
 
-        private async Task LookForSubreddits()
+        private async Task FindSubreddits()
         {
             if (Args != null)
             {
@@ -65,7 +63,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             else
             {
                 Log($"{Title} >> REDDIT SUBS ?");
-                Bot.SendMessage(Origin, REDDIT_SUBS_MANUAL);
+                SendManual(REDDIT_SUBS_MANUAL);
             }
         }
 
@@ -79,11 +77,11 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             else
             {
                 Log($"{Title} >> REDDIT ?");
-                Bot.SendMessage(Origin, REDDIT_MANUAL);
+                SendManual(REDDIT_MANUAL);
             }
         }
 
-        private async Task RedditSearch_OrOpenRandom()
+        private async Task SearchPosts()
         {
             if (RedditHelpers.ParseArgs_SearchOrScroll(Args) is { } query)
             {
@@ -124,6 +122,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             }
             catch
             {
+                Status = CommandResultStatus.BAD; // to the bone 😂🤣😭👌️
                 Bot.SendMessage(Origin, "💀");
 
                 //                   He sends

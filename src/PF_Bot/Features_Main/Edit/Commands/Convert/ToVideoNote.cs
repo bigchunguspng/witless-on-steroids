@@ -1,14 +1,14 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Convert
 {
-    public class ToVideoNote : VideoCommand
+    public class ToVideoNote : FileEditor_Video
     {
         protected override async Task Execute()
         {
-            var input = await DownloadFile();
+            var input = await GetFile();
             var (output, probe, options) = await input.InitEditing("note", ".mp4");
 
             var video = probe.GetVideoStream();
@@ -24,8 +24,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Convert
 
             await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
-            await using var stream = System.IO.File.OpenRead(output);
-            Bot.SendVideoNote(Origin, InputFile.FromStream(stream));
+            SendFile(output, MediaType.Round);
             Log($"{Title} >> NOTE (*)");
         }
     }

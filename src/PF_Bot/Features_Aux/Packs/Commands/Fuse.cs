@@ -4,7 +4,7 @@ using PF_Bot.Commands;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing.Callbacks;
 using PF_Tools.Copypaster.Helpers;
 using Telegram.Bot.Types;
 
@@ -32,7 +32,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
         }
     }
 
-    public class Fuse : AsyncSettingsCommand
+    public class Fuse : CommandHandlerAsync_SettingsAsync
     {
         [Flags]
         private enum FuseSource
@@ -47,6 +47,10 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             FilePrivate = File | Private,
         }
 
+        protected override CommandRequirements Requirements
+            => base.Requirements
+             | CommandRequirements.Copypaster;
+
         protected override async Task RunAuthorized()
         {
             var args = Args.SplitN(2);
@@ -55,7 +59,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             else if (Message.ProvidesFile("application/json", out document)) await ProcessJsonAttachment(document);
             else if (args.Length == 0)
             {
-                Bot.SendMessage(Origin, FUSE_MANUAL);
+                SendManual(FUSE_MANUAL);
                 Log($"{Title} >> FUSE ?");
             }
             else
@@ -99,6 +103,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
         {
             if (chat == Chat)
             {
+                Status = CommandResultStatus.BAD;
                 Bot.SendSticker(Origin, InputFile.FromFileId(HOLY_MOLY));
             }
             else if (ChatManager.Knowns(chat))
@@ -109,31 +114,36 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 await Baka_Fuse_Report(PackManager.GetPackPath(chat));
             }
             else
+            {
+                Status = CommandResultStatus.BAD;
                 Bot.SendMessage(Origin, FUSE_CHAT_NOT_FOUND);
+            }
         }
 
         private async Task FuseWithPack(bool isPrivate, string arg)
         {
             var files = PackManager.GetPacksFolder(Chat, isPrivate).GetFiles($"{arg}{Ext_Pack}");
-            if (files.Length > 0)
-                await Baka_Fuse_Report(files[0]);
-            else
+            if (files.Length == 0)
+            {
+                Status = CommandResultStatus.BAD;
                 ListingPacks.SendPackList(new ListPagination(Origin), isPrivate, fail: true);
+            }
+            else
+                await Baka_Fuse_Report(files[0]);
         }
 
         private async Task ProcessEatingRequest(bool isPrivate, string[] args)
         {
-            var name = string.Join(' ', args.Skip(1));
+            var name = string.Join(' ', args.Skip(1)); // todo investigate skip 1
 
             var files = PackManager.GetFilesFolder(Chat, isPrivate).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
+                Status = CommandResultStatus.BAD;
                 ListingPacks.SendFileList(new ListPagination(Origin), isPrivate, fail: true);
             }
             else
-            {
                 await EatFromJsonFile(files[0]);
-            }
         }
 
         // PROCESS FILE
@@ -162,6 +172,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             catch // wrong format
             {
                 File.Delete(path);
+                Status = CommandResultStatus.BAD;
                 Bot.SendMessage(Origin, GetJsonFormatExample());
             }
         }
@@ -227,7 +238,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
         }
 
         private int GetWordsPerLineLimit
-            () => Command!.MatchNumber().ExtractGroup(0, int.Parse, int.MaxValue);
+            () => Options.MatchNumber().ExtractGroup(0, int.Parse, int.MaxValue);
 
         private void Log_FUSION
             () => Log($"{Title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);

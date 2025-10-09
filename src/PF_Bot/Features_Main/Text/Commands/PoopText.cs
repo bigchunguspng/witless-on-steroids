@@ -1,5 +1,5 @@
 ﻿using PF_Bot.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 
 namespace PF_Bot.Features_Main.Text.Commands;
 

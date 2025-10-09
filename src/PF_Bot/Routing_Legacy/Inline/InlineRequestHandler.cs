@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 
-namespace PF_Bot.Routing.Inline;
+namespace PF_Bot.Routing_Legacy.Inline;
 
 public class InlineRequestHandler
 {

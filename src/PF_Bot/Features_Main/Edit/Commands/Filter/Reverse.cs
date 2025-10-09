@@ -3,11 +3,11 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Reverse : AudioVideoCommand
+    public class Reverse : FileEditor_AudioVideo
     {
         protected override async Task Execute()
         {
-            var input = await DownloadFile();
+            var input = await GetFile();
 
             var (output, probe, options) = await input.InitEditing("Reverse", Ext);
 

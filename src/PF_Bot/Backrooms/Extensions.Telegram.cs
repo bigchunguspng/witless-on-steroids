@@ -26,6 +26,12 @@ public static partial class Extensions
         }
     }
 
+    public static int? GetThread
+        (this Message message)
+        =>     message.IsAutomaticForward  ? message.Id              // channel post
+            :  message.IsTopicMessage      ? message.MessageThreadId // forum thread message
+            :  message.ReplyToMessage?.Id ?? message.MessageThreadId;
+
     public static string Format_ChatMessage
         (this Message message) => $"{message.Chat.Id}-{message.Id}";
 
@@ -83,7 +89,7 @@ public static partial class Extensions
     // MEDIA GET
 
     public static MessageOrigin GetOrigin
-        (this Message message) => (message.Chat.Id, message.MessageThreadId);
+        (this Message message) => (message.Chat.Id, message.GetThread());
 
     public static PhotoSize? GetPhoto
         (this Message message) => message.Photo?[^1];
@@ -140,7 +146,7 @@ public static partial class Extensions
     public static bool SenderIsBotAdmin
         (this Message message) => message.From != null && Config.AdminIDs.Contains(message.From.Id);
 
-    public static async Task<bool> SenderIsAdmin(this Message message)
+    public static async Task<bool> SenderIsChatAdmin(this Message message)
     {
         var chat = message.Chat.Id;
         if (message.SenderChat is not null)
@@ -151,14 +157,14 @@ public static partial class Extensions
         }
         else if (await message.From.IsAdminInChat(chat) == false)
         {
-            App.Bot.SendMessage(message.GetOrigin(), NOT_ADMIN.PickAny());
+            App.Bot.SendMessage(message.GetOrigin(), NOT_A_CHAT_ADMIN.PickAny());
         }
         else return true;
 
         return false;
     }
 
-    public static async Task<bool> IsAdminInChat(this User? user, long chat)
+    private static async Task<bool> IsAdminInChat(this User? user, long chat)
     {
         if (user is null) return false;
 

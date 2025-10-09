@@ -1,14 +1,13 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
-// ReSharper disable InconsistentNaming
+namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
-namespace PF_Bot.Features_Main.Edit.Commands.Direct;
-
-public class UseFFMpeg : AudioVideoPhotoCommand
+public class UseFFMpeg : FileEditor_AudioVideoPhoto
 {
     protected override string SyntaxManual => $"/man_44\n{ALIAS_INFO}/apeg_info";
 
@@ -32,12 +31,16 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         // GET OPTIONS
         var options = string.Join(' ', args.SkipLast(1));
 
-        if (Context.ApplyAliases(ref options, Dir_Alias_Peg).Failed()) return;
+        if (Context.ApplyAliases(ref options, Dir_Alias_Peg).Failed())
+        {
+            Status = CommandResultStatus.BAD;
+            return;
+        }
 
         // PROCESS OTHER OPTIONS
-        var vf = OptionUsed('v');
-        var af = OptionUsed('a');
-        var fc = OptionUsed('c');
+        var vf = Options.Contains('v');
+        var af = Options.Contains('a');
+        var fc = Options.Contains('c');
 
         if (vf || af || fc)
         {
@@ -59,20 +62,21 @@ public class UseFFMpeg : AudioVideoPhotoCommand
         var extensionInvalid = extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
+            Status = CommandResultStatus.BAD;
             await ManualEditing.SendTrollface(Origin, extensionInvalid);
             return;
         }
 
         // EXECUTE
 
-        var input = await DownloadFile();
+        var input = await GetFile();
         var output = input.GetOutputFilePath("Edit", $".{extension}");
 
         options = options.Replace("THIS", input);
 
         await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
-        SendResult(output, extension, sendDocument: OptionUsed('g'));
+        SendResult(output, extension, sendDocument: Options.Contains('g'));
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 
@@ -81,38 +85,21 @@ public class UseFFMpeg : AudioVideoPhotoCommand
      && (options.Contains("gdigrab")
       || options.Contains("x11grab"));
 
-    private bool OptionUsed(char option)
-    {
-        return Command!.Length > 4 && Command.IndexOf(option, 4) > 0;
-    }
-
-    protected override bool MessageContainsFile(Message m)
-    {
-        if      (m.Photo     != null) (File, Ext) = (m.Photo[^1], ".jpg");
-        else if (m.Audio     != null) (File, Ext) = (m.Audio    , m.Audio   .FileName.GetExtension_Or(".mp3"));
-        else if (m.Video     != null) (File, Ext) = (m.Video    , ".mp4");
-        else if (m.Animation != null) (File, Ext) = (m.Animation, ".mp4");
-        else if (m.HasImageSticker()) (File, Ext) = (m.Sticker! , ".webp");
-        else if (m.HasVideoSticker()) (File, Ext) = (m.Sticker! , ".webm");
-        else if (m.Voice     != null) (File, Ext) = (m.Voice    , ".ogg");
-        else if (m.VideoNote != null) (File, Ext) = (m.VideoNote, ".mp4");
-        else if (m.Document  != null) (File, Ext) = (m.Document , m.Document.FileName.GetExtension_Or(".png"));
-        else return false;
-
-        return true;
-    }
+    protected override bool MessageContainsFile(Message m) => GetAnyFileID(m);
 
     private void SendResult(string result, string extension, bool sendDocument = false)
     {
-        using var stream = System.IO.File.OpenRead(result);
-        if      (sendDocument)            Bot.SendDocument (Origin, InputFile_FromStream());
-        else if (_pic.IsMatch(extension)) Bot.SendPhoto    (Origin, InputFile.FromStream(stream));
-        else if (extension == "webp")     Bot.SendSticker  (Origin, InputFile.FromStream(stream));
-        else if (extension == "mp3")      Bot.SendAudio    (Origin, InputFile_FromStream());
-        else if (extension == "mp4")      Bot.SendAnimation(Origin, InputFile_FromStream());
-        else                              Bot.SendDocument (Origin, InputFile_FromStream());
+        var type =     sendDocument ? MediaType.Other :
+            extension     == "webp" ? MediaType.Stick :
+            extension     ==  "mp3" ? MediaType.Audio :
+            extension     ==  "mp4" ? MediaType.Anime :
+            _pic.IsMatch(extension) ? MediaType.Photo : MediaType.Other;
 
-        InputFile InputFile_FromStream() => InputFile.FromStream(stream, $"made with piece_fap_bot.{extension}");
+        var name = type is MediaType.Photo or MediaType.Stick
+            ? null
+            : $"made with piece_fap_bot.{extension}";
+
+        SendFile(result, type, name);
     }
 
     private static readonly Regex

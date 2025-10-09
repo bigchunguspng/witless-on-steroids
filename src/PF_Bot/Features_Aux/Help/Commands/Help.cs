@@ -1,6 +1,6 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Help.Helpers;
-using PF_Bot.Routing_New.Routers;
+using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Aux.Help.Commands;
@@ -21,11 +21,11 @@ public class Help_Callback : CallbackHandler
     }
 }
 
-public class Help : SyncCommand
+public class Help : CommandHandlerBlocking
 {
     protected override void Run()
     {
-        var args = Args ?? (Command!.Contains('_') ? Command.Substring(Command.IndexOf('_') + 1) : "");
+        var args = Args ?? (Options.IndexOf('_') is var i and >= 0 ? Options.Substring(i + 1) : "");
         RTFM.SendManualPage(Origin, args);
         Log($"{Title} >> MAN {args}");
     }

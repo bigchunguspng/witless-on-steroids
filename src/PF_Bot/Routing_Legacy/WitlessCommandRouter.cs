@@ -1,18 +1,15 @@
 ﻿using PF_Bot.Core;
-using PF_Bot.Features_Aux.Packs.Commands;
-using PF_Bot.Features_Aux.Settings.Commands;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Memes.Commands;
 using PF_Bot.Features_Main.Text.Commands;
-using PF_Bot.Features_Web.Boards.Commands;
-using PF_Bot.Features_Web.Reddit.Commands;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing;
+namespace PF_Bot.Routing_Legacy;
 
 public class WitlessCommandRouter : WitlessSyncCommand
 {
+    /*
     private readonly ChatInfo _chat = new();
     private readonly Baguette _baguette = new();
     private readonly Move _move = new();
@@ -23,6 +20,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
     private readonly ToggleStickers _stickers = new();
     private readonly ToggleAdmins _admins = new();
     private readonly Delete _delete = new();
+    */
 
     private readonly CommandRouter _parent;
 
@@ -45,6 +43,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
         };
 
         _witlessCommands = new CommandRegistry<Func<AnyCommand<WitlessContext>>>.Builder()
+            /*
             .Register("dp"      , () => new Demo_Dp())
             .Register("dg"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Square))
             .Register("dv"      , () => new Demo_Dg().SetMode(Demo_Dg.Mode.Wide))
@@ -69,6 +68,7 @@ public class WitlessCommandRouter : WitlessSyncCommand
             .Register("move"    , () => _move.WithMode(ExportMode.Private))
             .Register("delete"  , () => _delete)
             .Register("admins"  , () => _admins)
+            */
             .Build();
     }
 

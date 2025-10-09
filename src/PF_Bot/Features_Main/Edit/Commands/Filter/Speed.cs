@@ -5,7 +5,7 @@ using static PF_Bot.Features_Main.Edit.Commands.Filter.Speed.Mode;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Speed : AudioVideoCommand
+    public class Speed : FileEditor_AudioVideo
     {
         private double _speed, _value;
         private Mode _mode;
@@ -18,12 +18,12 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            _value = Context.HasDoubleArgument(out var x) ? x : 2D;
+            _value = Args.TryParseAsDouble(out var x) ? x : 2D;
             _speed = _mode == Fast ? _value : 1 / _value;
             _speed = Math.Clamp(_speed, 0.1, 94);
             _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
 
-            var input = await DownloadFile();
+            var input = await GetFile();
 
             var (output, probe, options) = await input.InitEditing("Speed", Ext);
 

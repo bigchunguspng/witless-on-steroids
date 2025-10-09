@@ -13,11 +13,11 @@ namespace PF_Bot.Features_Web.Reddit.Commands
         {
             if (RedditHelpers.ParseArgs_SearchOrScroll(Args) is { } query)
             {
-                var message = Bot.PingChat(Origin, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
-                await Bot.RunOrThrow(EatComments(query), Chat, message);
+                MessageToEdit = Bot.PingChat(Origin, string.Format(REDDIT_COMMENTS_START, MAY_TAKE_A_WHILE));
+                await EatComments(query);
             }
             else
-                Bot.SendMessage(Origin, REDDIT_COMMENTS_MANUAL);
+                SendManual(REDDIT_COMMENTS_MANUAL);
         }
 
         private async Task EatComments(RedditQuery query)

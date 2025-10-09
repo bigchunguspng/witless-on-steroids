@@ -1,9 +1,8 @@
 using PF_Bot.Core;
-using PF_Bot.Routing.Commands;
 using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing_New.Routers;
+namespace PF_Bot.Routing.Callbacks;
 
 public abstract class CallbackHandler
 {

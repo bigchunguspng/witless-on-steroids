@@ -9,7 +9,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
     //      /pub ! [name]    = PACK: PRIVATE -> PUBLIC
     //      /pub * [name]    = FILE: PRIVATE -> PUBLIC
 
-    public class Move : SettingsCommand
+    public class Move : CommandHandlerAsync_SettingsBlocking
     {
         private bool _public = true;
 
@@ -31,6 +31,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 var name = PackManager.Move(Chat, name: Args ?? Title, _public);
                 if (name == null)
                 {
+                    Status = CommandResultStatus.BAD;
                     Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
                 }
                 else
@@ -63,6 +64,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             }
             else
             {
+                Status = CommandResultStatus.BAD;
                 var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
                 Bot.SendMessage(Origin, text);
             }

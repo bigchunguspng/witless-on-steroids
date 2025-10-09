@@ -1,28 +1,15 @@
 using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Admin.Fun;
 
-public class React : SyncCommand
+public class React : CommandHandlerBlocking_Admin
 {
-    protected override void Run()
+    protected override void RunAuthourized()
     {
-        if (Message.SenderIsBotAdmin().Janai())
-        {
-            Bot.SendMessage(Origin, FORBIDDEN.PickAny());
-            return;
-        }
-
         if (Args is null)
         {
-            var manual =
-                """
-                <code>/re [message_url] [reaction]</code>
-
-                Reactions: 👍👎❤🔥🥰👏😁🤔🤯😱🤬😢🎉🤩🤮💩🙏👌🕊🤡🥱🥴😍🐳❤‍🔥🌚🌭💯🤣⚡🍌🏆💔🤨😐🍓🍾💋🖕😈😴😭🤓👻👨‍💻👀🎃🙈😇😨🤝✍🤗🫡🎅🎄☃💅🤪🗿🆒💘🙉🦄😘💊🙊😎👾🤷‍♂🤷🤷‍♀😡
-                """;
-            Bot.SendMessage(Origin, manual);
+            SendManual(MANUAL);
             return;
         }
 
@@ -36,4 +23,15 @@ public class React : SyncCommand
         Bot.ReactAsync(chat, message, reaction);
         Log($"REACTION >> {chat}", LogLevel.Info, LogColor.Yellow);
     }
+
+    private const string
+        RE1 = @"👍👎❤🔥🥰👏😁🤔🤯😱🤬😢🎉🤩🤮💩🙏👌🕊🤡🥱🥴😍🐳❤‍",
+        RE2 = @"🔥🌚🌭💯🤣⚡🍌🏆💔🤨😐🍓🍾💋🖕😈😴😭🤓👻👨‍💻👀🎃🙈😇",
+        RE3 = @"😨🤝✍🤗🫡🎅🎄☃💅🤪🗿🆒💘🙉🦄😘💊🙊😎👾🤷‍♂🤷🤷‍♀😡",
+        MANUAL =
+            $"""
+             <code>/re [message_url] [reaction]</code>
+
+             Reactions: {RE1}{RE2}{RE3}
+             """;
 }

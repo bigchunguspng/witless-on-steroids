@@ -30,35 +30,35 @@ namespace PF_Bot.Features_Main.Memes.Commands
         protected override bool ResultsAreRandom
             => _options.RandomTextColor
             || _options.FontOption.IsRandom
-            || Options.Check(_r_add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
+            || MemeOptions.Check(_r_add_bottom) && Args!.Contains('\n').Janai(); // (random bottom text)
 
         protected override void ParseOptions()
         {
-            _options.CustomColorBack = _colorWizardBack.CheckAndCut(Options);
-            _options.CustomColorText = _colorWizardText.CheckAndCut(Options);
+            _options.CustomColorBack = _colorWizardBack.CheckAndCut(MemeOptions);
+            _options.CustomColorText = _colorWizardText.CheckAndCut(MemeOptions);
 
-            _options.FontOption = _fontWizard.CheckAndCut(Options);
+            _options.FontOption = _fontWizard.CheckAndCut(MemeOptions);
 
-            _options.FontSizeMultiplier = Options.GetInt(_r_fontSize, 100);
-            _options.ShadowOpacity      = Options.GetInt(_r_shadow, 100).ClampByte().Clamp100();
-            _options.TextOffset         = Options.GetInt(_r_offset, -1);
+            _options.FontSizeMultiplier = MemeOptions.GetInt(_r_fontSize, 100);
+            _options.ShadowOpacity      = MemeOptions.GetInt(_r_shadow, 100).ClampByte().Clamp100();
+            _options.TextOffset         = MemeOptions.GetInt(_r_offset, -1);
 
-            _options.RandomTextOffset   = Options.CheckAndCut(_r_randomOffset);
-            _options.WrapText           = Options.CheckAndCut(_r_nowrap).Failed();
-            _options.RandomTextColor    = Options.CheckAndCut(_r_colorText);
-            _options.AbsolutelyNoMargin = Options.CheckAndCut(_r_noMarginDude);
-            _options.NoMargin           = Options.CheckAndCut(_r_noMargin);
+            _options.RandomTextOffset   = MemeOptions.CheckAndCut(_r_randomOffset);
+            _options.WrapText           = MemeOptions.CheckAndCut(_r_nowrap).Failed();
+            _options.RandomTextColor    = MemeOptions.CheckAndCut(_r_colorText);
+            _options.AbsolutelyNoMargin = MemeOptions.CheckAndCut(_r_noMarginDude);
+            _options.NoMargin           = MemeOptions.CheckAndCut(_r_noMargin);
         }
 
         protected override TextPair GetMemeText(string? text)
         {
             var generate = text.IsNull_OrEmpty();
-            var capitalize = Options.CheckCaps(_r_caps, generate);
+            var capitalize = MemeOptions.CheckCaps(_r_caps, generate);
 
-            var lowerCase      = Options.Check(_r_lowerCase);
-            var addBottomText  = Options.Check(_r_add_bottom);
-            var onlyBottomText = Options.Check(_r_only_bottom);
-            var onlyTopText    = Options.Check(_r_top_only);
+            var lowerCase      = MemeOptions.Check(_r_lowerCase);
+            var addBottomText  = MemeOptions.Check(_r_add_bottom);
+            var onlyBottomText = MemeOptions.Check(_r_only_bottom);
+            var onlyTopText    = MemeOptions.Check(_r_top_only);
 
             string a, b;
 

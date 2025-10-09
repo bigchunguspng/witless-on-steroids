@@ -4,7 +4,7 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Sus : AudioVideoCommand
+    public class Sus : FileEditor_AudioVideo
     {
         protected override string SyntaxManual => "/man_sus";
 
@@ -14,9 +14,9 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             var parsing = ArgumentParsing.GetCutTimecodes(Args?.Split());
             if (parsing.Failed)
             {
-                if (Args is not null)
+                if (Args != null)
                 {
-                    Bot.SendMessage(Origin, SUS_MANUAL);
+                    SendManual(SUS_MANUAL);
                     return;
                 }
                 argless = true;
@@ -24,7 +24,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
             var (_, start, length) = parsing;
 
-            var input = await DownloadFile();
+            var input = await GetFile();
             var (output, probe, options) = await input.InitEditing("Sus", Ext);
 
             length = argless                  ? probe.Duration / 2D
@@ -48,7 +48,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             string av, string a, string concat
         )
         {
-            var ss = start.TotalSeconds;
+            var ss =  start.TotalSeconds;
             var ls = length.TotalSeconds;
             args
                 .Filter($"[0:{av}]{a}trim=start={ss}:duration={ls},{a}setpts=PTS-STARTPTS,{a}split=2[{av}0][{av}1]")

@@ -2,7 +2,7 @@
 
 namespace PF_Bot.Commands;
 
-public class SendMessage : SyncCommand
+public class SendMessage : CommandHandlerBlocking
 {
     private string _text = null!;
 
@@ -13,6 +13,11 @@ public class SendMessage : SyncCommand
     }
 
     protected override void Run() => Bot.SendMessage(Origin, _text);
+}
+
+public class SendChatId : CommandHandlerBlocking
+{
+    protected override void Run() => Bot.SendMessage(Origin, $"<code>{Chat}</code>");
 }
 
 //                    L I V E   G O K U   R E A C T I O N :

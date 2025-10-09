@@ -3,7 +3,7 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Volume : AudioVideoCommand
+    public class Volume : FileEditor_AudioVideo
     {
         private string _arg = null!;
 
@@ -11,15 +11,11 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            if (Args is null)
-            {
-                Bot.SendMessage(Origin, VOLUME_MANUAL);
-            }
-            else
+            if (Args != null)
             {
                 _arg = Args.Split(' ', 2)[0];
 
-                var input = await DownloadFile();
+                var input = await GetFile();
                 var output = input.GetOutputFilePath("vol", Ext);
 
                 await FFMpeg.Args()
@@ -33,6 +29,8 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
                 SendResult(output);
                 Log($"{Title} >> VOLUME [{_arg}]");
             }
+            else
+                SendManual(VOLUME_MANUAL);
         }
 
         protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");

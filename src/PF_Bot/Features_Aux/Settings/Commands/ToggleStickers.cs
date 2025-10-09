@@ -3,7 +3,7 @@ using PF_Bot.Features_Aux.Settings.Core;
 
 namespace PF_Bot.Features_Aux.Settings.Commands
 {
-    public class ToggleStickers : SettingsCommand
+    public class ToggleStickers : CommandHandlerAsync_SettingsBlocking
     {
         protected override void RunAuthorized()
         {

@@ -1,18 +1,17 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Main.Edit.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Convert;
 
-public class ToGIF : VideoPhotoCommand
+public class ToGIF : FileEditor_VideoPhoto
 {
     protected override string SyntaxManual => "/man_g";
 
     protected override async Task Execute()
     {
-        var input = await DownloadFile();
+        var input = await GetFile();
 
         var options = FFMpeg.OutputOptions().FixVideo_Playback();
 
@@ -49,13 +48,10 @@ public class ToGIF : VideoPhotoCommand
 
         await args.Out(output, options).FFMpeg_Run();
 
-        await using var stream = System.IO.File.OpenRead(output);
-        Bot.SendAnimation(Origin, InputFile.FromStream(stream, VideoFileName));
+        SendFile(output, MediaType.Anime, "piece_fap_bot-gif.mp4");
         Log($"{Title} >> GIF [~]");
     }
 
     private double GetImageLoopDuration() =>
-        Context.HasDoubleArgument(out var value) ? Math.Clamp(value, 0.01, 120) : 5;
-
-    private new const string VideoFileName = "piece_fap_bot-gif.mp4";
+        Args.TryParseAsDouble(out var value) ? Math.Clamp(value, 0.01, 120) : 5;
 }

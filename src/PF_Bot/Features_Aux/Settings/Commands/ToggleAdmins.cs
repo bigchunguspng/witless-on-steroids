@@ -3,15 +3,18 @@ using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Aux.Settings.Commands
 {
-    public class ToggleAdmins : WitlessSyncCommand
+    public class ToggleAdmins : CommandHandlerAsync
     {
-        protected override void Run()
+        protected override CommandRequirements Requirements
+            => CommandRequirements.Settings;
+
+        protected override async Task Run()
         {
-            if (Context.ChatIsPrivate)
+            if (Chat.ChatIsPrivate())
             {
-                Bot.SendMessage(Origin, GROUPS_ONLY_COMAND);
+                Deny(DenyReason.ONLY_GROUPS);
             }
-            else if (Message.SenderIsAdmin().Result)
+            else if (await Message.SenderIsChatAdmin())
             {
                 Data.AdminsOnly = Data.AdminsOnly.Janai();
                 ChatManager.SaveChats();
@@ -19,6 +22,8 @@ namespace PF_Bot.Features_Aux.Settings.Commands
                 Bot.SendMessage(Origin, text);
                 Log($"{Title} >> ADMINS ONLY >> {(Data.AdminsOnly ? "YES" : "NO")}");
             }
+            else
+                Deny(DenyReason.ONLY_CHAT_ADMINS);
         }
     }
 }

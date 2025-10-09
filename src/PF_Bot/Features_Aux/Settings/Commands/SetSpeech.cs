@@ -4,11 +4,11 @@ using PF_Bot.Features_Aux.Settings.Core;
 
 namespace PF_Bot.Features_Aux.Settings.Commands;
 
-public class SetSpeech : SettingsCommand
+public class SetSpeech : CommandHandlerAsync_SettingsBlocking
 {
     protected override void RunAuthorized()
     {
-        if (Args is not null && Context.HasIntArgument(out var value))
+        if (Args.TryParseAsInt(out var value))
         {
             Data.Speech = value.ClampByte();
             ChatManager.SaveChats();
@@ -18,7 +18,7 @@ public class SetSpeech : SettingsCommand
         else
         {
             var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Data.Speech, "speech");
-            Bot.SendMessage(Origin, message);
+            SendManual(message);
         }
     }
 }

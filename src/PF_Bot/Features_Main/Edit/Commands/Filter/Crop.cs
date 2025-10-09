@@ -1,10 +1,10 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing_Legacy.Commands;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
 {
-    public class Crop : VideoPhotoCommand // todo shake is only for video
+    public class Crop : FileEditor_VideoPhoto // todo shake is only for video
     {
         private const string _crop  = "piece_fap_bot-crop.mp4";
         private const string _shake = "piece_fap_bot-shake.mp4";
@@ -32,7 +32,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            if (Args is not null || _isShakeMode)
+            if (Args != null || _isShakeMode)
             {
                 string[]? log = null;
                 var args = Args?.Split(' ');
@@ -66,7 +66,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
                 var cropArgs = string.Join(':', args);
 
-                var input = await DownloadFile();
+                var input = await GetFile();
                 var output = input.GetOutputFilePath("crop", Ext);
 
                 var options = FFMpeg.OutputOptions().VF($"crop={cropArgs}");
@@ -79,7 +79,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
                 Log($"{Title} >> {CropOrShake} [{(_isShakeMode ? string.Join(':', log!) : cropArgs)}]");
             }
             else
-                Bot.SendMessage(Origin, CROP_MANUAL);
+                SendManual(CROP_MANUAL);
         }
 
         protected override string VideoFileName => _isShakeMode ? _shake : _crop;

@@ -21,8 +21,8 @@ global using PF_Bot.Backrooms;
 
 global using static PF_Bot.Backrooms.Extensions;
 global using static PF_Bot.Core.Paths;
-global using static PF_Bot.Telegram.Literals.Texts;
-global using static PF_Bot.Telegram.Literals.Responses;
+global using static PF_Bot.Backrooms.Literals.Texts;
+global using static PF_Bot.Backrooms.Literals.Responses;
 global using static PF_Bot.Terminal.Texts;
 
 global using File = System.IO.File;

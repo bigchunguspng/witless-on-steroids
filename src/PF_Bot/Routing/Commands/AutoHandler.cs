@@ -1,9 +1,8 @@
 using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing_Legacy.Commands;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing_Legacy;
+namespace PF_Bot.Routing.Commands;
 
 public static class AutoHandler
 {
@@ -17,7 +16,7 @@ public static class AutoHandler
         if (Cache.Contains(chat, out var dictionary)) dictionary.Clear();
     }
 
-    public static string? TryGetMessageHandler(WitlessContext context, ChatSettings data)
+    public static string? TryGetMessageHandler(CommandContext context, ChatSettings data)
     {
         var expression = data.Options![MemeType.Auto];
         if (expression is null) return null;

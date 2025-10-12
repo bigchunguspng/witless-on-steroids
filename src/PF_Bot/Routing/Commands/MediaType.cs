@@ -1,4 +1,4 @@
-namespace PF_Bot.Routing_Legacy.Commands;
+namespace PF_Bot.Routing.Commands;
 
 public enum MediaType
 {

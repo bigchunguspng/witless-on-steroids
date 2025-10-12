@@ -1,10 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using PF_Bot.Core;
-using PF_Bot.Routing_Legacy.Commands;
-using PF_Bot.Routing_Legacy.Inline;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Inline;
 using PF_Bot.Routing.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -101,15 +100,6 @@ public partial class Bot
     {
         Print("How Did We Get Here?", ConsoleColor.Magenta);
         return Task.CompletedTask;
-    }
-
-    public void HandleCommandException(Exception e, CommandContext_Legacy? context)
-    {
-        LogError_ToFile(e, context, context?.Title ?? "[unknown]");
-        if (context != null)
-        {
-            SendMessage(context.Origin, GetSillyErrorMessage());
-        }
     }
 
     public void HandleMessageRoutingException(Exception e, Message message)

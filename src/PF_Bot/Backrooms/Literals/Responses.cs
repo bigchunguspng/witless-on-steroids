@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Telegram.Literals;
+﻿namespace PF_Bot.Backrooms.Literals;
 
 public static class Responses
 {

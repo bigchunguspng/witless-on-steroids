@@ -1,5 +1,4 @@
 ﻿using PF_Bot.Features_Web.Piracy.Core;
-using PF_Bot.Routing_Legacy.Commands;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
 

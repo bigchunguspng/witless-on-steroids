@@ -1,7 +1,7 @@
 ﻿using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Commands;
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing_Legacy;
+using PF_Bot.Routing.Commands;
 
 namespace PF_Bot.Features_Aux.Settings.Commands
 {

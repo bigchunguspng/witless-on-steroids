@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Routing_Legacy;
+﻿namespace PF_Tools.Backrooms.Types.Collections;
 
 public record struct CommandMapping<T>(string Command, T Handler);
 

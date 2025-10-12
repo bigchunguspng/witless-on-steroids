@@ -1,7 +1,6 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
-using PF_Bot.Routing_Legacy.Commands;
 using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Messages;
 using PF_Tools.FFMpeg;
@@ -11,7 +10,6 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 {
     public interface ImageProcessor
     {
-        void Pass(WitlessContext context);
         void Pass(MessageContext context);
 
         Task ProcessPhoto(FileBase file);
@@ -48,11 +46,6 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         protected virtual bool CropVideoNotes   => true;
         protected virtual bool ResultsAreRandom => false;
-
-        public void Pass(WitlessContext context)
-        {
-            throw new NotImplementedException();
-        }
 
         protected async Task RunInternal(string? options)
         {

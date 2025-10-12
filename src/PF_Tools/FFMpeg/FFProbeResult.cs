@@ -32,11 +32,8 @@ public class FFProbeResult(List<FFProbeResult.Stream> streams)
         public Size Size => new(Width ?? 0, Height ?? 0);
 
         public Type StreamType =>
-            CodecType is CODEC_audio
-                ? Type.Audio
-                : CodecType is CODEC_video
-                    ? Type.Video
-                    : Type.Other;
+            CodecType is CODEC_audio ? Type.Audio :
+            CodecType is CODEC_video ? Type.Video : Type.Other;
 
         public bool IsLikelyImage => Bitrate <= 0;
 
@@ -52,7 +49,8 @@ public class FFProbeResult(List<FFProbeResult.Stream> streams)
             Other,
         }
 
-        private const string CODEC_video = "video";
-        private const string CODEC_audio = "audio";
+        private const string
+            CODEC_video = "video",
+            CODEC_audio = "audio";
     }
 }

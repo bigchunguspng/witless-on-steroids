@@ -59,13 +59,13 @@ public class InlineRequestHandler
             foreach (var file in files)
                 results.Add(new InlineQueryResultCachedVoice(file.Id, file.FileId, file.GetTitle())
                 {
-                    Caption = caption, ParseMode = ParseMode.Html
+                    Caption = caption, ParseMode = ParseMode.Html,
                 });
         else
             foreach (var file in files)
                 results.Add(new InlineQueryResultCachedGif(file.Id, file.FileId)
                 {
-                    Caption = caption, ParseMode = ParseMode.Html
+                    Caption = caption, ParseMode = ParseMode.Html,
                 });
 
         return results;

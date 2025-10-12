@@ -5,13 +5,14 @@ namespace PF_Tools.Backrooms.Helpers;
 /// Random string generator.
 public static class Desert
 {
-    private static readonly string _chars32 =
-        "0123456789ABCDEFGHJKLNPQRSTUVXYZ";
-
-    private static readonly string _chars64 =
-        "0123456789"
-      + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      + "abcdefghijklmnopqrstuvwxyz_-";
+    private const string
+        _chars32 =
+            "0123456789"
+          + "ABCDEFGHJKLNPQRSTUVXYZ", // IMOW out
+        _chars64 =
+            "0123456789"
+          + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          + "abcdefghijklmnopqrstuvwxyz_-";
 
     /// Get a random char sequence of given length. <br/>
     /// Style: numbers, uppercase. <br/>

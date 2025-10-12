@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Features_Main.Edit.Core;
+﻿using PF_Bot.Features_Main.Edit.Core;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
@@ -10,16 +9,15 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            var args = Args?.Split().SkipWhile(x => x.StartsWith('/') || x.StartsWith("http")).ToArray();
+            var args = Args?.Split()
+                .SkipWhile(x => x.StartsWith('/') || x.StartsWith("http"))
+                .ToArray();
 
-            var parsing = ArgumentParsing.GetCutTimecodes(args);
-            if (parsing.Failed)
+            if (args.GetCutTimecodes(out var start, out var length).Failed())
             {
                 SendManual(CUT_MANUAL);
                 return;
             }
-
-            var (_, start, length) = parsing;
 
             var input = await GetFile();
 

@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Features_Main.Edit.Core;
+﻿using PF_Bot.Features_Main.Edit.Core;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter

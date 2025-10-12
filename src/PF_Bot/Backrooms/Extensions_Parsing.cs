@@ -1,21 +1,24 @@
-﻿namespace PF_Bot.Backrooms.Helpers;
+﻿namespace PF_Bot.Backrooms;
 
-// todo make it extension class
-public static class ArgumentParsing
+public static class Extensions_Parsing
 {
+    // SPLIT N
+
     private static readonly char[] _separators = [' ', '\n'];
 
     /// Splits arguments by whitespaces and line breaks.
-    public static string[] SplitN(this string? arguments, int count = int.MaxValue)
-    {
-        return arguments is null ? [] : arguments.Split(_separators, count, StringSplitOptions.RemoveEmptyEntries);
-    }
+    public static string[] SplitN
+        (this string? text, int count = int.MaxValue)
+        => text is null
+            ? []
+            : text.Split(_separators, count, StringSplitOptions.RemoveEmptyEntries);
 
     /// <seealso cref="SplitN"/>
-    public static bool CanBeSplitN(this string text)
-    {
-        return text.IndexOfAny(_separators) >= 0;
-    }
+    public static bool CanBeSplitN
+        (this string text)
+        => text.IndexOfAny(_separators) >= 0;
+
+    // TRY PARSE NUMBERS
 
     public static bool TryParseAsLong
         (this string? text, out long value)
@@ -44,28 +47,39 @@ public static class ArgumentParsing
         (this string text, out double value)
         => double.TryParse(text.Replace(',', '.'), out value);
 
-    public static (bool Failed, TimeSpan Start, TimeSpan Length) GetCutTimecodes(string[]? s)
+    // TIME SPANS
+
+    /// Expected syntax variants:
+    /// <br/> <c>length</c>
+    /// <br/> <c>start - end</c>
+    /// <br/> <c>start length</c>
+    /// <br/> <c>start fgsfds</c> (till the end)
+    /// <seealso cref="TryParseTime"/>
+    public static bool GetCutTimecodes
+        (this string[]? args, out TimeSpan start, out TimeSpan length)
     {
-        var zero = TimeSpan.Zero;
+        start = length = TimeSpan.Zero;
 
-        if (s is null) return (true, zero, zero);
+        if (args == null) return false;
 
-        var len = s.Length;
-        if     (len == 1 && s[0].IsTimeSpan(out var length)) return (false, zero,  length);      // [++]----]
-        if     (len >= 2 && s[0].IsTimeSpan(out var  start))
+        var     len = args.Length;
+        if     (len == 1 && args[0].TryParseTime(out  length)) return true;          // ==______ <- 2
+        if     (len >= 2 && args[0].TryParseTime(out   start))                       // __._____ <- 2 …
         {
-            if (len == 3 && s[2].IsTimeSpan(out var    end)) return (false, start, end - start); // [-[++]--]
-            if             (s[1].IsTimeSpan(out     length)) return (false, start, length);      // [-[++]--]
-            else                                             return (false, start, zero);        // [-[+++++]
+            if (len >= 3 && args[2].TryParseTime(out var end)) length = end - start; // __===___ <- 2 - 5
+            else            args[1].TryParseTime(out  length);  // __====== <- 2 .  OR  __===___ <- 2 3
+            return true;
         }
-        else                                                 return (true,  zero,  zero);        // [-------]
+        else return false;
     }
 
     private static readonly Regex
         _rgx_seconds = new(@"^(?:(\d+)[:;^Жж])?(\d+(?:[.,юб]\d+)?)$", RegexOptions.Compiled),
         _rgx_comma   = new("[,юб]", RegexOptions.Compiled);
 
-    private static bool IsTimeSpan(this string text, out TimeSpan span)
+    /// Expected syntax: <c>[minutes][:;^Жж][seconds][.,юб][ms]</c>.
+    private static bool TryParseTime
+        (this string text, out TimeSpan span)
     {
         span = TimeSpan.Zero;
         text = text.TrimStart('-');

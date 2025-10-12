@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Features_Main.Edit.Core;
+﻿using PF_Bot.Features_Main.Edit.Core;
 using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter
@@ -10,24 +9,17 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
 
         protected override async Task Execute()
         {
-            var argless = false;
-            var parsing = ArgumentParsing.GetCutTimecodes(Args?.Split());
-            if (parsing.Failed)
+            var parsing = (Args?.Split()).GetCutTimecodes(out var start, out var length);
+            if (parsing.Failed() && Args != null)
             {
-                if (Args != null)
-                {
-                    SendManual(SUS_MANUAL);
-                    return;
-                }
-                argless = true;
+                SendManual(SUS_MANUAL);
+                return;
             }
-
-            var (_, start, length) = parsing;
 
             var input = await GetFile();
             var (output, probe, options) = await input.InitEditing("Sus", Ext);
 
-            length = argless                  ? probe.Duration / 2D
+            length = Args == null             ? probe.Duration / 2D
                 : (start + length).Ticks <= 0 ? probe.Duration
                 : length;
 

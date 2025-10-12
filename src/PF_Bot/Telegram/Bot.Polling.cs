@@ -16,7 +16,7 @@ public partial class Bot
 {
     public static IMessageRouter  Router_Message  { get; private set; } = null!;
     public static ICallbackRouter Router_Callback { get; private set; } = null!;
-    public static InlineRequestHandler    Inliner { get; private set; } = new();
+    public static InlineQueryHandler      Inliner { get; private set; } = new();
 
     public void StartListening()
     {
@@ -88,7 +88,7 @@ public partial class Bot
     {
         try
         {
-            await Inliner.HandleRequest(inline);
+            await Inliner.Handle(inline);
         }
         catch (Exception e)
         {

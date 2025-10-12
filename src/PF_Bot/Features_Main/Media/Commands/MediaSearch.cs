@@ -5,9 +5,9 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 
-namespace PF_Bot.Routing.Inline;
+namespace PF_Bot.Features_Main.Media.Commands;
 
-public class InlineRequestHandler
+public class MediaSearch
 {
     private readonly Regex
         _rgx_sound_mode = new(@"^[as!*.@аз](?=[\s]|$)", RegexOptions.Compiled),
@@ -15,10 +15,8 @@ public class InlineRequestHandler
 
     // @bot [g!*.@гж] query[|caption]
 
-    public async Task HandleRequest(InlineQuery inline)
+    public async Task Search(InlineQuery inline)
     {
-        Telemetry.LogInline(inline.From.Id, inline.Query);
-
         string? query = inline.Query, caption = null;
 
         var captionMatch = _rgx_caption.Match(query);

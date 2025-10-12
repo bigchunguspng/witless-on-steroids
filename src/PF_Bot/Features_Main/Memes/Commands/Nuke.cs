@@ -1,5 +1,4 @@
-﻿using PF_Bot.Backrooms.Helpers;
-using PF_Bot.Features_Aux.Listing;
+﻿using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Main.Memes.Core.Generators;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
@@ -52,9 +51,7 @@ namespace PF_Bot.Features_Main.Memes.Commands
     {
         protected override Task Run()
         {
-            var pagination = Query.GetPagination(Content);
-
-            ListingNukes.SendNukeLog(pagination);
+            ListingNukes.SendNukeLog(GetPagination(Content));
             return Task.CompletedTask;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Commands;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Packs.Core;
@@ -22,7 +21,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
     {
         protected override Task Run()
         {
-            var pagination = Query.GetPagination(Content);
+            var pagination = GetPagination(Content);
 
             if      (Key == "fi") ListingPacks.SendPackList(pagination);
             else if (Key == "f!") ListingPacks.SendPackList(pagination, isPrivate: true);

@@ -1,4 +1,3 @@
-using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Help.Helpers;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
@@ -16,7 +15,7 @@ public class Help_Callback : CallbackHandler
 {
     protected override Task Run()
     {
-        RTFM.SendManualPage(Query.GetOrigin(), Content, Query.GetMessageId());
+        RTFM.SendManualPage(Origin, Content, Message.Id);
         return Task.CompletedTask;
     }
 }

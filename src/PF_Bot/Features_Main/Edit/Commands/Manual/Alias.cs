@@ -1,4 +1,3 @@
-using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Routing;
 using PF_Bot.Routing.Callbacks;
@@ -34,7 +33,7 @@ public class Alias_Callback(AliasContext ctx) : CallbackHandler
 {
     protected override Task Run()
     {
-        ListingAliases.SendList(ctx, Query.GetPagination(Content));
+        ListingAliases.SendList(ctx, GetPagination(Content));
         return Task.CompletedTask;
     }
 }

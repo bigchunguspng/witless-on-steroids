@@ -1,4 +1,3 @@
-using PF_Bot.Backrooms.Helpers;
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Packs.Commands;
@@ -51,7 +50,7 @@ public class ChanEaterCore_Callback(ImageBoardContext ctx) : CallbackHandler
 {
     protected override Task Run()
     {
-        var pagination = Query.GetPagination(Content);
+        var pagination = GetPagination(Content);
 
         if (Key == ctx.CallbackKey) ListingBoards.SendBoardList(ctx, pagination, ctx.Boards);
         else                        ListingBoards.SendSavedList(ctx, pagination);

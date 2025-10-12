@@ -1,4 +1,3 @@
-using PF_Bot.Backrooms.Helpers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing.Callbacks;
@@ -21,16 +20,24 @@ public class CallbackRouter_Default
 {
     public void Route(CallbackQuery query)
     {
-        if (query.Data == null) return;
+        var data = query.Data;
+        if (data == null) 
+            return;
 
-        LogDebug($"[Callback] {query.From.Id,14}.u {query.Message!.Chat.Id,14}.c {query.Message.Id,8}.M  |  {query.Data}");
+        var message = query.Message!;
 
-        var (key, content) = query.ParseData();
+        LogDebug($"[Callback] {query.From.Id,14}.u {message.Chat.Id,14}.c {message.Id,8}.M  |  {data}");
 
-        if (key == null) return;
+        var parts = data.Contains(SEPARATOR) ? data.Split(SEPARATOR, 2) : [];
+        if (parts.Length != 2) 
+            return;
+
+        var (key, content) = (parts[0], parts[1]);
 
         var handler = registry.Resolve(key);
         if (handler != null)
             handler.Invoke().Handle(new CallbackContext(query, key, content));
     }
+
+    private const string SEPARATOR = " - ";
 }

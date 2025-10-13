@@ -154,23 +154,32 @@ public abstract class CommandHandler
         }
     }
 
+    private List<FilePath>? Output;
+
+    public void RedirectFileOutputTo(List<FilePath> output)
+    {
+        Output = output;
+    }
+
     protected void SendFile(FilePath output, MediaType type, string? name = null)
     {
-        // defalut: send file
-        // todo pipe: pass to the next handler
-
-        using var stream = File.OpenRead(output);
-        var file = InputFile.FromStream(stream, name);
-        switch (type)
+        if (Output != null)
+            Output.Add(output);
+        else
         {
-            case MediaType.Photo: Bot.SendPhoto     (Origin, file); break;
-            case MediaType.Stick: Bot.SendSticker   (Origin, file); break;
-            case MediaType.Audio: Bot.SendAudio     (Origin, file); break;
-            case MediaType.Anime: Bot.SendAnimation (Origin, file); break;
-            case MediaType.Video: Bot.SendVideo     (Origin, file); break;
-            case MediaType.Round: Bot.SendVideoNote (Origin, file); break;
-            case MediaType.Voice: Bot.SendVoice     (Origin, file); break;
-            case MediaType.Other: Bot.SendDocument  (Origin, file); break;
+            using var stream = File.OpenRead(output);
+            var file = InputFile.FromStream(stream, name);
+            switch (type)
+            {
+                case MediaType.Photo: Bot.SendPhoto     (Origin, file); break;
+                case MediaType.Stick: Bot.SendSticker   (Origin, file); break;
+                case MediaType.Audio: Bot.SendAudio     (Origin, file); break;
+                case MediaType.Anime: Bot.SendAnimation (Origin, file); break;
+                case MediaType.Video: Bot.SendVideo     (Origin, file); break;
+                case MediaType.Round: Bot.SendVideoNote (Origin, file); break;
+                case MediaType.Voice: Bot.SendVoice     (Origin, file); break;
+                case MediaType.Other: Bot.SendDocument  (Origin, file); break;
+            }
         }
     }
 
@@ -200,7 +209,7 @@ public abstract class CommandHandler
 
     private void Log()
     {
-        if (Input.HasValue) return; // pipe mode
+        if (Input.HasValue || Output != null) return; // auto mode
 
         var A = GetMessageTypeChar(Message.ReplyToMessage);
         var B = GetMessageTypeChar(Message);

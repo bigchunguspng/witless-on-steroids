@@ -1,79 +1,95 @@
 using PF_Bot.Features_Aux.Settings.Core;
-using PF_Bot.Routing.Messages;
 using Telegram.Bot.Types;
+using HandlerChance = (int Percent, string Handler); // handler = pipe
 
-namespace PF_Bot.Routing.Commands;
+namespace PF_Bot.Routing.Messages;
 
 // auto = [expr 0][;] [expr N]
 // expr = [types][N%]:[pipe]
 // pipe = [section 0][ > ][section N]
 // sect = [command][options] [args]
 
+public class AutoHandlerMap : Dictionary<char, List<HandlerChance>>;
+
 public static class AutoHandler
 {
     private static readonly Regex
-        _rgx_handler = new(@"([pvagus]+)(\d{1,3}%)?:\s*(.+)", RegexOptions.Compiled);
+        _rgx_handler = new(@"([pvagus]+)(?:(\d{1,3})%)?:\s*(.+)", RegexOptions.Compiled);
 
     // todo investigate: cache has duplicate entries ?
-    private static readonly LimitedCache<long, Dictionary<char, List<(int Percent, string Command)>>> Cache = new(32);
+    private static readonly LimitedCache<long, AutoHandlerMap> Cache = new(32);
 
     public static void ClearCache(long chat)
     {
-        if (Cache.Contains(chat, out var dictionary)) dictionary.Clear();
+        if (Cache.Contains(chat, out var map)) map.Clear();
     }
 
-    public static string? TryGetMessageHandler(MessageContext context, ChatSettings data)
+    // EXPRESSION PARSING
+
+    public static LinkedList<string>? TryGetMessageHandler(MessageContext context, ChatSettings data)
     {
         var expression = data.Options![MemeType.Auto];
         if (expression is null) return null;
 
-        var handlers = Cache.Contains(context.Chat, out var cached) && cached.Count > 0
-            ? cached
-            : Parse(expression, context.Chat);
+        var handlers = Cache.Contains(context.Chat, out var map) && map.Count > 0
+            ? map
+            : Parse_AndCache(expression, context.Chat);
 
         foreach (var type in handlers.Keys)
         {
             var handler = handlers[type].FirstOrDefault(x => Fortune.LuckyFor(x.Percent));
             if (handler != default && MessageMatches(type, context.Message))
             {
-                if (type is not 'u')
-                    return handler.Command;
+                var sections = handler.Handler.Split(">").Select(x => x.Trim());
+                var pipe = new LinkedList<string>(sections);
 
-                var split = handler.Command.SplitN(2);
-                var command = split[0];
-                var args = split.Length > 1 ? split[1] : null;
-                return $"{command} {GetURL(context.Message)} {args}"; // e.g. /cut URL 300
+                if (type == 'u' && pipe.First is { } first)
+                {
+                    var split = handler.Handler.SplitN(2);
+                    var command = split[0];
+                    var args = split.Length > 1 ? split[1] : null;
+
+                    first.Value = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
+                }
+
+                return pipe;
             }
         }
 
         return null;
     }
 
-    private static Dictionary<char, List<(int Percent, string Command)>> Parse(string expression, long chat)
+    private static AutoHandlerMap Parse_AndCache(string definition, long chat)
     {
-        var handlers = new Dictionary<char, List<(int Percent, string Command)>>();
+        var map = new AutoHandlerMap();
 
-        var matches = expression.Split(";", StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => _rgx_handler.Match(x.Trim())).Where(x => x.Success);
+        var expressions = definition
+            .Split(";", StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim());
+        var matches = expressions
+            .Select(x => _rgx_handler.Match(x))
+            .Where(x => x.Success);
 
         foreach (var match in matches)
         {
             var types   = match.ExtractGroup(1, s => s, "");
-            var percent = match.ExtractGroup(2, s => int.Parse(s.TrimEnd('%')), 100);
-            var command = match.ExtractGroup(3, s => s, "");
+            var percent = match.ExtractGroup(2, int.Parse, 100);
+            var handler = match.ExtractGroup(3, s => s, "");
             foreach (var type in types)
             {
-                if (handlers.ContainsKey(type).Janai())
-                    handlers[type] = [];
+                if (map.ContainsKey(type).Janai())
+                    map[type] = [];
 
-                handlers[type].Add((percent, command));
+                map[type].Add((percent, handler));
             }
         }
 
-        Cache.Add(chat, handlers);
+        Cache.Add(chat, map);
 
-        return handlers;
+        return map;
     }
+
+    // MEDIA
 
     private static bool MessageMatches(char type, Message message) => type switch
     {
@@ -124,10 +140,9 @@ public static class AutoHandler
         return message.HasImageSticker();
     }
 
-    private static string GetURL(Message message)
+    private static string GetURL(MessageContext ctx)
     {
-        var text = message.GetTextOrCaption()!;
-        var url  = message.GetURL()!;
-        return text.Substring(url.Offset, url.Length);
+        var url = ctx.Message.GetURL()!;
+        return ctx.Text!.Substring(url.Offset, url.Length);
     }
 }

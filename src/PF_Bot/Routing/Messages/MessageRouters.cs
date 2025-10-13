@@ -154,30 +154,64 @@ public class MessageRouter_Default_KnownChat
 
     private bool TryAutoHandleMessage()
     {
-        var command = AutoHandler.TryGetMessageHandler(Context, Settings);
-        if (command is null) return false;
+        var pipe = AutoHandler.TryGetMessageHandler(Context, Settings);
+        if (pipe is null) return false;
 
-        AutoHandleCommand(command);
+        AutoHandleCommand(pipe);
 
         return true;
     }
 
-    private void AutoHandleCommand(string command)
+    private void AutoHandleCommand(LinkedList<string> pipe) // meme3, nuke
     {
-        // split expression into commands
-        // construct pipe
-        // foreach handler in pipe:
-            // run handler
-            // for each result => run second handler
-            
-        // set custom result handler [default- / pipe-]?
-
         Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
-        if (registry.Resolve(command, out var command_found) is { } handler)
+        var count = pipe.Count;
+
+        var handlers = new Func<CommandHandler>[count]; // [ () => new Meme(), () => new Nuke() ]
+        var contexts = new      CommandContext [count];
+
+        var node = pipe.First!;
+        for (var i = 0; i < count; i++)
         {
-            var context = new CommandContext(Message, command_found!, command.Replace("THIS", Context.Text));
-            _ = handler.Invoke().Handle(context);
+            var section = node.Value;
+            if (registry.Resolve(section, out var command) is { } handler)
+            {
+                var text    = section.Replace("THIS", Context.Text);
+                var context = new CommandContext(Message, command!, text);
+                handlers[i] = handler;
+                contexts[i] = context;
+
+                if (node.Next != null)
+                    node = node.Next;
+            }
+            else
+            {
+                App.Bot.SendMessage(Origin, $"Can't resolve command: {section}");
+                return;
+            }
+        }
+
+        TraversePipe();
+
+        void TraversePipe(int i = 0, FilePath? input = null)
+        {
+            var hasNext = i < count - 1;
+            var output  = new List<FilePath>(9);
+            var handler = handlers[i].Invoke();
+            var context = contexts[i];
+            if (hasNext) handler.RedirectFileOutputTo(output);
+            if (input != null) context.Input = input;
+
+            LogDebug($"TraversePipe: [{context.Command}][{context.Options}] [{context.Args}] {{i:{input}}}");
+            handler.Handle(context).Wait();
+
+            if (hasNext.Janai()) return;
+
+            foreach (var file in output)
+            {
+                TraversePipe(i + 1, file);
+            }
         }
     }
 }

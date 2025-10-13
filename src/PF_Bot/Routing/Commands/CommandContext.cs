@@ -17,7 +17,7 @@ public class CommandContext : MessageContext
     public string? Args      { get; private set; }
 
     /// Local file to process. Used in pipes (chained command handlers).
-    public FilePath? Input   { get; private set; }
+    public FilePath? Input   { get; set; }
 
     /// Whether THIS bot was mentioned
     public bool BotMentioned { get; private set; }

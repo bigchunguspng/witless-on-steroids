@@ -2,20 +2,12 @@
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
 using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentNaming
 {
-    public interface AutoMemesHandler
-    {
-        void Automemes_PassContext(CommandContext context);
-
-        Task ProcessPhoto(FileBase file);
-        Task ProcessStick(FileBase file);
-        Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false);
-    }
-
     public abstract class Meme_Core_Static : CommandHandlerAsync
     {
         protected const string
@@ -89,19 +81,19 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         public async Task ProcessPhoto(FileBase file)
         {
-            var input = await DownloadFileAndParseOptions(file, ".jpg");
+            var input = await Bot.Download(file, Origin, ".jpg");
             await ProcessPhoto(input);
         }
 
         public async Task ProcessStick(FileBase file)
         {
-            var input = await DownloadFileAndParseOptions(file, ".webp");
+            var input = await Bot.Download(file, Origin, ".webp");
             await ProcessStick(input);
         }
 
         public async Task ProcessVideo(FileBase file, string extension = ".mp4", bool round = false)
         {
-            var input = await DownloadFileAndParseOptions(file, extension);
+            var input = await Bot.Download(file, Origin, extension);
             await ProcessVideo(input, round);
         }
 
@@ -109,6 +101,8 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private async Task ProcessPhoto(FilePath input)
         {
+            SetupOptions();
+
             var repeats = GetRepeatCount();
             for (var i = 0; i < repeats; i++)
             {
@@ -121,6 +115,8 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private async Task ProcessStick(FilePath input)
         {
+            SetupOptions();
+
             var jpegSticker = OptionsContains('x');
             if (jpegSticker)
             {
@@ -148,6 +144,8 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private async Task ProcessVideo(FilePath input, bool round = false)
         {
+            SetupOptions();
+
             var sw = Stopwatch.StartNew();
 
             if (round && CropVideoNotes)
@@ -176,13 +174,12 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private float _pressure;
 
-        private Task<FilePath> DownloadFileAndParseOptions(FileBase file, string extension)
+        private void SetupOptions()
         {
             MemeOptions = GetOptionsContext();
             ParseOptions();
 
             _pressure = MemeOptions.GetFraction(_r_press, 75, 2);
-            return Bot.Download(file, Origin, extension);
         }
 
         protected abstract void ParseOptions();

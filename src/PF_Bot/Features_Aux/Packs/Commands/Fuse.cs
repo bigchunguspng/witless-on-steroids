@@ -46,10 +46,6 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             FilePrivate = File | Private,
         }
 
-        protected override CommandRequirements Requirements
-            => base.Requirements
-             | CommandRequirements.Copypaster;
-
         protected override async Task RunAuthorized()
         {
             var args = Args.SplitN(2);

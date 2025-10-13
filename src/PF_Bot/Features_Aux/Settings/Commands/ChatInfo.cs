@@ -9,8 +9,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
     public class ChatInfo : CommandHandlerBlocking
     {
         protected override CommandRequirements Requirements
-            => CommandRequirements.Settings
-             | CommandRequirements.Copypaster; // todo check: really ?
+            => CommandRequirements.KnownChat;
 
         protected override void Run()
         {

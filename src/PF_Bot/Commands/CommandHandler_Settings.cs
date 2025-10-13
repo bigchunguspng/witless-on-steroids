@@ -2,19 +2,23 @@
 
 namespace PF_Bot.Commands;
 
-public abstract class CommandHandlerAsync_Settings : CommandHandlerAsync
+public abstract class CommandHandlerAsync_Settings 
+    :                 CommandHandlerAsync
 {
-    protected override CommandRequirements Requirements => CommandRequirements.Settings;
+    protected override CommandRequirements Requirements
+        => CommandRequirements.KnownChat;
 
-    protected async Task<bool> /* when the */ SenderIsSus() // !😳
-    {
-        return Settings.AdminsOnly && await Message.SenderIsChatAdmin() == false;
-    }
+    protected async Task<bool>
+        /* when the */ SenderIsSus() // !😳
+        => Settings.AdminsOnly
+        &&       Message. SenderIsBotAdmin() == false
+        && await Message.SenderIsChatAdmin() == false;
 }
 
 /// For commands that can be restricted to chat admins only.
 /// Is <see cref="CommandHandlerAsync"/> under the hood anyways!
-public abstract class CommandHandlerAsync_SettingsBlocking : CommandHandlerAsync_Settings
+public abstract class CommandHandlerAsync_SettingsBlocking 
+    :                 CommandHandlerAsync_Settings
 {
     protected sealed override async Task Run()
     {
@@ -27,7 +31,8 @@ public abstract class CommandHandlerAsync_SettingsBlocking : CommandHandlerAsync
 }
 
 /// <inheritdoc cref="CommandHandlerAsync_SettingsBlocking"/>
-public abstract class CommandHandlerAsync_SettingsAsync : CommandHandlerAsync_Settings
+public abstract class CommandHandlerAsync_SettingsAsync 
+    :                 CommandHandlerAsync_Settings
 {
     protected sealed override async Task Run()
     {

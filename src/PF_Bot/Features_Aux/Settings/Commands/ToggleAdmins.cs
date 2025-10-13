@@ -6,7 +6,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
     public class ToggleAdmins : CommandHandlerAsync
     {
         protected override CommandRequirements Requirements
-            => CommandRequirements.Settings;
+            => CommandRequirements.KnownChat;
 
         protected override async Task Run()
         {

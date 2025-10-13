@@ -9,7 +9,7 @@ public class Spam : CommandHandlerBlocking_Admin
         _rgx_days = new(@"a(>|<|>=|<=)?(\d+)",        RegexOptions.Compiled),
         _rgx_size = new(@"s(>|<|>=|<=)?(\d+)([km])?", RegexOptions.Compiled);
 
-    protected override void RunAuthourized()
+    protected override void Run()
     {
         var messageId = Message.ReplyToMessage is { } reply ? reply.Id : -1;
 

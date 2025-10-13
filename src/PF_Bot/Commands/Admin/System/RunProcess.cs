@@ -6,7 +6,7 @@ namespace PF_Bot.Commands.Admin.System;
 
 public class RunProcess : CommandHandlerAsync_Admin
 {
-    protected override async Task RunAuthourized()
+    protected override async Task Run()
     {
         if (Args is null)
         {

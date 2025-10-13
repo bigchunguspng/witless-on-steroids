@@ -6,7 +6,7 @@ namespace PF_Bot.Commands.Admin.Fun;
 
 public class Reply : CommandHandlerBlocking_Admin
 {
-    protected override void RunAuthourized()
+    protected override void Run()
     {
         if (Args is null)
         {

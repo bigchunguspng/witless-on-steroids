@@ -36,29 +36,48 @@ public abstract class CommandHandler
     protected ChatSettings Settings => _settings ??=
         ChatManager.Knowns(Chat, out var settings)
             ? settings
-            : Requirements.HasFlag(CommandRequirements.Settings)
-                ? throw new CommandRequirementsException()
-                : ChatSettingsFactory.GetTemporary();
+            : ChatSettingsFactory.GetTemporary();
 
     private   Copypaster?        _baka;
     protected Copypaster Baka => _baka ??=
         ChatManager.Knowns(Chat)
             ? PackManager.GetBaka(Chat)
-            : Requirements.HasFlag(CommandRequirements.Copypaster)
-                ? throw new CommandRequirementsException()
-                : DementiaCopypaster.Instance;
+            : DementiaCopypaster.Instance;
 
     [Flags]
     protected enum    CommandRequirements
     {
-        None       = 1,
-        Settings   = 2,
-        Copypaster = 4,
+        None      = 0,
+        KnownChat = 1, // chat has to be in chat list
+        BotAdmin  = 2, // user has to be a bot admin (defined in config)
     }
 
-    private   class   CommandRequirementsException : Exception;
-
     protected virtual CommandRequirements Requirements { get; } = CommandRequirements.None;
+
+    private bool CommandShouldBeHandled()
+    {
+        if (Requirements == CommandRequirements.None) return true;
+
+        if (Requirements.HasFlag(CommandRequirements.KnownChat))
+        {
+            if (ChatManager.Knowns(Chat, out _settings).Janai())
+            {
+                Deny(DenyReason.ONLY_KNOWN_CHATS);
+                return false;
+            }
+        }
+
+        if (Requirements.HasFlag(CommandRequirements.BotAdmin))
+        {
+            if (Message.SenderIsBotAdmin().Janai())
+            {
+                Deny(DenyReason.ONLY_BOT_ADMINS);
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     // HANDLE
 
@@ -67,7 +86,10 @@ public abstract class CommandHandler
         Context = context;
         try
         {
-            await Handle_Internal();
+            if (CommandShouldBeHandled())
+            {
+                await Handle_Internal();
+            }
         }
         catch (Exception e)
         {
@@ -106,7 +128,7 @@ public abstract class CommandHandler
     {
         ONLY_BOT_ADMINS,
         ONLY_CHAT_ADMINS,
-        ONLY_STARTED_BOT,
+        ONLY_KNOWN_CHATS,
         ONLY_GROUPS,
     }
 
@@ -125,7 +147,7 @@ public abstract class CommandHandler
             case DenyReason.ONLY_GROUPS:
                 Bot.SendMessage(Origin, GROUPS_ONLY_COMAND);
                 break;
-            case DenyReason.ONLY_STARTED_BOT:
+            case DenyReason.ONLY_KNOWN_CHATS:
                 if (Chat.ChatIsPrivate() || Context.BotMentioned)
                     Bot.SendMessage(Origin, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
                 break;
@@ -163,14 +185,7 @@ public abstract class CommandHandler
             Bot.EditMessage(Chat, MessageToEdit, GetSillyErrorMessage());
         }
 
-        if      (exception is CommandRequirementsException)
-        {
-            Status = CommandResultStatus.DENY;
-
-            if (Chat.ChatIsPrivate() || Context.BotMentioned)
-                Bot.SendMessage(Origin, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
-        }
-        else if (exception is ProcessException e)
+        if (exception is ProcessException e)
         {
             LogError($"{context.Title} >> PROCESS FAILED | {e.File} / {e.Result.ExitCode}");
             Bot.SendErrorDetails(e, context.Origin);

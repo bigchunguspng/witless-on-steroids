@@ -12,7 +12,7 @@ public class KillProcess : CommandHandlerAsync_Admin
         "CAACAgIAAxkBAAEEc-NndmyzLg5EMR1QRcKa8G2McNLe6AACCSMAAlmMaEgeI5p8MZXe5zYE",
     ];
 
-    protected override async Task RunAuthourized()
+    protected override async Task Run()
     {
         var name = Args ?? FFMPEG;
         var process = Process.GetProcessesByName(name).FirstOrDefault();

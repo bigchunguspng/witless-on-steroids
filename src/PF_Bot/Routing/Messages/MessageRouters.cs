@@ -97,9 +97,7 @@ public class MessageRouter_Default_KnownChat
 
         if (Settings.Type is MemeType.Auto)
         {
-            App.Bot.SendMessage(Origin, "автообработка закрыта на ремонт");
-            // todo invoke automemes handler
-            //if (Settings.Options != null && TryAutoHandleMessage().Failed()) TryLuckForFunnyText();
+            if (Settings.Options != null && TryAutoHandleMessage().Failed()) TryLuckForFunnyText();
         }
         else if (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1);
         else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2);
@@ -154,7 +152,7 @@ public class MessageRouter_Default_KnownChat
         return mematic;
     }
 
-    /*private bool TryAutoHandleMessage()
+    private bool TryAutoHandleMessage()
     {
         var command = AutoHandler.TryGetMessageHandler(Context, Settings);
         if (command is null) return false;
@@ -174,16 +172,14 @@ public class MessageRouter_Default_KnownChat
             
         // set custom result handler [default- / pipe-]?
 
-        Context.UseText(command);
         Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
-        if (registry.Resolve_AsMapping(command) is { } mapping)
+        if (registry.Resolve(command, out var command_found) is { } handler)
         {
-            var (command_found, handler) = mapping;
-
-            _ = handler.Handle(new CommandContext_New(Message, command_found));
+            var context = new CommandContext(Message, command_found!, command.Replace("THIS", Context.Text));
+            _ = handler.Invoke().Handle(context);
         }
-    }*/
+    }
 }
 
 public class PoopText : MessageHandler

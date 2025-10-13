@@ -8,19 +8,19 @@ namespace PF_Bot.Routing.Commands;
 public class CommandContext : MessageContext
 {
     /// Command name, lowercase. Options, '/', and bot mention are removed.
-    public string  Command { get; }
+    public string  Command   { get; private set; }
 
     /// Command options, lowercase. Can contain '▒' (in the middle) if bot was mentioned.
-    public string? Options { get; }
+    public string? Options   { get; private set; }
 
     /// Command arguments, case preserved.
-    public string? Args    { get; }
+    public string? Args      { get; private set; }
 
     /// Local file to process. Used in pipes (chained command handlers).
-    public FilePath? Input { get; }
+    public FilePath? Input   { get; private set; }
 
     /// Whether THIS bot was mentioned
-    public bool BotMentioned { get; }
+    public bool BotMentioned { get; private set; }
 
     /// Automemes
     public CommandContext(Message message) : base(message)
@@ -29,25 +29,36 @@ public class CommandContext : MessageContext
         Args = Text;
     }
 
+    /// Autohandler
+    public CommandContext(Message message, string command, string expression) : base(message)
+    {
+        Command = command;
+        ParseText(0, command.Length, expression);
+    }
+
     /// This constructor expects message text to start with "/command".
     public CommandContext(Message message, string command) : base(message)
     {
         Command = command;
+        ParseText(1, command.Length, Text!);
+    }
 
-        var command_end = 1 + command.Length;
-        var space_index = Text!.IndexOfAny(_separators, command_end);
+    private void ParseText(int command_offset, int command_length, string text)
+    {
+        var command_end = command_offset + command_length;
+        var space_index = text.IndexOfAny(_separators, command_end);
         if (space_index < 0)
-            space_index = Text.Length;
+            space_index = text.Length;
         else
-            Args = Text.Substring(space_index + 1);
+            Args = text.Substring(space_index + 1);
 
         var options_length = space_index - command_end;
         if (options_length > 0)
         {
-            var mention_start = Text.IndexOf(_botUsername, command_end, StringComparison.OrdinalIgnoreCase);
+            var mention_start = text.IndexOf(_botUsername, command_end, StringComparison.OrdinalIgnoreCase);
             if (mention_start < 0)
             {
-                Options = Text.Substring(command_end, options_length);
+                Options = text.Substring(command_end, options_length);
             }
             else
             {
@@ -63,8 +74,8 @@ public class CommandContext : MessageContext
                 var op2_start = mention_end;
                 var op1_length = mention_start - command_end;
                 var op2_length =   space_index - mention_end;
-                var op1 = Text.Substring(op1_start, op1_length);
-                var op2 = Text.Substring(op2_start, op2_length);
+                var op1 = text.Substring(op1_start, op1_length);
+                var op2 = text.Substring(op2_start, op2_length);
                 if (op1.Length + op2.Length > 0)
                 {
                     Options =

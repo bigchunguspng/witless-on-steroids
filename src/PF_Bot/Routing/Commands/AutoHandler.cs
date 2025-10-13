@@ -1,13 +1,20 @@
 using PF_Bot.Features_Aux.Settings.Core;
+using PF_Bot.Routing.Messages;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing.Commands;
+
+// auto = [expr 0][;] [expr N]
+// expr = [types][N%]:[pipe]
+// pipe = [section 0][ > ][section N]
+// sect = [command][options] [args]
 
 public static class AutoHandler
 {
     private static readonly Regex
         _rgx_handler = new(@"([pvagus]+)(\d{1,3}%)?:\s*(.+)", RegexOptions.Compiled);
 
+    // todo investigate: cache has duplicate entries ?
     private static readonly LimitedCache<long, Dictionary<char, List<(int Percent, string Command)>>> Cache = new(32);
 
     public static void ClearCache(long chat)
@@ -15,7 +22,7 @@ public static class AutoHandler
         if (Cache.Contains(chat, out var dictionary)) dictionary.Clear();
     }
 
-    public static string? TryGetMessageHandler(CommandContext context, ChatSettings data)
+    public static string? TryGetMessageHandler(MessageContext context, ChatSettings data)
     {
         var expression = data.Options![MemeType.Auto];
         if (expression is null) return null;
@@ -51,15 +58,15 @@ public static class AutoHandler
 
         foreach (var match in matches)
         {
-            var types   = match.Groups[1].Value;
-            var percent = match.Groups[2].Success ? int.Parse(match.Groups[2].Value.TrimEnd('%')) : 100;
-            var command = match.Groups[3].Value;
+            var types   = match.ExtractGroup(1, s => s, "");
+            var percent = match.ExtractGroup(2, s => int.Parse(s.TrimEnd('%')), 100);
+            var command = match.ExtractGroup(3, s => s, "");
             foreach (var type in types)
             {
                 if (handlers.ContainsKey(type).Janai())
                     handlers[type] = [];
 
-                handlers[type].Add((percent, $"/{command}"));
+                handlers[type].Add((percent, command));
             }
         }
 
@@ -73,15 +80,15 @@ public static class AutoHandler
         'p' => CheckPhoto(message),
         'v' => CheckVideo(message),
         'a' => CheckAudio(message),
-        'g' => CheckGIF(message),
-        'u' => CheckURL(message),
-        's' => CheckSticker(message),
-        _ => throw new ArgumentException()
+        'g' => CheckGIF  (message),
+        'u' => CheckURL  (message),
+        's' => CheckStick(message),
+        _ => throw new ArgumentException(),
     };
 
     private static bool CheckPhoto(Message message)
     {
-        return message.Photo != null 
+        return message.Photo != null
             || message.HasImageDocument();
     }
 
@@ -112,7 +119,7 @@ public static class AutoHandler
             && message.GetURL() != null;
     }
 
-    private static bool CheckSticker(Message message)
+    private static bool CheckStick(Message message)
     {
         return message.HasImageSticker();
     }

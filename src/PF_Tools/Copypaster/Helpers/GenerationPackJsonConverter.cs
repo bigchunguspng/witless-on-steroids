@@ -1,13 +1,9 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace PF_Tools.Copypaster.Helpers;
 
-public class GenerationPackJsonConverter : JsonConverter<GenerationPack>
+public class GenerationPackJsonConverter : WriteOnlyJsonConverter<GenerationPack>
 {
-    public override GenerationPack Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-        => throw new NotImplementedException();
-
     public override void Write(Utf8JsonWriter writer, GenerationPack pack, JsonSerializerOptions options)
     {
         writer.WriteObject(() =>

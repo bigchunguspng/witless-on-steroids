@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using PF_Bot.Routing.Messages;
 using Telegram.Bot.Types;
 
@@ -14,12 +13,8 @@ public class CallbackContext
     public string        Content { get; } = content;
 }
 
-public class CallbackContextJsonConverter : JsonConverter<CallbackContext>
+public class CallbackContextJsonConverter : WriteOnlyJsonConverter<CallbackContext>
 {
-    public override CallbackContext Read
-        (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-        => throw new NotImplementedException();
-
     public override void Write
     (
         Utf8JsonWriter writer,

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
@@ -212,12 +211,8 @@ public abstract class CommandHandler
 
     //
 
-    public class JsonConverter : JsonConverter<CommandHandler>
+    public class JsonConverter : WriteOnlyJsonConverter<CommandHandler>
     {
-        public override CommandHandler Read
-            (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-            => throw new NotImplementedException();
-
         public override void Write
         (
             Utf8JsonWriter writer,

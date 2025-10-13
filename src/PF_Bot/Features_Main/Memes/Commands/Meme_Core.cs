@@ -2,7 +2,6 @@
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Routing.Messages;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 
@@ -10,7 +9,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 {
     public interface AutoMemesHandler
     {
-        void Pass(MessageContext context);
+        void Automemes_PassContext(CommandContext context);
 
         Task ProcessPhoto(FileBase file);
         Task ProcessStick(FileBase file);
@@ -33,8 +32,6 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
         protected MemeOptionsContext MemeOptions = null!;
 
         protected abstract IMemeGenerator<TCaption> MemeMaker { get; }
-
-        protected abstract Regex _rgx_cmd { get; }
 
         protected abstract string VideoName { get; }
 
@@ -224,12 +221,12 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private TCaption GetText()
         {
-            var baseText
-                = _auto.Janai()
-               || Data.Pics > 100 && Context.Message.IsForwarded().Janai()
-                    ? Args
-                    : null;
-            return GetMemeText(baseText);
+            var automemes = Command is "@";
+            var useArgs =
+                automemes.Janai()
+             || (Settings.Pics > 100 && Message.IsForwarded().Janai());
+
+            return GetMemeText(useArgs ? Args : null);
         }
 
         protected abstract TCaption GetMemeText(string? text);
@@ -244,7 +241,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
             var empty = Context.Text == null && default_options == null;
             if (empty) return new MemeOptionsContext(empty, string.Empty, null, null);
 
-            var command_options = Options;
+            var command_options = Options.MakeNull_IfEmpty();
 
             var combineOptions =
                 command_options != null
@@ -272,18 +269,11 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
             return MemeOptions.Buffer.Contains(option);
         }
 
-        // AUTO-MODE HACKS
+        // AUTO-MODE
 
-        private bool _auto;
-        private MessageContext _messageContext = null!;
-
-        public void Pass(MessageContext context)
+        public void Automemes_PassContext(CommandContext context)
         {
-            _auto = true;
-            _messageContext = context;
+            Context = context;
         }
-
-        protected new string? Args     => _auto ? _messageContext.Text : Context.Args;
-        protected new string? Options  => _auto ? null                 : Context.Options;
     }
 }

@@ -13,8 +13,6 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override IMemeGenerator<string> MemeMaker => new Demotivators2077(_options);
 
-        protected override Regex _rgx_cmd { get; } = new(@"^\/dp(\S*)", RegexOptions.Compiled);
-
         protected override string VideoName => "piece_fap_bot-dp.mp4";
 
         protected override string Log_STR => "DEMOTIVATOR-B";

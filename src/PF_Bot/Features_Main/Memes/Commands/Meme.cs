@@ -14,8 +14,6 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override IMemeGenerator<TextPair> MemeMaker => new MemeGenerator(_options);
 
-        protected override Regex _rgx_cmd { get; } = new(@"^\/meme(\S*)", RegexOptions.Compiled);
-
         protected override string VideoName => "piece_fap_bot-meme.mp4";
 
         protected override string Log_STR => "MEME";

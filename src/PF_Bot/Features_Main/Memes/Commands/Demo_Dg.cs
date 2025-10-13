@@ -20,8 +20,6 @@ namespace PF_Bot.Features_Main.Memes.Commands
                 ? new Demotivators2007(_options)
                 : new Demotivators2007(_options, 1280);
 
-        protected override Regex _rgx_cmd { get; } = new(@"^\/d[vg](\S*)", RegexOptions.Compiled);
-
         protected override string VideoName => $"piece_fap_bot-d{(_mode == Square ? "g" : "v")}.mp4";
 
         protected override string Log_STR => "DEMOTIVATOR";

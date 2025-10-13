@@ -14,8 +14,6 @@ public class Snap : Meme_Core<string>
 
     protected override IMemeGenerator<string> MemeMaker => new SnapChat(_options);
 
-    protected override Regex _rgx_cmd { get; } = new(@"^\/snap(\S*)", RegexOptions.Compiled);
-
     protected override string VideoName => "piece_fap_bot-snap.mp4";
 
     protected override string Log_STR => "SNAP";

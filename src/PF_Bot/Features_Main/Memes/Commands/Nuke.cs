@@ -12,8 +12,6 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options, Chat);
 
-        protected override Regex _rgx_cmd { get; } = new(@"^\/nuke(\S*)", RegexOptions.Compiled);
-
         protected override string VideoName => "piece_fap_bot-nuke.mp4";
 
         protected override string Log_STR => "NUKED";

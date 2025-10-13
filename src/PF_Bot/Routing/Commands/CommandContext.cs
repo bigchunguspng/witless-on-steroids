@@ -22,6 +22,13 @@ public class CommandContext : MessageContext
     /// Whether THIS bot was mentioned
     public bool BotMentioned { get; }
 
+    /// Automemes
+    public CommandContext(Message message) : base(message)
+    {
+        Command = "@";
+        Args = Text;
+    }
+
     /// This constructor expects message text to start with "/command".
     public CommandContext(Message message, string command) : base(message)
     {

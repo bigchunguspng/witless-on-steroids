@@ -142,14 +142,14 @@ public class MessageRouter_Default_KnownChat
     private AutoMemesHandler GetMemeMaker(FileBase file)
     {
         var mematic = _mematics[Settings.Type].Invoke();
-        mematic.Pass(Context); // todo fix Chat not set
+        mematic.Automemes_PassContext(new CommandContext(Message));
         if (mematic is Demo_Dg dg)
         {
             var (w, h) = file.TryGetSize();
             dg.SelectMode(w, h);
         }
 
-        Telemetry.LogAuto(Context.Chat, Settings.Pics, $"/{Settings.Type.ToString().ToLower()}{Settings.Options?[Settings.Type]}");
+        Telemetry.LogAuto(Chat, Settings.Pics, $"/{Settings.Type.ToString().ToLower()}{Settings.Options?[Settings.Type]}");
 
         return mematic;
     }

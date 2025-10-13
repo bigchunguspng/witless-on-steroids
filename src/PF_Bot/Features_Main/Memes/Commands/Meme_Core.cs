@@ -8,7 +8,7 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentNaming
 {
-    public interface ImageProcessor
+    public interface AutoMemesHandler
     {
         void Pass(MessageContext context);
 
@@ -28,7 +28,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
             _r_press  = new(@"(\*)(\d{1,2})?", RegexOptions.Compiled);
     }
 
-    public abstract class Meme_Core<TCaption> : Meme_Core_Static, ImageProcessor
+    public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
     {
         protected MemeOptionsContext MemeOptions = null!;
 

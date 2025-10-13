@@ -125,7 +125,7 @@ public class MessageRouter_Default_KnownChat
         () => Fortune.LuckyFor(Settings.Pics)
            && Message.ContainsSpoilers().Janai();
 
-    private readonly Dictionary<MemeType, Func<ImageProcessor>> _mematics = new()
+    private readonly Dictionary<MemeType, Func<AutoMemesHandler>> _mematics = new()
     {
         { MemeType.Dg,   () => new Demo_Dg() },
         { MemeType.Meme, () => new Meme() },
@@ -139,7 +139,7 @@ public class MessageRouter_Default_KnownChat
     // command: {image} [def] | /command[ops] [args]
     // auto:    {image} [def] |               [text]
     // autohan: {image} [def] | /command[ops] [args]
-    private ImageProcessor GetMemeMaker(FileBase file)
+    private AutoMemesHandler GetMemeMaker(FileBase file)
     {
         var mematic = _mematics[Settings.Type].Invoke();
         mematic.Pass(Context); // todo fix Chat not set

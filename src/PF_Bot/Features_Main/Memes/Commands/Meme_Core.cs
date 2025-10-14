@@ -52,7 +52,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
             var      ext = input.Extension;
             if      (ext is ".jpg" or ".png"           ) await ProcessPhoto(input);
             else if (ext is                     ".webp") await ProcessStick(input);
-            else if (ext is ".mp4" or ".gif" or ".webm") await ProcessStick(input);
+            else if (ext is ".mp4" or ".gif" or ".webm") await ProcessVideo(input);
             else return false;
 
             return true;

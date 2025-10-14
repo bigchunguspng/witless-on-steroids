@@ -23,7 +23,7 @@ namespace PF_Bot.Features_Main.Memes.Commands
 
         protected override Task Run()
         {
-            if /**/ (Args is "log" or "logs" || (Options != null && Options.StartsWith("_log")))
+            if /**/ (Args is "log" or "logs" || Options.StartsWith("_log"))
                 ListingNukes.SendNukeLog(new ListPagination(Origin, PerPage: 5));
             else
                 return RunInternal("nuke\n⏳История фильтров: /nuke_log");

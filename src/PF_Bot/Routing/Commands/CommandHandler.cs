@@ -246,14 +246,18 @@ public abstract class CommandHandler
         {
             var context = value.Context;
             writer.WriteObject("message", context.Message, options);
+            writer.WriteNumber("chat", context.Chat);
             writer.WriteString("title", context.Title);
             writer.WriteString("text", context.Text);
             writer.WriteString("command", context.Command);
             writer.WriteString("options", context.Options);
             writer.WriteString("args", context.Args);
-            writer.WriteNumber("chat", context.Chat);
-            writer.WriteString("input", context.Input);
             writer.WriteBoolean("bot_mentioned", context.BotMentioned);
+            writer.WriteString("input", context.Input);
+            if (value.Output != null)
+            {
+                writer.WriteArray("output", () => value.Output.ForEach(x => writer.WriteStringValue(x)));
+            }
             if (value._settings != null)
             {
                 writer.WriteObject("settings", value._settings, options);

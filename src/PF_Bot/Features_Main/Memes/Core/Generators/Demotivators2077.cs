@@ -109,7 +109,7 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators // ReSharper disable Incons
             var emoji = EmojiTool.FindEmoji(text);
             var plain = emoji.Count == 0;
             pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
-            text = plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs);
+            text = plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs!);
             return MakeTextFitCard(text);
         }
 

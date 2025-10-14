@@ -162,7 +162,7 @@ namespace PF_Bot.Features_Main.Memes.Core.Generators
             var plain = emoji.Count == 0;
             
             var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
-            text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+            text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs!));
 
             var origin = GetTextOrigin(text, top, out var caseOffset);
             var options = GetDefaultTextOptions(origin, top);

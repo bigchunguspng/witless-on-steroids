@@ -118,7 +118,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         var plain = emoji.Count == 0;
 
         var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
-        text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+        text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs!));
 
         AdjustTextOffset(text);
 

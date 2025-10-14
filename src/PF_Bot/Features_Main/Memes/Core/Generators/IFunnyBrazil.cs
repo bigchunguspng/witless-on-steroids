@@ -144,7 +144,7 @@ public partial class IFunnyBrazil(MemeOptions_Top op) : MemeGeneratorBase, IMeme
         var plain = emoji.Count == 0;
 
         var pngs = plain ? null : EmojiTool.GetEmojiPngs(emoji);
-        text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs));
+        text = MakeTextFitCard(plain ? text : EmojiTool.ReplaceEmoji(text, "👌", emoji, pngs!));
 
         AdjustTextOffset(text);
 

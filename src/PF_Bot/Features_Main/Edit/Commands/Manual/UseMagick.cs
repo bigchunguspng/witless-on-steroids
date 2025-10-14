@@ -7,7 +7,7 @@ using PF_Tools.ProcessRunning;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
-public class UseMagick : FileEditor_Photo
+public class UseMagick : FileEditor_VideoPhoto
 {
     protected override string SyntaxManual => $"/man_43\n{ALIAS_INFO}/aim_info";
 
@@ -38,6 +38,8 @@ public class UseMagick : FileEditor_Photo
         else if (extension == "p") extension = "png";
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";
+        else if (extension == "4") extension = "mp4";
+        else if (extension == "g") extension = "gif";
 
         var extensionInvalid = extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options))

@@ -57,6 +57,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         else if (extension == "p") extension = "png";
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";
+        else if (extension == "g") extension = "gif";
 
         var extensionInvalid = extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))

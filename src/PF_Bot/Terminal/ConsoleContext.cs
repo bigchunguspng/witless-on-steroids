@@ -11,7 +11,7 @@ public class ConsoleContext
     public ConsoleContext(string input)
     {
         var match = _r_input.Match(input);
-        Command = match.Groups[1].Value.MakeNull_IfEmpty() ?? "?";
+        Command = match.ExtractGroup(1, s => s, "?");
         Args    = match.ExtractGroup(2, s => s);
     }
 }

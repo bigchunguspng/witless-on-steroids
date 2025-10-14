@@ -12,7 +12,7 @@ public class AutoHandlerMap : Dictionary<char, List<HandlerChance>>;
 public static class AutoHandler
 {
     private static readonly Regex
-        _rgx_handler = new(@"([pvagus]+)(?:(\d{1,3})%)?:\s*(.+)", RegexOptions.Compiled);
+        _rgx_handler = new(@"([pvagusd]+)(?:(\d{1,3})%)?:\s*(.+)", RegexOptions.Compiled);
 
     private static readonly LimitedCache<long, AutoHandlerMap> Cache = new(32);
 
@@ -94,46 +94,45 @@ public static class AutoHandler
         'g' => CheckGIF  (message),
         'u' => CheckURL  (message),
         's' => CheckStick(message),
+        'd' => CheckDoc  (message),
         _ => throw new ArgumentException(),
     };
 
-    private static bool CheckPhoto(Message message)
-    {
-        return message.Photo != null
-            || message.HasImageDocument();
-    }
+    private static bool CheckPhoto
+        (Message message)
+        => message.Photo != null
+        || message.HasImageDocument();
 
-    private static bool CheckVideo(Message message)
-    {
-        return message.Video     != null
-            || message.VideoNote != null
-            || message.HasVideoDocument();
-    }
+    private static bool CheckVideo
+        (Message message)
+        => message.Video     != null
+        || message.VideoNote != null
+        || message.HasVideoDocument();
 
-    private static bool CheckAudio(Message message)
-    {
-        return message.Audio != null 
-            || message.Voice != null 
-            || message.HasAudioDocument();
-    }
+    private static bool CheckAudio
+        (Message message)
+        => message.Audio != null
+        || message.Voice != null
+        || message.HasAudioDocument();
 
-    private static bool CheckGIF(Message message)
-    {
-        return message.Animation != null
-            || message.HasVideoSticker()
-            || message.HasAnimeDocument();
-    }
+    private static bool CheckGIF
+        (Message message)
+        => message.Animation != null
+        || message.HasVideoSticker()
+        || message.HasAnimeDocument();
 
-    private static bool CheckURL(Message message)
-    {
-        return message.GetTextOrCaption() != null 
-            && message.GetURL() != null;
-    }
+    private static bool CheckURL
+        (Message message)
+        => message.GetTextOrCaption() != null
+        && message.GetURL() != null;
 
-    private static bool CheckStick(Message message)
-    {
-        return message.HasImageSticker();
-    }
+    private static bool CheckStick
+        (Message message)
+        => message.HasImageSticker();
+
+    private static bool CheckDoc
+        (Message message)
+        => message.Document != null;
 
     private static string GetURL(MessageContext ctx)
     {

@@ -1,6 +1,4 @@
-﻿using PF_Bot.Routing.Commands;
-
-namespace PF_Bot.Commands;
+﻿namespace PF_Bot.Routing.Commands;
 
 public abstract class CommandHandlerAsync_Settings 
     :                 CommandHandlerAsync

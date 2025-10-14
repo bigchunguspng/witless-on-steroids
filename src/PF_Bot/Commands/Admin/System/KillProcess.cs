@@ -1,3 +1,5 @@
+using PF_Bot.Routing.Commands;
+
 namespace PF_Bot.Commands.Admin.System;
 
 public class KillProcess : CommandHandlerAsync_Admin

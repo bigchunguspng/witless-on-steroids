@@ -145,7 +145,7 @@ public abstract class EatBoard_Core : Fuse
             .Combine($"{date} {name.Replace(' ', '-')}.json");
     }
 
-    protected Uri UrlOrBust(ref string url)
+    protected Uri? UrlOrBust(ref string url)
     {
         try
         {
@@ -163,8 +163,9 @@ public abstract class EatBoard_Core : Fuse
         }
         catch
         {
+            Status = CommandResultStatus.BAD;
             Bot.SendMessage(Origin, UnknownURL);
-            throw;
+            return null;
         }
     }
 }

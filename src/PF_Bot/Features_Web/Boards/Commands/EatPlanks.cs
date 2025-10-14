@@ -25,7 +25,10 @@ public class EatPlanks : EatBoard_Core
 
     protected override async Task EatOnlineData(string url)
     {
-        _uri = UrlOrBust(ref url);
+        var uri = UrlOrBust(ref url);
+        if (uri is null) return;
+
+        _uri = uri;
 
         var board = _uri.Segments[1].Replace("/", "");
 

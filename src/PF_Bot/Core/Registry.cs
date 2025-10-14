@@ -17,7 +17,7 @@ using PF_Bot.Features_Web.Reddit.Commands;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Commands;
 
-namespace PF_Bot.Routing;
+namespace PF_Bot.Core;
 
 public static class Registry
 {

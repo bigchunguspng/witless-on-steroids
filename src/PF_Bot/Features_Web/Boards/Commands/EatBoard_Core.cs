@@ -2,7 +2,6 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Packs.Commands;
 using PF_Bot.Features_Web.Boards.Core;
-using PF_Bot.Routing;
 using PF_Bot.Routing.Callbacks;
 
 namespace PF_Bot.Features_Web.Boards.Commands;

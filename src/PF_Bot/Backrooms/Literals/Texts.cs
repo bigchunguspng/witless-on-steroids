@@ -860,4 +860,33 @@ public static class Texts
         - <code>s&lt;100K</code> → pack is less than 100 KB
         - <code>s&lt;=34 </code> → pack is 34 bytes (empty)</blockquote>
         """;
+
+    public const string PIPE_MANUAL =
+        """
+        <b><u>Труба</u></b> 🔩
+
+        Позволяет пропускать файл через несколько команд за раз.
+
+        <b>Синтаксис:</b>
+        <code>/pipe cmd 1 > cmd 2 > cmd N</code>
+
+        Вместо "<code>cmd X</code>" подставляется команда без слэша. Опции и аргументы по желанию.
+
+        <b>Примеры:</b>
+        <blockquote expandable>📸 <code>/pipe meme > nuke</code> 👈 зажаренный мем
+        📸 <code>/pipe meme3 > nuke3"2</code>
+        └─ 3 мема, хорошо зажарены в 2 вариантах
+        📸 <code>/pipe meme3 > nuke > im o4:4! .</code>
+        └─ 3 мема с прожаркой и фильтром
+        📸 <code>/pipe meme POV: > memed^^cc9</code>
+        └─ 9 мемов с 🎲 нижним текстом
+        🎬 <code>/pipe meme > dp > toppp > shake</code>
+        └─ комбо-мем + тряска
+        🎬 <code>/pipe shake > damn > nuke > fast 3</code>
+        └─ жмынуть и ускорить
+        🎧 <code>/pipe damn > eq 100 20 1000 > eq 4000 -30 1000</code> 👈 💀💀💀</blockquote>
+        """;
+
+    public const string PIPE_FAIL_RESOLVE =
+        "Не удалось распознать команду: <code>{0}</code>";
 }

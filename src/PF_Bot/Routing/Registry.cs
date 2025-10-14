@@ -117,6 +117,7 @@ public static class Registry
             .Register("upload" , () => new UploadFile())
             .Register("im"     , () => new UseMagick())
             .Register("peg"    , () => new UseFFMpeg())
+            .Register("pipe"   , () => new Pipe())
             .Register("w"      , () => new BrowseReddit())
             .Register("link"   , () => new GetRedditLink())
             .Register("piece"  , () => _piece)
@@ -146,6 +147,7 @@ public static class Registry
             .Register("fonts"  , () => _mail.WithText(FONTS_CHEAT_SHEET))
             // manuals
             .Register("man_g"    , () => _mail.WithText(G_MANUAL))
+            .Register("man_pipe" , () => _mail.WithText(PIPE_MANUAL))
             .Register("man_crop" , () => _mail.WithText(CROP_MANUAL))
             .Register("man_shake", () => _mail.WithText(SHAKE_MANUAL))
             .Register("man_scale", () => _mail.WithText(SCALE_MANUAL))

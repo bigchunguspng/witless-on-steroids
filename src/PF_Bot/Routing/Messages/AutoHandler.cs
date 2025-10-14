@@ -1,13 +1,11 @@
 using PF_Bot.Features_Aux.Settings.Core;
 using Telegram.Bot.Types;
-using HandlerChance = (int Percent, string Handler); // handler = pipe
+using HandlerChance = (int Percent, string Handler);
 
 namespace PF_Bot.Routing.Messages;
 
 // auto = [expr 0][;] [expr N]
-// expr = [types][N%]:[pipe]
-// pipe = [section 0][ > ][section N]
-// sect = [command][options] [args]
+// expr = [types][N%]:[command][options] [args]
 
 public class AutoHandlerMap : Dictionary<char, List<HandlerChance>>;
 
@@ -26,7 +24,8 @@ public static class AutoHandler
 
     // EXPRESSION PARSING
 
-    public static LinkedList<string>? TryGetMessageHandler(MessageContext context, ChatSettings data)
+    /// Returns command-like input string in this format: <c>cmd[ops] [args]</c>
+    public static string? TryGetMessageHandler(MessageContext context, ChatSettings data)
     {
         var expression = data.Options![MemeType.Auto];
         if (expression is null) return null;
@@ -40,19 +39,16 @@ public static class AutoHandler
             var handler = handlers[type].FirstOrDefault(x => Fortune.LuckyFor(x.Percent));
             if (handler != default && MessageMatches(type, context.Message))
             {
-                var sections = handler.Handler.Split(">").Select(x => x.Trim());
-                var pipe = new LinkedList<string>(sections);
-
-                if (type == 'u' && pipe.First is { } first)
+                if (type == 'u')
                 {
                     var split = handler.Handler.SplitN(2);
                     var command = split[0];
                     var args = split.Length > 1 ? split[1] : null;
 
-                    first.Value = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
+                    handler.Handler = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
                 }
 
-                return pipe;
+                return handler.Handler;
             }
         }
 

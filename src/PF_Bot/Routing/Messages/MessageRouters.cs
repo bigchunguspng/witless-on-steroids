@@ -4,6 +4,7 @@ using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Memes.Commands;
 using PF_Bot.Routing.Commands;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Routing.Messages;
 
@@ -95,18 +96,17 @@ public class MessageRouter_Default_KnownChat
             }
         }
 
-        if (Settings.Type is MemeType.Auto)
-        {
-            if (Settings.Options != null && TryAutoHandleMessage().Failed()) TryLuckForFunnyText();
-        }
-        else if (Message.GetPhoto       () is { } f1 && HaveToMeme       ()) GetMemeMaker(f1).ProcessPhoto(f1);
-        else if (Message.GetImageSticker() is { } f2 && HaveToMemeSticker()) GetMemeMaker(f2).ProcessStick(f2);
-        else if (Message.GetAnimation   () is { } f3 && HaveToMeme       ()) GetMemeMaker(f3).ProcessVideo(f3);
-        else if (Message.GetVideoSticker() is { } f4 && HaveToMemeSticker()) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
-        else TryLuckForFunnyText();
+        if (TryAuto().Failed())
+            TrySendFunnyText();
     }
 
-    private void TryLuckForFunnyText()
+    private bool TryAuto() => Settings.Type switch
+    {
+        MemeType.Auto => TryCallAutoHandler(),
+        _             => TryMakeAutoMeme   (),
+    };
+
+    private void TrySendFunnyText()
     {
         if (Fortune.LuckyFor(Settings.Speech).Janai()) return;
 
@@ -115,105 +115,79 @@ public class MessageRouter_Default_KnownChat
         _ = new PoopText().Run(Context);
     }
 
-    private bool HaveToMemeSticker
-        () => Settings.Stickers
-           && HaveToMeme();
+    // AUTOHANDLER
 
-    private bool HaveToMeme
-        () => Fortune.LuckyFor(Settings.Pics)
-           && Message.ContainsSpoilers().Janai();
-
-    private readonly Dictionary<MemeType, Func<AutoMemesHandler>> _mematics = new()
+    private bool TryCallAutoHandler()
     {
-        { MemeType.Dg,   () => new Demo_Dg() },
-        { MemeType.Meme, () => new Meme() },
-        { MemeType.Top,  () => new Top() },
-        { MemeType.Dp,   () => new Demo_Dp() },
-        { MemeType.Snap, () => new Snap() },
-        { MemeType.Nuke, () => new Nuke() },
-    };
+        if (Settings.Options == null)
+            return false;
 
-    // making memes:
-    // command: {image} [def] | /command[ops] [args]
-    // auto:    {image} [def] |               [text]
-    // autohan: {image} [def] | /command[ops] [args]
+        var input = AutoHandler.TryGetMessageHandler(Context, Settings);
+        if (input == null)
+            return false;
+
+        var func = registry.Resolve(input, out var command);
+        if (func == null)
+            return false;
+        
+        Telemetry.LogAutoCommand(Context.Chat, Context.Text);
+
+        var text    = input.Replace("THIS", Context.Text);
+        var context = new CommandContext(Message, command!, text);
+
+        var handler = func.Invoke();
+        _ = handler.Handle(context);
+
+        return true;
+    }
+
+    // AUTOMEMES
+
+    private bool TryMakeAutoMeme()
+    {
+        if (Message.Type == MessageType.Text || Settings.Pics == 0) return false;
+
+        if      (Message.GetPhoto       () is { } f1 && WouldMeme     ) GetMemeMaker(f1).ProcessPhoto(f1);
+        else if (Message.GetImageSticker() is { } f2 && WouldMemeStick) GetMemeMaker(f2).ProcessStick(f2);
+        else if (Message.GetAnimation   () is { } f3 && WouldMeme     ) GetMemeMaker(f3).ProcessVideo(f3);
+        else if (Message.GetVideoSticker() is { } f4 && WouldMemeStick) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
+        else
+            return false;
+
+        return true;
+    }
+
+    private bool WouldMeme      => Fortune.LuckyFor(Settings.Pics) && Message.ContainsSpoilers().Janai();
+    private bool WouldMemeStick => Settings.Stickers && WouldMeme;
+
     private AutoMemesHandler GetMemeMaker(FileBase file)
     {
-        var mematic = _mematics[Settings.Type].Invoke();
-        mematic.Automemes_PassContext(new CommandContext(Message));
+        var context = new CommandContext(Message);
+        var mematic = CreateMemeMaker(Settings.Type);
+        mematic.Automemes_PassContext(context);
+
         if (mematic is Demo_Dg dg)
         {
             var (w, h) = file.TryGetSize();
             dg.SelectMode(w, h);
         }
 
-        Telemetry.LogAuto(Chat, Settings.Pics, $"/{Settings.Type.ToString().ToLower()}{Settings.Options?[Settings.Type]}");
+        var s = Settings;
+        Telemetry.LogAuto(Chat, s.Pics, $"/{s.Type.ToString().ToLower()}{s.Options?[s.Type]}");
 
         return mematic;
     }
 
-    private bool TryAutoHandleMessage()
+    private AutoMemesHandler CreateMemeMaker(MemeType type) => type switch
     {
-        var pipe = AutoHandler.TryGetMessageHandler(Context, Settings);
-        if (pipe is null) return false;
-
-        AutoHandleCommand(pipe);
-
-        return true;
-    }
-
-    private void AutoHandleCommand(LinkedList<string> pipe) // meme3, nuke
-    {
-        Telemetry.LogAutoCommand(Context.Chat, Context.Text);
-
-        var count = pipe.Count;
-
-        var handlers = new Func<CommandHandler>[count]; // [ () => new Meme(), () => new Nuke() ]
-        var contexts = new      CommandContext [count];
-
-        var node = pipe.First!;
-        for (var i = 0; i < count; i++)
-        {
-            var section = node.Value;
-            if (registry.Resolve(section, out var command) is { } handler)
-            {
-                var text    = section.Replace("THIS", Context.Text);
-                var context = new CommandContext(Message, command!, text);
-                handlers[i] = handler;
-                contexts[i] = context;
-
-                if (node.Next != null)
-                    node = node.Next;
-            }
-            else
-            {
-                App.Bot.SendMessage(Origin, $"Can't resolve command: {section}");
-                return;
-            }
-        }
-
-        TraversePipe();
-
-        void TraversePipe(int i = 0, FilePath? input = null)
-        {
-            var hasNext = i < count - 1;
-            var output  = new List<FilePath>(9);
-            var handler = handlers[i].Invoke();
-            var context = contexts[i];
-            if (hasNext) context.Output = output;
-            if (input != null) context.Input = input;
-
-            LogDebug($"TraversePipe: [{context.Command}][{context.Options}] [{context.Args}] {{i:{input}}}");
-            handler.Handle(context).Wait();
-
-            if (hasNext.Janai()) return;
-
-            foreach (var file in output)
-            {
-                TraversePipe(i + 1, file);
-            }
-        }
-    }
+        MemeType.Dg   => new Demo_Dg(),
+        MemeType.Dp   => new Demo_Dp(),
+        MemeType.Meme => new Meme(),
+        MemeType.Top  => new Top(),
+        MemeType.Snap => new Snap(),
+        MemeType.Nuke => new Nuke(),
+        _ => throw new ArgumentException("Bro added a new meme type..."),
+    };
 }
 
 public class PoopText : MessageHandler

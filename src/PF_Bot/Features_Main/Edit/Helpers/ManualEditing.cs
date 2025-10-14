@@ -28,6 +28,7 @@ public static class ManualEditing
     //
 
     private static readonly Regex
+        _rgx_args  = new(@"\{(\d+)\}",      RegexOptions.Compiled),
         _rgx_alias = new(@"\$?([^\s\$]*)!", RegexOptions.Compiled);
 
     public static bool ApplyAliases(this CommandContext context, ref string options, FilePath directory)
@@ -48,22 +49,42 @@ public static class ManualEditing
 
     private static bool ApplyAlias(this CommandContext context, Match aliasMatch, ref string options, FilePath directory)
     {
-        var data = aliasMatch.Groups[1].Value;
-        var args = data.Split(':');
-        var name = args[0];
+        var expr = aliasMatch.Groups[1].Value;
+        var bits = expr.Split(':');
+        var name = bits[0];
         var path = directory.Combine($"{name}.txt");
 
         var success = path.FileExists;
         if (success)
         {
-            var aliasTemplate = File.ReadAllText(path);
-            var aliatArgs = args.Skip(1).ToArray();
-            var aliasRender = aliasTemplate.Format(aliatArgs);
-            var aliasRegex = new Regex(Regex.Escape(aliasMatch.Value));
-            options = aliasRegex.Replace(options, aliasRender, 1);
+            var template = File.ReadAllText(path);
+            var args = bits.Skip(1).ToArray();
+            try
+            {
+                var aliasRender = template.Format(args);
+                var aliasRegex = new Regex(Regex.Escape(aliasMatch.Value));
+                options = aliasRegex.Replace(options, aliasRender, 1);
+            }
+            catch (FormatException e)
+            {
+                LogError($"{context.Title} >> ALIAS PARSING FAIL | {e.GetErrorMessage()}");
+
+                var args_log = args.Length == 0 
+                    ? "*пусто*" 
+                    : $"[{string.Join(", ", args.Select(x => $"<code>{x}</code>"))}], {args.Length} шт.";
+
+                var count = _rgx_args.Count(template);
+
+                var text = ALIAS_FORMAT_FAIL.Format(FAIL_EMOJI.PickAny(), args_log, name, count, count.ED("", "а", "ов"), template);
+                App.Bot.SendMessage(context.Origin, text);
+                return false;
+            }
         }
         else
-            App.Bot.SendMessage(context.Origin, ALIAS_NOT_FOUND.Format(name, FAIL_EMOJI.PickAny()));
+        {
+            var text = ALIAS_NOT_FOUND.Format(name, FAIL_EMOJI.PickAny());
+            App.Bot.SendMessage(context.Origin, text);
+        }
 
         return success;
     }

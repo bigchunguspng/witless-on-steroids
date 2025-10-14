@@ -826,6 +826,15 @@ public static class Texts
         Не могу найти ярлык "<code>{0}</code>" {1}
         """;
 
+    public const string ALIAS_FORMAT_FAIL =
+        """
+        Не удалось подставить аргументы {0}
+
+        Ваши аргументы: {1}
+        Ярлык: <code>{2}</code> ({3} аргумент{4}):
+        <blockquote>{5}</blockquote>
+        """;
+
     public const string SOUND_UPLOADED =
         """
         🎙 Файл сохранён как:

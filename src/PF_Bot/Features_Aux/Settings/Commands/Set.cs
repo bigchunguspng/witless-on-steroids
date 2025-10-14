@@ -28,7 +28,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
                 else if (_s.IsMatch(w)) Set(MemeType.Snap, "/snap");
                 else if (_n.IsMatch(w)) Set(MemeType.Nuke, "/nuke");
                 else if (_a.IsMatch(w)) Set(MemeType.Auto, "*");
-                else SendManual(string.Format(SET_MEME_TYPE_MANUAL, w));
+                else SendManual(SET_MEME_TYPE_MANUAL.Format(w));
 
                 void Set(MemeType type, string command)
                 {
@@ -94,8 +94,8 @@ namespace PF_Bot.Features_Aux.Settings.Commands
         {
             ChatManager.SaveChats();
             var message = command == "*"
-                ? string.Format(SET_AUTO_HANDLER_RESPONSE, GetAutoHandlerTip())
-                : string.Format(SET_MEMES_RESPONSE, ChatInfo.Types[Data.Type]);
+                ? SET_AUTO_HANDLER_RESPONSE.Format(GetAutoHandlerTip())
+                : SET_MEMES_RESPONSE.Format(ChatInfo.Types[Data.Type]);
             Bot.SendMessage(Origin, message.XDDD());
             Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
         }
@@ -111,7 +111,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
         private void ReportOptionsSet(string command, string result)
         {
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, string.Format(SET_MEME_OPS_RESPONSE, command, result).XDDD());
+            Bot.SendMessage(Origin, SET_MEME_OPS_RESPONSE.Format(command, result).XDDD());
             Log($"{Title} >> MEMES OPTIONS >> {result}");
         }
                 
@@ -120,7 +120,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
             ChatManager.SaveChats();
             if (handler != null)
             {
-                Bot.SendMessage(Origin, string.Format(SET_AUTO_HANDLER_OPTIONS_RESPONSE, handler).XDDD());
+                Bot.SendMessage(Origin, SET_AUTO_HANDLER_OPTIONS_RESPONSE.Format(handler).XDDD());
                 Log($"{Title} >> AUTO HANDLER >> {handler}");
             }
             else

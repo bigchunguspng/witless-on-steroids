@@ -11,12 +11,12 @@ public class SetPics : CommandHandlerAsync_SettingsBlocking
         {
             Data.Pics = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, string.Format(SET_P_RESPONSE, Data.Pics).XDDD());
+            Bot.SendMessage(Origin, SET_P_RESPONSE.Format(Data.Pics).XDDD());
             Log($"{Title} >> MEME CHANCE >> {Data.Pics}%");
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Вероятность мемчиков", Data.Pics, "pics");
+            var message = SET_X_GUIDE.Format("Вероятность мемчиков", Data.Pics, "pics");
             SendManual(message);
         }
     }

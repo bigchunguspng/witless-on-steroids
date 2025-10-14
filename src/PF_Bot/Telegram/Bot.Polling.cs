@@ -33,7 +33,7 @@ public partial class Bot
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
         Telemetry.Log_START(Me);
-        Print(string.Format(BUENOS_DIAS, Username, Me.FirstName), ConsoleColor.Yellow);
+        Print(BUENOS_DIAS.Format(Username, Me.FirstName), ConsoleColor.Yellow);
     }
 
     private Task HandleUpdate(ITelegramBotClient bot, Update update, CancellationToken token)

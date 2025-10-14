@@ -38,7 +38,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                     Log($"{Title} >> DIC {(_public ? "PUBLISHED" : "MOVED")} >> {name}", LogLevel.Info, LogColor.Fuchsia);
                     var marker = _public ? "" : "! ";
                     var result = _public ? "опубликовано" : "сохранено";
-                    Bot.SendMessage(Origin, string.Format(MOVING_DONE, EMPTY_EMOJI.PickAny(), result, marker, name));
+                    Bot.SendMessage(Origin, MOVING_DONE.Format(EMPTY_EMOJI.PickAny(), result, marker, name));
                 }
             }
         }
@@ -58,13 +58,13 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 var fileTarget = directory.Combine(filename).MakeUnique();
                 File.Move(fileSource, fileTarget);
 
-                var text = string.Format(PUB_DONE, ctx.What_SentenceCase, name, ctx.TargetMarker);
+                var text = PUB_DONE.Format(ctx.What_SentenceCase, name, ctx.TargetMarker);
                 Bot.SendMessage(Origin, text);
             }
             else
             {
                 Status = CommandResultStatus.BAD;
-                var text = string.Format(PUB_NOT_FOUND, FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
+                var text = PUB_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
                 Bot.SendMessage(Origin, text);
             }
         }

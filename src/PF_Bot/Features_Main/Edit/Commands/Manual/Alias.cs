@@ -61,7 +61,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
             {
                 Status = CommandResultStatus.BAD;
                 var content = File.ReadAllText(files[0]);
-                Bot.SendMessage(Origin, string.Format(ALIAS_EXIST_RESPONSE, name, content, FAIL_EMOJI.PickAny()));
+                Bot.SendMessage(Origin, ALIAS_EXIST_RESPONSE.Format(name, content, FAIL_EMOJI.PickAny()));
             }
             else
             {
@@ -71,18 +71,18 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
                 if (options == "0" && admin)
                 {
                     File.Delete(path);
-                    Bot.SendMessage(Origin, string.Format(ALIAS_DELETED_RESPONSE, name));
+                    Bot.SendMessage(Origin, ALIAS_DELETED_RESPONSE.Format(name));
                     Log($"{Title} >> {ctx.CommandName.ToUpper()} ALIAS REMOVED [{name}]");
                 }
                 else
                 {
                     File.WriteAllText(path, options);
-                    Bot.SendMessage(Origin, string.Format(ALIAS_SAVED_RESPONSE, name));
+                    Bot.SendMessage(Origin, ALIAS_SAVED_RESPONSE.Format(name));
                     Log($"{Title} >> {ctx.CommandName.ToUpper()} ALIAS ADDED [{name}]");
                 }
             }
         }
         else
-            SendManual(string.Format(ALIAS_SYNTAX, ctx.CommandName, ctx.Tool));
+            SendManual(ALIAS_SYNTAX.Format(ctx.CommandName, ctx.Tool));
     }
 }

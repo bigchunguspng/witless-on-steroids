@@ -31,7 +31,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 var path = PackManager.GetExtraPackPath(name);
                 GenerationPackIO.Save(pack, path);
 
-                Bot.SendMessage(Origin, string.Format(PIECE_RESPONSE, Path.GetFileNameWithoutExtension(path)));
+                Bot.SendMessage(Origin, PIECE_RESPONSE.Format(Path.GetFileNameWithoutExtension(path)));
                 Log($"{Title} >> THE ONE PIECE IS REAL!!!");
             }
             else

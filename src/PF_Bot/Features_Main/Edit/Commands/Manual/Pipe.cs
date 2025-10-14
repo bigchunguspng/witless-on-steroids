@@ -20,7 +20,7 @@ public class Pipe : CommandHandlerAsync
             if (plumber.LayPipe(pipe, Message, out var i).Failed())
             {
                 Status = CommandResultStatus.BAD;
-                Bot.SendMessage(Origin, string.Format(PIPE_FAIL_RESOLVE, pipe[i].SplitN(2)[0]));
+                Bot.SendMessage(Origin, PIPE_FAIL_RESOLVE.Format(pipe[i].SplitN(2)[0]));
                 return;
             }
 
@@ -31,7 +31,7 @@ public class Pipe : CommandHandlerAsync
             Log($"{Title} >> PIPE [{Args}] >> {sw.ElapsedReadable()}", color: LogColor.Yellow);
         }
         else
-            SendManual(string.Format(EDIT_MANUAL_SYN, "🎬, 📸, 🎧, 📎", "/man_pipe"));
+            SendManual(EDIT_MANUAL_SYN.Format("🎬, 📸, 🎧, 📎", "/man_pipe"));
     }
 }
 

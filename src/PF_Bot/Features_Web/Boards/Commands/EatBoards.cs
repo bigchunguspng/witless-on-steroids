@@ -23,7 +23,7 @@ public class EatBoards : EatBoard_Core
         var shortURL = _uri.Segments.Length > 2 && _uri.Segments[2].Contains("search")
             ? "desuarchive.org"
             : _uri.LocalPath;
-        return string.Format(FUSE_SOURCE, _uri, shortURL);
+        return FUSE_SOURCE.Format(_uri, shortURL);
     }
 
     protected override async Task EatOnlineData(string url)

@@ -11,12 +11,12 @@ public class SetQuality : CommandHandlerAsync_SettingsBlocking
         {
             Data.Quality = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, string.Format(SET_Q_RESPONSE, Data.Quality).XDDD());
+            Bot.SendMessage(Origin, SET_Q_RESPONSE.Format(Data.Quality).XDDD());
             Log($"{Title} >> QUALITY >> {Data.Quality}%");
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Качество графики", Data.Quality, "quality");
+            var message = SET_X_GUIDE.Format("Качество графики", Data.Quality, "quality");
             SendManual(message);
         }
     }

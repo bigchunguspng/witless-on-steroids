@@ -239,6 +239,6 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             () => Log($"{Title} >> FUSION DONE", LogLevel.Info, LogColor.Fuchsia);
 
         private string FUSION_SUCCESS_REPORT
-            (FuseReport r) => string.Format(FUSE_SUCCESS_RESPONSE, Title, r.NewSize, r.DeltaSize, r.DeltaCount);
+            (FuseReport r) => FUSE_SUCCESS_RESPONSE.Format(Title, r.NewSize, r.DeltaSize, r.DeltaCount);
     }
 }

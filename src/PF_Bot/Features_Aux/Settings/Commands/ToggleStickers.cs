@@ -9,7 +9,7 @@ namespace PF_Bot.Features_Aux.Settings.Commands
         {
             Data.Stickers = Data.Stickers.Janai();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, string.Format(STICKERS_RESPONSE, Data.Stickers ? "" : "<b>НЕ</b> ").XDDD());
+            Bot.SendMessage(Origin, STICKERS_RESPONSE.Format(Data.Stickers ? "" : "<b>НЕ</b> ").XDDD());
             Log($"{Title} >> STICKERS >> {(Data.Stickers ? "ON" : "OFF")}");
         }
     }

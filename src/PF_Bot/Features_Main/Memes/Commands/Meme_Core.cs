@@ -36,7 +36,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
         protected virtual bool CropVideoNotes   => true;
         protected virtual bool ResultsAreRandom => false;
 
-        protected async Task RunInternal(string? options)
+        protected async Task RunInternal(string options)
         {
             if (Input.HasValue && await ProcessInput(Input.Value))
                 return;
@@ -44,7 +44,7 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
             if (await ProcessMessage(Message) || await ProcessMessage(Message.ReplyToMessage))
                 return;
 
-            SendManual(string.Format(MEME_MANUAL, options));
+            SendManual(MEME_MANUAL.Format(options));
         }
 
         private async Task<bool> ProcessInput(FilePath input)

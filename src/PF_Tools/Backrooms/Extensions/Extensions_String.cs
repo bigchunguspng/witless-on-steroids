@@ -34,6 +34,22 @@ public static class Extensions_String
 
     // OTHER
 
+    public static string Format
+        ([StringSyntax("CompositeFormat")] this string text, string arg) 
+        => string.Format(text, arg);
+
+    public static string Format
+        ([StringSyntax("CompositeFormat")] this string text, string arg0, string arg1) 
+        => string.Format(text, arg0, arg1);
+
+    public static string Format
+        ([StringSyntax("CompositeFormat")] this string text, string arg0, string arg1, string arg2) 
+        => string.Format(text, arg0, arg1, arg2);
+
+    public static string Format
+        ([StringSyntax("CompositeFormat")] this string text, params object?[] args)
+        => string.Format(text, args);
+
     public static byte[] GetBytes_UTF8
         (this string text) =>
         System.Text.Encoding.UTF8.GetBytes(text);

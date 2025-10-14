@@ -11,12 +11,12 @@ public class SetSpeech : CommandHandlerAsync_SettingsBlocking
         {
             Data.Speech = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, string.Format(SET_FREQUENCY_RESPONSE, Data.Speech).XDDD());
+            Bot.SendMessage(Origin, SET_FREQUENCY_RESPONSE.Format(Data.Speech).XDDD());
             Log($"{Title} >> SPEECH >> {Data.Speech}");
         }
         else
         {
-            var message = string.Format(SET_X_GUIDE, "Вероятность ответа", Data.Speech, "speech");
+            var message = SET_X_GUIDE.Format("Вероятность ответа", Data.Speech, "speech");
             SendManual(message);
         }
     }

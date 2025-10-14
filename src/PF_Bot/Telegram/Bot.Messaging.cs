@@ -179,7 +179,7 @@ namespace PF_Bot.Telegram
                 output = sbOutput.ToString();
             }
 
-            var text = string.Format(FF_ERROR_REPORT, e.File, e.Result.Arguments, GetRandomASCII(), output);
+            var text = FF_ERROR_REPORT.Format(e.File, e.Result.Arguments, GetRandomASCII(), output);
             File.WriteAllText(path, text);
             using var stream = new MemoryStream(text.GetBytes_UTF8());
             SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));

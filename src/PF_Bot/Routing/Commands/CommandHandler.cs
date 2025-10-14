@@ -139,7 +139,7 @@ public abstract class CommandHandler
                 break;
             case DenyReason.ONLY_KNOWN_CHATS:
                 if (Chat.ChatIsPrivate() || Context.BotMentioned)
-                    Bot.SendMessage(Origin, string.Format(WITLESS_ONLY_COMAND, Bot.Username));
+                    Bot.SendMessage(Origin, WITLESS_ONLY_COMAND.Format(Bot.Username));
                 break;
         }
     }

@@ -17,7 +17,7 @@ public class UploadFile : FileEditor_AudioVideo
             var text = userText ?? Path.GetFileNameWithoutExtension(fileName);
             var name = $"{text}{Ext}";
             await SoundDB.Instance.UploadSingle(File.FileId, name, Origin);
-            Bot.SendMessage(Origin, string.Format(SOUND_UPLOADED, text));
+            Bot.SendMessage(Origin, SOUND_UPLOADED.Format(text));
             Log($"{Title} >> SOUND UPLOADED [{text}]");
         }
         else
@@ -29,7 +29,7 @@ public class UploadFile : FileEditor_AudioVideo
             var text = userText ?? Path.GetFileNameWithoutExtension(fileName);
             var name = $"{text}{Ext}";
             await GIF_DB.Instance.UploadSingle(File.FileId, name, Origin);
-            Bot.SendMessage(Origin, string.Format(GIF_UPLOADED, text));
+            Bot.SendMessage(Origin, GIF_UPLOADED.Format(text));
             Log($"{Title} >> GIF UPLOADED [{text}]");
         }
     }

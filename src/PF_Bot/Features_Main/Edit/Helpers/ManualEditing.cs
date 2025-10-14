@@ -56,12 +56,14 @@ public static class ManualEditing
         var success = path.FileExists;
         if (success)
         {
-            var aliasRender = string.Format(File.ReadAllText(path), args.Skip(1).ToArray());
+            var aliasTemplate = File.ReadAllText(path);
+            var aliatArgs = args.Skip(1).ToArray();
+            var aliasRender = aliasTemplate.Format(aliatArgs);
             var aliasRegex = new Regex(Regex.Escape(aliasMatch.Value));
             options = aliasRegex.Replace(options, aliasRender, 1);
         }
         else
-            App.Bot.SendMessage(context.Origin, string.Format(ALIAS_NOT_FOUND, name, FAIL_EMOJI.PickAny()));
+            App.Bot.SendMessage(context.Origin, ALIAS_NOT_FOUND.Format(name, FAIL_EMOJI.PickAny()));
 
         return success;
     }

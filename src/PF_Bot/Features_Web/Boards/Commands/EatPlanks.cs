@@ -20,7 +20,7 @@ public class EatPlanks : EatBoard_Core
 
     protected override string? GetSourceAnnotation()
     {
-        return _uri is null ? null : string.Format(FUSE_SOURCE, _uri, _uri.LocalPath.Replace(".html", ""));
+        return _uri is null ? null : FUSE_SOURCE.Format(_uri, _uri.LocalPath.Replace(".html", ""));
     }
 
     protected override async Task EatOnlineData(string url)

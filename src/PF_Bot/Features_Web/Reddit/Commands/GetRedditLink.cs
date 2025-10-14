@@ -25,7 +25,7 @@ public class GetRedditLink : CommandHandlerBlocking
             }
         }
         else
-            SendManual(string.Format(LINK_MANUAL, RedditApp.KEEP_POSTS));
+            SendManual(LINK_MANUAL.Format(RedditApp.KEEP_POSTS));
     }
 
     private static string FormatPost(RedditPost p)

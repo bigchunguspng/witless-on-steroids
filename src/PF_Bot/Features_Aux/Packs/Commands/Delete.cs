@@ -80,7 +80,7 @@ public class Delete_Callback : CallbackHandler
         ChatManager.SaveChats();
 
         Log($"{Title} >> DIC REMOVED >> {Chat}", LogLevel.Info, LogColor.Fuchsia);
-        Bot.SendMessage(Origin, string.Format(DEL_SUCCESS_RESPONSE, Title, result, Bot.Username));
+        Bot.SendMessage(Origin, DEL_SUCCESS_RESPONSE.Format(Title, result, Bot.Username));
     }
 
     private const string

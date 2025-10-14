@@ -36,8 +36,8 @@ namespace PF_Bot.Features_Main.Edit.Commands
         protected void SendManual()
         {
             var manual = SyntaxManual == null
-                ? string.Format(EDIT_MANUAL,     SuportedMedia)
-                : string.Format(EDIT_MANUAL_SYN, SuportedMedia, SyntaxManual);
+                ? EDIT_MANUAL    .Format(SuportedMedia)
+                : EDIT_MANUAL_SYN.Format(SuportedMedia, SyntaxManual);
             SendManual(manual);
         }
 

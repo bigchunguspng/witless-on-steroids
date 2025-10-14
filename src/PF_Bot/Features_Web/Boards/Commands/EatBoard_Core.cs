@@ -104,7 +104,7 @@ public abstract class EatBoard_Core : Fuse
         if (files.Length == 0)
         {
             Status = CommandResultStatus.BAD;
-            Bot.SendMessage(Origin, string.Format(FUSE_FAIL_BOARD, $"{CommandName}s"));
+            Bot.SendMessage(Origin, FUSE_FAIL_BOARD.Format($"{CommandName}s"));
         }
         else
             await EatFromJsonFile(files[0]);
@@ -119,7 +119,7 @@ public abstract class EatBoard_Core : Fuse
 
         var threads = await Task.WhenAll(tasks);
 
-        var text = string.Format(BOARD_START_EDIT, threads.Length);
+        var text = BOARD_START_EDIT.Format(threads.Length);
         if (threads.Length > 150) text += MAY_TAKE_A_WHILE;
 
         Bot.EditMessage(Chat, message, text);

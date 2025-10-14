@@ -88,6 +88,7 @@ public abstract class CommandHandler
         finally
         {
             Log();
+            Reset();
         }
     }
 
@@ -199,6 +200,12 @@ public abstract class CommandHandler
         var text = $"{Status,-4} {A}{B} {Context.Text}";
 
         Telemetry.LogCommand(Chat, text);
+    }
+
+    private void Reset()
+    {
+        Status = CommandResultStatus.OK;
+        MessageToEdit = 0;
     }
 
     private static char GetMessageTypeChar

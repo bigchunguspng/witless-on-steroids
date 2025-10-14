@@ -43,7 +43,8 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
         {
             var (_, probe, options) = await input.InitEditing("DAMN", Ext);
 
-            if (probe.HasVideo)
+            var video = probe.HasVideo && probe.GetVideoStream().IsLikelyImage.Janai();
+            if (video)
             {
                 options
                     .SetCRF(GetVideoCRF())
@@ -55,7 +56,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
                 var audio = probe.GetAudioStream();
                 var bitrate = ValueAsQuality.GetAudioBitrate_kbps(audio.Bitrate);
                 options.Options($"-b:a {bitrate}k");
-                if (probe.HasVideo.Janai()) options.Options("-f mp3");
+                if (video.Janai()) options.Options("-f mp3");
             }
 
             options.Fix_AudioVideo(probe);

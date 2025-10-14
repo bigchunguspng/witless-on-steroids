@@ -1,8 +1,5 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Routing.Callbacks;
-using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Inline;
 using PF_Bot.Routing.Messages;
 using Telegram.Bot;
@@ -14,42 +11,49 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public static IMessageRouter  Router_Message  { get; private set; } = null!;
-    public static ICallbackRouter Router_Callback { get; private set; } = null!;
-    public static InlineQueryHandler      Inliner { get; private set; } = new();
+    private static IMessageRouter  Router_Message  { get; set; } = null!;
+    private static ICallbackRouter Router_Callback { get; set; } = null!;
+    private static InlineQueryHandler      Inliner { get; set; } = new();
 
     public void StartListening()
     {
-        var options = new ReceiverOptions
-        {
-            AllowedUpdates =
-            [
-                UpdateType.Message,
-                UpdateType.EditedMessage,
-                UpdateType.CallbackQuery,
-                UpdateType.InlineQuery,
-            ],
-        };
+        UpdateType[] updates =
+        [
+            UpdateType.Message,
+            UpdateType.EditedMessage,
+            UpdateType.CallbackQuery,
+            UpdateType.InlineQuery,
+        ];
+
+        var options = new ReceiverOptions { AllowedUpdates = updates };
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
+
         Telemetry.Log_START(Me);
         Print(BUENOS_DIAS.Format(Username, Me.FirstName), ConsoleColor.Yellow);
     }
 
-    private Task HandleUpdate(ITelegramBotClient bot, Update update, CancellationToken token)
+    private Task HandleUpdate
+    (
+        ITelegramBotClient bot,
+        Update update,
+        CancellationToken token
+    ) => update switch
     {
-        return update switch
-        {
-            { Message:       { } message } => OnMessage(message),
-            { EditedMessage: { } message } => OnMessage(message),
-            { CallbackQuery: { } query   } => OnCallback(query),
-            { InlineQuery:   { } inline  } => OnInline(inline),
-            _ => OnUnknown(),
-        };
-    }
+        { Message:       { } message } => OnMessage  (message),
+        { EditedMessage: { } message } => OnMessage  (message),
+        { CallbackQuery: { } query   } => OnCallback (query),
+        { InlineQuery:   { } inline  } => OnInline   (inline),
+        _ => OnUnknown(),
+    };
 
     // todo: moving average and dynamic delay: 1s -> 5s -> 15s
-    private async Task HandlePollingError(ITelegramBotClient bot, Exception exception, CancellationToken token)
+    private async Task HandlePollingError
+    (
+        ITelegramBotClient bot,
+        Exception exception,
+        CancellationToken token
+    )
     {
         LogError($"Telegram API | {exception.GetErrorMessage()}");
 
@@ -62,9 +66,11 @@ public partial class Bot
         {
             Router_Message.Route(message);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            HandleMessageRoutingException(e, message);
+            Unluckies.Handle(exception, message, title: "MESSAGE R.");
+
+            SendMessage(message.GetOrigin(), GetSillyErrorMessage());
         }
 
         return Task.CompletedTask;
@@ -76,9 +82,9 @@ public partial class Bot
         {
             Router_Callback.Route(query);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            LogError_ToFile(e, query, "Callback");
+            Unluckies.Handle(exception, query, title: "CALLBACK R.");
         }
 
         return Task.CompletedTask;
@@ -90,9 +96,9 @@ public partial class Bot
         {
             await Inliner.Handle(inline);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            LogError_ToFile(e, inline, "Inline");
+            Unluckies.Handle(exception, inline, title: "INLINE H.");
         }
     }
 
@@ -100,57 +106,5 @@ public partial class Bot
     {
         Print("How Did We Get Here?", ConsoleColor.Magenta);
         return Task.CompletedTask;
-    }
-
-    public void HandleMessageRoutingException(Exception e, Message message)
-    {
-        LogError_ToFile(e, message, $"Message router ({message.Format_ChatMessage()})");
-        SendMessage(message.GetOrigin(), GetSillyErrorMessage());
-    }
-
-    private static readonly FileLogger_Simple _errorLogger = new (File_Errors);
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        Encoder = NewtonsoftJsonCompatibleEncoder.Encoder,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        WriteIndented = true,
-        Converters =
-        {
-            new  CommandContextJsonConverter(),
-            new CallbackContextJsonConverter(),
-            new      JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower),
-        },
-    };
-
-    // todo outta here
-    public static void LogError_ToFile(Exception e, object? context, string title)
-    {
-        LogError($"{title} >> BRUH | {e.GetErrorMessage()}");
-        try
-        {
-            var json = JsonSerializer.Serialize(context, JsonOptions);
-            var entry =
-                $"""
-                 # {DateTime.Now:MMM' 'dd', 'HH:mm:ss.fff}
-
-                 ## Error
-                 ```c#
-                 {e}
-                 ```
-                 ## Context
-                 ```json
-                 {json}
-                 ```
-
-
-                 """;
-            _errorLogger.Log(entry);
-        }
-        catch
-        {
-            //
-        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using PF_Tools.ProcessRunning;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -161,29 +160,6 @@ namespace PF_Bot.Telegram
 
         public async Task<Message> SendAnima_OrThrow(MessageOrigin og, InputFile anima, string caption)
             => await Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread);
-
-        public void SendErrorDetails(ProcessException e, MessageOrigin origin)
-        {
-            var path = Dir_Reports
-                .EnsureDirectoryExist()
-                .Combine($"{DateTime.Now:yyyy-MM-dd}-{e.File}-{origin.Chat}-{Desert.GetSilt(11)}.txt")
-                .MakeUnique();
-
-            var output = "*пусто*";
-            var sbOutput = e.Result.Output;
-            if (sbOutput.Length > 0)
-            {
-                if (e.Result.WasKilled)
-                    sbOutput.Append("\n[I KILLED THE PROCESS :3]");
-
-                output = sbOutput.ToString();
-            }
-
-            var text = FF_ERROR_REPORT.Format(e.File, e.Result.Arguments, GetRandomASCII(), output);
-            File.WriteAllText(path, text);
-            using var stream = new MemoryStream(text.GetBytes_UTF8());
-            SendDocument(origin, InputFile.FromStream(stream, (string?)"произошла ашыпка.txt"));
-        }
 
         // todo separate technical and user-driven usage
         public int PingChat(MessageOrigin origin, string text = "😏", bool notify = true)

@@ -81,7 +81,7 @@ public abstract class CommandHandler
         }
         catch (Exception e)
         {
-            HandleCommandError(context, e);
+            HandleCommandError(e);
         }
         finally
         {
@@ -167,25 +167,23 @@ public abstract class CommandHandler
 
     // ERROR / LOGGING
 
-    private void HandleCommandError(CommandContext context, Exception exception)
+    private void HandleCommandError(Exception exception)
     {
         Status = CommandResultStatus.FAIL;
 
         if (MessageToEdit > 0)
-        {
             Bot.EditMessage(Chat, MessageToEdit, GetSillyErrorMessage());
-        }
 
         if (exception is ProcessException e)
         {
-            LogError($"{context.Title} >> PROCESS FAILED | {e.File} / {e.Result.ExitCode}");
-            Bot.SendErrorDetails(e, context.Origin);
+            Unluckies.HandleProcessException(e, Context);
         }
         else
         {
-            // log to err.mkd
-            Bot.SendMessage(Origin, GetSillyErrorMessage());
-            Bot.LogError_ToFile(exception, context, context.Title);
+            if (MessageToEdit == 0)
+                Bot.SendMessage(Origin, GetSillyErrorMessage());
+
+            Unluckies.Handle(exception, Context, $"COMMAND H. | {Title}");
         }
     }
 

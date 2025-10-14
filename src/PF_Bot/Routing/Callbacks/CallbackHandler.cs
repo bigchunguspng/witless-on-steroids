@@ -27,9 +27,9 @@ public abstract class CallbackHandler
             Context = context;
             await Run();
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            Bot.LogError_ToFile(e, Context, "Callback");
+            Unluckies.Handle(exception, Context, $"CALLBACK H. | {Title}");
         }
     }
 

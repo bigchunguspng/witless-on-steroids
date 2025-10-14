@@ -3,7 +3,6 @@ using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Memes.Commands;
 using PF_Bot.Routing.Commands;
-using PF_Bot.Telegram;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -207,17 +206,14 @@ public class MessageRouter_Default_KnownChat
         }
         catch (Exception exception)
         {
-            // todo extract - duplicate from command handler
             if (exception is ProcessException e)
             {
-                LogError($"{Title} >> PROCESS FAILED | {e.File} / {e.Result.ExitCode}");
-                App.Bot.SendErrorDetails(e, Origin);
+                Unluckies.HandleProcessException(e, context);
             }
             else
             {
-                // log to err.mkd
-                App.Bot.SendMessage(Origin, GetSillyErrorMessage());
-                Bot.LogError_ToFile(exception, context, Title);
+                App.Bot.SendMessage(context.Origin, GetSillyErrorMessage());
+                Unluckies.Handle(exception, context, $"AUTOMEMES | {context.Title}");
             }
         }
         finally

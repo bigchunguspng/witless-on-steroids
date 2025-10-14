@@ -14,8 +14,8 @@ public static class ChatManager
     public static bool Knowns(long chat, [NotNullWhen(true)] out ChatSettings? settings)
         => Chats.TryGetValue(chat, out settings);
 
-    public static bool TryAdd(long chat, bool privateChat)
-        => Chats.TryAdd(chat, ChatSettingsFactory.CreateFor(privateChat));
+    public static bool TryAdd(long chat)
+        => Chats.TryAdd(chat, ChatSettingsFactory.CreateFor(chat.ChatIsPrivate()));
 
     public static void Remove(long chat)
         => Chats.Remove(chat);

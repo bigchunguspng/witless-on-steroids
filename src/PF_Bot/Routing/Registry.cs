@@ -50,6 +50,7 @@ public static class Registry
     private static readonly SendMessage _mail = new();
     private static readonly Htmlizer    _html = new();
     private static readonly CommandHandler
+        _start = new Start(),
         _tell  = new Tell(),
         _spam  = new Spam(),
         _help  = new Help(),
@@ -87,6 +88,7 @@ public static class Registry
             .Register("move"    , () => new Move().WithMode(ExportMode.Private))
             .Register("delete"  , () => new Delete())
             // settings
+            .Register("start"   , () => _start)
             .Register("chat"    , () => _chat)
             .Register("set"     , () => new Set())
             .Register("speech"  , () => new SetSpeech())

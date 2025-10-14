@@ -7,26 +7,26 @@ namespace PF_Tools.Backrooms.Types.Collections;
 public class LimitedCache<TKey, TValue> (int limit)
     where TKey : notnull
 {
-    private readonly LimitedQueue<TKey>          _keys = new(limit);
-    private readonly Dictionary  <TKey, TValue> _paths = new(limit);
+    private readonly LimitedQueue<TKey>        _keys = new(limit);
+    private readonly Dictionary  <TKey, TValue> _map = new(limit);
 
     public int Count => _keys.Count;
 
     public void Add(TKey id, TValue value)
     {
-        if (_keys.Enqueue(id) is { } key)
+        var key  = _keys.Enqueue(id);
+        if (key != null)
         {
-            _paths.Remove(key);
+            _map.Remove(key);
         }
 
-        _keys.Enqueue(id);
-        _paths.TryAdd(id, value);
+        _map.TryAdd(id, value);
     }
 
     public bool Contains
         (TKey id, [MaybeNullWhen(false)] out TValue value)
     {
-        return _paths.TryGetValue(id, out value);
+        return _map.TryGetValue(id, out value);
     }
 
     public bool Contains_No

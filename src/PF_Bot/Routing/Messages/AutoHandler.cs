@@ -14,7 +14,6 @@ public static class AutoHandler
     private static readonly Regex
         _rgx_handler = new(@"([pvagus]+)(?:(\d{1,3})%)?:\s*(.+)", RegexOptions.Compiled);
 
-    // todo investigate: cache has duplicate entries ?
     private static readonly LimitedCache<long, AutoHandlerMap> Cache = new(32);
 
     public static void ClearCache(long chat)

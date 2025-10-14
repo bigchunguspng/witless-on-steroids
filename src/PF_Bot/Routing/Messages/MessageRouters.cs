@@ -3,6 +3,8 @@ using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Memes.Commands;
 using PF_Bot.Routing.Commands;
+using PF_Bot.Telegram;
+using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -145,37 +147,90 @@ public class MessageRouter_Default_KnownChat
 
     private bool TryMakeAutoMeme()
     {
-        if (Message.Type == MessageType.Text || Settings.Pics == 0) return false;
+        if (Message.Type == MessageType.Text || Settings.Pics == 0)
+            return false;
 
-        if      (Message.GetPhoto       () is { } f1 && WouldMeme     ) GetMemeMaker(f1).ProcessPhoto(f1);
-        else if (Message.GetImageSticker() is { } f2 && WouldMemeStick) GetMemeMaker(f2).ProcessStick(f2);
-        else if (Message.GetAnimation   () is { } f3 && WouldMeme     ) GetMemeMaker(f3).ProcessVideo(f3);
-        else if (Message.GetVideoSticker() is { } f4 && WouldMemeStick) GetMemeMaker(f4).ProcessVideo(f4, ".webm");
+        FileBase file;
+        AutoMemeType type;
+
+        if      (Message.GetPhoto       () is { } f1) (file, type) = (f1, AutoMemeType.Image);
+        else if (Message.GetImageSticker() is { } f2) (file, type) = (f2, AutoMemeType.Stick);
+        else if (Message.GetAnimation   () is { } f3) (file, type) = (f3, AutoMemeType.Video);
+        else if (Message.GetVideoSticker() is { } f4) (file, type) = (f4, AutoMemeType.VideoStick);
         else
             return false;
 
-        return true;
-    }
+        var sticker = type.HasFlag(AutoMemeType.Stick);
+        var skip = sticker && Settings.Stickers.IsOff() || WouldMeme.Janai();
+        if (skip)
+            return false;
 
-    private bool WouldMeme      => Fortune.LuckyFor(Settings.Pics) && Message.ContainsSpoilers().Janai();
-    private bool WouldMemeStick => Settings.Stickers && WouldMeme;
-
-    private AutoMemesHandler GetMemeMaker(FileBase file)
-    {
         var context = new CommandContext(Message);
         var mematic = CreateMemeMaker(Settings.Type);
-        mematic.Automemes_PassContext(context);
-
         if (mematic is Demo_Dg dg)
         {
             var (w, h) = file.TryGetSize();
             dg.SelectMode(w, h);
         }
 
-        var s = Settings;
-        Telemetry.LogAuto(Chat, s.Pics, $"/{s.Type.ToString().ToLower()}{s.Options?[s.Type]}");
+        mematic.Automemes_PassContext(context);
 
-        return mematic;
+        var makeMeme = type switch
+        {
+            AutoMemeType.Image      => mematic.ProcessPhoto(file),
+            AutoMemeType.Stick      => mematic.ProcessStick(file),
+            AutoMemeType.Video      => mematic.ProcessVideo(file),
+            AutoMemeType.VideoStick => mematic.ProcessVideo(file, ".webm"),
+            _ => throw new ArgumentException("Bro added a new automeme type..."),
+        };
+
+        _ = HandleAutoMeme(makeMeme, context);
+
+        return true;
+    }
+
+    [Flags] private enum AutoMemeType
+    {
+        Image = 1,
+        Stick = 2,
+        Video = 4,
+        VideoStick = Video | Stick,
+    }
+
+    private bool WouldMeme => Fortune.LuckyFor(Settings.Pics) && Message.ContainsSpoilers().Janai();
+
+    private async Task HandleAutoMeme(Task makeMeme, CommandContext context)
+    {
+        try
+        {
+            await makeMeme;
+        }
+        catch (Exception exception)
+        {
+            // todo extract - duplicate from command handler
+            if (exception is ProcessException e)
+            {
+                LogError($"{Title} >> PROCESS FAILED | {e.File} / {e.Result.ExitCode}");
+                App.Bot.SendErrorDetails(e, Origin);
+            }
+            else
+            {
+                // log to err.mkd
+                App.Bot.SendMessage(Origin, GetSillyErrorMessage());
+                Bot.LogError_ToFile(exception, context, Title);
+            }
+        }
+        finally
+        {
+            //todo new logging
+            var s = Settings;
+            Telemetry.LogAuto(Chat, s.Pics, $"/{s.Type.ToString().ToLower()}{s.Options?[s.Type]}");
+            /*var A = GetMessageTypeChar(Message.ReplyToMessage);
+            var B = GetMessageTypeChar(Message);
+            var text = $"{Status,-4} {A}{B} {Context.Text}";
+
+            Telemetry.LogCommand(Chat, text);*/
+        }
     }
 
     private AutoMemesHandler CreateMemeMaker(MemeType type) => type switch

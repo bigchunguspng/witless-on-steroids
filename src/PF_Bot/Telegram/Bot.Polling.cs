@@ -120,6 +120,7 @@ public partial class Bot
         {
             new  CommandContextJsonConverter(),
             new CallbackContextJsonConverter(),
+            new      JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower),
         },
     };
 

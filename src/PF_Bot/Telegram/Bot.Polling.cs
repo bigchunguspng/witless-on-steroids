@@ -118,7 +118,7 @@ public partial class Bot
         WriteIndented = true,
         Converters =
         {
-            new CommandHandler.JsonConverter(),
+            new  CommandContextJsonConverter(),
             new CallbackContextJsonConverter(),
         },
     };

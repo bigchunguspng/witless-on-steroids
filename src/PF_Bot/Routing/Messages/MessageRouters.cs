@@ -200,7 +200,7 @@ public class MessageRouter_Default_KnownChat
             var output  = new List<FilePath>(9);
             var handler = handlers[i].Invoke();
             var context = contexts[i];
-            if (hasNext) handler.RedirectFileOutputTo(output);
+            if (hasNext) context.Output = output;
             if (input != null) context.Input = input;
 
             LogDebug($"TraversePipe: [{context.Command}][{context.Options}] [{context.Args}] {{i:{input}}}");

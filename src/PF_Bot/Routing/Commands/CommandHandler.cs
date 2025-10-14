@@ -18,31 +18,21 @@ public abstract class CommandHandler
 
     protected CommandContext Context { get; set; } = null!;
 
+    protected MessageOrigin Origin => Context.Origin;
+
     protected Message Message  => Context.Message;
     protected long    Chat     => Context.Chat;
     protected string  Title    => Context.Title;
     protected string  Command  => Context.Command;
     protected string  Options  => Context.Options ?? "";
     protected string? Args     => Context.Args;
-    protected FilePath? Input  => Context.Input;
 
-    protected MessageOrigin Origin => Context.Origin;
+    protected      FilePath ? Input   => Context.Input;
+    protected List<FilePath>? Output  => Context.Output;
 
-    // KNOWN CHAT CONTEXT
-
-    protected ChatSettings Data     =>  Settings;
-
-    private   ChatSettings?            _settings;
-    protected ChatSettings Settings => _settings ??=
-        ChatManager.Knowns(Chat, out var settings)
-            ? settings
-            : ChatSettingsFactory.GetTemporary();
-
-    private   Copypaster?        _baka;
-    protected Copypaster Baka => _baka ??=
-        ChatManager.Knowns(Chat)
-            ? PackManager.GetBaka(Chat)
-            : DementiaCopypaster.Instance;
+    protected ChatSettings Data     => Context.Settings;
+    protected ChatSettings Settings => Context.Settings;
+    protected Copypaster   Baka     => Context.Baka;
 
     [Flags]
     protected enum    CommandRequirements
@@ -60,7 +50,7 @@ public abstract class CommandHandler
 
         if (Requirements.HasFlag(CommandRequirements.KnownChat))
         {
-            if (ChatManager.Knowns(Chat, out _settings).Janai())
+            if (ChatManager.Knowns(Chat).Janai())
             {
                 Deny(DenyReason.ONLY_KNOWN_CHATS);
                 return false;
@@ -154,13 +144,6 @@ public abstract class CommandHandler
         }
     }
 
-    private List<FilePath>? Output;
-
-    public void RedirectFileOutputTo(List<FilePath> output)
-    {
-        Output = output;
-    }
-
     protected void SendFile(FilePath output, MediaType type, string? name = null)
     {
         if (Output != null)
@@ -203,7 +186,7 @@ public abstract class CommandHandler
         {
             // log to err.mkd
             Bot.SendMessage(Origin, GetSillyErrorMessage());
-            Bot.LogError_ToFile(exception, this, context.Title);
+            Bot.LogError_ToFile(exception, context, context.Title);
         }
     }
 
@@ -232,36 +215,4 @@ public abstract class CommandHandler
         MessageType.Document  => 'D',
         _                     => '?',
     };
-
-    //
-
-    public class JsonConverter : WriteOnlyJsonConverter<CommandHandler>
-    {
-        public override void Write
-        (
-            Utf8JsonWriter writer,
-            CommandHandler value,
-            JsonSerializerOptions options
-        ) => writer.WriteObject(() =>
-        {
-            var context = value.Context;
-            writer.WriteObject("message", context.Message, options);
-            writer.WriteNumber("chat", context.Chat);
-            writer.WriteString("title", context.Title);
-            writer.WriteString("text", context.Text);
-            writer.WriteString("command", context.Command);
-            writer.WriteString("options", context.Options);
-            writer.WriteString("args", context.Args);
-            writer.WriteBoolean("bot_mentioned", context.BotMentioned);
-            writer.WriteString("input", context.Input);
-            if (value.Output != null)
-            {
-                writer.WriteArray("output", () => value.Output.ForEach(x => writer.WriteStringValue(x)));
-            }
-            if (value._settings != null)
-            {
-                writer.WriteObject("settings", value._settings, options);
-            }
-        });
-    }
 }

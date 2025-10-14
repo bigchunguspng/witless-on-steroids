@@ -1,4 +1,8 @@
+using System.Text.Json;
 using PF_Bot.Core;
+using PF_Bot.Features_Aux.Packs.Core;
+using PF_Bot.Features_Aux.Settings.Core;
+using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Routing.Messages;
 using Telegram.Bot.Types;
 
@@ -7,6 +11,8 @@ namespace PF_Bot.Routing.Commands;
 /// Expected syntax: <c>/[command][ops][@bot][ops] [args]</c>
 public class CommandContext : MessageContext
 {
+    // COMMON
+
     /// Command name, lowercase. Options, '/', and bot mention are removed.
     public string  Command   { get; private set; }
 
@@ -16,11 +22,37 @@ public class CommandContext : MessageContext
     /// Command arguments, case preserved.
     public string? Args      { get; private set; }
 
-    /// Local file to process. Used in pipes (chained command handlers).
-    public FilePath? Input   { get; set; }
-
     /// Whether THIS bot was mentioned
     public bool BotMentioned { get; private set; }
+
+    // PIPES
+
+    /// Local file to process.
+    /// Used in pipes (chained command handlers).
+    public      FilePath ? Input  { get; set; }
+
+    /// Processing results.
+    /// Used in pipes (chained command handlers).
+    public List<FilePath>? Output { get; set; }
+
+    // KNOWN CHATS
+
+    private ChatSettings?            _settings;
+    public  ChatSettings Settings => _settings ??=
+        ChatManager.Knowns(Chat, out var settings)
+            ? settings
+            : ChatSettingsFactory.GetTemporary();
+
+    private Copypaster?        _baka;
+    public  Copypaster Baka => _baka ??=
+        ChatManager.Knowns(Chat)
+            ? PackManager.GetBaka(Chat)
+            : DementiaCopypaster.Instance;
+
+    public  ChatSettings? Settings_Debug => _settings;
+    public  Copypaster? Copypaster_Debug => _baka;
+
+    // CTORS
 
     /// Automemes
     public CommandContext(Message message) : base(message)
@@ -88,4 +120,45 @@ public class CommandContext : MessageContext
 
     private static readonly char[] _separators  = [' ', '\n'];
     private static readonly string _botUsername = App.Bot.Username;
+}
+
+public class CommandContextJsonConverter : WriteOnlyJsonConverter<CommandContext>
+{
+    public override void Write
+    (
+        Utf8JsonWriter writer,
+        CommandContext value,
+        JsonSerializerOptions options
+    ) => writer.WriteObject(() =>
+    {
+        writer.WriteObject("message", value.Message, options);
+        writer.WriteNumber("chat", value.Chat);
+        writer.WriteString("title", value.Title);
+        writer.WriteString("text", value.Text);
+        writer.WriteString("command", value.Command);
+        writer.WriteString("options", value.Options);
+        writer.WriteString("args", value.Args);
+        writer.WriteBoolean("bot_mentioned", value.BotMentioned);
+
+        if (value.Input != null)
+            writer.WriteString("input", value.Input);
+
+        if (value.Output != null)
+            writer.WriteArray("output", () => value.Output.ForEach(x => writer.WriteStringValue(x)));
+
+        if (value.Settings_Debug != null)
+            writer.WriteObject("settings", value.Settings_Debug, options);
+
+        if (value.Copypaster_Debug != null)
+            writer.WriteObject("baka", () =>
+            {
+                var baka = value.Copypaster_Debug;
+                var pack = value.Copypaster_Debug.Pack;
+                writer.WriteNumber ("idle",  baka.Idle);
+                writer.WriteBoolean("dirty", baka.IsDirty);
+                writer.WriteNumber("count_special",    pack.SpecialCount);
+                writer.WriteNumber("count_ordinal",    pack.OrdinalCount);
+                writer.WriteNumber("count_vocabulary", pack.VocabularyCount);
+            });
+    });
 }

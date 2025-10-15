@@ -118,10 +118,11 @@ public class MessageRouter_Default_KnownChat
 
     private bool TryCallAutoHandler()
     {
-        if (Settings.Options == null)
+        var expression = Settings.Options?[MemeType.Auto];
+        if (expression == null)
             return false;
 
-        var input = AutoHandler.TryGetMessageHandler(Context, Settings);
+        var input = AutoHandler.TryGetHandlerInput(Context, expression);
         if (input == null)
             return false;
 

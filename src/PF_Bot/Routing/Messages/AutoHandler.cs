@@ -1,87 +1,46 @@
-using PF_Bot.Features_Aux.Settings.Core;
 using Telegram.Bot.Types;
-using HandlerChance = (int Percent, string Handler);
 
 namespace PF_Bot.Routing.Messages;
 
-// auto = [expr 0][;] [expr N]
-// expr = [types][N%]:[command][options] [args]
-
-public class AutoHandlerMap : Dictionary<char, List<HandlerChance>>;
-
 public static class AutoHandler
 {
-    private static readonly Regex
-        _rgx_handler = new(@"([pvagusd]+)(?:(\d{1,3})%)?:\s*([\S\s]+)", RegexOptions.Compiled);
-
-    private static readonly LimitedCache<long, AutoHandlerMap> Cache = new(32);
+    private static readonly Dictionary<long, AutoHandlerScript> Cache = new(32);
 
     public static void ClearCache(long chat)
     {
-        if (Cache.Contains(chat, out var map)) map.Clear();
+        Cache.Remove(chat);
     }
 
     // EXPRESSION PARSING
 
     /// Returns command-like input string in this format: <c>cmd[ops] [args]</c>
-    public static string? TryGetMessageHandler(MessageContext context, ChatSettings data)
+    public static string? TryGetHandlerInput(MessageContext context, string expression)
     {
-        var expression = data.Options![MemeType.Auto];
-        if (expression is null) return null;
-
-        var handlers = Cache.Contains(context.Chat, out var map) && map.Count > 0
-            ? map
-            : Parse_AndCache(expression, context.Chat);
-
-        foreach (var type in handlers.Keys)
+        if (Cache.TryGetValue_Failed(context.Chat, out var script))
         {
-            var handler = handlers[type].FirstOrDefault(x => Fortune.LuckyFor(x.Percent));
-            if (handler != default && MessageMatches(type, context.Message))
+            script = AutoHandlerScript.Create(expression);
+            Cache.Add(context.Chat, script);
+        }
+
+        foreach (var type in script.SupportedFileTypes)
+        {
+            if (MessageMatches(type, context.Message).Janai())
+                continue;
+
+            var input = script.GenerateInput(type);
+            if (input != null && type == 'u')
             {
-                if (type == 'u')
-                {
-                    var split = handler.Handler.SplitN(2);
-                    var command = split[0];
-                    var args = split.Length > 1 ? split[1] : null;
+                var split = input.SplitN(2);
+                var command = split[0];
+                var args = split.Length > 1 ? split[1] : null;
 
-                    handler.Handler = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
-                }
-
-                return handler.Handler;
+                input = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
             }
+
+            return input;
         }
 
         return null;
-    }
-
-    private static AutoHandlerMap Parse_AndCache(string definition, long chat)
-    {
-        var map = new AutoHandlerMap();
-
-        var expressions = definition
-            .Split(";", StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Trim());
-        var matches = expressions
-            .Select(x => _rgx_handler.Match(x))
-            .Where(x => x.Success);
-
-        foreach (var match in matches)
-        {
-            var types   = match.ExtractGroup(1, s => s, "");
-            var percent = match.ExtractGroup(2, int.Parse, 100);
-            var handler = match.ExtractGroup(3, s => s, "");
-            foreach (var type in types)
-            {
-                if (map.ContainsKey(type).Janai())
-                    map[type] = [];
-
-                map[type].Add((percent, handler));
-            }
-        }
-
-        Cache.Add(chat, map);
-
-        return map;
     }
 
     // MEDIA

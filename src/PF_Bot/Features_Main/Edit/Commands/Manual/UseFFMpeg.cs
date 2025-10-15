@@ -32,7 +32,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
 
         if (Context.ApplyAliases(ref options, Dir_Alias_Peg).Failed())
         {
-            Status = CommandResultStatus.BAD;
+            SetBadStatus();
             return;
         }
 
@@ -62,7 +62,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         var extensionInvalid = extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
-            Status = CommandResultStatus.BAD;
+            SetBadStatus();
             await ManualEditing.SendTrollface(Origin, extensionInvalid);
             return;
         }

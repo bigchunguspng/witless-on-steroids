@@ -104,8 +104,10 @@ public abstract class CommandHandler
         FAIL, // error was thrown ((9
         DENY, // massive skill issue
     }
+    private CommandResultStatus Status {  get; set; } = CommandResultStatus.OK;
 
-    protected CommandResultStatus Status { private get; set; } = CommandResultStatus.OK;
+    protected void SetBadStatus() =>
+        Status = CommandResultStatus.BAD;
 
     protected void SendManual(string manual)
     {

@@ -122,7 +122,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             }
             catch
             {
-                Status = CommandResultStatus.BAD; // to the bone 😂🤣😭👌️
+                SetBadStatus();
                 Bot.SendMessage(Origin, "💀");
 
                 //                   He sends

@@ -30,7 +30,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
                 var name = PackManager.Move(Chat, name: Args ?? Title, _public);
                 if (name == null)
                 {
-                    Status = CommandResultStatus.BAD;
+                    SetBadStatus();
                     Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
                 }
                 else
@@ -63,7 +63,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             }
             else
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 var text = PUB_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
                 Bot.SendMessage(Origin, text);
             }

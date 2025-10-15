@@ -32,7 +32,7 @@ public class KillProcess : CommandHandlerAsync_Admin
         }
         else
         {
-            Status = CommandResultStatus.BAD;
+            SetBadStatus();
             Bot.SendSticker(Origin, NO);
         }
     }

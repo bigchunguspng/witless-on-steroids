@@ -98,7 +98,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
         {
             if (chat == Chat)
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 Bot.SendSticker(Origin, InputFile.FromFileId(HOLY_MOLY));
             }
             else if (ChatManager.Knowns(chat))
@@ -110,7 +110,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             }
             else
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 Bot.SendMessage(Origin, FUSE_CHAT_NOT_FOUND);
             }
         }
@@ -120,7 +120,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             var files = PackManager.GetPacksFolder(Chat, isPrivate).GetFiles($"{arg}{Ext_Pack}");
             if (files.Length == 0)
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 ListingPacks.SendPackList(new ListPagination(Origin), isPrivate, fail: true);
             }
             else
@@ -134,7 +134,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             var files = PackManager.GetFilesFolder(Chat, isPrivate).GetFiles($"{name}.json");
             if (files.Length == 0)
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 ListingPacks.SendFileList(new ListPagination(Origin), isPrivate, fail: true);
             }
             else
@@ -167,7 +167,7 @@ namespace PF_Bot.Features_Aux.Packs.Commands
             catch // wrong format
             {
                 File.Delete(path);
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 Bot.SendMessage(Origin, GetJsonFormatExample());
             }
         }

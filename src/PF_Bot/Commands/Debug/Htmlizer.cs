@@ -23,7 +23,7 @@ public class Htmlizer : CommandHandlerBlocking
         var text = htmlize ? HtmlText.Escape(message.ToHtml()) : message.GetTextOrCaption();
         if (text is null)
         {
-            Status = CommandResultStatus.BAD;
+            SetBadStatus();
             Bot.SendSticker(Origin, InputFile.FromFileId(LOL.PickAny()));
         }
         else

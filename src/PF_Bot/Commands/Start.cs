@@ -15,6 +15,6 @@ public class Start : CommandHandlerBlocking
             Bot.SendMessage(Origin, START_RESPONSE);
         }
         else
-            Status = CommandResultStatus.BAD;
+            SetBadStatus();
     }
 }

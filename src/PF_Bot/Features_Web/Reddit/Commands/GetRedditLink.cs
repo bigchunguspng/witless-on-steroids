@@ -20,7 +20,7 @@ public class GetRedditLink : CommandHandlerBlocking
             }
             else
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
             }
         }

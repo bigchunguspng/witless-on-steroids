@@ -59,7 +59,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
             var files = Directory.GetFiles($"{name}.*");
             if (files.Length > 0 && admin.Janai())
             {
-                Status = CommandResultStatus.BAD;
+                SetBadStatus();
                 var content = File.ReadAllText(files[0]);
                 Bot.SendMessage(Origin, ALIAS_EXIST_RESPONSE.Format(name, content, FAIL_EMOJI.PickAny()));
             }

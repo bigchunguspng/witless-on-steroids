@@ -63,7 +63,7 @@ public class AutoHandlerScript
 
         foreach (var statement in statements)
         {
-            var let = statement.StartsWith("let");
+            var let = statement.StartsWith("let", StringComparison.OrdinalIgnoreCase);
             if (let) // let m 50 meme, 25 top, 25 dp
             {
                 var bits = statement.SplitN(3);

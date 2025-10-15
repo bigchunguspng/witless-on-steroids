@@ -28,7 +28,7 @@ public class Pipe : CommandHandlerAsync
 
             await plumber.TraversePipe();
 
-            Log($"{Title} >> PIPE [{Args}] >> {sw.ElapsedReadable()}", color: LogColor.Yellow);
+            Log($"{Title} >> PIPE [{Args.Trim().Replace("\n", "[N]")}] >> {sw.ElapsedReadable()}", color: LogColor.Yellow);
         }
         else
             SendManual(EDIT_MANUAL_SYN.Format("🎬, 📸, 🎧, 📎", "/man_pipe"));

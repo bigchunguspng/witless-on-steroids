@@ -12,7 +12,7 @@ public class AutoHandlerMap : Dictionary<char, List<HandlerChance>>;
 public static class AutoHandler
 {
     private static readonly Regex
-        _rgx_handler = new(@"([pvagusd]+)(?:(\d{1,3})%)?:\s*(.+)", RegexOptions.Compiled);
+        _rgx_handler = new(@"([pvagusd]+)(?:(\d{1,3})%)?:\s*([\S\s]+)", RegexOptions.Compiled);
 
     private static readonly LimitedCache<long, AutoHandlerMap> Cache = new(32);
 

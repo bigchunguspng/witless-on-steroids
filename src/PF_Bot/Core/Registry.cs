@@ -92,8 +92,8 @@ public static class Registry
             .Register("chat"    , () => _chat)
             .Register("set"     , () => new Set())
             .Register("speech"  , () => new SetSpeech())
-            .Register("quality" , () => new SetPics())
-            .Register("pics"    , () => new SetQuality())
+            .Register("pics"    , () => new SetPics())
+            .Register("quality" , () => new SetQuality())
             .Register("stickers", () => new ToggleStickers())
             .Register("admins"  , () => new ToggleAdmins())
             // other

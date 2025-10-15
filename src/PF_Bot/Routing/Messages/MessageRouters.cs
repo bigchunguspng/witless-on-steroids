@@ -133,7 +133,7 @@ public class MessageRouter_Default_KnownChat
         
         Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
-        var text    = input.Replace("THIS", Context.Text);
+        var text    = input.Replace("TEXT", Context.Text);
         var context = new CommandContext(Message, command!, text);
 
         var handler = func.Invoke();

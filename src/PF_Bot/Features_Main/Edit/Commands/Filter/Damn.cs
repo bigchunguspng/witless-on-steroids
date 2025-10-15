@@ -18,7 +18,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             _value = Args.TryParseAsInt(out var x) ? Math.Clamp(x, 0, 21) : 21;
 
             var input = await GetFile();
-            var output = input.GetOutputFilePath("DAMN", Type is MediaType.Photo ? "jpg" : Ext);
+            var output = input.GetOutputFilePath("DAMN", Type is MediaType.Photo ? ".jpg" : Ext);
 
             var compressTask = Type switch
             {

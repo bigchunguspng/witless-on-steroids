@@ -96,14 +96,14 @@ public abstract class CommandHandler
 
     protected int MessageToEdit { get; set; }
 
-    private CommandResultStatus Status {  get; set; } = CommandResultStatus.OK;
+    private HandlingStatus Status {  get; set; } = HandlingStatus.OK;
 
     protected void SetBadStatus() =>
-        Status = CommandResultStatus.BAD;
+        Status = HandlingStatus.BAD;
 
     protected void SendManual(string manual)
     {
-        Status = CommandResultStatus.MAN;
+        Status = HandlingStatus.MAN;
         Bot.SendMessage(Origin, manual);
     }
 
@@ -117,7 +117,7 @@ public abstract class CommandHandler
 
     protected void Deny(DenyReason reason)
     {
-        Status = CommandResultStatus.DENY;
+        Status = HandlingStatus.DENY;
         switch (reason)
         {
             case DenyReason.ONLY_BOT_ADMINS:
@@ -163,7 +163,7 @@ public abstract class CommandHandler
 
     private void HandleError(Exception exception)
     {
-        Status = CommandResultStatus.FAIL;
+        Status = HandlingStatus.FAIL;
 
         if (MessageToEdit > 0)
             Bot.EditMessage(Chat, MessageToEdit, GetSillyErrorMessage());
@@ -200,7 +200,7 @@ public abstract class CommandHandler
 
     private void Reset()
     {
-        Status = CommandResultStatus.OK;
+        Status = HandlingStatus.OK;
         MessageToEdit = 0;
     }
 }

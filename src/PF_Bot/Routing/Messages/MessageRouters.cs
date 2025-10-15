@@ -209,7 +209,7 @@ public class MessageRouter_Default_KnownChat
 
 public class AutoMeme : MessageHandler
 {
-    private CommandResultStatus Status = CommandResultStatus.OK;
+    private HandlingStatus Status = HandlingStatus.OK;
 
     public async Task Run(Task makeMeme, CommandContext context)
     {
@@ -220,7 +220,7 @@ public class AutoMeme : MessageHandler
         }
         catch (Exception exception)
         {
-            Status = CommandResultStatus.FAIL;
+            Status = HandlingStatus.FAIL;
 
             HandleError(exception, context);
         }
@@ -256,7 +256,7 @@ public class AutoMeme : MessageHandler
 
 public class PoopText(int chance) : MessageHandler
 {
-    private CommandResultStatus Status = CommandResultStatus.OK;
+    private HandlingStatus Status = HandlingStatus.OK;
 
     public async Task Run(MessageContext context)
     {
@@ -267,7 +267,7 @@ public class PoopText(int chance) : MessageHandler
         }
         catch (Exception exception)
         {
-            Status = CommandResultStatus.FAIL;
+            Status = HandlingStatus.FAIL;
 
             Unluckies.Handle(exception, Context, $"FUNNY | {Title}");
         }

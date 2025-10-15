@@ -10,14 +10,14 @@ public class InlineQueryHandler
 
     public async Task Handle(InlineQuery inline)
     {
-        var status = CommandResultStatus.OK;
+        var status = HandlingStatus.OK;
         try
         {
             status = await Jarvis.Search(inline);
         }
         catch (Exception exception)
         {
-            status = CommandResultStatus.FAIL;
+            status = HandlingStatus.FAIL;
 
             Unluckies.Handle(exception, inline, title: "INLINE H.");
         }

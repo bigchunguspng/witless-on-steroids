@@ -20,7 +20,7 @@ public abstract class CallbackHandler
 
     protected MessageOrigin Origin => Context.Origin;
 
-    private CommandResultStatus Status = CommandResultStatus.OK;
+    private HandlingStatus Status = HandlingStatus.OK;
 
     public async Task Handle(CallbackContext context)
     {
@@ -31,7 +31,7 @@ public abstract class CallbackHandler
         }
         catch (Exception exception)
         {
-            Status = CommandResultStatus.FAIL;
+            Status = HandlingStatus.FAIL;
 
             Unluckies.Handle(exception, Context, $"CALLBACK H. | {Title}");
         }

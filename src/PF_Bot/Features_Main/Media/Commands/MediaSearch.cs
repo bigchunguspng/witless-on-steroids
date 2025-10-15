@@ -15,7 +15,7 @@ public class MediaSearch
 
     // @bot [g!*.@гж] query[|caption]
 
-    public async Task<CommandResultStatus> Search(InlineQuery inline)
+    public async Task<HandlingStatus> Search(InlineQuery inline)
     {
         string? query = inline.Query, caption = null;
 
@@ -45,8 +45,8 @@ public class MediaSearch
         Log($"[@inline-{mode}] {title} >> {query_log}{caption_log}");
 
         return results.Count > 0
-            ? CommandResultStatus.OK
-            : CommandResultStatus.BAD;
+            ? HandlingStatus.OK
+            : HandlingStatus.BAD;
     }
 
     private List<InlineQueryResult> GetResults(bool sound_mode, string? query, string? caption)

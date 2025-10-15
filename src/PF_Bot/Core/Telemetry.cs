@@ -3,7 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Core;
 
-public enum CommandResultStatus // todo rename ProcessingStatus
+public enum HandlingStatus
 {
     OK,   // all's good, according to keikaku
     MAN,  // bad syntax -> manual's sent
@@ -68,34 +68,34 @@ public static class BigBrother
     // TELEGRAM
 
     public static void LogCommand
-        (long chat, CommandResultStatus status, Message message, string? input)
+        (long chat, HandlingStatus status, Message message, string? input)
     {
         var (A, B) = GetMessageType(message);
         LogTelegram(chat, $"-> {status,-4} {A}{B} {input}");
     }
 
     public static void LogAuto
-        (long chat, CommandResultStatus status, Message message, AutoType type, int chance, string? input = null)
+        (long chat, HandlingStatus status, Message message, AutoType type, int chance, string? input = null)
     {
         var (A, B) = GetMessageType(message);
         LogTelegram(chat, $"<- {status,-4} {A}{B} @{type} {chance,3}% {input}");
     }
 
     public static void LogAuto
-        (long chat, CommandResultStatus status, Message message, AutoType type, string id_4char, string? input = null)
+        (long chat, HandlingStatus status, Message message, AutoType type, string id_4char, string? input = null)
     {
         var (A, B) = GetMessageType(message);
         LogTelegram(chat, $"<- {status,-4} {A}{B} @{type} {id_4char} {input}");
     }
 
     public static void LogCallback
-        (long chat, CommandResultStatus status, string? data)
+        (long chat, HandlingStatus status, string? data)
     {
         LogTelegram(chat, $"-> {status,-4} *{data}");
     }
 
     public static void LogInline
-        (long user, CommandResultStatus status, string input)
+        (long user, HandlingStatus status, string input)
     {
         LogTelegram(user, $"-- {status,-4} {App.Bot.Username} {input}");
     }

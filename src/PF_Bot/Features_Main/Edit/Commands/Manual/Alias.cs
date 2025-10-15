@@ -56,7 +56,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
             var name = args[0].ValidFileName();
 
             var admin = Message.SenderIsBotAdmin();
-            var files = Directory.GetFiles($"{name}.*");
+            var files = ctx.Directory.GetFiles($"{name}.*");
             if (files.Length > 0 && admin.Janai())
             {
                 SetBadStatus();

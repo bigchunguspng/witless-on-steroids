@@ -28,10 +28,20 @@ public static class Desert
 
     private static string GetSoil(int length, byte mask, string alphabet)
     {
-        Span<char> chars = stackalloc char[length];
         Span<byte> bytes = stackalloc byte[length];
-
         RandomNumberGenerator.Fill(bytes);
+        return TurnIntoSoil(bytes, mask, alphabet);
+    }
+
+    public static string TurnIntoSand
+        (Span<byte> bytes) => TurnIntoSoil(bytes, 0b00011111, _chars32);
+    public static string TurnIntoSilt
+        (Span<byte> bytes) => TurnIntoSoil(bytes, 0b00111111, _chars64);
+
+    private static string TurnIntoSoil(Span<byte> bytes, byte mask, string alphabet)
+    {
+        var length = bytes.Length;
+        Span<char> chars = stackalloc char[length];
 
         for (var i = 0; i < length; i++)
         {
@@ -41,7 +51,6 @@ public static class Desert
 
         return new string(chars);
     }
-
 }
 
 /*  .    _    +     .  ______   .          .

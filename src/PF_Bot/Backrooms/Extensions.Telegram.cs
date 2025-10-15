@@ -32,6 +32,16 @@ public static partial class Extensions
             :  message.IsTopicMessage      ? message.MessageThreadId // forum thread message
             :  message.ReplyToMessage?.Id ?? message.MessageThreadId;
 
+
+    public static byte[] GetHashCode_Binary
+        (this Message message) =>
+    [
+        (byte) message.Chat.Id,
+        (byte)(message.Chat.Id >> 8),
+        (byte) message     .Id,
+        (byte)(message.EditDate ?? message.Date).Second,
+    ];
+
     public static string Format_ChatMessage
         (this Message message) => $"{message.Chat.Id}-{message.Id}";
 

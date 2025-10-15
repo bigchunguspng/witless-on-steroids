@@ -57,8 +57,8 @@ public static class App
     private static void SaveAndExit()
     {
         Print("На выход…", ConsoleColor.Yellow);
-        Telemetry.Log_EXIT(Bot.Me);
-        Telemetry.Write();
+        BigBrother.Log_EXIT();
+        BigBrother.Write();
 
         PackManager.Bakas_SaveDirty();
         if (LoggedIntoReddit) Reddit.SaveExcluded();

@@ -46,7 +46,7 @@ public class MessageRouter_Default
         var handler = registry.Resolve(Text, out var command, offset: 1);
         if (handler != null)
         {
-            var context = new CommandContext(Context.Message, command!);
+            var context = CommandContext.CreateOrdinary(Context.Message, command!);
 
             var forMe = CommandIsForMe(context);
             if (forMe)
@@ -111,9 +111,7 @@ public class MessageRouter_Default_KnownChat
     {
         if (Fortune.LuckyFor(Settings.Speech).Janai()) return;
 
-        Telemetry.LogAuto(Chat, Settings.Speech, "FUNNY");
-
-        _ = new PoopText().Run(Context);
+        _ = new PoopText(Settings.Speech).Run(Context);
     }
 
     // AUTOHANDLER
@@ -130,11 +128,9 @@ public class MessageRouter_Default_KnownChat
         var func = registry.Resolve(input, out var command);
         if (func == null)
             return false;
-        
-        Telemetry.LogAutoCommand(Context.Chat, Context.Text);
 
         var text    = input.Replace("TEXT", Context.Text);
-        var context = new CommandContext(Message, command!, text);
+        var context = CommandContext.CreateForAuto(Message, command!, text, CommandMode.AUTO);
 
         var handler = func.Invoke();
         _ = handler.Handle(context);
@@ -143,6 +139,14 @@ public class MessageRouter_Default_KnownChat
     }
 
     // AUTOMEMES
+
+    [Flags] private enum AutoMemeType
+    {
+        Image = 1,
+        Stick = 2,
+        Video = 4,
+        VideoStick = Video | Stick,
+    }
 
     private bool TryMakeAutoMeme()
     {
@@ -164,7 +168,8 @@ public class MessageRouter_Default_KnownChat
         if (skip)
             return false;
 
-        var context = new CommandContext(Message);
+        var command = Settings.Type.ToLower();
+        var context = CommandContext.CreateForAutoMemes(Message, command!);
         var mematic = CreateMemeMaker(Settings.Type);
         if (mematic is Demo_Dg dg)
         {
@@ -183,51 +188,12 @@ public class MessageRouter_Default_KnownChat
             _ => throw new ArgumentException("Bro added a new automeme type..."),
         };
 
-        _ = HandleAutoMeme(makeMeme, context);
+        _ = new AutoMeme().Run(makeMeme, context);
 
         return true;
     }
 
-    [Flags] private enum AutoMemeType
-    {
-        Image = 1,
-        Stick = 2,
-        Video = 4,
-        VideoStick = Video | Stick,
-    }
-
     private bool WouldMeme => Fortune.LuckyFor(Settings.Pics) && Message.ContainsSpoilers().Janai();
-
-    private async Task HandleAutoMeme(Task makeMeme, CommandContext context)
-    {
-        try
-        {
-            await makeMeme;
-        }
-        catch (Exception exception)
-        {
-            if (exception is ProcessException e)
-            {
-                Unluckies.HandleProcessException(e, context);
-            }
-            else
-            {
-                App.Bot.SendMessage(context.Origin, GetSillyErrorMessage());
-                Unluckies.Handle(exception, context, $"AUTOMEMES | {context.Title}");
-            }
-        }
-        finally
-        {
-            //todo new logging
-            var s = Settings;
-            Telemetry.LogAuto(Chat, s.Pics, $"/{s.Type.ToString().ToLower()}{s.Options?[s.Type]}");
-            /*var A = GetMessageTypeChar(Message.ReplyToMessage);
-            var B = GetMessageTypeChar(Message);
-            var text = $"{Status,-4} {A}{B} {Context.Text}";
-
-            Telemetry.LogCommand(Chat, text);*/
-        }
-    }
 
     private AutoMemesHandler CreateMemeMaker(MemeType type) => type switch
     {
@@ -241,12 +207,78 @@ public class MessageRouter_Default_KnownChat
     };
 }
 
-public class PoopText : MessageHandler
+public class AutoMeme : MessageHandler
 {
+    private CommandResultStatus Status = CommandResultStatus.OK;
+
+    public async Task Run(Task makeMeme, CommandContext context)
+    {
+        Context = context;
+        try
+        {
+            await makeMeme;
+        }
+        catch (Exception exception)
+        {
+            Status = CommandResultStatus.FAIL;
+
+            HandleError(exception, context);
+        }
+        finally
+        {
+            Log(context);
+        }
+    }
+
+    private void HandleError(Exception exception, CommandContext context)
+    {
+        if (exception is ProcessException e)
+        {
+            Unluckies.HandleProcessException(e, context);
+        }
+        else
+        {
+            App.Bot.SendMessage(Origin, GetSillyErrorMessage());
+            Unluckies.Handle(exception, context, $"AUTOMEMES | {Title}");
+        }
+    }
+
+    private void Log(CommandContext context)
+    {
+        var settings = context.Settings;
+        var options = settings.Options?[settings.Type];
+        var args = context.Automemes_UseMessageText ? Text : null;
+        var input = $"/{context.Command}{options} {args}";
+
+        BigBrother.LogAuto(Chat, Status, Message, AutoType.MEME, settings.Pics, input);
+    }
+}
+
+public class PoopText(int chance) : MessageHandler
+{
+    private CommandResultStatus Status = CommandResultStatus.OK;
+
     public async Task Run(MessageContext context)
     {
         Context = context;
+        try
+        {
+            await SendText();
+        }
+        catch (Exception exception)
+        {
+            Status = CommandResultStatus.FAIL;
 
+            Unluckies.Handle(exception, Context, $"FUNNY | {Title}");
+        }
+        finally
+        {
+            BigBrother.LogAuto(Chat, Status, Message, AutoType.TEXT, chance);
+        }
+    }
+
+    private async Task SendText()
+    {
         await Task.Delay(GetRealisticResponseDelay(Text));
 
         var baka = PackManager.GetBaka(Chat);

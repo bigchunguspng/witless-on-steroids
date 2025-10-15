@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using PF_Bot.Core;
+using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Text.Core;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Helpers;
@@ -89,19 +91,33 @@ public static class PackManager
 
     public static void Bakas_SaveDirty_DropIdle()
     {
-        Bakas_SaveDirty();
-        Bakas_DropIdle();
+        var chats = ChatManager.Chats.Count;
+        var packs = Bakas.Count;
+
+        var saved   = Bakas_SaveDirty();
+        var dropped = Bakas_DropIdle();
+
+        if (saved + dropped > 0)
+            BigBrother.Log_SAVE(chats, packs, saved, dropped);
     }
 
-    public static void Bakas_SaveDirty
-        () => Bakas.ForEachPair(Save);
-
-    private static void Bakas_DropIdle
-        () => Bakas.ForEachPair((chat, baka) =>
+    public  static int Bakas_SaveDirty
+        () => Bakas.Count(pair =>
     {
-        if (baka.Idle >= MAX_IDLE_BEFORE_UNLOAD) Drop(chat);
+        var (chat, baka) = pair;
+        return Save(chat, baka);
+    });
+
+    private static int Bakas_DropIdle
+        () => Bakas.Count(pair =>
+    {
+        var (chat, baka) = pair;
+        var drop = baka.Idle >= MAX_IDLE_BEFORE_UNLOAD;
+        if (drop) Drop(chat);
         else
             baka.BumpIdle();
+
+        return drop;
     });
 
     // LOAD / SAVE / DROP
@@ -130,9 +146,9 @@ public static class PackManager
     }
 
     /// Saves <see cref="baka"/> if it's dirty.
-    public static void Save(long chat, Copypaster baka) // todo should we pass baka?
+    public static bool Save(long chat, Copypaster baka) // todo should we pass baka?
     {
-        if (baka.IsDirty.Janai()) return;
+        if (baka.IsDirty.Janai()) return false;
 
         var log = PackIO_MeasureSpeed(chat, path =>
         {
@@ -145,6 +161,8 @@ public static class PackManager
         });
 
         Log($"DIC SAVE | {chat,14} | {log}", LogLevel.Info, LogColor.Lime);
+
+        return true;
     }
 
     private static void Drop(long chat)

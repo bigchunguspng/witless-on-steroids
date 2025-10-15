@@ -20,16 +20,24 @@ public abstract class CallbackHandler
 
     protected MessageOrigin Origin => Context.Origin;
 
-    public async void Handle(CallbackContext context)
+    private CommandResultStatus Status = CommandResultStatus.OK;
+
+    public async Task Handle(CallbackContext context)
     {
+        Context = context;
         try
         {
-            Context = context;
             await Run();
         }
         catch (Exception exception)
         {
+            Status = CommandResultStatus.FAIL;
+
             Unluckies.Handle(exception, Context, $"CALLBACK H. | {Title}");
+        }
+        finally
+        {
+            BigBrother.LogCallback(Chat, Status, Query.Data);
         }
     }
 

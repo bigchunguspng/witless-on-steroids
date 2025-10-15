@@ -46,10 +46,10 @@ public class PipeExecutionTask(int length)
     {
         for (i = 0; i < length; i++)
         {
-            var section = pipe[i];
-            if (registry.Resolve(section, out var command) is { } handler)
+            var input = pipe[i];
+            if (registry.Resolve(input, out var command) is { } handler)
             {
-                var context = new CommandContext(message, command!, section);
+                var context = CommandContext.CreateForAuto(message, command!, input, CommandMode.PIPE);
                 handlers[i] = handler;
                 contexts[i] = context;
             }

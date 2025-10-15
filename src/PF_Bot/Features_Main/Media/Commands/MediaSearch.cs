@@ -15,7 +15,7 @@ public class MediaSearch
 
     // @bot [g!*.@гж] query[|caption]
 
-    public async Task Search(InlineQuery inline)
+    public async Task<CommandResultStatus> Search(InlineQuery inline)
     {
         string? query = inline.Query, caption = null;
 
@@ -43,6 +43,10 @@ public class MediaSearch
         var   query_log = query  .IsNull_OrWhiteSpace() ? "[empty]"    :       query;
         var caption_log = caption.IsNull_OrWhiteSpace() ? string.Empty : $" | {caption}";
         Log($"[@inline-{mode}] {title} >> {query_log}{caption_log}");
+
+        return results.Count > 0
+            ? CommandResultStatus.OK
+            : CommandResultStatus.BAD;
     }
 
     private List<InlineQueryResult> GetResults(bool sound_mode, string? query, string? caption)

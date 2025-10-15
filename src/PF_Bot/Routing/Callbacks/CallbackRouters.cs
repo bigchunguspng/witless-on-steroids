@@ -35,8 +35,9 @@ public class CallbackRouter_Default
         var (key, content) = (parts[0], parts[1]);
 
         var handler = registry.Resolve(key);
-        if (handler != null)
-            handler.Invoke().Handle(new CallbackContext(query, key, content));
+        if (handler == null) return;
+
+        _ = handler.Invoke().Handle(new CallbackContext(query, key, content));
     }
 
     private const string SEPARATOR = " - ";

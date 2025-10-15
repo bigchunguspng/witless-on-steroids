@@ -6,12 +6,24 @@ namespace PF_Bot.Routing.Inline;
 
 public class InlineQueryHandler
 {
-    private readonly MediaSearch _Jarvis = new();
+    private static readonly MediaSearch Jarvis = new();
 
     public async Task Handle(InlineQuery inline)
     {
-        Telemetry.LogInline(inline.From.Id, inline.Query);
+        var status = CommandResultStatus.OK;
+        try
+        {
+            status = await Jarvis.Search(inline);
+        }
+        catch (Exception exception)
+        {
+            status = CommandResultStatus.FAIL;
 
-        await _Jarvis.Search(inline);
+            Unluckies.Handle(exception, inline, title: "INLINE H.");
+        }
+        finally
+        {
+            BigBrother.LogInline(inline.From.Id, status, inline.Query);
+        }
     }
 }

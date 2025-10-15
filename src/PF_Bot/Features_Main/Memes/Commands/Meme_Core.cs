@@ -218,10 +218,9 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
 
         private TCaption GetText()
         {
-            var automemes = Command is "@";
             var useArgs =
-                automemes.Janai()
-             || (Settings.Pics > 100 && Message.IsForwarded().Janai());
+                Mode != CommandMode.AUTO
+             || Context.Automemes_UseMessageText;
 
             return GetMemeText(useArgs ? Args : null);
         }

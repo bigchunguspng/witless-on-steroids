@@ -29,7 +29,7 @@ public partial class Bot
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
 
-        Telemetry.Log_START(Me);
+        BigBrother.Log_START();
         Print(BUENOS_DIAS.Format(Username, Me.FirstName), ConsoleColor.Yellow);
     }
 
@@ -90,16 +90,11 @@ public partial class Bot
         return Task.CompletedTask;
     }
 
-    private async Task OnInline(InlineQuery inline)
+    private Task OnInline(InlineQuery inline)
     {
-        try
-        {
-            await Inliner.Handle(inline);
-        }
-        catch (Exception exception)
-        {
-            Unluckies.Handle(exception, inline, title: "INLINE H.");
-        }
+        _ = Inliner.Handle(inline);
+
+        return Task.CompletedTask;
     }
 
     private Task OnUnknown()

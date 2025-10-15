@@ -4,7 +4,6 @@ using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Telegram;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Routing.Commands;
 
@@ -28,6 +27,7 @@ public abstract class CommandHandler
     protected      FilePath ? Input   => Context.Input;
     protected List<FilePath>? Output  => Context.Output;
 
+    protected CommandMode  Mode     => Context.Mode;
     protected ChatSettings Data     => Context.Settings;
     protected ChatSettings Settings => Context.Settings;
     protected Copypaster   Baka     => Context.Baka;
@@ -81,7 +81,7 @@ public abstract class CommandHandler
         }
         catch (Exception e)
         {
-            HandleCommandError(e);
+            HandleError(e);
         }
         finally
         {
@@ -96,14 +96,6 @@ public abstract class CommandHandler
 
     protected int MessageToEdit { get; set; }
 
-    protected enum CommandResultStatus
-    {
-        OK,   // all's good, according to keikaku
-        MAN,  // bad syntax -> manual's sent
-        BAD,  // 404 and similar
-        FAIL, // error was thrown ((9
-        DENY, // massive skill issue
-    }
     private CommandResultStatus Status {  get; set; } = CommandResultStatus.OK;
 
     protected void SetBadStatus() =>
@@ -169,7 +161,7 @@ public abstract class CommandHandler
 
     // ERROR / LOGGING
 
-    private void HandleCommandError(Exception exception)
+    private void HandleError(Exception exception)
     {
         Status = CommandResultStatus.FAIL;
 
@@ -191,33 +183,24 @@ public abstract class CommandHandler
 
     private void Log()
     {
-        if (Input.HasValue || Output != null) return; // auto mode
-
-        var A = GetMessageTypeChar(Message.ReplyToMessage);
-        var B = GetMessageTypeChar(Message);
-        var text = $"{Status,-4} {A}{B} {Context.Text}";
-
-        Telemetry.LogCommand(Chat, text);
+        var normal = Mode == CommandMode.NORMAL;
+        if (normal) BigBrother.LogCommand(Chat, Status, Message, Context.Text);
+        else        BigBrother.LogAuto   (Chat, Status, Message, GetAutoType(), GetAutoId(), $"/{Command}{Options} {Args}");
     }
+
+    private string GetAutoId()
+    {
+        return Desert.TurnIntoSand(Message.GetHashCode_Binary());
+    }
+
+    private AutoType GetAutoType() =>
+        Mode == CommandMode.AUTO ? AutoType.AUTO :
+        Mode == CommandMode.PIPE ? AutoType.PIPE :
+        throw new UnexpectedException("ONLY AUTO & PIPE MODE EXPECTED");
 
     private void Reset()
     {
         Status = CommandResultStatus.OK;
         MessageToEdit = 0;
     }
-
-    private static char GetMessageTypeChar
-        (Message? m) => m == null ? '-' : m.Type switch
-    {
-        MessageType.Text      => 'T',
-        MessageType.Photo     => 'P',
-        MessageType.Sticker   => 'S',
-        MessageType.Animation => 'G',
-        MessageType.Video     => 'V',
-        MessageType.VideoNote => 'V',
-        MessageType.Audio     => 'A',
-        MessageType.Voice     => 'A',
-        MessageType.Document  => 'D',
-        _                     => '?',
-    };
 }

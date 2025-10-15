@@ -8,6 +8,13 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing.Commands;
 
+public enum CommandMode
+{
+    NORMAL,
+    AUTO,
+    PIPE,
+}
+
 /// Expected syntax: <c>/[command][ops][@bot][ops] [args]</c>
 public class CommandContext : MessageContext
 {
@@ -24,6 +31,9 @@ public class CommandContext : MessageContext
 
     /// Whether THIS bot was mentioned
     public bool BotMentioned { get; private set; }
+
+    /// Whether the command is created for auto-mode or pipe.
+    public CommandMode Mode  { get; private set; }
 
     // PIPES
 
@@ -52,27 +62,38 @@ public class CommandContext : MessageContext
     public  ChatSettings? Settings_Debug => _settings;
     public  Copypaster? Copypaster_Debug => _baka;
 
+    public bool Automemes_UseMessageText => Settings.Pics > 100 && Message.IsForwarded().Janai();
+
     // CTORS
 
-    /// Automemes
-    public CommandContext(Message message) : base(message)
+    public static CommandContext CreateOrdinary
+        (Message message, string command)
     {
-        Command = "@";
-        Args = Text;
+        var context = new CommandContext(message, command, CommandMode.NORMAL);
+        context.ParseText(1, command.Length, context.Text!);
+        return context;
     }
 
-    /// Autohandler
-    public CommandContext(Message message, string command, string expression) : base(message)
+    public static CommandContext CreateForAutoMemes
+        (Message message, string command)
     {
-        Command = command;
-        ParseText(0, command.Length, expression);
+        var context = new CommandContext(message, command, CommandMode.AUTO);
+        context.Args = context.Text;
+        return context;
     }
 
-    /// This constructor expects message text to start with "/command".
-    public CommandContext(Message message, string command) : base(message)
+    public static CommandContext CreateForAuto
+        (Message message, string command, string input, CommandMode mode)
+    {
+        var context = new CommandContext(message, command, mode);
+        context.ParseText(0, command.Length, input);
+        return context;
+    }
+
+    private CommandContext(Message message, string command, CommandMode mode) : base(message)
     {
         Command = command;
-        ParseText(1, command.Length, Text!);
+        Mode = mode;
     }
 
     private void ParseText(int command_offset, int command_length, string text)

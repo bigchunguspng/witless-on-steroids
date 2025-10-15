@@ -1,4 +1,5 @@
-﻿using PF_Bot.Features_Aux.Packs.Core;
+﻿using PF_Bot.Core;
+using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 
 namespace PF_Bot.Terminal;
@@ -51,6 +52,8 @@ public partial class AdminConsole
         try
         {
             if (input.IsNull_OrWhiteSpace() || input.EndsWith("_")) return;
+
+            BigBrother.Log_ADMIN(input);
 
             if      (input.StartsWith('/')) ResolveCommand(input);
             else if (input.StartsWith('+')) SetActiveChat (input);

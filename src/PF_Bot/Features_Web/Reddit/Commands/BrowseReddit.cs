@@ -42,7 +42,7 @@ namespace PF_Bot.Features_Web.Reddit.Commands // ReSharper disable InconsistentN
             var text = message.GetTextOrCaption();
             var success = text?.StartsWith("/w", StringComparison.OrdinalIgnoreCase) ?? false;
             if (success)
-                Context = new CommandContext(message, Command);
+                Context = CommandContext.CreateOrdinary(message, Command);
 
             return success;
         }

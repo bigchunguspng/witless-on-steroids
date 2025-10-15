@@ -130,7 +130,7 @@ public class MessageRouter_Default_KnownChat
         if (func == null)
             return false;
 
-        var text    = input.Replace("TEXT", Context.Text);
+        var text    = input.Replace("TEXT", Context.Text).TrimEnd();
         var context = CommandContext.CreateForAuto(Message, command!, text, CommandMode.AUTO);
 
         var handler = func.Invoke();

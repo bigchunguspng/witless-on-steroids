@@ -35,15 +35,11 @@ public class AutoHandlerScript
         var r = Random.Shared.Next(totalWeight);
         foreach (var macro in macros)
         {
-            if (macro.Weight > r)
-            {
-                return macro.Content;
-            }
-
+            if  (macro.Weight > r) return macro.Content;
             r -= macro.Weight;
         }
 
-        throw new UnexpectedException("ERROR IN WEIGHTED MACRO RANDOM SELECION");
+        throw new UnexpectedException("UNEXPECTED EXECUTION PATH");
     }
 
     // CREATE (PARSE)

@@ -33,7 +33,7 @@ public static class Generation_Basic
         while (ids.First!.Value != GenerationPack.START)
         {
             var table = pack.GetWordsBefore(ids.First.Value);
-            ids.AddFirst(table.PickWordId(fallback: GenerationPack.START));
+            ids.AddFirst(table.PickWordId());
         }
 
         return ids;
@@ -68,20 +68,15 @@ public static class Generation_Basic
     }
 
     private static int PickWordId
-        (this TransitionTable table, int fallback = GenerationPack.END)
+        (this TransitionTable table)
     {
-        var r = Random.Shared.NextSingle() * table.TotalChance;
-        if (r > 0F)
+        var r = Random.Shared.Next(table.TotalChance);
+        foreach (var transition in table.AsIEnumerable())
         {
-            foreach (var transition in table.AsIEnumerable())
-            {
-                if (transition.Chance > r) return transition.WordId;
-                r -= transition.Chance;
-            }
-
-            throw new Exception("UNEXPECTED EXECUTION PATH");
+            if  (transition.Chance > r) return transition.WordId;
+            r -= transition.Chance;
         }
 
-        return fallback;
+        throw new Exception("UNEXPECTED EXECUTION PATH");
     }
 }

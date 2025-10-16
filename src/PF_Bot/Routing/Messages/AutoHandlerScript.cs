@@ -67,8 +67,9 @@ public class AutoHandlerScript
                 var body = bits[2]; // 50 meme, 25 top, 25 dp
 
                 var options = body
-                    .Split(", ", StringSplitOptions.RemoveEmptyEntries)
-                    .Select(chunk =>
+                    .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Select(chunk => // 50 meme
                     {
                         var match = _r_wm.Match(chunk);
                         var weight  = match.ExtractGroup(1, int.Parse, 1); // 50

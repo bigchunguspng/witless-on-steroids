@@ -22,8 +22,8 @@ public static class ManualEditing
     
     public static bool OptionsMentionsPrivateFile(string options) =>
         options.Contains(File_Config, StringComparison.OrdinalIgnoreCase)
-     || options.Contains(File_Log,    StringComparison.OrdinalIgnoreCase)
-     || options.Contains(File_Errors, StringComparison.OrdinalIgnoreCase);
+     || options.Contains(Dir_Log,     StringComparison.OrdinalIgnoreCase)
+     || options.Contains(Dir_DB,      StringComparison.OrdinalIgnoreCase);
 
     //
 

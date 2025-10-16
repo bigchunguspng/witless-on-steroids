@@ -38,7 +38,9 @@ public class AutoHandlerScript
     {
         var a = match.ExtractGroup(1, int.Parse);
         var b = match.ExtractGroup(2, int.Parse);
-        return Fortune.RandomInt(a, b).ToString();
+        var min = Math.Min(a, b);
+        var max = Math.Max(a, b);
+        return Fortune.RandomInt(min, max).ToString();
     }
 
     private string PickRandom(List<WeightedOption> macros)

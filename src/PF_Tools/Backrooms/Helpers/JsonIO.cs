@@ -120,7 +120,7 @@ public class NewtonsoftJsonCompatibleEncoder : JavaScriptEncoder
         (int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten)
         => _defaultEncoder.TryEncodeUnicodeScalar(unicodeScalar, buffer, bufferLength, out numberOfCharactersWritten);
 
-    // Quote, slash, CC -> escape. Everything else -> leave as is.
+    // Quote, slash, control chars -> escape. Everything else -> leave as is.
     public override bool WillEncode
         (int unicodeScalar) => unicodeScalar is '"' or '\\' or < 0x20 && _defaultEncoder.WillEncode(unicodeScalar);
 }

@@ -26,7 +26,6 @@ public partial class AdminConsole
         .Register("p",  PacksInfo)
         .Register("pp", PacksInfoFull)
         .Register("xp", PackCopyJson)
-        .Register("mg", Migration_JsonToBinary.MigrateAll)
         .Register("cc", ClearTempFiles)
         .Register("UG", UploadGIFs)
         .Register("US", UploadSounds)

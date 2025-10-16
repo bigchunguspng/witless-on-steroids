@@ -25,7 +25,6 @@ public static class Texts
         /pp - packs info (full)
         /cc - clear temp files
 
-        /mg - JSON -> TGP migration (temporary)
         /xp - [chat/+] export pack to JSON
 
         /US - [path] upload sounds

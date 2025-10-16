@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
 using System.Text.Encodings.Web;
-using PF_Tools.Copypaster_Legacy.Pack;
 using NS = Newtonsoft.Json;
 using ST = System.Text.Json;
 using ST_S = System.Text.Json.Serialization;
@@ -16,13 +15,11 @@ public static class JsonIO
         SerializerDefault = new()
         {
             DefaultValueHandling = NS.DefaultValueHandling.Ignore,
-            Converters = { new TransitionTableConverter() },
         },
         SerializerIndented = new()
         {
             Formatting = NS.Formatting.Indented,
             DefaultValueHandling = NS.DefaultValueHandling.Ignore,
-            Converters = { new TransitionTableConverter() },
         };
 
     public static T LoadData<T>(FilePath path) where T : new()

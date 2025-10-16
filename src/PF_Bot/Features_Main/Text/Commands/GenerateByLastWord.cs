@@ -1,39 +1,38 @@
-﻿namespace PF_Bot.Features_Main.Text.Commands
+﻿namespace PF_Bot.Features_Main.Text.Commands;
+
+public class GenerateByLastWord : GenerateByFirstWord
 {
-    public class GenerateByLastWord : GenerateByFirstWord
+    protected override async Task Run()
     {
-        protected override async Task Run()
+        string word = null!, ending = null!;
+        var byWord = Args != null;
+        if (byWord)
         {
-            string word = null!, ending = null!;
-            var byWord = Args != null;
-            if (byWord)
-            {
-                var lines = Args!.Split('\n');
-                var words = lines[0].Split();
+            var lines = Args!.Split('\n');
+            var words = lines[0].Split();
                 
-                word = words.Length == 1 ? words[0] : string.Join(' ', words[..2]);
-                word = word.ToLower();
+            word = words.Length == 1 ? words[0] : string.Join(' ', words[..2]);
+            word = word.ToLower();
 
-                ending = Args[word.Length..];
-            }
-
-            var up = Options.Contains("up");
-            var repeats = _rgx_repeat.ExtractGroup(0, Options, int.Parse, 1);
-            var texts = new string[repeats];
-            for (var i = 0; i < repeats; i++)
-            {
-                var mode = up ? LetterCase.Upper : GetMode(Args);
-                texts[i] = byWord
-                    ? Baka.GenerateByLast(word).InLetterCase(mode) + ending
-                    : Baka.GenerateBackwards().InLetterCase(mode);
-            }
-
-            await Task.Run(() =>
-            {
-                foreach (var text in texts) Bot.SendMessage(Origin, text, preview: true);
-            });
-
-            LogXD(Title, repeats, "FUNNY BY LAST WORD");
+            ending = Args[word.Length..];
         }
+
+        var up = Options.Contains("up");
+        var repeats = _rgx_repeat.ExtractGroup(0, Options, int.Parse, 1);
+        var texts = new string[repeats];
+        for (var i = 0; i < repeats; i++)
+        {
+            var mode = up ? LetterCase.Upper : GetMode(Args);
+            texts[i] = byWord
+                ? Baka.GenerateByLast(word).InLetterCase(mode) + ending
+                : Baka.GenerateBackwards().InLetterCase(mode);
+        }
+
+        await Task.Run(() =>
+        {
+            foreach (var text in texts) Bot.SendMessage(Origin, text, preview: true);
+        });
+
+        LogXD(Title, repeats, "FUNNY BY LAST WORD");
     }
 }

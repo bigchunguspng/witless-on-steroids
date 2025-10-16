@@ -27,7 +27,7 @@ public static class AutoHandler
             if (MessageMatches(type, context.Message).Janai())
                 continue;
 
-            var input = script.GenerateInput(type);
+            var input = script.GenerateInput(type, context.Text);
             if (input != null && type == 'u')
             {
                 var split = input.SplitN(2);

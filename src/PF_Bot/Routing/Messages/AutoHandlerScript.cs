@@ -14,7 +14,7 @@ public class AutoHandlerScript
     private static readonly Regex
         _r_range = new(@"\[(-?\d+)\.\.(-?\d+)\]", RegexOptions.Compiled);
 
-    public string? GenerateInput(char type)
+    public string? GenerateInput(char type, string? messageText)
     {
         if (Templates.TryGetValue_Failed(type, out var template))
             return null;
@@ -30,6 +30,7 @@ public class AutoHandlerScript
         }
 
         template = _r_range.Replace(template, ReplaceRangeMacro);
+        template = template.Replace("[TEXT]", messageText);
 
         return template;
     }

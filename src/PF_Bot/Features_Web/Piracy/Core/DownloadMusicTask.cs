@@ -89,9 +89,13 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context)
             : ArtAttached
                 ? Bot.DownloadFile(Cover!, thumbPath, context.Origin)
                 : youTube
-                    ? Task.Run(() => thumbPath = YouTubePreviewFetcher.DownloadPreview(id, directory).Result)
+                    ? YouTube_DownloadPreview()
                     : Task.CompletedTask;
         await Task.WhenAll(taskA, taskV);
+
+        // [LOCAL FUNCTION]
+        async Task<FilePath> YouTube_DownloadPreview
+            () => thumbPath = await YouTubePreviewFetcher.DownloadPreview(id, directory);
 
         // GRAB FILES
 

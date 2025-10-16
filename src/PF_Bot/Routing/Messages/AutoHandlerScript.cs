@@ -11,6 +11,9 @@ public class AutoHandlerScript
 
     public IEnumerable<char> SupportedFileTypes => Templates.Keys;
 
+    private static readonly Regex
+        _r_range = new(@"\[(-?\d+)\.\.(-?\d+)\]", RegexOptions.Compiled);
+
     public string? GenerateInput(char type)
     {
         if (Templates.TryGetValue_Failed(type, out var template))
@@ -26,7 +29,16 @@ public class AutoHandlerScript
             template = template.Replace(macroUsage, replacement);
         }
 
+        template = _r_range.Replace(template, ReplaceRangeMacro);
+
         return template;
+    }
+
+    private string ReplaceRangeMacro(Match match)
+    {
+        var a = match.ExtractGroup(1, int.Parse);
+        var b = match.ExtractGroup(2, int.Parse);
+        return Fortune.RandomInt(a, b).ToString();
     }
 
     private string PickRandom(List<WeightedOption> macros)

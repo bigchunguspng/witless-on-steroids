@@ -30,7 +30,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter
             await compressTask;
 
             SendResult(output);
-            Log($"{Title} >> DAMN [*]");
+            Log($"{Title} >> DAMN [{_value}]");
         }
 
         private async Task CompressStick(FilePath input, FilePath output)

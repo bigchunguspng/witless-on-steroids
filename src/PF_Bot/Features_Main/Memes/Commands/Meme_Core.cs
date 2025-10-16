@@ -234,10 +234,10 @@ namespace PF_Bot.Features_Main.Memes.Commands // ReSharper disable InconsistentN
         {
             var default_options = DefaultOptions;
 
-            var empty = Context.Text == null && default_options == null;
+            var empty = Context.Options == null && default_options == null;
             if (empty) return new MemeOptionsContext(empty, string.Empty, null, null);
 
-            var command_options = Options.MakeNull_IfEmpty();
+            var command_options = Context.Options;
 
             var combineOptions =
                 command_options != null

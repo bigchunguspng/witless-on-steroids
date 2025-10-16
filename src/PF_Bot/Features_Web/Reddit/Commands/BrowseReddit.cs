@@ -1,17 +1,12 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs.Core;
-using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing.Commands;
-using PF_Tools.FFMpeg;
 using PF_Tools.ProcessRunning;
 using PF_Tools.Reddit;
 using Reddit.Controllers;
 using Telegram.Bot.Types;
-
-#pragma warning disable SYSLIB0014
 
 namespace PF_Bot.Features_Web.Reddit.Commands; // ReSharper disable InconsistentNaming
 
@@ -99,28 +94,22 @@ public class BrowseReddit : CommandHandlerAsync
 
     private async Task SendPost(RedditQuery query)
     {
-        var post = await GetPostOrBust(query);
-        if (post == null) return;
-
-        var sendPost = post.URL.Contains("/gallery/")
-            ? SendGalleryPost   (post)
-            : SendSingleFilePost(post);
-
-        await sendPost;
-        Reddit.Exclude(post);
-
-        if (PackManager.BakaIsLoaded(Chat, out var baka)) baka.Eat(post.Title);
-
-        Log($"{Title} >> r/{post.Subreddit} <- {query}");
-    }
-
-    private async Task<RedditPost?> GetPostOrBust(RedditQuery query)
-    {
-        try
+        var post = await Reddit.PullPost(query, Chat).OrDefault_OnException();
+        if (post != null)
         {
-            return await Reddit.PullPost(query, Chat);
+            var sendPost = post.URL.Contains("/gallery/")
+                ? SendGalleryBatched(post)
+                : SendSingleFilePost(post);
+
+            await sendPost;
+            Reddit.Exclude(post);
+
+            if (PackManager.BakaIsLoaded(Chat, out var baka))
+                baka.Eat(post.Title);
+
+            Log($"{Title} >> r/{post.Subreddit} <- {query}");
         }
-        catch
+        else
         {
             SetBadStatus();
             Bot.SendMessage(Origin, "💀");
@@ -144,11 +133,12 @@ public class BrowseReddit : CommandHandlerAsync
             // ⠄⠄⠄⠄⠄⠄⣴⣆⠄⢋⠄⠐⣡⣿⣆⣴⣼⣿⣿⣿⣿⣿⣿⣿⣿⠏⢈⣿⣿⣿⣿⣿⣿⣷⡄⠄⠄⠄
             // ⠄⠄⠄⠄⠄⣼⣿⣷⠄⠉⠒⣪⣹⣟⣹⣿⣿⣿⣿⣿⣟⣿⣿⣿⡇⢀⣸⣿⣿⣿⢟⣽⣿⣿⣇⠄⠄⠄
             // WHOLESEOME 0 DESTRUCTION 100 QUAGMIRE TOILET 62
-            return null;
         }
     }
 
-    private async Task SendGalleryPost(RedditPost post)
+    // GALLERY
+
+    private async Task SendGalleryBatched(RedditPost post)
     {
         RedditApp.Log($"GALLERY | {post.URL}");
         var urls = await GalleryDl.Run($"{post.URL} -g");
@@ -156,16 +146,15 @@ public class BrowseReddit : CommandHandlerAsync
         var origin = Origin;
         for (var i = 0; i < 5; i++)
         {
-            var album = urls
+            var batch = urls
                 .Skip(10 * i).Take(10)
-                .Select(url => new InputMediaPhoto(InputFile.FromUri(url)))
-                .ToList();
+                .ToArray();
 
-            if (album.Count == 0) break;
+            if (batch.Length == 0) break;
 
-            if (i == 0) album[0].Caption = post.Title;
+            var caption = i == 0 ? post.Title : null;
 
-            var messages = Bot.SendAlbum(origin, album);
+            var messages = await SendGalleryChunk_AsAlbum(origin, batch, caption);
             if (messages?.Length > 0)
             {
                 var message = messages[0];
@@ -177,18 +166,70 @@ public class BrowseReddit : CommandHandlerAsync
         }
     }
 
+    private async Task<Message[]?> SendGalleryChunk_AsAlbum
+        (MessageOrigin origin, Uri[] urls, string? caption)
+    {
+        try // Send from URLs
+        {
+            var album = urls
+                .Select(url => new InputMediaPhoto(InputFile.FromUri(url)))
+                .ToList();
+
+            return await SendAlbum(album);
+        }
+        catch // Some files are too big -> compress
+        {
+            RedditApp.Log("DOWNLOAD GALLERY");
+
+            var inputs = urls     // Download
+                .Select(url => url.ToString())
+                .Select(async (url) => await RedditHelpers.DownloadMeme(url))
+                .ToArray();
+            await Task.WhenAll(inputs);
+
+            var outputs = inputs  // Compress
+                .Select(task => task.Result)
+                .Select(async (input) => await RedditHelpers.CompressMeme(input))
+                .ToArray();
+            await Task.WhenAll(outputs);
+
+            var streams = outputs // Open
+                .Select(task => task.Result)
+                .Select(file => File.OpenRead(file))
+                .ToArray();
+
+            var album = streams
+                .Select(stream => new InputMediaPhoto(InputFile.FromStream(stream)))
+                .ToList();
+
+            var messages = await SendAlbum(album);
+            streams.ForEach(x => x.DisposeAsync());
+            return messages;
+        }
+
+        async Task<Message[]> SendAlbum(List<InputMediaPhoto> album)
+        {
+            if (caption != null) album[0].Caption = caption;
+
+            return await Bot.SendAlbum_OrThrow(origin, album);
+        }
+    }
+
+    // SINGLE POST
+
     private async Task SendSingleFilePost(RedditPost post)
     {
         var gif = post.URL.EndsWith(".gif");
         try
         {
-            // todo fix bug: some gifs are sent as "fgsfds.gif.jpg" image document for no reason
             await SendPicOrAnimation(InputFile.FromUri(post.URL));
         }
         catch
         {
-            var input  =       DownloadMeme(post,  gif ? ".gif" : ".png");
-            var output = await CompressMeme(input, gif);
+            RedditApp.Log($"DOWNLOAD | {post.URL}");
+
+            var input  = await RedditHelpers.DownloadMeme(post.URL);
+            var output = await RedditHelpers.CompressMeme(input, gif);
 
             var filename = gif
                 ? $"r-{post.Subreddit}.mp4"
@@ -206,37 +247,6 @@ public class BrowseReddit : CommandHandlerAsync
 
             Reddit.LastPosts_Remember(message.Format_ChatMessage(), post);
         }
-    }
-
-    private static FilePath DownloadMeme(RedditPost post, string extension)
-    {
-        var name = Dir_RedditMemes
-            .EnsureDirectoryExist()
-            .Combine($"{post.Fullname}{extension}")
-            .MakeUnique();
-        using var web = new WebClient();
-        web.DownloadFile(post.URL, name);
-
-        return name;
-    }
-
-    private static async Task<FilePath> CompressMeme(FilePath input, bool gif)
-    {
-        var (output, probe, options) = await input.InitEditing("small", gif ? ".mp4" : ".jpg");
-
-        options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
-
-        _ = gif
-            ? options
-                .Options("-an")
-                .FixVideo_Playback()
-                .SetCRF(30)
-            : options
-                .Options("-qscale:v 5");
-
-        await FFMpeg.Command(input, output, options).FFMpeg_Run();
-
-        return output;
     }
 
     #endregion

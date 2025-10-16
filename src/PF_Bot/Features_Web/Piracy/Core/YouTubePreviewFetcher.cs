@@ -13,7 +13,7 @@ public static class YouTubePreviewFetcher
             $"https://i1.ytimg.com/vi/{id}/hqdefault.jpg",
         };
 
-        using var client = new HttpClient();
+        using var client = HttpClientFactory.CreateClient();
 
         foreach (var url in urls)
         {

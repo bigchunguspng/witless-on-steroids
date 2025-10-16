@@ -46,4 +46,16 @@ public static class Extensions_Generic
     {
         return collection.ElementAt(Random.Shared.Next(collection.Count));
     }
+
+    public static async Task<T?> OrDefault_OnException<T>(this Task<T> getThing)
+    {
+        try
+        {
+            return await getThing;
+        }
+        catch
+        {
+            return default;
+        }
+    }
 }

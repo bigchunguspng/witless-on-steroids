@@ -127,9 +127,6 @@ public partial class Bot
     public void SendAnimation (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendAnimation (og.Chat, file, replyParameters: og.Thread), "animation");
     public void SendDocument  (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendDocument  (og.Chat, file, replyParameters: og.Thread), "document");
     public void SendSticker   (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendSticker   (og.Chat, file, replyParameters: og.Thread), "sticker");
-    public Message[]? SendAlbum
-        (MessageOrigin og, IEnumerable<IAlbumInputMedia> album) 
-        => TrySend(og.Chat, Client.SendMediaGroup(og.Chat, album, replyParameters: og.Thread), "album");
 
     public void SendAudio(MessageOrigin og, InputFile audio, string? art = null)
     {
@@ -139,27 +136,28 @@ public partial class Bot
     }
 
 
-    private static T? TrySend<T>(long chat, Task<T> task, string what, string action = "send")
+    private static void TrySend<T>(long chat, Task<T> task, string what, string action = "send")
     {
-        var result = default(T);
         try
         {
             task.Wait();
-            result = task.IsFaulted ? throw new Exception(task.Exception?.Message) : task.Result;
+            if (task.IsFaulted) throw new Exception(task.Exception?.Message);
         }
         catch (Exception e)
         {
             LogError($"{chat} >> Can't {action} {what} | {e.GetErrorMessage()}");
         }
-
-        return result;
     }
 
+    public async Task<Message[]> SendAlbum_OrThrow
+        (MessageOrigin og, IEnumerable<IAlbumInputMedia> album)
+        => await Client.SendMediaGroup(og.Chat, album,          replyParameters: og.Thread);
+
     public async Task<Message> SendPhoto_OrThrow(MessageOrigin og, InputFile photo, string caption)
-        => await Client.SendPhoto    (og.Chat, photo, caption, replyParameters: og.Thread);
+        => await Client.SendPhoto     (og.Chat, photo, caption, replyParameters: og.Thread);
 
     public async Task<Message> SendAnima_OrThrow(MessageOrigin og, InputFile anima, string caption)
-        => await Client.SendAnimation(og.Chat, anima, caption, replyParameters: og.Thread);
+        => await Client.SendAnimation (og.Chat, anima, caption, replyParameters: og.Thread);
 
     // todo separate technical and user-driven usage
     public int PingChat(MessageOrigin origin, string text = "😏", bool notify = true)

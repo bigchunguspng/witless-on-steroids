@@ -1,3 +1,5 @@
+using PF_Bot.Features_Main.Edit.Core;
+using PF_Tools.FFMpeg;
 using PF_Tools.Reddit;
 using static System.Text.RegularExpressions.RegexOptions;
 
@@ -5,6 +7,8 @@ namespace PF_Bot.Features_Web.Reddit;
 
 public static class RedditHelpers
 {
+    // //// ARGS //// //
+
     private static readonly Regex
         _r_args_search = new(@"^(.*?)?(?:\s?([A-Za-z0-9_]+)\*)?(?:\s?-([hntrc][hdwmya]?))?$", Compiled),
         _r_args_scroll = new(@"            ^([A-Za-z0-9_]+)?   (?:\s?-([hntrc][hdwmya]?))?$", Compiled | IgnorePatternWhitespace);
@@ -76,4 +80,40 @@ public static class RedditHelpers
         s != Reddit_ScrollSort.Hot
      && s != Reddit_ScrollSort.New
      && s != Reddit_ScrollSort.Rising;
+
+
+    // //// FILES //// //
+
+    public static async Task<FilePath> DownloadMeme(string url)
+    {
+        var name = Path.GetFileName(url);
+        var path = Dir_RedditMemes
+            .EnsureDirectoryExist()
+            .Combine(name)
+            .MakeUnique();
+
+        using var client = HttpClientFactory.CreateClient();
+        await client.DownloadFileAsync(url, path);
+
+        return path;
+    }
+
+    public static async Task<FilePath> CompressMeme(FilePath input, bool gif = false)
+    {
+        var (output, probe, options) = await input.InitEditing("small", gif ? ".mp4" : ".jpg");
+
+        options.MP4_EnsureSize_Valid_And_Fits(probe.GetVideoStream(), gif ? 1080 : 2560);
+
+        _ = gif
+            ? options
+                .Options("-an")
+                .FixVideo_Playback()
+                .SetCRF(30)
+            : options
+                .Options("-qscale:v 5");
+
+        await FFMpeg.Command(input, output, options).FFMpeg_Run();
+
+        return output;
+    }
 }

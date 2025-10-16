@@ -32,39 +32,11 @@ public static class Generation_Basic
 
         while (ids.First!.Value != GenerationPack.START)
         {
-            var table = pack.GetWordsBefore(ids.First.Value);
+            var table = pack.FindWordsComingBefore(ids.First.Value);
             ids.AddFirst(table.PickWordId());
         }
 
         return ids;
-    }
-
-    /// Finds all word ids, that has given word id in their transition table
-    private static TransitionTable GetWordsBefore
-        (this GenerationPack pack, int wordId)
-    {
-        var reverseTable = new TransitionTableVU();
-        foreach (var pair in pack.Transitions)
-        {
-            var table = pair.Value;
-            if (table.ContainsWordId(wordId, out var index))
-            {
-                reverseTable.Put(pair.Key, table[index].Chance);
-            }
-        }
-        return reverseTable;
-    }
-
-    private static int PickRandomLastWordId
-        (this GenerationPack pack)
-    {
-        for (var i = 0; i < 12; i++)
-        {
-            var table = pack.Transitions.ElementAt(Random.Shared.Next(pack.TransitionsCount));
-            if (table.Value.AsIEnumerable().Any(x => x.WordId == GenerationPack.END)) return table.Key;
-        }
-
-        return -1;
     }
 
     private static int PickWordId
@@ -78,5 +50,38 @@ public static class Generation_Basic
         }
 
         throw new Exception("UNEXPECTED EXECUTION PATH");
+    }
+
+    // BACKWARDS GENERATION HACKS
+
+    private static int PickRandomLastWordId
+        (this GenerationPack pack)
+    {
+        for (var i = 0; i < 12; i++)
+        {
+            var index = Random.Shared.Next(pack.TransitionsCount);
+            var (id, table) = pack.Transitions.ElementAt(index);
+            var transitions = table.AsIEnumerable();
+            var transitions_to_END = transitions.Any(x => x.WordId == GenerationPack.END);
+            if (transitions_to_END) return id;
+        }
+
+        return GenerationPack.NO_WORD;
+    }
+
+    private static TransitionTable FindWordsComingBefore
+        (this GenerationPack pack, int wordId)
+    {
+        var reverseTable = new TransitionTableVU();
+
+        foreach (var (id, table) in pack.Transitions)
+        {
+            if (table.ContainsWordId(wordId, out var index))
+            {
+                reverseTable.Put(id, table[index].Chance);
+            }
+        }
+
+        return reverseTable;
     }
 }

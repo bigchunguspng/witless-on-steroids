@@ -32,24 +32,12 @@ public class Fuse_Callback : CallbackHandler
 
 public class Fuse : CommandHandlerAsync_SettingsAsync
 {
-    [Flags]
-    private enum FuseSource
-    {
-        Pack    = 1,
-        File    = 2,
-        Public  = 4,
-        Private = 8,
-        PackPublic  = Pack | Public,
-        PackPrivate = Pack | Private,
-        FilePublic  = File | Public,
-        FilePrivate = File | Private,
-    }
-
     protected override async Task RunAuthorized()
     {
         var args = Args.SplitN(2);
 
         if      (Message.ProvidesFile("text/plain",   out var document)) await ProcessTextAttachment(document);
+        if      (Message.ProvidesFile("text/x-ssa",       out document)) await ProcessSubsAttachment(document);
         else if (Message.ProvidesFile("application/json", out document)) await ProcessJsonAttachment(document);
         else if (args.Length == 0)
         {
@@ -58,16 +46,17 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         }
         else
         {
-            var _source = args[0] switch
-            {
-                "!" => FuseSource.PackPrivate,
-                "*" => FuseSource.FilePrivate,
-                "@" => FuseSource.FilePublic,
-                _   => FuseSource.PackPublic,
-            };
+            const bool 
+                PACK    = true, FILE   = false,
+                PRIVATE = true, PUBLIC = false;
 
-            var pack      = (_source & FuseSource.Pack)    == FuseSource.Pack;
-            var isPrivate = (_source & FuseSource.Private) == FuseSource.Private;
+            var (pack, isPrivate) = args[0] switch
+            {
+                "!" => (PACK, PRIVATE),
+                "*" => (FILE, PRIVATE),
+                "@" => (FILE, PUBLIC),
+                _   => (PACK, PUBLIC),
+            };
 
             if (args.Length > 0 && args[^1] == "info")
             {
@@ -75,10 +64,11 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
                 if (pack) ListingPacks.SendPackList(pagination, isPrivate);
                 else      ListingPacks.SendFileList(pagination, isPrivate);
 
-                Log($"{Title} >> FUSE INFO {(_source == FuseSource.PackPublic ? "" : args[0])}");
+                var marker = pack && isPrivate.Janai() ? "" : args[0];
+                Log($"{Title} >> FUSE INFO {marker}");
             }
             else if (pack) await ProcessFusionRequest(isPrivate, args[^1]);
-            else           await ProcessEatingRequest(isPrivate, args);
+            else           await ProcessEatingRequest(isPrivate, args.Skip(1));
         }
     }
 
@@ -126,9 +116,9 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
             await Baka_Fuse_Report(files[0]);
     }
 
-    private async Task ProcessEatingRequest(bool isPrivate, string[] args)
+    private async Task ProcessEatingRequest(bool isPrivate, IEnumerable<string> args)
     {
-        var name = string.Join(' ', args.Skip(1)); // todo investigate skip 1
+        var name = string.Join(' ', args);
 
         var files = PackManager.GetFilesFolder(Chat, isPrivate).GetFiles($"{name}.json");
         if (files.Length == 0)
@@ -144,21 +134,20 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
 
     private async Task ProcessTextAttachment(Document document)
     {
-        var path = Dir_Temp
-            .EnsureDirectoryExist()
-            .Combine(document.FileName ?? "fuse.txt")
-            .MakeUnique();
-        await Bot.DownloadFile(document.FileId, path, Origin);
+        var path = await DownloadDocument(document, ".txt", Dir_Temp);
         await EatFromTextFile(path);
+    }
+
+    private async Task ProcessSubsAttachment(Document document)
+    {
+        var path = await DownloadDocument(document, ".ass", Dir_Temp);
+        await EatFromSubsFile(path);
     }
 
     private async Task ProcessJsonAttachment(Document document)
     {
-        var path = PackManager.GetPrivateFilesFolder(Chat)
-            .EnsureDirectoryExist()
-            .Combine(document.FileName ?? "fuse.json")
-            .MakeUnique();
-        await Bot.DownloadFile(document.FileId, path, Origin);
+        var dir  = PackManager.GetPrivateFilesFolder(Chat);
+        var path = await DownloadDocument(document, ".json", dir);
         try
         {
             await EatFromJsonFile(path);
@@ -169,6 +158,19 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
             SetBadStatus();
             Bot.SendMessage(Origin, GetJsonFormatExample());
         }
+    }
+
+    private async Task<string> DownloadDocument
+        (Document document, string extension, FilePath directory)
+    {
+        var name = document.FileName
+                ?? $"fuse-{Desert.GetSand()}{extension}";
+        var path = directory
+            .EnsureDirectoryExist()
+            .Combine(name)
+            .MakeUnique();
+        await Bot.DownloadFile(document.FileId, path, Origin);
+        return path;
     }
 
     private string GetJsonFormatExample()
@@ -193,6 +195,14 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         var lines = await File.ReadAllLinesAsync(path);
         await Baka_Eat_Report(lines);
         await SaveJsonCopy(path, lines);
+    }
+
+    private async Task EatFromSubsFile(string path)
+    {
+        var lines = await File.ReadAllLinesAsync(path);
+        var texts = AssParser.ExtractTexts(lines).ToArray();
+        await Baka_Eat_Report(texts);
+        await SaveJsonCopy(path, texts);
     }
 
     private async Task SaveJsonCopy(FilePath path, string[] lines)

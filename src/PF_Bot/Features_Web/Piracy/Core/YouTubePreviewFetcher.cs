@@ -4,7 +4,7 @@ public static class YouTubePreviewFetcher
 {
     public static async Task<FilePath> DownloadPreview(string id, FilePath directory)
     {
-        YTPD_Log(ConsoleColor.Gray);
+        YTPD_Log(ConsoleColor.DarkGray);
 
         var urls = new[]
         {

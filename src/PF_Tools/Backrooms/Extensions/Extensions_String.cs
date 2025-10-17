@@ -72,6 +72,23 @@ public static class Extensions_String
             : text.AsSpan();
     }
 
+    /// Returns an index of EXACTLY N-th occurence
+    /// of given char in the string. Or -1
+    /// if string contains less than N given chars.
+    public static int IndexOfNth
+        (this string text, char c, int N)
+    {
+        var index = -1;
+
+        for (var i = 0; i < N; i++)
+        {
+            index = text.IndexOf(c, index + 1);
+            if (index < 0) break;
+        }
+
+        return index;
+    }
+
     // PATH
     
     public static string RemoveExtension

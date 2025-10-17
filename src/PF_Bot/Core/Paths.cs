@@ -34,7 +34,7 @@ namespace PF_Bot.Core;
     Log/
         Reports/
             2025-09-11-ffmpeg--1001539756197-BRS0peYTP41.txt
-        errors.txt
+        err.mkd
         log.txt
 
     Pics/
@@ -45,11 +45,17 @@ namespace PF_Bot.Core;
 
     Static/
         ASCII/
+            xd.txt
         Emoji/
+            1f4af-1f3a6.png
         Fonts/
             Fallback/
+                1 Sawarabi Gothic.ttf
+            bb-bi.ttf
         Manual/
+            44 FFMpeg.html
         Water/
+            556 698.png
 
         2chan.html
         4chan.html

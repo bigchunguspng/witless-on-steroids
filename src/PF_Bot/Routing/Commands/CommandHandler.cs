@@ -151,7 +151,7 @@ public abstract class CommandHandler
                 case MediaType.Stick: Bot.SendSticker   (Origin, file); break;
                 case MediaType.Audio: Bot.SendAudio     (Origin, file); break;
                 case MediaType.Anime: Bot.SendAnimation (Origin, file); break;
-                case MediaType.Video: Bot.SendVideo     (Origin, file); break;
+                case MediaType.Video: Bot.SendAnimation (Origin, file); break;
                 case MediaType.Round: Bot.SendVideoNote (Origin, file); break;
                 case MediaType.Voice: Bot.SendVoice     (Origin, file); break;
                 case MediaType.Other: Bot.SendDocument  (Origin, file); break;

@@ -11,14 +11,6 @@ public static class ChatSettingsFactory
         Stickers =  privateChat,
     };
 
-    private static MemeType GetRandomMemeType() => Random.Shared.Next(4) switch
-    {
-        0 => MemeType.Meme,
-        1 => MemeType.Snap,
-        2 => MemeType.Dg,
-        _ => MemeType.Dp,
-    };
-
     public static ChatSettings GetTemporary() => new()
     {
         Type     = GetRandomMemeType(),
@@ -26,5 +18,13 @@ public static class ChatSettingsFactory
         Speech   = 0,
         Pics     = 0,
         Stickers = false,
+    };
+
+    private static MemeType GetRandomMemeType() => Random.Shared.Next(4) switch
+    {
+        0 => MemeType.Meme,
+        1 => MemeType.Snap,
+        2 => MemeType.Dg,
+        _ => MemeType.Dp,
     };
 }

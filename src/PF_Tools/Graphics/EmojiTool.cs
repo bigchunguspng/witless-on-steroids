@@ -7,7 +7,7 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace PF_Tools.Backrooms.Helpers;
+namespace PF_Tools.Graphics;
 
 /// Can be used to:
 /// <li>Render text with emoji.</li>

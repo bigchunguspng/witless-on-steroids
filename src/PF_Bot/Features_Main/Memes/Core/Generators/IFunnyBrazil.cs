@@ -4,6 +4,7 @@ using PF_Bot.Features_Main.Edit.Helpers;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
 using PF_Tools.FFMpeg;
+using PF_Tools.Graphics;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;

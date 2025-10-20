@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 
-namespace PF_Tools.Backrooms.Helpers;
+namespace PF_Tools.Graphics;
 
 /// Use this to measure and distribute text.
 public static class Ruler

@@ -120,6 +120,7 @@ public static class Registry
             .Register("peg"    , () => new UseFFMpeg())
             .Register("pipe"   , () => new Pipe())
             .Register("w"      , () => new BrowseReddit())
+            .Register("wss"    , () => new FindSubreddits())
             .Register("link"   , () => new GetRedditLink())
             .Register("piece"  , () => _piece)
             .Register("apeg"   , () => _apeg)

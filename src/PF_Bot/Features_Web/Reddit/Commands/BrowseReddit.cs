@@ -1,11 +1,9 @@
-﻿using System.Text;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing.Commands;
 using PF_Tools.ProcessRunning;
 using PF_Tools.Reddit;
-using Reddit.Controllers;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Web.Reddit.Commands; // ReSharper disable InconsistentNaming
@@ -16,17 +14,14 @@ public class BrowseReddit : CommandHandlerAsync
 
     // input: /w {reply message}
     // input: /ww
-    // input: /wss subreddit
     // input: /ws [subreddit [-ops]]
     // input: /w search query [subreddit*] [-ops]   (ops: -h/-n/-t/-c/-ta/...)
     protected override async Task Run()
     {
-        if     (MessageRepliesToRequest())            await Run();
-        else if (Options.Length == 0)      /* /w   */ await SearchPosts();
-        else if (Options.StartsWith('s'))
-            if  (Options.StartsWith("ss")) /* /wss */ await FindSubreddits();
-            else                           /* /ws  */ await OpenSubreddit();
-        else                               /* /ww  */ await Scroll();
+        if     (MessageRepliesToRequest())          await Run();
+        else if (Options.Length == 0)     /* /w  */ await SearchPosts();
+        else if (Options.StartsWith('s')) /* /ws */ await OpenSubreddit();
+        else                              /* /ww */ await Scroll();
     }
 
     private bool MessageRepliesToRequest()
@@ -46,20 +41,6 @@ public class BrowseReddit : CommandHandlerAsync
     {
         RedditApp.Log("/ww -> LAST QUERY");
         await SendPost(Reddit.GetLastOrRandomQuery(Chat));
-    }
-
-    private async Task FindSubreddits()
-    {
-        if (Args != null)
-        {
-            RedditApp.Log("/wss -> FIND SUBREDDITS");
-            await SendSubredditList(Args);
-        }
-        else
-        {
-            Log($"{Title} >> REDDIT SUBS ?");
-            SendManual(REDDIT_SUBS_MANUAL);
-        }
     }
 
     private async Task OpenSubreddit()
@@ -90,7 +71,7 @@ public class BrowseReddit : CommandHandlerAsync
         }
     }
 
-    #region SENDING MEMES
+    // SENDING MEMES
 
     private async Task SendPost(RedditQuery query)
     {
@@ -248,35 +229,4 @@ public class BrowseReddit : CommandHandlerAsync
             Reddit.LastPosts_Remember(message.Format_ChatMessage(), post);
         }
     }
-
-    #endregion
-
-    #region LOOKING FOR SUBREDDITS
-
-    private async Task SendSubredditList(string query)
-    {
-        var subs = await Reddit.FindSubreddits(query);
-        var text = subs.Count > 0 
-            ? GetSubredditList(query, subs) 
-            : "<b>*пусто*</b>";
-
-        Bot.SendMessage(Origin, text);
-        Log($"{Title} >> FOUND {subs.Count} SUBS >> {query}");
-    }
-
-    private static string GetSubredditList(string query, List<Subreddit> subs)
-    {
-        var count_ED = subs.Count.ED("о", "а", "");
-        var sb = new StringBuilder();
-        sb.Append($"По запросу <b>{query}</b> найдено <b>{subs.Count}</b> сообществ{count_ED}:\n");
-        foreach (var subreddit in subs)
-        {
-            var members = (subreddit.Subscribers ?? 0).Format_bruh_1k_100k_1M();
-            sb.Append($"\n<code>{subreddit.Name}</code> - <i>{members}</i>");
-        }
-
-        return sb.Append("\n\nБлагодарим за использование поисковика ").Append(Bot.Me.FirstName).ToString();
-    }
-
-    #endregion
 }

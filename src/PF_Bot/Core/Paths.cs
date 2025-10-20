@@ -123,33 +123,4 @@ public static class Paths
         .EnsureDirectoryExist()
         .Combine($"{Desert.GetSand(8)}.{extension}")
         .MakeUnique();
-
-    // TODO: MOVE TFO
-
-    public static void ClearTempFiles()
-    {
-        ClearDirectory(Dir_Temp,    "*",      new EnumerationOptions { RecurseSubdirectories = true });
-        ClearDirectory(Dir_Fuse, "del*.json", new EnumerationOptions { RecurseSubdirectories = true });
-    }
-
-    private static void ClearDirectory(FilePath path, string pattern, EnumerationOptions options)
-    {
-        if (path.DirectoryExists == false) return;
-
-        var files = Directory.GetFiles(path, pattern, options);
-        if (files.Length == 0) return;
-
-        try
-        {
-            var onePunch = options.RecurseSubdirectories && pattern is "*";
-            if (onePunch) Directory.Delete(path, true);
-            else files.ForEach(File.Delete);
-
-            Print($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
-        }
-        catch (Exception e)
-        {
-            Print($"CAN'T CLEAR [{path}] >> {e.Message}", ConsoleColor.Red);
-        }
-    }
 }

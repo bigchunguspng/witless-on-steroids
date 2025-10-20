@@ -27,7 +27,7 @@ public partial class AdminConsole
         .Register("p",  PacksInfo)
         .Register("pp", PacksInfoFull)
         .Register("xp", PackCopyJson)
-        .Register("cc", ClearTempFiles)
+        .Register("cc", App.ClearTempFiles)
         .Register("UG", UploadGIFs)
         .Register("US", UploadSounds)
         .Register("db", DeleteBlockers_SaveChats)

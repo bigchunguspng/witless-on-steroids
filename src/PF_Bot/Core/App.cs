@@ -66,4 +66,34 @@ public static class App
         PackManager.Bakas_SaveDirty();
         if (LoggedIntoReddit) Reddit.SaveExcluded();
     }
+
+    // CLEAN
+
+    public static void ClearTempFiles()
+    {
+        var options = new EnumerationOptions { RecurseSubdirectories = true };
+        ClearDirectory(Dir_Temp,    "*",      options);
+        ClearDirectory(Dir_Fuse, "del*.json", options);
+    }
+
+    private static void ClearDirectory(FilePath path, string pattern, EnumerationOptions options)
+    {
+        if (path.DirectoryExists == false) return;
+
+        var files = Directory.GetFiles(path, pattern, options);
+        if (files.Length == 0) return;
+
+        try
+        {
+            var onePunch = options.RecurseSubdirectories && pattern is "*";
+            if (onePunch) Directory.Delete(path, true);
+            else files.ForEach(File.Delete);
+
+            Print($"CLEAR [{path}] >> {files.Length} FILES!", ConsoleColor.Yellow);
+        }
+        catch (Exception e)
+        {
+            Print($"CAN'T CLEAR [{path}] >> {e.Message}", ConsoleColor.Red);
+        }
+    }
 }

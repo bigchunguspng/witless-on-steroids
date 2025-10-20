@@ -33,6 +33,9 @@ public static class Texts
         /db - delete blockers
         /DB - delete active chat if blocked
 
+        /ie - print  input encoding name
+        /oe - print output encoding name
+
         End input with '_' to discard it.
         """;
 }

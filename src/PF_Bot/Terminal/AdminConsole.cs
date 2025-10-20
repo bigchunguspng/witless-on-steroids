@@ -31,6 +31,8 @@ public partial class AdminConsole
         .Register("US", UploadSounds)
         .Register("db", DeleteBlockers_SaveChats)
         .Register("DB", DeleteBlocker__SaveChats)
+        .Register("ie", () => Print(Console. InputEncoding.EncodingName))
+        .Register("oe", () => Print(Console.OutputEncoding.EncodingName))
         .Build();
 
     private void PrintManual() => Print(CONSOLE_MANUAL, ConsoleColor.Yellow);

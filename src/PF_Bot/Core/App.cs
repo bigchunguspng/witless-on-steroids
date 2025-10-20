@@ -30,6 +30,9 @@ public static class App
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console. InputEncoding = System.Text.Encoding.UTF8;
+
         Config.ReadFromFile();
 
         EmojiTool.Directory_EmojiPNGs = Dir_Emoji;

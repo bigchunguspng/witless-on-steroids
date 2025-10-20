@@ -40,7 +40,7 @@ public static class FFProbe
     public static FFProbeResult.Stream
         GetAudioStream
         (this FFProbeResult probe) =>
-        probe.GetPrimaryVideoStream() ?? throw new UnexpectedException("FILE HAS NO AUDIO STREAM");
+        probe.GetPrimaryAudioStream() ?? throw new UnexpectedException("FILE HAS NO AUDIO STREAM");
 
 
     // LOGIC

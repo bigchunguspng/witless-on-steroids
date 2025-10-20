@@ -4,7 +4,7 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands;
 
-public abstract class FileEditor : CommandHandlerAsync
+public abstract class FileEditor_Core : CommandHandlerAsync
 {
     [Flags]
     protected enum SupportedFileTypes

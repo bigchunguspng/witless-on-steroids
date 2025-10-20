@@ -3,6 +3,7 @@ using PF_Bot.Features_Aux.Packs.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Memes.Commands;
 using PF_Bot.Routing.Commands;
+using PF_Bot.Telegram;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -236,7 +237,7 @@ public class AutoMeme : MessageHandler
         {
             Unluckies.HandleProcessException(e, context);
         }
-        else
+        else if (exception is not FileTooBigException)
         {
             App.Bot.SendMessage(Origin, GetSillyErrorMessage());
             Unluckies.Handle(exception, context, $"AUTOMEMES | {Title}");

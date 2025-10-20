@@ -172,7 +172,7 @@ public abstract class CommandHandler
         {
             Unluckies.HandleProcessException(e, Context);
         }
-        else
+        else if (exception is not FileTooBigException)
         {
             if (MessageToEdit == 0)
                 Bot.SendMessage(Origin, GetSillyErrorMessage());

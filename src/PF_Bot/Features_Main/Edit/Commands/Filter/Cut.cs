@@ -10,7 +10,7 @@ public class Cut : FileEditor_AudioVideoUrl
     protected override async Task Execute()
     {
         var args = Args?.Split()
-            .SkipWhile(x => x.StartsWith('/') || x.StartsWith("http"))
+            .Where(x => x.StartsWith("http").Janai())
             .ToArray();
 
         if (args.GetCutTimecodes(out var start, out var length).Failed())

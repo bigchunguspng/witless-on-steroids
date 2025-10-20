@@ -72,49 +72,49 @@ namespace PF_Bot.Core;
 
 public static class Paths
 {
-    public static FilePath Dir_DB     { get; } = "DB";
-    public static FilePath Dir_Log    { get; } = "Log";
-    public static FilePath Dir_Pics   { get; } = "Pics";
-    public static FilePath Dir_Static { get; } = "Static";
-    public static FilePath Dir_Temp   { get; } = "Temp";
-
-    public static FilePath File_Config      { get; } = "config.txt";
-    public static FilePath File_RedditPosts { get; } = "reddit-posts.json";
-
     public const string Ext_Pack = ".tgp";
 
-    public static FilePath Dir_Alias   { get; } = Dir_DB.Combine("Alias");
-    public static FilePath Dir_Chat    { get; } = Dir_DB.Combine("Chat");
-    public static FilePath Dir_Fuse    { get; } = Dir_DB.Combine("Fuse");
-    public static FilePath Dir_History { get; } = Dir_DB.Combine("History");
-    public static FilePath Dir_Board   { get; } = Dir_DB.Combine("History.Board");
-    public static FilePath Dir_Plank   { get; } = Dir_DB.Combine("History.Plank");
-    public static FilePath File_Chats  { get; } = Dir_DB.Combine("chats.json");
-    public static FilePath File_GIFs   { get; } = Dir_DB.Combine("GIFs.txt");
-    public static FilePath File_Sounds { get; } = Dir_DB.Combine("sounds.txt");
-
-    public static FilePath Dir_Reports { get; } = Dir_Log.Combine("Reports");
-    public static FilePath File_Errors { get; } = Dir_Log.Combine("err.mkd");
-    public static FilePath File_Log    { get; } = Dir_Log.Combine("log.txt");
-
-    public static FilePath Dir_Alias_Peg { get; } = Dir_Alias.Combine("Peg");
-    public static FilePath Dir_Alias_Im  { get; } = Dir_Alias.Combine("Im");
-
-    public static FilePath Dir_ASCII  { get; } = Dir_Static.Combine("ASCII");
-    public static FilePath Dir_Emoji  { get; } = Dir_Static.Combine("Emoji");
-    public static FilePath Dir_Fonts  { get; } = Dir_Static.Combine("Fonts");
-    public static FilePath Dir_Manual { get; } = Dir_Static.Combine("Manual");
-    public static FilePath Dir_Water  { get; } = Dir_Static.Combine("Water");
-
-    public static FilePath Dir_RedditMemes { get; } = Dir_Pics.Combine("Memes");
-
-    public static FilePath Dir_Fonts_Fallback  { get; } = Dir_Fonts.Combine("Fallback");
-
-    public static FilePath File_2chanHtmlPage       { get; } = Dir_Static.Combine("2chan.html");
-    public static FilePath File_4chanHtmlPage       { get; } = Dir_Static.Combine("4chan.html");
-    public static FilePath File_DefaultAlbumCover   { get; } = Dir_Static.Combine("art.jpg");
-    public static FilePath File_DefaultTexts        { get; } = Dir_Static.Combine("texts.json");
-    public static FilePath File_DefaultVoiceMessage { get; } = Dir_Static.Combine("voice.ogg");
+    public static readonly FilePath
+        // Top level dirs
+        Dir_DB     = "DB",
+        Dir_Log    = "Log",
+        Dir_Pics   = "Pics",
+        Dir_Static = "Static",
+        Dir_Temp   = "Temp",
+        File_Config      = "config.txt",
+        File_RedditPosts = "reddit-posts.json",
+        // DB/
+        Dir_Alias   = Dir_DB.Combine("Alias"),
+        Dir_Chat    = Dir_DB.Combine("Chat"),
+        Dir_Fuse    = Dir_DB.Combine("Fuse"),
+        Dir_History = Dir_DB.Combine("History"),
+        Dir_Board   = Dir_DB.Combine("History.Board"),
+        Dir_Plank   = Dir_DB.Combine("History.Plank"),
+        File_Chats  = Dir_DB.Combine("chats.json"),
+        File_GIFs   = Dir_DB.Combine("GIFs.txt"),
+        File_Sounds = Dir_DB.Combine("sounds.txt"),
+        // DB/Alias/
+        Dir_Alias_Peg = Dir_Alias.Combine("Peg"),
+        Dir_Alias_Im  = Dir_Alias.Combine("Im"),
+        // Log/
+        Dir_Reports = Dir_Log.Combine("Reports"),
+        File_Errors = Dir_Log.Combine("err.mkd"),
+        File_Log    = Dir_Log.Combine("log.txt"),
+        // Pics/
+        Dir_RedditMemes = Dir_Pics.Combine("Memes"),
+        // Static/
+        Dir_ASCII  = Dir_Static.Combine("ASCII"),
+        Dir_Emoji  = Dir_Static.Combine("Emoji"),
+        Dir_Fonts  = Dir_Static.Combine("Fonts"),
+        Dir_Manual = Dir_Static.Combine("Manual"),
+        Dir_Water  = Dir_Static.Combine("Water"),
+        File_2chanHtmlPage       = Dir_Static.Combine("2chan.html"),
+        File_4chanHtmlPage       = Dir_Static.Combine("4chan.html"),
+        File_DefaultAlbumCover   = Dir_Static.Combine("art.jpg"),
+        File_DefaultTexts        = Dir_Static.Combine("texts.json"),
+        File_DefaultVoiceMessage = Dir_Static.Combine("voice.ogg"),
+        // Static/Fonts/
+        Dir_Fonts_Fallback = Dir_Fonts.Combine("Fallback");
 
     //
 

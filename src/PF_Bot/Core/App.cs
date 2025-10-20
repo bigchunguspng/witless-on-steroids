@@ -31,8 +31,6 @@ public static class App
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-        AnsiConsole.Profile.Capabilities.Ansi = false;
-
         Config.ReadFromFile();
 
         EmojiTool.Directory_EmojiPNGs = Dir_Emoji;

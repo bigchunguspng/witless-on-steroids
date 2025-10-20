@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Runtime.CompilerServices;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Telegram;
@@ -7,7 +8,8 @@ public partial class Bot
 {
     /// Downloads a file to the <b>Pics</b> directory if it's not there already.
     /// <br/>To be used with media files attached to commands.
-    public async Task<FilePath> Download(FileBase file, MessageOrigin origin, string extension)
+    public async Task<FilePath> Download
+        (FileBase file, MessageOrigin origin, string extension)
     {
         var directory = Dir_Pics
             .Combine(origin.Chat.ToString())
@@ -16,52 +18,65 @@ public partial class Bot
         var hash = GetCapitalizationHash(file.FileUniqueId).ToString("X");
         var name = $"{file.FileUniqueId}+{hash}{extension}";
         var path = directory.Combine(name);
-        if (path.FileExists)
-        {
-            while (FileIsLocked(path)) await Task.Delay(250);
-        }
-        else
-        {
-            await DownloadFile(file.FileId, path, origin);
-        }
+
+        await DownloadFile(file.FileId, path, origin, overwriteFiles: false);
 
         return path;
     }
 
     /// Downloads a file or send a message if the exception is thrown.
-    /// <br/>Make sure provided path is unique and directory is created!
-    public async Task DownloadFile(string fileId, string path, MessageOrigin origin)
+    /// <br/> Make sure provided path is unique and directory is created!
+    public async Task DownloadFile
+        (string fileId, FilePath path, MessageOrigin origin, bool overwriteFiles = true)
     {
+        var   semaphore = GetSemaphor(path);
+        await semaphore.WaitAsync();
+
         try
         {
+            if (path.FileExists)
+            {
+                await path.WaitForFile(checkEvery_ms: 125);
+                if (overwriteFiles == false) return;
+            }
+
             var file = await Client.GetFile(fileId);
-            var stream = new FileStream(path, FileMode.Create);
-            Client.DownloadFile(file.FilePath!, stream).Wait();
-            await stream.DisposeAsync();
+            await using var stream = new FileStream(path, FileMode.Create);
+            await Client.DownloadFile(file.FilePath!, stream);
         }
         catch (Exception e)
         {
-            var message = e.Message.Contains("file is too big")
-                ? FILE_TOO_BIG.PickAny()
-                : e.Message.XDDD();
-            SendMessage(origin, message);
-            throw;
+            if (e.Message.Contains("file is too big"))
+            {
+                SendMessage(origin, FILE_TOO_BIG.PickAny());
+                LogError("Telegram | FILE TOO BIG");
+                throw new FileTooBigException();
+            }
+            else
+            {
+                SendMessage(origin, e.Message.XDDD());
+                throw;
+            }
+        }
+        finally
+        {
+            semaphore.Release();
         }
     }
 
-    private static bool FileIsLocked(string path)
+    private readonly LimitedCache<string, SemaphoreSlim>
+        _semaphores = new(32);
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    private SemaphoreSlim GetSemaphor(string path)
     {
-        try
+        if (_semaphores.Contains_No(path, out var slim))
         {
-            using var fs = File.Open(path, FileMode.Open, FileAccess.Read);
-            fs.Close();
-        }
-        catch (IOException)
-        {
-            return true;
+            slim = new SemaphoreSlim(1, 1);
+            _semaphores.Add(path, slim);
         }
 
-        return false;
+        return slim;
     }
 
     /// Certified Windows™ moment.
@@ -80,3 +95,5 @@ public partial class Bot
         return result;
     }
 }
+
+public class FileTooBigException : Exception;

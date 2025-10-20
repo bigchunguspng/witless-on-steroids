@@ -27,4 +27,20 @@ public static class Extensions_FilePath
     public static FilePath ChangeEnding
         (this FilePath path, string suffix_and_extension,     char separator = '-') =>
         new ($"{path.AsSpan_WithoutExtension()}{separator}{suffix_and_extension}");
+
+    public static async Task WaitForFile(this FilePath path, int checkEvery_ms)
+    {
+        while (true)
+        {
+            try
+            {
+                await using var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                return;
+            }
+            catch (IOException)
+            {
+                await Task.Delay(checkEvery_ms);
+            }
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using SixLabors.Fonts;
 
 namespace PF_Bot.Features_Main.Memes.Core.Options;
@@ -6,7 +7,7 @@ namespace PF_Bot.Features_Main.Memes.Core.Options;
 public static class FontStorage
 {
     /// Main fonts by their key.
-    public static readonly Dictionary<string, FontFamily> Families;
+    public static readonly FrozenDictionary<string, FontFamily> Families;
 
     /// Falback fonts: Exotic.
     public static readonly IReadOnlyList<FontFamily> Fallback_Default;
@@ -26,7 +27,7 @@ public static class FontStorage
             .Select(Path.GetFileNameWithoutExtension).OfType<string>()
             .Where(key => key.Contains('-').Janai())
             .Zip(families_main, (key, font) => new KeyValuePair<string, FontFamily>(key, font))
-            .ToDictionary();
+            .ToFrozenDictionary();
 
         Fallback_Default = families_fall.ToArray();
         Fallback_Regular = new[] { Families["sg"] }.Concat(Fallback_Default).ToList();

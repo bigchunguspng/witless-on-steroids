@@ -1,8 +1,10 @@
-﻿namespace PF_Tools.Backrooms.Types.Collections;
+﻿using System.Collections.Frozen;
+
+namespace PF_Tools.Backrooms.Types.Collections;
 
 public record struct CommandMapping<T>(string Command, T Handler);
 
-public class CommandRegistry<T>(Dictionary<char, List<CommandMapping<T>>> registry)
+public class CommandRegistry<T>(FrozenDictionary<char, List<CommandMapping<T>>> registry)
 {
     public T? Resolve
         (string? text, int offset = 0) =>
@@ -38,8 +40,12 @@ public class CommandRegistry<T>(Dictionary<char, List<CommandMapping<T>>> regist
         public CommandRegistry<T> Build()
         {
             var registry = _lobby
-                    .GroupBy(x => x.Command[0])
-                    .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Command).ToList());
+                .GroupBy(x => x.Command[0])
+                .ToFrozenDictionary
+                (
+                    g => g.Key,
+                    g => g.OrderByDescending(x => x.Command).ToList()
+                );
 
             return new CommandRegistry<T>(registry);
         }

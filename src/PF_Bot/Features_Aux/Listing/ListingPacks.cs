@@ -1,6 +1,6 @@
 using System.Text;
 using PF_Bot.Core;
-using PF_Bot.Features_Aux.Packs.Core;
+using PF_Bot.Features_Aux.Packs;
 
 namespace PF_Bot.Features_Aux.Listing;
 

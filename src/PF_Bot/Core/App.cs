@@ -1,5 +1,5 @@
 using System.Globalization;
-using PF_Bot.Features_Aux.Packs.Core;
+using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Features_Web.Boards.Core;
 using PF_Bot.Features_Web.Reddit.Core;

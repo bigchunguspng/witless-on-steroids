@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using PF_Bot.Features_Aux.Packs.Core;
+using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Commands;
 

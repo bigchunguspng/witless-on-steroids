@@ -7,7 +7,7 @@ using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Helpers;
 using PackProps = (long packSize, int wordCount);
 
-namespace PF_Bot.Features_Aux.Packs.Core;
+namespace PF_Bot.Features_Aux.Packs;
 
 // Rules:
 // 1. Only non-empty packs should be saved to disk.

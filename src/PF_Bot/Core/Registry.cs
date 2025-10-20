@@ -2,6 +2,7 @@ using PF_Bot.Commands;
 using PF_Bot.Commands.Admin.Fun;
 using PF_Bot.Commands.Admin.System;
 using PF_Bot.Commands.Debug;
+using PF_Bot.Features_Aux.Delete;
 using PF_Bot.Features_Aux.Packs.Commands;
 using PF_Bot.Features_Aux.Settings.Commands;
 using PF_Bot.Features_Main.Edit.Commands.Convert;

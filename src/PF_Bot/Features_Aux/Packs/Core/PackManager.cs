@@ -290,4 +290,8 @@ public static class PackManager
 
         File.Delete(GetPackPath(chat));
     }
+
+    // DEBUG
+
+    public static int PacksTotal => Dir_Chat.GetFiles().Length;
 }

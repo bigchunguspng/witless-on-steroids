@@ -113,10 +113,15 @@ public class DebugMessage : CommandHandlerBlocking
 
     private static string GetPacksInfo()
     {
+        var chats  = ChatManager.Chats.Count;
         var loaded = PackManager.Bakas.Count;
-        var total  = ChatManager.Chats.Count;
+        var total  = PackManager.PacksTotal;
         var packs = string.Join('\n', PackManager.Bakas.Select(x => x.Key.ToString()));
-        return $"📝 <u>PACKS LOADED</u>: {loaded}/{total}\n<blockquote expandable>{packs}</blockquote>";
+        return $"""
+                💬 <u>CHATS KNOWN</u>: {chats}
+                📝 <u>PACKS LOADED</u>: {loaded}/{total}
+                <blockquote expandable>{packs}</blockquote>
+                """;
     }
 
     private static string GetRedditInfo()

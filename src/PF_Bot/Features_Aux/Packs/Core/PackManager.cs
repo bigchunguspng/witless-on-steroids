@@ -183,8 +183,8 @@ public static class PackManager
         var elapsed = sw.Elapsed;
         var bytes = path.FileSizeInBytes;
         var bytes_ps = bytes / elapsed.TotalSeconds;
-        var size  = bytes   .ReadableFileSize();
-        var speed = bytes_ps.ReadableFileSpeed();
+        var size  = bytes   .ReadableFileSize (isUI: false);
+        var speed = bytes_ps.ReadableFileSpeed(isUI: false);
 
         return $"{elapsed.ReadableTime(),10} | {size,9} | {speed,10}";
     }

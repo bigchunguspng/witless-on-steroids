@@ -32,28 +32,34 @@ public static partial class Extensions
 
     // UI
 
+    private static readonly string[]
+        Units_UI = ["с", "МБ", "КБ", "байт"],
+        Units_BE = ["s", "MB", "KB", "B"   ];
+
     public static string ReadableFileSize
-        (this long bytes)
+        (this long bytes, bool isUI = true)
     {
+        var u = isUI ? Units_UI : Units_BE;
         var kbs = bytes / 1024F;
         var mbs = kbs   / 1024F;
-        return mbs >= 100 ? UI($"{mbs:F1} МБ")
-            :  mbs >=   1 ? UI($"{mbs:F2} МБ")
-            :  kbs >= 100 ? UI($"{kbs:F1} КБ")
-            :  kbs >=   1 ? UI($"{kbs:F0} КБ")
-            :                  $"{bytes} байт";
+        return mbs >= 100 ? UI($"{mbs:F1} {u[1]}")
+            :  mbs >=   1 ? UI($"{mbs:F2} {u[1]}")
+            :  kbs >= 100 ? UI($"{kbs:F1} {u[2]}")
+            :  kbs >=   1 ? UI($"{kbs:F0} {u[2]}")
+            :                   $"{bytes} {u[3]}";
     }
 
     public static string ReadableFileSpeed
-        (this double bytesPerSecond)
+        (this double bytesPerSecond, bool isUI = true)
     {
+        var u = isUI ? Units_UI : Units_BE;
         var kbs = bytesPerSecond / 1024F;
         var mbs = kbs   / 1024F;
-        return mbs >= 100 ? UI($"{mbs:F1} МБ/с")
-            :  mbs >=   1 ? UI($"{mbs:F2} МБ/с")
-            :  kbs >= 100 ? UI($"{kbs:F1} КБ/c")
-            :  kbs >=   1 ? UI($"{kbs:F2} КБ/с")
-            :       $"{bytesPerSecond:F2} байт/с";
+        return mbs >= 100 ? UI($"{mbs:F1} {u[1]}/{u[0]}")
+            :  mbs >=   1 ? UI($"{mbs:F2} {u[1]}/{u[0]}")
+            :  kbs >= 100 ? UI($"{kbs:F1} {u[2]}/{u[0]}")
+            :  kbs >=   1 ? UI($"{kbs:F2} {u[2]}/{u[0]}")
+            :       $"{bytesPerSecond:F2} {u[3]}/{u[0]}";
     }
 
     public static string Format_bruh_1k_100k_1M

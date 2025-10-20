@@ -18,18 +18,24 @@ public class FileLogger_Batch(FilePath filePath)
         MoveHead();
     }
 
+    /// Writes pending logs to file. Call this before exit!
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public void Write()
+    {
+        Write_Internal();
+    }
+
     private void MoveHead()
     {
         if (++_head < 32) return;
 
-        Write();
-        _head &= 0b00011111; // same as %= 32
+        Write_Internal();
     }
 
-    /// Writes pending logs to file. Call this before exit!
-    public void Write()
+    private void Write_Internal()
     {
         _directory.CreateDirectory();
         File.AppendAllLines(filePath, _buffer.Take(_head));
+        _head = 0;
     }
 }

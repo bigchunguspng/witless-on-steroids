@@ -21,6 +21,7 @@ public static class Texts
         /w  - send [text] to active chat + /a
 
         /s  - save packs
+        /l  - write logs
         /p  - packs info
         /pp - packs info (full)
         /cc - clear temp files

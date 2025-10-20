@@ -23,6 +23,7 @@ public partial class AdminConsole
         .Register("a",    AddTextToPack)
         .Register("w",  WriteTextToChat)
         .Register("s",  PackManager.Bakas_SaveDirty_DropIdle)
+        .Register("l",  BigBrother.Write)
         .Register("p",  PacksInfo)
         .Register("pp", PacksInfoFull)
         .Register("xp", PackCopyJson)

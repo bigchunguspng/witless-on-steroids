@@ -1,4 +1,4 @@
-﻿namespace PF_Bot.Routing.Commands;
+﻿namespace PF_Bot.Routing.Messages.Commands;
 
 public abstract class CommandHandlerAsync_Settings 
     :                 CommandHandlerAsync

@@ -3,10 +3,9 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Features_Main.Text.Core;
-using PF_Bot.Routing.Messages;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing.Commands;
+namespace PF_Bot.Routing.Messages.Commands;
 
 public enum CommandMode
 {

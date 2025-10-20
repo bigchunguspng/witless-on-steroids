@@ -1,4 +1,4 @@
-namespace PF_Bot.Routing.Messages;
+namespace PF_Bot.Routing.Messages.Auto;
 
 public record WeightedOption(int Weight, string Content);
 

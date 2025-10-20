@@ -5,7 +5,6 @@ using PF_Bot.Features_Web.Boards.Core;
 using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages;
-using PF_Bot.Telegram;
 using PF_Bot.Terminal;
 using PF_Tools.Graphics;
 using Spectre.Console;

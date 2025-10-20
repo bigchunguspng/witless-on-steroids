@@ -1,4 +1,4 @@
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Admin.Fun;

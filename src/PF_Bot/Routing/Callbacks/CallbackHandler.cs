@@ -1,6 +1,5 @@
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
-using PF_Bot.Telegram;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Routing.Callbacks;

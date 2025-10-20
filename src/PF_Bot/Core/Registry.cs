@@ -15,7 +15,7 @@ using PF_Bot.Features_Web.Boards.Commands;
 using PF_Bot.Features_Web.Piracy.Commands;
 using PF_Bot.Features_Web.Reddit.Commands;
 using PF_Bot.Routing.Callbacks;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 
 namespace PF_Bot.Core;
 

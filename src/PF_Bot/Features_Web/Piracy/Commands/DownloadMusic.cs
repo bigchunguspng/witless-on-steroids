@@ -1,5 +1,5 @@
 ﻿using PF_Bot.Features_Web.Piracy.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
 #pragma warning disable CS4014

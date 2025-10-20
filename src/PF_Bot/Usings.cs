@@ -18,6 +18,7 @@ global using static PF_Tools.ProcessRunning.CLIs;
 global using static PF_Tools.Logging.ConsoleLogger;
 
 global using PF_Bot.Backrooms;
+global using PF_Bot.Telegram;
 
 global using static PF_Bot.Backrooms.Extensions;
 global using static PF_Bot.Core.Paths;

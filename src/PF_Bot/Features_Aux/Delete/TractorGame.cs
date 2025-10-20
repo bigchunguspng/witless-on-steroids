@@ -1,7 +1,7 @@
 using PF_Bot.Core;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace PF_Bot.Features_Aux.Packs.Core;
+namespace PF_Bot.Features_Aux.Delete;
 
 /// <i>pov: your super gaming house is getting destroyed by a tractor</i>
 public class TractorGame(List<List<InlineKeyboardButton>> game)

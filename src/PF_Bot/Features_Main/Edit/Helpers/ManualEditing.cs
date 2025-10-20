@@ -1,7 +1,7 @@
 // ReSharper disable CoVariantArrayConversion
 
 using PF_Bot.Core;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Helpers;

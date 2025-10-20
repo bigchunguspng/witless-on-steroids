@@ -1,4 +1,4 @@
-﻿using PF_Bot.Routing.Commands;
+﻿using PF_Bot.Routing.Messages.Commands;
 using PF_Tools.Copypaster;
 using PF_Tools.Copypaster.Extensions;
 using PF_Tools.Copypaster.Helpers;

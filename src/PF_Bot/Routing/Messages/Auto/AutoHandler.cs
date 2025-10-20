@@ -1,6 +1,6 @@
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing.Messages;
+namespace PF_Bot.Routing.Messages.Auto;
 
 public static class AutoHandler
 {

@@ -1,7 +1,7 @@
 using System.Text;
 using PF_Bot.Core;
 using PF_Bot.Routing.Callbacks;
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Commands;

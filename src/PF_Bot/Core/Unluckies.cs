@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PF_Bot.Routing.Callbacks;
-using PF_Bot.Routing.Commands;
 using PF_Bot.Routing.Messages;
+using PF_Bot.Routing.Messages.Commands;
 using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 

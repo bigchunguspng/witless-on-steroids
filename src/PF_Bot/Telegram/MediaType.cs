@@ -1,4 +1,4 @@
-namespace PF_Bot.Routing.Commands;
+namespace PF_Bot.Telegram;
 
 public enum MediaType
 {

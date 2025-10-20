@@ -1,4 +1,4 @@
-namespace PF_Bot.Routing.Commands;
+namespace PF_Bot.Routing.Messages.Commands;
 
 /// Non-blocking command. Should be used for time consuming actions!
 /// A new instance should be created every time!

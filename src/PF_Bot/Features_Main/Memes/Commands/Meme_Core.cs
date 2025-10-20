@@ -1,8 +1,8 @@
 ﻿using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
-using PF_Bot.Routing.Commands;
-using PF_Bot.Routing.Messages;
+using PF_Bot.Routing.Messages.Auto;
+using PF_Bot.Routing.Messages.Commands;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
 

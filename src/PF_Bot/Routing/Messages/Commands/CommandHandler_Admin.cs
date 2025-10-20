@@ -1,4 +1,4 @@
-namespace PF_Bot.Routing.Commands;
+namespace PF_Bot.Routing.Messages.Commands;
 
 /// For commands that are restricted to bot admins only.
 public abstract class CommandHandlerBlocking_Admin : CommandHandlerBlocking

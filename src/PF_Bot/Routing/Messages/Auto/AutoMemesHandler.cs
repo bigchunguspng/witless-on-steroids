@@ -1,7 +1,7 @@
-using PF_Bot.Routing.Commands;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
-namespace PF_Bot.Routing.Messages;
+namespace PF_Bot.Routing.Messages.Auto;
 
 public interface AutoMemesHandler
 {

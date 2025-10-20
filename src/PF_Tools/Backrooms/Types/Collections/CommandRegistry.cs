@@ -7,17 +7,23 @@ public record struct CommandMapping<T>(string Command, T Handler);
 public class CommandRegistry<T>(FrozenDictionary<char, List<CommandMapping<T>>> registry)
 {
     public T? Resolve
-        (string? text, int offset = 0) =>
-        text != null && registry.TryGetValue(text[offset], out var mappings)
-            ? mappings.FirstOrDefault(x => text.AsSpan(offset).StartsWith(x.Command)).Handler
-            : default;
+        (string? input, int offset = 0)
+    {
+        if (input != null && registry.TryGetValue(input[offset], out var mappings))
+        {
+            var mapping = mappings.FirstOrDefault(x_StartsWithTextSubstring(input, offset));
+            return mapping.Handler;
+        }
+
+        return default;
+    }
 
     public T? Resolve
-        (string? text, out string? command, int offset = 0)
+        (string? input, out string? command, int offset = 0)
     {
-        if (text != null && registry.TryGetValue(text[offset], out var mappings))
+        if (input != null && registry.TryGetValue(input[offset], out var mappings))
         {
-            var mapping = mappings.FirstOrDefault(x => text.AsSpan(offset).StartsWith(x.Command));
+            var mapping = mappings.FirstOrDefault(x_StartsWithTextSubstring(input, offset));
             command = mapping.Command;
             return    mapping.Handler;
         }
@@ -25,6 +31,11 @@ public class CommandRegistry<T>(FrozenDictionary<char, List<CommandMapping<T>>> 
         command = null;
         return default;
     }
+
+    private static Func<CommandMapping<T>, bool>
+        x_StartsWithTextSubstring
+        (string input, int offset) =>
+        x => input.AsSpan(offset).StartsWith(x.Command);
 
     public class Builder
     {

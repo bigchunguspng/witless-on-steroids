@@ -37,7 +37,7 @@ public class ChatInfo : CommandHandlerBlocking
             sb.Append("\nМогут 🔩⚙️: ").Append(Data.AdminsOnly ? "только админы 😎" : "все 🤠");
 
         sb.Append("\n\n<u>Авто-мемы:</u>");
-        sb.Append("\nТип: ").Append(Types[Data.Type]);
+        sb.Append("\nТип: ").Append(GetMemeTypeName(Data.Type));
         if (Data.Type == MemeType.Auto) sb.Append("<s>");
         sb.Append("\nВероятность: ").Append(Data.Pics).Append('%');
         sb.Append("\nСтикеры: ").Append(Data.Stickers ? "тоже 👌" : "пропускаем");
@@ -82,14 +82,15 @@ public class ChatInfo : CommandHandlerBlocking
         Log($"{Title} >> CHAT INFO");
     }
 
-    public static readonly Dictionary<MemeType, string> Types = new()
+    public static string GetMemeTypeName(MemeType type) => type switch
     {
-        { MemeType.Meme, "мемы"             },
-        { MemeType.Dg,   "демотиваторы💀"   },
-        { MemeType.Top,  "подписанки 💬"    },
-        { MemeType.Dp,   "демотиваторы👌"   },
-        { MemeType.Snap, "снапчаты 😭"      },
-        { MemeType.Nuke, "ядерные отходы🍤" },
-        { MemeType.Auto, "авто-обработка 👾"},
+        MemeType.Meme => "мемы",
+        MemeType.Dg   => "демотиваторы💀",
+        MemeType.Top  => "подписанки 💬",
+        MemeType.Dp   => "демотиваторы👌",
+        MemeType.Snap => "снапчаты 😭",
+        MemeType.Nuke => "ядерные отходы🍤",
+        MemeType.Auto => "авто-обработка 👾",
+        _ => throw new ArgumentException("Bro added a new meme type..."),
     };
 }

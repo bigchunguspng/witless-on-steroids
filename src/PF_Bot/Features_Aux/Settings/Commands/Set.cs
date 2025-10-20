@@ -95,7 +95,7 @@ public class Set : CommandHandlerAsync_SettingsBlocking
         ChatManager.SaveChats();
         var message = command == "*"
             ? SET_AUTO_HANDLER_RESPONSE.Format(GetAutoHandlerTip())
-            : SET_MEMES_RESPONSE.Format(ChatInfo.Types[Data.Type]);
+            : SET_MEMES_RESPONSE.Format(ChatInfo.GetMemeTypeName(Data.Type));
         Bot.SendMessage(Origin, message.XDDD());
         Log($"{Title} >> MEMES TYPE >> {Data.Type.ToString()[0]}");
     }

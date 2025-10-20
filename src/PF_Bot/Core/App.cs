@@ -7,6 +7,7 @@ using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages;
 using PF_Bot.Telegram;
 using PF_Bot.Terminal;
+using Spectre.Console;
 
 namespace PF_Bot.Core;
 
@@ -30,8 +31,7 @@ public static class App
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        Console. InputEncoding = System.Text.Encoding.UTF8;
+        AnsiConsole.Profile.Capabilities.Ansi = false;
 
         Config.ReadFromFile();
 

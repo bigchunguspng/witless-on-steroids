@@ -140,7 +140,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
     private async Task ProcessSubsAttachment(Document document)
     {
         var path = await DownloadDocument(document, ".ass", Dir_Temp);
-        await EatFromSubsFile(path);
+        await EatFromSubsFile_OrListStyles(path);
     }
 
     private async Task ProcessJsonAttachment(Document document)
@@ -196,12 +196,18 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         await SaveJsonCopy(path, lines);
     }
 
-    private async Task EatFromSubsFile(string path)
+    private async Task EatFromSubsFile_OrListStyles(string path)
     {
         var lines = await File.ReadAllLinesAsync(path);
-        var texts = AssParser.ExtractTexts(lines).ToArray();
-        await Baka_Eat_Report(texts);
-        await SaveJsonCopy(path, texts);
+        if (Args == null || Args.StartsWith("!").Janai())
+        {
+            var styles = Args?.Split(',').Select(x => x.Trim()).ToArray();
+            var texts = AssParser.ExtractTexts(lines, styles).ToArray();
+            await Baka_Eat_Report(texts);
+            await SaveJsonCopy(path, texts);
+        }
+        else
+            ListAssStyles(lines);
     }
 
     private async Task SaveJsonCopy(FilePath path, string[] lines)
@@ -211,6 +217,36 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
             .Combine($"{path.FileNameWithoutExtension}.json")
             .MakeUnique();
         await JsonIO.SaveDataAsync(lines, save);
+    }
+
+    private void ListAssStyles(string[] lines)
+    {
+        var styles = AssParser.ListStyles(lines, examplesLimit: 3);
+        var sb = new StringBuilder()
+            .Append("🍑 Стилей найдено: ")
+            .Append(styles.Length)
+            .Append("\n\n");
+
+        foreach (var style in styles)
+            sb
+                .Append("<code>")
+                .Append(style.Name)
+                .Append("</code> - ")
+                .Append(style.Count)
+                .Append(" шт.\n<blockquote expandable>")
+                .AppendJoin("\n", style.Examples)
+                .Append("</blockquote>");
+
+        if (styles.Length > 0)
+            sb
+                .Append("\n\n🥢 Перечислите нужные стили после <code>/fuse</code> ")
+                .Append("через запятую чтобы скормить только нужные реплики, например:")
+                .Append("\n<code>/fuse ")
+                .AppendJoin(", ", styles.Take(3).Select(x => x.Name))
+                .Append("</code>");
+
+        Bot.SendMessage(Origin, sb.ToString());
+        Log($"{Title} >> FUSE ASS - LIST STYLES");
     }
 
     // CORE + LOGS

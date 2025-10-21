@@ -47,6 +47,27 @@ public static class Extensions_Generic
         return collection.ElementAt(Random.Shared.Next(collection.Count));
     }
 
+    public static int FindIndex<T>(this T[] array, Predicate<T> match)
+    {
+        var l = array.Length;
+        for (var i = 0; i < l; i++)
+        {
+            if (match(array[i])) return i;
+        }
+
+        return -1;
+    }
+
+    public static int FindLastIndex<T>(this T[] array, Predicate<T> match)
+    {
+        for (var i = array.Length - 1; i >= 0; i--)
+        {
+            if (match(array[i])) return i;
+        }
+
+        return -1;
+    }
+
     public static async Task<T?> OrDefault_OnException<T>(this Task<T> getThing)
     {
         try

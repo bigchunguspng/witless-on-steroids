@@ -26,7 +26,6 @@ public abstract class CommandHandler
     protected      FilePath ? Input   => Context.Input;
     protected List<FilePath>? Output  => Context.Output;
 
-    protected CommandMode  Mode     => Context.Mode;
     protected ChatSettings Data     => Context.Settings;
     protected ChatSettings Settings => Context.Settings;
     protected Copypaster   Baka     => Context.Baka;
@@ -182,7 +181,7 @@ public abstract class CommandHandler
 
     private void Log()
     {
-        var normal = Mode == CommandMode.NORMAL;
+        var normal = Context.Mode == CommandMode.NORMAL;
         if (normal) BigBrother.LogCommand(Chat, Status, Message, Context.Text);
         else        BigBrother.LogAuto   (Chat, Status, Message, GetAutoType(), GetAutoId(), $"/{Command}{Options} {Args}");
     }
@@ -193,8 +192,8 @@ public abstract class CommandHandler
     }
 
     private AutoType GetAutoType() =>
-        Mode == CommandMode.AUTO ? AutoType.AUTO :
-        Mode == CommandMode.PIPE ? AutoType.PIPE :
+        Context.Mode == CommandMode.AUTO ? AutoType.AUTO :
+        Context.Mode == CommandMode.PIPE ? AutoType.PIPE :
         throw new UnexpectedException("ONLY AUTO & PIPE MODE EXPECTED");
 
     private void Reset()

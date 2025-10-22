@@ -219,7 +219,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
     private TCaption GetText()
     {
         var useArgs =
-            Mode != CommandMode.AUTO
+            Context.Mode != CommandMode.AUTO
          || Context.Automemes_UseMessageText;
 
         return GetMemeText(useArgs ? Args : null);

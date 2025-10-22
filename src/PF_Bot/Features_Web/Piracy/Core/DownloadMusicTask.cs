@@ -39,12 +39,12 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context)
 
     private string GetAudioArgs(string url, string output)
     {
-        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(YtDlp.ARGS_DEFAULT);
         if (HighQuality)
             builder.Append("--audio-quality 0 ");
         if (!youTube && !ExtractThumb && !ArtAttached)
             builder.Append("--write-thumbnail ");
-        builder.Append("-f ba -k -x --audio-format mp3 ");
+        builder.Append("-f ba/b -k -x --audio-format mp3 ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.AppendInQuotes(url).Append(" -o ").AppendInQuotes(output);
         return builder.ToString();
@@ -52,7 +52,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context)
 
     private string GetVideoArgs(string url)
     {
-        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(YtDlp.ARGS_DEFAULT);
         builder.Append("-f \"bv*[height<=720]\" -k ");
         builder.Append("-I ").Append(PlayListIndex ?? "1").Append(' ');
         builder.AppendInQuotes(url).Append(" -o ").AppendInQuotes("video.%(ext)s");

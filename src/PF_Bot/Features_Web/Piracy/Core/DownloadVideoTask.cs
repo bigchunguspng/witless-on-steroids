@@ -13,7 +13,7 @@ public class DownloadVideoTask(string id, CommandContext context)
 
     private string GetDownloadCommand(string url)
     {
-        var builder = new StringBuilder(YtDlp.DEFAULT_ARGS);
+        var builder = new StringBuilder(YtDlp.ARGS_DEFAULT);
         var args = "-k -I 1 "
                  + "-f \""
                  + "bv*[height<=480][width<=720][vcodec*=avc]+ba[acodec*=mp4a]/"

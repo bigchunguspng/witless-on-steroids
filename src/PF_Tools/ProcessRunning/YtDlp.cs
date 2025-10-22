@@ -2,7 +2,9 @@ namespace PF_Tools.ProcessRunning;
 
 public static class YtDlp
 {
-    public const string DEFAULT_ARGS = "--no-mtime --no-warnings --cookies-from-browser firefox ";
+    public const string ARGS_DEFAULT
+        = "--no-mtime --no-warnings --cookies-from-browser firefox "
+        + "--extractor-args \"youtube:player_js_version=actual\" ";
 
     private const int MIN_HOURS_BEFORE_UPDATES = 8;
 

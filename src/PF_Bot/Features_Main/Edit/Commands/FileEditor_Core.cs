@@ -173,12 +173,10 @@ public abstract class FileEditor_Core : CommandHandlerAsync
 
     private async Task<FilePath> DownloadFileByURL(string url)
     {
+        var download = new DownloadVideoTask(url, Context).RunAsync();
         MessageToEdit = Bot.PingChat(Origin, PLS_WAIT[Random.Shared.Next(5)]);
-
-        var path = await new DownloadVideoTask(url, Context).RunAsync();
-
+        var path = await download;
         Bot.EditMessage(Chat, MessageToEdit, PROCESSING.PickAny().XDDD());
-
         return path;
     }
 

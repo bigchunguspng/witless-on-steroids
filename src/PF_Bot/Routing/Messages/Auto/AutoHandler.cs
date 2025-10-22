@@ -22,25 +22,11 @@ public static class AutoHandler
             Cache.Add(context.Chat, script);
         }
 
-        foreach (var type in script.SupportedFileTypes)
-        {
-            if (MessageMatches(type, context.Message).Janai())
-                continue;
-
-            var input = script.GenerateInput(type, context.Text);
-            if (input != null && type == 'u')
-            {
-                var split = input.SplitN(2);
-                var command = split[0];
-                var args = split.Length > 1 ? split[1] : null;
-
-                input = $"{command} {GetURL(context)} {args}"; // e.g. /cut URL 300
-            }
-
-            return input;
-        }
-
-        return null;
+        var type = script.SupportedFileTypes
+            .FirstOrDefault(type => MessageMatches(type, context.Message));
+        return type == 0
+            ? null
+            : script.GenerateInput(type, context.Text);
     }
 
     // MEDIA
@@ -92,10 +78,4 @@ public static class AutoHandler
     private static bool CheckDoc
         (Message message)
         => message.Document != null;
-
-    private static string GetURL(MessageContext ctx)
-    {
-        var url = ctx.Message.GetURL()!;
-        return ctx.Text!.Substring(url.Offset, url.Length);
-    }
 }

@@ -38,6 +38,9 @@ namespace PF_Bot.Core;
         log.txt
 
     Pics/
+        Manga/
+            one-piece/1162/
+                1162 - 001.jpg
         Memes/
             t3_1cibu47.png
         -1001539756197/
@@ -101,6 +104,7 @@ public static class Paths
         File_Errors = Dir_Log.Combine("err.mkd"),
         File_Log    = Dir_Log.Combine("log.txt"),
         // Pics/
+        Dir_Manga       = Dir_Pics.Combine("Manga"),
         Dir_RedditMemes = Dir_Pics.Combine("Memes"),
         // Static/
         Dir_ASCII  = Dir_Static.Combine("ASCII"),

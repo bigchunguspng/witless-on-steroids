@@ -21,10 +21,12 @@ public static class ConsoleLogger
     // LOG (MORE FANCY)
 
     public static void LogError
-        (string message) => Log(message, LogLevel.Error, LogColor.Maroon);
+        (string message, LogColor color = LogColor.Maroon)
+        => Log(message, LogLevel.Error, color);
 
     public static void LogDebug
-        (string message) => Log(message, LogLevel.Debug, LogColor.Grey);
+        (string message, LogColor color = LogColor.Grey)
+        => Log(message, LogLevel.Debug, color);
 
     public static void Log
     (

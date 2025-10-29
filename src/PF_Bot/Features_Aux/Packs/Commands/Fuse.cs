@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Callbacks;
@@ -21,10 +22,11 @@ public class Fuse_Callback : CallbackHandler
     {
         var pagination = GetPagination(Content);
 
-        if      (Key == "fi") ListingPacks.SendPackList(pagination);
-        else if (Key == "f!") ListingPacks.SendPackList(pagination, isPrivate: true);
-        else if (Key == "f@") ListingPacks.SendFileList(pagination);
-        else          /* f**/ ListingPacks.SendFileList(pagination, isPrivate: true);
+        var c = Key[Registry.CallbackKey_Fuse.Length];
+        if      (c == 'i') ListingPacks.SendPackList(pagination);
+        else if (c == '!') ListingPacks.SendPackList(pagination, isPrivate: true);
+        else if (c == '@') ListingPacks.SendFileList(pagination);
+        else     /* '*' */ ListingPacks.SendFileList(pagination, isPrivate: true);
         return Task.CompletedTask;
     }
 }

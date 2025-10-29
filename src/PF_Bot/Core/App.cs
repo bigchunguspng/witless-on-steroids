@@ -2,6 +2,7 @@ using System.Globalization;
 using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Features_Web.Boards.Core;
+using PF_Bot.Features_Web.Manga;
 using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages;
@@ -23,6 +24,9 @@ public static class App
     public  static               BoardService Chan4 => Chan4_Lazy.Value;
     private static readonly Lazy<PlankService>         Chan2_Lazy = new();
     public  static               PlankService Chan2 => Chan2_Lazy.Value;
+
+    private static readonly Lazy<TCB_Scans_Client>       TCB_Lazy = new();
+    public  static               TCB_Scans_Client TCB => TCB_Lazy.Value;
 
     public static bool LoggedIntoReddit => Reddit_Lazy.IsValueCreated;
 

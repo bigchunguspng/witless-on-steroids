@@ -32,6 +32,7 @@ public static class Registry
         CallbackKey_Boards = "b", // i_
         CallbackKey_Planks = "p", // i_
         CallbackKey_Nukes  = "n", // l
+        CallbackKey_Piece  = "tcb", // mc
         CallbackKey_Delete = "del";
 
     public static readonly CommandRegistry<Func<CallbackHandler>> CallbackHandlers
@@ -43,6 +44,7 @@ public static class Registry
             .Register(CallbackKey_Boards, () => new ChanEaterCore_Callback(ImageBoardContext.Chan4))
             .Register(CallbackKey_Planks, () => new ChanEaterCore_Callback(ImageBoardContext.Chan2))
             .Register(CallbackKey_Nukes,  () => new Nuke_Callback())
+            .Register(CallbackKey_Piece,  () => new Piece_Callback())
             .Register(CallbackKey_Delete, () => new Delete_Callback())
             .Build();
 
@@ -55,7 +57,6 @@ public static class Registry
         _tell  = new Tell(),
         _spam  = new Spam(),
         _help  = new Help(),
-        _piece = new Piece(),
         _react = new React(),
         _reply = new Reply(),
         _que   = new QueueMessage(),
@@ -121,10 +122,10 @@ public static class Registry
             .Register("im"     , () => new UseMagick())
             .Register("peg"    , () => new UseFFMpeg())
             .Register("pipe"   , () => new Pipe())
+            .Register("piece"  , () => new Piece())
             .Register("w"      , () => new BrowseReddit())
             .Register("wss"    , () => new FindSubreddits())
             .Register("link"   , () => new GetRedditLink())
-            .Register("piece"  , () => _piece)
             .Register("apeg"   , () => _apeg)
             .Register("aim"    , () => _aim)
             .Register("man"    , () => _help)

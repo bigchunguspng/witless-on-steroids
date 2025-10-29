@@ -6,8 +6,11 @@ public record ListPagination(MessageOrigin Origin, int MessageId = -1, int Page 
 
 public static class Listing
 {
-    public static InlineKeyboardMarkup GetPaginationKeyboard(int page, int perPage, int last, string key)
+    public static InlineKeyboardMarkup GetPaginationKeyboard
+        (this ListPagination pagination, int last, string key)
     {
+        var (_, _, page, perPage) = pagination;
+
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
         var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
 
@@ -19,5 +22,11 @@ public static class Listing
         return new InlineKeyboardMarkup(buttons);
 
         string CallbackData(int p) => $"{key} - {p} {perPage}";
+    }
+
+    public static int GetLastPageIndex
+        (this ListPagination pagination, int items_Count)
+    {
+        return (int)Math.Ceiling(items_Count / (double)pagination.PerPage) - 1;
     }
 }

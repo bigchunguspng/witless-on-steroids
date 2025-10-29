@@ -1,4 +1,8 @@
-﻿using PF_Bot.Routing.Messages.Commands;
+﻿using System.Text;
+using PF_Bot.Core;
+using PF_Bot.Features_Aux.Listing;
+using PF_Bot.Routing.Callbacks;
+using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Web.Manga;
@@ -8,95 +12,121 @@ namespace PF_Bot.Features_Web.Manga;
 // /piece titlekey        list chapers
 // /piece titlekey? N     dl chaper cbz
 // /man_piece             FULL MAN
+
+public class Piece_Callback : CallbackHandler
+{
+    protected override async Task Run()
+    {
+        var pagination = GetPagination(Content);
+
+        var c = Key[Registry.CallbackKey_Piece.Length];
+        if      (c == 'm') await ListingManga.ListMangas  (pagination);
+        else if (c == 'c') await ListingManga.ListChapters(pagination, await GetManga());
+    }
+
+    private static TCB_Scans_Cache Cache => TCB_Scans_Cache.Instance;
+
+    private async Task<Manga> GetManga()
+    {
+        var number = Key.Substring(Key.IndexOf('-') + 1);
+        var mangas = await Cache.EnsureMangasCached();
+        return mangas.First(x => x.Number == number);
+    }
+}
+
 public class /* One */ Piece : CommandHandlerAsync // 🍖
 {
     protected override async Task Run()
     {
-        if (Args != null)
-        {
-            if (Args == "info")
-            {
-                await ListTitles();
-            }
-            else if (Args.CanBeSplitN())
-            {
-                var bits = Args.SplitN(2);
-                var title   = bits[0];
-                var chapter = bits[1];
-
-                await DownloadChapter(title, chapter);
-            }
-            else
-                await ListChapters(title: Args);
-        }
-        else
-            SendManual(PIECE_MANUAL);
+        if      (Args == null)             SendManual(PIECE_MANUAL);
+        else if (Args == "info")     await ListTitles();
+        else if (Args.CanBeSplitN()) await DownloadChapter(Args.SplitN(2));
+        else /* (single argument) */ await ListChapters(title: Args);
     }
 
-    private static readonly TCB_Scans_Client _client = new();
+    private static TCB_Scans_Cache Cache => TCB_Scans_Cache.Instance;
 
     private async Task ListTitles()
     {
-        // https://tcbonepiecechapters.com/projects
-        // f/e:
-        // one-piece - One Piece | code - a
-        // https://tcbonepiecechapters.com/mangas/5/one-piece
-
-        // todo - show paginated, cache for 15 min
-
-        Bot.SendMessage(Origin, "<i>фича в разработке</i>");
+        await ListingManga.ListMangas(new ListPagination(Origin, PerPage: 10));
     }
 
-    // One Piece = one-piece | one-pi | one | 5 | . // = full / part / number / one-piece is default
-
+    private const string DEFAULT_TITLE = "one-piece";
+    
     private async Task ListChapters(string title)
     {
-        // https://tcbonepiecechapters.com/mangas/5/one-piece
-        // 1162 - God Valley Battle Royale | code - a
-        // https://tcbonepiecechapters.com/chapters/7899/one-piece-chapter-1162
+        if (title == ".") title = DEFAULT_TITLE;
 
-        // todo - show paginated, cache for 15 min
+        var manga = await GetManga(title);
+        if (manga == null) return;
 
-        Bot.SendMessage(Origin, "<i>фича в разработке</i>");
+        await ListingManga.ListChapters(new ListPagination(Origin, PerPage: 25), manga);
     }
 
-    private async Task DownloadChapter(string title, string number)
+    private async Task DownloadChapter(string[] args)
     {
-        if (title == ".") title = "one-piece";
+        var title  = args[0];
+        var number = args[1];
 
-        var titleURL = await _client.GetTitleURL(title);
-        if (titleURL == null)
-        {
-            SetBadStatus();
-            var text = PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny());
-            Bot.SendMessage(Origin, text);
-            return;
-        }
+        if (title == ".") title = DEFAULT_TITLE;
 
-        var chapterInfo = await _client.GetChapterInfo(titleURL, number);
-        if (chapterInfo == null)
-        {
-            SetBadStatus();
-            var code = title.Substring(title.LastIndexOf('/') + 1);
-            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), code);
-            Bot.SendMessage(Origin, text);
-            return;
-        }
+        var manga = await GetManga(title);
+        if (manga == null) return;
+
+        var chapter = await GetChapter(title, manga.URL, number);
+        if (chapter == null) return;
 
         MessageToEdit = Bot.PingChat(Origin, PLS_WAIT[Random.Shared.Next(5)]);
 
-        var pageURLs = await _client.GetPageURLs(chapterInfo.URL);
+        var pageURLs = await App.TCB.GetPageURLs(chapter.URL);
         var path = await new DownloadChapterCbzTask(pageURLs, title, number).Run();
 
         Bot.DeleteMessageAsync(Chat, MessageToEdit);
 
         await using var stream = File.OpenRead(path);
-        Bot.SendDocument(Origin, InputFile.FromStream(stream, GetCbzName(chapterInfo)));
-        Log($"{Title} >> {chapterInfo.MangaTitle} ch. {chapterInfo.Number}");
+        Bot.SendDocument(Origin, InputFile.FromStream(stream, GetCbzName(chapter)));
+        Log($"{Title} >> {chapter.MangaTitle} ch. {chapter.Number}");
+    }
+
+    //
+
+    private async Task<Manga?> GetManga(string title)
+    {
+        var mangas = await Cache.EnsureMangasCached();
+        var manga = int.TryParse(title, out _)
+            ? mangas
+                .FirstOrDefault(x => x.Number == title)
+            : mangas
+                .OrderBy(x => x.Code)
+                .FirstOrDefault(x => x.Code.Contains(title, StringComparison.OrdinalIgnoreCase));
+
+        if (manga == null)
+        {
+            var text = PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny());
+            SetBadStatus();
+            Bot.SendMessage(Origin, text);
+        }
+
+        return manga;
+    }
+
+    private async Task<Chapter?> GetChapter
+        (string title, string titleURL, string number)
+    {
+        var chapter = await App.TCB.GetChapter(titleURL, number);
+        if (chapter == null)
+        {
+            var code = title.Substring(title.LastIndexOf('/') + 1);
+            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), code);
+            SetBadStatus();
+            Bot.SendMessage(Origin, text);
+        }
+
+        return chapter;
     }
 
     private string GetCbzName
-        (TCB_Scans_Client.Chapter c) => c.ChapterTitle == null
+        (Chapter c) => c.ChapterTitle == null
         ? $"{c.MangaTitle} ch. {c.Number}.cbz"
         : $"{c.MangaTitle} ch. {c.Number} - {c.ChapterTitle}.cbz";
 }

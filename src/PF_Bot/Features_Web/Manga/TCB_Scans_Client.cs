@@ -2,6 +2,12 @@ using HtmlAgilityPack;
 
 namespace PF_Bot.Features_Web.Manga;
 
+public record Manga
+    (string URL, string Title, string Number, string Code);
+
+public record Chapter
+    (string URL, string MangaTitle, string? ChapterTitle, string Number);
+
 public class TCB_Scans_Client
 {
     private const string
@@ -16,29 +22,50 @@ public class TCB_Scans_Client
 
     private readonly HtmlWeb _web = new();
 
-    /// Return format: /mangas/5/one-piece
-    public async Task<string?> GetTitleURL(string title)
+    // TITLES
+
+    public async Task<List<Manga>> GetTitles()
     {
-        LogDebug($"TCB >> TITLE | {title}");
+        LogDebug("TCB >> TITLES");
         var doc = await _web.LoadFromWebAsync(URL_PROJECTS);
         return doc.DocumentNode.SelectNodes(_xp_ProjectsTitle)
-            .OrderBy(x => x.InnerText)
-            .Select(x => x.Attributes["href"].Value)
-            .FirstOrDefault(x => x.AsSpan(x.LastIndexOf('/') + 1).StartsWith(title, StringComparison.OrdinalIgnoreCase));
+            .Select(x =>
+            {
+                var url = x.Attributes["href"].Value;
+                var bits = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var number = bits[1];
+                var code   = bits[2];
+                return new Manga(URL_BASE + url, x.InnerText, number, code);
+            })
+            .OrderBy(x => x.Code)
+            .ToList();
     }
 
-    public record Chapter(string URL, string MangaTitle, string? ChapterTitle, string Number);
+    // CHAPTER(S)
 
-    /// Return format (Chapter.URL): /chapters/7899/one-piece-chapter-1162
-    public async Task<Chapter?> GetChapterInfo(string titleURL, string number)
+    public async Task<List<Chapter>> GetChapters(string titleURL)
     {
-        LogDebug($"TCB >> CHAPTER | {titleURL.AsSpan(8)}, {number}");
-        var doc = await _web.LoadFromWebAsync(URL_BASE + titleURL);
+        LogDebug($"TCB >> CHAPTERS | {TrimURL(titleURL, 8)}");
+        var doc = await _web.LoadFromWebAsync(titleURL);
+        return doc.DocumentNode.SelectNodes(_xp_TitleChapter)
+            .Select(ChapterFromNode)
+            .ToList();
+    }
+
+    public async Task<Chapter?> GetChapter(string titleURL, string number)
+    {
+        LogDebug($"TCB >> CHAPTER | {TrimURL(titleURL, 8)}, {number}");
+        var doc = await _web.LoadFromWebAsync(titleURL);
         var node = doc.DocumentNode.SelectNodes(_xp_TitleChapter)
             .FirstOrDefault(x => x.ChildNodes.First(x1 => x1.Name == "div").InnerText.EndsWith(number));
 
-        if (node is null) return null;
+        return node is null
+            ? null
+            : ChapterFromNode(node);
+    }
 
+    private Chapter ChapterFromNode(HtmlNode node)
+    {
         var url = node.Attributes["href"].Value;
         var divs = node.ChildNodes.Where(x => x.Name == "div").ToArray();
         var div1 = divs.Length > 0 ? divs[0].InnerText.MakeNull_IfEmpty() : null;
@@ -48,16 +75,22 @@ public class TCB_Scans_Client
         var   mangaTitle  = bits[0].Trim();
         var chapterNumber = bits[1].Trim();
         var chapterTitle  =   div2?.Trim();
-        return new Chapter(url, mangaTitle, chapterTitle, chapterNumber);
+        return new Chapter(URL_BASE + url, mangaTitle, chapterTitle, chapterNumber);
     }
 
-    /// Return format: Full URLs.
+    // PAGES
+
     public async Task<List<string>> GetPageURLs(string chapterURL)
     {
-        LogDebug($"TCB >> PAGES | {chapterURL.AsSpan(10)}");
-        var doc = await _web.LoadFromWebAsync(URL_BASE + chapterURL);
+        LogDebug($"TCB >> PAGES | {TrimURL(chapterURL, 10)}");
+        var doc = await _web.LoadFromWebAsync(chapterURL);
         return doc.DocumentNode.SelectNodes(_xp_ChapterPage)
             .Select(x => x.Attributes["src"].Value)
             .ToList();
     }
+
+    //
+
+    private static ReadOnlySpan<char> TrimURL
+        (string text, int offset) => text.AsSpan(URL_BASE.Length + offset);
 }

@@ -1,17 +1,10 @@
-﻿using System.Text;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages.Commands;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Web.Manga;
-
-// /piece                 SHORT MAN
-// /piece titles          list
-// /piece titlekey        list chapers
-// /piece titlekey? N     dl chaper cbz
-// /man_piece             FULL MAN
 
 public class Piece_Callback : CallbackHandler
 {
@@ -33,6 +26,12 @@ public class Piece_Callback : CallbackHandler
         return mangas.First(x => x.Number == number);
     }
 }
+
+/*  /piece                 SHORT GUIDE   *\
+    /piece info            list
+    /piece one-piece       list chapers
+    /piece one-piece 1162  dl chaper cbz
+\*  /man_piece             FULL MANUAL   */
 
 public class /* One */ Piece : CommandHandlerAsync // 🍖
 {
@@ -73,13 +72,14 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
         var manga = await GetManga(title);
         if (manga == null) return;
 
-        var chapter = await GetChapter(title, manga.URL, number);
+        var chapter = await GetChapter(manga, number);
         if (chapter == null) return;
 
         MessageToEdit = Bot.PingChat(Origin, PLS_WAIT[Random.Shared.Next(5)]);
 
         var pageURLs = await App.TCB.GetPageURLs(chapter.URL);
-        var path = await new DownloadChapterCbzTask(pageURLs, title, number).Run();
+        var task = new DownloadChapterCbzTask(pageURLs, manga.Code, chapter.Number);
+        var path = await task.Run();
 
         Bot.DeleteMessageAsync(Chat, MessageToEdit);
 
@@ -111,13 +111,12 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
     }
 
     private async Task<Chapter?> GetChapter
-        (string title, string titleURL, string number)
+        (Manga manga, string number)
     {
-        var chapter = await App.TCB.GetChapter(titleURL, number);
+        var chapter = await App.TCB.GetChapter(manga.URL, number);
         if (chapter == null)
         {
-            var code = title.Substring(title.LastIndexOf('/') + 1);
-            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), code);
+            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), manga.Code);
             SetBadStatus();
             Bot.SendMessage(Origin, text);
         }

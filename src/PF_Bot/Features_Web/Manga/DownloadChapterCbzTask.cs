@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Web.Manga;
 
@@ -14,7 +15,11 @@ public class DownloadChapterCbzTask
             .Combine(title),
         Dir_Chapter = Dir_Manga
             .Combine(title)
+            .Combine(chapter),
+        Dir_JPG     = Dir_Manga
+            .Combine(title)
             .Combine(chapter)
+            .Combine("JPG")
             .EnsureDirectoryExist();
 
     public async Task<FilePath> Run()
@@ -40,21 +45,27 @@ public class DownloadChapterCbzTask
 
     private async Task DownloadPages()
     {
-        var page = 0;
+        var paths = links.Select((link, i) =>
+        {
+            var page = 1 + i;
+            var name = $"{chapter} - {page:000}";
+            var path1 = Dir_Chapter.Combine($"{name}{Path.GetExtension(link)}");
+            var path2 = Dir_JPG    .Combine($"{name}.jpg");
+            return (URL: link, Download: path1, Compress: path2);
+        });
 
         using var client = HttpClientFactory.CreateClient();
-        foreach (var link in links)
+        var tasks = paths.Select(async x => 
         {
-            var name = $"{chapter} - {++page:000}{Path.GetExtension(link)}";
-            var path = Dir_Chapter.Combine(name);
-
-            await client.DownloadFileAsync(link, path);
-        }
+            await client.DownloadFileAsync(x.URL, x.Download);
+            await FFMpeg.Command(x.Download, x.Compress, "-q 5").FFMpeg_Run();
+        });
+        await Task.WhenAll(tasks);
     }
 
     private void AddPagesToArchive(string archive)
     {
-        var pages = Dir_Chapter.GetFiles($"{chapter} - *.*");
+        var pages = Dir_JPG.GetFiles($"{chapter} - *.*");
 
         using var zip = ZipFile.Open(archive, ZipArchiveMode.Update);
         foreach (var page in pages)

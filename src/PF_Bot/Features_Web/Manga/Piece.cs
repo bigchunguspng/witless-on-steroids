@@ -30,8 +30,7 @@ public class Piece_Callback : CallbackHandler
 /*  /piece                 SHORT GUIDE   *\
     /piece info            list
     /piece one-piece       list chapers
-    /piece one-piece 1162  dl chaper cbz
-\*  /man_piece             FULL MANUAL   */
+\*  /piece one-piece 1162  dl chaper cbz */
 
 public class /* One */ Piece : CommandHandlerAsync // 🍖
 {

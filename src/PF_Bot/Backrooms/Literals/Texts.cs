@@ -219,13 +219,24 @@ public static class Texts
 
     public const string PIECE_MANUAL =
         """
-        Фича закрыта на ремонт.
-
+        🍱 <u><b>Блин блинский мангу скачать</b></u>
+        
+        🧐 Откуда качаем? <a href='https://tcbonepiecechapters.com/'>Отсюда</a>
+        
         <b>Синтаксис:</b>
-        <code>/piece [хз]</code>
-
-        <blockquote><b>Например:</b>
-        /piece чё-то там</blockquote>
+        <code>/piece info</code> - список тайтлов (числа и кодовые имена)
+        <code>/piece [тайтл]</code> - список глав
+        <code>/piece [тайтл] [глава]</code> - скачать
+        
+        <blockquote expandable><b>Примеры:</b>
+        📃 <code>/piece one-piece</code>
+        📃 <code>/piece 5</code>
+        💾 <code>/piece one-piece 1045</code>
+        💾 <code>/piece 5 1045</code>
+        📃 <code>/piece jujutsu-kaisen</code>
+        📃 <code>/piece 4</code>
+        💾 <code>/piece jujutsu-kaisen 221</code>
+        💾 <code>/piece 4 221</code></blockquote>
         """;
 
     public const string PIECE_MANGA_NOT_FOUND =

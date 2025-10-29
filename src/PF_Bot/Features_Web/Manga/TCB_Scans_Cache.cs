@@ -32,6 +32,7 @@ public class TCB_Scans_Cache
         if (cache.TryGetValue_Failed(out var chapters))
         {
             chapters = await App.TCB.GetChapters(manga.URL);
+            chapters.Reverse();
             cache.Set(chapters);
         }
 

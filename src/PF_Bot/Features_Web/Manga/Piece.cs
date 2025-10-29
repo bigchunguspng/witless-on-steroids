@@ -60,7 +60,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
         var manga = await GetManga(title);
         if (manga == null) return;
 
-        await ListingManga.ListChapters(new ListPagination(Origin, PerPage: 25), manga);
+        await ListingManga.ListChapters(new ListPagination(Origin, Page: -1, PerPage: 25), manga);
     }
 
     private async Task DownloadChapter(string[] args)

@@ -11,6 +11,8 @@ public static class Listing
     {
         var (_, _, page, perPage) = pagination;
 
+        if (page < 0) page = last;
+
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
         var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
 

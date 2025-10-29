@@ -39,6 +39,8 @@ public static class ListingManga
         var paginated = chapters.Count > perPage;
         var lastPage = pagination.GetLastPageIndex(chapters.Count);
 
+        if (page < 0) page = lastPage;
+
         var sb = new StringBuilder(GetFunnyMangaEmoji(manga.Number));
         sb.Append(" <b>").Append(manga.Title).Append("</b>");
         if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");

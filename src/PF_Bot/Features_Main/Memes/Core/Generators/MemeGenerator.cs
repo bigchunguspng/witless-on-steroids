@@ -19,11 +19,13 @@ public struct MemeOptions_Meme()
     /// Color to fill sticker background with.
     public ColorOption CustomColorBack;
     public ColorOption CustomColorText;
+    public ColorOption CustomColorShad;
 
     /// Text vertical offset, 0-100%
     /// If negative, standart 2-text meme is generated.
     public int TextOffset         =  -1;
     public int FontSizeMultiplier = 100;
+    public int ShadowThickness    = 100;
 
     public byte ShadowOpacity = 100;
 
@@ -52,6 +54,8 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
 
     // DATA
 
+    private Rgba32 _shadowColor = Color.Black;
+
     private SolidBrush _textBrush = null!;
 
     private readonly SolidBrush _white = new(Color.White);
@@ -71,7 +75,7 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
 
         using var image = await GetImage(request);
 
-        SetCaptionColor(image);
+        SetCaptionColors(image);
         using var caption = DrawCaption(text);
         using var meme = Combine(image, caption);
 
@@ -88,7 +92,7 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
     {
         await FetchVideoSize(request);
         SetUp();
-        SetCaptionColor(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
+        SetCaptionColors(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var caption = DrawCaption(text);
         var captionAsFile = await ImageSaver.SaveImageTemp(caption);
@@ -187,21 +191,22 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
         return (FontSize * GetLineSpacing() * text.GetLineCount(), FontSize);
     }
 
-    private void SetCaptionColor(Image<Rgba32>? image)
+    private void SetCaptionColors(Image<Rgba32>? image)
     {
-        var color = op.CustomColorText.GetColor(image);
-        _textBrush = color is not null 
-            ? new SolidBrush(color.Value) 
-            : op.RandomTextColor ? RandomColor() : _white;
+        var colorText = op.CustomColorText.GetColor(image);
+        _textBrush = colorText is not null 
+            ? new SolidBrush(colorText.Value) 
+            : op.RandomTextColor ? new SolidBrush(RandomColor()) : _white;
+        _shadowColor = op.CustomColorShad.GetColor(image) ?? Color.Black;
     }
 
-    private SolidBrush RandomColor()
+    private Color RandomColor()
     {
         var h =       Random.Shared.Next(360);
         var s = (byte)Random.Shared.Next(50, 100);
         var l = (byte)Random.Shared.Next(50,  95);
 
         var rgb = ColorConverter.HslToRgb(new HSL(h, s, l));
-        return new SolidBrush(rgb.ToRgb24());
+        return rgb.ToRgb24();
     }
 }

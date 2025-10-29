@@ -17,10 +17,12 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         var pixelated = op.FontOption.FontIsPixelated();
 
-        var opacity = op.ShadowOpacity / 100F;
-        var maxOpacity = (255 * opacity).RoundInt().ClampByte();
+        var opacity_rel = op.ShadowOpacity / 100F;
+        var opacity_abs = (255 * opacity_rel).RoundInt().ClampByte();
 
-        Func<int, int, double, double> getShadowOpacity = pixelated ? SquareShadow : RoundShadow;
+        Func<int, int, double, double> getShadowOpacity = pixelated
+            ? GetShadowOpacity_Square
+            : GetShadowOpacity_Round;
 
         var sw = Stopwatch.StartNew();
 
@@ -47,16 +49,20 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
 
         void ShadowImagePart(float fontSize, Rectangle rectangle)
         {
-            var w = Math.Sqrt(fontSize) / (pixelated ? 1.6F : 2F);
+            var w = op.ShadowThickness / 100F * Math.Sqrt(fontSize) / (pixelated ? 1.6F : 2F);
             var w2 = (int)Math.Ceiling(w) + 2;
 
             var width  = textLayer.Width;
             var height = textLayer.Height;
-            
+
+            var color = _shadowColor;
+
             shadowRealm.ProcessPixelRows(accessor =>
             {
-                for (var y = rectangle.Y; y < rectangle.Bottom; y++)
-                for (var x = rectangle.X; x < rectangle.Right;  x++)
+                var y_max  = rectangle.Bottom;
+                var x_max  = rectangle.Right;
+                for (var y = rectangle.Y; y < y_max; y++)
+                for (var x = rectangle.X; x < x_max; x++)
                 {
                     var textA = textLayer[x, y].A;
                     if (textA == 0) continue;
@@ -76,13 +82,13 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
                             ref var pixel = ref row[kx];
 
                             var shadowA = pixel.A;
-                            if (shadowA == maxOpacity) continue;
+                            if (shadowA == opacity_abs) continue;
 
-                            var shadowOpacity = opacity * getShadowOpacity(kx - x, ky - y, w);
+                            var shadowOpacity = opacity_rel * getShadowOpacity(kx - x, ky - y, w);
                             if (shadowOpacity == 0) continue;
 
-                            var a = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
-                            pixel = new Rgba32(0, 0, 0, a);
+                            color.A = Math.Max(shadowA, shadowOpacity * textA).RoundInt().ClampByte();
+                            pixel = color;
                         }
                     }
                 }
@@ -90,13 +96,13 @@ public partial class MemeGenerator // SHADOW (THE HEDGEHOG THE ULTIMATE LIFE FOR
         }
     }
 
-    private double RoundShadow(int kx, int ky, double w)
+    private double GetShadowOpacity_Round(int kx, int ky, double w)
     {
         var r = Math.Sqrt(kx * kx + ky * ky);
         return Math.Clamp(1 - 2 * (r - w), 0, 1);
     }
 
-    private double SquareShadow(int kx, int ky, double w)
+    private double GetShadowOpacity_Square(int kx, int ky, double w)
     {
         var x = Math.Abs(kx);
         var y = Math.Abs(ky);

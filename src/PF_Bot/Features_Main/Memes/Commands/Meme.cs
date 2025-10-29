@@ -9,6 +9,7 @@ public class Meme : Meme_Core<TextPair>
     private static readonly FontWizard _fontWizard = new ("im");
     private static readonly ColorWizard _colorWizardBack = new ("_");
     private static readonly ColorWizard _colorWizardText = new ("#");
+    private static readonly ColorWizard _colorWizardShad = new ("!");
 
     private MemeOptions_Meme _options;
 
@@ -34,11 +35,13 @@ public class Meme : Meme_Core<TextPair>
     {
         _options.CustomColorBack = _colorWizardBack.CheckAndCut(MemeOptions);
         _options.CustomColorText = _colorWizardText.CheckAndCut(MemeOptions);
+        _options.CustomColorShad = _colorWizardShad.CheckAndCut(MemeOptions);
 
         _options.FontOption = _fontWizard.CheckAndCut(MemeOptions);
 
         _options.FontSizeMultiplier = MemeOptions.GetInt(_r_fontSize, 100);
-        _options.ShadowOpacity      = MemeOptions.GetInt(_r_shadow, 100).ClampByte().Clamp100();
+        _options.ShadowOpacity      = MemeOptions.GetInt(_r_shadowO, 100).ClampByte().Clamp100();
+        _options.ShadowThickness    = MemeOptions.GetInt(_r_shadowT, 100);
         _options.TextOffset         = MemeOptions.GetInt(_r_offset, -1);
 
         _options.RandomTextOffset   = MemeOptions.CheckAndCut(_r_randomOffset);
@@ -127,6 +130,7 @@ public class Meme : Meme_Core<TextPair>
 
     private static readonly Regex
         _r_fontSize = new(@"(\d{1,3})("")", RegexOptions.Compiled),
-        _r_shadow   = new(@"(\d{1,3})(%)",  RegexOptions.Compiled),
+        _r_shadowO  = new(@"(\d{1,3})(%)",  RegexOptions.Compiled),
+        _r_shadowT  = new(@"(\d{1,3})(w)",  RegexOptions.Compiled),
         _r_offset   = new(@"(\d{1,3})(!)",  RegexOptions.Compiled);
 }

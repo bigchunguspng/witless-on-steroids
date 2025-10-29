@@ -102,7 +102,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
 
         if (manga == null)
         {
-            var text = PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny());
+            var text = PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), title);
             SetBadStatus();
             Bot.SendMessage(Origin, text);
         }
@@ -113,10 +113,11 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
     private async Task<Chapter?> GetChapter
         (Manga manga, string number)
     {
-        var chapter = await App.TCB.GetChapter(manga.URL, number);
+        var chapters = await Cache.EnsureChaptersCached(manga);
+        var chapter = chapters.FirstOrDefault(x => x.Number == number);
         if (chapter == null)
         {
-            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), manga.Code);
+            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), number, manga.Code);
             SetBadStatus();
             Bot.SendMessage(Origin, text);
         }

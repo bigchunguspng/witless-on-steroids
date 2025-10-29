@@ -230,16 +230,16 @@ public static class Texts
 
     public const string PIECE_MANGA_NOT_FOUND =
         """
-        Не удалось найти тайтл {0}
+        {0} Не удалось найти тайтл "{1}"
 
         Пропишите <code>/piece info</code> чтобы посмотреть список тайтлов.
         """;
 
     public const string PIECE_CHAPTER_NOT_FOUND =
         """
-        Не удалось найти главу {0}
+        {0} Не удалось найти главу "{1}"
 
-        Пропишите <code>/piece {1}</code> чтобы посмотреть список глав.
+        Пропишите <code>/piece {2}</code> чтобы посмотреть список глав.
         """;
 
     public const string LINK_MANUAL =

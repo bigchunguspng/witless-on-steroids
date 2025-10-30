@@ -8,6 +8,7 @@ public class Snap : Meme_Core<string>
 {
     private static readonly FontWizard _fontWizard = new ("rg");
     private static readonly ColorWizard _colorWizardBack = new ("_");
+    private static readonly ColorWizard _colorWizardCard = new ("!");
     private static readonly ColorWizard _colorWizardText = new ("#");
 
     private MemeOptions_Snap _options;
@@ -32,6 +33,7 @@ public class Snap : Meme_Core<string>
         _options.RandomTextOffset = MemeOptions.CheckAndCut(_r_randomOffset);
 
         _options.CustomColorBack = _colorWizardBack.CheckAndCut(MemeOptions);
+        _options.CustomColorCard = _colorWizardCard.CheckAndCut(MemeOptions);
         _options.CustomColorText = _colorWizardText.CheckAndCut(MemeOptions);
 
         _options.FontOption = _fontWizard.CheckAndCut(MemeOptions);

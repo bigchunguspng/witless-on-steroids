@@ -233,9 +233,9 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
     private void SetCaptionColors(Image<Rgba32>? image)
     {
         var colorText = op.CustomColorText.GetColor(image);
-        _textBrush = colorText is not null 
-            ? new SolidBrush(colorText.Value) 
-            : op.RandomTextColor ? new SolidBrush(RandomTextColor()) : _white;
+        _textBrush = colorText.HasValue ? new SolidBrush(colorText.Value)
+            : op.RandomTextColor        ? new SolidBrush(RandomTextColor())
+            : _white;
         _shadowColor = op.CustomColorShad.GetColor(image) ?? Color.Black;
     }
 

@@ -17,6 +17,7 @@ public struct MemeOptions_Snap()
 
     /// Color to fill sticker background with.
     public ColorOption CustomColorBack;
+    public ColorOption CustomColorCard;
     public ColorOption CustomColorText;
 
     // Vertical offset of text card, 0-100%.
@@ -42,6 +43,8 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
 
     // DATA
 
+    private Color _cardColor = Color.Black;
+
     private SolidBrush _textBrush = null!;
 
     private readonly SolidBrush _white = new(Color.White);
@@ -53,7 +56,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
 
         using var image = await GetImage(request);
 
-        SetCaptionColor(image);
+        SetCaptionColors(image);
         using var card = DrawText(text);
         using var meme = Combine(image, card);
 
@@ -70,7 +73,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
     {
         await FetchVideoSize(request);
         SetUp();
-        SetCaptionColor(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
+        SetCaptionColors(op.CustomColorText.ByCoords ? await request.GetVideoSnapshot() : null);
 
         using var caption = DrawText(text);
         var captionAsFile = await ImageSaver.SaveImageTemp(caption);
@@ -130,7 +133,7 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         {
             var y = (_offsetY - 0.5 * _cardHeight).RoundInt();
             var rect = new Rectangle(0, y, _w, _cardHeight);
-            var color = new Rgba32(0, 0, 0, op.CardOpacity / 100F);
+            var color = _cardColor.WithAlpha(op.CardOpacity / 100F);
             x.Fill(color, rect);
         });
 
@@ -161,11 +164,12 @@ public partial class SnapChat(MemeOptions_Snap op) : MemeGeneratorBase, IMemeGen
         return meme;
     }
 
-    private void SetCaptionColor(Image<Rgba32>? image)
+    private void SetCaptionColors(Image<Rgba32>? image)
     {
-        var color = op.CustomColorText.GetColor(image);
-        _textBrush = color is null
-            ? _white
-            : new SolidBrush(color.Value);
+        var colorText = op.CustomColorText.GetColor(image);
+        _textBrush = colorText.HasValue
+            ? new SolidBrush(colorText.Value)
+            : _white;
+        _cardColor = op.CustomColorCard.GetColor(image) ?? Color.Black;
     }
 }

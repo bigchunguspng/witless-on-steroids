@@ -23,9 +23,9 @@ public readonly struct ColorOption(ColorOptionMode mode, Rgba32 color = default,
 
     public Rgba32? GetColor(Image<Rgba32>? image) => Mode switch
     {
-        ColorOptionMode.Off        => null,
-        ColorOptionMode.Color => Color,
-        ColorOptionMode.Coords   => PickColor(image!),
+        ColorOptionMode.Off    => null,
+        ColorOptionMode.Color  => Color,
+        ColorOptionMode.Coords => PickColor(image!),
         _ => throw new ArgumentOutOfRangeException(),
     };
 

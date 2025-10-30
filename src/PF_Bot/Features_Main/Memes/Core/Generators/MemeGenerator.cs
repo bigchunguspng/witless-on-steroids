@@ -125,14 +125,53 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
         {
             using var image = await GetImage(request.SourcePath);
 
-            var color = op.CustomColorBack.GetColor(image) ?? Color.Black;
-            var background = new Image<Rgba32>(_w, _h, color);
+            var color = op.CustomColorBack.GetColor(image);
+            var background = color.HasValue
+                ?     new Image<Rgba32>(_w, _h, color.Value)
+                : image.HasTransparentAreas(200)
+                    ? await GetFunnyBackground()
+                    : new Image<Rgba32>(_w, _h, Color.White);
 
             background.Mutate(x => x.DrawImage(image));
             return background;
         }
         else
             return await GetImage(request.SourcePath);
+    }
+
+    private async Task<Image<Rgba32>> GetFunnyBackground()
+    {
+        var sw = Stopwatch.StartNew();
+        var file = Dir_Backs.GetFiles().PickAny();
+        var back = await Image.LoadAsync<Rgba32>(file);
+        var size = back.Size.AdjustBackgroundSize(new Size(_w, _h));
+        var x = (size.Width  - _w) / 2;
+        var y = (size.Height - _h) / 2;
+        var crop = new Rectangle(x, y, _w, _h);
+        back.Mutate(ctx =>
+        {
+            if (size != back.Size)
+                ctx.Resize(size);
+
+            if (size != crop.Size && crop.Location != Point.Empty)
+                ctx.Crop(crop);
+        });
+        sw.Log("/meme -> GetFunnyBackground");
+        return back;
+    }
+
+    public static void ScaleBackgrounds()
+    {
+        var stickerSize = new Size(512, 512);
+        foreach (var file in Dir_Backs.Combine("_").GetFiles())
+        {
+            var image = Image.Load<Rgba32>(file);
+            var size  = image.Size.AdjustBackgroundSize(stickerSize);
+            image.Mutate(ctx => ctx.Resize(size));
+            var name = Path.GetFileNameWithoutExtension(file);
+            var path = Dir_Backs.Combine(name + ".png");
+            image.SaveAsPng(path);
+        }
     }
 
     private Image<Rgba32> Combine(Image<Rgba32> image, Image<Rgba32> caption)
@@ -196,11 +235,11 @@ public partial class MemeGenerator(MemeOptions_Meme op) : MemeGeneratorBase, IMe
         var colorText = op.CustomColorText.GetColor(image);
         _textBrush = colorText is not null 
             ? new SolidBrush(colorText.Value) 
-            : op.RandomTextColor ? new SolidBrush(RandomColor()) : _white;
+            : op.RandomTextColor ? new SolidBrush(RandomTextColor()) : _white;
         _shadowColor = op.CustomColorShad.GetColor(image) ?? Color.Black;
     }
 
-    private Color RandomColor()
+    private Color RandomTextColor()
     {
         var h =       Random.Shared.Next(360);
         var s = (byte)Random.Shared.Next(50, 100);

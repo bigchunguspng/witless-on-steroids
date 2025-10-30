@@ -49,6 +49,8 @@ namespace PF_Bot.Core;
     Static/
         ASCII/
             xd.txt
+        Backs/
+            win xp.png
         Emoji/
             1f4af-1f3a6.png
         Fonts/
@@ -108,6 +110,7 @@ public static class Paths
         Dir_RedditMemes = Dir_Pics.Combine("Memes"),
         // Static/
         Dir_ASCII  = Dir_Static.Combine("ASCII"),
+        Dir_Backs  = Dir_Static.Combine("Backs"),
         Dir_Emoji  = Dir_Static.Combine("Emoji"),
         Dir_Fonts  = Dir_Static.Combine("Fonts"),
         Dir_Manual = Dir_Static.Combine("Manual"),

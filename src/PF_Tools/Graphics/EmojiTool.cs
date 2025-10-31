@@ -92,11 +92,20 @@ public static class EmojiTool
 
     private static Image<Rgba32> DrawEmojiTextParagraph
     (
-        string paragraph, RichTextOptions rto, Options options, Queue<string> pngs
+        string paragraph, // all png-mapped emojis replaced with "👌"
+        RichTextOptions rto,
+        Options options,
+        Queue<string> pngs // actual emoji pngs/characters for all paragraphs
     )
     {
-        var  textChunks = _rgx_Emoji.Replace(paragraph, "\t").Split('\t');
+        var  textChunks = _rgx_Emoji.Replace(paragraph, "\t").Split('\t'); // last chunk can be empty
         var emojiChunks = GetEmojiPngs(_rgx_Emoji.Matches(paragraph));
+        //  ↑ Fake pngs (each item is "👌" png path). Used to know amount of emojis in this paragraph.
+
+        var   emojiSize = options.EmojiSize.RoundInt();
+        var  paragpaphM = string.Join("👌", textChunks); // replace all emoji clusters (including false matches) with "👌"
+        var  textWidths = GetTextChunksWidths(Ruler.MeasureTextSuperCool(paragpaphM, rto, emojiSize));
+        //     ↑ Widths of text chunks. Calculated upfront to display spaces before emoji chunks.
 
         var width  = options.Width;
         var height = rto.Font.Size * rto.LineSpacing;
@@ -123,12 +132,11 @@ public static class EmojiTool
 
         void DrawEmoji(List<string> sequence)
         {
-            var side = options.EmojiSize.RoundInt();
-            var size = new Size(side, side);
+            var size = new Size(emojiSize, emojiSize);
             var decoder = new DecoderOptions
             {
                 TargetSize = size,
-                Sampler = KnownResamplers.Lanczos2
+                Sampler = KnownResamplers.Lanczos2,
             };
 
             foreach (var _ in sequence)
@@ -137,34 +145,42 @@ public static class EmojiTool
                 if (emoji.EndsWith(".png"))
                 {
                     var image = Image.Load<Rgba32>(decoder, emoji);
-                    if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(Math.Max(side / 16, 2)));
+                    if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(Math.Max(emojiSize / 16, 2)));
 #if DEBUG
                     canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
 #endif
                     canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffsetEmo(), new GraphicsOptions()));
-                    MoveX(side);
+                    MoveX(emojiSize);
                 }
-                else DrawText(emoji);
+                else DrawText(emoji, measure: true);
             }
         }
 
-        void DrawText(string text) // todo make emoji drawer a transient class with methods ?
+        void DrawText(string text, bool measure = false) // todo make emoji drawer a transient class with methods ?
         {
+            if (text == "") return;
+
             var optionsW = new RichTextOptions(rto)
             {
                 WrappingLength = -1,
-                Origin = GetDrawingOffsetTxt()
+                Origin = GetDrawingOffsetTxt(),
             }.WithDefaultAlignment();
 
-            var textSize = Ruler.MeasureTextSize(text, optionsW, out _);
+            var textWidth = measure
+                ? Ruler.MeasureTextSize(text, optionsW, out _).Width
+                : textWidths.TryDequeue(out var w) ? w : 0;
+#if DEBUG
+            if (measure)
+            {
+                var size = new Size((int)textWidth, emojiSize);
+                canvas.Mutate(ctx => ctx.Fill(Color.Bisque, new Rectangle(GetDrawingOffsetTxt(), size)));
+            }
+#endif
             canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
-            MoveX((int)textSize.Width);
+            MoveX((int)textWidth);
         }
 
-        void MoveX(int offset)
-        {
-            x += offset;
-        }
+        void MoveX(int offset) => x += offset;
 
         Point GetDrawingOffsetEmo() => new(x, margin + 0);
         Point GetDrawingOffsetTxt() => new(x, margin + options.FontOffset.RoundInt());
@@ -172,6 +188,31 @@ public static class EmojiTool
         Image<Rgba32> GetEmptyCanvas() => new(width, safeHeight);
     }
 
+    private static Queue<float> GetTextChunksWidths(LinkedList<TextChunk> chunks)
+    {
+        var widths = new List<float>();
+
+        var clusters = chunks
+            .Select(x => (IsEmoji: x.Type == CharType.Emoji, x.Width))
+            .Where(x => x.Width != 0)
+            .ToArray();
+
+        var last_IsEmoji = clusters[0].IsEmoji.Janai();
+
+        foreach (var cluster in clusters)
+        {
+            var sameType = cluster.IsEmoji == last_IsEmoji;
+            if (cluster.IsEmoji.Janai())
+            {
+                if (sameType) widths[^1] += cluster.Width;
+                else          widths.Add   (cluster.Width);
+            }
+
+            last_IsEmoji = cluster.IsEmoji;
+        }
+
+        return new Queue<float>(widths);
+    }
 
     // NOT DRAWING
 

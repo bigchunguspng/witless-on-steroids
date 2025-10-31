@@ -144,7 +144,7 @@ public static class EmojiTool
                 var emoji = pngs.Dequeue();
                 if (emoji.EndsWith(".png"))
                 {
-                    var image = Image.Load<Rgba32>(decoder, emoji);
+                    var image = LoadEmojiImage_Cached(emoji, decoder);
                     if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(Math.Max(emojiSize / 16, 2)));
 #if DEBUG
                     canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
@@ -302,20 +302,39 @@ public static class EmojiTool
         return pngs;
     }
 
-    private static readonly LimitedCache<string, string[]> _emojiCache = new(128);
+    // CACHE
+
+    public static int EmojisCache_Count => _emojiCache_Pngs.Count;
+
+    private static readonly LimitedCache<string, string[]>
+        _emojiCache_Pngs   = new(128);
+
+    private static readonly LimitedCache<(string, Size), Image<Rgba32>>
+        _emojiCache_Images = new (32);
 
     private static string[] GetEmojiFiles_Cached(string name)
     {
-        if (_emojiCache.Contains_No(name, out var files))
+        if (_emojiCache_Pngs.Contains_No(name, out var files))
         {
             files = Directory_EmojiPNGs.GetFiles(name + "*.png");
-            _emojiCache.Add(name, files);
+            _emojiCache_Pngs.Add(name, files);
         }
 
         return files;
     }
 
-    public static int EmojisCache_Count => _emojiCache.Count;
+    private static Image<Rgba32> LoadEmojiImage_Cached
+        (string path, DecoderOptions decoder)
+    {
+        var key = (path, decoder.TargetSize.GetValueOrDefault());
+        if (_emojiCache_Images.Contains_No(key, out var image))
+        {
+            image = Image.Load<Rgba32>(decoder, path);
+            _emojiCache_Images.Add(key, image);
+        }
+
+        return image;
+    }
 }
 
 /// List of emoji clusters.

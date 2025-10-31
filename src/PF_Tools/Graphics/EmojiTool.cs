@@ -190,6 +190,8 @@ public static class EmojiTool
 
     private static Queue<float> GetTextChunksWidths(LinkedList<TextChunk> chunks)
     {
+        if (chunks.Count == 0) return new Queue<float>();
+
         var widths = new List<float>();
 
         var clusters = chunks

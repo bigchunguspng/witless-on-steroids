@@ -15,6 +15,7 @@ namespace PF_Tools.Graphics;
 /// <li>Get emoji PNGs from a <see cref="Directory_EmojiPNGs">folder</see>.</li>
 public static class EmojiTool
 {
+    /// Set this to an actual path before using.
     public static FilePath Directory_EmojiPNGs;
 
     [StringSyntax("Regex")] private const string EMOJI_REGEX_PATTERN =
@@ -35,6 +36,8 @@ public static class EmojiTool
         _rgx_Emoji = new(EMOJI_REGEX_PATTERN, RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace),
         _rgx_Magic = new(@"[\u231a-\u303d]",  RegexOptions.Compiled);
 
+    private static readonly GraphicsOptions _graphicsOptions = new();
+
     /// Finds all emojis and emoji-like characters in text using regex.
     public static MatchCollection FindEmoji(string text)
     {
@@ -54,7 +57,10 @@ public static class EmojiTool
     /// Renders multiline text with emojis.
     public static Image<Rgba32> DrawEmojiText
     (
-        string text, RichTextOptions rto, Options options, Queue<string> pngs
+        string text,
+        RichTextOptions rto,
+        Options options,
+        Queue<string> pngs
     )
     {
         // RENDER EACH PARAGRAPH
@@ -67,23 +73,25 @@ public static class EmojiTool
 
         // COMBINE
 
+        var lineHeight = rto.Font.Size * rto.LineSpacing;
+
         var width  = options.Width;
-        var height = rto.Font.Size * rto.LineSpacing;
+        var height = ((lines.Count + 0.5F) * lineHeight).RoundInt();
 
-        var canvas = new Image<Rgba32>(width, ((lines.Count + 0.5F) * height).RoundInt());
+        var canvas = new Image<Rgba32>(width, height);
 
-        var offsetY = 0.25F;
+        var y = 0F;
         foreach (var line in lines)
         {
             var x = rto.HorizontalAlignment switch
             {
                 HorizontalAlignment.Center => (width - line.Width) / 2,
                 HorizontalAlignment.Right  =>  width - line.Width,
-                _ => 0
+                _ => 0,
             };
-            var point = new Point(x, offsetY.RoundInt());
+            var point = new Point(x, y.RoundInt());
             canvas.Mutate(ctx => ctx.DrawImage(line, point));
-            offsetY += height;
+            y += lineHeight;
             line.Dispose();
         }
 
@@ -98,23 +106,36 @@ public static class EmojiTool
         Queue<string> pngs // actual emoji pngs/characters for all paragraphs
     )
     {
+        // MEASURE
+
         var  textChunks = _rgx_Emoji.Replace(paragraph, "\t").Split('\t'); // last chunk can be empty
         var emojiChunks = GetEmojiPngs(_rgx_Emoji.Matches(paragraph));
         //  ↑ Fake pngs (each item is "👌" png path). Used to know amount of emojis in this paragraph.
 
-        var   emojiSize = options.EmojiSize.RoundInt();
+        var  emojiWidth = options.EmojiSize.RoundInt();
         var  paragpaphM = string.Join("👌", textChunks); // replace all emoji clusters (including false matches) with "👌"
-        var  textWidths = GetTextChunksWidths(Ruler.MeasureTextSuperCool(paragpaphM, rto, emojiSize));
+        var  textWidths = GetTextChunksWidths(Ruler.MeasureTextSuperCool(paragpaphM, rto, emojiWidth));
         //     ↑ Widths of text chunks. Calculated upfront to display spaces before emoji chunks.
 
-        var width  = options.Width;
-        var height = rto.Font.Size * rto.LineSpacing;
-        var safeHeight = (1.5F * height).CeilingInt();
-        var margin = (0.25F * height).RoundInt();
+        // RENDER
 
-        var canvas = GetEmptyCanvas();
+        var emojiSize = new Size(emojiWidth, emojiWidth);
+        var emojiDecoder = new DecoderOptions
+        {
+            TargetSize = emojiSize,
+            Sampler = KnownResamplers.Lanczos2,
+        };
+
+        var textOptions = new RichTextOptions(rto) { WrappingLength = -1 }.WithDefaultAlignment();
+
+        var     width  = options.Width;
+        var lineHeight = rto.Font.Size * rto.LineSpacing;
+        var safeHeight =  (1.5F * lineHeight).CeilingInt();
+        var     margin = (0.25F * lineHeight).RoundInt();
+
+        var canvas = new Image<Rgba32>(width, safeHeight);
+
         var x = 0;
-
         for (var i = 0; i < emojiChunks.Count; i++)
         {
             DrawText ( textChunks[i]);
@@ -130,53 +151,45 @@ public static class EmojiTool
 
         // == FUN ==
 
-        void DrawEmoji(List<string> sequence)
+        void DrawEmoji(List<string> cluster)
         {
-            var size = new Size(emojiSize, emojiSize);
-            var decoder = new DecoderOptions
-            {
-                TargetSize = size,
-                Sampler = KnownResamplers.Lanczos2,
-            };
-
-            foreach (var _ in sequence)
+            foreach (var _ in cluster)
             {
                 var emoji = pngs.Dequeue();
-                if (emoji.EndsWith(".png"))
+                if (emoji.EndsWith(".png").Janai()) DrawText(emoji, emoji_mismatch: true);
+                else
                 {
-                    var image = LoadEmojiImage_Cached(emoji, decoder);
-                    if (options.Pixelate) image.Mutate(ctx => ctx.Pixelate(Math.Max(emojiSize / 16, 2)));
+                    var image = LoadEmojiImage_Cached(emoji, emojiDecoder);
+                    var point = GetDrawingOffsetEmo();
+                    if (options.Pixelate)
+                        image.Mutate(ctx => ctx.Pixelate(Math.Max(emojiWidth / 16, 2)));
 #if DEBUG
-                    canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(GetDrawingOffsetEmo(), size)));
+                    canvas.Mutate(ctx => ctx.Fill(Color.Gold, new Rectangle(point, emojiSize)));
 #endif
-                    canvas.Mutate(ctx => ctx.DrawImage(image, GetDrawingOffsetEmo(), new GraphicsOptions()));
-                    MoveX(emojiSize);
+                    canvas.Mutate(ctx => ctx.DrawImage(image, point, _graphicsOptions));
+                    MoveX(emojiWidth);
                 }
-                else DrawText(emoji, measure: true);
             }
         }
 
-        void DrawText(string text, bool measure = false) // todo make emoji drawer a transient class with methods ?
+        void DrawText(string text, bool emoji_mismatch = false)
         {
             if (text == "") return;
 
-            var optionsW = new RichTextOptions(rto)
-            {
-                WrappingLength = -1,
-                Origin = GetDrawingOffsetTxt(),
-            }.WithDefaultAlignment();
+            var point = GetDrawingOffsetTxt();
+            textOptions.Origin = point;
 
-            var textWidth = measure
-                ? Ruler.MeasureTextSize(text, optionsW, out _).Width
+            var textWidth = emoji_mismatch
+                ? Ruler.MeasureTextSize(text, textOptions, out _).Width
                 : textWidths.TryDequeue(out var w) ? w : 0;
 #if DEBUG
-            if (measure)
+            if (emoji_mismatch)
             {
-                var size = new Size((int)textWidth, emojiSize);
-                canvas.Mutate(ctx => ctx.Fill(Color.Bisque, new Rectangle(GetDrawingOffsetTxt(), size)));
+                var size = new Size((int)textWidth, emojiWidth);
+                canvas.Mutate(ctx => ctx.Fill(Color.Bisque, new Rectangle(point, size)));
             }
 #endif
-            canvas.Mutate(ctx => ctx.DrawText(optionsW, text, options.Color));
+            canvas.Mutate(ctx => ctx.DrawText(textOptions, text, options.Color));
             MoveX((int)textWidth);
         }
 
@@ -184,8 +197,6 @@ public static class EmojiTool
 
         Point GetDrawingOffsetEmo() => new(x, margin + 0);
         Point GetDrawingOffsetTxt() => new(x, margin + options.FontOffset.RoundInt());
-
-        Image<Rgba32> GetEmptyCanvas() => new(width, safeHeight);
     }
 
     private static Queue<float> GetTextChunksWidths(LinkedList<TextChunk> chunks)
@@ -203,9 +214,9 @@ public static class EmojiTool
 
         foreach (var cluster in clusters)
         {
-            var sameType = cluster.IsEmoji == last_IsEmoji;
             if (cluster.IsEmoji.Janai())
             {
+                var sameType = cluster.IsEmoji == last_IsEmoji;
                 if (sameType) widths[^1] += cluster.Width;
                 else          widths.Add   (cluster.Width);
             }

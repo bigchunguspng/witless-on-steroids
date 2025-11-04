@@ -6,7 +6,7 @@ namespace PF_Bot.Features_Web.Boards.Core;
 
 public class PlankService
 {
-    private const string BASE_URL = "https://2ch.hk";
+    private const string BASE_URL = "https://2ch.org";
 
     private static readonly Regex
         _rgx_thread_post    = new(@"<article id=""\S*?"" class=""post__message "">\s*(.*?)\s*<\/article>", RegexOptions.Compiled),
@@ -23,10 +23,12 @@ public class PlankService
         (string url) => Task.Run(() => GetThreadDiscussion(url).ToList());
 
     /// Returns every single line of a thread.
-    /// <param name="url">thread URL, like https://2ch.hk/a/res/XXX.html</param>
+    /// <param name="url">thread URL, like https://2ch.org/a/res/XXX.html</param>
     public IEnumerable<string> GetThreadDiscussion(string url)
     {
-        var response = _rest.Get(new RestRequest(url, Method.GET));
+        LogDebug($"PLANK | THREAD >> {url}");
+
+        var response = _rest.Get(new RestRequest(url));
         var html = response.Content;
         
         var replyIndicator = "<a";
@@ -56,10 +58,12 @@ public class PlankService
         }
     }
 
-    /// <summary> Returns URLs of first threads from a board. </summary>
-    /// <param name="url">board URL, like https://2ch.hk/a/</param>
+    /// Returns URLs of first threads from a board.
+    /// <param name="url">board URL, like https://2ch.org/a/</param>
     public IEnumerable<string> GetSomeThreads(string url)
     {
+        LogDebug($"PLANK | BOARD  >> {url}");
+
         var response = _rest.Get(new RestRequest(url));
         var html = response.Content;
 
@@ -69,6 +73,8 @@ public class PlankService
     /// Returns unique URLs of threads found on a board by a text.
     public IEnumerable<string> GetSearchResults(string board, string text)
     {
+        LogDebug($"PLANK | SEARCH >> {board} -> {text}");
+
         var request = new RestRequest($"{BASE_URL}/user/search", Method.POST) { AlwaysMultipartFormData = true };
 
         request.AddParameter("board", board);
@@ -93,6 +99,8 @@ public class PlankService
     /// <param name="path">path to a saved home page file.</param>
     public List<BoardGroup> GetBoardList(string path)
     {
+        LogDebug($"PLANK | BOARD LIST >> {path}");
+
         var boards = new List<BoardGroup>();
         BoardGroup group = null!;
 

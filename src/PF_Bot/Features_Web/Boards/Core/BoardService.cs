@@ -18,8 +18,8 @@ public class BoardService
         _rgx_thread_subject_desu = new(@"<h2 class=""post_title"">(.*?)<\/h2>", RegexOptions.Compiled),
         _rgx_tags                = new("<.*?>", RegexOptions.Compiled);
 
-    private readonly HtmlWeb _web = new();
     private readonly RestClient _rest = new();
+    private readonly HtmlWeb     _web = new();
 
     private Regex GetRegexForSubject
         (bool desu) => desu
@@ -39,6 +39,8 @@ public class BoardService
     /// <param name="url">thread URL, like https://boards.4channel.org/a/thread/XXX</param>
     public IEnumerable<string> GetThreadDiscussion(string url)
     {
+        LogDebug($"BOARD | THREAD >> {url}");
+
         var html = TryGetThreadHtml(url);
         if (html is null) yield break;
 
@@ -78,19 +80,21 @@ public class BoardService
             var response = _rest.Get(new RestRequest(threadURL, Method.GET));
             if (response.StatusCode == HttpStatusCode.OK) return response.Content;
 
-            LogDebug($"Board Service -> TryGetThreadHtml -> StatusCode: {response.StatusCode}");
+            LogDebug($"BOARD | TryGetThreadHtml -> StatusCode: {response.StatusCode}");
             Task.Delay(5000).Wait();
         }
         while (patience-- > 0);
 
-        LogError("Board Service -> TryGetThreadHtml -> NO POSTS!?");
+        LogError("BOARD | TryGetThreadHtml -> NO POSTS!?");
         return null;
     }
 
-    /// <summary> Returns thread URLs from first 10 pages of the board. </summary>
+    /// Returns thread URLs from first 10 pages of the board.
     /// <param name="url">board URL, like https://boards.4channel.org/a/</param>
     public IEnumerable<string> GetAllActiveThreads(string url)
     {
+        LogDebug($"BOARD | BOARD  >> {url}");
+
         for (var i = 1; i <= 10; i++)
         {
             IEnumerable<string> hrefs;
@@ -139,6 +143,8 @@ public class BoardService
     /// <param name="path">path to a saved home page file, since it's more reliable to have it this way.</param>
     public List<BoardGroup> GetBoardList(string path)
     {
+        LogDebug($"BOARD | BOARD LIST >> {path}");
+
         var boards = new List<BoardGroup>();
         var group = new BoardGroup();
 

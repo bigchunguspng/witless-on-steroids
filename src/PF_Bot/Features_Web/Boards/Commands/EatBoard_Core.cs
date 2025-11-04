@@ -80,21 +80,18 @@ public abstract class EatBoard_Core : Fuse
         }
         else
         {
-            if (Args.EndsWith("info"))
+            if      (Args.EndsWith("info"))
                 ListingBoards.SendSavedList(Ctx, new ListPagination(Origin, PerPage: 10));
+            else if (Args.CanBeSplitN())
+            {
+                var args = Args.SplitN(2);
+                var filename = args[0].Contains('-');
+                if (filename) await EatJsonFile();
+                else          await EatOnlineFind(args);
+            }
             else
-                await EatBoard();
+                await EatOnlineData(url: Args);
         }
-    }
-
-    private async Task EatBoard()
-    {
-        var args = Args.SplitN(2);
-        var pair = args.Length > 1;
-        var json = pair && args[0].Contains('-');
-        if      (json) await EatJsonFile();
-        else if (pair) await EatOnlineFind(args);
-        else           await EatOnlineData(url: args[0]);
     }
 
     private async Task EatJsonFile()
@@ -152,11 +149,10 @@ public abstract class EatBoard_Core : Fuse
             if (url.Contains('/').Janai()) // is a board code e.g. "a" or "b"
             {
                 var key = url;
-                var match = Boards.SelectMany(x => x.Boards).FirstOrDefault(x => x.Key == key);
-                if (match != null)
-                {
-                    url = match.URL;
-                }
+                var board = Boards
+                    .SelectMany(x => x.Boards)
+                    .FirstOrDefault(x => x.Key == key);
+                if (board != null) url = board.URL;
             }
 
             return new Uri(url);

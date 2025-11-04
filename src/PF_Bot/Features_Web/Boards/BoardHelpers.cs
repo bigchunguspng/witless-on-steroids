@@ -75,7 +75,7 @@ public static class BoardHelpers
         Converters = { new FirstRowReader() }, DefaultValueHandling = DefaultValueHandling.Ignore
     };
 
-    /// <summary> <b>READ-ONLY!</b> Returns only <b>THE FIRST</b> string from the list. </summary>
+    /// <b>READ-ONLY!</b> Returns only <b>THE FIRST</b> string from the list.
     private class FirstRowReader : JsonConverter<List<string>>
     {
         public override void WriteJson

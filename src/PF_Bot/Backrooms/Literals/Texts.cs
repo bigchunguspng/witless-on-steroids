@@ -465,7 +465,7 @@ public static class Texts
         """🍀 <b><a href="https://www.4chan.org/">4CHAN</a> BOARDS</b> 🍀""";
 
     public const string BOARDS_2CHAN =
-        """⚡️ <b>ДОСКИ <a href="https://2ch.hk/">ДВАЧА</a></b> ⚡️""";
+        """⚡️ <b>ДОСКИ <a href="https://2ch.org/">ДВАЧА</a></b> ⚡️""";
 
     public const string UNKNOWN_LINK_4CHAN =
         "Dude, wrong URL 👉😄";
@@ -497,14 +497,14 @@ public static class Texts
 
     public const string PLANK_MANUAL =
         """
-        ⚡️ <b><u>Кормёжка тредами с <a href="https://2ch.hk/">двача</a></u></b>
+        ⚡️ <b><u>Кормёжка тредами с <a href="https://2ch.org/">двача</a></u></b>
 
         <b>Синтаксис:</b>
         <blockquote expandable><code>/plank [тред/доска]</code>
-        /plank <a href="https://2ch.hk/a/">a</a>
-        /plank https://2ch.hk/a/
-        /plank https://2ch.hk/hw/
-        /plank https://2ch.hk/a/res/7819159.html</blockquote>
+        /plank <a href="https://2ch.org/a/">a</a>
+        /plank https://2ch.org/a/
+        /plank https://2ch.org/hw/
+        /plank https://2ch.org/a/res/7819159.html</blockquote>
         <blockquote><code>/plank [имя сохранёнки]</code>
         /plank 2024-12-08 di.527818</blockquote>
         <blockquote><code>/plank [код доски] [запрос]</code>

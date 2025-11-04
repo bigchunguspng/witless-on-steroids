@@ -32,9 +32,8 @@ public class EatPlanks : EatBoard_Core
 
         var board = _uri.Segments[1].Replace("/", "");
 
-        var res = url.Contains("/res/");
-        if (res) await EatSingleThread(url, board);
-        else     await EatWholeBoard  (url, board);
+        if (url.Contains("/res/")) await EatSingleThread(url, board);
+        else                       await EatWholeBoard  (url, board);
     }
 
     private async Task EatSingleThread(string url, string board)

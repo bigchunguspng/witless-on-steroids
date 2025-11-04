@@ -29,7 +29,7 @@ public class MessageRouter_Default
     {
         Context = new MessageContext(message);
 
-        var messageIsCommand = Text != null && Text.StartsWith('/');
+        var messageIsCommand = Text is { Length: > 1 } && Text.StartsWith('/');
         if (messageIsCommand && HandleCommand())
             return;
 

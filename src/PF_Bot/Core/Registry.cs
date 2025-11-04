@@ -161,5 +161,5 @@ public static class Registry
             .Register("man_sus"  , () => _mail.WithText(SUS_MANUAL))
             .Register("man_eq"   , () => _mail.WithText(EQ_MANUAL))
             .Register("man_vol"  , () => _mail.WithText(VOLUME_MANUAL))
-            .Build();
+            .Build(new CaseInsensitiveCharComparer());
 }

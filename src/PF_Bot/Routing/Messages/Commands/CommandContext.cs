@@ -91,7 +91,7 @@ public class CommandContext : MessageContext
 
     private CommandContext(Message message, string command, CommandMode mode) : base(message)
     {
-        Command = command;
+        Command = command.ToLower();
         Mode = mode;
     }
 
@@ -110,7 +110,7 @@ public class CommandContext : MessageContext
             var mention_start = text.IndexOf(_botUsername, command_end, StringComparison.OrdinalIgnoreCase);
             if (mention_start < 0)
             {
-                Options = text.Substring(command_end, options_length);
+                Options = text.Substring(command_end, options_length).ToLower();
             }
             else
             {
@@ -126,8 +126,8 @@ public class CommandContext : MessageContext
                 var op2_start = mention_end;
                 var op1_length = mention_start - command_end;
                 var op2_length =   space_index - mention_end;
-                var op1 = text.Substring(op1_start, op1_length);
-                var op2 = text.Substring(op2_start, op2_length);
+                var op1 = text.Substring(op1_start, op1_length).ToLower();
+                var op2 = text.Substring(op2_start, op2_length).ToLower();
                 if (op1.Length + op2.Length > 0)
                 {
                     Options =

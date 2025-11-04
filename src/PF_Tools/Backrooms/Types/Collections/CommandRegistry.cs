@@ -35,7 +35,7 @@ public class CommandRegistry<T>(FrozenDictionary<char, List<CommandMapping<T>>> 
     private static Func<CommandMapping<T>, bool>
         x_StartsWithTextSubstring
         (string input, int offset) =>
-        x => input.AsSpan(offset).StartsWith(x.Command);
+        x => input.AsSpan(offset).StartsWith(x.Command, StringComparison.OrdinalIgnoreCase);
 
     public class Builder
     {
@@ -48,17 +48,30 @@ public class CommandRegistry<T>(FrozenDictionary<char, List<CommandMapping<T>>> 
             return this;
         }
 
-        public CommandRegistry<T> Build()
+        public CommandRegistry<T> Build(IEqualityComparer<char>? comparer = null)
         {
             var registry = _lobby
                 .GroupBy(x => x.Command[0])
                 .ToFrozenDictionary
                 (
                     g => g.Key,
-                    g => g.OrderByDescending(x => x.Command).ToList()
+                    g => g.OrderByDescending(x => x.Command).ToList(),
+                    comparer
                 );
 
             return new CommandRegistry<T>(registry);
         }
     }
+}
+
+public class CaseInsensitiveCharComparer : IEqualityComparer<char>
+{
+    public bool Equals
+        (char a, char b) 
+        => char.ToLowerInvariant(a) 
+        == char.ToLowerInvariant(b);
+
+    public int GetHashCode
+        (char c) 
+        => char.ToLowerInvariant(c).GetHashCode();
 }

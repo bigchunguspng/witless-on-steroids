@@ -177,7 +177,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
     private string GetJsonFormatExample()
     {
         var count = Random.Shared.Next(3, 7);
-        var sb = new StringBuilder(ONLY_ARRAY_JSON).Append("\n\n<pre>[");
+        var sb = new StringBuilder(FUSE_ONLY_ARRAY_JSON).Append("\n\n<pre>[");
         for (var i = 0; i < count; i++)
             sb.Append("\n    ").AppendInQuotes(Baka.Generate()).Append(",");
         return sb.Remove(sb.Length - 1, 1).Append("\n]</pre>").ToString();

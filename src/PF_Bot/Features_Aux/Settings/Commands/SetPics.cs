@@ -11,7 +11,7 @@ public class SetPics : CommandHandlerAsync_SettingsBlocking
         {
             Data.Pics = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, SET_P_RESPONSE.Format(Data.Pics).XDDD());
+            Bot.SendMessage(Origin, SET_PICS_RESPONSE.Format(Data.Pics).XDDD());
             Log($"{Title} >> MEME CHANCE >> {Data.Pics}%");
         }
         else

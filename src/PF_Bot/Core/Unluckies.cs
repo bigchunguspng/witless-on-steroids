@@ -75,7 +75,7 @@ public static class Unluckies
             output = sbOutput.ToString();
         }
 
-        var text = FF_ERROR_REPORT.Format(e.File, e.Result.Arguments, GetRandomASCII(), output);
+        var text = PROCESS_ERROR_REPORT.Format(e.File, e.Result.Arguments, GetRandomASCII(), output);
         File.WriteAllText(path, text);
         using var stream = new MemoryStream(text.GetBytes_UTF8());
         App.Bot.SendDocument(context.Origin, InputFile.FromStream(stream, "произошла ашыпка.txt"));

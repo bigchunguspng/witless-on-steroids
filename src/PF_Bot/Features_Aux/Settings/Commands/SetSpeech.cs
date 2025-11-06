@@ -11,7 +11,7 @@ public class SetSpeech : CommandHandlerAsync_SettingsBlocking
         {
             Data.Speech = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, SET_FREQUENCY_RESPONSE.Format(Data.Speech).XDDD());
+            Bot.SendMessage(Origin, SET_SPEECH_RESPONSE.Format(Data.Speech).XDDD());
             Log($"{Title} >> SPEECH >> {Data.Speech}");
         }
         else

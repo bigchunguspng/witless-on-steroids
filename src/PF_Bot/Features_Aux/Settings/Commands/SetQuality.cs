@@ -11,7 +11,7 @@ public class SetQuality : CommandHandlerAsync_SettingsBlocking
         {
             Data.Quality = value.ClampByte();
             ChatManager.SaveChats();
-            Bot.SendMessage(Origin, SET_Q_RESPONSE.Format(Data.Quality).XDDD());
+            Bot.SendMessage(Origin, SET_QUALITY_RESPONSE.Format(Data.Quality).XDDD());
             Log($"{Title} >> QUALITY >> {Data.Quality}%");
         }
         else

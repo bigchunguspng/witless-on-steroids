@@ -12,13 +12,9 @@ public class Nuke : Meme_Core<int>
 
     protected override IMemeGenerator<int> MemeMaker => new DukeNukem(_options, Chat);
 
-    protected override string VideoName => "piece_fap_bot-nuke.mp4";
-
-    protected override string Log_STR => "NUKED";
-    protected override string Log_CMD => "/nuke";
-    protected override string Suffix  => "Nuked"; // Needs more nuking!
-
     protected override string? DefaultOptions => Data.Options?.Nuke;
+
+    protected override MemeMakerContext Ctx => MemeMakerContext.Nuke;
 
 
     protected override Task Run()
@@ -42,7 +38,7 @@ public class Nuke : Meme_Core<int>
     protected override int GetMemeText(string? text) => 0;
 
     private static readonly Regex
-        _r_depth = new(@"([1-9])("")", RegexOptions.Compiled);
+        _r_depth = new(@"([1-9])("")", RegexOptions.Compiled); // Needs more nuking!
 }
 
 public class Nuke_Callback : CallbackHandler

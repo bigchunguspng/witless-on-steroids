@@ -15,13 +15,9 @@ public class Meme : Meme_Core<TextPair>
 
     protected override IMemeGenerator<TextPair> MemeMaker => new MemeGenerator(_options);
 
-    protected override string VideoName => "piece_fap_bot-meme.mp4";
-
-    protected override string Log_STR => "MEME";
-    protected override string Log_CMD => "/meme";
-    protected override string Suffix  => "Meme";
-
     protected override string? DefaultOptions => Data.Options?.Meme;
+
+    protected override MemeMakerContext Ctx => MemeMakerContext.Meme;
 
 
     protected override Task Run() => RunInternal("meme");

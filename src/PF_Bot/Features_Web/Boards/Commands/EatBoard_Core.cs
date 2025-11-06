@@ -20,29 +20,29 @@ public class ImageBoardContext
     public required Lazy<List<BoardGroup>> Boards_Lazy { get; init; }
     public               List<BoardGroup>  Boards => Boards_Lazy.Value;
 
-    public static readonly ImageBoardContext Chan2 = new()
-    {
-        ArchivePath = Dir_Plank,
-        CallbackKey = Registry.CallbackKey_Planks,
-        CommandName = "plank",
-        BoardsTitle = BOARDS_2CHAN,
-        Manual      = PLANK_MANUAL,
-        UnknownURL  = UNKNOWN_LINK_2CHAN,
-        EmojiLogo   = "⚡️",
-        Boards_Lazy = new Lazy<List<BoardGroup>>(App.Chan2.GetBoardList(File_2chanHtmlPage)),
-    };
-
-    public static readonly ImageBoardContext Chan4 = new()
-    {
-        ArchivePath = Dir_Board,
-        CallbackKey = Registry.CallbackKey_Boards,
-        CommandName = "board",
-        BoardsTitle = BOARDS_4CHAN,
-        Manual      = BOARD_MANUAL,
-        UnknownURL  = UNKNOWN_LINK_4CHAN,
-        EmojiLogo   = "🍀",
-        Boards_Lazy = new Lazy<List<BoardGroup>>(App.Chan4.GetBoardList(File_4chanHtmlPage)),
-    };
+    public static readonly ImageBoardContext
+        Chan2 = new()
+        {
+            ArchivePath = Dir_Plank,
+            CallbackKey = Registry.CallbackKey_Planks,
+            CommandName = "plank",
+            BoardsTitle = BOARDS_2CHAN,
+            Manual      = PLANK_MANUAL,
+            UnknownURL  = UNKNOWN_LINK_2CHAN,
+            EmojiLogo   = "⚡️",
+            Boards_Lazy = new Lazy<List<BoardGroup>>(App.Chan2.GetBoardList(File_2chanHtmlPage)),
+        },
+        Chan4 = new()
+        {
+            ArchivePath = Dir_Board,
+            CallbackKey = Registry.CallbackKey_Boards,
+            CommandName = "board",
+            BoardsTitle = BOARDS_4CHAN,
+            Manual      = BOARD_MANUAL,
+            UnknownURL  = UNKNOWN_LINK_4CHAN,
+            EmojiLogo   = "🍀",
+            Boards_Lazy = new Lazy<List<BoardGroup>>(App.Chan4.GetBoardList(File_4chanHtmlPage)),
+        };
 }
 
 public class ChanEaterCore_Callback(ImageBoardContext ctx) : CallbackHandler

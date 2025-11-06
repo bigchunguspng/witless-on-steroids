@@ -13,13 +13,9 @@ public class Top : Meme_Core<string>
 
     protected override IMemeGenerator<string> MemeMaker => new IFunnyBrazil(_options);
 
-    protected override string VideoName => "piece_fap_bot-top.mp4";
-
-    protected override string Log_STR => "TOP";
-    protected override string Log_CMD => "/top";
-    protected override string Suffix  => "Top";
-
     protected override string? DefaultOptions => Data.Options?.Top;
+
+    protected override MemeMakerContext Ctx => MemeMakerContext.Top;
 
 
     protected override Task Run() => RunInternal("top");

@@ -8,6 +8,18 @@ using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Memes.Commands; // ReSharper disable InconsistentNaming
 
+public record MemeMakerContext(string VideoName, string Log_NAME, string Log_CMD, string Suffix)
+{
+    public static readonly MemeMakerContext
+        Dg   = new("piece_fap_bot-dg.mp4", "DEMOTIVATOR",   "/dg", "Dg"),
+        Dv   = new("piece_fap_bot-dv.mp4", "DEMOTIVATOR-w", "/dv", "Dv"),
+        Dp   = new("piece_fap_bot-dp.mp4", "DEMOTIVATOR-B", "/dp", "Dp"),
+        Meme = new("piece_fap_bot-meme.mp4", "MEME",  "/meme", "Meme" ),
+        Top  = new("piece_fap_bot-top.mp4",  "TOP",   "/top",  "Top"  ),
+        Snap = new("piece_fap_bot-snap.mp4", "SNAP",  "/snap", "Snap" ),
+        Nuke = new("piece_fap_bot-nuke.mp4", "NUKED", "/nuke", "Nuked");
+}
+
 public abstract class Meme_Core_Static : CommandHandlerAsync
 {
     protected const string
@@ -21,17 +33,11 @@ public abstract class Meme_Core_Static : CommandHandlerAsync
 
 public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
 {
-    protected MemeOptionsContext MemeOptions = null!;
-
     protected abstract IMemeGenerator<TCaption> MemeMaker { get; }
 
-    protected abstract string VideoName { get; }
-
-    protected abstract string Log_STR { get; }
-    protected abstract string Log_CMD { get; }
-    protected abstract string Suffix  { get; }
-
     protected abstract string? DefaultOptions { get; }
+
+    protected abstract MemeMakerContext Ctx { get; }
 
     protected virtual bool CropVideoNotes   => true;
     protected virtual bool ResultsAreRandom => false;
@@ -164,7 +170,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
             await MakeMemeVideo(request);
 
             var type = note ? MediaType.Round : MediaType.Anime;
-            var name = note ? null : VideoName;
+            var name = note ? null : Ctx.VideoName;
             SendFile(request.TargetPath, type, name);
         }
         Log($"{GetLogString(repeats)} VID >> {sw.ElapsedReadable()}");
@@ -187,14 +193,14 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
     private MemeRequest GetMemeFileRequest
         (MemeSourceType type, FilePath input, string extension)
     {
-        var output = input.ChangeEnding($"{Suffix}-{Desert.GetSilt()}{extension}");
+        var output = input.ChangeEnding($"{Ctx.Suffix}-{Desert.GetSilt()}{extension}");
         return new MemeRequest(type, input, output, Data.Quality, _pressure);
     }
 
     private string GetLogString(int repeats)
     {
-        var repSuffix = repeats > 1 ? $"-{repeats}" : null;
-        return $"{Title} >> {Log_STR}{repSuffix} [{MemeOptions.Options ?? "~"}]";
+        var suffix = repeats > 1 ? $"-{repeats}" : null;
+        return $"{Title} >> {Ctx.Log_NAME}{suffix} [{MemeOptions.Options ?? "~"}]";
     }
 
 
@@ -205,7 +211,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
     {
         var sw = Stopwatch.StartNew();
         await MemeMaker.GenerateMeme(request, GetText());
-        sw.Log(Log_CMD);
+        sw.Log(Ctx.Log_CMD);
     }
 
     private async Task MakeMemeVideo
@@ -213,7 +219,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
     {
         var sw = Stopwatch.StartNew();
         await MemeMaker.GenerateVideoMeme(request, GetText());
-        sw.Log(Log_CMD + " video");
+        sw.Log(Ctx.Log_CMD + " video");
     }
 
     private TCaption GetText()
@@ -229,6 +235,8 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
 
 
     // OPTIONS
+
+    protected MemeOptionsContext MemeOptions = null!;
 
     private MemeOptionsContext GetOptionsContext()
     {

@@ -20,13 +20,12 @@ public class Demo_Dg : Meme_Core<TextPair>
             ? new Demotivators2007(_options)
             : new Demotivators2007(_options, 1280);
 
-    protected override string VideoName => $"piece_fap_bot-d{(_mode == Square ? "g" : "v")}.mp4";
-
-    protected override string Log_STR => "DEMOTIVATOR";
-    protected override string Log_CMD => _mode == Square ? "/dg" : "/dv";
-    protected override string Suffix  => _mode == Square ?  "Dg" :  "Dv";
-
     protected override string? DefaultOptions => Data.Options?.Dg;
+
+    protected override MemeMakerContext Ctx =>
+        _mode == Square
+            ? MemeMakerContext.Dg
+            : MemeMakerContext.Dv;
 
 
     protected override Task Run() => RunInternal("dg");

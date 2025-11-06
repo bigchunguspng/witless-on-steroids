@@ -15,13 +15,9 @@ public class Snap : Meme_Core<string>
 
     protected override IMemeGenerator<string> MemeMaker => new SnapChat(_options);
 
-    protected override string VideoName => "piece_fap_bot-snap.mp4";
-
-    protected override string Log_STR => "SNAP";
-    protected override string Log_CMD => "/snap";
-    protected override string Suffix  => "Snap";
-
     protected override string? DefaultOptions => Data.Options?.Snap;
+
+    protected override MemeMakerContext Ctx => MemeMakerContext.Snap;
 
 
     protected override Task Run() => RunInternal("snap");

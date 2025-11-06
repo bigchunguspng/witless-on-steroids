@@ -13,13 +13,9 @@ public class Demo_Dp : Meme_Core<string>
 
     protected override IMemeGenerator<string> MemeMaker => new Demotivators2077(_options);
 
-    protected override string VideoName => "piece_fap_bot-dp.mp4";
-
-    protected override string Log_STR => "DEMOTIVATOR-B";
-    protected override string Log_CMD => "/dp";
-    protected override string Suffix  =>  "Dp";
-
     protected override string? DefaultOptions => Data.Options?.Dp;
+
+    protected override MemeMakerContext Ctx => MemeMakerContext.Dp;
 
 
     protected override Task Run() => RunInternal("dp");

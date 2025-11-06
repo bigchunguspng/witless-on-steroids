@@ -44,15 +44,18 @@ public class Crop : FileEditor_VideoPhoto // todo shake is only for video
                 args = F_Shake(crop, speed, offset).Split();
                 log  = [crop, speed, offset];
             }
-            else if (args?.Length == 2 && _rgx_tlbr.IsMatch(args[0]))
+            else if (args?.Length == 2)
             {
-                var match = _rgx_tlbr.Match(args[0].ToLower());
-                var a0 = match.Value;
-                var a1 = int.Parse(args[1]) / 100F;
-                if      (a0 == "t") args = ["iw", $"(1-{a1})*ih", "0", $"ih*{a1}"];
-                else if (a0 == "l") args = [$"(1-{a1})*iw", "ih", $"iw*{a1}", "0"];
-                else if (a0 == "b") args = ["iw", $"(1-{a1})*ih", "0", "0"];
-                else if (a0 == "r") args = [$"(1-{a1})*iw", "ih", "0", "0"];
+                var match = _rgx_tlbr.Match(args[1]);
+                if (match.Success)
+                {
+                    var a0 = int.Parse(args[0]) / 100F;
+                    var a1 = match.Value.ToLower();
+                    if      (a1 == "t") args = ["iw", $"(1-{a0})*ih", "0", $"ih*{a0}"];
+                    else if (a1 == "l") args = [$"(1-{a0})*iw", "ih", $"iw*{a0}", "0"];
+                    else if (a1 == "b") args = ["iw", $"(1-{a0})*ih", "0", "0"];
+                    else if (a1 == "r") args = [$"(1-{a0})*iw", "ih", "0", "0"];
+                }
             }
                 
             for (var i = 0; i < Math.Min(args!.Length, 4); i++)

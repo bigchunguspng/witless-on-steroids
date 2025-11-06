@@ -222,15 +222,13 @@ public static partial class Texts
 
         <b>Синтаксис:</b>
         ☝️ <code>/crop ширина высота X Y</code>
-        ✌️ <code>/crop сторона %_обрезки</code>
+        ✌️ <code>/crop %_обрезки сторона</code>
 
         <code>сторона</code> = <code>[tlbr]</code> - <code>top</code> / <code>left</code> / <code>bottom</code> / <code>right</code>
 
-        <b>Дефолтные значения:</b> <code>w</code>, <code>h</code>, <code>x</code>, <code>y</code>
-
         <b>Валидные примеры:</b>
-        <blockquote expandable><code>/crop b 50</code> 👈 убрать нижнюю половину
-        <code>/crop t 20</code> 👈 убрать верхние 20%
+        <blockquote expandable><code>/crop 50 b</code> 👈 убрать нижнюю половину
+        <code>/crop 20 t</code> 👈 убрать верхние 20%
         <code>/crop min(w,h) min(w,h)</code> 👈 обрезать до квадрата
         <code>/crop w-20 h-20</code> 👈 срезать по 10 пикселей со всех сторон
         <code>/crop w/2</code> 👈 обрезать по 25% слева и справа</blockquote>

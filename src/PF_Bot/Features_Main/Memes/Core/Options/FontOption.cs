@@ -3,7 +3,13 @@ using FontSpecificData = (float size, float offset, float caps);
 
 namespace PF_Bot.Features_Main.Memes.Core.Options;
 
-public class FontOption(string fontKey, string? styleKey, bool random, bool @default)
+public class FontOption
+(
+    string   fontKey,
+    string? styleKey,
+    bool random   = false,
+    bool @default = false
+)
 {
     public string   FontKey { get; set; } = fontKey;
     public string? StyleKey { get; }     = styleKey;

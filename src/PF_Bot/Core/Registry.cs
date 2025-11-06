@@ -150,6 +150,7 @@ public static class Registry
             .Register("op_snap", () => _mail.WithText(SNAP_OPTIONS))
             .Register("op_nuke", () => _mail.WithText(NUKE_OPTIONS))
             .Register("fonts"  , () => _mail.WithText(FONTS_CHEAT_SHEET))
+            .Register("fonts_0", () => new TestFonts())
             // manuals
             .Register("man_g"    , () => _mail.WithText(G_MANUAL))
             .Register("man_pipe" , () => _mail.WithText(PIPE_MANUAL))

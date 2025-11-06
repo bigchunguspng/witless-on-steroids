@@ -3,3 +3,13 @@ reddit-app-id        = VALUE
 reddit-refresh-token = VALUE
 reddit-secret        = VALUE
 admin-id             = VALUE
+sound-chat	         = VALUE
+
+
+Values are matched with this expression:  property-name\s+=\s+(\S+)
+
+Therefore, values should not contain spaces.
+
+Any number of spaces can be placed before and after the property name or equals sign.
+
+Multiple values can be assigned to admin-id if they are separated by ",".

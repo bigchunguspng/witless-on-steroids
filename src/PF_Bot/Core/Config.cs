@@ -35,5 +35,5 @@ public static class Config
         (string s) => long.TryParse(s, out var result) ? result : 0;
 
     private static long[] GetLongs
-        (string s) => s.Split(',').Select(x => long.TryParse(x, out var result) ? result : 0).ToArray();
+        (string s) => s.Split(',').Select(GetLong).ToArray();
 }

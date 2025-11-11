@@ -67,7 +67,8 @@ public class RedditTool(RedditClient client, int POST_LIMIT)
 
     private void CollectCommentThread(Comment comment, List<string> texts)
     {
-        if (comment.Body != null) texts.Add(comment.Body);
+        var text = comment.Body;
+        if (text.IsNotNull_NorWhiteSpace()) texts.Add(text.Trim());
 
         foreach (var reply in comment.Replies)
         {

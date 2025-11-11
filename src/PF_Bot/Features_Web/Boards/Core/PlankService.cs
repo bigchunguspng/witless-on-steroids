@@ -53,7 +53,9 @@ public class PlankService
                     subjectPending = false;
                 }
 
-                yield return HttpUtility.HtmlDecode(text);
+                var text_decoded = HttpUtility.HtmlDecode(text);
+                if (text_decoded.IsNotNull_NorWhiteSpace())
+                    yield return text_decoded.Trim();
             }
         }
     }

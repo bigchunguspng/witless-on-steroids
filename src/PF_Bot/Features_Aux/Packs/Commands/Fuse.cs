@@ -38,7 +38,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         var args = Args.SplitN(2);
 
         if      (Message.ProvidesFile("text/plain",   out var document)) await ProcessTextAttachment(document);
-        if      (Message.ProvidesFile("text/x-ssa",       out document)) await ProcessSubsAttachment(document);
+        else if (Message.ProvidesFile("text/x-ssa",       out document)) await ProcessSubsAttachment(document);
         else if (Message.ProvidesFile("application/json", out document)) await ProcessJsonAttachment(document);
         else if (args.Length == 0)
         {
@@ -194,8 +194,11 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
     private async Task EatFromTextFile(string path)
     {
         var lines = await File.ReadAllLinesAsync(path);
-        await Baka_Eat_Report(lines);
-        await SaveJsonCopy(path, lines);
+        var texts = lines
+            .Where(x => x.IsNotNull_NorWhiteSpace())
+            .Select(x => x.Trim()).ToArray();
+        await Baka_Eat_Report(texts);
+        await SaveJsonCopy(path, texts);
     }
 
     private async Task EatFromSubsFile_OrListStyles(string path)
@@ -204,7 +207,9 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         if (Args == null || Args.StartsWith("!").Janai())
         {
             var styles = Args?.Split(',').Select(x => x.Trim()).ToArray();
-            var texts = AssParser.ExtractTexts(lines, styles).ToArray();
+            var texts = AssParser.ExtractTexts(lines, styles)
+                .Where(x => x.IsNotNull_NorWhiteSpace())
+                .Select(x => x.Trim()).ToArray();
             await Baka_Eat_Report(texts);
             await SaveJsonCopy(path, texts);
         }

@@ -66,6 +66,11 @@ public partial class IFunnyBrazil
             if (textWidth < textWidthLimit)
             {
                 if (op.ThinCard) SetCardHeight(GetHeightWithPadding(lineHeight, 1F));
+                else
+                {
+                    var h = GetHeightWithPadding(lineHeight, 1F);
+                    if (h > _cardHeight) SetCardHeight(h);
+                }
                 return text; // OK - don't change anything!
             }
 

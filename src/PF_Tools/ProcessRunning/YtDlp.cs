@@ -24,7 +24,7 @@ public static class YtDlp
                 {
                     // todo test if deletion is nesessary
                     directory
-                        .Delete(recursive: true)
+                        .DeleteDirectory(recursive: true)
                         .EnsureDirectoryExist();
 
                     await Run(args, directory, firstTime: false);

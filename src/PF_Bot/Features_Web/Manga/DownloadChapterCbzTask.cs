@@ -35,6 +35,9 @@ public class DownloadChapterCbzTask
             LogDebug("CBZ >> ARCHIVING");
             AddPagesToArchive(archive);
 
+            LogDebug("CBZ >> CLEANING");
+            Dir_Chapter.DeleteDirectory(recursive: true);
+
             LogDebug($"CBZ >> DONE >> {sw.ElapsedReadable()}", LogColor.Lime);
         }
         else

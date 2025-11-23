@@ -116,7 +116,7 @@ public readonly struct FilePath(string value)
 
     // DELETE DIRECTORY
 
-    public FilePath Delete(bool recursive)
+    public FilePath DeleteDirectory(bool recursive)
     {
         if (DirectoryExists) Directory.Delete(_path, recursive);
         return this;

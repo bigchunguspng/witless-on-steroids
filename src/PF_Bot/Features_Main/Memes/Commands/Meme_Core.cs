@@ -163,7 +163,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
 
         var note = round && CropVideoNotes.IsOff();
 
-        var repeats = GetRepeatCount().Clamp(3);
+        var repeats = GetRepeatCount();
         for (var i = 0; i < repeats; i++)
         {
             var request = GetMemeFileRequest(MemeSourceType.Video, input, ".mp4");

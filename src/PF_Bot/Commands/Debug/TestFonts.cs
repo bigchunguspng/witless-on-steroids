@@ -22,7 +22,7 @@ public class TestFonts : CommandHandlerAsync
 
     protected override async Task Run()
     {
-        var text = Args?.Split('\n', StringSplitOptions.RemoveEmptyEntries)[0].Trim()
+        var text = Args?.SliceByFirst('\n').Trim().ToString()
                 ?? "Вы слушаете: ... Certified H0OD classic!";
 
         var task_loadBackground = Image.LoadAsync(File_TestFontsBackground);

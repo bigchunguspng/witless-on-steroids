@@ -51,6 +51,6 @@ public class Baguette : CommandHandlerBlocking
 
         return sb.ToString();
 
-        string GenerateLine() => Baka.Generate().Split(sign, 2)[0].Trim();
+        string GenerateLine() => Baka.Generate().Before(sign).Trim();
     }
 }

@@ -63,7 +63,16 @@ public static class Extensions_String
     public static int GetLineCount
         (this string text) => 1 + text.Count(x => x == '\n');
 
-    public static ReadOnlySpan<char> SubstringTill
+    public static string Before
+        (this string text, char c)
+    {
+        var index = text.IndexOf(c);
+        return index >= 0
+            ? text.Remove(index)
+            : text;
+    }
+
+    public static ReadOnlySpan<char> SliceByFirst
         (this string text, char c)
     {
         var index = text.IndexOf(c);

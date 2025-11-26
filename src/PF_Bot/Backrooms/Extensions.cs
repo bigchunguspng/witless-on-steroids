@@ -28,7 +28,7 @@ public static partial class Extensions
         : e                .GetErrorMessage_Internal();
 
     private static string GetErrorMessage_Internal
-        (this Exception e) => $"{e.GetType().Name} >> {e.Message}\n{(e.StackTrace ?? "").SubstringTill('\n')}";
+        (this Exception e) => $"{e.GetType().Name} >> {e.Message}\n{(e.StackTrace ?? "").SliceByFirst('\n')}";
 
     // UI
 

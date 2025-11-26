@@ -17,7 +17,7 @@ public static class Generation_Advanced
         var id = pack.FindExistingOrSimilarWord(word, START, out var separated);
         var ids = pack.Generate(id);
         var result = pack.RenderText(ids);
-        if (separated) result = word.Split()[0] + " " + result;
+        if (separated) result = $"{word.SliceByFirst(' ')} {result}";
         return result;
     }
 

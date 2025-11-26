@@ -13,7 +13,7 @@ public class Volume : FileEditor_AudioVideo
     {
         if (Args != null)
         {
-            _arg = Args.Split(' ', 2)[0];
+            _arg = Args.Before(' ');
 
             var input = await GetFile();
             var output = input.GetOutputFilePath("vol", Ext);

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace PF_Tools.Backrooms.Extensions;
 
 public static class Extensions_Time

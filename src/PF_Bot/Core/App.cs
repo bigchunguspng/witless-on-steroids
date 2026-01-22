@@ -8,6 +8,7 @@ using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages;
 using PF_Bot.Terminal;
 using PF_Tools.Graphics;
+using PF_Tools.ProcessRunning;
 
 namespace PF_Bot.Core;
 
@@ -37,6 +38,7 @@ public static class App
         Config.ReadFromFile();
 
         EmojiTool.Directory_EmojiPNGs = Dir_Emoji;
+        YtDlp.File_Cookies = File_Cookies;
 
         Bot = await Bot.Create
         (

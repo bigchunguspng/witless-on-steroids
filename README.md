@@ -13,7 +13,7 @@
 
 ### Setup ⚙️
 - Have `dotnet-sdk` installed.
-- Have `ffmpeg`, `imagemagick`, `yt-dlp`, and `gallery-dl` on your `PATH`.
+- Have `ffmpeg`, `imagemagick`, `yt-dlp`, `node`, and `gallery-dl` on your `PATH`.
 - Setup the working directory as shown in [`Paths.cs`](src/PF_Bot/Core/Paths.cs). Required items:
   - [`config.txt`](config-example.txt),
   - the whole `Static` directory 😳.

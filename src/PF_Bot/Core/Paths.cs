@@ -119,7 +119,7 @@ public static class Paths
         File_2chanHtmlPage       = Dir_Static.Combine("2chan.html"),
         File_4chanHtmlPage       = Dir_Static.Combine("4chan.html"),
         File_DefaultAlbumCover   = Dir_Static.Combine("art.jpg"),
-        File_Cookies             = Dir_Static.Combine("cookies-www-youtube-com.txt"),
+        File_Cookies             = Dir_Static.Combine("cookies.firefox-private.txt"),
         File_TestFontsBackground = Dir_Static.Combine("fonts-back.png"),
         File_DefaultTexts        = Dir_Static.Combine("texts.json"),
         File_DefaultVoiceMessage = Dir_Static.Combine("voice.ogg"),

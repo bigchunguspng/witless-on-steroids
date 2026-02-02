@@ -19,11 +19,14 @@ public static class ManualEditing
             App.Bot.SendMessage(origin, PEG_EXTENSION_MISSING);
         }
     }
-    
+
     public static bool OptionsMentionsPrivateFile(string options) =>
-        options.Contains(File_Config, StringComparison.OrdinalIgnoreCase)
-     || options.Contains(Dir_Log,     StringComparison.OrdinalIgnoreCase)
-     || options.Contains(Dir_DB,      StringComparison.OrdinalIgnoreCase);
+        options.Contains(File_Config,    StringComparison.OrdinalIgnoreCase)
+     || options.Contains(File_Cookies,   StringComparison.OrdinalIgnoreCase)
+     || options.Contains(Dir_Log + "/",  StringComparison.OrdinalIgnoreCase)
+     || options.Contains(Dir_Log + "\\", StringComparison.OrdinalIgnoreCase)
+     || options.Contains(Dir_DB  + "/",  StringComparison.OrdinalIgnoreCase)
+     || options.Contains(Dir_DB  + "\\", StringComparison.OrdinalIgnoreCase);
 
     //
 

@@ -41,7 +41,8 @@ public class Auto : CommandHandlerAsync
             await handler.Handle(context);
         }
 
-        Log($"{Title} >> AUTO{(repeats > 1 ? repeats : null)}");
+        var suffix = repeats > 1 ? $"-{repeats}" : null;
+        Log($"{Title} >> AUTO{suffix}");
     }
 
     private static readonly Regex

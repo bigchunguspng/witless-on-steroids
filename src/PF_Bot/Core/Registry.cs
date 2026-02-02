@@ -122,6 +122,7 @@ public static class Registry
             .Register("im"     , () => new UseMagick())
             .Register("peg"    , () => new UseFFMpeg())
             .Register("pipe"   , () => new Pipe())
+            .Register("auto"   , () => new Auto())
             .Register("piece"  , () => new Piece())
             .Register("w"      , () => new BrowseReddit())
             .Register("wss"    , () => new FindSubreddits())

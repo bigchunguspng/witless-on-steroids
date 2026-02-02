@@ -1,4 +1,5 @@
 ﻿using PF_Bot.Features_Aux.Settings.Core;
+using PF_Bot.Features_Main.Edit.Helpers;
 using PF_Bot.Routing.Messages.Auto;
 using PF_Bot.Routing.Messages.Commands;
 
@@ -53,9 +54,19 @@ public class Set : CommandHandlerAsync_SettingsBlocking
 
                     if (command == "*") // /set a p:scale 0.5; v:nuke; a:peg rip! 3; u:songcs
                     {
+                        var bits = Args.SplitN(2);
+                        if (bits[1].Contains("auto"))
+                        {
+                            Bot.SendSticker(Origin, ManualEditing.TROLLFACE);
+                            Thread.Sleep(500);
+                            Bot.SendMessage(Origin, "Не пойдёт 😎");
+                            SetBadStatus();
+                            return;
+                        }
+
                         AutoHandler.ClearCache(Origin.Chat);
 
-                        var result = SetOrClearOptions(type, Args.SplitN(2));
+                        var result = SetOrClearOptions(type, bits);
                         ReportAutoHandlerSet(result);
                     }
                     else // /set m largmm!!420"!!

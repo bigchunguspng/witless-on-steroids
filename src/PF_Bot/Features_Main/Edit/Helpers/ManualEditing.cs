@@ -8,7 +8,8 @@ namespace PF_Bot.Features_Main.Edit.Helpers;
 
 public static class ManualEditing
 {
-    private const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
+    // todo -> resources
+    public const string TROLLFACE = "CAACAgQAAx0CW-fiGwABBCUKZZ1tWkTgqp6spEH7zvPgyqZ3w0AAAt4BAAKrb-4HuRiqZWTyoLw0BA";
 
     public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
     {

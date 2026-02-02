@@ -14,16 +14,17 @@ public static class AutoHandler
     // EXPRESSION PARSING
 
     /// Returns command-like input string in this format: <c>cmd[ops] [args]</c>
-    public static string? TryGetHandlerInput(MessageContext context, string expression)
+    public static string? TryGetHandlerInput
+        (MessageContext context, string expression, Message? message = null, bool cache = true)
     {
-        if (Cache.TryGetValue_Failed(context.Chat, out var script))
+        if (cache.IsOff() || Cache.TryGetValue_Failed(context.Chat, out var script))
         {
             script = AutoHandlerScript.Create(expression);
-            Cache.Add(context.Chat, script);
+            if (cache) Cache.Add(context.Chat, script);
         }
 
         var type = script.SupportedFileTypes
-            .FirstOrDefault(type => MessageMatches(type, context.Message));
+            .FirstOrDefault(type => MessageMatches(type, message ?? context.Message));
         return type == 0
             ? null
             : script.GenerateInput(type, context.Text);

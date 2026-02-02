@@ -40,6 +40,8 @@ public class Auto : CommandHandlerAsync
 
             await handler.Handle(context);
         }
+
+        Log($"{Title} >> AUTO{(repeats > 1 ? repeats : null)}");
     }
 
     private static readonly Regex

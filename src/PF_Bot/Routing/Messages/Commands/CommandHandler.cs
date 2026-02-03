@@ -99,6 +99,12 @@ public abstract class CommandHandler
     protected void SetBadStatus() =>
         Status = HandlingStatus.BAD;
 
+    protected void SendBadNews(string message)
+    {
+        Status = HandlingStatus.BAD;
+        Bot.SendMessage(Origin, message);
+    }
+
     protected void SendManual(string manual)
     {
         Status = HandlingStatus.MAN;

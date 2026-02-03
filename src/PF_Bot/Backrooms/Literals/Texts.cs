@@ -170,6 +170,9 @@ public static partial class Texts
         {3}
         """;
 
+    public const string AUTO_FAIL_TYPE =
+        "Не удалось найти обработчик для сообщения данного типа {0}";
+
     public const string PIPE_FAIL_RESOLVE =
         "Не удалось распознать команду: <code>{0}</code>";
 

@@ -2,6 +2,7 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Messages.Auto;
 using PF_Bot.Routing.Messages.Commands;
+using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
@@ -12,9 +13,9 @@ public class Auto : CommandHandlerAsync
     protected override async Task Run()
     {
         var expression = Args ?? Settings.Options?[MemeType.Auto];
-        if (expression == null)
+        if (expression == null || Message is { Type: MessageType.Text, ReplyToMessage: null })
         {
-            Bot.SendMessage(Origin, "☝️ Установите автообработчик или передайте его аргументом. Справка - /man_341");
+            SendManual(AUTO_MANUAL);
             return;
         }
 
@@ -24,14 +25,14 @@ public class Auto : CommandHandlerAsync
             var input = AutoHandler.TryGetHandlerInput(Context, expression, Context.Message.ReplyToMessage, cache: false);
             if (input == null)
             {
-                Bot.SendMessage(Origin, $"Не удалось распарсить ввод {FAIL_EMOJI.PickAny()}");
+                SendBadNews(AUTO_FAIL_TYPE.Format(FAIL_EMOJI.PickAny()));
                 return;
             }
 
             var func = Registry.CommandHandlers.Resolve(input, out var command);
             if (func == null)
             {
-                Bot.SendMessage(Origin, PIPE_FAIL_RESOLVE.Format(input));
+                SendBadNews(PIPE_FAIL_RESOLVE.Format(input));
                 return;
             }
 
@@ -42,7 +43,7 @@ public class Auto : CommandHandlerAsync
         }
 
         var suffix = repeats > 1 ? $"-{repeats}" : null;
-        Log($"{Title} >> AUTO{suffix}");
+        Log($"{Title} >> AUTO{suffix}", color: LogColor.Yellow);
     }
 
     private static readonly Regex

@@ -98,10 +98,7 @@ public abstract class EatBoard_Core : Fuse
     {
         var files = ArchivePath.GetFiles($"{Args}.json");
         if (files.Length == 0)
-        {
-            SetBadStatus();
-            Bot.SendMessage(Origin, FUSE_FAIL_BOARD.Format($"{CommandName}s"));
-        }
+            SendBadNews(FUSE_FAIL_BOARD.Format($"{CommandName}s"));
         else
             await EatFromJsonFile(files[0]);
     }
@@ -159,8 +156,7 @@ public abstract class EatBoard_Core : Fuse
         }
         catch
         {
-            SetBadStatus();
-            Bot.SendMessage(Origin, UnknownURL);
+            SendBadNews(UnknownURL);
             return null;
         }
     }

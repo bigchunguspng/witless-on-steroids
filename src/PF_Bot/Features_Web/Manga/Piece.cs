@@ -101,9 +101,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
 
         if (manga == null)
         {
-            var text = PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), title);
-            SetBadStatus();
-            Bot.SendMessage(Origin, text);
+            SendBadNews(PIECE_MANGA_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), title));
         }
 
         return manga;
@@ -116,9 +114,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
         var chapter = chapters.FirstOrDefault(x => x.Number == number);
         if (chapter == null)
         {
-            var text = PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), number, manga.Code);
-            SetBadStatus();
-            Bot.SendMessage(Origin, text);
+            SendBadNews(PIECE_CHAPTER_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), number, manga.Code));
         }
 
         return chapter;

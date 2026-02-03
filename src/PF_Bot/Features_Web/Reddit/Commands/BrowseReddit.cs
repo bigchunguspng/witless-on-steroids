@@ -92,8 +92,7 @@ public class BrowseReddit : CommandHandlerAsync
         }
         else
         {
-            SetBadStatus();
-            Bot.SendMessage(Origin, "💀");
+            SendBadNews("💀");
 
             //                   He sends
             // awesome fucking evil blue flaming skull next to

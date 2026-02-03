@@ -59,8 +59,7 @@ public class Set : CommandHandlerAsync_SettingsBlocking
                         {
                             Bot.SendSticker(Origin, ManualEditing.TROLLFACE);
                             Thread.Sleep(500);
-                            Bot.SendMessage(Origin, "Не пойдёт 😎");
-                            SetBadStatus();
+                            SendBadNews("Не пойдёт 😎");
                             return;
                         }
 

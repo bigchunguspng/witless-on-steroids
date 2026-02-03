@@ -19,10 +19,7 @@ public class GetRedditLink : CommandHandlerBlocking
                 Log($"{Title} >> LINK TO r/{post.Subreddit}");
             }
             else
-            {
-                SetBadStatus();
-                Bot.SendMessage(Origin, $"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
-            }
+                SendBadNews($"{I_FORGOR.PickAny()} {FAIL_EMOJI.PickAny()}");
         }
         else
             SendManual(REDDIT_LINK_MANUAL.Format(RedditApp.KEEP_POSTS));

@@ -26,18 +26,15 @@ public class Move : CommandHandlerAsync_SettingsBlocking
         else
         {
             var name = PackManager.Move(Chat, name: Args ?? Title, _public);
-            if (name == null)
-            {
-                SetBadStatus();
-                Bot.SendMessage(Origin, "Ваш словарь пуст, сударь 🫥");
-            }
-            else
+            if (name != null)
             {
                 Log($"{Title} >> DIC {(_public ? "PUBLISHED" : "MOVED")} >> {name}", LogLevel.Info, LogColor.Fuchsia);
                 var marker = _public ? "" : "! ";
                 var result = _public ? "опубликовано" : "сохранено";
                 Bot.SendMessage(Origin, MOVING_DONE.Format(EMPTY_EMOJI.PickAny(), result, marker, name));
             }
+            else
+                SendBadNews("Ваш словарь пуст, сударь 🫥");
         }
     }
 
@@ -60,11 +57,7 @@ public class Move : CommandHandlerAsync_SettingsBlocking
             Bot.SendMessage(Origin, text);
         }
         else
-        {
-            SetBadStatus();
-            var text = PUB_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker);
-            Bot.SendMessage(Origin, text);
-        }
+            SendBadNews(PUB_NOT_FOUND.Format(FAIL_EMOJI.PickAny(), ctx.What, ctx.SourceMarker));
     }
 }
 

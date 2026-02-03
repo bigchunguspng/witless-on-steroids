@@ -99,10 +99,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
             await Baka_Fuse_Report(PackManager.GetPackPath(chat));
         }
         else
-        {
-            SetBadStatus();
-            Bot.SendMessage(Origin, FUSE_CHAT_NOT_FOUND);
-        }
+            SendBadNews(FUSE_CHAT_NOT_FOUND);
     }
 
     private async Task FuseWithPack(bool isPrivate, string arg)
@@ -156,8 +153,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         catch // wrong format
         {
             File.Delete(path);
-            SetBadStatus();
-            Bot.SendMessage(Origin, GetJsonFormatExample());
+            SendBadNews(GetJsonFormatExample());
         }
     }
 

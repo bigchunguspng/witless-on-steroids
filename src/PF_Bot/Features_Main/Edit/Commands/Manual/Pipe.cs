@@ -19,8 +19,7 @@ public class Pipe : CommandHandlerAsync
 
             if (plumber.LayPipe(pipe, Message, out var i).Failed())
             {
-                SetBadStatus();
-                Bot.SendMessage(Origin, PIPE_FAIL_RESOLVE.Format(pipe[i].SplitN(2)[0]));
+                SendBadNews(PIPE_FAIL_RESOLVE.Format(pipe[i].SplitN(2)[0]));
                 return;
             }
 

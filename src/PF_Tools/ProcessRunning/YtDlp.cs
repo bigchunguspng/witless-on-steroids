@@ -9,8 +9,8 @@ public static class YtDlp
             = "--no-mtime "
             + "--no-warnings "
             + $"--cookies \"{Path.GetFullPath(value.Value)}\" "
-            + "--js-runtime node "
-            + "--extractor-args \"youtube:player_js_version=actual\" ";
+            + "--js-runtime node ";
+         // + "--extractor-args \"youtube:player_js_version=actual\" ";
     }
 
     public static string ARGS_DEFAULT = null!;

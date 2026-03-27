@@ -25,3 +25,9 @@ public static class Extensions_Time
     public static bool HappenedWithinLast
         (this DateTime date, TimeSpan span) => DateTime.Now - date < span;
 }
+
+public static class TimeMath
+{
+    public static TimeSpan Min(TimeSpan a, TimeSpan b) => a.Ticks < b.Ticks ? a : b;
+    public static TimeSpan Max(TimeSpan a, TimeSpan b) => a.Ticks > b.Ticks ? a : b;
+}

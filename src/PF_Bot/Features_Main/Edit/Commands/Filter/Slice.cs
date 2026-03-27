@@ -18,6 +18,11 @@ public class Slice : FileEditor_AudioVideoUrl
         var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
         var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
 
+        var args = Args?.Split()
+            .Where(x => x.StartsWith("http").Janai())
+            .ToArray();
+        args.GetCutTimecodes(out var start, out var length);
+
         var sw = Stopwatch.StartNew();
 
         var (output, probe, options) = await input.InitEditing("Slice", Ext);
@@ -27,7 +32,7 @@ public class Slice : FileEditor_AudioVideoUrl
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
         await new FFMpeg_Slice(input, probe)
-            .ApplyRandomSlices(breaks / 5D, pacing / 5D)
+            .ApplyRandomSlices(breaks / 5D, pacing / 5D, new TimeSelection(start, length))
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
 

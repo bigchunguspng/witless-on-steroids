@@ -206,19 +206,21 @@ public static partial class Texts
         <u><b>Нарезка видео</b></u>
 
         <b>Синтаксис:</b>
-        <code>/slice[дк][*др]</code>
+        <code>/slice[дк][*др] [таймкоды]</code>
 
         <code>дк</code> - относительная длина кусков
         <code>др</code> - относительная длина разрывов
-
-        Стандартное значение для обеих: 5. Если <code>др</code> не указан, то <code>др</code> = <code>дк</code>.
+        <blockquote>Стандартное значение для <code>дк</code> - 5.
+        Если <code>др</code> не указан, то <code>др</code> = <code>дк</code>.</blockquote>
+        <code>таймкоды</code> - указать фрагмент <i>(см. /man_cut)</i>
 
         <blockquote><b>Примеры:</b>
         <code>/slice</code> ← стандартно
         <code>/slice5</code> ← стандартно
         <code>/slice1</code> ← короткие куски и разрывы
         <code>/slice25</code> ← длинные куски и разрывы
-        <code>/slice1*5</code> ← короткие куски, обычные разрывы</blockquote>
+        <code>/slice1*5</code> ← короткие куски, обычные разрывы
+        <code>/slice 50</code> ← нарезать только первые 50 секунд</blockquote>
 
         ☝️ Перевес в сторону <code>дк</code> даёт более длинные видео.
         """;

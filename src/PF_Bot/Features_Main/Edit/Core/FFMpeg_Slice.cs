@@ -4,17 +4,21 @@ using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Features_Main.Edit.Core;
 
+public readonly record struct TimeSelection(TimeSpan Start, TimeSpan Length)
+{
+    public TimeSpan End => Start + Length;
+}
+
 public class FFMpeg_Slice(string input, FFProbeResult probe)
 {
     private readonly FFMpegArgs _args = FFMpeg.Args();
 
-    public FFMpegArgs ApplyRandomSlices(double breaks, double pacing)
+    public FFMpegArgs ApplyRandomSlices
+        (double breaks, double pacing, TimeSelection selection = default)
     {
         var soundOnly = probe.HasAudio && (probe.HasVideo.Janai() || probe.GetVideoStream().IsLikelyImage);
-        var seconds = probe.Duration.TotalSeconds;
-        var minutes = seconds / 60;
 
-        var timecodes = GetTrimCodes(minutes, seconds, breaks, pacing, soundOnly);
+        var timecodes = GetTrimCodes(breaks, pacing, soundOnly, selection);
 
         AddInputs(timecodes);
         AddFilter(timecodes, soundOnly);
@@ -24,7 +28,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
 
     private void AddInputs(List<TrimCode> timecodes)
     {
-        timecodes.ForEach(codes => _args.Input(input, $"-ss {codes.A:F3} -to {codes.B:F3}"));
+        timecodes.ForEach(codes => _args.Input(input, $"-ss {codes.Start:F3} -to {codes.End:F3}"));
     }
 
     private void AddFilter(List<TrimCode> timecodes, bool soundOnly)
@@ -49,10 +53,22 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
 
     // PURE LOGIC
 
-    private record TrimCode(double A, double B);
-
-    private static List<TrimCode> GetTrimCodes(double minutes, double seconds, double breaks, double pacing, bool soundOnly)
+    private readonly record struct TrimCode(double Start, double End)
     {
+        public double Length => End - Start;
+    }
+
+    private List<TrimCode> GetTrimCodes
+        (double breaks, double pacing, bool soundOnly, TimeSelection selection)
+    {
+        var offset   = selection.Start.TotalSeconds;
+        var duration = selection.Length == TimeSpan.Zero
+            ?                             probe.Duration  - selection.Start
+            : TimeMath.Min(selection.End, probe.Duration) - selection.Start;
+
+        var seconds = duration.TotalSeconds;
+        var minutes = seconds / 60;
+
         var timecodes = new List<TrimCode>();
         var head = -seconds / 2;
         while (head < seconds)
@@ -82,7 +98,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
             var a = Math.Clamp(head + step, 0, seconds);
             var b = Math.Min(a + length, seconds);
 
-            timecodes.Add(new TrimCode(a, b));
+            timecodes.Add(new TrimCode(offset + a, offset + b));
 
             head = b;
 
@@ -93,7 +109,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
             }
         }
 
-        if (timecodes[^1].B - timecodes[^1].A == 0)
+        if (timecodes.Count > 0 && timecodes[^1].Length == 0)
             timecodes.RemoveAt(timecodes.Count - 1);
 
         if (seconds < 5) // SHUFFLE

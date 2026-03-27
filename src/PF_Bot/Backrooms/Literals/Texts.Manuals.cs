@@ -225,6 +225,11 @@ public static partial class Texts
         ☝️ Перевес в сторону <code>дк</code> даёт более длинные видео.
         """;
 
+    public const string RANDOM_MANUAL =
+        """
+        Ещё нету, приходи позже...
+        """;
+
     public const string CROP_MANUAL =
         """
         <b><u>Обрезка кадра</u></b> ✋🤚

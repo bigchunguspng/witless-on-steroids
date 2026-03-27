@@ -1,4 +1,6 @@
-﻿namespace PF_Bot.Features_Main.Memes.Core.Options;
+﻿using PF_Bot.Routing.Messages.Commands;
+
+namespace PF_Bot.Features_Main.Memes.Core.Options;
 
 public class MemeOptionsContext(bool empty, string buffer, string? options, string? commandOptions)
 {
@@ -15,4 +17,14 @@ public class MemeOptionsContext(bool empty, string buffer, string? options, stri
 
     /// Options provided via command (opposed to default options).
     public readonly string? CommandOptions = commandOptions;
+
+    public static MemeOptionsContext FromCommandContext(CommandContext context)
+    {
+        var options = context.Options;
+
+        var empty = options == null;
+        if (empty) return new MemeOptionsContext(empty, string.Empty, null, null);
+
+        return new MemeOptionsContext(empty, $"{options}", options, options);
+    }
 }

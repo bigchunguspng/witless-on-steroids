@@ -2,6 +2,8 @@
 
 public static class MemeOptions_Extensions
 {
+    // NON-INVASIVE CHECKS
+
     public static bool Check
         (this MemeOptionsContext context, Regex regex)
         => context.Empty.Janai()
@@ -11,6 +13,8 @@ public static class MemeOptions_Extensions
         (this MemeOptionsContext context, string option)
         => context.Empty.Janai()
         && context.Buffer.Contains(option, StringComparison.Ordinal);
+
+    // INVASIVE CHECKS (match gets cut out)
 
     public static bool CheckAndCut
         (this MemeOptionsContext context, Regex regex, int group = 1)
@@ -45,16 +49,14 @@ public static class MemeOptions_Extensions
     public static string? GetValue
         (this MemeOptionsContext context, Regex regex, int group = 1)
     {
-        if (context.Empty) return null;
+        if (context.Empty)  return null;
 
         var match = regex.Match(context.Buffer);
         if (match.Failed()) return null;
 
         var value = match.Groups[group].Value;
-        for (var i = match.Groups.Count - 1; i > 0; i--)
-        {
-            context.CutCaptureOut(match.Groups[i]);
-        }
+
+        context.CutCapturesOut(match);
 
         return value;
     }
@@ -68,6 +70,27 @@ public static class MemeOptions_Extensions
         return int.Parse(value);
     }
 
+    public static (int from, int to) GetIntRange
+    (
+        this MemeOptionsContext context,
+        Regex regex,
+        (int from, int to) @default,
+        (int from, int to) groups
+    )
+    {
+        if (context.Empty)  return @default;
+
+        var match = regex.Match(context.Buffer);
+        if (match.Failed()) return @default;
+
+        var from = match.Groups[groups.from].Value;
+        var   to = match.Groups[groups.to  ].Value.MakeNull_IfEmpty() ?? from;
+
+        context.CutCapturesOut(match);
+
+        return (int.Parse(from), int.Parse(to));
+    }
+
     /// 75 -> 0.75; 5 -> 0.5; 0.5 -> 0.05.
     public static float GetFraction
         (this MemeOptionsContext context, Regex regex, int @default, int group = 1)
@@ -79,6 +102,18 @@ public static class MemeOptions_Extensions
             ? (@default, @default.ToString())
             : (int.Parse(value), value);
         return number / MathF.Pow(10, text.Length);
+    }
+
+    /// Don't use nested capturing groups in matches you pass here!
+    /// BAD:    (a(b)),
+    /// OK: (?:(a)(b)).
+    private static void CutCapturesOut
+        (this MemeOptionsContext context, Match match)
+    {
+        for (var i = match.Groups.Count - 1; i > 0; i--)
+        {
+            context.CutCaptureOut(match.Groups[i]);
+        }
     }
 
     public static void CutCaptureOut

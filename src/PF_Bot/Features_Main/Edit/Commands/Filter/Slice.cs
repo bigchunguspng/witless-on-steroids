@@ -37,7 +37,7 @@ public class Slice : FileEditor_AudioVideoUrl
             .FFMpeg_Run();
 
         SendResult(output);
-        Log($"{Title} >> SLICE [{breaks}*{pacing}] >> {sw.ElapsedReadable()}");
+        Log($"{Title} >> SLICE [{breaks}*{pacing}, {start} - {TimeMath.Min(length, probe.Duration)}] >> {sw.ElapsedReadable()}");
     }
 
     protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";

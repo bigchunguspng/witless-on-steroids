@@ -164,11 +164,11 @@ public static partial class Texts
 
     public const string CUT_MANUAL =
         """
-        <u><b>Обрезка видео</b></u>
+        <u><b>Обрезка (и скачивание) видео</b></u>
 
         <blockquote><b>Примеры:</b>
         <code>/cut 10</code> ← первые 10 секунд
-        <code>/cut 10 x</code> ← всё после 10-й секунды
+        <code>/cut 10 .</code> ← всё после 10-й секунды
         <code>/cut 10 5</code> ← с 10-й секунды по 15-ю
         <code>/cut 10 - 15</code> ← тоже</blockquote>
 
@@ -178,9 +178,22 @@ public static partial class Texts
         1:28 ← минута, 28 секунд
         3.65 ← 3 секунды, 650 мс.</blockquote>
 
-        📎 Куда вставлять ссылку, если что?
-        <blockquote><b>В начало:</b>
-        /cut https://youtu.be/dydER0YegMc 2:00</blockquote>
+        📎 Как скачать по ссылке?
+        <blockquote><b>Определённый фрагмент:</b>
+        /cut https://youtu.be/dydER0YegMc 1:30
+        /cut 1:30 https://youtu.be/dydER0YegMc
+        <b>Полностью</b> (если видео короткое):
+        /cut https://youtu.be/PgGrwmFWr0I
+        </blockquote>
+        """;
+
+    public const string CUT_TOO_BIG_RESPONSE =
+        """
+        {1} К сожалению, скачанный файл весит <b>{0}</b>, что больше допустимого лимита в <b>50 МБ</b>. 
+
+        ☝️ Как вариант, я могу прислать фрагмент видео. Для этого, отредактируйте сообщение, указав таймкоды нужного фрагмента ✍️
+
+        📖 Синтаксис команды: /man_cut
         """;
 
     public const string SUS_MANUAL =

@@ -75,7 +75,7 @@ public partial class FFMpeg_Effects
 
         var timecodes = new List<TrimCode>();
         var head = -seconds / 2;
-        while (head < seconds)
+        while (head < seconds) // PICK A TIMECODE
         {
             var goBack_pc = Math.Clamp(10 + go_back_chance_mul / (seconds + 15), 10, 80).RoundInt();
             var direction = LuckyFor(goBack_pc) ? -1.0 : 1.0;
@@ -105,10 +105,17 @@ public partial class FFMpeg_Effects
 
             head = b;
 
-            double BigLeap()
+            double BigLeap() // seconds >= 60
             {
-                var avg = Math.Min(seconds + head, 2 * seconds - head);
-                return direction * RandomInt(10, Math.Max(10, (int)(0.1 * avg)));
+                var edge_distance = Math.Min(head, seconds - head);
+                var s = (seconds + edge_distance) / 10; // 60s - 6-9s,  5m - 30-45s
+                var abs = Math.Abs(10 - s);
+                var extra = abs < 5
+                    ? 0.5 * (5 - abs)
+                    : 0;
+                var min = Math.Min(10, s) - extra;
+                var max = Math.Max(10, s) + extra;
+                return direction * RandomDouble(min, max); // only forward!
             }
         }
 

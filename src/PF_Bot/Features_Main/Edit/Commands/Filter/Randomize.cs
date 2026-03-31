@@ -4,28 +4,19 @@ using PF_Tools.FFMpeg;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 
-/*
-    /random[ops] [timecodes]
-    == fragment repeats
-    ^N - % of repeating a fragment 0..100,10
-    *N..M - range of possible repeat number 1..99,1..4
-    == nuke
-    N% - % of nuking a fragment, 0..100,10
-    N" / N..M" - range of possible nuke depth, 1..9,1..2
-    == misc
-    s - sorted (fragments are shuffled a bit by default)
-*/
-
 public class Randomize : FileEditor_AudioVideoUrl
 {
     private const string
         _r_sorted = "s";
 
     private static readonly Regex
-        _r_nuke_pc        = new(@"(\d{1,3})(%)",                      RegexOptions.Compiled),
-        _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled),
-        _r_rep_pc         = new(@"(\^)(\d{1,3})(%)",                  RegexOptions.Compiled),
-        _r_rep_range      = new(@"(\*)(\d{1,2})(?:(\.\.)(\d{1,2}))?", RegexOptions.Compiled);
+        _r_sfx_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 10a
+        _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
+        _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
+        _r_nuke_pc        = new(@"(\d{1,3})(n)",                      RegexOptions.Compiled), // 10n
+        _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled), // 1..4"
+        _r_rep_pc         = new(@"(\d{1,3})(r)",                      RegexOptions.Compiled), // 10r
+        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\*)", RegexOptions.Compiled); // 1..25*
 
     protected override string SyntaxManual => "/man_random";
 
@@ -36,15 +27,18 @@ public class Randomize : FileEditor_AudioVideoUrl
         // OPTIONS
         var options_ctx = MemeOptionsContext.FromCommandContext(Context);
 
-        var  rep_pc = options_ctx.GetInt( _r_rep_pc, 10, 2).ClampByte();
-        var nuke_pc = options_ctx.GetInt(_r_nuke_pc, 10   ).ClampByte();
+        var  sfx_pc = options_ctx.GetInt( _r_sfx_pc, 10).ClampByte();
+        var time_pc = options_ctx.GetInt(_r_time_pc, 10).ClampByte();
+        var crop_pc = options_ctx.GetInt(_r_crop_pc, 10).ClampByte();
+        var  rep_pc = options_ctx.GetInt( _r_rep_pc, 10).ClampByte();
+        var nuke_pc = options_ctx.GetInt(_r_nuke_pc, 10).ClampByte();
 
-        var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 4), (2, 4));
+        var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 4), (1, 3));
         var nuke_range = options_ctx.GetIntRange(_r_nuke_dep_range, (1, 2), (1, 3));
 
         var sorted = options_ctx.Check(_r_sorted);
 
-        var filter_options = new RandomizeOptions(rep_range, nuke_range, rep_pc, nuke_pc, sorted);
+        var filter_options = new RandomizeOptions(rep_range, nuke_range, rep_pc, nuke_pc, sfx_pc, time_pc, crop_pc, sorted);
 
         var args = Args?.Split()
             .Where(x => x.StartsWith("http").Janai())
@@ -60,10 +54,12 @@ public class Randomize : FileEditor_AudioVideoUrl
         if (video != null)
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
-        await new FFMpeg_Randomize(input, probe)
-            .ApplyEffects(filter_options, new TimeSelection(start, length))
+        await new FFMpeg_Effects(input, probe)
+            .FX_Random(filter_options, new TimeSelection(start, length))
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
+
+        var log_end = length == TimeSpan.Zero ? probe.Duration : TimeMath.Min(start + length, probe.Duration);
 
         SendResult(output);
         Log
@@ -71,7 +67,7 @@ public class Randomize : FileEditor_AudioVideoUrl
             $"{Title} >> RANDOMIZE ["
           + $"R:{ rep_range.from}..{ rep_range.to}^{ rep_pc}%, "
           + $"N:{nuke_range.from}..{nuke_range.to}^{nuke_pc}%, "
-          + $"{start} - {TimeMath.Min(length, probe.Duration)}"
+          + $"{start} - {log_end}"
           + $"] >> {sw.ElapsedReadable()}"
         );
     }

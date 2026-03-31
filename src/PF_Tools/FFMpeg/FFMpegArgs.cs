@@ -38,7 +38,7 @@ public class FFMpegArgs
         => this.Fluent(() => _filter.AppendSeparator(';').Append(filter));
 
     /// Arg is auto-prepended by ',' if filtergraph is not empty,
-    /// except when filtergraph ends with ']' or arg starts with ':', '=' or '+'.
+    /// except when filtergraph ends with ']' or arg starts with '[', ':', '=' or '+'.
     /// Don't pass empty strings!
     public FFMpegArgs FilterAppend
         (string filter)
@@ -48,7 +48,7 @@ public class FFMpegArgs
             {
                 var ending = _filter[^1];
                 var start  =  filter[0];
-                var insertComma = false == (ending is ']' || start is ':' or '=' or '+');
+                var insertComma = false == (ending is ']' || start is '[' or ':' or '=' or '+');
                 if (insertComma)
                     _filter.Append(',');
             }

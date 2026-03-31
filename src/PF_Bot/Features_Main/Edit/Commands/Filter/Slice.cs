@@ -15,8 +15,8 @@ public class Slice : FileEditor_AudioVideoUrl
         var input = await GetFile();
 
         var match = _rgx_multipliers.Match(Options);
-        var pacing = match.ExtractGroup(1, int.Parse, 5);      // length of shown   parts
-        var breaks = match.ExtractGroup(2, int.Parse, pacing); // length of dropped parts
+        var piece_len = match.ExtractGroup(1, int.Parse, 5);         // length of shown   parts
+        var break_len = match.ExtractGroup(2, int.Parse, piece_len); // length of dropped parts
 
         var args = Args?.Split()
             .Where(x => x.StartsWith("http").Janai())
@@ -31,13 +31,15 @@ public class Slice : FileEditor_AudioVideoUrl
         if (video != null)
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
-        await new FFMpeg_Slice(input, probe)
-            .ApplyRandomSlices(breaks / 5D, pacing / 5D, new TimeSelection(start, length))
+        await new FFMpeg_Effects(input, probe)
+            .FX_Slice(piece_len / 5.0, break_len / 5.0, new TimeSelection(start, length))
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
 
+        var log_end = length == TimeSpan.Zero ? probe.Duration : TimeMath.Min(start + length, probe.Duration);
+
         SendResult(output);
-        Log($"{Title} >> SLICE [{breaks}*{pacing}, {start} - {TimeMath.Min(length, probe.Duration)}] >> {sw.ElapsedReadable()}");
+        Log($"{Title} >> SLICE [{piece_len}*{break_len}, {start} - {log_end}] >> {sw.ElapsedReadable()}");
     }
 
     protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";

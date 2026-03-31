@@ -4,15 +4,14 @@ using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Features_Main.Edit.Core;
 
-public class FFMpeg_Nuke(FFProbeResult probe, MemeRequest request)
+public partial class FFMpeg_Effects
 {
-    private readonly FFMpegArgs             _args = new();
-    private readonly FFMpegOutputOptions _options = new();
-
-    public FFMpegArgs Nuke(int depth = 1)
+    public FFMpegArgs FX_Nuke(MemeRequest request, int depth = 1)
     {
+        var options = new FFMpegOutputOptions();
+
         _args.Input(request.SourcePath);
-        _args.Out  (request.TargetPath, _options);
+        _args.Out  (request.TargetPath, options);
         _args.Filter("[v:0]");
 
         if (request.IsVideo)
@@ -32,7 +31,7 @@ public class FFMpeg_Nuke(FFProbeResult probe, MemeRequest request)
             DropNuke(request.IsVideo);
         }
 
-        SetQuality();
+        SetQuality(options, request);
 
         return _args;
     }
@@ -134,18 +133,18 @@ public class FFMpeg_Nuke(FFProbeResult probe, MemeRequest request)
         // https://ffmpeg.org/ffmpeg-filters.html#noise
     }
 
-    private void SetQuality()
+    private void SetQuality(FFMpegOutputOptions options, MemeRequest request)
     {
         var quality = request.Quality;
 
         if (request.IsVideo)
-            _options.Meme_Compression(quality, probe);
+            options.Meme_Compression(quality, probe);
 
         var sticker = request is { IsSticker: true, ExportAsSticker: true };
         if (sticker)
         {
             var qscale = quality.GetQscale_WEBP();
-            _options.Options($"-qscale:v {qscale}");
+            options.Options($"-qscale:v {qscale}");
         }
     }
 }

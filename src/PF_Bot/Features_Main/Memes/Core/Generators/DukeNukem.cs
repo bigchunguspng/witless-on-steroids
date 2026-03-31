@@ -17,8 +17,8 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
     {
         //throw new InvalidOperationException($"Surprize mazafaka! {DateTime.Now.Ticks}");
         var probe = await FFProbe.Analyze(request.SourcePath);
-        var result = await new FFMpeg_Nuke(probe, request)
-            .Nuke(op.Depth)
+        var result = await new FFMpeg_Effects(request.SourcePath, probe)
+            .FX_Nuke(request, op.Depth)
             .FFMpeg_Run();
 
         LogNuke(chat, result, request);
@@ -27,8 +27,8 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
     public async Task GenerateVideoMeme(MemeRequest request, int text)
     {
         var probe = await FFProbe.Analyze(request.SourcePath);
-        var result = await new FFMpeg_Nuke(probe, request)
-            .Nuke(op.Depth.Clamp(3))
+        var result = await new FFMpeg_Effects(request.SourcePath, probe)
+            .FX_Nuke(request, op.Depth.Clamp(3))
             .FFMpeg_Run();
 
         LogNuke(chat, result, request);

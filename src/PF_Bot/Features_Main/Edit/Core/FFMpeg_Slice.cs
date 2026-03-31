@@ -9,16 +9,21 @@ public readonly record struct TimeSelection(TimeSpan Start, TimeSpan Length)
     public TimeSpan End => Start + Length;
 }
 
-public class FFMpeg_Slice(string input, FFProbeResult probe)
+public partial class FFMpeg_Effects(string input, FFProbeResult probe)
 {
     private readonly FFMpegArgs _args = FFMpeg.Args();
 
-    public FFMpegArgs ApplyRandomSlices
-        (double breaks, double pacing, TimeSelection selection = default)
-    {
-        var soundOnly = probe.HasAudio && (probe.HasVideo.Janai() || probe.GetVideoStream().IsLikelyImage);
+    private bool SoundOnly
+        () => probe.HasAudio && (probe.HasVideo.Janai() || probe.GetVideoStream().IsLikelyImage);
+}
 
-        var timecodes = GetTrimCodes(breaks, pacing, soundOnly, selection);
+public partial class FFMpeg_Effects
+{
+    public FFMpegArgs FX_Slice
+        (double piece_len_mul, double break_len_mul, TimeSelection selection = default)
+    {
+        var soundOnly = SoundOnly();
+        var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection);
 
         AddInputs(timecodes);
         AddFilter(timecodes, soundOnly);
@@ -28,7 +33,7 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
 
     private void AddInputs(List<TrimCode> timecodes)
     {
-        timecodes.ForEach(codes => _args.Input(input, $"-ss {codes.Start:F3} -to {codes.End:F3}"));
+        timecodes.ForEach(trim => _args.Input(input, $"-ss {trim.Start:F3} -to {trim.End:F3}"));
     }
 
     private void AddFilter(List<TrimCode> timecodes, bool soundOnly)
@@ -50,16 +55,15 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
         _args.Filter(sb.ToString());
     }
 
-
     // PURE LOGIC
 
-    private readonly record struct TrimCode(double Start, double End)
+    protected readonly record struct TrimCode(double Start, double End)
     {
         public double Length => End - Start;
     }
 
     private List<TrimCode> GetTrimCodes
-        (double breaks, double pacing, bool soundOnly, TimeSelection selection)
+        (double piece_len_mul, double break_len_mul, bool soundOnly, TimeSelection selection, int go_back_chance_mul = 750)
     {
         var offset   = selection.Start.TotalSeconds;
         var duration = selection.Length == TimeSpan.Zero
@@ -73,25 +77,24 @@ public class FFMpeg_Slice(string input, FFProbeResult probe)
         var head = -seconds / 2;
         while (head < seconds)
         {
-            var chanceOfGoingBackwards
-                = seconds <  5 ? 8
-                : seconds < 30 ? 6
-                : seconds < 60 ? 4 : 2;
+            var goBack_pc = Math.Clamp(10 + go_back_chance_mul / (seconds + 15), 10, 80).RoundInt();
+            var direction = LuckyFor(goBack_pc) ? -1.0 : 1.0;
 
-            var direction = IsFirstOf(chanceOfGoingBackwards, 10) ? -1D : 1D;
-            var step = direction
-                * seconds <  5 ? RandomDouble(seconds / 20, seconds / 5)
-                : seconds < 30 ? IsOneIn(3) ? RandomInt(2,  5) : seconds / 15
-                : seconds < 60 ? IsOneIn(5) ? RandomInt(2, 10) : 5
-                : minutes <  5 ? IsOneIn(2) ? IsOneIn(2) ? RandomInt(10, 30) : RandomInt(1, 5) :  5
-                :                IsOneIn(2) ? IsOneIn(2) ? BigLeap()         : RandomInt(1, 5) : 10;
+            //                      ↓  1m - 0%,  5m - 10%,  60m - 25%,  3h - 33%
+            var step_abs = LuckyFor((15 * Math.Log10(minutes)).RoundInt())
+                ? BigLeap()
+                : LuckyFor(20)
+                    ? RandomDouble(Math.Min(1, seconds / 300), seconds / 20) // short  leap
+                    : RandomDouble(seconds / 20, seconds / 5);               // medium leap (main case)
 
-            var length = seconds < 5
-                ? RandomDouble(0.15, 0.35)
-                : RandomDouble(0.25, Math.Min(0.35 + 0.01 * seconds, 1.25));
+            var step = direction * Math.Max(0.025, step_abs);
 
-            step   *= breaks; // skip: less..more
-            length *= pacing; // fast..slow
+            var length = seconds < 10
+                ? RandomDouble(0.15 + 0.01 * seconds, 0.35 + 0.01 * seconds) // 0.15..0.35 - 0.25..0.45
+                : RandomDouble(0.25,   Math.Min(1.25, 0.35 + 0.01 * seconds));            // 0.25..0.45  -90s-  0.25..1.25
+
+            step   *= break_len_mul;
+            length *= piece_len_mul;
 
             if (soundOnly && minutes < 3) length *= RandomDouble(1.5, 3);
 

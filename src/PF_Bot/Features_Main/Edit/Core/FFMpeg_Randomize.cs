@@ -1,4 +1,5 @@
 using PF_Tools.FFMpeg;
+using static PF_Tools.Backrooms.Helpers.Fortune;
 
 namespace PF_Bot.Features_Main.Edit.Core;
 
@@ -50,17 +51,23 @@ public partial class FFMpeg_Effects
         var audio = probe.HasAudio;
 
         // MAP + REPEATS
+        var adjust_timecodes = IsOneIn(2);
         foreach (var timecode in timecodes)
         {
             fragments.Add(new Fragment(timecode, 0));
-            var repeat = Fortune.LuckyFor(options.Percent_Repeats);
+            var repeat = LuckyFor(options.Percent_Repeats);
             if (repeat)
             {
                 var (from, to) = options.Range_Repeats;
-                var number = Fortune.RandomInt(from, to);
+                var number = RandomInt(from, to);
                 for (var i = 0; i < number; i++)
                 {
-                    fragments.Add(new Fragment(timecode, i + 1));
+                    if (LuckyFor(adjust_timecodes ? 20 : 35)) adjust_timecodes = !adjust_timecodes;
+
+                    var length = timecode.Length;
+                    var start  = timecode.Start + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
+                    var end    = timecode.End   + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
+                    fragments.Add(new Fragment(new TrimCode(start, end), i + 1));
                 }
             }
         }
@@ -70,11 +77,11 @@ public partial class FFMpeg_Effects
         {
             if (video)
             {
-                var nuke = Fortune.LuckyFor(options.Percent_Nuke); // todo only if video
+                var nuke = LuckyFor(options.Percent_Nuke);
                 if (nuke)
                 {
                     var (from, to) = options.Range_Nuke;
-                    fragment.Nuke = Fortune.RandomInt(from, to);
+                    fragment.Nuke = RandomInt(from, to);
                 }
             }
 

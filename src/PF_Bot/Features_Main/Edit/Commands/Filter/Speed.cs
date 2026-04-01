@@ -26,7 +26,7 @@ public class Speed : FileEditor_AudioVideo
 
         var (output, probe, options) = await input.InitEditing("Speed", Ext);
 
-        if (probe.HasVideo)
+        if (probe.HasVideo && probe.GetVideoStream().IsLikelyImage.Janai())
         {
             var video = probe.GetVideoStream();
             var fps = Math.Min(video.AvgFramerate * _speed, 90D);

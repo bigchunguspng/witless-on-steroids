@@ -12,7 +12,7 @@ public record struct RandomizeOptions
     byte Percent_Sfx,  // volume, eq
     byte Percent_Time, // fast / slow, pitch
     byte Percent_Crop, // pan, scale, transform etc
-    bool sorted
+    bool Sorted
 );
 
 public partial class FFMpeg_Effects
@@ -21,7 +21,7 @@ public partial class FFMpeg_Effects
         (double piece_len_mul, double break_len_mul, RandomizeOptions options, TimeSelection selection = default)
     {
         var soundOnly = SoundOnly(); // ↓ default: 0.1, 0.25
-        var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection, go_back_chance_mul: 200);
+        var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection, 200, options.Sorted.IsOff());
         var fragments = GenerateSchematic(timecodes, options, soundOnly);
 
         // todo random-specific slicing code

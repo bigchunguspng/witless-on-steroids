@@ -63,7 +63,14 @@ public partial class FFMpeg_Effects
     }
 
     private List<TrimCode> GetTrimCodes
-        (double piece_len_mul, double break_len_mul, bool soundOnly, TimeSelection selection, int go_back_chance_mul = 750)
+    (
+        double piece_len_mul,
+        double break_len_mul,
+        bool soundOnly,
+        TimeSelection selection,
+        int go_back_chance_mul = 750,
+        bool force_shuffle = false
+    )
     {
         var offset   = selection.Start.TotalSeconds;
         var duration = selection.Length == TimeSpan.Zero
@@ -122,7 +129,7 @@ public partial class FFMpeg_Effects
         if (timecodes.Count > 0 && timecodes[^1].Length == 0)
             timecodes.RemoveAt(timecodes.Count - 1);
 
-        if (seconds < 5) // SHUFFLE
+        if (seconds < 5 || force_shuffle) // SHUFFLE
         {
             var shuffles = RandomInt(0, timecodes.Count / 3);
             for (var i = 0; i < shuffles; i++)

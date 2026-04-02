@@ -10,13 +10,14 @@ public class Randomize : FileEditor_AudioVideoUrl
         _r_sorted = "s";
 
     private static readonly Regex
+        _r_multipliers    = new(@"(\d+)(?:\*(\d+))?",                 RegexOptions.Compiled), // 1*1
         _r_sfx_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 10a
         _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
         _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
         _r_nuke_pc        = new(@"(\d{1,3})(n)",                      RegexOptions.Compiled), // 10n
         _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled), // 1..4"
         _r_rep_pc         = new(@"(\d{1,3})(r)",                      RegexOptions.Compiled), // 10r
-        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\*)", RegexOptions.Compiled); // 1..25*
+        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\^)", RegexOptions.Compiled); // 1..25^
 
     protected override string SyntaxManual => "/man_random";
 
@@ -35,6 +36,10 @@ public class Randomize : FileEditor_AudioVideoUrl
 
         var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 4), (1, 3));
         var nuke_range = options_ctx.GetIntRange(_r_nuke_dep_range, (1, 2), (1, 3));
+
+        var match = _r_multipliers.Match(options_ctx.Buffer);
+        var piece_len = match.ExtractGroup(1, int.Parse, 1);
+        var break_len = match.ExtractGroup(2, int.Parse, piece_len);
 
         var sorted = options_ctx.Check(_r_sorted);
 
@@ -55,7 +60,7 @@ public class Randomize : FileEditor_AudioVideoUrl
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
         await new FFMpeg_Effects(input, probe)
-            .FX_Random(filter_options, new TimeSelection(start, length))
+            .FX_Random(piece_len / 10.0, break_len / 4.0, filter_options, new TimeSelection(start, length))
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
 
@@ -65,6 +70,7 @@ public class Randomize : FileEditor_AudioVideoUrl
         Log
         (
             $"{Title} >> RANDOMIZE ["
+          + $"{piece_len}*{break_len}, "
           + $"R:{ rep_range.from}..{ rep_range.to}^{ rep_pc}%, "
           + $"N:{nuke_range.from}..{nuke_range.to}^{nuke_pc}%, "
           + $"{start} - {log_end}"

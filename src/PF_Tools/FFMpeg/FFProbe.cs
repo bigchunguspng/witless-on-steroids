@@ -11,12 +11,13 @@ public static class FFProbe
         BIT_RATE    = "bit_rate",
         RAW_RATE    =   "r_frame_rate",
         AVG_RATE    = "avg_frame_rate",
+        SAMPLE_RATE = "sample_rate",
         W = "width",
         H = "height",
-        PIXFMT = "pix_fmt";
+        PIXFMT = "pix_fmt",
 
-    private const string ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{BIT_RATE},{RAW_RATE},{AVG_RATE},{W},{H},{PIXFMT}";
-    private const string ARGS     = $"-v error -show_entries stream={ENTRIES}";
+        ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{BIT_RATE},{RAW_RATE},{AVG_RATE},{SAMPLE_RATE},{W},{H},{PIXFMT}",
+        ARGS     = $"-v error -show_entries stream={ENTRIES}";
 
 
     // WRAPPERS
@@ -84,6 +85,7 @@ public static class FFProbe
                 case DURATION:    streams[^1].Duration     = ParseFloat_NA(value); break; // float      | N/A -> NaN
                 case DURATION_TS: streams[^1].DurationTs   = ParseInt___NA(value); break; // int        | N/A -> -1
                 case BIT_RATE:    streams[^1].Bitrate      = ParseInt___NA(value); break; // int        | N/A -> -1
+                case SAMPLE_RATE: streams[^1].SampleRate   = ParseInt___NA(value); break; // int        | [not tested]
                 case W:           streams[^1].Width        = ParseInt___NA(value); break; // int        | -
                 case H:           streams[^1].Height       = ParseInt___NA(value); break; // int        | -
                 case RAW_RATE:    streams[^1].RawFramerate = ParseFps___NA(value); break; // 24000/1001 | N/A -> NaN

@@ -15,8 +15,8 @@ public class Slice : FileEditor_AudioVideoUrl
         var input = await GetFile();
 
         var match = _rgx_multipliers.Match(Options);
-        var piece_len = match.ExtractGroup(1, int.Parse, 5);         // length of shown   parts
-        var break_len = match.ExtractGroup(2, int.Parse, piece_len); // length of dropped parts
+        var piece_len = match.ExtractGroup(1, int.Parse, 5);
+        var break_len = match.ExtractGroup(2, int.Parse, piece_len);
 
         var args = Args?.Split()
             .Where(x => x.StartsWith("http").Janai())

@@ -23,6 +23,7 @@ public class FFProbeResult(List<FFProbeResult.Stream> streams)
         public float   Duration     { get; set; } // seconds
         public int     DurationTs   { get; set; } // timebase units
         public int     Bitrate      { get; set; }
+        public int     SampleRate   { get; set; }
         public float   AvgFramerate { get; set; }
         public float   RawFramerate { get; set; }
         public int?    Width        { get; set; }

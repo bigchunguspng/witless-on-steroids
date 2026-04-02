@@ -18,13 +18,13 @@ public record struct RandomizeOptions
 public partial class FFMpeg_Effects
 {
     public FFMpegArgs FX_Random
-        (RandomizeOptions options, TimeSelection selection = default)
+        (double piece_len_mul, double break_len_mul, RandomizeOptions options, TimeSelection selection = default)
     {
-        var soundOnly = SoundOnly();
-        var timecodes = GetTrimCodes(0.1, 0.25, soundOnly, selection, go_back_chance_mul: 200); // todo random-specific slicing code
+        var soundOnly = SoundOnly(); // ↓ default: 0.1, 0.25
+        var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection, go_back_chance_mul: 200);
         var fragments = GenerateSchematic(timecodes, options, soundOnly);
 
-        // todo
+        // todo random-specific slicing code
         // repeats - not equal in length, may be offset
         // slice jump back and forth with higher chance
 
@@ -36,11 +36,16 @@ public partial class FFMpeg_Effects
 
     private record Fragment(TrimCode Trim, int Copy) // repeat number, 0 - first occurence
     {
-        public int Nuke { get; set; }
+        public int    Nuke  { get; set; }
+        public double Speed { get; set; } = 1.0;
 
-        public bool UseOriginalVideo => Nuke == 0;
-        public bool UseOriginalAudio => true;
+        public bool TimeStretch => Math.Abs(1.0 - Speed) > 0.005;
+
+        public bool UseOriginalVideo => TimeStretch.IsOff() && Nuke == 0;
+        public bool UseOriginalAudio => TimeStretch.IsOff();
     }
+
+    // PHASE I
 
     private List<Fragment> GenerateSchematic
         (List<TrimCode> timecodes, RandomizeOptions options, bool soundOnly)
@@ -89,10 +94,24 @@ public partial class FFMpeg_Effects
             {
 
             }
+
+            // (any)
+            {
+                var time = LuckyFor(options.Percent_Time);
+                if (time)
+                {
+                    fragment.Speed = IsOneIn(2)
+                        ? RandomDouble(0.5, 1.0)
+                        : RandomDouble(1.0, 2.0);
+                    // todo chance of very slow frag
+                }
+            }
         }
 
         return fragments;
     }
+
+    // PHASE II
 
     private void AddInputs(List<Fragment> fragments)
     {
@@ -113,6 +132,13 @@ public partial class FFMpeg_Effects
             if (video && frag.UseOriginalVideo.Janai()) // VFX
             {
                 _args.Filter($"[{i}:v]");
+
+                if (frag.TimeStretch)
+                {
+                    _args.FilterAppend($"setpts={1 / frag.Speed:F3}*PTS");
+                    _args.FilterAppend($"fps={probe.GetVideoStream().AvgFramerate}");
+                }
+
                 if (frag.Nuke > 0)
                 {
                     for (var j = 0; j < frag.Nuke; j++)
@@ -120,13 +146,21 @@ public partial class FFMpeg_Effects
                         DropNuke(isVideo: true);
                     }
                 }
+
                 _args.FilterAppend($"[v{i}]");
             }
 
             if (audio && frag.UseOriginalAudio.Janai()) // AFX
             {
                 _args.Filter($"[{i}:a]");
-                // ...
+
+                if (frag.TimeStretch)
+                {
+                    _ = IsOneIn(2)
+                        ? _args.FilterAppend  ($"atempo={frag.Speed:F3}") // maintain pitch
+                        : _args.FilterAppend($"asetrate={frag.Speed:F3}*{probe.GetAudioStream().SampleRate}"); // change pitch
+                }
+
                 _args.FilterAppend($"[a{i}]");
             }
         }

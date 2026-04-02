@@ -7,11 +7,11 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 public class Randomize : FileEditor_AudioVideoUrl
 {
     private const string
-        _r_sorted = "s";
+        _r_ordered = "o";
 
     private static readonly Regex
         _r_multipliers    = new(@"(\d+)(?:\*(\d+))?",                 RegexOptions.Compiled), // 1*1
-        _r_sfx_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 10a
+        _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 10s
         _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
         _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
         _r_nuke_pc        = new(@"(\d{1,3})(n)",                      RegexOptions.Compiled), // 10n
@@ -41,9 +41,9 @@ public class Randomize : FileEditor_AudioVideoUrl
         var piece_len = match.ExtractGroup(1, int.Parse, 1);
         var break_len = match.ExtractGroup(2, int.Parse, piece_len);
 
-        var sorted = options_ctx.Check(_r_sorted);
+        var ordered = options_ctx.Check(_r_ordered);
 
-        var filter_options = new RandomizeOptions(rep_range, nuke_range, rep_pc, nuke_pc, sfx_pc, time_pc, crop_pc, sorted);
+        var filter_options = new RandomizeOptions(rep_range, nuke_range, rep_pc, nuke_pc, sfx_pc, time_pc, crop_pc, ordered);
 
         var args = Args?.Split()
             .Where(x => x.StartsWith("http").Janai())

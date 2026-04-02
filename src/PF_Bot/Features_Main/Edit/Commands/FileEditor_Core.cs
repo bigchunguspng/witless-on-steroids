@@ -184,15 +184,11 @@ public abstract class FileEditor_Core : CommandHandlerAsync
 
     protected void SendResult(string result)
     {
-        if (MessageToEdit > 0)
-        {
-            Bot.DeleteMessageAsync(Chat, MessageToEdit);
-            MessageToEdit = 0;
-        }
-
         var name = Type == MediaType.Audio
             ? AudioFileName
             : VideoFileName;
+
+        DeleteAny_MessageToEdit();
         SendFile(result, Type, name);
     }
 

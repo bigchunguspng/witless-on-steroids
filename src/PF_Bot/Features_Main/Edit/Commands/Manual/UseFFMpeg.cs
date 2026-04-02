@@ -98,6 +98,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
             ? null
             : $"made with piece_fap_bot.{extension}";
 
+        DeleteAny_MessageToEdit();
         SendFile(result, type, name);
     }
 

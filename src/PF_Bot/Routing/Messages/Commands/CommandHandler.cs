@@ -141,6 +141,14 @@ public abstract class CommandHandler
         }
     }
 
+    protected void DeleteAny_MessageToEdit()
+    {
+        if (MessageToEdit == 0) return;
+
+        Bot.DeleteMessageAsync(Chat, MessageToEdit);
+        MessageToEdit = 0;
+    }
+
     protected void SendFile(FilePath output, MediaType type, string? name = null)
     {
         if (Output != null)

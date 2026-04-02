@@ -78,6 +78,7 @@ public class UseMagick : FileEditor_VideoPhoto
             ? null
             : $"made with piece_fap_bot.{extension}";
 
+        DeleteAny_MessageToEdit();
         SendFile(result, type, name);
     }
 

@@ -158,6 +158,7 @@ public static class Registry
             .Register("man_pipe"  , () => _mail.WithText(PIPE_MANUAL))
             .Register("man_crop"  , () => _mail.WithText(CROP_MANUAL))
             .Register("man_shake" , () => _mail.WithText(SHAKE_MANUAL))
+            .Register("man_speed" , () => _mail.WithText(SPEED_MANUAL))
             .Register("man_scale" , () => _mail.WithText(SCALE_MANUAL))
             .Register("man_slice" , () => _mail.WithText(SLICE_MANUAL))
             .Register("man_random", () => _mail.WithText(RANDOM_MANUAL))

@@ -15,12 +15,17 @@ public class Speed : FileEditor_AudioVideo
         return this;
     }
 
+    protected override string SyntaxManual => "/man_speed";
+
     protected override async Task Execute()
     {
         _value = Args.TryParseAsDouble(out var x) ? x : 2D;
         _speed = _mode == Fast ? _value : 1 / _value;
         _speed = Math.Clamp(_speed, 0.1, 94);
         _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
+
+        var change_pitch   =                 Options.Contains('p');
+        var use_rubberband = change_pitch || Options.Contains('r');
 
         var input = await GetFile();
 
@@ -39,14 +44,30 @@ public class Speed : FileEditor_AudioVideo
 
         if (probe.HasAudio)
         {
-            var speed = _speed;
-            while (speed < 0.5) // speed = [0.1 - 94]
+            if (use_rubberband)
             {
-                options.AF("atempo=0.5"); // af.atempo: [0.5 - 94]
-                speed *= 2;
-            }
+                options.AF($"rubberband=tempo={_speed}");
 
-            options.AF($"atempo={speed}");
+                if (change_pitch)
+                    options.AF($"rubberband=pitch={_speed}");
+
+                // As 2 separate filters because of weird bug on prod:
+                // "rubberband=tempo=0.95:pitch=0.95" ->
+                // [libmp3lame @ 000000a24ceb9f40] inadequate AVFrame plane padding
+                // Works fine with other values for the same file.
+                // Works fine on dev machine.
+            }
+            else
+            {
+                var speed = _speed;
+                while (speed < 0.5) // speed = [0.1 - 94]
+                {
+                    options.AF("atempo=0.5"); // af.atempo: [0.5 - 94]
+                    speed *= 2;
+                }
+
+                options.AF($"atempo={speed}");
+            }
         }
 
         options.Fix_AudioVideo(probe);

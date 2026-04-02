@@ -303,6 +303,27 @@ public static partial class Texts
         📖 <a href="https://ffmpeg.org/ffmpeg-filters.html#crop"><b>Справка ffmpeg/crop</b></a>
         """;
 
+    public const string SPEED_MANUAL =
+        """
+        ⚡️ <b><u>Ускорение и замедление</u></b> 🐌
+
+        <b>Синтаксис:</b>
+        <code>/fast[опции] [скорость]</code>
+        <code>/slow[опции] [длительность]</code>
+
+        <b>Примеры:</b>
+        <code>/fast</code> ← ускорить в 2 раза
+        <code>/fast 3</code> ← ускорить в 3 раза
+        <code>/slow 5</code> ← замедлить в 5 раз
+        <code>/fastp 1.25</code> ← ускорить в 1.25 раза, отпустив питч
+
+        <b>Опции:</b>
+        <code>p</code> ← изменять <u>п</u>итч аудио
+        <code>r</code> ← использовать аудиофильтр <i><u>r</u>ubberband</i> вместо <i>atempo</i> (другое качесто)
+
+        Стандартные скорость и длительность - 2. При использовании опции <code>p</code>, фильтр <i>rubberband</i> используется автоматически.
+        """;
+
     public const string SCALE_MANUAL =
         """
         <b><u>Масштабирование</u></b>

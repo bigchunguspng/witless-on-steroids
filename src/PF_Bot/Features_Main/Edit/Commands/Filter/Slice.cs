@@ -6,7 +6,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 public class Slice : FileEditor_AudioVideoUrl
 {
     private static readonly Regex
-        _rgx_multipliers = new(@"(\d+)(?:\*(\d+))?", RegexOptions.Compiled);
+        _rgx_multipliers = new(@"(\d{1,2})(?:\*(\d{1,3}))?", RegexOptions.Compiled);
 
     protected override string SyntaxManual => "/man_slice";
 

@@ -10,14 +10,14 @@ public class Randomize : FileEditor_AudioVideoUrl
         _r_ordered = "o";
 
     private static readonly Regex
-        _r_multipliers    = new(@"(\d+)(?:\*(\d+))?",                 RegexOptions.Compiled), // 1*1
+        _r_multipliers    = new(@"(\d{1,2})(?:\*(\d{1,3}))?",         RegexOptions.Compiled), // 1*1
         _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 10s
         _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
         _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
         _r_nuke_pc        = new(@"(\d{1,3})(n)",                      RegexOptions.Compiled), // 10n
-        _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled), // 1..4"
+        _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled), // 1..2"
         _r_rep_pc         = new(@"(\d{1,3})(r)",                      RegexOptions.Compiled), // 10r
-        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\^)", RegexOptions.Compiled); // 1..25^
+        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\^)", RegexOptions.Compiled); // 1..4^
 
     protected override string SyntaxManual => "/man_random";
 

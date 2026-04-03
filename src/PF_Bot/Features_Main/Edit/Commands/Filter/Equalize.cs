@@ -36,6 +36,6 @@ public class Equalize : FileEditor_AudioVideo
             SendManual(EQ_MANUAL);
     }
 
-    protected override string AudioFileName => SongNameOr($"Bassboosted by {Sender}.mp3");
-    protected override string VideoFileName => $"piece_fap_bot ft. DJ {Sender}.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] Bassboosted by {Sender}.mp3");
+    protected override string VideoFileName => $"[{Desert.GetSand()}] piece_fap_bot ft. DJ {Sender}.mp4";
 }

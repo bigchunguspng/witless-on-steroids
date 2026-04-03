@@ -66,5 +66,5 @@ public class Scale : FileEditor_VideoPhoto
             SendManual(SCALE_MANUAL);
     }
 
-    protected override string VideoFileName { get; } = "piece_fap_bot-scale.mp4";
+    protected override string VideoFileName => $"piece_fap_bot-scale-{Desert.GetSand()}.mp4";
 }

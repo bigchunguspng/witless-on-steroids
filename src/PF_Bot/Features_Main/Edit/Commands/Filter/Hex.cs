@@ -65,7 +65,7 @@ public class Hex : FileEditor_Photo
         var processResult = await ProcessRunner.Run(MAGICK, args);
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
 
-        SendFile(result, MediaType.Anime, "piece_fap_bot-hex.mp4");
+        SendFile(result, MediaType.Anime, $"piece_fap_bot-hex-{Desert.GetSand()}.mp4");
         Log($"{Title} >> HEX [#{corruptionCount}] VID");
     }
 

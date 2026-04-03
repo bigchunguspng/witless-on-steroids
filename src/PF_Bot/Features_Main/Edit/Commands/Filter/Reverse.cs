@@ -22,6 +22,6 @@ public class Reverse : FileEditor_AudioVideo
         Log($"{Title} >> REVERSED [<<]");
     }
 
-    protected override string AudioFileName => SongNameOr($"Kid Named {Sender}.mp3");
-    protected override string VideoFileName { get; } = "piece_fap_bot-reverse.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] Kid Named {Sender}.mp3");
+    protected override string VideoFileName => $"piece_fap_bot-reverse-{Desert.GetSand()}.mp4";
 }

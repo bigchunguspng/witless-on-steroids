@@ -78,8 +78,8 @@ public class Speed : FileEditor_AudioVideo
         Log($"{Title} >> {ModeNameUpper} [{ModeIcon}]");
     }
 
-    protected override string AudioFileName => SongNameOr($"Are you {Sender.Before(' ')} or something.mp3");
-    protected override string VideoFileName => $"piece_fap_bot-{ModeNameLower}-{_value}.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] Are you {Sender.Before(' ')} or something.mp3");
+    protected override string VideoFileName => $"piece_fap_bot-{ModeNameLower}-{_value}-{Desert.GetSand()}.mp4";
 
     private string ModeNameUpper => _mode == Fast ? "FAST" : "SLOW";
     private string ModeNameLower => _mode == Fast ? "fast" : "slow";

@@ -78,6 +78,6 @@ public class Damn : FileEditor_AudioVideoPhoto
     private int     GetVideoCRF   () => _value + 30;         //  30 - 51     crf: 0 lossless - 51 lowest quality
     private Quality GetJpegQuality() => (byte)(22 - _value); //  22 -  1     quality: 1 - 100
 
-    protected override string AudioFileName => SongNameOr($"Damn, {Sender}.mp3");
-    protected override string VideoFileName => $"piece_fap_bot-damn-{_value}.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] Damn, {Sender}.mp3");
+    protected override string VideoFileName => $"piece_fap_bot-damn-{_value}-{Desert.GetSand()}.mp4";
 }

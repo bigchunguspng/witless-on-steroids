@@ -78,6 +78,6 @@ public class Randomize : FileEditor_AudioVideoUrl
         );
     }
 
-    protected override string AudioFileName { get; } = "random_by_piece_fap_bot.mp3";
-    protected override string VideoFileName { get; } = "piece_fap_random.mp4";
+    protected override string AudioFileName => $"random_by_piece_fap_bot-{Desert.GetSand()}.mp3";
+    protected override string VideoFileName => $"piece_fap_random-{Desert.GetSand()}.mp4";
 }

@@ -42,6 +42,6 @@ public class Slice : FileEditor_AudioVideoUrl
         Log($"{Title} >> SLICE [{piece_len}*{break_len}, {start} - {log_end}] >> {sw.ElapsedReadable()}");
     }
 
-    protected override string AudioFileName { get; } = "sliced_by_piece_fap_bot.mp3";
-    protected override string VideoFileName { get; } = "piece_fap_slice.mp4";
+    protected override string AudioFileName => $"sliced_by_piece_fap_bot-{Desert.GetSand()}.mp3";
+    protected override string VideoFileName => $"piece_fap_slice-{Desert.GetSand()}.mp4";
 }

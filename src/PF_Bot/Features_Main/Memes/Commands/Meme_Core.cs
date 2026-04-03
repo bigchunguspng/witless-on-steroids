@@ -11,13 +11,13 @@ namespace PF_Bot.Features_Main.Memes.Commands; // ReSharper disable Inconsistent
 public record MemeMakerContext(string VideoName, string Log_NAME, string Log_CMD, string Suffix)
 {
     public static readonly MemeMakerContext
-        Dg   = new("piece_fap_bot-dg.mp4", "DEMOTIVATOR",   "/dg", "Dg"),
-        Dv   = new("piece_fap_bot-dv.mp4", "DEMOTIVATOR-w", "/dv", "Dv"),
-        Dp   = new("piece_fap_bot-dp.mp4", "DEMOTIVATOR-B", "/dp", "Dp"),
-        Meme = new("piece_fap_bot-meme.mp4", "MEME",  "/meme", "Meme" ),
-        Top  = new("piece_fap_bot-top.mp4",  "TOP",   "/top",  "Top"  ),
-        Snap = new("piece_fap_bot-snap.mp4", "SNAP",  "/snap", "Snap" ),
-        Nuke = new("piece_fap_bot-nuke.mp4", "NUKED", "/nuke", "Nuked");
+        Dg   = new("piece_fap_bot-dg", "DEMOTIVATOR",   "/dg", "Dg"),
+        Dv   = new("piece_fap_bot-dv", "DEMOTIVATOR-w", "/dv", "Dv"),
+        Dp   = new("piece_fap_bot-dp", "DEMOTIVATOR-B", "/dp", "Dp"),
+        Meme = new("piece_fap_bot-meme", "MEME",  "/meme", "Meme" ),
+        Top  = new("piece_fap_bot-top",  "TOP",   "/top",  "Top"  ),
+        Snap = new("piece_fap_bot-snap", "SNAP",  "/snap", "Snap" ),
+        Nuke = new("piece_fap_bot-nuke", "NUKED", "/nuke", "Nuked");
 }
 
 public abstract class Meme_Core_Static : CommandHandlerAsync
@@ -170,7 +170,7 @@ public abstract class Meme_Core<TCaption> : Meme_Core_Static, AutoMemesHandler
             await MakeMemeVideo(request);
 
             var type = note ? MediaType.Round : MediaType.Anime;
-            var name = note ? null : Ctx.VideoName;
+            var name = note ? null : $"{Ctx.VideoName}-{Desert.GetSand()}.mp4";
             SendFile(request.TargetPath, type, name);
         }
         Log($"{GetLogString(repeats)} VID >> {sw.ElapsedReadable()}");

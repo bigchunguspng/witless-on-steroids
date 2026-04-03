@@ -46,7 +46,7 @@ public class ToGIF : FileEditor_VideoPhoto
 
         await args.Out(output, options).FFMpeg_Run();
 
-        SendFile(output, MediaType.Anime, "piece_fap_bot-gif.mp4");
+        SendFile(output, MediaType.Anime, $"piece_fap_bot-gif-{Desert.GetSand()}.mp4");
         Log($"{Title} >> GIF [~]");
     }
 

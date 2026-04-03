@@ -64,6 +64,6 @@ public class Cut : FileEditor_AudioVideoUrl
         Log($"{Title} >> CUT [8K-]");
     }
 
-    protected override string VideoFileName => "piece_fap_bot-cut.mp4";
-    protected override string AudioFileName => SongNameOr($"((({Sender}))).mp3");
+    protected override string VideoFileName => $"piece_fap_bot-cut-{Desert.GetSand()}.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] ((({Sender}))).mp3");
 }

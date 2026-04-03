@@ -33,6 +33,8 @@ public class Volume : FileEditor_AudioVideo
             SendManual(VOLUME_MANUAL);
     }
 
-    protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect.mp3");
-    protected override string VideoFileName => _arg.Length < 4 ? $"VOLUME-{_arg.ValidFileName()}.mp4" : "VERY-LOUD-ICE-CREAM.mp4";
+    protected override string AudioFileName => SongNameOr($"{Sender} Sound Effect #{Desert.GetSand()}.mp3");
+    protected override string VideoFileName => _arg.Length < 4
+        ? $"VOLUME-{_arg.ValidFileName()}-{Desert.GetSand()}.mp4"
+        : $"VERY-LOUD-ICE-CREAM-{Desert.GetSand()}.mp4";
 }

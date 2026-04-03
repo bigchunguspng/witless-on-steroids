@@ -5,9 +5,6 @@ namespace PF_Bot.Features_Main.Edit.Commands.Filter;
 
 public class Crop : FileEditor_VideoPhoto // todo shake is only for video
 {
-    private const string _crop  = "piece_fap_bot-crop.mp4";
-    private const string _shake = "piece_fap_bot-shake.mp4";
-
     private static readonly Regex
         _rgx_tlbr = new("[tlbr]",                   RegexOptions.Compiled | RegexOptions.IgnoreCase),
         _rgx_iw   = new("(?<=[^io_]|^)w",           RegexOptions.Compiled),
@@ -84,7 +81,9 @@ public class Crop : FileEditor_VideoPhoto // todo shake is only for video
             SendManual(CROP_MANUAL);
     }
 
-    protected override string VideoFileName => _isShakeMode ? _shake : _crop;
+    protected override string VideoFileName => _isShakeMode
+        ? $"piece_fap_bot-shake-{Desert.GetSand()}.mp4"
+        : $"piece_fap_bot-crop-{Desert.GetSand()}.mp4";
 
     private string CropOrShake => _isShakeMode ? "SHAKE" : "CROP";
 

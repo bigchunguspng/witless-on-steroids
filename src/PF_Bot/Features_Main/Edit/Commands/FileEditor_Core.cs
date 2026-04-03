@@ -192,8 +192,8 @@ public abstract class FileEditor_Core : CommandHandlerAsync
         SendFile(result, Type, name);
     }
 
-    protected virtual string VideoFileName => "piece_fap_bot.mp3";
-    protected virtual string AudioFileName => "piece_fap_bot.mp4";
+    protected virtual string VideoFileName => $"piece_fap_bot-{Desert.GetSand()}.mp4";
+    protected virtual string AudioFileName => $"piece_fap_bot-{Desert.GetSand()}.mp3";
 
     protected string Sender => Message.GetSenderName().ValidFileName();
     protected string SongNameOr(string s) => Message.GetSongNameOr(s);

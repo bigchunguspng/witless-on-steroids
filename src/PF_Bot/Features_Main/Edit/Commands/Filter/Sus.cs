@@ -48,8 +48,8 @@ public class Sus : FileEditor_AudioVideo
             .Filter($"[{av}0][{av}r]concat=n=2:{concat}");
     }
 
-    protected override string AudioFileName => SongNameOr($"Kid Named {WhenTheSenderIsSus()}.mp3");
-    protected override string VideoFileName => "piece_fap_bot-sus.mp4";
+    protected override string AudioFileName => SongNameOr($"[{Desert.GetSand()}] Kid Named {WhenTheSenderIsSus()}.mp3");
+    protected override string VideoFileName => $"piece_fap_bot-sus-{Desert.GetSand()}.mp4";
 
     private string WhenTheSenderIsSus() => Sender.Length > 2 ? Sender[..2] + Sender[0] : Sender;
 }

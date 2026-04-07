@@ -73,6 +73,9 @@ public class Randomize : FileEditor_AudioVideoUrl
           + $"{piece_len}*{break_len}, "
           + $"R:{ rep_range.from}..{ rep_range.to}^{ rep_pc}%, "
           + $"N:{nuke_range.from}..{nuke_range.to}^{nuke_pc}%, "
+          + $"T:{time_pc}%, "
+          + $"X:{crop_pc}%, "
+          + $"S:{ sfx_pc}%, "
           + $"{start} - {log_end}"
           + $"] >> {sw.ElapsedReadable()}"
         );

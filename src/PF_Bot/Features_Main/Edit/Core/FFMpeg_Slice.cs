@@ -126,8 +126,10 @@ public partial class FFMpeg_Effects
             }
         }
 
-        if (timecodes.Count > 0 && timecodes[^1].Length == 0)
+        while (timecodes.Count > 0 && timecodes[^1].Length == 0)
+        {
             timecodes.RemoveAt(timecodes.Count - 1);
+        }
 
         if (seconds < 5 || force_shuffle) // SHUFFLE
         {

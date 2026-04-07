@@ -34,15 +34,17 @@ public partial class FFMpeg_Effects
         return _args;
     }
 
-    private record Fragment(TrimCode Trim, int Copy) // repeat number, 0 - first occurence
+    private record Fragment(TrimCode Trim)
     {
         public bool   SFX   { get; set; }
+        public bool   Crop  { get; set; }
         public int    Nuke  { get; set; }
         public double Speed { get; set; } = 1.0;
 
         public bool TimeStretch => Math.Abs(1.0 - Speed) > 0.005;
 
-        public bool UseOriginalVideo => TimeStretch.IsOff() && Nuke == 0;
+        // DON'T FORGET TO UPDATE THESE IF YOU ADD NEW PROP!!!
+        public bool UseOriginalVideo => TimeStretch.IsOff() && Crop.IsOff() && Nuke == 0;
         public bool UseOriginalAudio => TimeStretch.IsOff() && SFX.IsOff();
     }
 
@@ -60,7 +62,7 @@ public partial class FFMpeg_Effects
         var adjust_timecodes = IsOneIn(2);
         foreach (var timecode in timecodes)
         {
-            fragments.Add(new Fragment(timecode, 0));
+            fragments.Add(new Fragment(timecode));
             var repeat = LuckyFor(options.Percent_Repeats);
             if (repeat)
             {
@@ -73,7 +75,7 @@ public partial class FFMpeg_Effects
                     var length = timecode.Length;
                     var start  = timecode.Start + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
                     var end    = timecode.End   + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
-                    fragments.Add(new Fragment(new TrimCode(start, end), i + 1));
+                    fragments.Add(new Fragment(new TrimCode(start, end)));
                 }
             }
         }
@@ -83,6 +85,8 @@ public partial class FFMpeg_Effects
         {
             if (video)
             {
+                fragment.Crop = LuckyFor(options.Percent_Crop);
+
                 if (LuckyFor(options.Percent_Nuke))
                 {
                     var (from, to) = options.Range_Nuke;
@@ -124,7 +128,7 @@ public partial class FFMpeg_Effects
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
 
-        // FX
+        // FRAG FX
         var fx = false;
 
         for (var i = 0; i < count; i++)
@@ -164,10 +168,81 @@ public partial class FFMpeg_Effects
     {
         _args.Filter($"[{i}:v]");
 
+        var video = probe.GetVideoStream();
+
         if (frag.TimeStretch)
         {
             _args.FilterAppend($"setpts={1 / frag.Speed:F3}*PTS");
-            _args.FilterAppend($"fps={probe.GetVideoStream().AvgFramerate}");
+            _args.FilterAppend($"fps={video.AvgFramerate}");
+        }
+
+        if (frag.Crop)
+        {
+            var og_w = video.Width !.Value;
+            var og_h = video.Height!.Value;
+
+            var lucky = false;
+
+            // FLIP
+            if (IsOneIn(7))
+            {
+                lucky = true;
+                _args.FilterAppend("hflip");
+            }
+
+            // ZOOM IN
+            if (IsOneIn(3))
+            {
+                lucky = true;
+                var    zoom_speed = RandomDouble(1, 4);
+                var starting_size = RandomDouble(1, 3);
+                var formula = LuckyFor(75)
+                    ? $"({starting_size:F3}+{zoom_speed:F3}*t*t)" // quadratic
+                    : $"({starting_size:F3}+{zoom_speed:F3}*t)";  // linear
+                var (off_x, off_y) = IsOneIn(2)
+                    ? (0.5, 0.5)                                // zoom to center
+                    : (RandomDouble(0, 1), RandomDouble(0, 1)); // zoom to random point
+                _args.FilterAppend($"scale=iw*{formula}:ih*{formula}:eval=frame");
+                _args.FilterAppend($"crop={og_w}:{og_h}");
+                _args.FilterAppend($":({og_w}*{formula}-{og_w})*{off_x:F3}");
+                _args.FilterAppend($":({og_h}*{formula}-{og_h})*{off_y:F3}");
+            }
+
+            // STRETCH
+            if (IsOneIn(3))
+            {
+                lucky = true;
+                var stretch_speed = RandomDouble(2, 4);
+                var starting_size = RandomDouble(1, 2);
+                var formula = LuckyFor(75)
+                    ? $"({starting_size:F3}+{stretch_speed:F3}*t*t)" // quadratic
+                    : $"({starting_size:F3}+{stretch_speed:F3}*t)";  // linear
+                var widen = IsOneIn(2);
+                var scale = widen
+                    ? $"scale=iw*{formula}:ih:eval=frame"
+                    : $"scale=iw:ih*{formula}:eval=frame";
+                _args.FilterAppend(scale);
+                _args.FilterAppend($"crop={og_w}:{og_h}");
+            }
+
+            // PAN
+            if (IsOneIn(3) || lucky.Janai()) // add at least something
+            {
+                var scale = RandomDouble(2, 4);
+                var w = (og_w * scale).RoundInt();
+                var h = (og_h * scale).RoundInt();
+                var w_gap = w - og_w;
+                var h_gap = h - og_h;
+                var len = frag.Trim.Length;
+                var (off_x1, off_y1) = (RandomDouble(0, 1), RandomDouble(0, 1));
+                var (off_x2, off_y2) = (RandomDouble(0, 1), RandomDouble(0, 1));
+                _args.FilterAppend($"scale={w}:{h}");
+                _args.FilterAppend($"crop={og_w}:{og_h}");
+                _args.FilterAppend($":(1-t/{len:F3})*{w_gap}*{off_x1:F3}+t/{len:F3}*{w_gap}*{off_x2:F3}");
+                _args.FilterAppend($":(1-t/{len:F3})*{h_gap}*{off_y1:F3}+t/{len:F3}*{h_gap}*{off_y2:F3}");
+            }
+
+            _args.FilterAppend("setsar=sar=1/1");
         }
 
         if (frag.Nuke > 0)

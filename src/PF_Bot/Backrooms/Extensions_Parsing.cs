@@ -18,6 +18,12 @@ public static class Extensions_Parsing
         (this string text)
         => text.IndexOfAny(_separators) >= 0;
 
+    public static string[]? Split_SkipHttpLinks
+        (this string? text)
+        => text?.Split()
+            .Where(x => x.StartsWith("http").Janai())
+            .ToArray();
+
     // TRY PARSE NUMBERS
 
     public static bool TryParseAsLong

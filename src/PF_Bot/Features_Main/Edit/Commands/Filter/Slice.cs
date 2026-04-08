@@ -18,9 +18,7 @@ public class Slice : FileEditor_AudioVideoUrl
         var piece_len = match.ExtractGroup(1, int.Parse, 5);
         var break_len = match.ExtractGroup(2, int.Parse, piece_len);
 
-        var args = Args?.Split()
-            .Where(x => x.StartsWith("http").Janai())
-            .ToArray();
+        var args = Args?.Split_SkipHttpLinks();
         args.GetCutTimecodes(out var start, out var length);
 
         var sw = Stopwatch.StartNew();

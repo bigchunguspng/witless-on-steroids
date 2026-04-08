@@ -45,9 +45,7 @@ public class Randomize : FileEditor_AudioVideoUrl
 
         var filter_options = new RandomizeOptions(rep_range, nuke_range, rep_pc, nuke_pc, sfx_pc, time_pc, crop_pc, ordered);
 
-        var args = Args?.Split()
-            .Where(x => x.StartsWith("http").Janai())
-            .ToArray();
+        var args = Args?.Split_SkipHttpLinks();
         args.GetCutTimecodes(out var start, out var length);
 
         // COOKING

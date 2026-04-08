@@ -18,6 +18,7 @@ public abstract class FileEditor_Core : CommandHandlerAsync
     protected FileBase  File = null!;
     protected string    Ext  = null!;
     protected MediaType Type;
+    protected bool      ByURL;
 
     // RUN
 
@@ -147,6 +148,7 @@ public abstract class FileEditor_Core : CommandHandlerAsync
         var url = text.Substring(entity.Offset, entity.Length);
         Type = MediaType.Video;
         Ext = ".mp4";
+        ByURL = true;
         GetFileStrategy = () => DownloadFileByURL(url);
         return true;
     }

@@ -9,14 +9,9 @@ public class Cut : FileEditor_AudioVideoUrl
 
     protected override async Task Execute()
     {
-        var args_split = Args?.Split();
-        var args = args_split?
-            .Where(x => x.StartsWith("http").Janai())
-            .ToArray();
-
-        var byURL = args_split?.Any(x => x.StartsWith("http")) ?? false;
-        var cut   = args.GetCutTimecodes(out var start, out var length);
-        if (cut.Janai() && byURL.Janai())
+        var args = Args?.Split_SkipHttpLinks();
+        var cut  = args.GetCutTimecodes(out var start, out var length);
+        if (cut.Janai() && ByURL.Janai())
         {
             SendManual(CUT_MANUAL);
             return;
@@ -26,7 +21,7 @@ public class Cut : FileEditor_AudioVideoUrl
 
         var (output, probe, options) = await input.InitEditing("Cut", Ext);
 
-        var downloadFull = byURL && cut.Janai();
+        var downloadFull = ByURL && cut.Janai();
         if (downloadFull)
         {
             var size = input.FileSizeInBytes;

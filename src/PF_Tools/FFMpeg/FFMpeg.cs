@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using PF_Tools.ProcessRunning;
 
 namespace PF_Tools.FFMpeg;
@@ -41,9 +42,8 @@ public static class FFMpeg
     {
         if (overwrite) args.Globals("-y");
 
-        var arguments = args.Build();
-        var startedProcess = ProcessStarter.StartProcess(FFMPEG, arguments);
-        var process = startedProcess.Process;
+        var startedProcess = FFMpeg_Start(args, out var arguments);
+        var        process = startedProcess.Process;
 
         var we = process.WaitForExitAsync();
         var mp = ManagePriority(process);
@@ -54,6 +54,22 @@ public static class FFMpeg
         {
             WasKilled = mp is { IsCompleted: true, Result: true },
         };
+    }
+
+    private static StartedProcess FFMpeg_Start(FFMpegArgs args, out string arguments)
+    {
+        try
+        {
+            arguments = args.Build();
+            return ProcessStarter.StartProcess(FFMPEG, arguments);
+        }
+        catch (Win32Exception) // command line args length limit
+        {
+            LogError("FFMPEG >> COMMAND TOO LONG");
+
+            arguments = args.Build(script_mode: true);
+            return ProcessStarter.StartProcess(FFMPEG, arguments);
+        }
     }
 
     /// True if task was killed.

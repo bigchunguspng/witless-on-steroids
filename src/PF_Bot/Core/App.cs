@@ -7,6 +7,7 @@ using PF_Bot.Features_Web.Reddit.Core;
 using PF_Bot.Routing.Callbacks;
 using PF_Bot.Routing.Messages;
 using PF_Bot.Terminal;
+using PF_Tools.FFMpeg;
 using PF_Tools.Graphics;
 using PF_Tools.ProcessRunning;
 
@@ -37,6 +38,7 @@ public static class App
 
         Config.ReadFromFile();
 
+        FFMpegArgs.Directory_Temp = Dir_Temp;
         EmojiTool.Directory_EmojiPNGs = Dir_Emoji;
         YtDlp.File_Cookies = File_Cookies;
 

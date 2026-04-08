@@ -67,7 +67,7 @@ public class FFMpegArgs
         (string path, FFMpegOutputOptionsModifier options)
         => this.Fluent(() => _outputs.Add((path, options)));
 
-    public string Build()
+    public string Build(bool script_mode = false)
     {
         var sb = new StringBuilder();
 
@@ -83,8 +83,18 @@ public class FFMpegArgs
 
         if (_filter.Length > 0)
         {
-            sb.AppendSpaceSeparator();
-            sb.Append("-filter_complex ").AppendInQuotes(_filter);
+            if (script_mode)
+            {
+                var path = SaveFilter_ToTempFile();
+
+                sb.AppendSpaceSeparator();
+                sb.Append("-/filter_complex ").AppendInQuotes(path);
+            }
+            else
+            {
+                sb.AppendSpaceSeparator();
+                sb.Append("-filter_complex ").AppendInQuotes(_filter);
+            }
         }
 
         foreach (var output in _outputs)
@@ -104,5 +114,23 @@ public class FFMpegArgs
         }
 
         return sb.ToString();
+    }
+
+    public static FilePath Directory_Temp = Path.GetTempPath();
+
+    private string SaveFilter_ToTempFile()
+    {
+        var path = new FilePath(Directory_Temp)
+            .EnsureDirectoryExist()
+            .Combine($"filter-{Desert.GetSand(16)}.txt")
+            .MakeUnique();
+
+        using var writer = new StreamWriter(path);
+        foreach (var chunk in _filter.GetChunks())
+        {
+            writer.Write(chunk.Span);
+        }
+
+        return path;
     }
 }

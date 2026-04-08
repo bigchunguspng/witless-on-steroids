@@ -1,3 +1,4 @@
+using PF_Bot.Features_Main.Edit.Commands.Filter;
 using PF_Tools.FFMpeg;
 using static PF_Tools.Backrooms.Helpers.Fortune;
 
@@ -226,8 +227,9 @@ public partial class FFMpeg_Effects
             }
 
             // PAN
-            if (IsOneIn(3) || lucky.Janai()) // add at least something
+            if (IsOneIn(3))
             {
+                lucky = true;
                 var scale = RandomDouble(2, 4);
                 var w = (og_w * scale).RoundInt();
                 var h = (og_h * scale).RoundInt();
@@ -240,6 +242,18 @@ public partial class FFMpeg_Effects
                 _args.FilterAppend($"crop={og_w}:{og_h}");
                 _args.FilterAppend($":(1-t/{len:F3})*{w_gap}*{off_x1:F3}+t/{len:F3}*{w_gap}*{off_x2:F3}");
                 _args.FilterAppend($":(1-t/{len:F3})*{h_gap}*{off_y1:F3}+t/{len:F3}*{h_gap}*{off_y2:F3}");
+            }
+
+            // SHAKE
+            if (IsOneIn(5) || lucky.Janai()) // add at least something
+            {
+                var size   = RandomDouble(1.05, 1.25);
+                var speed  = $"random({RandomInt(0,16)})";
+                var offset = $"random({RandomInt(0,16)})";
+                _args.FilterAppend($"scale=iw*{size:F3}:ih*{size:F3}");
+                _args.FilterAppend($"crop={og_w}:{og_h}");
+                _args.FilterAppend($":(iw-out_w)*0.5*(1+sin(t*({speed})-{offset}))");
+                _args.FilterAppend($":(ih-out_h)*0.5*(1+sin(t*({speed})+{offset}*2))");
             }
 
             _args.FilterAppend("setsar=sar=1/1");

@@ -38,7 +38,7 @@ public class Crop : FileEditor_VideoPhoto // todo shake is only for video
                 var crop   = args?.Length > 0 ? args[0] : "0.95";
                 var speed  = args?.Length > 1 ? args[1] : "random(0)";
                 var offset = args?.Length > 2 ? args[2] : "random(0)";
-                args = F_Shake(crop, speed, offset).Split();
+                args = F_Shake(crop, speed, offset);
                 log  = [crop, speed, offset];
             }
             else if (args?.Length == 2)
@@ -87,8 +87,11 @@ public class Crop : FileEditor_VideoPhoto // todo shake is only for video
 
     private string CropOrShake => _isShakeMode ? "SHAKE" : "CROP";
 
-    private static string F_Shake(string a, string b, string c)
-    {
-        return $"w*({a}) h*({a}) (w-out_w)/2+((w-out_w)/2)*sin(t*({b})-{c}) (h-out_h)/2+((h-out_h)/2)*sin(t*({b})+2*{c})";
-    }
+    private static string[] F_Shake(string crop, string speed, string offset) =>
+    [
+        $"w*({crop})",
+        $"h*({crop})",
+        $"(w-out_w)*0.5*(1+sin(t*({speed})-{offset}))",
+        $"(h-out_h)*0.5*(1+sin(t*({speed})+{offset}*2))",
+    ];
 }

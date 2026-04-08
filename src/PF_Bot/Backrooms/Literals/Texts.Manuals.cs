@@ -219,7 +219,7 @@ public static partial class Texts
         <u><b>Нарезка видео</b></u>
 
         <b>Синтаксис:</b>
-        <code>/slice[дк][*др] [таймкоды]</code>
+        <code>/slice[дк[*др]] [таймкоды]</code>
 
         <code>дк</code> - относительная длина кусков
         <code>др</code> - относительная длина разрывов
@@ -240,7 +240,38 @@ public static partial class Texts
 
     public const string RANDOM_MANUAL =
         """
-        Ещё нету, приходи позже...
+        <u><b>Рандом</b></u> 🎲
+
+        Нарезает видео и добавляет кучу эффектов)) 🎉
+
+        <b>Синтаксис:</b>
+        <code>/random[опции][дк[*др]] [таймкоды]</code>
+
+        <b>Опции:</b>
+        <u>Верояность модификации</u>, % (0-100):
+        <code>10a</code> - все эффекты
+        <code>10s</code> - аудио
+        <code>10t</code> - время, питч и скорость
+        <code>10x</code> - панкроп
+        <code>10r</code> - повторы
+        <code>10n</code> - эффекты из /nuke
+        <u>Диапазон</u> (<code>от..до</code>):
+        <code>1..2"</code> - глубина /nuke (1-9)
+        <code>1..4^</code> - количество повторов (1-999)
+        <u>Опции как в /slice</u>:
+        <code>дк</code> - относительная длина кусков
+        <code>др</code> - относительная длина разрывов
+        <blockquote>Стандартное значение для <code>дк</code> - 1.
+        Если <code>др</code> не указан, то <code>др</code> = <code>дк</code>.</blockquote>
+        <code>таймкоды</code> - указать фрагмент <i>(см. /man_cut)</i>
+        <u>Прочие</u>:
+        <code>o</code> - сохранить порядок фрагментов
+
+        <blockquote><b>Примеры:</b>
+        <code>/random</code> ← стандартно
+        <code>/random80a</code> ← много разных эффектов
+        <code>/random80a0n</code> ← много разных эффектов, но без /nuke
+        <code>/random100r3..5^</code> ← повторяй все фрагменты по 3-5 раз</blockquote>
         """;
 
     public const string CROP_MANUAL =

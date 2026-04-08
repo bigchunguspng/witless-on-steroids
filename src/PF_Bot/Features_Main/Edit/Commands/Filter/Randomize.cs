@@ -11,6 +11,7 @@ public class Randomize : FileEditor_AudioVideoUrl
 
     private static readonly Regex
         _r_multipliers    = new(@"(\d{1,2})(?:\*(\d{1,3}))?",         RegexOptions.Compiled), // 1*1
+        _r_all_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 10a
         _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 10s
         _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
         _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
@@ -28,11 +29,12 @@ public class Randomize : FileEditor_AudioVideoUrl
         // OPTIONS
         var options_ctx = MemeOptionsContext.FromCommandContext(Context);
 
-        var  sfx_pc = options_ctx.GetInt( _r_sfx_pc, 10).ClampByte();
-        var time_pc = options_ctx.GetInt(_r_time_pc, 10).ClampByte();
-        var crop_pc = options_ctx.GetInt(_r_crop_pc, 10).ClampByte();
-        var  rep_pc = options_ctx.GetInt( _r_rep_pc, 10).ClampByte();
-        var nuke_pc = options_ctx.GetInt(_r_nuke_pc, 10).ClampByte();
+        var  all_pc = options_ctx.GetInt( _r_all_pc, -1);
+        var  sfx_pc = options_ctx.GetInt( _r_sfx_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
+        var time_pc = options_ctx.GetInt(_r_time_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
+        var crop_pc = options_ctx.GetInt(_r_crop_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
+        var  rep_pc = options_ctx.GetInt( _r_rep_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
+        var nuke_pc = options_ctx.GetInt(_r_nuke_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
 
         var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 4), (1, 3));
         var nuke_range = options_ctx.GetIntRange(_r_nuke_dep_range, (1, 2), (1, 3));

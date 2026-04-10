@@ -24,8 +24,8 @@ public class Speed : FileEditor_AudioVideo
         _speed = Math.Clamp(_speed, 0.1, 94);
         _value = _mode == Fast ? _speed : 1 / _speed; // show clamped value in a filename
 
-        var change_pitch   =                 Options.Contains('p');
-        var use_rubberband = change_pitch || Options.Contains('r');
+        var change_pitch   = Options.Contains('p');
+        var use_rubberband = Options.Contains('r');
 
         var input = await GetFile();
 
@@ -56,6 +56,11 @@ public class Speed : FileEditor_AudioVideo
                 // [libmp3lame @ 000000a24ceb9f40] inadequate AVFrame plane padding
                 // Works fine with other values for the same file.
                 // Works fine on dev machine.
+            }
+            else if (change_pitch)
+            {
+                var rate = probe.GetAudioStream().SampleRate;
+                options.AF($"asetrate={_speed}*{rate}");
             }
             else
             {

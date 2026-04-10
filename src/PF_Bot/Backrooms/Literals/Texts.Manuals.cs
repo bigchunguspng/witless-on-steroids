@@ -350,9 +350,9 @@ public static partial class Texts
 
         <b>Опции:</b>
         <code>p</code> ← изменять <u>п</u>итч аудио
-        <code>r</code> ← использовать аудиофильтр <i><u>r</u>ubberband</i> вместо <i>atempo</i> (другое качесто)
+        <code>r</code> ← использовать аудиофильтр <i><u>r</u>ubberband</i> вместо <i>atempo</i> или <i>asetrate</i> (другое качесто)
 
-        Стандартные скорость и длительность - 2. При использовании опции <code>p</code>, фильтр <i>rubberband</i> используется автоматически.
+        Стандартные скорость и длительность - 2
         """;
 
     public const string SCALE_MANUAL =

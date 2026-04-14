@@ -59,7 +59,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context)
         return builder.ToString();
     }
 
-    public async Task<(string MP3, FilePath JPG)> RunAsync()
+    public async Task<(FilePath MP3, FilePath JPG)> RunAsync()
     {
         // GET READY
 

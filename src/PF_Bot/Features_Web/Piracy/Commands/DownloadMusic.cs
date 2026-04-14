@@ -63,7 +63,7 @@ public class DownloadMusic : CommandHandlerAsync
             MessageToEdit = 0;
 
             await using var stream = File.OpenRead(mp3);
-            Bot.SendAudio(Origin, InputFile.FromStream(stream, mp3), jpg);
+            Bot.SendAudio(Origin, InputFile.FromStream(stream, mp3.FileName), jpg);
             Log($"{Title} >> YOUTUBE MUSIC >> TIME: {sw.ElapsedReadable()}", LogLevel.Info, LogColor.Yellow);
         }
         else

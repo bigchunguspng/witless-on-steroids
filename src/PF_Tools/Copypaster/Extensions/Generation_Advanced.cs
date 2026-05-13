@@ -37,24 +37,28 @@ public static class Generation_Advanced
         var backwards = alt == END;
         separated = false;
 
+        var pair = word.Contains(' ');
+
         var id = pack.GetWordId(word);
-        if (id != GenerationPack.NO_WORD)
+        if (id != GenerationPack.NO_WORD) // known word
         {
-            return id;
+            if (pair.Janai() || Fortune.IsOneIn(2))
+                return id;
         }
 
-        // word is not a part of the vocabulary
+        // unknown word OR a pair
 
-        if (word.Contains(' '))
+        if (pair)
         {
             word = word.Split()[backwards ? 0 : 1];
             separated = true;
 
             id = pack.GetWordId(word);
-            if (id != GenerationPack.NO_WORD) return id;
-
-            // word is not a part of the vocabulary + is separated by space;
+            if (id != GenerationPack.NO_WORD)
+                return id; // known bit of pair
         }
+
+        // unknown word
 
         // S lisba ->     [lisba]ngelion
         // E lisba -> mega[lisba]

@@ -94,11 +94,12 @@ public static class Consuming_Advanced
         var token = tokens.First!;
         while (true)
         {
+            var next = token.Next;
             if (token.Value == LINE_BREAK)
                 tokens.Remove(token);
 
-            if (token.Next != null)
-                token = token.Next;
+            if (next != null)
+                token = next;
             else
                 break;
         }

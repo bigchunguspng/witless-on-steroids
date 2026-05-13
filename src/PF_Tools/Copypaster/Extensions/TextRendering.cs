@@ -14,7 +14,7 @@ public static class TextRendering
         foreach (var id in ids)
         {
             var word = DB.GetWord(id);
-            if (word is not null)
+            if (word is not null and not "[N]") // wiping packs? can remove [N] check as well, it shouldn't go to packs now
             {
                 words.AddLast(word);
             }

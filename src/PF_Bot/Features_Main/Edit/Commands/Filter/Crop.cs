@@ -59,6 +59,7 @@ public class Crop : FileEditor_VideoPhoto // todo shake is only for video
             {
                 args[i] = _rgx_iw.Replace(args[i], "iw");
                 args[i] = _rgx_ih.Replace(args[i], "ih");
+                args[i] = args[i].Replace(",", "\\,");
             }
 
             if (args.Length > 4) args = args.Take(4).ToArray();

@@ -61,8 +61,8 @@ public abstract class FileEditor_Core : CommandHandlerAsync
         => message != null && MessageContainsFile(message);
 
     protected virtual bool MessageContainsFile(Message m)
-        => (SupportedTypes.HasFlag(SupportedFileTypes.Video) && GetVideoFileID(m))
-        || (SupportedTypes.HasFlag(SupportedFileTypes.Photo) && GetPhotoFileID(m))
+        => (SupportedTypes.HasFlag(SupportedFileTypes.Photo) && GetPhotoFileID(m))
+        || (SupportedTypes.HasFlag(SupportedFileTypes.Video) && GetVideoFileID(m))
         || (SupportedTypes.HasFlag(SupportedFileTypes.Audio) && GetAudioFileID(m))
         || (SupportedTypes.HasFlag(SupportedFileTypes.URL  ) && GetVideoURL   (m));
 

@@ -21,16 +21,16 @@ public abstract class FileEditor_Audio : FileEditor_Core
 public abstract class FileEditor_AudioVideoPhoto : FileEditor_Core
 {
     protected override SupportedFileTypes SupportedTypes
-        => SupportedFileTypes.Photo
-         | SupportedFileTypes.Video
+        => SupportedFileTypes.Video
+         | SupportedFileTypes.Photo
          | SupportedFileTypes.Audio;
 }
 
 public abstract class FileEditor_VideoPhoto : FileEditor_Core
 {
     protected override SupportedFileTypes SupportedTypes
-        => SupportedFileTypes.Photo
-         | SupportedFileTypes.Video;
+        => SupportedFileTypes.Video
+         | SupportedFileTypes.Photo;
 }
 
 public abstract class FileEditor_AudioVideo : FileEditor_Core

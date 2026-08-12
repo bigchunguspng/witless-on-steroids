@@ -25,6 +25,11 @@ public class TestFonts : CommandHandlerAsync
         var text = Args?.SliceByFirst('\n').Trim().ToString()
                 ?? "Вы слушаете: ... Certified H0OD classic!";
 
+        if      (Options.Contains("up"))
+            text = text.ToUpper();
+        else if (Options.Contains("lo"))
+            text = text.ToLower();
+
         var task_loadBackground = Image.LoadAsync(File_TestFontsBackground);
 
         var lines = new List<Image>();

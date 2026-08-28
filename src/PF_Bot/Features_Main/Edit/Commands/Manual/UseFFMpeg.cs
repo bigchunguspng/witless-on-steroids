@@ -72,6 +72,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         var output = input.GetOutputFilePath("Edit", $".{extension}");
 
         options = options.Replace("THIS", input);
+        options = options.Replace("CHAT", Chat.ToString());
 
         await FFMpeg.Command(input, output, options).FFMpeg_Run();
 

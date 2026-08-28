@@ -50,21 +50,22 @@ public class UseMagick : FileEditor_VideoPhoto
 
         // EXECUTE
 
-        var path = await GetFile();
-        options = options.Replace("THIS", path);
+        var input = await GetFile();
+        var output = input.GetOutputFilePath("Mgk", $".{extension}");
 
-        var output = await ProcessImage(path, options, extension);
+        options = options.Replace("THIS", input);
+        options = options.Replace("CHAT", Chat.ToString());
+
+        await ProcessImage(input, output, options);
+
         SendResult(output, extension, sendDocument: Options.Contains('g'));
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
     }
 
-    private async Task<string> ProcessImage(FilePath input, string options, string extension)
+    private async Task ProcessImage(FilePath input, FilePath output, string options)
     {
-        var output = input.GetOutputFilePath("Mgk", $".{extension}");
         var processResult = await ProcessRunner.Run(MAGICK, $"\"{input}\" {options} \"{output}\"");
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
-
-        return output;
     }
 
     private void SendResult(string result, string extension, bool sendDocument = false)

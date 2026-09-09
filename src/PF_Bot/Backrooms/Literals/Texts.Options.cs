@@ -94,6 +94,7 @@ public static partial class Texts
         <b>Опции команды</b> <code>/nuke</code>:
 
         <code>N"</code> - кол-во проходов (1-9 📸, 1-3 🎬)
+        <code>Nx</code> - вероятность пикселизации (0-100)
 
         <b>Общие опции</b>: /man_32
         """;

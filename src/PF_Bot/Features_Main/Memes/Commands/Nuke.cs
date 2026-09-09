@@ -32,13 +32,15 @@ public class Nuke : Meme_Core<int>
 
     protected override void ParseOptions()
     {
-        _options.Depth = MemeOptions.GetInt(_r_depth, 1);
+        _options.Depth      = MemeOptions.GetInt(_r_depth, 1);
+        _options.PixelizePc = MemeOptions.GetInt(_r_pixel, -1);
     }
 
     protected override int GetMemeText(string? text) => 0;
 
     private static readonly Regex
-        _r_depth = new(@"([1-9])("")", RegexOptions.Compiled); // Needs more nuking!
+        _r_depth = new(@"([1-9])("")",  RegexOptions.Compiled), // Needs more nuking!
+        _r_pixel = new(@"(\d{1,3})(x)", RegexOptions.Compiled);
 }
 
 public class Nuke_Callback : CallbackHandler

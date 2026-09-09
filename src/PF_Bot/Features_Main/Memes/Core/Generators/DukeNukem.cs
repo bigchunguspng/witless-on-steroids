@@ -9,6 +9,7 @@ public struct MemeOptions_Nuke()
 {
     /// Amount of dropped nukes XD.
     public int Depth = 1;
+    public int PixelizePc = -1;
 }
 
 public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
@@ -18,7 +19,7 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
         //throw new InvalidOperationException($"Surprize mazafaka! {DateTime.Now.Ticks}");
         var probe = await FFProbe.Analyze(request.SourcePath);
         var result = await new FFMpeg_Effects(request.SourcePath, probe)
-            .FX_Nuke(request, op.Depth)
+            .FX_Nuke(request, op)
             .FFMpeg_Run();
 
         LogNuke(chat, result, request);
@@ -26,9 +27,10 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
 
     public async Task GenerateVideoMeme(MemeRequest request, int text)
     {
+        op.Depth.Clamp(3);
         var probe = await FFProbe.Analyze(request.SourcePath);
         var result = await new FFMpeg_Effects(request.SourcePath, probe)
-            .FX_Nuke(request, op.Depth.Clamp(3))
+            .FX_Nuke(request, op)
             .FFMpeg_Run();
 
         LogNuke(chat, result, request);

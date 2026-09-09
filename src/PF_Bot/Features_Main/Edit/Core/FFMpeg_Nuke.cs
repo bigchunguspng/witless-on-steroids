@@ -1,3 +1,4 @@
+using PF_Bot.Features_Main.Memes.Core.Generators;
 using PF_Bot.Features_Main.Memes.Core.Shared;
 using PF_Tools.FFMpeg;
 using static PF_Tools.Backrooms.Helpers.Fortune;
@@ -6,7 +7,7 @@ namespace PF_Bot.Features_Main.Edit.Core;
 
 public partial class FFMpeg_Effects
 {
-    public FFMpegArgs FX_Nuke(MemeRequest request, int depth = 1)
+    public FFMpegArgs FX_Nuke(MemeRequest request, MemeOptions_Nuke op)
     {
         var options = new FFMpegOutputOptions();
 
@@ -26,9 +27,10 @@ public partial class FFMpeg_Effects
 
         _args.Meme_HydraulicPress(request.Press);
 
-        for (var i = 0; i < depth; i++)
+        var intensity = 0.0;
+        for (var i = 0; i < op.Depth; i++)
         {
-            DropNuke(request.IsVideo);
+            intensity += DropNuke(op.PixelizePc, intensity, request.IsVideo);
         }
 
         SetQuality(options, request);
@@ -36,17 +38,18 @@ public partial class FFMpeg_Effects
         return _args;
     }
 
-    private void DropNuke(bool isVideo = false)
+    private double DropNuke
+        (int pixelize_pc = -1, double total_intensity = 0, bool isVideo = false)
     {
         // VIGNETTE
-        if (isVideo && IsOneIn(4))
+        if (IsOneIn(isVideo ? 4 : 8))
         {
             _args.FilterAppend($"vignette={RandomDouble(0.1, 0.5)}");
         }
         // https://ffmpeg.org/ffmpeg-filters.html#vignette-1
 
         // PIXELIZE
-        if (IsOneIn(isVideo ? 4 : 8))
+        if (pixelize_pc >= 0 ? LuckyFor(pixelize_pc) : IsOneIn(isVideo ? 4 : 8))
         {
             var size = probe.GetVideoStream().Size;
             var p = Math.Max(2, Math.Min(size.Width, size.Height) / RandomInt(60, 120));
@@ -73,10 +76,14 @@ public partial class FFMpeg_Effects
         // https://ffmpeg.org/ffmpeg-filters.html#amplify
 
         // HUE SATURATION
-        var hue        = RandomInt(-25,  25); // [-180 - 180]
-        var strength   = RandomInt(  1, 100);
-        var saturation = RandomDouble(-1, 1); // was 0, 0.5
-        var intensity  = RandomDouble(-1, 1); // 1 - 100 // was 1, 14
+        var hue        = RandomInt(-25,  25);        // -180 - 180
+        var saturation = RandomDouble(-1, 1);        //   -1 -   1
+        var i_min = -1 - Math.Min(total_intensity, 0); // TI < 0 ? move limit up
+        var i_max =  1 - Math.Max(total_intensity, 0); // TI > 0 ? move limit down 
+        var intensity  = RandomDouble(i_min, i_max); //   -1 -   1
+        var s_max = Math.Clamp((2.5 / Math.Abs(intensity)).RoundInt(), 1, 100);
+        var strength   = RandomInt(1, s_max);        //    1 - 100
+        // ^ limit strength to avoid ugly pixel mess
         _args.FilterAppend($"huesaturation={hue}");
         _args.FilterAppend($":saturation={saturation}");
         _args.FilterAppend($":intensity={intensity}");
@@ -131,6 +138,8 @@ public partial class FFMpeg_Effects
             _args.FilterAppend($"+{flag}");
         }
         // https://ffmpeg.org/ffmpeg-filters.html#noise
+
+        return intensity;
     }
 
     private void SetQuality(FFMpegOutputOptions options, MemeRequest request)

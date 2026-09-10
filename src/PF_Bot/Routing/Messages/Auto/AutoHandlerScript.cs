@@ -6,6 +6,7 @@ public class AutoHandlerScript
 {
     private readonly Dictionary<string, List<WeightedOption>> Macros = new(); // name -> possible values
     private readonly Dictionary<char,   string>            Templates = new(); // file type -> input template
+    private readonly Dictionary<char,   int>                 Repeats = new(); // file type -> repeats
 
     // GET (RENDER)
 
@@ -14,25 +15,33 @@ public class AutoHandlerScript
     private static readonly Regex
         _r_range = new(@"\[(-?\d+)\.\.(-?\d+)\]", RegexOptions.Compiled);
 
-    public string? GenerateInput(char type, string? messageText)
+    public string[] GenerateInputs(char type, string? messageText)
     {
         if (Templates.TryGetValue_Failed(type, out var template))
-            return null;
+            return [];
 
-        foreach (var (name, options) in Macros) // expand macros
+        var repeats = Repeats[type];
+        var result = new string[repeats];
+        for (var i = 0; i < repeats; i++)
         {
-            var macroUsage = $"[{name}]";
-            if (template.Contains(macroUsage).Janai())
-                continue;
+            var input = template;
+            foreach (var (name, options) in Macros) // expand macros
+            {
+                var macroUsage = $"[{name}]";
+                if (input.Contains(macroUsage).Janai())
+                    continue;
 
-            var replacement = PickRandom(options);
-            template = template.Replace(macroUsage, replacement);
+                var replacement = PickRandom(options);
+                input = input.Replace(macroUsage, replacement);
+            }
+
+            input = _r_range.Replace(input, ReplaceRangeMacro);
+            input = input.Replace("[TEXT]", messageText);
+
+            result[i] = input;
         }
 
-        template = _r_range.Replace(template, ReplaceRangeMacro);
-        template = template.Replace("[TEXT]", messageText);
-
-        return template;
+        return result;
     }
 
     private string ReplaceRangeMacro(Match match)
@@ -60,8 +69,8 @@ public class AutoHandlerScript
     // CREATE (PARSE)
 
     private static readonly Regex
-        _r_wm      = new(    @"(?:(\d+)\s)?([\S\s]+)", RegexOptions.Compiled),
-        _r_handler = new(@"([pvagusd]+):\s*([\S\s]+)", RegexOptions.Compiled);
+        _r_wm      = new(            @"(?:(\d+)\s)?([\S\s]+)", RegexOptions.Compiled),
+        _r_handler = new(@"([pvagusd]+)([1-9])?:\s*([\S\s]+)", RegexOptions.Compiled);
 
     public static AutoHandlerScript Create(string raw)
     {
@@ -96,14 +105,16 @@ public class AutoHandlerScript
 
                 script.Macros.Add(name, options);
             }
-            else // psg: [m]^^*3upim
+            else // psg3: [m]^^*3upim
             {
                 var match = _r_handler.Match(statement);
                 var types    = match.ExtractGroup(1, s => s, ""); // psg
-                var template = match.ExtractGroup(2, s => s, ""); // [m]^^*3upim
+                var repeats  = match.ExtractGroup(2, int.Parse, 1); // 3
+                var template = match.ExtractGroup(3, s => s, ""); // [m]^^*3upim
                 foreach (var type in types)
                 {
                     script.Templates.Add(type, template);
+                    script.Repeats  .Add(type, repeats);
                 }
             }
         }

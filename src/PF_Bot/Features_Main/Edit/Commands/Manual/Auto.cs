@@ -22,24 +22,27 @@ public class Auto : CommandHandlerAsync
         var repeats = _r_repeat.ExtractGroup(0, Options, int.Parse, 1);
         for (var i = 0; i < repeats; i++)
         {
-            var input = AutoHandler.TryGetHandlerInput(Context, expression, Context.Message.ReplyToMessage, cache: false);
-            if (input == null)
+            var inputs = AutoHandler.TryGetHandlerInputs(Context, expression, Context.Message.ReplyToMessage, cache: false);
+            if (inputs.Length == 0)
             {
                 SendBadNews(AUTO_FAIL_TYPE.Format(FAIL_EMOJI.PickAny()));
                 return;
             }
 
-            var func = Registry.CommandHandlers.Resolve(input, out var command);
-            if (func == null)
+            foreach (var input in inputs)
             {
-                SendBadNews(PIPE_FAIL_RESOLVE.Format(input));
-                return;
+                var func = Registry.CommandHandlers.Resolve(input, out var command);
+                if (func == null)
+                {
+                    SendBadNews(PIPE_FAIL_RESOLVE.Format(input));
+                    return;
+                }
+
+                var context = CommandContext.CreateForAuto(Message, command!, input.TrimEnd(), CommandMode.AUTO);
+                var handler = func.Invoke();
+
+                await handler.Handle(context);
             }
-
-            var context = CommandContext.CreateForAuto(Message, command!, input.TrimEnd(), CommandMode.AUTO);
-            var handler = func.Invoke();
-
-            await handler.Handle(context);
         }
 
         var suffix = repeats > 1 ? $"-{repeats}" : null;

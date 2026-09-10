@@ -14,7 +14,7 @@ public static class AutoHandler
     // EXPRESSION PARSING
 
     /// Returns command-like input string in this format: <c>cmd[ops] [args]</c>
-    public static string? TryGetHandlerInput
+    public static string[] TryGetHandlerInputs
         (MessageContext context, string expression, Message? message = null, bool cache = true)
     {
         if (cache.IsOff() || Cache.TryGetValue_Failed(context.Chat, out var script))
@@ -26,8 +26,8 @@ public static class AutoHandler
         var type = script.SupportedFileTypes
             .FirstOrDefault(type => MessageMatches(type, message ?? context.Message));
         return type == 0
-            ? null
-            : script.GenerateInput(type, context.Text);
+            ? []
+            : script.GenerateInputs(type, context.Text);
     }
 
     // MEDIA

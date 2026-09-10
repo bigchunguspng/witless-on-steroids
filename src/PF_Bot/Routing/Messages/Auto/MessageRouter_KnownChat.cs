@@ -51,18 +51,21 @@ public class MessageRouter_KnownChat
         if (expression == null)
             return false;
 
-        var input = AutoHandler.TryGetHandlerInput(Context, expression);
-        if (input == null)
+        var inputs = AutoHandler.TryGetHandlerInputs(Context, expression);
+        if (inputs.Length == 0)
             return false;
 
-        var func = registry.Resolve(input, out var command);
-        if (func == null)
-            return false;
+        foreach (var input in inputs)
+        {
+            var func = registry.Resolve(input, out var command);
+            if (func == null)
+                return false;
 
-        var context = CommandContext.CreateForAuto(Message, command!, input.TrimEnd(), CommandMode.AUTO);
+            var context = CommandContext.CreateForAuto(Message, command!, input.TrimEnd(), CommandMode.AUTO);
 
-        var handler = func.Invoke();
-        _ = handler.Handle(context);
+            var handler = func.Invoke();
+            _ = handler.Handle(context);
+        }
 
         return true;
     }

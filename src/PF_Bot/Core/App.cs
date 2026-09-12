@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Main.Text.Core;
 using PF_Bot.Features_Web.Boards.Core;
@@ -35,6 +36,9 @@ public static class App
     public static async Task Run(string? args)
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.InputEncoding  = Encoding.UTF8;
 
         Config.ReadFromFile();
 

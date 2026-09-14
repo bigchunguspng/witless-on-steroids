@@ -9,6 +9,12 @@ public static class Listing
     public static InlineKeyboardMarkup GetPaginationKeyboard
         (this ListPagination pagination, int last, string key)
     {
+        return new InlineKeyboardMarkup(pagination.GetPaginationButtons(last, key));
+    }
+
+    public static List<InlineKeyboardButton> GetPaginationButtons
+        (this ListPagination pagination, int last, string key)
+    {
         var (_, _, page, perPage) = pagination;
 
         if (page < 0) page = last;
@@ -21,7 +27,7 @@ public static class Listing
         if (page < last    ) buttons[2] = InlineKeyboardButton.WithCallbackData("➡️", CallbackData(page + 1));
         if (page < last - 1) buttons[3] = InlineKeyboardButton.WithCallbackData("⏩", CallbackData(last));
 
-        return new InlineKeyboardMarkup(buttons);
+        return buttons;
 
         string CallbackData(int p) => $"{key} - {p} {perPage}";
     }

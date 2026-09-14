@@ -65,6 +65,7 @@ namespace PF_Bot.Core;
         2chan.html
         4chan.html
         art.jpg
+        ffmpeg.html
         fonts-back.png
         texts.json
         voice.ogg
@@ -120,6 +121,7 @@ public static class Paths
         File_4chanHtmlPage       = Dir_Static.Combine("4chan.html"),
         File_DefaultAlbumCover   = Dir_Static.Combine("art.jpg"),
         File_Cookies             = Dir_Static.Combine("cookies.firefox-private.txt"),
+        File_FFMpegDocsPage      = Dir_Static.Combine("ffmpeg.html"),
         File_TestFontsBackground = Dir_Static.Combine("fonts-back.png"),
         File_DefaultTexts        = Dir_Static.Combine("texts.json"),
         File_DefaultVoiceMessage = Dir_Static.Combine("voice.ogg"),

@@ -54,16 +54,7 @@ public class FFMpegDocumentation
         ParseFilters(PagesVF, doc.DocumentNode.SelectNodes(_xp_vfs));
         sw.Log("FFMPEG DOCS -> parse filters");
 
-        var count = 0;
-        PagesAF.Concat(PagesVF)
-            .Where(x => x.Content.Length > 4096)
-            .ForEach(x =>
-            {
-                if (count == 0) LogDebug("FFMPEG DOCS LONG FILES:");
-                count++;
-                Print($"{x.Content.Length,10} | {x.Number,3} {x.Title}");
-            });
-        if (count > 0) Print($"^ COUNT: {count}");
+        Debug_PrintLongFilesCount();
     }
 
     private static void ParseFilters
@@ -134,7 +125,8 @@ public class FFMpegDocumentation
             if (n) sb.Append('\n');
             n = true;
             var node = li.FirstChild;
-            AppendExampleDesc(node.InnerHtml);
+            sb.Append($"{BULLET} ").Append(Sanitize(node.InnerHtml));
+            // ^ text before example
             while (true)
             {
                 node = node.NextElementSibling();
@@ -142,38 +134,37 @@ public class FFMpegDocumentation
                 if (node.Name == "div")
                 {
                     var pre = node.FirstElementChild()!;
-                    AppendExample(pre.InnerHtml);
+                    sb.Append('\n').Append("<code>").Append(Sanitize(pre.InnerHtml)).Append("</code>");
+                    // ^ example code
                 }
                 else if (node.Name == "p")
                 {
-                    AppendExampleMisc(node.InnerHtml);
+                    sb.Append('\n').Append($"{TRIG} ").Append(Sanitize(node.InnerHtml));
+                    // ^ text after example
                 }
                 else if (node.Name == "a") // 11.64 derain
                 {
                     sb.Append(' ').Append(node.OuterHtml);
+                    // ^ it's not even in the examples section lol
                 }
                 else if (node.Name is "code" or "samp" or "var") // 8.25 afir
                 {
                     sb.Append(' ').Append("<code>").Append(Sanitize(node.InnerHtml)).Append("</code>");
                     var text_node = node.NextSibling;
                     if (text_node.NodeType == HtmlNodeType.Text)
-                    {
                         sb.Append(Sanitize(text_node.InnerHtml));
-                    }
+                    // ^ tags & text inside [text before example]
                 }
                 else if (node.Name == "dl") // 11.50 curves
                 {
                     ParseTable_DL(sb, node.ElementChildren(), nesting: 1);
+                    // ^ table
                 }
                 else
                     throw new UnexpectedException($"PARSING UL >> NODE {node.Name}? WTF");
             }
         }
         sb.Append("</blockquote>");
-
-        void AppendExampleDesc(string s) => sb.Append($"{BULLET} ").Append(Sanitize(s));
-        void AppendExample    (string s) => sb.Append('\n').Append("<code>").Append(Sanitize(s)).Append("</code>");
-        void AppendExampleMisc(string s) => sb.Append('\n').Append($"{TRIG} ").Append(Sanitize(s));
     }
 
     private static void ParseTable_DL
@@ -191,10 +182,12 @@ public class FFMpegDocumentation
                 var samp = node_dt.FirstElementChild()!;
                 for (var i = 2; i <= nesting; i++) sb.Append("    ");
                 sb.Append($"{BULLET} ").Append("<code>").Append(Sanitize(samp.InnerHtml)).Append("</code>");
+                // ^ option/value name
             }
             else if (node is { Name: "dd" } node_dd)
             {
                 ParseTable_DD(sb, node_dd.ElementChildren(), nesting);
+                // ^ lore
             }
             else
                 throw new UnexpectedException($"PARSING DL >> NODE {node.Name}? WTF");
@@ -214,30 +207,33 @@ public class FFMpegDocumentation
                 {
                     first = false;
                     sb.Append(" - ")     .Append(Sanitize(node_p.InnerHtml));
+                    // ^ just text (very common)
                 }
                 else
                 {
                     sb.Append('\n');
                     for (var i = 2; i <= nesting; i++) sb.Append("    ");
                     sb.Append($"{TRIG} ").Append(Sanitize(node_p.InnerHtml));
+                    // ^ additional texts (quite often)
                 }
+            }
+            else if (node is { Name: "dl" } node_dl)
+            {
+                ParseTable_DL(sb, node_dl.ElementChildren(), nesting + 1);
+                // ^ nested table (sometimes)
             }
             else if (node is { Name: "div" } node_div) // 8.120 volume
             {
                 var pre = node_div.FirstElementChild()!;
                 sb.Append('\n').Append("<code>").Append(Sanitize(pre.InnerHtml)).Append("</code>");
+                // ^ example (lol)
             }
             else if (node is { Name: "a" }) // 11.39 colorspace
             {
                 // skip, it's there by mistake
             }
-            else if (node is { Name: "dl" } node_dl)
-            {
-                ParseTable_DL(sb, node_dl.ElementChildren(), nesting + 1);
-            }
             else
                 throw new UnexpectedException($"PARSING DD >> NODE {node.Name}? WTF");
-
         }
     }
 
@@ -302,5 +298,21 @@ public class FFMpegDocumentation
             .Append("</h3>\n<div>")
             .Append(page.Content)
             .Append("</div>\n");
+    }
+
+    /// Telegram says it's 4096, and yet for some reason
+    /// I can send pages with <c>Content.Length</c> ~ 4900 too (e.g. 8.25 afir)
+    private void Debug_PrintLongFilesCount()
+    {
+        var count = 0;
+        PagesAF.Concat(PagesVF)
+            .Where(x => x.Content.Length > 4096)
+            .ForEach(x =>
+            {
+                if (count == 0) LogDebug("FFMPEG DOCS LONG FILES:");
+                count++;
+                Print($"{x.Content.Length,10} | {x.Number,3} {x.Title}");
+            });
+        if (count > 0) Print($"^ COUNT: {count}");
     }
 }

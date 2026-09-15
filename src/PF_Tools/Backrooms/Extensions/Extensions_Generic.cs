@@ -11,6 +11,13 @@ public static class Extensions_Generic
         return obj;
     }
 
+    public static T Fluent<T>
+        (this T obj, Action<T> action)
+    {
+        action(obj);
+        return obj;
+    }
+
     public static bool TryGetValue_Failed<TKey,TValue>
     (
         this IDictionary<TKey, TValue> dictionary,

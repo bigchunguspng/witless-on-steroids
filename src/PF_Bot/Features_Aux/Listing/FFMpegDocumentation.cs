@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿ using System.Text;
+ using HtmlAgilityPack;
 
-namespace PF_Bot.Features_Aux.Listing;
+ namespace PF_Bot.Features_Aux.Listing;
 
 public class FFMpegDocsPage
 {
@@ -23,183 +24,227 @@ public class FFMpegDocumentation
 
     public const string URL = "https://ffmpeg.org/ffmpeg-filters.html";
 
-    private const RegexOptions
-        ROps = RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace;
+    private const string
+        _xp_afs = "//h3[starts-with(text(),  '8')]",
+        _xp_vfs = "//h3[starts-with(text(), '11')]";
 
     private static readonly Regex
-        _r_h2    = new("""<h2\sclass="chapter">    ( [0-9]+)\s([^<]+)<.+?>               <\/h2>""", ROps),
-        _r_h3_af = new("""<h3\sclass="section"> 8\.([.0-9]+)\s([^<]+)<.+?href="(.+?)".+?><\/h3>""", ROps),
-        _r_h3_vf = new("""<h3\sclass="section">11\.([.0-9]+)\s([^<]+)<.+?href="(.+?)".+?><\/h3>""", ROps);
+        _r_title = new("""(?:\d+)\.(\d+) (.+)""", RegexOptions.Compiled);
 
-    public FFMpegDocumentation() => Parse().Wait();
+    public FFMpegDocumentation() => Parse();
 
-    private async Task Parse()
+    private void Parse()
     {
-        var html = File_FFMpegDocsPage.FileExists
-            ? await File.ReadAllTextAsync(File_FFMpegDocsPage)
-            : await GetOnlineWebPage();
+        var sw = Stopwatch.StartNew();
 
-        var matches_h2   = _r_h2   .Matches(html);
-        var matches_h3_a = _r_h3_af.Matches(html);
-        var matches_h3_v = _r_h3_vf.Matches(html);
-        PopulateFilters(html, matches_h3_a, matches_h2[ 8], PagesAF);
-        PopulateFilters(html, matches_h3_v, matches_h2[11], PagesVF);
+        var       file_exists = File_FFMpegDocsPage.FileExists; 
+        var doc = file_exists
+            ? new HtmlDocument().Fluent(x => x.Load(File_FFMpegDocsPage))
+            : new HtmlWeb().Load(URL);
 
-        return;
+        sw.Log($"FFMPEG DOCS -> parse file ({(file_exists ? "local" : "online")})");
 
-        async Task<string> GetOnlineWebPage()
+        if (file_exists.Janai())
         {
-            using var client = HttpClientFactory.CreateClient();
-            return await client.GetStringAsync(URL);
+            File.WriteAllText(File_FFMpegDocsPage, doc.ParsedText);
+            sw.Log("FFMPEG DOCS -> save file");
         }
+
+        ParseFilters(PagesAF, doc.DocumentNode.SelectNodes(_xp_afs));
+        ParseFilters(PagesVF, doc.DocumentNode.SelectNodes(_xp_vfs));
+        sw.Log("FFMPEG DOCS -> parse filters");
+
+        var count = 0;
+        PagesAF.Concat(PagesVF)
+            .Where(x => x.Content.Length > 4096)
+            .ForEach(x =>
+            {
+                if (count == 0) LogDebug("FFMPEG DOCS LONG FILES:");
+                count++;
+                Print($"{x.Content.Length,10} | {x.Number,3} {x.Title}");
+            });
+        if (count > 0) Print($"^ COUNT: {count}");
     }
 
-    private static void PopulateFilters
-        (string html, MatchCollection filters, Match nextChapter, List<FFMpegDocsPage> pages)
+    private static void ParseFilters
+        (List<FFMpegDocsPage> pages, HtmlNodeCollection nodes) // nodes - h3 of filters
     {
-        for (var i = 0; i < filters.Count; i++)
+        pages.Capacity = nodes.Count;
+        foreach (var node in nodes)
         {
-            var match  = filters[i];
-            var number = match.Groups[1].Value;
-            var title  = match.Groups[2].Value;
-            var anchor = match.Groups[3].Value;
-
-            var content_start = match.Index + match.Length;
-            var content_end   = i + 1 == filters.Count
-                ? nextChapter   .Index
-                : filters[i + 1].Index;
-            var content = html.Substring(content_start, content_end - content_start);
-
+            var match  = _r_title.Match(node.FirstChild.InnerText);
             pages.Add(new FFMpegDocsPage
             {
-                Number   = int.Parse(number),
-                Anchor   = anchor,
-                Title    = title,
-                Content  = ParseContent(content),
+                Anchor   = node.PrevElementSibling()!.Attributes["name"].Value,
+                Number   = match.ExtractGroup(1, int.Parse),
+                Title    = match.ExtractGroup(2, s => s, ""),
+                Content  = ParseContent(node.NextElementSibling()!),
             });
         }
     }
 
     // PARSING CONTENT
 
-    private static readonly Regex
-        _r_content_p  = new("""<p>\s?((?:\s|\S)+?)\s?<\/p>""", ROps),
-        _r_content_EX = new("""<h4\sclass="subsection">(?:\d+\.){2}\d+\sExamples<.+?><\/h4>""", ROps),
-        _r_content_CO = new("""<h4\sclass="subsection">(?:\d+\.){2}\d+\sCommands<.+?><\/h4>""", ROps),
-        _r_content_li = new("""<li>((?:\s|\S)+?)<""", ROps),
-        _r_content_ex = new("""<pre\sclass="example-preformatted">((?:\s|\S)+?)<\/pre>""", ROps),
-        _r_content_dl = new("""<dl\sclass="table">\s?((?:\s|\S)+?)\s?<\/dl>(?!\s+?<\/dd>)(?=\s+?<a)""", ROps);
+    // (ANTI)WARNING! HAP shit can be null even tho HAP doesn't expose nullability
+    // ReSharper disable NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+    // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
-    private static string ParseContent(string content)
+    private const string BULLET = "•", TRIG = "▵";
+
+    private static string ParseContent(HtmlNode node) // node - 1st node of filter section, usually p
     {
-        var groups = _r_content_p .Matches(content).Select(x => new Group(x.Groups[1], TagType.Paragraph))
-            .Concat (_r_content_EX.Matches(content).Select(x => new Group(x.Groups[0], TagType.Examples)))
-            .Concat (_r_content_CO.Matches(content).Select(x => new Group(x.Groups[0], TagType.Commands)))
-            .Concat (_r_content_li.Matches(content).Select(x => new Group(x.Groups[1], TagType.Li)))
-            .Concat (_r_content_ex.Matches(content).Select(x => new Group(x.Groups[1], TagType.Example)))
-            .Concat (_r_content_dl.Matches(content).Select(x => new Group(x.Groups[1], TagType.Table)))
-            .OrderBy(x => x.Index)
-            .ToList();
-
-        var tables = groups
-            .Where(x => x.Type == TagType.Table)
-            .ToList();
-
+        // filter page sections: description [p…, dl], Examples [a, h4, ul], Commands [a, h4, p…, dl]
+        // edge cases: examples a5 crossfade, commands a35 amix, table^3 a37 aneq
         var sb = new StringBuilder();
-        var example_section = false;
-        foreach (var group in groups)
+        while (true)
         {
-            switch (group.Type)
+            if (node.Name == "a")
             {
-                case TagType.Paragraph:
-                    if (tables.Any(x => group.Index > x.Index && group.End < x.End)) continue;
-                    sb.Append(example_section ? "\n• " : "\n\n");
-                    sb.Append(Sanitize(group.Value));
-                    break;
-                case TagType.Examples:
-                    example_section = true;
-                    sb.Append("\n\n").Append("<blockquote expandable><b>Examples</b>:");
-                    break;
-                case TagType.Commands:
-                    if (example_section) sb.Append("</blockquote>");
-                    example_section = false; // commands go after examples
-                    sb.Append("\n\n").Append("<u>Commands</u>:");
-                    break;
-                case TagType.Li:
-                    sb.Append(example_section ? "\n• " : "\n\n");
-                    sb.Append(Sanitize(group.Value));
-                    break;
-                case TagType.Example:
-                    sb.Append('\n').Append($"<code>{Sanitize(group.Value)}</code>");
-                    break;
-                case TagType.Table:
-                    AppendTable(sb, group);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                var attr_id   = node.Attributes["id"];
+                var attr_name = node.Attributes["name"];
+                var      name = (attr_id ?? attr_name).Value;
+                if      (name.StartsWith("Examples")) sb.Append("\n\n").Append("<u>Examples</u>:");
+                else if (name.StartsWith("Commands")) sb.Append("\n\n").Append("<u>Commands</u>:");
+                else break;
+
+                // skip h4:
+                node = attr_name != null
+                    ? node.NextElementSibling()!
+                    : node.NextElementSibling().NextElementSibling()!;
             }
+            else if (node.Name == "p")
+            {
+                sb.Append("\n\n").Append(Sanitize(node.InnerHtml));
+            }
+            else if (node.Name == "ul") ParseExamples_UL(sb, node.ElementChildren());
+            else if (node.Name == "dl") ParseTable_DL   (sb, node.ElementChildren());
+
+            node = node.NextElementSibling()!;
         }
-
-        if (example_section) sb.Append("</blockquote>");
-
         return sb.ToString();
     }
 
-    private static readonly Regex
-        _r_content_dt_dd = new("""(?:<dt>(?:&lsquo;)?<.+>(.+?)<\/.+>(?:&rsquo;)?\s?<\/dt>)\s?(?:<dd>\s?<.+?>((?:\s|\S)+?)<\/.+>\s?(?:<dl\sclass="table">\s?((?:\s|\S)+)\s?<\/dl>\s*?(?:\s?<p>((?:\s|\S)+?)\s?<\/p>)?)?\s*?<\/dd>)?""", ROps);
-    // todo make it work with nested^2 tables
-
-    private static void AppendTable(StringBuilder sb, Group group)
+    private static void ParseExamples_UL
+        (StringBuilder sb, IEnumerable<HtmlNode> nodes) // nodes - ul children (li)
     {
-        sb.Append('\n');
-        var html = group.Value;
-        var rows = _r_content_dt_dd.Matches(html);
-        foreach (Match row in rows)
+        sb.Append('\n').Append("<blockquote expandable>");
+        var n = false;
+        foreach (var li in nodes)
         {
-            AppendTableRow(sb, row);
-            var t = row.Groups[3].Value; // nested table (optional)
-            if (t.IsNotNull_NorEmpty())
+            if (n) sb.Append('\n');
+            n = true;
+            var node = li.FirstChild;
+            AppendExampleDesc(node.InnerHtml);
+            while (true)
             {
-                var rows2 = _r_content_dt_dd.Matches(t);
-                sb.Append("\n<blockquote><b>Values</b>:");
-                foreach (Match row2 in rows2)
+                node = node.NextElementSibling();
+                if (node == null) break;
+                if (node.Name == "div")
                 {
-                    AppendTableRow(sb, row2);
-                    var t2 = row2.Groups[3].Value; // nested^2 table (example: 8.37 anequalizer > params > t)
-                    if (t2.IsNotNull_NorEmpty())
+                    var pre = node.FirstElementChild()!;
+                    AppendExample(pre.InnerHtml);
+                }
+                else if (node.Name == "p")
+                {
+                    AppendExampleMisc(node.InnerHtml);
+                }
+                else if (node.Name == "a") // 11.64 derain
+                {
+                    sb.Append(' ').Append(node.OuterHtml);
+                }
+                else if (node.Name is "code" or "samp" or "var") // 8.25 afir
+                {
+                    sb.Append(' ').Append("<code>").Append(Sanitize(node.InnerHtml)).Append("</code>");
+                    var text_node = node.NextSibling;
+                    if (text_node.NodeType == HtmlNodeType.Text)
                     {
-                        var rows3 = _r_content_dt_dd.Matches(t2);
-                        foreach (Match row3 in rows3)
-                        {
-                            AppendTableRow(sb, row3, prefix: "    • ");
-                        }
+                        sb.Append(Sanitize(text_node.InnerHtml));
                     }
                 }
-                sb.Append("</blockquote>");
-            }
-
-            var p = row.Groups[4].Value;
-            if (p.IsNotNull_NorEmpty())
-            {
-                sb.Append('\n').Append(Sanitize(p));
+                else if (node.Name == "dl") // 11.50 curves
+                {
+                    ParseTable_DL(sb, node.ElementChildren(), nesting: 1);
+                }
+                else
+                    throw new UnexpectedException($"PARSING UL >> NODE {node.Name}? WTF");
             }
         }
+        sb.Append("</blockquote>");
+
+        void AppendExampleDesc(string s) => sb.Append($"{BULLET} ").Append(Sanitize(s));
+        void AppendExample    (string s) => sb.Append('\n').Append("<code>").Append(Sanitize(s)).Append("</code>");
+        void AppendExampleMisc(string s) => sb.Append('\n').Append($"{TRIG} ").Append(Sanitize(s));
     }
 
-    private static void AppendTableRow
-        (StringBuilder sb, Match row, string prefix = "• ")
+    private static void ParseTable_DL
+        (StringBuilder sb, IEnumerable<HtmlNode> nodes, int nesting = 0) // nodes - dl children
     {
-        var k = row.Groups[1].Value; // option
-        var v = row.Groups[2].Value; // description
-        _ = v.IsNull_OrEmpty()
-            ? sb.Append($"\n{prefix}<code>{k}</code>")
-            : sb.Append($"\n{prefix}<code>{k}</code> - {Sanitize(v)}");
+        // table can be nested up 3 times
+        if (nesting == 1) sb.Append('\n').Append("<blockquote>");
+        var n = nesting != 1;
+        foreach (var node in nodes)
+        {
+            if (node is { Name: "dt" } node_dt)
+            {
+                if (n) sb.Append('\n');
+                n = true;
+                var samp = node_dt.FirstElementChild()!;
+                for (var i = 2; i <= nesting; i++) sb.Append("    ");
+                sb.Append($"{BULLET} ").Append("<code>").Append(Sanitize(samp.InnerHtml)).Append("</code>");
+            }
+            else if (node is { Name: "dd" } node_dd)
+            {
+                ParseTable_DD(sb, node_dd.ElementChildren(), nesting);
+            }
+            else
+                throw new UnexpectedException($"PARSING DL >> NODE {node.Name}? WTF");
+        }
+        if (nesting == 1) sb.Append("</blockquote>");
+    }
+
+    private static void ParseTable_DD
+        (StringBuilder sb, IEnumerable<HtmlNode> nodes, int nesting = 0) // nodes - dd children
+    {
+        var first = true;
+        foreach (var node in nodes)
+        {
+            if (node is { Name: "p" } node_p)
+            {
+                if (first)
+                {
+                    first = false;
+                    sb.Append(" - ")     .Append(Sanitize(node_p.InnerHtml));
+                }
+                else
+                {
+                    sb.Append('\n');
+                    for (var i = 2; i <= nesting; i++) sb.Append("    ");
+                    sb.Append($"{TRIG} ").Append(Sanitize(node_p.InnerHtml));
+                }
+            }
+            else if (node is { Name: "div" } node_div) // 8.120 volume
+            {
+                var pre = node_div.FirstElementChild()!;
+                sb.Append('\n').Append("<code>").Append(Sanitize(pre.InnerHtml)).Append("</code>");
+            }
+            else if (node is { Name: "a" }) // 11.39 colorspace
+            {
+                // skip, it's there by mistake
+            }
+            else if (node is { Name: "dl" } node_dl)
+            {
+                ParseTable_DL(sb, node_dl.ElementChildren(), nesting + 1);
+            }
+            else
+                throw new UnexpectedException($"PARSING DD >> NODE {node.Name}? WTF");
+
+        }
     }
 
     private static string Sanitize(string s)
     {
-        s = s.Replace("\n", " ");
-        if (s.Contains("&"))
+        s = s.TrimEnd().Replace("\n", " ");
+        if (s.Contains('&'))
             s = s // <> - don't replace!, &" - replaced by telegram anyway, rest - should be replaced here!
                 .Replace("&amp;", "&")
                 .Replace("&nbsp;", "\u00a0")
@@ -209,28 +254,23 @@ public class FFMpegDocumentation
                 .Replace("&ldquo;", "\"")
                 .Replace("&rdquo;", "\"")
                 .Replace("&quot;", "\"");
-        if (s.Contains("<p"))
-            s = s.Replace("</p> <p>", "");
-        if (s.Contains("<var"))
-            s = s.Replace("<var class=\"var\">", "<code>").Replace("</var>", "</code>");
-        if (s.Contains("<samp"))
-            s = s.Replace("<samp class=\"samp\">", "<code>").Replace("</samp>", "</code>");
+        if (s.Contains("<"))
+        {
+            s = s.Replace("<br>", $"\n{TRIG}"); // 11.270 v360
+            if (s.Contains("<p"))
+                s = s.Replace("</p> <p>", "");
+            if (s.Contains("<var"))
+                s = s
+                    .Replace("<var class=\"var\">", "<code>")
+                    .Replace("</var>", "</code>");
+            if (s.Contains("<samp"))
+                s = s
+                    .Replace("<samp class=\"samp\">", "<code>")
+                    .Replace("<samp class=\"option\">", "<code>")
+                    .Replace("<samp class=\"file\">", "<code>")
+                    .Replace("</samp>", "</code>");
+        }
         return s;
-    }
-
-    private readonly struct Group(Capture group, TagType type)
-    {
-        public string Value { get; } = group.Value;
-        public int    Index { get; } = group.Index;
-        public int   Length { get; } = group.Length;
-        public TagType Type { get; } = type;
-
-        public int End => Index + Length;
-    }
-
-    private enum TagType
-    {
-        Paragraph, Examples, Commands, Li, Example, Table
     }
 
     // DEBUG
@@ -245,32 +285,22 @@ public class FFMpegDocumentation
         var sb = new StringBuilder();
         sb.Append("<a name=\"Audio-Filters\"></a>\n");
         sb.Append("<h2>8 Audio Filters</h2>\n");
-        foreach (var page in PagesAF)
-        {
-            sb
-                .Append($"<a name=\"{page.Anchor[1..]}\"></a>\n")
-                .Append("<h3>8.")
-                .Append(page.Number)
-                .Append(' ')
-                .Append(page.Title)
-                .Append("</h3>\n<div>")
-                .Append(page.Content)
-                .Append("</div>\n");
-        }
+        foreach (var page in PagesAF) AppendPage(page, 8);
         sb.Append("<a name=\"Video-Filters\"></a>\n");
         sb.Append("<h2>11 Video Filters</h2>\n");
-        foreach (var page in PagesVF)
-        {
-            sb
-                .Append($"<a name=\"{page.Anchor[1..]}\"></a>\n")
-                .Append("<h3>11.")
-                .Append(page.Number)
-                .Append(' ')
-                .Append(page.Title)
-                .Append("</h3>\n<div>")
-                .Append(page.Content)
-                .Append("</div>\n");
-        }
+        foreach (var page in PagesVF) AppendPage(page, 11);
         File.WriteAllText(Dir_Static.Combine("ffmpeg-parsed.html"), sb.ToString());
+
+        void AppendPage(FFMpegDocsPage page, int kind) => sb
+            .Append($"<a name=\"{page.Anchor}\"></a>\n")
+            .Append("<h3>")
+            .Append(kind)
+            .Append('.')
+            .Append(page.Number)
+            .Append(' ')
+            .Append(page.Title)
+            .Append("</h3>\n<div>")
+            .Append(page.Content)
+            .Append("</div>\n");
     }
 }

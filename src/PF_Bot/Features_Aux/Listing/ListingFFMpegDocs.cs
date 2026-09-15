@@ -176,7 +176,7 @@ public static class ListingFFMpegDocs
         var page = list[i];
         var text
             = $"{emoji} {page.Number} - "
-            + $"<a href=\"{FFMpegDocumentation.URL}{page.Anchor}\"><b>{page.Title}</b></a>"
+            + $"<a href=\"{FFMpegDocumentation.URL}#{page.Anchor}\"><b>{page.Title}</b></a>"
             + $"{page.Content}";
 
         var list_page = i / PER_PAGE;

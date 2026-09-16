@@ -5,10 +5,10 @@
 
 public class FFMpegDocsPage
 {
-    public required int    Number  { get; init; }
-    public required string Anchor  { get; init; }
-    public required string Title   { get; init; }
-    public required string Content { get; init; }
+    public required int      Number  { get; init; }
+    public required string   Anchor  { get; init; }
+    public required string   Title   { get; init; }
+    public required string[] Content { get; init; }
 }
 
 /// Parses HTML docs, stores parsed pages.
@@ -22,6 +22,8 @@ public class FFMpegDocumentation
 
     // PARSING
 
+    public const int MAX_MESSAGE_LEN = 4096;
+
     public const string
         HOST = "https://ffmpeg.org/",
         URL  = "https://ffmpeg.org/ffmpeg-filters.html";
@@ -33,6 +35,7 @@ public class FFMpegDocumentation
     private const RegexOptions RO_COMP_NOSPACE = RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace;
 
     private static readonly Regex
+        _r_tag   = new("""<.+?>""",               RegexOptions.Compiled),
         _r_title = new("""(?:\d+)\.(\d+) (.+)""", RegexOptions.Compiled),
         _r_a_ref = new("""<a\sclass="ref"       \shref="(\S+?)">""", RO_COMP_NOSPACE),
         _r_a_man = new("""<a\sdata-manual="\S+?"\shref="(\S+?)">""", RO_COMP_NOSPACE);
@@ -61,6 +64,7 @@ public class FFMpegDocumentation
         sw.Log("FFMPEG DOCS -> parse filters");
 
         Debug_PrintLongFilesCount();
+        sw.Log("FFMPEG DOCS -> analyze pages");
     }
 
     private static void ParseFilters
@@ -70,12 +74,16 @@ public class FFMpegDocumentation
         foreach (var node in nodes)
         {
             var match  = _r_title.Match(node.FirstChild.InnerText);
+            var number = match.ExtractGroup(1, int.Parse);
+            var title  = match.ExtractGroup(2, s => s, "");
+            var offset = (int)Math.Log10(number) + 7 + title.Length;
+            var content = SplitIntoPages(ParseContent(node.NextElementSibling()!), offset);
             pages.Add(new FFMpegDocsPage
             {
                 Anchor   = node.PrevElementSibling()!.Attributes["name"].Value,
-                Number   = match.ExtractGroup(1, int.Parse),
-                Title    = match.ExtractGroup(2, s => s, ""),
-                Content  = ParseContent(node.NextElementSibling()!),
+                Number   = number,
+                Title    = title,
+                Content  = content,
             });
         }
     }
@@ -319,23 +327,138 @@ public class FFMpegDocumentation
             .Append(' ')
             .Append(page.Title)
             .Append("</h3>\n<div>")
-            .Append(page.Content)
+            .AppendJoin("\n\n<br>", page.Content)
             .Append("</div>\n");
     }
 
-    /// Telegram says it's 4096, and yet for some reason
-    /// I can send pages with <c>Content.Length</c> ~ 4900 too (e.g. 8.25 afir)
+    /// Telegram message length limit is 4096./
+    /// And this is TEXT only! HTML tags are excluded.
     private void Debug_PrintLongFilesCount()
     {
         var count = 0;
         PagesAF.Concat(PagesVF)
-            .Where(x => x.Content.Length > 4096)
+            .Select(x => (Page: x, Length: (int)Math.Log10(x.Number) + 7 + x.Title.Length + GetTextLength_HTML(x.Content[0])))
+            .Where(x => x.Length >= MAX_MESSAGE_LEN)
             .ForEach(x =>
             {
                 if (count == 0) LogDebug("FFMPEG DOCS LONG FILES:");
                 count++;
-                Print($"{x.Content.Length,10} | {x.Number,3} {x.Title}");
+                Print($"{x.Length,10} | {x.Page.Number,3} {x.Page.Title}");
             });
         if (count > 0) Print($"^ COUNT: {count}");
+    }
+
+    // SPLIT CONTENT -> PAGES
+
+    private const StringSplitOptions
+        SPLIT_RM_EMPTY_TRIM = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+
+    private static string[] SplitIntoPages(string content, int offset)
+    {
+        if (offset + content.Length <= MAX_MESSAGE_LEN)
+            return [content]; // 92.3% exit here (386/418 files)
+
+        if (offset + GetTextLength_HTML(content) <= MAX_MESSAGE_LEN)
+            return [content]; //  4.1% here (17)
+
+        // code for the rest 15  (3.6%) long ass files:
+        // TL;DR:
+        // Walk content line by line, keeping track of TEXT length and open tags.
+        // When too long - split at line break.
+
+        var sb = new StringBuilder();
+        List <string> pages = []; // result
+        Stack<string> tagsP = []; // breadcrumb of open tags, as for prev line
+        Stack<string> tagsC = []; // breadcrumb of open tags, as for curr line
+        var text_lengthP = 0; // of the current page, as for prev line
+        var text_lengthC = 0; // of the current page, as for curr line
+        var line_offset  = 0; // HTML, current line, chars
+        var lines_paged  = 0; // first N lines assigned to pages
+        var lines = content.Split('\n');
+        var    curr_line = 0; // index
+        while (curr_line < lines.Length)
+        {
+            // line can be: empty, [text & tag]*N & text?  | N>=0
+            var line = lines[curr_line];
+            if (line.Length - line_offset <= 0) // empty line / to text after tag
+                goto LINE_END;
+
+            // line not empty
+            var i_tag = line.IndexOf('<', line_offset);
+            if (i_tag < 0) // just text
+            {
+                text_lengthC += line.Length - line_offset;
+                goto LINE_END;
+            }
+
+            // tag found
+            var i_tag_end = line.IndexOf('>', i_tag + 1); // should be found!
+            var tag_is_closing_part = line[i_tag     + 1] == '/';
+            var tag_is_closing_full = line[i_tag_end - 1] == '/';
+            var tag_is_opening_part = tag_is_closing_part.Janai() && tag_is_closing_full.Janai();
+
+            // count length of text before tag
+            text_lengthC += i_tag - line_offset;
+            line_offset = i_tag_end + 1;
+
+            // update tag breadcrumb
+            if      (tag_is_closing_part) tagsC.Pop();
+            else if (tag_is_opening_part)
+            {
+                var tag = line.Substring(i_tag + 1, i_tag_end - i_tag - 1);
+                tagsC.Push(tag); // save THE WHOLE tag
+            }
+
+            continue;
+            LINE_END:
+            if (offset + text_lengthC > MAX_MESSAGE_LEN)
+            {
+                // write the page
+                var lines_to_take = curr_line - lines_paged;
+                var page_lines = lines.Skip(lines_paged).Take(lines_to_take);
+                sb.AppendJoin('\n', page_lines);
+                foreach (var tag in tagsP)
+                {
+                    // close tags
+                    var name = tag.Split(' ', 2, SPLIT_RM_EMPTY_TRIM)[0];
+                    sb.Append("</").Append(name).Append('>');
+                }
+                pages.Add(sb.ToString());
+
+                lines_paged += lines_to_take;
+                text_lengthC -= text_lengthP;
+
+                // start the next page
+                sb.Clear();
+                sb.Append("\n\n");
+                foreach (var tag in tagsP.Reverse())
+                {
+                    // open tags on the next page
+                    sb.Append('<').Append(tag).Append('>');
+                }
+            }
+            text_lengthC++; // \n
+            text_lengthP = text_lengthC;
+            curr_line++;
+            line_offset = 0;
+            tagsP = new Stack<string>(tagsC.Reverse());
+        }
+
+        // write the last page
+        sb.AppendJoin('\n', lines.Skip(lines_paged));
+        foreach (var tag in tagsP)
+        {
+            // close tags
+            var name = tag.Split(' ', 2, SPLIT_RM_EMPTY_TRIM)[0];
+            sb.Append("</").Append(name).Append('>');
+        }
+        pages.Add(sb.ToString());
+
+        return pages.ToArray();
+    }
+
+    public static int GetTextLength_HTML(string content)
+    {
+        return content.Length - _r_tag.Matches(content).Sum(x => x.Length);
     }
 }

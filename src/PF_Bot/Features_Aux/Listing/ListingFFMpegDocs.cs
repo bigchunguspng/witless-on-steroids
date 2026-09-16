@@ -18,7 +18,7 @@ public static class ListingFFMpegDocs
             """,
         TEXT_SYNTAX =
             $"""
-            📚 <u><b>Синтаксис команды</b></u>
+            ℹ️ <u><b>Синтаксис команды</b></u>
 
             <blockquote><b>Варианты использования</b>:
             <code>/pegman</code> - главная.
@@ -43,16 +43,16 @@ public static class ListingFFMpegDocs
     public const int PER_PAGE = 20;
 
     private static readonly InlineKeyboardButton
-        _butt_AF     = new("Audio Filters", CallbackData($"af - 0 {PER_PAGE}")),
-        _butt_VF     = new("Video Filters", CallbackData($"vf - 0 {PER_PAGE}")),
-        _butt_Syntax = new("Синтаксис",     CallbackData(   " - x")),
-        _butt_Main   = new("Назад",         CallbackData(   " - m"));
-    //  _butt_page                                       "a/v - i"
+        _butt_AF     = new("🎧 Audio Filters", CallbackData($"af - 0 {PER_PAGE}")),
+        _butt_VF     = new("🎬 Video Filters", CallbackData($"vf - 0 {PER_PAGE}")),
+        _butt_Syntax = new("ℹ️ Синтаксис",     CallbackData(   " - x")),
+        _butt_Main   = new("Назад",     /*💨*/ CallbackData(   " - m"));
+    //  _butt_page                        💨                "a/v - i(:p)"
 
     private static InlineKeyboardButton ButtAF
-        (int page) => new("Audio Filters", CallbackData($"af - {page} {PER_PAGE}"));
+        (int page)  => new("🎧 Audio Filters", CallbackData($"af - {page} {PER_PAGE}"));
     private static InlineKeyboardButton ButtVF
-        (int page) => new("Video Filters", CallbackData($"vf - {page} {PER_PAGE}"));
+        (int page)  => new("🎬 Video Filters", CallbackData($"vf - {page} {PER_PAGE}"));
 
     // MENU
 
@@ -135,14 +135,14 @@ public static class ListingFFMpegDocs
     // PAGE
 
     public static void SendPage_OrSyntax
-        (MessageOrigin origin, FilterKind kind, int number, int messageId = -1)
+        (MessageOrigin origin, FilterKind kind, int number, int page = 0, int messageId = -1)
     {
         var        audio = kind == FilterKind.Audio;
         var list = audio ? Docs.PagesAF : Docs.PagesVF;
         var i = number - 1;
         if (i >= 0 && i < list.Count)
         {
-            SendPage(origin, list, i, audio, messageId);
+            SendPage(origin, list, i, audio, page, messageId);
         }
         else
             SendSyntax(origin);
@@ -170,35 +170,49 @@ public static class ListingFFMpegDocs
     }
 
     private static void SendPage
-        (MessageOrigin origin, List<FFMpegDocsPage> list, int i, bool audio, int messageId = -1)
+        (MessageOrigin origin, List<FFMpegDocsPage> list, int i, bool audio, int filter_page = 0, int messageId = -1)
     {
+        var key   = audio ? "a" : "v";
         var emoji = audio ? "🎧" : "🎬";
         var page = list[i];
         var text
             = $"{emoji} {page.Number} - "
             + $"<a href=\"{FFMpegDocumentation.URL}#{page.Anchor}\"><b>{page.Title}</b></a>"
-            + $"{page.Content}";
+            + $"{page.Content[filter_page]}";
 
         var list_page = i / PER_PAGE;
         var list_butt = audio ? ButtAF(list_page) : ButtVF(list_page);
 
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
         var keyboard = new List<List<InlineKeyboardButton>>();
+        if (page.Content.Length > 1) // I'M NOT READING ALL O'THAT 😂😭🤣👌
+        {
+            keyboard.Add([inactive, inactive]);
+            if (filter_page > 0)
+            {
+                var data = CallbackData($"{key} - {i}:{filter_page - 1}");
+                keyboard[0][0] = new InlineKeyboardButton("⬅️ Вернуться", data);
+            }
+            if (filter_page < page.Content.Length - 1)
+            {
+                var data = CallbackData($"{key} - {i}:{filter_page + 1}");
+                keyboard[0][1] = new InlineKeyboardButton("➡️ Читать дальше", data);
+            }
+        }
         keyboard.Add([inactive, inactive]);
         keyboard.Add([list_butt]);
         keyboard.Add([_butt_Syntax, _butt_Main]);
-        var key = audio ? "a" : "v";
         if (i - 1 >= 0)
         {
             var title = $"⬅️ {list[i - 1].Title}";
             var data = CallbackData($"{key} - {i - 1}");
-            keyboard[0][0] = new InlineKeyboardButton(title, data);
+            keyboard[^3][0] = new InlineKeyboardButton(title, data);
         }
         if (i + 1 < list.Count)
         {
             var title = $"➡️ {list[i + 1].Title}";
             var data = CallbackData($"{key} - {i + 1}");
-            keyboard[0][1] = new InlineKeyboardButton(title, data);
+            keyboard[^3][1] = new InlineKeyboardButton(title, data);
         }
         App.Bot.SendOrEditMessage(origin, text, messageId, new InlineKeyboardMarkup(keyboard));
     }

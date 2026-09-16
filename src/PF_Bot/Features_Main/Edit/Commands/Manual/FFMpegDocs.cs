@@ -22,8 +22,10 @@ public class FFMpegDocs_Callback : CallbackHandler
             }
             else
             {
-                var code = int.Parse(Content) + 1;
-                ListingFFMpegDocs.SendPage_OrSyntax(Origin, kind, code, Message.Id);
+                var bits = Content.Split(':', 2);
+                var page = bits.Length > 1 ? int.Parse(bits[1]) : 0;
+                var code =                   int.Parse(bits[0]) + 1;
+                ListingFFMpegDocs.SendPage_OrSyntax(Origin, kind, code, page, Message.Id);
             }
         }
         else if (Content == "m") ListingFFMpegDocs.SendMainMenu(Origin, Message.Id);

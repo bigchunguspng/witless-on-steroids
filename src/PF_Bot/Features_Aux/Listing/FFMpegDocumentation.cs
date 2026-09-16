@@ -22,14 +22,20 @@ public class FFMpegDocumentation
 
     // PARSING
 
-    public const string URL = "https://ffmpeg.org/ffmpeg-filters.html";
+    public const string
+        HOST = "https://ffmpeg.org/",
+        URL  = "https://ffmpeg.org/ffmpeg-filters.html";
 
     private const string
         _xp_afs = "//h3[starts-with(text(),  '8')]",
         _xp_vfs = "//h3[starts-with(text(), '11')]";
 
+    private const RegexOptions RO_COMP_NOSPACE = RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace;
+
     private static readonly Regex
-        _r_title = new("""(?:\d+)\.(\d+) (.+)""", RegexOptions.Compiled);
+        _r_title = new("""(?:\d+)\.(\d+) (.+)""", RegexOptions.Compiled),
+        _r_a_ref = new("""<a\sclass="ref"       \shref="(\S+?)">""", RO_COMP_NOSPACE),
+        _r_a_man = new("""<a\sdata-manual="\S+?"\shref="(\S+?)">""", RO_COMP_NOSPACE);
 
     public FFMpegDocumentation() => Parse();
 
@@ -273,10 +279,15 @@ public class FFMpegDocumentation
                     .Replace("</var>", "</code>");
             if (s.Contains("<samp"))
                 s = s
-                    .Replace("<samp class=\"samp\">", "<code>")
+                    .Replace("<samp class=\"samp\">",   "<code>")
                     .Replace("<samp class=\"option\">", "<code>")
-                    .Replace("<samp class=\"file\">", "<code>")
+                    .Replace("<samp class=\"file\">",   "<code>")
                     .Replace("</samp>", "</code>");
+            if (s.Contains("<a"))
+            {
+                s = _r_a_ref.Replace(s, m => $"<a href=\"{URL }{m.Groups[1].Value}\">");
+                s = _r_a_man.Replace(s, m => $"<a href=\"{HOST}{m.Groups[1].Value}\">");
+            }
         }
         return s;
     }

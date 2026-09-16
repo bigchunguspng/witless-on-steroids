@@ -89,23 +89,23 @@ public class FFMpegDocumentation
         var sb = new StringBuilder();
         while (true)
         {
-            if (node.Name == "a")
+            if      (node.Name == "a") { } // skip to headers
+            else if (node.Name == "h3") break; // next filter
+            else if (node.Name == "h4") // subsections
             {
-                var attr_id   = node.Attributes["id"];
-                var attr_name = node.Attributes["name"];
-                var      name = (attr_id ?? attr_name).Value;
-                if      (name.StartsWith("Examples")) sb.Append("\n\n").Append("<u>Examples</u>:");
-                else if (name.StartsWith("Commands")) sb.Append("\n\n").Append("<u>Commands</u>:");
-                else break;
-
-                // skip h4:
-                node = attr_name != null
-                    ? node.NextElementSibling()!
-                    : node.NextElementSibling().NextElementSibling()!;
+                var text = node.FirstChild.InnerText.Split(' ', 2)[1];
+                sb.Append("\n\n").Append("<u>").Append(text).Append("</u>:");
             }
-            else if (node.Name == "p")
+            else if (node.Name == "p") // regular ass text
             {
                 sb.Append("\n\n").Append(Sanitize(node.InnerHtml));
+            }
+            else if (node.Name == "div") // example w/o ul  |  8.26 aformat, 8.92 hdcd, 8.95 join, …
+            {
+                var pre = node.FirstElementChild()!;
+                sb.Append('\n').Append("<blockquote>").Append("<code>");
+                sb.Append(Sanitize(pre.InnerHtml, make_one_line: false));
+                sb.Append("</code>").Append("</blockquote>");
             }
             else if (node.Name == "ul") ParseExamples_UL(sb, node.ElementChildren());
             else if (node.Name == "dl") ParseTable_DL   (sb, node.ElementChildren());
@@ -125,16 +125,19 @@ public class FFMpegDocumentation
             if (n) sb.Append('\n');
             n = true;
             var node = li.FirstChild;
-            sb.Append($"{BULLET} ").Append(Sanitize(node.InnerHtml));
-            // ^ text before example
             while (true)
             {
-                node = node.NextElementSibling();
                 if (node == null) break;
-                if (node.Name == "div")
+                if (node.Name == "#text")
+                {
+                    sb.Append($"{BULLET} ").Append(Sanitize(node.InnerHtml));
+                    // ^ text before example
+                }
+                else if (node.Name == "div")
                 {
                     var pre = node.FirstElementChild()!;
-                    sb.Append('\n').Append("<code>").Append(Sanitize(pre.InnerHtml)).Append("</code>");
+                    var txt = Sanitize(pre.InnerHtml, make_one_line: false);
+                    sb.Append('\n').Append("<code>").Append(txt).Append("</code>");
                     // ^ example code
                 }
                 else if (node.Name == "p")
@@ -162,6 +165,8 @@ public class FFMpegDocumentation
                 }
                 else
                     throw new UnexpectedException($"PARSING UL >> NODE {node.Name}? WTF");
+
+                node = node.NextElementSibling();
             }
         }
         sb.Append("</blockquote>");
@@ -225,21 +230,28 @@ public class FFMpegDocumentation
             else if (node is { Name: "div" } node_div) // 8.120 volume
             {
                 var pre = node_div.FirstElementChild()!;
-                sb.Append('\n').Append("<code>").Append(Sanitize(pre.InnerHtml)).Append("</code>");
+                var txt = Sanitize(pre.InnerHtml, make_one_line: false);
+                sb.Append('\n').Append("<code>").Append(txt).Append("</code>");
                 // ^ example (lol)
             }
             else if (node is { Name: "a" }) // 11.39 colorspace
             {
                 // skip, it's there by mistake
             }
+            else if (node is { Name: "ul" }) // 11.76 drawtext
+            {
+                ParseExamples_UL(sb, node.ElementChildren());
+            }
             else
                 throw new UnexpectedException($"PARSING DD >> NODE {node.Name}? WTF");
         }
     }
 
-    private static string Sanitize(string s)
+    private static string Sanitize(string s, bool make_one_line = true)
     {
-        s = s.TrimEnd().Replace("\n", " ");
+        s = s.TrimEnd();
+        if (make_one_line)
+            s = s.Replace("\n", " ");
         if (s.Contains('&'))
             s = s // <> - don't replace!, &" - replaced by telegram anyway, rest - should be replaced here!
                 .Replace("&amp;", "&")

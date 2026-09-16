@@ -174,10 +174,12 @@ public static class ListingFFMpegDocs
     {
         var key   = audio ? "a" : "v";
         var emoji = audio ? "🎧" : "🎬";
-        var page = list[i];
+        var page  = list[i];
+        var multipage = page.Content.Length > 1;
         var text
             = $"{emoji} {page.Number} - "
             + $"<a href=\"{FFMpegDocumentation.URL}#{page.Anchor}\"><b>{page.Title}</b></a>"
+            + (multipage ? $" 📃{filter_page + 1}/{page.Content.Length}" : "")
             + $"{page.Content[filter_page]}";
 
         var list_page = i / PER_PAGE;
@@ -185,7 +187,7 @@ public static class ListingFFMpegDocs
 
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
         var keyboard = new List<List<InlineKeyboardButton>>();
-        if (page.Content.Length > 1) // I'M NOT READING ALL O'THAT 😂😭🤣👌
+        if (multipage) // I'M NOT READING ALL O'THAT 😂😭🤣👌
         {
             keyboard.Add([inactive, inactive]);
             if (filter_page > 0)

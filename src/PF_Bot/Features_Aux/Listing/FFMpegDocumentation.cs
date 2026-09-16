@@ -73,14 +73,17 @@ public class FFMpegDocumentation
             var match  = _r_title.Match(node.FirstChild.InnerText);
             var number = match.ExtractGroup(1, int.Parse);
             var title  = match.ExtractGroup(2, s => s, "");
-            var offset = (int)Math.Log10(number) + 7 + title.Length;
-            var content = SplitIntoPages(ParseContent(node.NextElementSibling()!), offset);
+            var number_length = 1 + (int)Math.Log10(number);
+            var offset1 = number_length + 6 + title.Length; // ("🎬 " + " - ").len = 6
+            var offsetN = offset1 + 6; // " 📃6/7".len = 6
+            var content = ParseContent(node.NextElementSibling()!);
+            var content_pages = SplitIntoPages(content, offset1, offsetN);
             pages.Add(new FFMpegDocsPage
             {
                 Anchor   = node.PrevElementSibling()!.Attributes["name"].Value,
                 Number   = number,
                 Title    = title,
-                Content  = content,
+                Content  = content_pages,
             });
         }
     }
@@ -333,12 +336,13 @@ public class FFMpegDocumentation
     private const StringSplitOptions
         SPLIT_RM_EMPTY_TRIM = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
 
-    private static string[] SplitIntoPages(string content, int offset)
+    private static string[] SplitIntoPages
+        (string content, int offset_oneshot, int offset_paginated)
     {
-        if (offset + content.Length <= MAX_MESSAGE_LEN)
+        if (MAX_MESSAGE_LEN >= offset_oneshot + content.Length)
             return [content]; // 92.3% exit here (386/418 files)
 
-        if (offset + GetTextLength_HTML(content) <= MAX_MESSAGE_LEN)
+        if (MAX_MESSAGE_LEN >= offset_oneshot + GetTextLength_HTML(content))
             return [content]; //  4.1% here (17)
 
         // code for the rest 15  (3.6%) long ass files:
@@ -391,7 +395,7 @@ public class FFMpegDocumentation
 
             continue;
             LINE_END:
-            if (offset + text_lengthC > MAX_MESSAGE_LEN)
+            if (offset_paginated + text_lengthC > MAX_MESSAGE_LEN)
             {
                 // write the page
                 var lines_to_take = curr_line - lines_paged;

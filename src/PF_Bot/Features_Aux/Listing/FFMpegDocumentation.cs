@@ -22,8 +22,6 @@ public class FFMpegDocumentation
 
     // PARSING
 
-    public const int MAX_MESSAGE_LEN = 4096;
-
     public const string
         HOST = "https://ffmpeg.org/",
         URL  = "https://ffmpeg.org/ffmpeg-filters.html";
@@ -31,6 +29,8 @@ public class FFMpegDocumentation
     private const string
         _xp_afs = "//h3[starts-with(text(),  '8')]",
         _xp_vfs = "//h3[starts-with(text(), '11')]";
+
+    private const int MAX_MESSAGE_LEN = 4096; // TEXT only, HTML tags are excluded.
 
     private const RegexOptions RO_COMP_NOSPACE = RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace;
 
@@ -62,9 +62,6 @@ public class FFMpegDocumentation
         ParseFilters(PagesAF, doc.DocumentNode.SelectNodes(_xp_afs));
         ParseFilters(PagesVF, doc.DocumentNode.SelectNodes(_xp_vfs));
         sw.Log("FFMPEG DOCS -> parse filters");
-
-        Debug_PrintLongFilesCount();
-        sw.Log("FFMPEG DOCS -> analyze pages");
     }
 
     private static void ParseFilters
@@ -331,23 +328,6 @@ public class FFMpegDocumentation
             .Append("</div>\n");
     }
 
-    /// Telegram message length limit is 4096./
-    /// And this is TEXT only! HTML tags are excluded.
-    private void Debug_PrintLongFilesCount()
-    {
-        var count = 0;
-        PagesAF.Concat(PagesVF)
-            .Select(x => (Page: x, Length: (int)Math.Log10(x.Number) + 7 + x.Title.Length + GetTextLength_HTML(x.Content[0])))
-            .Where(x => x.Length >= MAX_MESSAGE_LEN)
-            .ForEach(x =>
-            {
-                if (count == 0) LogDebug("FFMPEG DOCS LONG FILES:");
-                count++;
-                Print($"{x.Length,10} | {x.Page.Number,3} {x.Page.Title}");
-            });
-        if (count > 0) Print($"^ COUNT: {count}");
-    }
-
     // SPLIT CONTENT -> PAGES
 
     private const StringSplitOptions
@@ -457,7 +437,7 @@ public class FFMpegDocumentation
         return pages.ToArray();
     }
 
-    public static int GetTextLength_HTML(string content)
+    private static int GetTextLength_HTML(string content)
     {
         return content.Length - _r_tag.Matches(content).Sum(x => x.Length);
     }

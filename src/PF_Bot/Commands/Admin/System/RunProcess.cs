@@ -23,13 +23,27 @@ public class RunProcess : CommandHandlerAsync_Admin
     {
         if (Args is null)
         {
-            SendManual("<code>/run [exe] [args]</code>");
+            SendManual(MANUAL);
             return;
         }
 
-        var split = Args.SplitN(2);
-        var exe = split[0];
-        var args = split.Length > 1 ? split[1] : "";
+        string exe, args;
+        if      (Options.Contains('b'))
+        {
+            exe  = "bash";
+            args = $"-c \"{Args}\"";
+        }
+        else if (Options.Contains('c'))
+        {
+            exe  = "cmd";
+            args = $"/c \"{Args}\"";
+        }
+        else
+        {
+            var    bits = Args.SplitN(2);
+            exe  = bits[0];
+            args = bits.Length > 1 ? bits[1] : "";
+        }
 
         var (stdout, stderr, code) = await ProcessRunner.Run_GetOutput(exe, args);
 
@@ -67,4 +81,12 @@ public class RunProcess : CommandHandlerAsync_Admin
         var buttons = pagination.GetPaginationKeyboard(last_page, Registry.CallbackKey_Runs);
         Bot.SendOrEditMessage(origin, pages[page], messageId, buttons);
     }
+
+    private const string MANUAL =
+        """
+        <code>/run [exe] [args]</code>
+
+        <code>/runb [bash command]</code>
+        <code>/runc [cmd  command]</code>
+        """;
 }

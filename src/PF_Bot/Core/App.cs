@@ -38,9 +38,6 @@ public static class App
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.InputEncoding  = Encoding.UTF8;
-
         Config.ReadFromFile();
 
         FFMpegArgs.Directory_Temp = Dir_Temp;

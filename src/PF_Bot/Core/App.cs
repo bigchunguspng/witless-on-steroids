@@ -18,7 +18,8 @@ public static class App
 {
     public  static Bot Bot = null!;
 
-    public  static readonly MessageQueue FunnyMessages = new();
+    public  static readonly MessageQueue   FunnyMessages  = new();
+    public  static readonly List<string[]> ProcessOutputs = [];
 
     private static readonly Lazy   <RedditApp>          Reddit_Lazy = new();
     public  static                  RedditApp Reddit => Reddit_Lazy.Value;

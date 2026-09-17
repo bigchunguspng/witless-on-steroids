@@ -33,7 +33,8 @@ public static class Registry
         CallbackKey_Planks = "p", // i_
         CallbackKey_Nukes  = "n", // l
         CallbackKey_Piece  = "tcb", // mc
-        CallbackKey_FFMpeg = "pm",
+        CallbackKey_FFMpeg = "pm", // [av][f]
+        CallbackKey_Runs   = "r",
         CallbackKey_Delete = "del";
 
     public static readonly CommandRegistry<Func<CallbackHandler>> CallbackHandlers
@@ -47,6 +48,7 @@ public static class Registry
             .Register(CallbackKey_Nukes,  () => new Nuke_Callback())
             .Register(CallbackKey_Piece,  () => new Piece_Callback())
             .Register(CallbackKey_FFMpeg, () => new FFMpegDocs_Callback())
+            .Register(CallbackKey_Runs,   () => new RunProcess_Callback())
             .Register(CallbackKey_Delete, () => new Delete_Callback())
             .Build();
 

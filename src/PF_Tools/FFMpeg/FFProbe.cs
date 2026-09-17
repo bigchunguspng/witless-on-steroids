@@ -49,7 +49,7 @@ public static class FFProbe
     public static async Task<FFProbeResult> Analyze(string filePath)
     {
         var arguments = $@"{ARGS} ""{filePath}""";
-        var (stdout, _) = await ProcessRunner.Run_GetOutput(FFPROBE, arguments);
+        var (stdout, _, _) = await ProcessRunner.Run_GetOutput(FFPROBE, arguments);
         return await ParseOutput(stdout);
     }
 

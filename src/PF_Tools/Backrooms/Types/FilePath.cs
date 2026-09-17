@@ -103,7 +103,8 @@ public readonly struct FilePath(string value)
     public FilePath EnsureParentDirectoryExist()
     {
         var directory = DirectoryName;
-        if (directory != null) Directory.CreateDirectory(directory);
+        if (directory.IsNotNull_NorEmpty())
+            Directory.CreateDirectory(directory);
 
         return this;
     }

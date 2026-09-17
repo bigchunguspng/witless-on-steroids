@@ -145,6 +145,8 @@ public static class Registry
             // admin
             .Register("run"    , () => new RunProcess())
             .Register("kill"   , () => new KillProcess())
+            .Register("fget"   , () => new FileGet())
+            .Register("fput"   , () => new FilePut())
             .Register("spam"   , () => _spam)
             .Register("tell"   , () => _tell)
             .Register("re"     , () => _react)

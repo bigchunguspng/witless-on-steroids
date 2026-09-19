@@ -21,7 +21,7 @@ public class Baguette : CommandHandlerBlocking
         var sign = greentext ? '>' : '@';
 
         var lines = new string[length];
-        lines[0] = Args ?? GenerateLine();
+        lines[0] = Args ?? Message.ReplyToMessage?.GetTextOrCaption() ?? GenerateLine();
         for (var i = 1; i < length; i++) lines[i] = GenerateLine();
 
         var sb = new StringBuilder();

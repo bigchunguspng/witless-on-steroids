@@ -5,16 +5,17 @@ public class GenerateByLastWord : GenerateByFirstWord
     protected override async Task Run()
     {
         string word = null!, ending = null!;
-        var byWord = Args != null;
+        var src = Args ?? Message.ReplyToMessage?.GetTextOrCaption();
+        var byWord = src != null;
         if (byWord)
         {
-            var lines = Args!.Split('\n');
+            var lines = src!.Split('\n');
             var words = lines[0].Split();
                 
             word = words.Length == 1 ? words[0] : string.Join(' ', words[..2]);
             word = word.ToLower();
 
-            ending = Args[word.Length..];
+            ending = src[word.Length..];
         }
 
         var up = Options.Contains("up");
@@ -22,7 +23,7 @@ public class GenerateByLastWord : GenerateByFirstWord
         var texts = new string[repeats];
         for (var i = 0; i < repeats; i++)
         {
-            var mode = up ? LetterCase.Upper : GetMode(Args);
+            var mode = up ? LetterCase.Upper : GetMode(src);
             texts[i] = byWord
                 ? Baka.GenerateByLast(word).InLetterCase(mode) + ending
                 : Baka.GenerateBackwards().InLetterCase(mode);

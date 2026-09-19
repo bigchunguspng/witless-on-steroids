@@ -7,16 +7,17 @@ public class GenerateByFirstWord : CommandHandlerAsync
     protected override async Task Run()
     {
         string word = null!, opening = null!;
-        var byWord = Args != null;
+        var src = Args ?? Message.ReplyToMessage?.GetTextOrCaption();
+        var byWord = src != null;
         if (byWord)
         {
-            var lines = Args!.Split('\n');
+            var lines = src!.Split('\n');
             var words = lines[^1].Split();
 
             word = words.Length == 1 ? words[^1] : string.Join(' ', words[^2..]);
             word = word.ToLower();
 
-            opening = Args.Remove(Args.Length - word.Length);
+            opening = src.Remove(src.Length - word.Length);
         }
 
         var up = Options.Contains("up");
@@ -24,7 +25,7 @@ public class GenerateByFirstWord : CommandHandlerAsync
         var texts = new string[repeats];
         for (var i = 0; i < repeats; i++)
         {
-            var mode = up ? LetterCase.Upper : GetMode(Args);
+            var mode = up ? LetterCase.Upper : GetMode(src);
             texts[i] = byWord
                 ? opening + Baka.GenerateByWord(word).InLetterCase(mode)
                 : Baka.Generate().InLetterCase(mode);

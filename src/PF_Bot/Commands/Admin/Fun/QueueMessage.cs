@@ -8,7 +8,7 @@ namespace PF_Bot.Commands.Admin.Fun;
 public class QueueMessage : CommandHandlerBlocking_Admin
 {
     private static readonly Regex
-        _r_repeats = new("x([1-9])", RegexOptions.Compiled);
+        _r_repeats = new("x([2-9])", RegexOptions.Compiled);
 
     protected override void Run()
     {

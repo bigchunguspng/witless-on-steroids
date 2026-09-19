@@ -60,22 +60,29 @@ public class UseMagick : FileEditor_VideoPhoto
         if (extension != null)
         {
             string output;
+            ProcessResult result;
             if (i) // no input file
             {
                 output = GetTempFileName(extension);
-                await RunMagick($"{options} \"{output}\"");
+                result = await RunMagick($"{options} \"{output}\"");
             }
             else // some input file
             {
-                var      input = await GetFile();
-                output = input.GetOutputFilePath("Mgk", $".{extension}");
+                var input = await GetFile();
 
                 options = options.Replace("THIS", input);
 
-                await RunMagick($"\"{input}\" {options} \"{output}\"");
+                output = input.GetOutputFilePath("Mgk", $".{extension}");
+                result = await RunMagick($"\"{input}\" {options} \"{output}\"");
             }
 
             SendResult(output, extension, sendDocument: Options.Contains('g'));
+
+            if (Options.Contains('o'))
+            {
+                var text = result.Output.ToString();
+                ProcessOutputSender.SendProcessOutput(Origin, text, null, result.ExitCode);
+            }
         }
         else // i, extension == null
         {

@@ -2,6 +2,7 @@
 using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
 using PF_Tools.FFMpeg;
+using PF_Tools.ProcessRunning;
 using Telegram.Bot.Types;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
@@ -80,22 +81,29 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         if (extension != null)
         {
             string output;
+            ProcessResult result;
             if (i) // no input file
             {
                 output = GetTempFileName(extension);
-                await FFMpeg.Args().Out(output, options).FFMpeg_Run();
+                result = await FFMpeg.Args().Out(output, options).FFMpeg_Run();
             }
             else // some input file
             {
-                var      input = await GetFile();
-                output = input.GetOutputFilePath("Edit", $".{extension}");
+                var input = await GetFile();
 
                 options = options.Replace("THIS", input);
 
-                await FFMpeg.Command(input, output, options).FFMpeg_Run();
+                output = input.GetOutputFilePath("Edit", $".{extension}");
+                result = await FFMpeg.Command(input, output, options).FFMpeg_Run();
             }
 
             SendResult(output, extension, sendDocument: Options.Contains('g'));
+
+            if (Options.Contains('o'))
+            {
+                var text = result.Output.ToString();
+                ProcessOutputSender.SendProcessOutput(Origin, text, null, result.ExitCode);
+            }
         }
         else // i, extension == null
         {

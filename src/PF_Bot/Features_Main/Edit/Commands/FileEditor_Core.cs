@@ -25,7 +25,8 @@ public abstract class FileEditor_Core : CommandHandlerAsync
     protected override async Task Run()
     {
         var fileProvided =
-            LocalFileProvided()
+            IgnoreFile()
+         || LocalFileProvided()
          || GetFileFrom(Message)
          || GetFileFrom(Message.ReplyToMessage);
         if (fileProvided) await Execute();
@@ -42,7 +43,8 @@ public abstract class FileEditor_Core : CommandHandlerAsync
         SendManual(manual);
     }
 
-    protected virtual string? SyntaxManual => null;
+    protected virtual string? SyntaxManual     => null;
+    protected virtual string? IgnoreFileOption => null;
     protected abstract SupportedFileTypes SupportedTypes { get; }
 
     private string SuportedMedia => string.Join(", ", GetSuportedMediaIcons());
@@ -65,6 +67,19 @@ public abstract class FileEditor_Core : CommandHandlerAsync
         || (SupportedTypes.HasFlag(SupportedFileTypes.Video) && GetVideoFileID(m))
         || (SupportedTypes.HasFlag(SupportedFileTypes.Audio) && GetAudioFileID(m))
         || (SupportedTypes.HasFlag(SupportedFileTypes.URL  ) && GetVideoURL   (m));
+
+    private static readonly Document DEFAULT_DOCUMENT = new();
+
+    private bool IgnoreFile()
+    {
+        var ignore = IgnoreFileOption != null && Options.Contains(IgnoreFileOption);
+        if (ignore)
+        {
+            File = DEFAULT_DOCUMENT;
+            Ext = "*";
+        }
+        return ignore;
+    }
 
     private bool LocalFileProvided()
     {

@@ -1,5 +1,6 @@
 // ReSharper disable InconsistentNaming
 
+using PF_Bot.Commands.Admin.System;
 using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
 using PF_Tools.ProcessRunning;
@@ -9,6 +10,7 @@ namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 public class UseMagick : FileEditor_VideoPhoto
 {
     protected override string SyntaxManual => $"/man_43\n{ALIAS_INFO}/aim_info";
+    protected override string IgnoreFileOption => "i";
 
     // /im [options] [extension]
 
@@ -31,16 +33,19 @@ public class UseMagick : FileEditor_VideoPhoto
             return;
         }
 
+        var i = Options.Contains('i'); // no input
+
         // GET EXTENSION
         var extension = args[^1];
-        if      (extension == ".") extension = Ext.Substring(1);
+        if (i && extension == "-") extension = null;
+        else if (extension == ".") extension = Ext.Substring(1);
         else if (extension == "p") extension = "png";
         else if (extension == "j") extension = "jpg";
         else if (extension == "w") extension = "webp";
         else if (extension == "4") extension = "mp4";
         else if (extension == "g") extension = "gif";
 
-        var extensionInvalid = extension.FileNameIsInvalid();
+        var extensionInvalid = extension != null && extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options))
         {
             SetBadStatus();
@@ -50,22 +55,42 @@ public class UseMagick : FileEditor_VideoPhoto
 
         // EXECUTE
 
-        var input = await GetFile();
-        var output = input.GetOutputFilePath("Mgk", $".{extension}");
-
-        options = options.Replace("THIS", input);
         options = options.Replace("CHAT", Chat.ToString());
 
-        await ProcessImage(input, output, options);
+        if (extension != null)
+        {
+            string output;
+            if (i) // no input file
+            {
+                output = GetTempFileName(extension);
+                await RunMagick($"{options} \"{output}\"");
+            }
+            else // some input file
+            {
+                var      input = await GetFile();
+                output = input.GetOutputFilePath("Mgk", $".{extension}");
 
-        SendResult(output, extension, sendDocument: Options.Contains('g'));
+                options = options.Replace("THIS", input);
+
+                await RunMagick($"\"{input}\" {options} \"{output}\"");
+            }
+
+            SendResult(output, extension, sendDocument: Options.Contains('g'));
+        }
+        else // i, extension == null
+        {
+            var result = await RunMagick(options);
+            var output = result.Output.ToString();
+            ProcessOutputSender.SendProcessOutput(Origin, output, null, result.ExitCode);
+        }
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
     }
 
-    private async Task ProcessImage(FilePath input, FilePath output, string options)
+    private static async Task<ProcessResult> RunMagick(string args)
     {
-        var processResult = await ProcessRunner.Run(MAGICK, $"\"{input}\" {options} \"{output}\"");
+        var processResult = await ProcessRunner.Run(MAGICK, args);
         if (processResult.Failure) throw new ProcessException(MAGICK, processResult);
+        return processResult;
     }
 
     private void SendResult(string result, string extension, bool sendDocument = false)

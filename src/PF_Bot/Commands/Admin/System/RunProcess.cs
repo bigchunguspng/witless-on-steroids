@@ -12,7 +12,7 @@ public class RunProcess_Callback : CallbackHandler
 {
     protected override Task Run()
     {
-        RunProcess.SendOutputPage(GetPagination(Content));
+        ProcessOutputSender.SendOutputPage(GetPagination(Content));
         return Task.CompletedTask;
     }
 }
@@ -47,7 +47,25 @@ public class RunProcess : CommandHandlerAsync_Admin
 
         var (stdout, stderr, code) = await ProcessRunner.Run_GetOutput(exe, args);
 
+        ProcessOutputSender.SendProcessOutput(Origin, stdout, stderr, code);
+
         Log($"{Title} >> RUN {exe} {args}", color: LogColor.Yellow);
+    }
+
+    private const string MANUAL =
+        """
+        <code>/run [exe] [args]</code>
+
+        <code>/runb [bash command]</code>
+        <code>/runc [cmd  command]</code>
+        """;
+}
+
+public static class ProcessOutputSender
+{
+    public static void SendProcessOutput
+        (MessageOrigin origin, string? stdout, string? stderr, int code)
+    {
         var output = FormatProcessOutputs(stdout, stderr, code);
         var output_pages = output.SplitIntoPages();
         if (output_pages.Length > 1)
@@ -58,13 +76,13 @@ public class RunProcess : CommandHandlerAsync_Admin
                 id = App.ProcessOutputs.Count;
                 App.ProcessOutputs.Add(output_pages);
             }
-            SendOutputPage(new ListPagination(Origin, PerPage: id));
+            SendOutputPage(new ListPagination(origin, PerPage: id));
         }
         else
-            Bot.SendMessage(Origin, output);
+            App.Bot.SendMessage(origin, output);
     }
 
-    private static string FormatProcessOutputs(string stdout, string stderr, int exitCode)
+    private static string FormatProcessOutputs(string? stdout, string? stderr, int exitCode)
     {
         var sb = new StringBuilder                     ($"<u>EXIT CODE</u>: <code>{exitCode}</code>\n");
         if (stdout.IsNotNull_NorWhiteSpace()) sb.Append($"<u>OUT</u>:\n<pre>{HtmlText.Escape(stdout)}</pre>");
@@ -79,14 +97,6 @@ public class RunProcess : CommandHandlerAsync_Admin
         var pages = App.ProcessOutputs[id];
         var last_page = pages.Length - 1;
         var buttons = pagination.GetPaginationKeyboard(last_page, Registry.CallbackKey_Runs);
-        Bot.SendOrEditMessage(origin, pages[page], messageId, buttons);
+        App.Bot.SendOrEditMessage(origin, pages[page], messageId, buttons);
     }
-
-    private const string MANUAL =
-        """
-        <code>/run [exe] [args]</code>
-
-        <code>/runb [bash command]</code>
-        <code>/runc [cmd  command]</code>
-        """;
 }

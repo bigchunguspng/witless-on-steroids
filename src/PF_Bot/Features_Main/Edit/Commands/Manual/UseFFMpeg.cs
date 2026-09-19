@@ -1,4 +1,5 @@
-﻿using PF_Bot.Features_Main.Edit.Core;
+﻿using PF_Bot.Commands.Admin.System;
+using PF_Bot.Features_Main.Edit.Core;
 using PF_Bot.Features_Main.Edit.Helpers;
 using PF_Tools.FFMpeg;
 using Telegram.Bot.Types;
@@ -8,10 +9,14 @@ namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 public class UseFFMpeg : FileEditor_AudioVideoPhoto
 {
     protected override string SyntaxManual => $"/man_44\n{ALIAS_INFO}/apeg_info";
+    protected override string IgnoreFileOption => "i";
 
-    // /peg  [options]      [extension]
-    // /pegv [videofilters] [extension]
-    // /pega [audiofilters] [extension]
+    // /peg  [options]        [extension]
+    // /pegv [videofilters]   [extension]
+    // /pega [audiofilters]   [extension]
+    // /pegc [complex filter] [extension]
+    // /pegi [options]        [extension] <-- NO INPUT FILE
+    // /pegi [options]        -           <-- NO OUTPUT FILE, SEND TEXT OUTPUT
 
     // /peg     [code:0:5]! [extension] <-- ALIAS USAGE
     // /peg […]$[code:0:5]! [extension] <-- ALIAS USAGE
@@ -36,6 +41,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         }
 
         // PROCESS OTHER OPTIONS
+        var i  = Options.Contains('i'); // no input
         var vf = Options.Contains('v');
         var af = Options.Contains('a');
         var fc = Options.Contains('c');
@@ -49,7 +55,8 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
 
         // GET EXTENSION
         var extension = args[^1];
-        if      (extension == ".") extension = Ext == ".webm" ? "mp4" : Ext.Substring(1);
+        if (i && extension == "-") extension = null;
+        else if (extension == ".") extension = Ext == ".webm" ? "mp4" : Ext.Substring(1);
         else if (extension == "3") extension = "mp3";
         else if (extension == "4") extension = "mp4";
         else if (extension == "o") extension = "ogg";
@@ -58,7 +65,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
         else if (extension == "w") extension = "webp";
         else if (extension == "g") extension = "gif";
 
-        var extensionInvalid = extension.FileNameIsInvalid();
+        var extensionInvalid = extension != null && extension.FileNameIsInvalid();
         if (extensionInvalid || ManualEditing.OptionsMentionsPrivateFile(options) || PixelThiefDetected(options))
         {
             SetBadStatus();
@@ -68,15 +75,34 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
 
         // EXECUTE
 
-        var input = await GetFile();
-        var output = input.GetOutputFilePath("Edit", $".{extension}");
-
-        options = options.Replace("THIS", input);
         options = options.Replace("CHAT", Chat.ToString());
 
-        await FFMpeg.Command(input, output, options).FFMpeg_Run();
+        if (extension != null)
+        {
+            string output;
+            if (i) // no input file
+            {
+                output = GetTempFileName(extension);
+                await FFMpeg.Args().Out(output, options).FFMpeg_Run();
+            }
+            else // some input file
+            {
+                var      input = await GetFile();
+                output = input.GetOutputFilePath("Edit", $".{extension}");
 
-        SendResult(output, extension, sendDocument: Options.Contains('g'));
+                options = options.Replace("THIS", input);
+
+                await FFMpeg.Command(input, output, options).FFMpeg_Run();
+            }
+
+            SendResult(output, extension, sendDocument: Options.Contains('g'));
+        }
+        else // i, extension == null
+        {
+            var result = await FFMpeg.Args().Globals(options).FFMpeg_Run();
+            var output = result.Output.ToString();
+            ProcessOutputSender.SendProcessOutput(Origin, output, null, result.ExitCode);
+        }
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }
 

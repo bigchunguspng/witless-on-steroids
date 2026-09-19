@@ -24,14 +24,13 @@ public class Tell : CommandHandlerBlocking_Admin
             Bot.SendMessage(chat, args[1], preview: true);
             var chatId = chat.Identifier ?? 0;
             if (chatId != 0 && ChatManager.Knowns(chatId)) PackManager.GetBaka(chatId).Eat(args[1]);
-            LogTell(chat);
         }
         else
         {
             Bot.CopyMessage(chat, Chat, messageToCopy);
-            LogTell(chat);
         }
-    }
 
-    private static void LogTell(ChatId chat) => Log($"TELL >> {chat}", LogLevel.Info, LogColor.Yellow);
+        Bot.ReactAsync(Chat, Message.Id, GetRandomReaction_DONE());
+        Log($"TELL >> {chat}", LogLevel.Info, LogColor.Yellow);
+    }
 }

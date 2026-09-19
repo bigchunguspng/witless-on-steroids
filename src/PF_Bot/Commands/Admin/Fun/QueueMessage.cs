@@ -2,31 +2,61 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Messages.Commands;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Admin.Fun;
 
 public class QueueMessage : CommandHandlerBlocking_Admin
 {
+    private static readonly Regex
+        _r_repeats = new("x([1-9])", RegexOptions.Compiled);
+
     protected override void Run()
     {
         if (Args is null)
         {
-            SendManual("<code>/que [chat|.] [text]</code>");
+            SendManual(MANUAL);
             return;
         }
 
-        var args = Args.SplitN(2);
-        var chat = args[0] is "." ? Chat : long.Parse(args[0]);
-        var text = args[1];
+        var repeats = _r_repeats.ExtractGroup(1, Options, int.Parse, 1);
 
-        App.FunnyMessages.Enqueue(chat, text);
+        if (Options.IsNull_OrEmpty())
+        {
+            var args = Args.SplitN(2);
+            var chat = args[0] is "." ? Chat : long.Parse(args[0]);
+            var text = args[1];
+
+            Queue(chat, text, repeats);
+            Bot.ReactAsync(Chat, Message.Id, GetRandomReaction_DONE());
+        }
+        else
+        {
+            var text = Args;
+            var request = ChatSelector.ParseOptions(Options);
+            var bakas   = ChatSelector.GetChats(request);
+
+            Bot.SendMessage(Origin, $"Queued messages to {bakas.Count} chats 😈");
+
+            bakas.ForEach(baka => Queue(baka, text, repeats));
+        }
+    }
+
+    private static void Queue(long chat, string text, int repeats)
+    {
+        for (var i = 0; i < repeats; i++)
+            App.FunnyMessages.Enqueue(chat, text);
 
         if (ChatManager.Knowns (chat))
             PackManager.GetBaka(chat).Eat(text);
 
-        LogQueue(chat);
+        Log($"QUEUE >> {chat}", LogLevel.Info, LogColor.Yellow);
     }
 
-    private static void LogQueue(ChatId chat) => Log($"QUEUE >> {chat}", LogLevel.Info, LogColor.Yellow);
+    private const string MANUAL =
+        """
+        <code>/que         [chat|.] [text]</code>
+        <code>/que[xR][g/p/a~D/s~B] [text]</code> (spam syntax)
+
+        <code>R</code> - repeats.
+        """;
 }

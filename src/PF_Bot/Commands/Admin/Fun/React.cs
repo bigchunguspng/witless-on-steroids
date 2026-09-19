@@ -16,7 +16,7 @@ public class React : CommandHandlerBlocking_Admin
         var args = Args.SplitN(3);
         var reaction = args.Length < 2
             ? null
-            : new ReactionType[] { new ReactionTypeEmoji() { Emoji = args[1] } };
+            : new ReactionTypeEmoji { Emoji = args[1] };
 
         var (chat, message) = args[0].GetChatIdAndMessage();
 

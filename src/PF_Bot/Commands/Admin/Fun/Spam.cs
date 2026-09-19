@@ -6,10 +6,6 @@ namespace PF_Bot.Commands.Admin.Fun;
 
 public class Spam : CommandHandlerBlocking_Admin
 {
-    private readonly Regex
-        _rgx_days = new(@"a(>|<|>=|<=)?(\d+)",        RegexOptions.Compiled),
-        _rgx_size = new(@"s(>|<|>=|<=)?(\d+)([km])?", RegexOptions.Compiled);
-
     protected override void Run()
     {
         var messageId = Message.ReplyToMessage is { } reply ? reply.Id : -1;
@@ -23,27 +19,13 @@ public class Spam : CommandHandlerBlocking_Admin
             return;
         }
 
-        var onlyGroups   = Options.Contains('g');
-        var onlyPrivates = Options.Contains('p');
-
-        var type
-            = onlyGroups   ? GetChatsType.OnlyGroups
-            : onlyPrivates ? GetChatsType.OnlyPrivates
-            :                GetChatsType.All;
-        var matchDays = _rgx_days.Match(Options);
-        var matchSize = _rgx_size.Match(Options);
-        var daysOperator = matchDays.ExtractGroup(1, s => s);
-        var sizeOperator = matchSize.ExtractGroup(1, s => s);
-        var daysValue    = matchDays.ExtractGroup(2, int.Parse);
-        var sizeValue    = matchSize.ExtractGroup(2, int.Parse);
-        var sizeUnits    = matchSize.ExtractGroup(3, s => s is "k" ? 1024 : s is "m" ? 1024 * 1024 : 1, 1);
-
-        var size = new ComparisonExpression(sizeOperator, sizeValue * sizeUnits);
-        var days = new ComparisonExpression(daysOperator, daysValue);
-        var bakas = GetChats(type, size, days);
+        var request = ChatSelector.ParseOptions(Options);
+        var bakas   = ChatSelector.GetChats(request);
 
         var chat = Chat;
         var text = Args!;
+
+        Bot.SendMessage(Origin, $"Spamming to {bakas.Count} chats… 😙");
 
         if (textProvided) Task.Run(() => SendSpam(bakas, text));
         else              Task.Run(() => CopySpam(bakas, chat, messageId));
@@ -67,12 +49,53 @@ public class Spam : CommandHandlerBlocking_Admin
         }
     }
 
-    private enum GetChatsType { All, OnlyGroups, OnlyPrivates }
+    private static void LogSpam(long chat) => Log($"SPAM >> {chat}", LogLevel.Info, LogColor.Yellow);
+}
 
-    private record ComparisonExpression(string? Operator, int Value);
+public static class ChatSelector
+{
+    public enum Type { All, OnlyGroups, OnlyPrivates }
 
-    private static IEnumerable<long> GetChats(GetChatsType type, ComparisonExpression size, ComparisonExpression days)
+    public record ChatSelectorRequest(Type type, ComparisonExpression size, ComparisonExpression days);
+
+    public record ComparisonExpression(string? Operator, int Value);
+
+    private static readonly Regex
+        _rgx_days = new(@"a(>|<|>=|<=)(\d+)",        RegexOptions.Compiled),
+        _rgx_size = new(@"s(>|<|>=|<=)(\d+)([km])?", RegexOptions.Compiled);
+
+    public static ChatSelectorRequest ParseOptions(string options)
     {
+        var onlyGroups   = options.Contains('g');
+        var onlyPrivates = options.Contains('p');
+
+        var type
+            = onlyGroups   ? Type.OnlyGroups
+            : onlyPrivates ? Type.OnlyPrivates
+            :                Type.All;
+        var matchDays = _rgx_days.Match(options);
+        var matchSize = _rgx_size.Match(options);
+        var daysOperator = matchDays.ExtractGroup(1, s => s);
+        var sizeOperator = matchSize.ExtractGroup(1, s => s);
+        var daysValue    = matchDays.ExtractGroup(2, int.Parse);
+        var sizeValue    = matchSize.ExtractGroup(2, int.Parse);
+        var sizeUnits    = matchSize.ExtractGroup(3, s => s switch
+        {
+            "k" => 1024,
+            "m" => 1024 * 1024,
+            _   => 1
+        }, 1);
+
+        var size = new ComparisonExpression(sizeOperator, sizeValue * sizeUnits);
+        var days = new ComparisonExpression(daysOperator, daysValue);
+
+        return new ChatSelectorRequest(type, size, days);
+    }
+
+    public static List<long> GetChats(ChatSelectorRequest request)
+    {
+        var (type, size, days) = request;
+
         return ChatManager.Chats.Lock(x => x.Keys.Where(chat =>
         {
             var path = PackManager.GetPackPath(chat);
@@ -80,10 +103,10 @@ public class Spam : CommandHandlerBlocking_Admin
             {
                 var file = new FileInfo(path);
                 var typeMathes
-                    = type is GetChatsType.All
-                   || type is GetChatsType.OnlyPrivates && chat.ChatIsPrivate()
-                   || type is GetChatsType.OnlyGroups   && chat.ChatIsPrivate().Janai();
-                var sizeMathces = size.Operator switch
+                    =  type is Type.All
+                    || type is Type.OnlyPrivates && chat.ChatIsPrivate()
+                    || type is Type.OnlyGroups   && chat.ChatIsPrivate().Janai();
+                var sizeMatches = size.Operator switch
                 {
                     ">"  => file.Length >  size.Value,
                     "<"  => file.Length <  size.Value,
@@ -101,12 +124,10 @@ public class Spam : CommandHandlerBlocking_Admin
                     "<=" => timeOfInactivity <= time,
                     _    => true
                 };
-                return typeMathes && sizeMathces && daysMatches;
+                return typeMathes && sizeMatches && daysMatches;
             }
 
             return false;
-        }));
+        }).ToList());
     }
-
-    private static void LogSpam(long chat) => Log($"SPAM >> {chat}", LogLevel.Info, LogColor.Yellow);
 }

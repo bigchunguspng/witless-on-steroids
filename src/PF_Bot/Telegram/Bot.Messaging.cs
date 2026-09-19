@@ -71,11 +71,11 @@ public partial class Bot
         TrySend(chat.Identifier ?? 0, task, "message", "copy");
     }
 
-    public async void ReactAsync(ChatId chat, int messageId, ReactionType[]? reaction)
+    public async void ReactAsync(ChatId chat, int messageId, ReactionType? emoji)
     {
         try
         {
-            await Client.SetMessageReaction(chat, messageId, reaction);
+            await Client.SetMessageReaction(chat, messageId, emoji is null ? [] : [emoji]);
         }
         catch (Exception e)
         {

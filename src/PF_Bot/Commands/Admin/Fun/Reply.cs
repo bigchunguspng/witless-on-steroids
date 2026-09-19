@@ -1,7 +1,6 @@
 using PF_Bot.Features_Aux.Packs;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Messages.Commands;
-using Telegram.Bot.Types;
 
 namespace PF_Bot.Commands.Admin.Fun;
 
@@ -24,14 +23,13 @@ public class Reply : CommandHandlerBlocking_Admin
             Bot.SendMessage(chat, args[1], preview: true, replyTo: message);
             var chatId = chat.Identifier ?? 0;
             if (chatId != 0 && ChatManager.Knowns(chatId)) PackManager.GetBaka(chatId).Eat(args[1]);
-            LogReply(chat);
         }
         else
         {
             Bot.CopyMessage(chat, Chat, messageToCopy, replyTo: message);
-            LogReply(chat);
         }
-    }
 
-    private static void LogReply(ChatId chat) => Log($"REPLY >> {chat}", LogLevel.Info, LogColor.Yellow);
+        Bot.ReactAsync(Chat, Message.Id, GetRandomReaction_DONE());
+        Log($"REPLY >> {chat}", LogLevel.Info, LogColor.Yellow);
+    }
 }

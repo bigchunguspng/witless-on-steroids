@@ -12,9 +12,21 @@ public abstract class MemeGeneratorBase
 
     protected async Task FetchImageSize(MemeRequest request)
     {
-        var info = await Image.IdentifyAsync(request.SourcePath);
-        _sourceSizeOG = info.Size;
-        _sourceSizeAdjusted = AdjustImageSize(request);
+        for (var i = 3; i > 0; i--) // <-- retry mechanism
+        {
+            try
+            {
+                var info = await Image.IdentifyAsync(request.SourcePath);
+                _sourceSizeOG = info.Size;
+                _sourceSizeAdjusted = AdjustImageSize(request);
+                i = 0;
+            }
+            catch
+            {
+                LogError($"[WARNING] FetchImageSize -> CAN'T OPEN FILE \"{request.SourcePath}\", WAITING…");
+                await request.SourcePath.WaitForFile(checkEvery_ms: 125);
+            }
+        }
     }
 
     protected async Task FetchVideoSize(MemeRequest request)

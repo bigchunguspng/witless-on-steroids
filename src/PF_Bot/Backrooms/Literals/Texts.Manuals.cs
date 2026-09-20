@@ -4,6 +4,8 @@ public static partial class Texts
 {
     public const string EDIT_MANUAL =
         """
+        💬 Отправь это В ОТВЕТ на файл или ВМЕСТЕ с файлом
+
         ❗️ Команда работает с {0}
 
         📖 Справка по обработке: /man_4
@@ -11,6 +13,8 @@ public static partial class Texts
 
     public const string EDIT_MANUAL_SYN =
         """
+        💬 Отправь это В ОТВЕТ на файл или ВМЕСТЕ с файлом
+
         ❗️ Команда работает с {0}
 
         📖 Синтаксис команды: {1}
@@ -19,6 +23,8 @@ public static partial class Texts
 
     public const string MEME_MANUAL =
         """
+        💬 Отправь это В ОТВЕТ на файл или ВМЕСТЕ с файлом
+
         ❗️ Команда работает с фото 📸 и видео 🎬
 
         📖 Справка: /man_3

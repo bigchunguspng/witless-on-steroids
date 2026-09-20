@@ -1,49 +1,22 @@
-using System.Text;
-using PF_Bot.Core;
+using Newtonsoft.Json;
 using PF_Bot.Features_Web.Boards;
 using PF_Bot.Features_Web.Boards.Commands;
 using PF_Bot.Features_Web.Boards.Core;
+using Telegram.Bot.Extensions;
 
 namespace PF_Bot.Features_Aux.Listing;
 
 public static class ListingBoards
 {
-    public static void SendSavedList
-        (ImageBoardContext ctx, ListPagination pagination)
-    {
-        var (origin, messageId, page, perPage) = pagination;
-
-        var files = ctx.ArchivePath.GetFilesInfo()
-            .Where(x => x.Length > 2)
-            .OrderByDescending(x => x.Name).ToArray();
-
-        var paginated = files.Length > perPage;
-        var lastPage = pagination.GetLastPageIndex(files.Length);
-
-        var sb = new StringBuilder(ctx.EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b>");
-        if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-        sb.Append("\n\n").AppendJoin('\n', BoardHelpers.GetJsonList(files, page, perPage));
-        if (paginated) sb.Append(USE_ARROWS);
-
-        var buttons = paginated
-            ? pagination.GetPaginationKeyboard(lastPage, $"{ctx.CallbackKey}i")
-            : null;
-        App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
-    }
-
     public static void SendBoardList
         (ImageBoardContext ctx, ListPagination pagination, List<BoardGroup> boardsAll)
     {
-        var (origin, messageId, page, perPage) = pagination;
-
-        var boards = boardsAll.Skip(page * perPage).Take(perPage);
-
-        var lastPage = pagination.GetLastPageIndex(boardsAll.Count);
-
-        var sb = new StringBuilder(ctx.BoardsTitle).Append($" 📃{page + 1}/{lastPage + 1}");
-        foreach (var group in boards)
+        Listing.SendList(boardsAll, ctx.CallbackKey, pagination, header: sb =>
         {
-            sb.Append($"\n\n<b><u>{group.Title}</u></b>");
+            sb.Append(ctx.BoardsTitle);
+        }, itemText: (sb, group) =>
+        {
+            sb.Append($"<b><u>{group.Title}</u></b>");
             if (group.IsNSFW) sb.Append(" (NSFW🥵)");
             sb.Append('\n');
             foreach (var board in group.Boards)
@@ -52,10 +25,71 @@ public static class ListingBoards
                 sb.Append($"<i><a href='{board.URL}'>{board.Title}</a></i>");
                 if (board.IsNSFW) sb.Append(" (NSFW🥵)");
             }
-        }
-        sb.Append(USE_ARROWS);
+        }, separator: "\n\n");
+    }
 
-        var buttons = pagination.GetPaginationKeyboard(lastPage, ctx.CallbackKey);
-        App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
+    public static void SendSavedList
+        (ImageBoardContext ctx, ListPagination pagination)
+    {
+        var files = ctx.ArchivePath.GetFilesInfo()
+            .Where(x => x.Length > 2)
+            .OrderByDescending(x => x.Name).ToArray();
+
+        Listing.SendList(files, $"{ctx.CallbackKey}i", pagination, header: sb =>
+        {
+            sb.Append(ctx.EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b>");
+        }, itemText: (sb, file) =>
+        {
+            var name = file.Name.Replace(".json", "");
+            var size = file.Length.ReadableFileSize();
+            sb.Append($"<code>{name}</code> | {size}");
+            if (BoardHelpers.FileNameIsThread(name.Split(' ')[^1]))
+                sb.Append($"<blockquote expandable>{GetThreadPreview(file.FullName)}</blockquote>");
+        });
+    }
+
+    private static readonly Regex
+        _rgx_URL = new(@"(?:\S+(?::[\/\\])\S+)|(?:<.+\/.*>)", RegexOptions.Compiled);
+
+    private static string GetThreadPreview(string path)
+    {
+        var serializer = ThreadSubjectDeserializer;
+        using var stream = File.OpenText(path);
+        using var reader = new JsonTextReader(stream);
+
+        var post = serializer.Deserialize<List<string>>(reader)!.First();
+
+        post = HtmlText.Escape(post);
+        post = _rgx_URL.Replace(post, match => $"<a href=\"{match.Value}\">[deleted]</a>");
+
+        if (post.Contains(": "))
+        {
+            var s = post.Split(": ", 2);
+            post = $"<b>{s[0]}</b>: {s[1]}";
+        }
+
+        return post;
+    }
+
+    private static readonly JsonSerializer ThreadSubjectDeserializer = new()
+    {
+        Converters = { new FirstRowReader() }, DefaultValueHandling = DefaultValueHandling.Ignore
+    };
+
+    /// <b>READ-ONLY!</b> Returns only <b>THE FIRST</b> string from the list.
+    private class FirstRowReader : JsonConverter<List<string>>
+    {
+        public override void WriteJson
+            (JsonWriter writer, List<string>? value, JsonSerializer serializer)
+            => throw new NotImplementedException();
+
+        public override List<string> ReadJson
+            (JsonReader reader, Type type, List<string>? list, bool hasValue, JsonSerializer serializer)
+        {
+            do     reader.Read();
+            while (reader.TokenType != JsonToken.String);
+
+            return [(string)reader.Value!];
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using PF_Bot.Core;
+﻿using PF_Bot.Core;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Features_Aux.Listing;
@@ -91,11 +90,14 @@ public static class ListingFFMpegDocs
             pagination = pagination with { Page = page };
         }
 
-        var AudioVideo = audio ? "Audio" : "Video";
-        var sb = new StringBuilder($"⚙ <b>{AudioVideo} Filters</b>");
-        if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-        sb.Append("\n\n").AppendJoin('\n', GetFilters(list, key, page, perPage));
-        if (paginated) sb.Append(USE_ARROWS);
+        var av = audio ? "Audio" : "Video";
+        var sb = Listing.BuildPageContent(list, page, perPage, lastPage, paginated, header: sb =>
+            {
+                sb.Append("⚙ <b>").Append(av).Append(" Filters</b>");
+            }, itemText: (sb, item) =>
+            {
+                sb.Append($"<code>/pegman {item.Number,3}{key}</code> - {item.Title}");
+            });
 
         var keyboard = new List<List<InlineKeyboardButton>>();
         if (paginated)
@@ -118,18 +120,6 @@ public static class ListingFFMpegDocs
 
         keyboard.Add([_butt_Main]);
         App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, new InlineKeyboardMarkup(keyboard));
-    }
-
-    private static IEnumerable<string> GetFilters
-        (List<FFMpegDocsPage> list, string key, int page, int perPage)
-    {
-        if (list.Count == 0) return ["*пусто*"];
-
-        return list
-            .Skip(perPage * page)
-            .Take(perPage)
-            .Select(item =>
-                $"<code>/pegman {item.Number,3}{key}</code> - {item.Title}");
     }
 
     // PAGE

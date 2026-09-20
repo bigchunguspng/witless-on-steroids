@@ -40,7 +40,7 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
 
     public record struct NukeLogEntry(DateTime Time, MemeSourceType Type, string Command);
 
-    public static readonly SyncDictionary<long, List<NukeLogEntry>> Logs = new();
+    public static readonly SyncDictionary<long, Stack<NukeLogEntry>> Logs = new();
 
     private static readonly Regex
         _rgx_nukeFilter = new(@"-filter_complex ""\[v:0\](.+?)"" ", RegexOptions.Compiled);
@@ -55,6 +55,6 @@ public class DukeNukem(MemeOptions_Nuke op, long chat) : IMemeGenerator<int>
             Logs.Add(chat, []);
 
         var command = _rgx_nukeFilter.ExtractGroup(1, process.Arguments, s => s, "[null]");
-        Logs[chat].Add(new NukeLogEntry(DateTime.UtcNow, request.Type, command));
+        Logs[chat].Push(new NukeLogEntry(DateTime.UtcNow, request.Type, command));
     }
 }

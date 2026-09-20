@@ -1,4 +1,3 @@
-using System.Text;
 using PF_Bot.Core;
 using PF_Bot.Features_Aux.Packs;
 
@@ -34,52 +33,28 @@ public static class ListingPacks // Did someone said Linkin' Park?
     private static void SendFilesList
         (FusionListContext ctx, FilePath directory, ListPagination pagination, bool fail = false)
     {
-        var (origin, messageId, page, perPage) = pagination;
+        Listing.SendList(directory.GetFilesInfo(), ctx.CallbackKey, pagination, header: sb =>
+        {
+            if (fail)
+                sb
+                    .Append("К сожалению, я не нашёл ")
+                    .Append(ctx.Object_Accusative)
+                    .Append(" с таким названием\n\n");
 
-        var files = directory.GetFilesInfo();
-
-        var paginated = files.Length > perPage;
-        var lastPage = pagination.GetLastPageIndex(files.Length);
-
-        var sb = new StringBuilder();
-        if (fail)
-            sb
-                .Append("К сожалению, я не нашёл ")
-                .Append(ctx.Object_Accusative)
-                .Append(" с таким названием\n\n");
-
-        sb.Append("<b>").Append(ctx.Title).Append(":</b>");
-        if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-        sb.Append("\n\n").AppendJoin('\n', FormatFiles(files, ctx.Marker, page, perPage));
-
-        sb.Append("\n\nСловарь <b>этой беседы</b> ");
-        var path = PackManager.GetPackPath(origin.Chat);
-        if (File.Exists(path))
-            sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
-        else
-            sb.Append("пуст");
-
-        if (paginated) sb.Append(USE_ARROWS);
-
-        var buttons = paginated
-            ? pagination.GetPaginationKeyboard(lastPage, ctx.CallbackKey)
-            : null;
-        App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
-    }
-
-    private static IEnumerable<string> FormatFiles
-        (FileInfo[] files, string marker, int page = 0, int perPage = 25)
-    {
-        if (files.Length == 0) return ["*пусто*"];
-
-        return files
-            .Skip(perPage * page)
-            .Take(perPage)
-            .Select(file =>
-            {
-                var name = Path.GetFileNameWithoutExtension(file.Name);
-                var size = file.Length.ReadableFileSize();
-                return $"<code>{marker}{name}</code> | {size}";
-            });
+            sb.Append("<b>").Append(ctx.Title).Append(":</b>");
+        }, itemText: (sb, file) =>
+        {
+            var name = Path.GetFileNameWithoutExtension(file.Name);
+            var size = file.Length.ReadableFileSize();
+            sb.Append($"<code>{ctx.Marker}{name}</code> | {size}");
+        }, footer: sb =>
+        {
+            sb.Append("\n\nСловарь <b>этой беседы</b> ");
+            var path = PackManager.GetPackPath(pagination.Origin.Chat);
+            if (File.Exists(path))
+                sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
+            else
+                sb.Append("пуст");
+        });
     }
 }

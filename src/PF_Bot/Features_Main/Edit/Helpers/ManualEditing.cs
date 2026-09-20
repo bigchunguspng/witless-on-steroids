@@ -32,10 +32,11 @@ public static class ManualEditing
     //
 
     private static readonly Regex
-        _rgx_args  = new(@"\{(\d+)\}",      RegexOptions.Compiled),
-        _rgx_alias = new(@"\$?([^\s\$]*)!", RegexOptions.Compiled);
+        _rgx_args  = new(@"\{(\d+)\}",       RegexOptions.Compiled),
+        _rgx_alias = new(@"([^\s!""',;]+)!", RegexOptions.Compiled);
 
-    public static bool ApplyAliases(this CommandContext context, ref string options, FilePath directory)
+    public static bool ApplyAliases
+        (this CommandContext context, ref string options, FilePath directory)
     {
         var noAliases = options.Contains('!').Janai();
         if (noAliases) return true;
@@ -51,7 +52,8 @@ public static class ManualEditing
         return true;
     }
 
-    private static bool ApplyAlias(this CommandContext context, Match aliasMatch, ref string options, FilePath directory)
+    private static bool ApplyAlias
+        (this CommandContext context, Match aliasMatch, ref string options, FilePath directory)
     {
         var expr = aliasMatch.Groups[1].Value;
         var bits = expr.Split(':');
@@ -65,9 +67,9 @@ public static class ManualEditing
             var args = bits.Skip(1).ToArray();
             try
             {
-                var aliasRender = template.Format(args);
-                var aliasRegex = new Regex(Regex.Escape(aliasMatch.Value));
-                options = aliasRegex.Replace(options, aliasRender, 1);
+                var expansion = template.Format(args);
+                var r_alias = new Regex(Regex.Escape(aliasMatch.Value));
+                options = r_alias.Replace(options, expansion, 1);
             }
             catch (FormatException e)
             {

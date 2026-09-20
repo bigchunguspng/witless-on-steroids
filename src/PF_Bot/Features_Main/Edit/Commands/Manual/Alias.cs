@@ -44,6 +44,9 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
     // /a{cmd} [code] 0         // ALIAS DELETION (admin only)
     // /a{cmd}  info            // ALIAS INFO
 
+    private readonly Regex _r_invalid
+        = new(@"[!""',;]", RegexOptions.Compiled);
+
     protected override void Run()
     {
         if (Args != null && Args.EndsWith("info") || Options.StartsWith("_info"))
@@ -53,7 +56,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
         else if (Args != null && Args.CanBeSplitN())
         {
             var args = Args!.SplitN(2);
-            var name = args[0].ValidFileName();
+            var name = _r_invalid.Replace(args[0].ValidFileName(), "_");
 
             var admin = Message.SenderIsBotAdmin();
             var files = ctx.Directory.GetFiles($"{name}.*");

@@ -18,7 +18,7 @@ public static class ListingAliases
 
         var sb = new StringBuilder("🔥 <b>Ярлыки команды /").Append(ctx.CommandName).Append(":</b>");
         if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-        sb.Append("\n\n").AppendJoin('\n', GetList(files, page, perPage));
+        sb.Append("\n\n").AppendJoin('\n', GetList(files, ctx.ShowFlairs, page, perPage));
         if (paginated) sb.Append(USE_ARROWS);
 
         var buttons = paginated
@@ -28,7 +28,7 @@ public static class ListingAliases
     }
 
     private static IEnumerable<string> GetList
-        (string[] files, int page = 0, int perPage = 25)
+        (string[] files, bool showFlairs, int page = 0, int perPage = 25)
     {
         if (files.Length == 0) return ["*пусто*"];
 
@@ -39,9 +39,26 @@ public static class ListingAliases
             {
                 var name = Path.GetFileNameWithoutExtension(file);
                 var content = File.ReadAllText(file);
+                var flair = showFlairs ? GetAliasKindEmoji(content) + " " : "";
                 return
-                    $"<code>{name}</code>:\n"
+                    $"{flair}<code>{name}</code>:\n"
                   + $"<blockquote>{content}</blockquote>";
             });
+    }
+
+    private static string GetAliasKindEmoji(string text)
+    {
+        if (text.StartsWith('-')) return "🔩";
+        if (text.StartsWith('[')) return "🎞️";
+
+        var eq_i = text.IndexOf('=');
+        if (eq_i > 0)
+        {
+            var filter_name = text.Substring(0, eq_i);
+            if (ListingFFMpegDocs.Docs.PagesAF.Any(x => x.Title.Contains(filter_name))) return "🎧";
+            if (ListingFFMpegDocs.Docs.PagesVF.Any(x => x.Title.Contains(filter_name))) return "🎬";
+        }
+
+        return "💬";
     }
 }

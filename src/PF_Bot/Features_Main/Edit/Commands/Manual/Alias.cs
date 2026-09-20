@@ -11,6 +11,7 @@ public class AliasContext
     public required string   CallbackKey { get; init; }
     public required string   Tool        { get; init; }
     public required FilePath Directory   { get; init; }
+    public required bool     ShowFlairs  { get; init; }
 
     public static readonly AliasContext FFMpeg = new()
     {
@@ -18,6 +19,7 @@ public class AliasContext
         CallbackKey = Registry.CallbackKey_AliasP,
         Tool = "FFMpeg",
         Directory = Dir_Alias_Peg,
+        ShowFlairs = true,
     };
 
     public static readonly AliasContext Magick = new()
@@ -26,6 +28,7 @@ public class AliasContext
         CallbackKey = Registry.CallbackKey_AliasI,
         Tool = "ImageMagick",
         Directory = Dir_Alias_Im,
+        ShowFlairs = false,
     };
 }
 

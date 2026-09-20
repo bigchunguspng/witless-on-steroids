@@ -7,7 +7,7 @@ namespace PF_Bot.Features_Aux.Listing;
 public static class ListingFFMpegDocs
 {
     private static readonly Lazy<FFMpegDocumentation>        Docs_Lazy = new(new FFMpegDocumentation());
-    private static               FFMpegDocumentation Docs => Docs_Lazy.Value;
+    public  static               FFMpegDocumentation Docs => Docs_Lazy.Value;
 
     private const string
         TEXT_MAIN =

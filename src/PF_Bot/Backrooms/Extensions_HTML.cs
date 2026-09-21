@@ -10,10 +10,10 @@ public static partial class Extensions
         SPLIT_RM_EMPTY_TRIM = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
 
     public static string[] SplitIntoPages
-        (this string content, int offset_oneshot = 0, int offset_paginated = 0)
+        (this string content, int offset_oneshot = 0, int offset_paginated = 0, string headBodySeparator = "\n\n")
     {
         if (TG_MAX_MESSAGE_LEN >= offset_oneshot + content.Length)
-            return [content]; // 92.3% exit here (386/418 files)
+            return [content]; // 92.3% exit here (386/418 files) (ffmpeg manuals)
 
         if (TG_MAX_MESSAGE_LEN >= offset_oneshot + Length_ExcludingHTML(content))
             return [content]; //  4.1% here (17)
@@ -84,10 +84,12 @@ public static partial class Extensions
 
                 lines_paged += lines_to_take;
                 text_lengthC -= text_lengthP;
+                text_lengthC += headBodySeparator.Length;
+                // ^ ffmpeg pages start with \n\n
 
                 // start the next page
                 sb.Clear();
-                sb.Append("\n\n");
+                sb.Append(headBodySeparator);
                 foreach (var tag in tagsP.Reverse())
                 {
                     // open tags on the next page

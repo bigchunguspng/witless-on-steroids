@@ -56,6 +56,6 @@ public static class YtDlp
 
         LastUpdate = DateTime.Now;
 
-        return processResult.Output.ToString().Contains("Updated yt-dlp");
+        return processResult.Output.Any(x => x.Line != null && x.Line.Contains("Updated yt-dlp"));
     }
 }

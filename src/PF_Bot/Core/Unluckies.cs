@@ -65,15 +65,12 @@ public static class Unluckies
             .Combine($"{DateTime.Now:yyyy-MM-dd}-{e.File}-{context.Chat}-{Desert.GetSilt(11)}.txt")
             .MakeUnique();
 
-        var output = "*пусто*";
-        var sbOutput = e.Result.Output;
-        if (sbOutput.Length > 0)
-        {
-            if (e.Result.WasKilled)
-                sbOutput.Append("\n[I KILLED THE PROCESS :3]");
+        if (e.Result.Output.Count == 0)
+            e.Result.AddComment("*пусто*");
+        else if (e.Result.WasKilled)
+            e.Result.AddComment("[I KILLED THE PROCESS :3]");
 
-            output = sbOutput.ToString();
-        }
+        var output = string.Join('\n', e.Result.Output.Select(x => x.Line));
 
         var text = PROCESS_ERROR_REPORT.Format(e.File, e.Result.Arguments, GetRandomASCII(), output);
         File.WriteAllText(path, text);

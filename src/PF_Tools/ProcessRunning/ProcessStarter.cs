@@ -26,15 +26,15 @@ public static class ProcessStarter
     /// Saves all stdout/stderr to result's property <see cref="StartedProcess.Output"/>.
     public static StartedProcess StartProcess
         (string file, string arguments, string directory = "") =>
-        StartProcess_WithOutputHandler(file, arguments, directory, Output_Save);
+        StartProcess_WithOutputHandler(file, arguments, directory, echo: false);
 
     /// Saves all stdout/stderr to result's property <see cref="StartedProcess.Output"/> and prints them to Console.
     public static StartedProcess StartProcess_WithEcho
         (string file, string arguments, string directory = "") =>
-        StartProcess_WithOutputHandler(file, arguments, directory, Output_SaveAndPrint);
+        StartProcess_WithOutputHandler(file, arguments, directory, echo: true);
 
     public static StartedProcess StartProcess_WithOutputHandler
-        (string file, string arguments, string directory, ProcessOutputHandler handler)
+        (string file, string arguments, string directory, bool echo)
     {
 #if DEBUG
         Log($"[RUN] >> {file} {arguments}", LogLevel.Debug, LogColor.Olive);
@@ -42,8 +42,8 @@ public static class ProcessStarter
         var process = InitProcess(file, arguments, directory);
         var result = new StartedProcess(process);
 
-        process.OutputDataReceived += (_, e) => handler(e.Data, result.Output);
-        process. ErrorDataReceived += (_, e) => handler(e.Data, result.Output);
+        process.OutputDataReceived += (_, e) => result.SaveOutput(ProcessOutputKind.Output, e.Data, echo);
+        process. ErrorDataReceived += (_, e) => result.SaveOutput(ProcessOutputKind.Error,  e.Data, echo);
 
         process.Start();
 
@@ -51,22 +51,5 @@ public static class ProcessStarter
         process.BeginErrorReadLine();
 
         return result;
-    }
-
-    // OUTPUT HANDLERS
-
-    public delegate void ProcessOutputHandler(string? data, StringBuilder output);
-
-    public static void Output_Save
-        (string? data, StringBuilder output)
-    {
-        output.Append(data).Append('\n');
-    }
-
-    public static void Output_SaveAndPrint
-        (string? data, StringBuilder output)
-    {
-        output.Append(data).Append('\n');
-        Console.WriteLine(data);
     }
 }

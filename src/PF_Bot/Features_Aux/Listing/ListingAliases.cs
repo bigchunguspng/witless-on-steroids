@@ -30,10 +30,16 @@ public static class ListingAliases
         if (eq_i > 0)
         {
             var filter_name = text.Substring(0, eq_i);
-            if (ListingFFMpegDocs.Docs.PagesAF.Any(x => x.Title.Contains(filter_name))) return "🎧";
-            if (ListingFFMpegDocs.Docs.PagesVF.Any(x => x.Title.Contains(filter_name))) return "🎬";
+            if (ListingFFMpegDocs.Docs.PagesAF.Any(x => FilterTitleMatches(x.Title, filter_name))) return "🎧";
+            if (ListingFFMpegDocs.Docs.PagesVF.Any(x => FilterTitleMatches(x.Title, filter_name))) return "🎬";
         }
 
         return "💬";
     }
+
+    private static bool FilterTitleMatches
+        (string title, string filter)
+        => title == filter
+        || title.Contains(", ")
+        && title.Split   (", ").Any(x => x == filter);
 }

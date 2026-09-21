@@ -80,15 +80,13 @@ public class UseMagick : FileEditor_VideoPhoto
 
             if (Options.Contains('o'))
             {
-                var text = result.Output.ToString();
-                ProcessOutputSender.SendProcessOutput(Origin, text, null, result.ExitCode);
+                ProcessOutputSender.SendProcessOutput(Origin, result.StdOut, result.StdErr, result.ExitCode);
             }
         }
         else // i, extension == null
         {
             var result = await RunMagick(options);
-            var output = result.Output.ToString();
-            ProcessOutputSender.SendProcessOutput(Origin, output, null, result.ExitCode);
+            ProcessOutputSender.SendProcessOutput(Origin, result.StdOut, result.StdErr, result.ExitCode);
         }
         Log($"{Title} >> MAGICK [{options}] [{extension}]");
     }

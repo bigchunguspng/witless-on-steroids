@@ -61,9 +61,9 @@ public class FFMpegDocs : CommandHandlerBlocking
             }
             else // find exact page
             {
-                var m_av67 = _r_code_av67.Match(bit1);
-                var m_67av = _r_code_67av.Match(bit1);
-                if (m_av67.Success || m_67av.Success)
+                var  m_av67 = _r_code_av67.Match(bit1);
+                var  m_67av = _r_code_67av.Match(bit1);
+                if ((m_av67.Success || m_67av.Success) && bit1 != "v360") // v360 - actual video filter lol
                 {
                     var kind_src = m_av67.Success
                         ? m_av67.Groups[1].Value

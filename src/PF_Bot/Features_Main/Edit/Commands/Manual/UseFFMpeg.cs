@@ -101,15 +101,13 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
 
             if (Options.Contains('o'))
             {
-                var text = result.Output.ToString();
-                ProcessOutputSender.SendProcessOutput(Origin, text, null, result.ExitCode);
+                ProcessOutputSender.SendProcessOutput(Origin, result.StdOut, result.StdErr, result.ExitCode);
             }
         }
         else // i, extension == null
         {
             var result = await FFMpeg.Args().Globals(options).FFMpeg_Run();
-            var output = result.Output.ToString();
-            ProcessOutputSender.SendProcessOutput(Origin, output, null, result.ExitCode);
+            ProcessOutputSender.SendProcessOutput(Origin, result.StdOut, result.StdErr, result.ExitCode);
         }
         Log($"{Title} >> FFMPEG [{options}] [{extension}]");
     }

@@ -43,19 +43,23 @@ public static class ManualEditing
 
         while (true)
         {
-            var match = _rgx_alias.Match(options);
-            if (match.Failed()) break;
-                
-            if (context.ApplyAlias(match, ref options, directory).Failed()) return false;
+            var matches = _rgx_alias.Matches(options);
+            if (matches.Count == 0) break;
+
+            var offset = 0;
+            foreach (Match match in matches)
+            {
+                if (context.ApplyAlias(match, ref options, ref offset, directory).Failed()) return false;
+            }
         }
 
         return true;
     }
 
     private static bool ApplyAlias
-        (this CommandContext context, Match aliasMatch, ref string options, FilePath directory)
+        (this CommandContext context, Match match, ref string options, ref int offset, FilePath directory)
     {
-        var expr = aliasMatch.Groups[1].Value;
+        var expr = match.Groups[1].Value;
         var bits = expr.Split(':');
         var name = bits[0];
         var path = directory.Combine($"{name}.txt");
@@ -68,10 +72,13 @@ public static class ManualEditing
             try
             {
                 var expansion = template.Format(args);
-                var r_alias = new Regex(Regex.Escape(aliasMatch.Value));
-                options = r_alias.Replace(options, expansion, 1);
+                var i_match = match.Index + offset;
+                var before = options.AsSpan(0, i_match);
+                var after  = options.AsSpan(   i_match + match.Length);
+                options = string.Concat(before, expansion, after);
+                offset += expansion.Length - match.Length;
             }
-            catch (FormatException e)
+            catch (FormatException e) // formatting error
             {
                 LogError($"{context.Title} >> ALIAS PARSING FAIL | {e.GetErrorMessage()}");
 
@@ -86,7 +93,7 @@ public static class ManualEditing
                 return false;
             }
         }
-        else
+        else // no such alias
         {
             var text = ALIAS_NOT_FOUND.Format(name, FAIL_EMOJI.PickAny());
             App.Bot.SendMessage(context.Origin, text);

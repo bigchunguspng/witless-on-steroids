@@ -69,8 +69,8 @@ public static class ProcessOutputSender
         (MessageOrigin origin, string? stdout, string? stderr, int code, TimeSpan time = default)
     {
         var output = FormatProcessOutputs(stdout, stderr, code, time);
-        var output_pages = output.SplitIntoPages(offset_paginated: 8); // 📃28/67\n
-        if (output_pages.Length > 1)
+        var output_pages = output.SplitIntoPages(offset_paginated: 10, headBodySeparator: "");
+        if (output_pages.Length > 1) //                            ^ "📃312/312\n"
         {
             int id;
             lock (App.ProcessOutputs)
@@ -87,7 +87,7 @@ public static class ProcessOutputSender
     private static string FormatProcessOutputs(string? stdout, string? stderr, int exitCode, TimeSpan time)
     {
         var sb = new StringBuilder();
-        if (time == default)                  sb.Append($"<u>TIME</u>: <code>{time.ReadableTime()}</code>\n");
+        if (time != default)                  sb.Append($"<u>TIME</u>: <code>{time.ReadableTime()}</code>\n");
         _ =                                   sb.Append($"<u>EXIT CODE</u>: <code>{exitCode}</code>\n");
         if (stdout.IsNotNull_NorWhiteSpace()) sb.Append($"<u>OUT</u>:\n<pre>{HtmlText.Escape(stdout)}</pre>");
         if (stderr.IsNotNull_NorWhiteSpace()) sb.Append($"<u>ERR</u>:\n<pre>{HtmlText.Escape(stderr)}</pre>");

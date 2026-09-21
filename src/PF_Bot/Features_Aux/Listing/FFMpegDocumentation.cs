@@ -328,3 +328,23 @@ public class FFMpegDocumentation
             .Append("</div>\n");
     }
 }
+
+/* LONG ASS PAGES (for testing):
+       LEN   AV# NAME
+     11083 |  85 dynaudnorm
+      5890 | 108 silenceremove
+      6903 |  72 dnn_processing
+     17992 |  76 drawtext
+     10882 |  93 fieldmatch
+      4443 | 145 lensfun
+     26819 | 147 libplacebo
+      5349 | 188 overlay
+      8125 | 207 qrencode
+     11835 | 221 scale
+      5372 | 236 signalstats
+      7162 | 258 tinterlace
+      7849 | 270 v360
+      4376 | 285 waveform
+      6882 | 296 zscale
+^ COUNT: 15
+*/

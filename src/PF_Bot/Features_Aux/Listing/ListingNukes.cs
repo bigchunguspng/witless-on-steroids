@@ -6,7 +6,7 @@ namespace PF_Bot.Features_Aux.Listing;
 
 public static class ListingNukes // List of nuclear weapons tests - Wikipedia
 {
-    public static bool SendNukeLog
+    public static void SendNukeLog
         (ListPagination pagination)
     {
         var origin = pagination.Origin;
@@ -14,7 +14,7 @@ public static class ListingNukes // List of nuclear weapons tests - Wikipedia
         if (DukeNukem.Logs.TryGetValue_Failed(origin.Chat, out var entries))
         {
             App.Bot.SendMessage(origin, NUKE_LOG_EXPLANATION);
-            return false;
+            return;
         }
 
         const string key = $"{Registry.CallbackKey_Nukes}l";
@@ -36,6 +36,5 @@ public static class ListingNukes // List of nuclear weapons tests - Wikipedia
             Footer = sb => sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>"),
             Placeholder = NUKE_LOG_EXPLANATION,
         }.Send();
-        return true;
     }
 }

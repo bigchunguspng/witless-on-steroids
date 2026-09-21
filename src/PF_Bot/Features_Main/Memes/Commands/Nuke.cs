@@ -22,8 +22,7 @@ public class Nuke : Meme_Core<int>
     {
         if /**/ (Args is "log" or "logs" || Options.StartsWith("_log"))
         {
-            if (ListingNukes.SendNukeLog(new ListPagination(Origin, perPage: 5)).Failed())
-                Status = HandlingStatus.MAN;
+            ListingNukes.SendNukeLog(new ListPagination(Origin, perPage: 5));
         }
         else
             return RunInternal("nuke\n⏳История фильтров: /nuke_log");

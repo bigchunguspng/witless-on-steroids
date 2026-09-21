@@ -13,7 +13,8 @@ public static class ListingFFMpegDocs
             """
             📚 <u><b>Документация FFMpeg</b> теперь в Telegram</u> 😎
 
-            📖 <a href="https://ffmpeg.org/ffmpeg-filters.html"><b>Сабж</b></a> 
+            📖 <a href="https://ffmpeg.org/ffmpeg-filters.html"><b>Сабж</b></a>
+            📖 Справка по FFMpeg командам: /man_peg
             """,
         TEXT_SYNTAX =
             $"""
@@ -75,13 +76,15 @@ public static class ListingFFMpegDocs
 
     public static void SendFilters(FilterKind kind, ListPagination pagination, int? targetNumber = null)
     {
-        var        audio = kind == FilterKind.Audio;
-        var key  = audio ? "a" : "v";
-        var list = audio ? Docs.PagesAF : Docs.PagesVF;
+        var         audio = kind == FilterKind.Audio;
+        var key   = audio ? "a" : "v";
+        var list  = audio ? Docs.PagesAF : Docs.PagesVF;
+        var emoji = audio ? "🎧" : "🎬";
+        var which = audio ? "Audio" : "Video";
 
         var pl = new PaginatedList<FFMpegDocsPage>(list, null, pagination)
         {
-            Header = sb => sb.Append("⚙ <b>").Append(audio ? "Audio" : "Video").Append(" Filters</b>"),
+            Header = sb => sb.Append(emoji).Append(" <b>").Append(which).Append(" Filters</b>"),
             ItemText = (sb, item) => sb.Append($"<code>/pegman {item.Number,3}{key}</code> - {item.Title}"),
         };
 

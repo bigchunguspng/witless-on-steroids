@@ -572,10 +572,8 @@ public static partial class Texts
 
     //
 
-    public const string SPAM_MANUAL =
+    public const string CHAT_FILTERS_MANUAL =
         """
-        <code>/spam[g/p/a~D/s~B]? [text|message]</code>
-
         <u><b>Chat filters</b></u>:
         <code>g</code> → only <u><b>g</b></u>roups
         <code>p</code> → only <u><b>p</b></u>rivate chats

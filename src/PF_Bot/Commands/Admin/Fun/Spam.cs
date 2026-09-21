@@ -15,7 +15,7 @@ public class Spam : CommandHandlerBlocking_Admin
 
         if (!textProvided && !copyProvided)
         {
-            SendManual(SPAM_MANUAL);
+            SendManual(MANUAL);
             return;
         }
 
@@ -25,7 +25,7 @@ public class Spam : CommandHandlerBlocking_Admin
         var chat = Chat;
         var text = Args!;
 
-        Bot.SendMessage(Origin, $"Spamming to {bakas.Count} chats… 😙");
+        Bot.SendMessage(Origin, $"Spamming to {bakas.Count} chats… 🤭");
 
         if (textProvided) Task.Run(() => SendSpam(bakas, text));
         else              Task.Run(() => CopySpam(bakas, chat, messageId));
@@ -50,6 +50,13 @@ public class Spam : CommandHandlerBlocking_Admin
     }
 
     private static void LogSpam(long chat) => Log($"SPAM >> {chat}", LogLevel.Info, LogColor.Yellow);
+
+    private const string MANUAL =
+        $"""
+         <code>/spam[g/p/a~D/s~B]? [text|message]</code>
+
+         {CHAT_FILTERS_MANUAL}
+         """;
 }
 
 public static class ChatSelector
@@ -95,6 +102,8 @@ public static class ChatSelector
     public static List<long> GetChats(ChatSelectorRequest request)
     {
         var (type, size, days) = request;
+
+        PackManager.Bakas_SaveDirty();
 
         return ChatManager.Chats.Lock(x => x.Keys.Where(chat =>
         {

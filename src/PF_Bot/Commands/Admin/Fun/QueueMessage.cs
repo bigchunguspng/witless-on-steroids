@@ -8,7 +8,7 @@ namespace PF_Bot.Commands.Admin.Fun;
 public class QueueMessage : CommandHandlerBlocking_Admin
 {
     private static readonly Regex
-        _r_repeats = new("x([2-9])", RegexOptions.Compiled);
+        _r_repeats = new("(?<![<>=])([2-9])", RegexOptions.Compiled);
 
     protected override void Run()
     {
@@ -18,9 +18,10 @@ public class QueueMessage : CommandHandlerBlocking_Admin
             return;
         }
 
-        var repeats = _r_repeats.ExtractGroup(1, Options, int.Parse, 1);
+        var repeats_match = _r_repeats.Match(Options);
+        var repeats = repeats_match.ExtractGroup(1, int.Parse, 1);
 
-        if (Options.IsNull_OrEmpty())
+        if (Options.IsNull_OrEmpty() || Options.Length == repeats_match.Length)
         {
             var args = Args.SplitN(2);
             var chat = args[0] is "." ? Chat : long.Parse(args[0]);
@@ -53,10 +54,12 @@ public class QueueMessage : CommandHandlerBlocking_Admin
     }
 
     private const string MANUAL =
-        """
-        <code>/que         [chat|.] [text]</code>
-        <code>/que[xR][g/p/a~D/s~B] [text]</code> (spam syntax)
+        $"""
+         <code>/que[R]     [chat|.] [text]</code>
+         <code>/que[R][g/p/a~D/s~B] [text]</code>
 
-        <code>R</code> - repeats.
-        """;
+         <code>R</code> = repeats
+
+         {CHAT_FILTERS_MANUAL}
+         """;
 }

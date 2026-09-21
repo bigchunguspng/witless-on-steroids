@@ -21,6 +21,7 @@ public class React : CommandHandlerBlocking_Admin
         var (chat, message) = args[0].GetChatIdAndMessage();
 
         Bot.ReactAsync(chat, message, reaction);
+        Bot.ReactAsync(Chat, Message.Id, GetRandomReaction_DONE());
         Log($"REACTION >> {chat}", LogLevel.Info, LogColor.Yellow);
     }
 
@@ -31,6 +32,7 @@ public class React : CommandHandlerBlocking_Admin
         MANUAL =
             $"""
              <code>/re [message_url] [reaction]</code>
+             <code>/re [message_url]</code> ← unreact
 
              Reactions: {RE1}{RE2}{RE3}
              """;

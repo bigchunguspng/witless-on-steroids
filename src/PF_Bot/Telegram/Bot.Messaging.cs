@@ -7,10 +7,10 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public void SendOrEditMessage(MessageOrigin origin, string text, int messageId, InlineKeyboardMarkup? buttons)
+    public void SendOrEditMessage(MessageOrigin origin, string text, int messageId, InlineKeyboardMarkup? keyboard)
     {
-        if (messageId < 0) SendMessage(origin,                 text, buttons);
-        else               EditMessage(origin.Chat, messageId, text, buttons);
+        if (messageId < 0) SendMessage(origin,                 text, keyboard);
+        else               EditMessage(origin.Chat, messageId, text, keyboard);
     }
 
     // SEND
@@ -91,12 +91,12 @@ public partial class Bot
         TrySend(chat, task, "message", "edit");
     }
 
-    public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? inline, bool preview = false)
+    public void EditMessage(long chat, int id, string text, InlineKeyboardMarkup? keyboard, bool preview = false)
     {
         var task = Client.EditMessageText
         (
             chat, id, text, ParseMode.Html,
-            replyMarkup: inline,
+            replyMarkup: keyboard,
             linkPreviewOptions: GetPreviewOptions(preview)
         );
         TrySend(chat, task, "message [+][-]", "edit");

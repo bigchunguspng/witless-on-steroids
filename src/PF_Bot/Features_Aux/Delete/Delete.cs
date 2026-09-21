@@ -28,8 +28,8 @@ public class Delete_Callback : CallbackHandler
         var input = new TractorGame.StepInput(obj, x, y);
         var game  = new TractorGame(GetGameBoard());
 
-        void UpdateGameKeyboard(InlineKeyboardMarkup buttons)
-            => Bot.EditMessage(Chat, Message.Id, TRACTOR_GAME_RULES, buttons);
+        void UpdateGameKeyboard(InlineKeyboardMarkup keyboard)
+            => Bot.EditMessage(Chat, Message.Id, TRACTOR_GAME_RULES, keyboard);
 
         var result = await game.DoStep(input, UpdateGameKeyboard);
         if (result == TractorGame.StepResult.PASS) return;

@@ -80,12 +80,11 @@ public readonly ref struct ManualPage
 
     public InlineKeyboardMarkup GetNavigationKeyboard()
     {
-        var keyboard = new List<List<InlineKeyboardButton>>();
-
         var buttons = GetButtons();
+        var button_rows = new List<List<InlineKeyboardButton>>();
 
         var odd = buttons.Count.IsOdd();
-        if (odd) keyboard.Add([buttons[0]]);
+        if (odd) button_rows.Add([buttons[0]]); // 1 wide button at the top
 
         var rows = buttons.Count / 2;
         var start = odd ? 1 : 0;
@@ -93,17 +92,17 @@ public readonly ref struct ManualPage
         {
             var a = buttons[start + i];
             var b = buttons[start + i + rows];
-            keyboard.Add([a, b]);
+            button_rows.Add([a, b]);
         }
 
         if (_mainPage.Janai()) // append "back" button
         {
             var data = _address.Length == 1 ? "0" : _address[..^1];
             var back = InlineKeyboardButton.WithCallbackData("Назад", GetCallbackData(data));
-            keyboard.Add([back]);
+            button_rows.Add([back]);
         }
 
-        return new InlineKeyboardMarkup(keyboard);
+        return new InlineKeyboardMarkup(button_rows);
     }
 
     private List<InlineKeyboardButton> GetButtons()

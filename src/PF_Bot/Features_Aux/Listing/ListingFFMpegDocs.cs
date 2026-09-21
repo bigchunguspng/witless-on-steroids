@@ -57,18 +57,18 @@ public static class ListingFFMpegDocs
 
     public static void SendMainMenu(MessageOrigin origin, int messageId = -1)
     {
-        var keyboard = new List<List<InlineKeyboardButton>>();
-        keyboard.Add([_butt_AF]);
-        keyboard.Add([_butt_VF]);
-        keyboard.Add([_butt_Syntax]);
-        App.Bot.SendOrEditMessage(origin, TEXT_MAIN, messageId, new InlineKeyboardMarkup(keyboard));
+        var button_rows = new List<List<InlineKeyboardButton>>();
+        button_rows.Add([_butt_AF]);
+        button_rows.Add([_butt_VF]);
+        button_rows.Add([_butt_Syntax]);
+        App.Bot.SendOrEditMessage(origin, TEXT_MAIN, messageId, new InlineKeyboardMarkup(button_rows));
     }
 
     public static void SendSyntax(MessageOrigin origin, int messageId = -1)
     {
-        var keyboard = new List<List<InlineKeyboardButton>>();
-        keyboard.Add([_butt_Main]);
-        App.Bot.SendOrEditMessage(origin, TEXT_SYNTAX, messageId, new InlineKeyboardMarkup(keyboard));
+        var button_rows = new List<List<InlineKeyboardButton>>();
+        button_rows.Add([_butt_Main]);
+        App.Bot.SendOrEditMessage(origin, TEXT_SYNTAX, messageId, new InlineKeyboardMarkup(button_rows));
     }
 
     // LIST
@@ -91,7 +91,7 @@ public static class ListingFFMpegDocs
             pl.Pagination.Page = Math.Clamp(i / pl.PerPage, 0, pl.LastPage);
         }
 
-        var buttons = new List<List<InlineKeyboardButton>>();
+        var button_rows = new List<List<InlineKeyboardButton>>();
         if (pl.Paginated) // add 1..4 buttons to open some filters from this page
         {
             var filterButtons = new List<InlineKeyboardButton>();
@@ -108,12 +108,12 @@ public static class ListingFFMpegDocs
                 var data = CallbackData($"{key} - {page_i}");
                 filterButtons.Add(new InlineKeyboardButton(text, data));
             }
-            buttons.Add(filterButtons);
-            buttons.Add(pagination.GetPaginationButtons(pl.LastPage, $"{Registry.CallbackKey_FFMpeg}{key}f"));
+            button_rows.Add(filterButtons);
+            button_rows.Add(pagination.GetPaginationButtons(pl.LastPage, $"{Registry.CallbackKey_FFMpeg}{key}f"));
         }
-        buttons.Add([_butt_Main]);
+        button_rows.Add([_butt_Main]);
 
-        pl.Keyboard = new InlineKeyboardMarkup(buttons);
+        pl.Keyboard = new InlineKeyboardMarkup(button_rows);
         pl.Send();
     }
 
@@ -171,37 +171,37 @@ public static class ListingFFMpegDocs
         var list_butt = audio ? ButtAF(list_page) : ButtVF(list_page);
 
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
-        var keyboard = new List<List<InlineKeyboardButton>>();
+        var button_rows = new List<List<InlineKeyboardButton>>();
         if (multipage) // I'M NOT READING ALL O'THAT 😂😭🤣👌
         {
-            keyboard.Add([inactive, inactive]);
+            button_rows.Add([inactive, inactive]);
             if (filter_page > 0)
             {
                 var data = CallbackData($"{key} - {i}:{filter_page - 1}");
-                keyboard[0][0] = new InlineKeyboardButton("⬅️ Вернуться", data);
+                button_rows[0][0] = new InlineKeyboardButton("⬅️ Вернуться", data);
             }
             if (filter_page < page.Content.Length - 1)
             {
                 var data = CallbackData($"{key} - {i}:{filter_page + 1}");
-                keyboard[0][1] = new InlineKeyboardButton("➡️ Читать дальше", data);
+                button_rows[0][1] = new InlineKeyboardButton("➡️ Читать дальше", data);
             }
         }
-        keyboard.Add([inactive, inactive]);
-        keyboard.Add([list_butt]);
-        keyboard.Add([_butt_Syntax, _butt_Main]);
+        button_rows.Add([inactive, inactive]);
+        button_rows.Add([list_butt]);
+        button_rows.Add([_butt_Syntax, _butt_Main]);
         if (i - 1 >= 0)
         {
             var title = $"⬅️ {list[i - 1].Title}";
             var data = CallbackData($"{key} - {i - 1}");
-            keyboard[^3][0] = new InlineKeyboardButton(title, data);
+            button_rows[^3][0] = new InlineKeyboardButton(title, data);
         }
         if (i + 1 < list.Count)
         {
             var title = $"➡️ {list[i + 1].Title}";
             var data = CallbackData($"{key} - {i + 1}");
-            keyboard[^3][1] = new InlineKeyboardButton(title, data);
+            button_rows[^3][1] = new InlineKeyboardButton(title, data);
         }
-        App.Bot.SendOrEditMessage(origin, text, messageId, new InlineKeyboardMarkup(keyboard));
+        App.Bot.SendOrEditMessage(origin, text, messageId, new InlineKeyboardMarkup(button_rows));
     }
 
     private static string CallbackData(string text) => $"{Registry.CallbackKey_FFMpeg}{text}";

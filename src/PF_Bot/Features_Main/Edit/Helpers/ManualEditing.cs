@@ -32,8 +32,8 @@ public static class ManualEditing
     //
 
     private static readonly Regex
-        _rgx_args  = new(@"\{(\d+)\}",       RegexOptions.Compiled),
-        _rgx_alias = new(@"([^\s!""',;]+)!", RegexOptions.Compiled);
+        _rgx_args  = new(@"\{(\d+)\}",          RegexOptions.Compiled),
+        _rgx_alias = new(@"\$?([^\s!""',;]+)!", RegexOptions.Compiled);
 
     public static bool ApplyAliases
         (this CommandContext context, ref string options, FilePath directory)

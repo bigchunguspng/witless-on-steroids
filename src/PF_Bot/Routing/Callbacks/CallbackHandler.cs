@@ -45,8 +45,9 @@ public abstract class CallbackHandler
     protected ListPagination GetPagination(string content)
     {
         var numbers = content.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var    page = int.Parse(numbers[0]);
-        var perPage = int.Parse(numbers[1]);
-        return new ListPagination(Origin, Message.Id, page, perPage);
+        var    page =                      int.Parse(numbers[0]);
+        var perPage =                      int.Parse(numbers[1]);
+        var   extra = numbers.Length > 2 ? int.Parse(numbers[2]) : -1;
+        return new ListPagination(Origin, Message.Id, page, perPage, extra);
     }
 }

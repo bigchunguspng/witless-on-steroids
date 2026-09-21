@@ -33,28 +33,30 @@ public static class ListingPacks // Did someone said Linkin' Park?
     private static void SendFilesList
         (FusionListContext ctx, FilePath directory, ListPagination pagination, bool fail = false)
     {
-        Listing.SendList(directory.GetFilesInfo(), ctx.CallbackKey, pagination, header: sb =>
+        new PaginatedList<FileInfo>(directory.GetFilesInfo(), ctx.CallbackKey, pagination)
         {
-            if (fail)
-                sb
-                    .Append("К сожалению, я не нашёл ")
-                    .Append(ctx.Object_Accusative)
-                    .Append(" с таким названием\n\n");
+            Header = sb =>
+            {
+                if (fail)
+                    sb.Append($"К сожалению, я не нашёл {ctx.Object_Accusative} с таким названием\n\n");
 
-            sb.Append("<b>").Append(ctx.Title).Append(":</b>");
-        }, itemText: (sb, file) =>
-        {
-            var name = Path.GetFileNameWithoutExtension(file.Name);
-            var size = file.Length.ReadableFileSize();
-            sb.Append($"<code>{ctx.Marker}{name}</code> | {size}");
-        }, footer: sb =>
-        {
-            sb.Append("\n\nСловарь <b>этой беседы</b> ");
-            var path = PackManager.GetPackPath(pagination.Origin.Chat);
-            if (File.Exists(path))
-                sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
-            else
-                sb.Append("пуст");
-        });
+                sb.Append($"<b>{ctx.Title}:</b>");
+            },
+            ItemText = (sb, file) =>
+            {
+                var name = Path.GetFileNameWithoutExtension(file.Name);
+                var size = file.Length.ReadableFileSize();
+                sb.Append($"<code>{ctx.Marker}{name}</code> | {size}");
+            },
+            Footer = sb =>
+            {
+                sb.Append("\n\nСловарь <b>этой беседы</b> ");
+                var path = PackManager.GetPackPath(pagination.Origin.Chat);
+                if (File.Exists(path))
+                    sb.Append("весит ").Append(path.FileSizeInBytes.ReadableFileSize());
+                else
+                    sb.Append("пуст");
+            },
+        }.Send();
     }
 }

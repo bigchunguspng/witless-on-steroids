@@ -45,9 +45,11 @@ public class RunProcess : CommandHandlerAsync_Admin
             args = bits.Length > 1 ? bits[1] : "";
         }
 
+        var sw = Stopwatch.StartNew();
         var (stdout, stderr, code) = await ProcessRunner.Run_GetOutput(exe, args);
+        var time = sw.Elapsed;
 
-        ProcessOutputSender.SendProcessOutput(Origin, stdout, stderr, code);
+        ProcessOutputSender.SendProcessOutput(Origin, stdout, stderr, code, time);
 
         Log($"{Title} >> RUN {exe} {args}", color: LogColor.Yellow);
     }
@@ -64,10 +66,10 @@ public class RunProcess : CommandHandlerAsync_Admin
 public static class ProcessOutputSender
 {
     public static void SendProcessOutput
-        (MessageOrigin origin, string? stdout, string? stderr, int code)
+        (MessageOrigin origin, string? stdout, string? stderr, int code, TimeSpan time = default)
     {
-        var output = FormatProcessOutputs(stdout, stderr, code);
-        var output_pages = output.SplitIntoPages();
+        var output = FormatProcessOutputs(stdout, stderr, code, time);
+        var output_pages = output.SplitIntoPages(offset_paginated: 8); // 📃28/67\n
         if (output_pages.Length > 1)
         {
             int id;
@@ -76,15 +78,17 @@ public static class ProcessOutputSender
                 id = App.ProcessOutputs.Count;
                 App.ProcessOutputs.Add(output_pages);
             }
-            SendOutputPage(new ListPagination(origin, PerPage: id));
+            SendOutputPage(new ListPagination(origin, perPage: 1, extra: id));
         }
         else
             App.Bot.SendMessage(origin, output);
     }
 
-    private static string FormatProcessOutputs(string? stdout, string? stderr, int exitCode)
+    private static string FormatProcessOutputs(string? stdout, string? stderr, int exitCode, TimeSpan time)
     {
-        var sb = new StringBuilder                     ($"<u>EXIT CODE</u>: <code>{exitCode}</code>\n");
+        var sb = new StringBuilder();
+        if (time == default)                  sb.Append($"<u>TIME</u>: <code>{time.ReadableTime()}</code>\n");
+        _ =                                   sb.Append($"<u>EXIT CODE</u>: <code>{exitCode}</code>\n");
         if (stdout.IsNotNull_NorWhiteSpace()) sb.Append($"<u>OUT</u>:\n<pre>{HtmlText.Escape(stdout)}</pre>");
         if (stderr.IsNotNull_NorWhiteSpace()) sb.Append($"<u>ERR</u>:\n<pre>{HtmlText.Escape(stderr)}</pre>");
         return sb.ToString();
@@ -92,11 +96,12 @@ public static class ProcessOutputSender
 
     public static void SendOutputPage(ListPagination pagination)
     {
-        var (origin, messageId, page, _) = pagination;
-        var id = pagination.PerPage;
-        var pages = App.ProcessOutputs[id];
-        var last_page = pages.Length - 1;
-        var buttons = pagination.GetPaginationKeyboard(last_page, Registry.CallbackKey_Runs);
-        App.Bot.SendOrEditMessage(origin, pages[page], messageId, buttons);
+        var id = pagination.Extra;
+        new PaginatedList<string>(App.ProcessOutputs[id], Registry.CallbackKey_Runs, pagination)
+        {
+            ItemText = (sb, page) => sb.Append(page),
+            ShowArrowsTip = false,
+            HeadSeparator = "\n",
+        }.Send();
     }
 }

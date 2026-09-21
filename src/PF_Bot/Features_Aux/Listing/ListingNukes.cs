@@ -6,7 +6,7 @@ namespace PF_Bot.Features_Aux.Listing;
 
 public static class ListingNukes // List of nuclear weapons tests - Wikipedia
 {
-    public static void SendNukeLog
+    public static bool SendNukeLog
         (ListPagination pagination)
     {
         var origin = pagination.Origin;
@@ -14,27 +14,28 @@ public static class ListingNukes // List of nuclear weapons tests - Wikipedia
         if (DukeNukem.Logs.TryGetValue_Failed(origin.Chat, out var entries))
         {
             App.Bot.SendMessage(origin, NUKE_LOG_EXPLANATION);
-            return;
+            return false;
         }
 
         const string key = $"{Registry.CallbackKey_Nukes}l";
-        Listing.SendList(entries, key, pagination, header: sb =>
+        new PaginatedList<DukeNukem.NukeLogEntry>(entries, key, pagination)
         {
-            sb.Append("🍤 <b>Последние вариации /nuke:</b>");
-        }, itemText: (sb, entry) =>
-        {
-            var logo = entry.Type switch
+            Header = sb => sb.Append("🍤 <b>Последние вариации /nuke:</b>"),
+            ItemText = (sb, entry) =>
             {
-                MemeSourceType.Image => "📸",
-                MemeSourceType.Sticker => "🎟",
-                MemeSourceType.Video => "🎬",
-                _ => throw new ArgumentOutOfRangeException(),
-            };
-            sb.Append($"{logo} <b>{entry.Time:MM'/'dd' 'HH:mm:ss}</b>\n");
-            sb.Append($"<blockquote><code>{entry.Command}</code></blockquote>");
-        }, footer: sb =>
-        {
-            sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>");
-        }, placeholder: NUKE_LOG_EXPLANATION);
+                var logo = entry.Type switch
+                {
+                    MemeSourceType.Image => "📸",
+                    MemeSourceType.Sticker => "🎟",
+                    MemeSourceType.Video => "🎬",
+                    _ => throw new ArgumentOutOfRangeException(),
+                };
+                sb.Append($"{logo} <b>{entry.Time:MM'/'dd' 'HH:mm:ss}</b>\n");
+                sb.Append($"<blockquote><code>{entry.Command}</code></blockquote>");
+            },
+            Footer = sb => sb.Append("\n\nИспользование: <code>/pegc [фильтр] .</code>"),
+            Placeholder = NUKE_LOG_EXPLANATION,
+        }.Send();
+        return true;
     }
 }

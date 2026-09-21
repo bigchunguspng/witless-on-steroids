@@ -54,7 +54,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
     {
         if (Args != null && Args.EndsWith("info") || Options.StartsWith("_info"))
         {
-            ListingAliases.SendList(ctx, new ListPagination(Origin, PerPage: 10));
+            ListingAliases.SendList(ctx, new ListPagination(Origin, perPage: 10));
         }
         else if (Args != null && Args.CanBeSplitN())
         {

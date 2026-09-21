@@ -56,7 +56,7 @@ public class FFMpegDocs : CommandHandlerBlocking
             {
                 var kind = a ? FilterKind.Audio : FilterKind.Video;
                 var target = int.TryParse(bit2, out var value) ? value : (int?)null;
-                var pagination = new ListPagination(Origin, PerPage: ListingFFMpegDocs.PER_PAGE);
+                var pagination = new ListPagination(Origin, perPage: ListingFFMpegDocs.PER_PAGE);
                 ListingFFMpegDocs.SendFilters(kind, pagination, target);
             }
             else // find exact page

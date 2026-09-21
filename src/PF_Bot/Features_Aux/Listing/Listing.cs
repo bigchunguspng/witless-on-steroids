@@ -4,7 +4,20 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PF_Bot.Features_Aux.Listing;
 
-public record ListPagination(MessageOrigin Origin, int MessageId = -1, int Page = 0, int PerPage = 25);
+public struct ListPagination(MessageOrigin origin, int messageId = -1, int page = 0, int perPage = 25, int extra = -1)
+{
+    public MessageOrigin Origin    = origin;
+    public int           MessageId = messageId;
+    public int           Page      = page;
+    public int           PerPage   = perPage;
+    public int           Extra     = extra;
+
+    public int GetPositivePage
+        (int lastPage) => Page < 0 ? Page = lastPage + 1 + Page : Page;
+
+    public int GetLastPageIndex
+        (int itemsTotal) => (int)Math.Ceiling(itemsTotal / (double)PerPage) - 1;
+}
 
 public static class Listing
 {
@@ -17,9 +30,7 @@ public static class Listing
     public static List<InlineKeyboardButton> GetPaginationButtons
         (this ListPagination pagination, int last, string key)
     {
-        var (_, _, page, perPage) = pagination;
-
-        if (page < 0) page = last;
+        var page = pagination.GetPositivePage(last);
 
         var inactive = InlineKeyboardButton.WithCallbackData("💀", "-");
         var buttons = new List<InlineKeyboardButton> { inactive, inactive, inactive, inactive };
@@ -31,77 +42,65 @@ public static class Listing
 
         return buttons;
 
-        string CallbackData(int p) => $"{key} - {p} {perPage}";
+        string CallbackData(int p) => pagination.Extra == -1
+            ? $"{key} - {p} {pagination.PerPage}"
+            : $"{key} - {p} {pagination.PerPage} {pagination.Extra}";
     }
+}
 
-    public static int GetLastPageIndex
-        (this ListPagination pagination, int items_Count)
-    {
-        return (int)Math.Ceiling(items_Count / (double)pagination.PerPage) - 1;
-    }
+public class PaginatedList<T>(IReadOnlyCollection<T> list, string? callbackKey, ListPagination pagination)
+{
+    public  ListPagination Pagination = pagination;
+    private MessageOrigin  Origin     => Pagination.Origin;
+    private int            MessageId  => Pagination.MessageId;
+    public  int            Page       => Pagination.GetPositivePage(LastPage);
+    public  int            PerPage    => Pagination.PerPage;
 
-    public static void SendList<T>
-    (
-        IReadOnlyCollection<T> list,
-        string callbackKey,
-        ListPagination pagination,
-        Action<StringBuilder> header,
-        Action<StringBuilder, T> itemText,
-        Action<StringBuilder>? footer = null,
-        string separator = "\n",
-        string placeholder = "*пусто*"
-    )
-    {
-        var (origin, messageId, page, perPage) = pagination;
+    public bool Paginated => Pagination.PerPage < list.Count;
+    public int   LastPage => Pagination.GetLastPageIndex(list.Count);
 
-        var paginated = list.Count > perPage;
-        var lastPage = pagination.GetLastPageIndex(list.Count);
+    public          Action<StringBuilder>?   Header   { get; init; }
+    public required Action<StringBuilder, T> ItemText { get; init; }
+    public          Action<StringBuilder>?   Footer   { get; init; }
+    public          string HeadSeparator { get; init; } = "\n\n";
+    public          string ItemSeparator { get; init; } = "\n";
+    public          string Placeholder   { get; init; } = "*пусто*";
+    public          bool   ShowArrowsTip { get; init; } = true;
 
-        if (page < 0) page = lastPage;
+    public InlineKeyboardMarkup? Keyboard { get; set; }
 
-        var sb = BuildPageContent
-        (
-            list, page, perPage, lastPage, paginated,
-            header, itemText, footer, separator, placeholder
-        );
-
-        var buttons = paginated
-            ? pagination.GetPaginationKeyboard(lastPage, callbackKey)
-            : null;
-
-        App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, buttons);
-    }
-
-    public static StringBuilder BuildPageContent<T>
-    (
-        IReadOnlyCollection<T> list,
-        int page, int perPage, int lastPage, bool paginated,
-        Action<StringBuilder>  header,
-        Action<StringBuilder, T> itemText,
-        Action<StringBuilder>? footer = null,
-        string separator = "\n",
-        string placeholder = "*пусто*"
-    )
+    public void Send()
     {
         var sb = new StringBuilder();
-        header .Invoke(sb);
-        if (paginated) sb.Append($" 📃{page + 1}/{lastPage + 1}");
-        sb.Append("\n\n");
-        if (list.Count == 0) sb.Append(placeholder);
+        Header?.Invoke(sb);
+        if (Paginated && Header != null)
+            sb.Append(' ');
+        if (Paginated)
+            sb.Append($"📃{Page + 1}/{LastPage + 1}");
+        if (Paginated || Header != null)
+            sb.Append(HeadSeparator);
+        if (list.Count == 0)
+            sb.Append(Placeholder);
         else
         {
             var i = 0;
-            list.Skip(perPage * page)
-                .Take(perPage)
+            list.Skip(PerPage * Page)
+                .Take(PerPage)
                 .ForEach(item =>
                 {
-                    if (i > 0) sb.Append(separator);
-                    itemText(sb, item);
+                    if (i > 0) sb.Append(ItemSeparator);
+                    ItemText(sb, item);
                     i = 1;
                 });
         }
-        footer?.Invoke(sb);
-        if (paginated) sb.Append(USE_ARROWS);
-        return sb;
+        Footer?.Invoke(sb);
+        if (Paginated && ShowArrowsTip) sb.Append(USE_ARROWS);
+
+        Debug.Assert(Keyboard != null || callbackKey != null);
+
+        if (Keyboard == null && Paginated)
+            Keyboard = Pagination.GetPaginationKeyboard(LastPage, callbackKey!);
+
+        App.Bot.SendOrEditMessage(Origin, sb.ToString(), MessageId, Keyboard);
     }
 }

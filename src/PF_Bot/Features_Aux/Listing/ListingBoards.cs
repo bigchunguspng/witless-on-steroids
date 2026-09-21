@@ -11,21 +11,23 @@ public static class ListingBoards
     public static void SendBoardList
         (ImageBoardContext ctx, ListPagination pagination, List<BoardGroup> boardsAll)
     {
-        Listing.SendList(boardsAll, ctx.CallbackKey, pagination, header: sb =>
+        new PaginatedList<BoardGroup>(boardsAll, ctx.CallbackKey, pagination)
         {
-            sb.Append(ctx.BoardsTitle);
-        }, itemText: (sb, group) =>
-        {
-            sb.Append($"<b><u>{group.Title}</u></b>");
-            if (group.IsNSFW) sb.Append(" (NSFW🥵)");
-            sb.Append('\n');
-            foreach (var board in group.Boards)
+            Header = sb => sb.Append(ctx.BoardsTitle),
+            ItemText = (sb, group) =>
             {
-                sb.Append(board.Key is null ? "\n\n" : $"\n<code>{board.Key}</code> - ");
-                sb.Append($"<i><a href='{board.URL}'>{board.Title}</a></i>");
-                if (board.IsNSFW) sb.Append(" (NSFW🥵)");
-            }
-        }, separator: "\n\n");
+                sb.Append($"<b><u>{group.Title}</u></b>");
+                if (group.IsNSFW) sb.Append(" (NSFW🥵)");
+                sb.Append('\n');
+                foreach (var board in group.Boards)
+                {
+                    sb.Append(board.Key is null ? "\n\n" : $"\n<code>{board.Key}</code> - ");
+                    sb.Append($"<i><a href='{board.URL}'>{board.Title}</a></i>");
+                    if (board.IsNSFW) sb.Append(" (NSFW🥵)");
+                }
+            },
+            ItemSeparator = "\n\n",
+        }.Send();
     }
 
     public static void SendSavedList
@@ -35,17 +37,18 @@ public static class ListingBoards
             .Where(x => x.Length > 2)
             .OrderByDescending(x => x.Name).ToArray();
 
-        Listing.SendList(files, $"{ctx.CallbackKey}i", pagination, header: sb =>
+        new PaginatedList<FileInfo>(files, $"{ctx.CallbackKey}i", pagination)
         {
-            sb.Append(ctx.EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b>");
-        }, itemText: (sb, file) =>
-        {
-            var name = file.Name.Replace(".json", "");
-            var size = file.Length.ReadableFileSize();
-            sb.Append($"<code>{name}</code> | {size}");
-            if (BoardHelpers.FileNameIsThread(name.Split(' ')[^1]))
-                sb.Append($"<blockquote expandable>{GetThreadPreview(file.FullName)}</blockquote>");
-        });
+            Header = sb => sb.Append(ctx.EmojiLogo).Append(" <b>Архив досокъ/трѣдовъ:</b>"),
+            ItemText = (sb, file) =>
+            {
+                var name = file.Name.Replace(".json", "");
+                var size = file.Length.ReadableFileSize();
+                sb.Append($"<code>{name}</code> | {size}");
+                if (BoardHelpers.FileNameIsThread(name.Split(' ')[^1]))
+                    sb.Append($"<blockquote expandable>{GetThreadPreview(file.FullName)}</blockquote>");
+            },
+        }.Send();
     }
 
     private static readonly Regex

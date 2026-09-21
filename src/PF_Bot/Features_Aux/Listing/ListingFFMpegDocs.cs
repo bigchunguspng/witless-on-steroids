@@ -75,51 +75,46 @@ public static class ListingFFMpegDocs
 
     public static void SendFilters(FilterKind kind, ListPagination pagination, int? targetNumber = null)
     {
-        var (origin, messageId, page, perPage) = pagination;
-
         var        audio = kind == FilterKind.Audio;
         var key  = audio ? "a" : "v";
         var list = audio ? Docs.PagesAF : Docs.PagesVF;
 
-        var paginated = list.Count > perPage;
-        var lastPage = pagination.GetLastPageIndex(list.Count);
+        var pl = new PaginatedList<FFMpegDocsPage>(list, null, pagination)
+        {
+            Header = sb => sb.Append("⚙ <b>").Append(audio ? "Audio" : "Video").Append(" Filters</b>"),
+            ItemText = (sb, item) => sb.Append($"<code>/pegman {item.Number,3}{key}</code> - {item.Title}"),
+        };
+
         if (targetNumber.HasValue)
         {
             var i = targetNumber.Value - 1;
-            page = Math.Clamp(i / perPage, 0, lastPage);
-            pagination = pagination with { Page = page };
+            pl.Pagination.Page = Math.Clamp(i / pl.PerPage, 0, pl.LastPage);
         }
 
-        var av = audio ? "Audio" : "Video";
-        var sb = Listing.BuildPageContent(list, page, perPage, lastPage, paginated, header: sb =>
-            {
-                sb.Append("⚙ <b>").Append(av).Append(" Filters</b>");
-            }, itemText: (sb, item) =>
-            {
-                sb.Append($"<code>/pegman {item.Number,3}{key}</code> - {item.Title}");
-            });
-
-        var keyboard = new List<List<InlineKeyboardButton>>();
-        if (paginated)
+        var buttons = new List<List<InlineKeyboardButton>>();
+        if (pl.Paginated) // add 1..4 buttons to open some filters from this page
         {
-            var filterPageButtons = new List<InlineKeyboardButton>();
-            var page_i0  = page * perPage;
-            var page_len = page == lastPage ? list.Count - page_i0 : perPage;
-            var count = Math.Min(4, page_len);
+            var filterButtons = new List<InlineKeyboardButton>();
+            var page_i0  = pl.Page * pl.PerPage; // first filter on page
+            var page_len = pl.Page == pl.LastPage 
+                ? list.Count - page_i0 
+                : pl.PerPage;
+            var count = Math.Min(4, page_len); // number of buttons to make
             var step = (double)page_len / count; // 20/4 -> 5  2/2 -> 1
             for (var i = 0; i < count; i++)
             {
                 var page_i = page_i0 + (i * step).RoundInt();
                 var text = $"{list[page_i].Number}{key}";
                 var data = CallbackData($"{key} - {page_i}");
-                filterPageButtons.Add(new InlineKeyboardButton(text, data));
+                filterButtons.Add(new InlineKeyboardButton(text, data));
             }
-            keyboard.Add(filterPageButtons);
-            keyboard.Add(pagination.GetPaginationButtons(lastPage, $"{Registry.CallbackKey_FFMpeg}{key}f"));
+            buttons.Add(filterButtons);
+            buttons.Add(pagination.GetPaginationButtons(pl.LastPage, $"{Registry.CallbackKey_FFMpeg}{key}f"));
         }
+        buttons.Add([_butt_Main]);
 
-        keyboard.Add([_butt_Main]);
-        App.Bot.SendOrEditMessage(origin, sb.ToString(), messageId, new InlineKeyboardMarkup(keyboard));
+        pl.Keyboard = new InlineKeyboardMarkup(buttons);
+        pl.Send();
     }
 
     // PAGE

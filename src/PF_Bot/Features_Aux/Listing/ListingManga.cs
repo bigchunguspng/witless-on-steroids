@@ -11,29 +11,34 @@ public static class ListingManga
         (ListPagination pagination)
     {
         const string key = $"{Registry.CallbackKey_Piece}m";
-        Listing.SendList(await Cache.EnsureMangasCached(), key, pagination, header: sb =>
+        new PaginatedList<Manga>(await Cache.EnsureMangasCached(), key, pagination)
         {
-            sb.Append("🍱 <b>ДОСТУПНЫЕ ТАЙТЛЫ [A-Z]</b>");
-        }, itemText: (sb, manga) =>
-        {
-            sb.Append($"<blockquote><code>{manga.Code}</code> / <code>{manga.Number}</code>\n");
-            sb.Append($"<a href='{manga.URL}'>{manga.Title}</a></blockquote>");
-        });
+            Header = sb => sb.Append("🍱 <b>ДОСТУПНЫЕ ТАЙТЛЫ [A-Z]</b>"),
+            ItemText = (sb, manga) =>
+            {
+                sb.Append($"<blockquote><code>{manga.Code}</code> / <code>{manga.Number}</code>\n");
+                sb.Append($"<a href='{manga.URL}'>{manga.Title}</a></blockquote>");
+            },
+        }.Send();
     }
 
     public static async Task ListChapters
         (ListPagination pagination, Manga manga)
     {
         var key = $"{Registry.CallbackKey_Piece}c-{manga.Number}";
-        Listing.SendList(await Cache.EnsureChaptersCached(manga), key, pagination, header: sb =>
+        new PaginatedList<Chapter>(await Cache.EnsureChaptersCached(manga), key, pagination)
         {
-            sb.Append(GetFunnyMangaEmoji(manga.Number));
-            sb.Append(" <b>").Append(manga.Title).Append("</b>");
-        }, itemText: (sb, chapter) =>
-        {
-            var chapter_Title = chapter.ChapterTitle ?? "[...]";
-            sb.Append($"<code>{chapter.Number}</code> - <a href='{chapter.URL}'>{chapter_Title}</a>");
-        });
+            Header = sb =>
+            {
+                sb.Append(GetFunnyMangaEmoji(manga.Number));
+                sb.Append(" <b>").Append(manga.Title).Append("</b>");
+            },
+            ItemText = (sb, chapter) =>
+            {
+                var chapter_Title = chapter.ChapterTitle ?? "[...]";
+                sb.Append($"<code>{chapter.Number}</code> - <a href='{chapter.URL}'>{chapter_Title}</a>");
+            },
+        }.Send();
     }
 
     private static readonly string[] _pieces = [ "☠️", "🏴‍☠️", "🌊", "🍖", "🧩" ];

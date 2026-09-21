@@ -1,4 +1,5 @@
-﻿using PF_Bot.Features_Aux.Listing;
+﻿using PF_Bot.Core;
+using PF_Bot.Features_Aux.Listing;
 using PF_Bot.Features_Main.Memes.Core.Generators;
 using PF_Bot.Features_Main.Memes.Core.Options;
 using PF_Bot.Features_Main.Memes.Core.Shared;
@@ -20,7 +21,10 @@ public class Nuke : Meme_Core<int>
     protected override Task Run()
     {
         if /**/ (Args is "log" or "logs" || Options.StartsWith("_log"))
-            ListingNukes.SendNukeLog(new ListPagination(Origin, PerPage: 5));
+        {
+            if (ListingNukes.SendNukeLog(new ListPagination(Origin, perPage: 5)).Failed())
+                Status = HandlingStatus.MAN;
+        }
         else
             return RunInternal("nuke\n⏳История фильтров: /nuke_log");
 

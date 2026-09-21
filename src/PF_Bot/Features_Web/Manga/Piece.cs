@@ -46,7 +46,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
 
     private async Task ListTitles()
     {
-        await ListingManga.ListMangas(new ListPagination(Origin, PerPage: 10));
+        await ListingManga.ListMangas(new ListPagination(Origin, perPage: 10));
     }
 
     private const string DEFAULT_TITLE = "one-piece";
@@ -58,7 +58,7 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
         var manga = await GetManga(title);
         if (manga == null) return;
 
-        await ListingManga.ListChapters(new ListPagination(Origin, Page: -1, PerPage: 25), manga);
+        await ListingManga.ListChapters(new ListPagination(Origin, page: -1, perPage: 25), manga);
     }
 
     private async Task DownloadChapter(string[] args)

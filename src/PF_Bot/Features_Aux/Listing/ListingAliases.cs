@@ -7,17 +7,18 @@ public static class ListingAliases
     public static void SendList
         (AliasContext ctx, ListPagination pagination)
     {
-        Listing.SendList(ctx.Directory.GetFiles(), ctx.CallbackKey, pagination, header: sb =>
+        new PaginatedList<string>(ctx.Directory.GetFiles(), ctx.CallbackKey, pagination)
         {
-            sb.Append("🔥 <b>Ярлыки команды /").Append(ctx.CommandName).Append(":</b>");
-        }, itemText: (sb, file) =>
-        {
-            var name    = Path.GetFileNameWithoutExtension(file);
-            var content = File.ReadAllText(file);
-            if (ctx.ShowFlairs) sb.Append(GetAliasKindEmoji(content)).Append(' ');
-            sb.Append($"<code>{name}</code>:\n");
-            sb.Append($"<blockquote>{content}</blockquote>");
-        });
+            Header = sb => sb.Append("🔥 <b>Ярлыки команды /").Append(ctx.CommandName).Append(":</b>"),
+            ItemText = (sb, file) =>
+            {
+                var name    = Path.GetFileNameWithoutExtension(file);
+                var content = File.ReadAllText(file);
+                if (ctx.ShowFlairs) sb.Append(GetAliasKindEmoji(content)).Append(' ');
+                sb.Append($"<code>{name}</code>:\n");
+                sb.Append($"<blockquote>{content}</blockquote>");
+            },
+        }.Send();
     }
 
     private static string GetAliasKindEmoji(string text) // ffmpeg only

@@ -94,7 +94,7 @@ public abstract class CommandHandler
 
     protected int MessageToEdit { get; set; }
 
-    private HandlingStatus Status {  get; set; } = HandlingStatus.OK;
+    protected HandlingStatus Status { get; set; } = HandlingStatus.OK;
 
     protected void SetBadStatus() =>
         Status = HandlingStatus.BAD;

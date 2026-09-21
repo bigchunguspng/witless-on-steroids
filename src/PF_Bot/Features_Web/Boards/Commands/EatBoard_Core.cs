@@ -74,14 +74,14 @@ public abstract class EatBoard_Core : Fuse
         if (Args is null)
         {
             if (Options.StartsWith('s'))
-                ListingBoards.SendBoardList(Ctx, new ListPagination(Origin, PerPage: 2), Boards);
+                ListingBoards.SendBoardList(Ctx, new ListPagination(Origin, perPage: 2), Boards);
             else
                 SendManual(Manual);
         }
         else
         {
             if      (Args.EndsWith("info"))
-                ListingBoards.SendSavedList(Ctx, new ListPagination(Origin, PerPage: 10));
+                ListingBoards.SendSavedList(Ctx, new ListPagination(Origin, perPage: 10));
             else if (Args.CanBeSplitN())
             {
                 var args = Args.SplitN(2);

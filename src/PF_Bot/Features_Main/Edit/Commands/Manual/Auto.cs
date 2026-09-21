@@ -2,7 +2,6 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Messages.Auto;
 using PF_Bot.Routing.Messages.Commands;
-using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
@@ -13,7 +12,7 @@ public class Auto : CommandHandlerAsync
     protected override async Task Run()
     {
         var expression = Args ?? Settings.Options?[MemeType.Auto];
-        if (expression == null || Message is { Type: MessageType.Text, ReplyToMessage: null })
+        if (expression == null)
         {
             SendManual(AUTO_MANUAL);
             return;

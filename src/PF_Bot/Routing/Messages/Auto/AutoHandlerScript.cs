@@ -69,8 +69,8 @@ public class AutoHandlerScript
     // CREATE (PARSE)
 
     private static readonly Regex
-        _r_wm      = new(            @"(?:(\d+)\s)?([\S\s]+)", RegexOptions.Compiled),
-        _r_handler = new(@"([pvagusd]+)([1-9])?:\s*([\S\s]+)", RegexOptions.Compiled);
+        _r_wm      = new(             @"(?:(\d+)\s)?([\S\s]+)", RegexOptions.Compiled),
+        _r_handler = new(@"([pvagusdt]+)([1-9])?:\s*([\S\s]+)", RegexOptions.Compiled);
 
     public static AutoHandlerScript Create(string raw)
     {

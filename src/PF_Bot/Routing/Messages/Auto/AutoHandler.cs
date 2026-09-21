@@ -41,6 +41,7 @@ public static class AutoHandler
         'u' => CheckURL  (message),
         's' => CheckStick(message),
         'd' => CheckDoc  (message),
+        't' => message.GetTextOrCaption() != null,
         _ => throw new ArgumentException(),
     };
 

@@ -48,7 +48,7 @@ public static class Listing
     }
 }
 
-public class PaginatedList<T>(IReadOnlyCollection<T> list, string? callbackKey, ListPagination pagination)
+public struct PaginatedList<T>(IReadOnlyCollection<T> list, string? callbackKey, ListPagination pagination)
 {
     public  ListPagination Pagination = pagination;
     private MessageOrigin  Origin     => Pagination.Origin;
@@ -84,14 +84,15 @@ public class PaginatedList<T>(IReadOnlyCollection<T> list, string? callbackKey, 
         else
         {
             var i = 0;
-            list.Skip(PerPage * Page)
-                .Take(PerPage)
-                .ForEach(item =>
-                {
-                    if (i > 0) sb.Append(ItemSeparator);
-                    ItemText(sb, item);
-                    i = 1;
-                });
+            var items = list
+                .Skip(PerPage * Page)
+                .Take(PerPage);
+            foreach (var item in items)
+            {
+                if (i > 0) sb.Append(ItemSeparator);
+                ItemText(sb, item);
+                i = 1;
+            }
         }
         Footer?.Invoke(sb);
         if (Paginated && ShowArrowsTip) sb.Append(USE_ARROWS);

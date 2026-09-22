@@ -32,8 +32,8 @@ public static class ManualEditing
     //
 
     private static readonly Regex
-        _rgx_args  = new(@"\{(\d+)\}",          RegexOptions.Compiled),
-        _rgx_alias = new(@"\$?([^\s!""',;]+)!", RegexOptions.Compiled);
+        _rgx_args  = new(@"\{(\d+)(?:,-?\d+)?(?::[^}]+)?\}", RegexOptions.Compiled),
+        _rgx_alias = new(@"\$?([^\s!""',;]+)!",              RegexOptions.Compiled);
 
     public static bool ApplyAliases
         (this CommandContext context, ref string options, FilePath directory)
@@ -82,13 +82,14 @@ public static class ManualEditing
             {
                 LogError($"{context.Title} >> ALIAS PARSING FAIL | {e.GetErrorMessage()}");
 
-                var args_log = args.Length == 0 
-                    ? "*пусто*" 
+                var args_log = args.Length == 0
+                    ? "*пусто*"
                     : $"[{string.Join(", ", args.Select(x => $"<code>{x}</code>"))}], {args.Length} шт.";
 
-                var count = _rgx_args.Count(template);
-
-                var text = ALIAS_FORMAT_FAIL.Format(FAIL_EMOJI.PickAny(), args_log, name, count, count.ED("", "а", "ов"), template);
+                var count = _rgx_args.Matches(template).DistinctBy(x => x.Groups[1].Value).Count();
+                var count_ed = count.ED("", "а", "ов");
+                var emoji = FAIL_EMOJI.PickAny();
+                var text  = ALIAS_FORMAT_FAIL.Format(emoji, args_log, name, count, count_ed, template);
                 App.Bot.SendMessage(context.Origin, text);
                 return false;
             }

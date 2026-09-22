@@ -41,7 +41,7 @@ public static class ManualEditing
         var noAliases = options.Contains('!').Janai();
         if (noAliases) return true;
 
-        while (true)
+        for (var i = 0; i < 10; i++) // limit recursion depth to 10
         {
             var matches = _rgx_alias.Matches(options);
             if (matches.Count == 0) break;

@@ -25,4 +25,6 @@ public static class Extensions_Math
     public static float Gap(this float outer, float inner) => (outer - inner) / 2F;
 
     public static int Clamp(this int x, int min, int max) => Math.Clamp(x, min, max);
+
+    public static int Digits(this int x) => 1 + Math.Max(0, (int)Math.Log10(Math.Abs(x)));
 }

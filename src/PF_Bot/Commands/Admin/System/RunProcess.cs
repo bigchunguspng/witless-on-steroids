@@ -69,8 +69,10 @@ public static class ProcessOutputSender
         (MessageOrigin origin, string? stdout, string? stderr, int code, TimeSpan time = default)
     {
         var output = FormatProcessOutputs(stdout, stderr, code, time);
-        var output_pages = output.SplitIntoPages(offset_paginated: 10, headBodySeparator: "");
-        if (output_pages.Length > 1) //                            ^ "📃312/312\n"
+        var max_page_digits = (1 + output.Length / 4000).Digits(); // <-- rough page count is used
+        var offset = 4 + 2 * max_page_digits; // "📃1918/1919\n"
+        var output_pages = output.SplitIntoPages(offset_paginated: offset, headBodySeparator: "");
+        if (output_pages.Length > 1)
         {
             int id;
             lock (App.ProcessOutputs)

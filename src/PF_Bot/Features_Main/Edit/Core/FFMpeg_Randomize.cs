@@ -21,7 +21,7 @@ public partial class FFMpeg_Effects
     public FFMpegArgs FX_Random
         (double piece_len_mul, double break_len_mul, RandomizeOptions options, TimeSelection selection = default)
     {
-        var soundOnly = SoundOnly(); // ↓ default: 0.1, 0.25
+        var soundOnly = SoundOnly();
         var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection, 200, options.Ordered.IsOff());
         var fragments = GenerateSchematic(timecodes, options, soundOnly);
 

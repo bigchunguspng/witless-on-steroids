@@ -11,14 +11,14 @@ public class Randomize : FileEditor_AudioVideoUrl
 
     private static readonly Regex
         _r_multipliers    = new(@"(\d{1,2})(?:\*(\d{1,3}))?",         RegexOptions.Compiled), // 1*1
-        _r_all_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 10a
-        _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 10s
-        _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 10t
-        _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 10x
+        _r_all_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 50a
+        _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 50s
+        _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 80t
+        _r_crop_pc        = new(@"(\d{1,3})(x)",                      RegexOptions.Compiled), // 50x
         _r_nuke_pc        = new(@"(\d{1,3})(n)",                      RegexOptions.Compiled), // 10n
         _r_nuke_dep_range = new(@"([1-9])(?:(\.\.)([1-9]))?("")",     RegexOptions.Compiled), // 1..2"
-        _r_rep_pc         = new(@"(\d{1,3})(r)",                      RegexOptions.Compiled), // 10r
-        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\^)", RegexOptions.Compiled); // 1..4^
+        _r_rep_pc         = new(@"(\d{1,3})(r)",                      RegexOptions.Compiled), // 50r
+        _r_rep_range      = new(@"(\d{1,2})(?:(\.\.)(\d{1,2}))?(\^)", RegexOptions.Compiled); // 1..6^
 
     protected override string SyntaxManual => "/man_random";
 
@@ -30,17 +30,17 @@ public class Randomize : FileEditor_AudioVideoUrl
         var options_ctx = MemeOptionsContext.FromCommandContext(Context);
 
         var  all_pc = options_ctx.GetInt( _r_all_pc, -1);
-        var  sfx_pc = options_ctx.GetInt( _r_sfx_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
-        var time_pc = options_ctx.GetInt(_r_time_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
-        var crop_pc = options_ctx.GetInt(_r_crop_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
-        var  rep_pc = options_ctx.GetInt( _r_rep_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
+        var  sfx_pc = options_ctx.GetInt( _r_sfx_pc, all_pc < 0 ? 50 : all_pc).ClampByte();
+        var time_pc = options_ctx.GetInt(_r_time_pc, all_pc < 0 ? 80 : all_pc).ClampByte();
+        var crop_pc = options_ctx.GetInt(_r_crop_pc, all_pc < 0 ? 50 : all_pc).ClampByte();
+        var  rep_pc = options_ctx.GetInt( _r_rep_pc, all_pc < 0 ? 50 : all_pc).ClampByte();
         var nuke_pc = options_ctx.GetInt(_r_nuke_pc, all_pc < 0 ? 10 : all_pc).ClampByte();
 
-        var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 4), (1, 3));
+        var  rep_range = options_ctx.GetIntRange(     _r_rep_range, (1, 6), (1, 3));
         var nuke_range = options_ctx.GetIntRange(_r_nuke_dep_range, (1, 2), (1, 3));
 
         var match = _r_multipliers.Match(options_ctx.Buffer);
-        var piece_len = match.ExtractGroup(1, int.Parse, 1);
+        var piece_len = match.ExtractGroup(1, int.Parse, 5);
         var break_len = match.ExtractGroup(2, int.Parse, piece_len);
 
         var ordered = options_ctx.Check(_r_ordered);
@@ -59,8 +59,14 @@ public class Randomize : FileEditor_AudioVideoUrl
         if (video != null)
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
+        var selection = new TimeSelection(start, length);
+        var duration  = selection.GetDuration(probe);
+        var pl_mult   = duration.TotalMinutes / 50;
+        var bl_mult   = duration.TotalMinutes / 50;
+        //  default: 5 min = 0.5, 10 min = 1.0, 60 min = 6.0
+
         await new FFMpeg_Effects(input, probe)
-            .FX_Random(piece_len / 10.0, break_len / 4.0, filter_options, new TimeSelection(start, length))
+            .FX_Random(piece_len * pl_mult, break_len * bl_mult, filter_options, selection)
             .Out(output, options.Fix_AudioVideo(probe))
             .FFMpeg_Run();
 

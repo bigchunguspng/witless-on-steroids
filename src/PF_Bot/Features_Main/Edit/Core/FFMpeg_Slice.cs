@@ -7,6 +7,11 @@ namespace PF_Bot.Features_Main.Edit.Core;
 public readonly record struct TimeSelection(TimeSpan Start, TimeSpan Length)
 {
     public TimeSpan End => Start + Length;
+
+    public TimeSpan GetDuration
+        (FFProbeResult probe) => Length == TimeSpan.Zero
+        ?                   probe.Duration  - Start
+        : TimeMath.Min(End, probe.Duration) - Start;
 }
 
 public partial class FFMpeg_Effects(string input, FFProbeResult probe)
@@ -73,9 +78,7 @@ public partial class FFMpeg_Effects
     )
     {
         var offset   = selection.Start.TotalSeconds;
-        var duration = selection.Length == TimeSpan.Zero
-            ?                             probe.Duration  - selection.Start
-            : TimeMath.Min(selection.End, probe.Duration) - selection.Start;
+        var duration = selection.GetDuration(probe);
 
         var seconds = duration.TotalSeconds;
         var minutes = seconds / 60;

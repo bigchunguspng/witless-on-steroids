@@ -109,7 +109,10 @@ public class DebugMessage : CommandHandlerBlocking
     {
         using var process = Process.GetCurrentProcess();
         var memory = process.PrivateMemorySize64.ReadableFileSize();
-        return $"🐏 <u>RAM USAGE</u>: {memory}";
+        var uptime = DateTime.Now - process.StartTime;
+        return  $"🐏 <u>RAM USAGE</u>: {memory}"
+            + $"\n⏳ <u>UPTIME</u>: {uptime:d\\.hh\\:mm\\:ss\\.fff}"
+            + $"\n🔖 <u>PID</u>: <code>{process.Id}</code>";
     }
 
     private static string GetPacksInfo()

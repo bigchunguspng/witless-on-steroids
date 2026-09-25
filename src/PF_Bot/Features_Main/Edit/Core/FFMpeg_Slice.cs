@@ -36,9 +36,25 @@ public partial class FFMpeg_Effects
         return _args;
     }
 
+    /// Win32 has limits on how long command line can be. 
+    /// <br/> Direct call - 32k chars.
+    /// <br/> Through cmd -  8k chars.
+    private const int INPUT_SECTION_MAX_LENGTH = 30_000;
+
+    private int GetMaxFragmets()
+    {
+        var  time_maxLength = probe.Duration.TotalSeconds.CeilingInt().Digits() + 4; // 69.420
+        var input_maxLength = input.Length + 2 * time_maxLength + 16; // [-ss S -to E -i "I" ]
+        return INPUT_SECTION_MAX_LENGTH / input_maxLength;
+    }
+
     private void AddInputs(List<TrimCode> timecodes)
     {
-        timecodes.ForEach(trim => _args.Input(input, $"-ss {trim.Start:F3} -to {trim.End:F3}"));
+        var tooMany = timecodes.Count > GetMaxFragmets();
+        if (tooMany)
+            _args.Input(input);
+        else
+            timecodes.ForEach(trim => _args.Input(input, $"-ss {trim.Start:F3} -to {trim.End:F3}"));
     }
 
     private void AddFilter(List<TrimCode> timecodes, bool soundOnly)
@@ -47,10 +63,42 @@ public partial class FFMpeg_Effects
         var count = timecodes.Count;
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
-        for (var i = 0; i < count; i++)
+
+        var tooMany = count > GetMaxFragmets();
+        if (tooMany)
         {
-            if (video) sb.Append('[').Append(i).Append(":v]");
-            if (audio) sb.Append('[').Append(i).Append(":a]");
+            for (var i = 0; i < count; i++)
+            {
+                if (video)
+                    sb
+                        .Append("[0:v]trim=start=")
+                        .Append($"{timecodes[i].Start:F3}")
+                        .Append(":end=")
+                        .Append($"{timecodes[i].End:F3}")
+                        .Append(",setpts=PTS-STARTPTS")
+                        .Append("[v").Append(i).Append("];");
+                if (audio)
+                    sb
+                        .Append("[0:a]atrim=start=")
+                        .Append($"{timecodes[i].Start:F3}")
+                        .Append(":end=")
+                        .Append($"{timecodes[i].End:F3}")
+                        .Append(",asetpts=PTS-STARTPTS")
+                        .Append("[a").Append(i).Append("];");
+            }
+            for (var i = 0; i < count; i++)
+            {
+                if (video) sb.Append("[v").Append(i).Append(']');
+                if (audio) sb.Append("[a").Append(i).Append(']');
+            }
+        }
+        else
+        {
+            for (var i = 0; i < count; i++)
+            {
+                if (video) sb.Append('[').Append(i).Append(":v]");
+                if (audio) sb.Append('[').Append(i).Append(":a]");
+            }
         }
 
         sb.Append("concat=n=").Append(count);

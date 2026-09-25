@@ -3,6 +3,21 @@ using PF_Tools.ProcessRunning;
 
 namespace PF_Tools.FFMpeg;
 
+
+// THIS IS THE MINIMAL FFMPEG WRAPPER.
+// For people who know ffmpeg syntax.
+// ===
+// You can copy this entire folder to your project
+// and use it (with minor changes to dependencies).
+// Also I'd recommend to copy dependencies from:
+// ./src/PF_Tools/ProcessRunning
+// ./src/PF_Tools/Backrooms/Extensions/Extensions_StringBuilder.cs
+// ./src/PF_Tools/Backrooms/Extensions/Extensions_Generic.cs
+// The code expects ffmpeg & ffprobe to be on PATH.
+// ===
+// Examples of usage can be found in:
+// ./src/PF_Bot/Features_Main/Edit
+
 /// Runs FFMpeg processes and manages their priority.
 public static class FFMpeg
 {

@@ -3,7 +3,6 @@ using PF_Tools.ProcessRunning;
 
 namespace PF_Tools.FFMpeg;
 
-
 // THIS IS THE MINIMAL FFMPEG WRAPPER.
 // For people who know ffmpeg syntax.
 // ===

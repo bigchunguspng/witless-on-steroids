@@ -45,11 +45,25 @@ public class RunProcess : CommandHandlerAsync_Admin
             args = bits.Length > 1 ? bits[1] : "";
         }
 
-        var sw = Stopwatch.StartNew();
-        var (stdout, stderr, code) = await ProcessRunner.Run_GetOutput(exe, args);
-        var time = sw.Elapsed;
+        if (Options.Contains('-')) // don't wait
+        {
+            var process = ProcessStarter.InitProcess(exe, args, listen: false);
+            process.StartInfo.UseShellExecute = true;
+            process.Start();
 
-        ProcessOutputSender.SendProcessOutput(Origin, stdout, stderr, code, time);
+            await Task.Delay(100); // (to mark command processed)
+
+            if (Options.Contains('x')) // exit
+                Environment.Exit(8);
+        }
+        else
+        {
+            var sw = Stopwatch.StartNew();
+            var (stdout, stderr, code) = await ProcessRunner.Run_GetOutput(exe, args);
+            var time = sw.Elapsed;
+
+            ProcessOutputSender.SendProcessOutput(Origin, stdout, stderr, code, time);
+        }
 
         Log($"{Title} >> RUN {exe} {args}", color: LogColor.Yellow);
     }
@@ -58,8 +72,10 @@ public class RunProcess : CommandHandlerAsync_Admin
         """
         <code>/run [exe] [args]</code>
 
-        <code>/runb [bash command]</code>
-        <code>/runc [cmd  command]</code>
+        <code>/runb  [bash command]</code>
+        <code>/runc  [cmd  command]</code>
+        <code>/run-  [exe args]</code> - launch & forget
+        <code>/run-x [exe args]</code> - launch & stop bot
         """;
 }
 

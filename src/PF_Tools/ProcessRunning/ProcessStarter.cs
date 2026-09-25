@@ -9,17 +9,17 @@ public static class ProcessStarter
 
     /// Returns a process with redirected stdout/stderr ready to be started.
     public static Process InitProcess
-        (string file, string arguments, string directory = "") => new()
+        (string file, string arguments, string directory = "", bool listen = true) => new()
     {
         StartInfo = new ProcessStartInfo
         {
             FileName = file, Arguments = arguments,
             WorkingDirectory = directory,
             UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError  = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            StandardErrorEncoding  = Encoding.UTF8,
+            RedirectStandardOutput = listen,
+            RedirectStandardError  = listen,
+            StandardOutputEncoding = listen ? Encoding.UTF8 : null,
+            StandardErrorEncoding  = listen ? Encoding.UTF8 : null,
         },
     };
 

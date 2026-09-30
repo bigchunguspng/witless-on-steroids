@@ -19,6 +19,8 @@ public class TCB_Scans_Client
         _xp_TitleChapter  = "//a[@class='block border border-border bg-card mb-3 p-3 rounded']",
         _xp_ChapterPage   = "//img[@class='fixed-ratio-content']";
 
+    // XPath cheat sheet: https://devhints.io/xpath#prefixes
+
     private readonly HtmlWeb _web = new();
 
     // TITLES

@@ -39,22 +39,28 @@ public partial class FFMpeg_Effects
     /// Win32 has limits on how long command line can be. 
     /// <br/> Direct call - 32k chars.
     /// <br/> Through cmd -  8k chars.
-    private const int INPUT_SECTION_MAX_LENGTH = 30_000;
+    private const int INPUT_SECTION_MAX_LENGTH = 7_500;
 
-    private int GetMaxFragmets()
+    private void AddInputs(List<TrimCode> timecodes)
+    {
+        var singleInput = ShouldBeSingleInput(timecodes.Count);
+        if (singleInput)
+            _args.Input(input);
+        else
+            timecodes.ForEach(trim => _args.Input(input, $"-ss {trim.Start:F3} -to {trim.End:F3}"));
+    }
+
+    private bool ShouldBeSingleInput(int fragmentsCount)
+    {
+        return probe.Duration.TotalMinutes < 5 // file small enough -> open it whole
+            || fragmentsCount > GetMaxFragments(); // can't fit into command
+    }
+
+    private int GetMaxFragments()
     {
         var  time_maxLength = probe.Duration.TotalSeconds.CeilingInt().Digits() + 4; // 69.420
         var input_maxLength = input.Length + 2 * time_maxLength + 16; // [-ss S -to E -i "I" ]
         return INPUT_SECTION_MAX_LENGTH / input_maxLength;
-    }
-
-    private void AddInputs(List<TrimCode> timecodes)
-    {
-        var tooMany = timecodes.Count > GetMaxFragmets();
-        if (tooMany)
-            _args.Input(input);
-        else
-            timecodes.ForEach(trim => _args.Input(input, $"-ss {trim.Start:F3} -to {trim.End:F3}"));
     }
 
     private void AddFilter(List<TrimCode> timecodes, bool soundOnly)
@@ -64,8 +70,8 @@ public partial class FFMpeg_Effects
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
 
-        var tooMany = count > GetMaxFragmets();
-        if (tooMany)
+        var singleInput = ShouldBeSingleInput(count);
+        if (singleInput)
         {
             for (var i = 0; i < count; i++)
             {

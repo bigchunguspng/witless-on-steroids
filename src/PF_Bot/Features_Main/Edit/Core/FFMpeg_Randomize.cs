@@ -120,8 +120,8 @@ public partial class FFMpeg_Effects
 
     private void AddInputs(List<Fragment> fragments)
     {
-        var tooMany = fragments.Count > GetMaxFragmets();
-        if (tooMany)
+        var singleInput = ShouldBeSingleInput(fragments.Count);
+        if (singleInput)
             _args.Input(input);
         else
             fragments.ForEach(frag => _args.Input(input, $"-ss {frag.Trim.Start:F3} -to {frag.Trim.End:F3}"));
@@ -132,7 +132,7 @@ public partial class FFMpeg_Effects
         var count = fragments.Count;
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
-        var tooMany = count > GetMaxFragmets();
+        var singleInput = ShouldBeSingleInput(count);
 
         // FRAG FX
         var fx = false;
@@ -141,11 +141,11 @@ public partial class FFMpeg_Effects
         {
             var frag = fragments[i];
 
-            var vfx = video && (tooMany || frag.UseOriginalVideo.Janai());
-            var afx = audio && (tooMany || frag.UseOriginalAudio.Janai());
+            var vfx = video && (singleInput || frag.UseOriginalVideo.Janai());
+            var afx = audio && (singleInput || frag.UseOriginalAudio.Janai());
 
-            if (vfx) AddVideoFilters(frag, i, tooMany);
-            if (afx) AddAudioFilters(frag, i, tooMany);
+            if (vfx) AddVideoFilters(frag, i, singleInput);
+            if (afx) AddAudioFilters(frag, i, singleInput);
 
             fx |= afx || vfx;
         }
@@ -158,11 +158,11 @@ public partial class FFMpeg_Effects
             var frag = fragments[i];
 
             if (video)
-                _ = tooMany.Janai() && frag.UseOriginalVideo
+                _ = singleInput.Janai() && frag.UseOriginalVideo
                     ? _args.FilterAppend($"[{i}:v]")
                     : _args.FilterAppend($"[v{i}]");
             if (audio)
-                _ = tooMany.Janai() && frag.UseOriginalAudio
+                _ = singleInput.Janai() && frag.UseOriginalAudio
                     ? _args.FilterAppend($"[{i}:a]")
                     : _args.FilterAppend($"[a{i}]");
         }
@@ -170,11 +170,11 @@ public partial class FFMpeg_Effects
         _args.FilterAppend($"concat=n={count}:v={(video ? 1 : 0)}:a={(audio ? 1 : 0)}");
     }
 
-    private void AddVideoFilters(Fragment frag, int i, bool trim)
+    private void AddVideoFilters(Fragment frag, int i, bool singleInput)
     {
-        _args.Filter($"[{(trim ? 0 : i)}:v]");
+        _args.Filter($"[{(singleInput ? 0 : i)}:v]");
 
-        if (trim)
+        if (singleInput)
         {
             _args.FilterAppend($"trim=start={frag.Trim.Start:F3}:end={frag.Trim.End:F3}");
             _args.FilterAppend("setpts=PTS-STARTPTS");
@@ -281,11 +281,11 @@ public partial class FFMpeg_Effects
         _args.FilterAppend($"[v{i}]");
     }
 
-    private void AddAudioFilters(Fragment frag, int i, bool trim)
+    private void AddAudioFilters(Fragment frag, int i, bool singleInput)
     {
-        _args.Filter($"[{(trim ? 0 : i)}:a]");
+        _args.Filter($"[{(singleInput ? 0 : i)}:a]");
 
-        if (trim)
+        if (singleInput)
         {
             _args.FilterAppend($"atrim=start={frag.Trim.Start:F3}:end={frag.Trim.End:F3}");
             _args.FilterAppend("asetpts=PTS-STARTPTS");

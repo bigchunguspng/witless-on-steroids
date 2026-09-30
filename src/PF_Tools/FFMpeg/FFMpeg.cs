@@ -79,7 +79,7 @@ public static class FFMpeg
         }
         catch (Win32Exception) // command line args length limit
         {
-            LogError("FFMPEG >> COMMAND TOO LONG");
+            LogError("[WARN] FFMPEG >> COMMAND TOO LONG -> RETRYING IN SCRIPT MODE");
 
             arguments = args.Build(script_mode: true);
             return ProcessStarter.StartProcess(FFMPEG, arguments);

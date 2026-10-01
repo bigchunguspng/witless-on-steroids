@@ -16,7 +16,7 @@ public class DownloadMusicTask(string id, bool youTube, CommandContext context)
     private const string _YT_list  = "https://www.youtube.com/playlist?list=";
 
     private static readonly Regex
-        _rgx_name  = new(@"(?:NA - )?(?:([\S\s][^-]+) - )?([\S\s]+)? xd\.mp3", RegexOptions.Compiled),
+        _rgx_name  = new(@"(?:NA - )?(?:([\S\s]+) - )?([\S\s]+)? xd\.mp3", RegexOptions.Compiled),
         _rgx_thumb = new(".jpg$|.png$|.webp$", RegexOptions.Compiled);
 
     public required string? PlaylistID;

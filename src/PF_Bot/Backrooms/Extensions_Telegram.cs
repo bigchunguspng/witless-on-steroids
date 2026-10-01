@@ -130,7 +130,7 @@ public static partial class Extensions
         (this Message message) => message.Document is { MimeType: "image/png" or "image/jpeg" };
 
     public static bool HasAnimeDocument
-        (this Message message) => message.Document?.MimeType?.StartsWith("image") ?? false;
+        (this Message message) => message.Document is { MimeType: "image/gif" };
 
     public static bool HasVideoDocument
         (this Message message) => message.Document?.MimeType?.StartsWith("video") ?? false;

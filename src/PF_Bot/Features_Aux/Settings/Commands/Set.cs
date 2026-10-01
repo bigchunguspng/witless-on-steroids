@@ -40,7 +40,7 @@ public class Set : CommandHandlerAsync_SettingsBlocking
                         ? "А НЕТУ!!!"
                         : $"<code>{commandOptions}</code>";
                     var message = command == "*"
-                        ? $"Текущий авто-обработчик:\n\n{options}"
+                        ? $"Текущий авто-обработчик:\n<pre><code class=\"language-js\">{commandOptions}</code></pre>"
                         : $"Опции команды <b>{command}</b>: {options}";
                     Bot.SendMessage(Origin, message.XDDD());
                 }
@@ -114,7 +114,7 @@ public class Set : CommandHandlerAsync_SettingsBlocking
     {
         var options = Data.Options?.Auto;
         return options != null
-            ? $"<blockquote expandable><b>Текущий авто-обработчик</b>:\n<code>{options}</code></blockquote>"
+            ? $"Текущий авто-обработчик:\n<pre><code class=\"language-js\">{options}</code></pre>"
             : SET_AUTO_HANDLER_EMPTY_TIP;
     }
 

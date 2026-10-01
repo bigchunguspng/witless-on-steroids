@@ -50,8 +50,7 @@ public static partial class Texts
     public const string SET_AUTO_HANDLER_OPTIONS_RESPONSE =
         """
         Установлен <b>авто-обработчик</b>:
-
-        <code>{0}</code>
+        <pre><code class="language-js">{0}</code></pre>
         """;
 
     public const string SET_AUTO_HANDLER_OPTIONS_CLEAR_RESPONSE =

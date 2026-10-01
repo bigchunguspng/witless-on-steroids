@@ -51,7 +51,7 @@ public class TCB_Scans_Client
         return doc.DocumentNode.SelectNodes(_xp_TitleChapter)
             .Select(node =>
             {
-                var url = node.Attributes["href"].Value;
+                var url  = node.Attributes["href"].Value;
                 var divs = node.ChildNodes.Where(x => x.Name == "div").ToArray();
                 var div1 = divs.Length > 0 ? divs[0].InnerText.MakeNull_IfEmpty() : null;
                 var div2 = divs.Length > 1 ? divs[1].InnerText.MakeNull_IfEmpty() : null;
@@ -59,10 +59,21 @@ public class TCB_Scans_Client
                 var bits = div1?.Split(" Chapter ") ?? ["Boku no Pico", "1"];
                 var   mangaTitle  = bits[0].Trim();
                 var chapterNumber = bits[1].Trim();
-                var chapterTitle  =   div2?.Trim();
+                var chapterTitle  = div2 is null ? null : SanitizeChapterTitle(div2.Trim());
                 return new Chapter(URL_BASE + url, mangaTitle, chapterTitle, chapterNumber);
             })
             .ToList();
+    }
+
+    private static string SanitizeChapterTitle(string s)
+    {
+        s = s.Replace("’", "'");
+        if (s.Contains('&'))
+            s = s
+                .Replace("&#39;", "'")
+                .Replace("&quot;", "\"")
+                .Replace("&amp;", "&");
+        return s;
     }
 
     // PAGES

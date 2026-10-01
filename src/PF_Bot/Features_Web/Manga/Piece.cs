@@ -123,5 +123,11 @@ public class /* One */ Piece : CommandHandlerAsync // 🍖
     private string GetCbzName
         (Chapter c) => c.ChapterTitle == null
         ? $"{c.MangaTitle} ch. {c.Number}.cbz"
-        : $"{c.MangaTitle} ch. {c.Number} - {c.ChapterTitle}.cbz";
+        : $"{c.MangaTitle} ch. {c.Number} - {SanitizeChapterTitle(c.ChapterTitle)}.cbz";
+
+    private static string SanitizeChapterTitle
+        (string s) => s
+        .Replace("'", "-")
+        .Replace("\"", "")
+        .Replace("&", "and");
 }

@@ -2,6 +2,7 @@ using PF_Bot.Core;
 using PF_Bot.Features_Aux.Settings.Core;
 using PF_Bot.Routing.Messages.Auto;
 using PF_Bot.Routing.Messages.Commands;
+using Telegram.Bot.Types.Enums;
 
 namespace PF_Bot.Features_Main.Edit.Commands.Manual;
 
@@ -24,7 +25,10 @@ public class Auto : CommandHandlerAsync
             var inputs = AutoHandler.TryGetHandlerInputs(Context, expression, Context.Message.ReplyToMessage, cache: false);
             if (inputs.Length == 0)
             {
-                SendBadNews(AUTO_FAIL_TYPE.Format(FAIL_EMOJI.PickAny()));
+                var text = Message is { Type: MessageType.Text, ReplyToMessage: null }
+                    ? AUTO_FAIL_EMPTY
+                    : AUTO_FAIL_TYPE.Format(FAIL_EMOJI.PickAny());
+                SendBadNews(text);
                 return;
             }
 

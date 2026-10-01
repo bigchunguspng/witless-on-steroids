@@ -169,8 +169,24 @@ public static partial class Texts
         {3}
         """;
 
+    public const string AUTO_FAIL_EMPTY =
+        """
+        💬 Отправь это В ОТВЕТ на другое сообщение (файл или текст) или ВМЕСТЕ с файлом
+
+        📖 Справка: /man_341
+        """;
+
     public const string AUTO_FAIL_TYPE =
-        "Не удалось найти обработчик для сообщения данного типа {0}";
+        """
+        {0} Обработчик для сообщений данного типа не установлен.
+
+        <blockquote><b>Установите его командой:</b>
+        <code>/set a [скрипт]</code></blockquote>
+        <blockquote><b>Или передайте как аргумент:</b>
+        <code>/auto [скрипт]</code></blockquote>
+
+        📖 Справка: /man_341
+        """;
 
     public const string PIPE_FAIL_RESOLVE =
         "Не удалось распознать команду: <code>{0}</code>";

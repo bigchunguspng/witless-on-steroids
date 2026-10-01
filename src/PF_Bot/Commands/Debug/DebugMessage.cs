@@ -98,7 +98,9 @@ public class DebugMessage : CommandHandlerBlocking
 
     private static string FormatResolutions(MatchCollection matches)
     {
-        var resolutions = matches.Where(x => x.Success).Select(x => $"{x.Groups[1].Value}x{x.Groups[2].Value}").Distinct();
+        var resolutions = matches.Where(x => x.Success)
+            .Select(x => $"<code>{x.Groups[1].Value}x{x.Groups[2].Value}</code>")
+            .Distinct();
         return string.Join(", ", resolutions);
     }
 

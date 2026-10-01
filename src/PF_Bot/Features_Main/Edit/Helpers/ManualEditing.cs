@@ -33,7 +33,7 @@ public static class ManualEditing
 
     private static readonly Regex
         _rgx_args  = new(@"\{(\d+)(?:,-?\d+)?(?::[^}]+)?\}", RegexOptions.Compiled),
-        _rgx_alias = new(@"\$?([^\s!""',;]+)!",              RegexOptions.Compiled);
+        _rgx_alias = new(@"\$?([^\s!""',;=\]]+)!",           RegexOptions.Compiled); // change with _r_invalid
 
     public static bool ApplyAliases
         (this CommandContext context, ref string options, FilePath directory)

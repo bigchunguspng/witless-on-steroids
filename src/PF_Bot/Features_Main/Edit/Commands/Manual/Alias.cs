@@ -48,7 +48,7 @@ public class Alias(AliasContext ctx) : CommandHandlerBlocking
     // /a{cmd}  info            // ALIAS INFO
 
     private readonly Regex _r_invalid
-        = new(@"[!""',;]", RegexOptions.Compiled);
+        = new(@"[!""',;=\]]", RegexOptions.Compiled); // change with _rgx_alias
 
     protected override void Run()
     {

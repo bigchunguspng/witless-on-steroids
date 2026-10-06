@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Runtime.CompilerServices;
+using Spectre.Console;
 
 namespace PF_Tools.Logging;
 
@@ -6,15 +7,17 @@ public static class ConsoleLogger
 {
     // PRINT
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public static void Print
         (string message) =>
         Console.WriteLine(message);
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public static void Print
         (string message, ConsoleColor color)
     {
         Console.ForegroundColor = color;
-        Print(message);
+        Console.WriteLine(message);
         Console.ResetColor();
     }
 
@@ -35,12 +38,20 @@ public static class ConsoleLogger
         LogColor color = LogColor.Silver
     )
     {
-        var icon  = level.GetCharIcon();
-        var style = level.GetDefaultColor();
-        var log = $"[8]{DateTime.Now:MM'/'dd' 'HH:mm:ss.fff}[/] "
-                + $"[{style}]{icon}[/] "
-                + $"[{color}]{message.EscapeMarkup()}[/]";
-        AnsiConsole.MarkupLine(log);
+        var now     = DateTime.Now;
+        var icon    = level.GetCharIcon();
+        var icon_CC = level.GetDefaultColor().ToConsoleColor();
+        var text_CC = color                  .ToConsoleColor();
+        lock (typeof(ConsoleLogger))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"{now:MM'/'dd' 'HH:mm:ss.fff} ");
+            Console.ForegroundColor = icon_CC;
+            Console.Write($"{icon} ");
+            Console.ForegroundColor = text_CC;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
     }
 
     //
@@ -61,6 +72,21 @@ public static class ConsoleLogger
         LogLevel.Info  => LogColor.Silver,
         LogLevel.Error => LogColor.Red,
         _              => LogColor.Silver,
+    };
+    
+    private static ConsoleColor ToConsoleColor
+        (this LogColor color) => color switch
+    {
+        LogColor.Maroon  => ConsoleColor.DarkRed,
+        LogColor.Olive   => ConsoleColor.DarkYellow,
+        LogColor.Silver  => ConsoleColor.Gray,
+        LogColor.Grey    => ConsoleColor.DarkGray,
+        LogColor.Red     => ConsoleColor.Red,
+        LogColor.Lime    => ConsoleColor.Green,
+        LogColor.Yellow  => ConsoleColor.Yellow,
+        LogColor.Blue    => ConsoleColor.Blue,
+        LogColor.Fuchsia => ConsoleColor.Magenta,
+        _                => ConsoleColor.White,
     };
 }
 

@@ -8,7 +8,7 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public readonly TelegramBotClient Client;
+    public readonly ITelegramBotClient Client;
     public readonly User Me;
 
     /// Lowercase bot username with "@" symbol.
@@ -16,22 +16,47 @@ public partial class Bot
 
     public static async Task<Bot> Create(IMessageRouter rM, ICallbackRouter rC)
     {
+        var client = Config.TelegramLocalServer
+            ? CreateTelegramBotClient_LOCAL()
+            : CreateTelegramBotClient_NORMAL();
+
+        var me = await client.GetMe_AtAllCost();
+        return new Bot(client, me, rM, rC);
+    }
+
+    private static ITelegramBotClient CreateTelegramBotClient_NORMAL()
+    {
         var options = new TelegramBotClientOptions(Config.TelegramToken)
         {
             RetryThreshold = 300,
             RetryCount = 5,
         };
 
-        var client = new TelegramBotClient(options)
+        return new TelegramBotClient(options)
         {
             Timeout = TimeSpan.FromMinutes(5),
         };
-
-        var me = await client.GetMe_AtAllCost();
-        return new Bot(client, me, rM, rC);
     }
 
-    private Bot(TelegramBotClient client, User me, IMessageRouter rM, ICallbackRouter rC)
+    private static ITelegramBotClient CreateTelegramBotClient_LOCAL()
+    {
+        WTelegram.Helpers.Log = (_, _) => { };
+
+        var db_con  = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=bot.db");
+        var options = new WTelegramBotClientOptions
+            (Config.TelegramToken, Config.TelegramApiId, Config.TelegramApiHash, db_con)
+        {
+            RetryThreshold = 300,
+            RetryCount = 5,
+        };
+
+        return new WTelegramBotClient(options)
+        {
+            Timeout = TimeSpan.FromMinutes(10),
+        };
+    }
+
+    private Bot(ITelegramBotClient client, User me, IMessageRouter rM, ICallbackRouter rC)
     {
         Client   = client;
         Me       =     me;

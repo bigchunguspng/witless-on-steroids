@@ -10,7 +10,7 @@ public static partial class Extensions
 {
     private const string UNKNOWN = "[UNKNOWN]";
 
-    public static async Task<User> GetMe_AtAllCost(this TelegramBotClient client)
+    public static async Task<User> GetMe_AtAllCost(this ITelegramBotClient client)
     {
         while (true)
         {

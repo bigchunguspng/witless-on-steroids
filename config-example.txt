@@ -1,15 +1,13 @@
-tg-token             = VALUE
-reddit-app-id        = VALUE
-reddit-refresh-token = VALUE
-reddit-secret        = VALUE
-admin-id             = VALUE
-sound-chat	         = VALUE
+tg-token             = STRING
+tg-local-server      = 0|1
+tg-api-id            = INT
+tg-api-hash          = STRING
+reddit-app-id        = STRING
+reddit-refresh-token = STRING
+reddit-secret        = STRING
+admin-id             = LONG,LONG
+sound-chat           = LONG
 
-
-Values are matched with this expression:  property-name\s+=\s+(\S+)
-
-Therefore, values should not contain spaces.
-
-Any number of spaces can be placed before and after the property name or equals sign.
-
+Values should not contain spaces or be in quotes.
+Any number of spaces can be placed before and after the property name or "=".
 Multiple values can be assigned to admin-id if they are separated by ",".

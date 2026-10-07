@@ -64,6 +64,9 @@ public partial class Bot
     {
         try
         {
+            if (Config.TelegramLocalServer && message.Date == default)
+                return Task.CompletedTask; // skip bot messages
+
             Router_Message.Route(message);
         }
         catch (Exception exception)

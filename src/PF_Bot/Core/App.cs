@@ -71,6 +71,7 @@ public static class App
         BigBrother.Write();
 
         PackManager.Bakas_SaveDirty();
+        Bot.SaveLastRun();
         if (LoggedIntoReddit) Reddit.SaveExcluded();
     }
 

@@ -25,12 +25,16 @@ public partial class Bot
             UpdateType.InlineQuery,
         ];
 
-        var options = new ReceiverOptions { AllowedUpdates = updates };
+        var options = new ReceiverOptions
+        {
+            AllowedUpdates = updates,
+            DropPendingUpdates = ShouldDropUpdates(),
+        };
 
         Client.StartReceiving(HandleUpdate, HandlePollingError, options);
 
         BigBrother.Log_START();
-        Print(BUENOS_DIAS.Format(Username, Me.FirstName), ConsoleColor.Yellow);
+        Print(BUENOS_DIAS.Format(Username, Me.FirstName, Config.TelegramLocalServer ? "!!" : ""), ConsoleColor.Yellow);
     }
 
     private Task HandleUpdate
@@ -104,5 +108,22 @@ public partial class Bot
     {
         Print("How Did We Get Here?", ConsoleColor.Magenta);
         return Task.CompletedTask;
+    }
+
+    // LAST RUN
+
+    private static bool ShouldDropUpdates()
+    {
+        if (File_LastRun.Exists.Janai()) return false;
+
+        var text = File.ReadAllText(File_LastRun);
+        if (text.StartsWith("LOCAL" ) && Config.TelegramLocalServer        ) return false;
+        if (text.StartsWith("NORMAL") && Config.TelegramLocalServer.Janai()) return false;
+        return true;
+    }
+
+    public static void SaveLastRun()
+    {
+        File.WriteAllText(File_LastRun, Config.TelegramLocalServer ? "LOCAL" : "NORMAL");
     }
 }

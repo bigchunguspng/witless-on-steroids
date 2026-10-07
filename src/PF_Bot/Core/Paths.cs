@@ -74,6 +74,7 @@ namespace PF_Bot.Core;
         ...
 
     config.txt
+    last-run.txt
     reddit-posts.json
 */
 
@@ -89,6 +90,7 @@ public static class Paths
         Dir_Static = "Static",
         Dir_Temp   = "Temp",
         File_Config      = "config.txt",
+        File_LastRun     = "last-run.txt",
         File_RedditPosts = "reddit-posts.json",
         // DB/
         Dir_Alias   = Dir_DB.Combine("Alias"),

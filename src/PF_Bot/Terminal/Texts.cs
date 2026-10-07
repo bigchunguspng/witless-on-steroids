@@ -4,7 +4,7 @@ public static class Texts
 {
     public const string BUENOS_DIAS =
         """
-        This is the certified {0} classic!
+        This is the certified {0} classic!{2}
         =======
         {1} на связи!
         """;

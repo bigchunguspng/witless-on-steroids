@@ -12,11 +12,13 @@ public static class FFProbe
         RAW_RATE    =   "r_frame_rate",
         AVG_RATE    = "avg_frame_rate",
         SAMPLE_RATE = "sample_rate",
-        W = "width",
-        H = "height",
-        PIXFMT = "pix_fmt",
+        W           = "width",
+        H           = "height",
+        PIXFMT      = "pix_fmt",
+        SAR         =  "sample_aspect_ratio",
+        DAR         = "display_aspect_ratio",
 
-        ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{BIT_RATE},{RAW_RATE},{AVG_RATE},{SAMPLE_RATE},{W},{H},{PIXFMT}",
+        ENTRIES  = $"{CODEC_TYPE},{DURATION},{DURATION_TS},{BIT_RATE},{RAW_RATE},{AVG_RATE},{SAMPLE_RATE},{W},{H},{PIXFMT},{SAR},{DAR}",
         ARGS     = $"-v error -show_entries stream={ENTRIES}";
 
 
@@ -90,6 +92,8 @@ public static class FFProbe
                 case H:           streams[^1].Height       = ParseInt___NA(value); break; // int        | -
                 case RAW_RATE:    streams[^1].RawFramerate = ParseFps___NA(value); break; // 24000/1001 | N/A -> NaN
                 case AVG_RATE:    streams[^1].AvgFramerate = ParseFps___NA(value); break; // 24000/1001 | N/A -> NaN
+                case SAR:         streams[^1].SAR          = value;                break; // string A:B
+                case DAR:         streams[^1].DAR          = value;                break; // string A:B
             }
         }
     }

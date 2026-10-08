@@ -29,6 +29,8 @@ public class FFProbeResult(List<FFProbeResult.Stream> streams)
         public int?    Width        { get; set; }
         public int?    Height       { get; set; }
         public string? PixFmt       { get; set; }
+        public string? SAR          { get; set; }
+        public string? DAR          { get; set; }
 
         public Size Size => new(Width ?? 0, Height ?? 0);
 

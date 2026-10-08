@@ -267,7 +267,9 @@ public partial class FFMpeg_Effects
                 _args.FilterAppend($":(ih-out_h)*0.5*(1+sin(t*({speed})+{offset}*2))");
             }
 
-            _args.FilterAppend("setsar=sar=1/1");
+            var sar = video.SAR?.Contains(':') ?? false ? video.SAR.Replace(':', '/') : "1/1";
+            var dar = video.DAR?.Contains(':') ?? false ? video.DAR.Replace(':', '/') : "1/1";
+            _args.FilterAppend($"setsar=sar={sar},setdar=dar={dar}");
         }
 
         if (frag.Nuke > 0)

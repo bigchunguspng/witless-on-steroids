@@ -179,12 +179,23 @@ public abstract class FileEditor_Core : CommandHandlerAsync
 
     private async Task<FilePath> DownloadFile()
     {
-        var path = await Bot.Download(File, Origin, Ext);
+        var download = Bot.Download(File, Origin, Ext);
+        if (File.FileSize is > 10_000_000)
+        {
+            LogDebug($"{Title} >> LOADING HEAVY FILE ({File.FileSize.Value.ReadableFileSize()})");
+            var debounce = Task.Delay(1000);
+            await Task.WhenAny(download, debounce);
+            if (debounce.IsCompleted)
+                MessageToEdit = Bot.PingChat(Origin, PLS_WAIT[Random.Shared.Next(5)]);
+        }
+        var path = await download;
         if (path.FileSizeInBytes > 4_000_000)
         {
-            MessageToEdit = Bot.PingChat(Origin, PROCESSING.PickAny().XDDD());
+            if (MessageToEdit == 0)
+                MessageToEdit = Bot.PingChat(Origin, PROCESSING.PickAny().XDDD());
+            else
+                Bot.EditMessage(Chat, MessageToEdit, PROCESSING.PickAny().XDDD());
         }
-
         return path;
     }
 

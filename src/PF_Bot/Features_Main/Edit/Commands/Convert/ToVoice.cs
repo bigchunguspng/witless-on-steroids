@@ -19,6 +19,7 @@ public class ToVoice : FileEditor_AudioVideo
             await FFMpeg.Command(input, output, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
         }
 
+        DeleteAny_MessageToEdit();
         SendFile(output, MediaType.Voice, "balls.ogg");
         Log($"{Title} >> VOICE ~|||~");
     }

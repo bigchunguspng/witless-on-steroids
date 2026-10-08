@@ -23,6 +23,7 @@ public class ToVideoNote : FileEditor_Video
 
         await FFMpeg.Command(input, output, options).FFMpeg_Run();
 
+        DeleteAny_MessageToEdit();
         SendFile(output, MediaType.Round);
         Log($"{Title} >> NOTE (*)");
     }

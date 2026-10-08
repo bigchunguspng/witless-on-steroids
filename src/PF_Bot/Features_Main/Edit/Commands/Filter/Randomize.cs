@@ -10,7 +10,7 @@ public class Randomize : FileEditor_AudioVideoUrl
         _r_ordered = "o";
 
     private static readonly Regex
-        _r_multipliers    = new(@"(\d{1,2})(?:\*(\d{1,3}))?",         RegexOptions.Compiled), // 1*1
+        _r_multipliers    = new(@"(\d{1,3})(?:\*(\d{1,3}))?",         RegexOptions.Compiled), // 1*1
         _r_all_pc         = new(@"(\d{1,3})(a)",                      RegexOptions.Compiled), // 50a
         _r_sfx_pc         = new(@"(\d{1,3})(s)",                      RegexOptions.Compiled), // 50s
         _r_time_pc        = new(@"(\d{1,3})(t)",                      RegexOptions.Compiled), // 80t

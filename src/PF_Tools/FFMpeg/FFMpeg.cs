@@ -75,9 +75,13 @@ public static class FFMpeg
         try
         {
             arguments = args.Build();
+
+            var tooLong = FFMPEG.Length + arguments.Length + 1 >= 8192;
+            if (tooLong) arguments = args.Build(script_mode: true);
+
             return ProcessStarter.StartProcess(FFMPEG, arguments);
         }
-        catch (Win32Exception) // command line args length limit
+        catch (Exception) // command line args length limit
         {
             LogError("[WARN] FFMPEG >> COMMAND TOO LONG -> RETRYING IN SCRIPT MODE");
 

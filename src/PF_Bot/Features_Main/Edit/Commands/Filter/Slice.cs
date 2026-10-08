@@ -31,7 +31,7 @@ public class Slice : FileEditor_AudioVideoUrl
 
         await new FFMpeg_Effects(input, probe)
             .FX_Slice(piece_len / 5.0, break_len / 5.0, new TimeSelection(start, length))
-            .Out(output, options.Fix_AudioVideo(probe))
+            .Out(output, options.Fix_AudioVideo(probe).SetCRF(25))
             .FFMpeg_Run();
 
         var log_end = length == TimeSpan.Zero ? probe.Duration : TimeMath.Min(start + length, probe.Duration);

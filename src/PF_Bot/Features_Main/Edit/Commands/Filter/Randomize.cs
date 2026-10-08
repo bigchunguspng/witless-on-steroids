@@ -68,7 +68,7 @@ public class Randomize : FileEditor_AudioVideoUrl
 
         await new FFMpeg_Effects(input, probe)
             .FX_Random(piece_len * pl_mult, break_len * bl_mult, filter_options, selection)
-            .Out(output, options.Fix_AudioVideo(probe))
+            .Out(output, options.Fix_AudioVideo(probe).SetCRF(30))
             .FFMpeg_Run();
 
         var log_end = length == TimeSpan.Zero ? probe.Duration : TimeMath.Min(start + length, probe.Duration);

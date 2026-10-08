@@ -60,10 +60,11 @@ public class Randomize : FileEditor_AudioVideoUrl
             options.MP4_EnsureSize_Valid_And_Fits(video, 720);
 
         var selection = new TimeSelection(start, length);
-        var duration  = selection.GetDuration(probe);
-        var pl_mult   = duration.TotalMinutes / 50;
-        var bl_mult   = duration.TotalMinutes / 50;
-        //  default: 5 min = 0.5, 10 min = 1.0, 60 min = 6.0
+        var minutes   = selection.GetDuration(probe).TotalMinutes;
+        var sqrt = Math.Sqrt(0.2 * minutes) / 10;
+        var lin  =                 minutes  / 50;
+        var pl_mult = sqrt;
+        var bl_mult = Math.Max(sqrt, lin); // sqrt == lin at 5 min
 
         await new FFMpeg_Effects(input, probe)
             .FX_Random(piece_len * pl_mult, break_len * bl_mult, filter_options, selection)

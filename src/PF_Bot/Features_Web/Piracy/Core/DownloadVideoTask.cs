@@ -21,7 +21,7 @@ public class DownloadVideoTask(string id, CommandContext context)
                  + "bv*[height<=480][width<=720]+ba/"
                  +   "b[height<=480][width<=720]/"
                  + "wv*+ba/w\" "
-                 + "--remux-video gif>gif/mp4 ";
+                 + "--remux-video \"gif>gif/mp4\" ";
         builder.Append(args);
         builder.AppendInQuotes(url).Append(" -o ").AppendInQuotes("video.%(ext)s");
         return builder.ToString();

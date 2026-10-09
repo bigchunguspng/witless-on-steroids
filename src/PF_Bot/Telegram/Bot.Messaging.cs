@@ -42,7 +42,7 @@ public partial class Bot
 
     public void SendMessage(ChatId chat, string text, bool preview = false, int? replyTo = null)
     {
-        var task = Client.SendMessage
+        var task = Client_Public.SendMessage
         (
             chat, text, ParseMode.Html,
             replyParameters: replyTo,
@@ -53,7 +53,7 @@ public partial class Bot
 
     public void CopyMessage(long chat, long fromChat, int messageId, int? replyTo = null)
     {
-        var task = Client.CopyMessage
+        var task = Client_Public.CopyMessage
         (
             chat, fromChat, messageId,
             replyParameters: replyTo
@@ -63,7 +63,7 @@ public partial class Bot
 
     public void CopyMessage(ChatId chat, long fromChat, int messageId, int? replyTo = null)
     {
-        var task = Client.CopyMessage
+        var task = Client_Public.CopyMessage
         (
             chat, fromChat, messageId,
             replyParameters: replyTo
@@ -75,7 +75,7 @@ public partial class Bot
     {
         try
         {
-            await Client.SetMessageReaction(chat, messageId, emoji is null ? [] : [emoji]);
+            await Client_Public.SetMessageReaction(chat, messageId, emoji is null ? [] : [emoji]);
         }
         catch (Exception e)
         {

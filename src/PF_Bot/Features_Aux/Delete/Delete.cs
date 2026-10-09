@@ -39,20 +39,20 @@ public class Delete_Callback : CallbackHandler
 
         if      (result == TractorGame.StepResult.DRAW)
         {
-            Bot.SendSticker(Origin, InputFile.FromFileId(GG));
+            Bot.SendSticker(Origin, GG);
             Bot.SendMessage(Origin, "НИЧЬЯ");
             Log($"{Title} >> DELETE >> 1:1");
         }
         else if (result == TractorGame.StepResult.LOSE)
         {
-            Bot.SendSticker(Origin, InputFile.FromFileId(I_WIN));
+            Bot.SendSticker(Origin, I_WIN);
             Bot.SendMessage(Origin, "RIP 🤣😭😂👌");
             Log($"{Title} >> DELETE >> RIP BOZO LMAO");
         }
         else
         {
-            Bot.SendSticker(Origin, InputFile.FromFileId(U_WIN));
-            Bot.SendSticker(Origin, InputFile.FromFileId(D_100));
+            Bot.SendSticker(Origin, U_WIN);
+            Bot.SendSticker(Origin, D_100);
             Log($"{Title} >> DELETE >> IT'S OVER :(");
 
             DeleteChat();

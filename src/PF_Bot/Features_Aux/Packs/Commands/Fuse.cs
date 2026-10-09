@@ -89,7 +89,7 @@ public class Fuse : CommandHandlerAsync_SettingsAsync
         if (chat == Chat)
         {
             SetBadStatus();
-            Bot.SendSticker(Origin, InputFile.FromFileId(HOLY_MOLY));
+            Bot.SendSticker(Origin, HOLY_MOLY);
         }
         else if (ChatManager.Knowns(chat))
         {

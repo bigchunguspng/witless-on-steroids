@@ -13,7 +13,7 @@ public static class ManualEditing
 
     public static async Task SendTrollface(MessageOrigin origin, bool extensionInvalid)
     {
-        App.Bot.SendSticker(origin, InputFile.FromFileId(TROLLFACE));
+        App.Bot.SendSticker(origin, TROLLFACE);
         if (extensionInvalid)
         {
             await Task.Delay(Fortune.RandomInt(900, 1100));

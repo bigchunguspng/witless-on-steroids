@@ -23,7 +23,7 @@ public class GIF_DB : MediaDB<Animation>
         await FFMpeg_VideoToGIF(path, temp);
 
         await using var stream = File.OpenRead(temp);
-        var message = await App.Bot.Client.SendAnimation(channel, stream);
+        var message = await App.Bot.Client_Public.SendAnimation(channel, stream);
         return message.Animation!;
     }
 

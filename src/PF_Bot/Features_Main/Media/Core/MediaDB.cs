@@ -7,7 +7,7 @@ namespace PF_Bot.Features_Main.Media.Core;
 
 public abstract class MediaDB<T> where T : FileBase
 {
-    private readonly List<(string Id, string FileId, string Text, string LowercaseText)> _files = [];
+    private readonly List<MediaFile> _files = [];
 
     protected abstract string Name { get; }
     protected abstract string What { get; }
@@ -41,7 +41,7 @@ public abstract class MediaDB<T> where T : FileBase
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    private void SaveData(List<(string Id, string FileId, string Text, string LowercaseText)> buffer)
+    private void SaveData(List<MediaFile> buffer)
     {
         if (buffer.Count == 0) return;
 
@@ -60,7 +60,7 @@ public abstract class MediaDB<T> where T : FileBase
     // SEARCH
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    public IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> Search(string? query)
+    public IEnumerable<MediaFile> Search(string? query)
     {
         var filtered = query.IsNull_OrWhiteSpace()
             ? GetRandomFiles()
@@ -68,13 +68,14 @@ public abstract class MediaDB<T> where T : FileBase
         return filtered.Take(50);
     }
 
-    private IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> GetRandomFiles()
+    private IEnumerable<MediaFile> GetRandomFiles()
     {
+        if (_files.Count == 0) return [];
         var pickChance = Math.Max(1, 5000 / _files.Count);
         return _files.Where(_ => Fortune.LuckyFor(pickChance));
     }
 
-    private IEnumerable<(string Id, string FileId, string Text, string LowercaseText)> GetFilesByQuery(string query)
+    private IEnumerable<MediaFile> GetFilesByQuery(string query)
     {
         var words = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var except = words.Where(x => x.Length > 1 && x.StartsWith('!')).ToArray();
@@ -110,7 +111,7 @@ public abstract class MediaDB<T> where T : FileBase
     {
         var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
         int count = 0, total = files.Length;
-        var buffer = new List<(string Id, string FileId, string Text, string LowercaseText)>(total);
+        var buffer = new List<MediaFile>(total);
         Directory.CreateDirectory(Dir_Temp);
         foreach (var file in files)
         {

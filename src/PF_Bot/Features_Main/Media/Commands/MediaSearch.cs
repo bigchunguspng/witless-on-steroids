@@ -36,7 +36,7 @@ public class MediaSearch
 
         var results = GetResults(sound_mode, query, caption);
 
-        await App.Bot.Client.AnswerInlineQuery(inline.Id, results.Take(50));
+        await App.Bot.Client_Public.AnswerInlineQuery(inline.Id, results.Take(50));
 
         var title = inline.From.GetFullNameTruncated();
         var mode = sound_mode ? "a" : "g";

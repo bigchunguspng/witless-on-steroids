@@ -22,7 +22,7 @@ public class SoundDB : MediaDB<Voice>
         await FFMpeg.Command(path, temp, FFMpegOptions.Out_VOICE_MESSAGE).FFMpeg_Run();
 
         await using var stream = File.OpenRead(temp);
-        var message = await App.Bot.Client.SendVoice(channel, stream);
+        var message = await App.Bot.Client_Public.SendVoice(channel, stream);
         return message.Voice!;
     }
 }

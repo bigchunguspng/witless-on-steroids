@@ -127,6 +127,7 @@ public partial class Bot
     public void SendAnimation (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendAnimation (og.Chat, file, replyParameters: og.Thread), "animation");
     public void SendDocument  (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendDocument  (og.Chat, file, replyParameters: og.Thread), "document");
     public void SendSticker   (MessageOrigin og, InputFile file) => TrySend(og.Chat, Client.SendSticker   (og.Chat, file, replyParameters: og.Thread), "sticker");
+    public void SendSticker   (MessageOrigin og, string id) => TrySend(og.Chat, Client_Public.SendSticker (og.Chat, InputFile.FromFileId(id), replyParameters: og.Thread), "sticker");
 
     public void SendAudio(MessageOrigin og, InputFile audio, string? art = null)
     {

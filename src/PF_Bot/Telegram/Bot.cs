@@ -8,20 +8,30 @@ namespace PF_Bot.Telegram;
 
 public partial class Bot
 {
-    public readonly ITelegramBotClient Client;
-    public readonly User Me;
+    public required ITelegramBotClient Client;
+    public required ITelegramBotClient Client_Public; // <- to work with public file ids
+    public required User Me;
 
     /// Lowercase bot username with "@" symbol.
-    public readonly string Username;
+    public required string Username;
 
     public static async Task<Bot> Create(IMessageRouter rM, ICallbackRouter rC)
     {
-        var client = Config.TelegramLocalServer
-            ? CreateTelegramBotClient_LOCAL()
-            : CreateTelegramBotClient_NORMAL();
+        Router_Message  = rM;
+        Router_Callback = rC;
+
+        var                 local = Config.TelegramLocalServer;
+        var client        = local ? CreateTelegramBotClient_LOCAL () : CreateTelegramBotClient_NORMAL();
+        var client_public = local ? CreateTelegramBotClient_NORMAL() : client;
 
         var me = await client.GetMe_AtAllCost();
-        return new Bot(client, me, rM, rC);
+        return new Bot
+        {
+            Client          = client,
+            Client_Public   = client_public,
+            Me              =     me,
+            Username        = $"@{me.Username!.ToLower()}",
+        };
     }
 
     private static ITelegramBotClient CreateTelegramBotClient_NORMAL()
@@ -54,14 +64,5 @@ public partial class Bot
         {
             Timeout = TimeSpan.FromMinutes(10),
         };
-    }
-
-    private Bot(ITelegramBotClient client, User me, IMessageRouter rM, ICallbackRouter rC)
-    {
-        Client   = client;
-        Me       =     me;
-        Username = $"@{me.Username!.ToLower()}";
-        Router_Message  = rM;
-        Router_Callback = rC;
     }
 }

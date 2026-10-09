@@ -24,7 +24,7 @@ public class Htmlizer : CommandHandlerBlocking
         if (text is null)
         {
             SetBadStatus();
-            Bot.SendSticker(Origin, InputFile.FromFileId(LOL.PickAny()));
+            Bot.SendSticker(Origin, LOL.PickAny());
         }
         else
         {

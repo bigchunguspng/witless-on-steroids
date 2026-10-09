@@ -16,7 +16,7 @@ public class Scale : FileEditor_VideoPhoto
     {
         if (Args != null)
         {
-            var args = Args.Split(' ').ToArray();
+            var args = Args.Split(' ');
 
             MultiplyIfArgIsNumber(0, 'w');
             MultiplyIfArgIsNumber(1, 'h');

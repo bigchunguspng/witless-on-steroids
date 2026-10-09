@@ -129,7 +129,7 @@ public class UseFFMpeg : FileEditor_AudioVideoPhoto
 
         var name = type is MediaType.Photo or MediaType.Stick
             ? null
-            : $"[{Desert.GetSand()}] made with piece_fap_bot.{extension}";
+            : $"piece_fap_bot-peg-{Desert.GetSand()}.{extension}";
 
         DeleteAny_MessageToEdit();
         SendFile(result, type, name);

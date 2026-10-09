@@ -20,7 +20,7 @@ public class ToVoice : FileEditor_AudioVideo
         }
 
         DeleteAny_MessageToEdit();
-        SendFile(output, MediaType.Voice, "balls.ogg");
+        SendFile(output, MediaType.Voice);
         Log($"{Title} >> VOICE ~|||~");
     }
 }

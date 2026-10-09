@@ -210,11 +210,15 @@ public abstract class FileEditor_Core : CommandHandlerAsync
 
     // SEND
 
-    protected void SendResult(string result)
+    protected void SendResult(FilePath result)
     {
-        var name = Type == MediaType.Audio
-            ? AudioFileName
-            : VideoFileName;
+        var name = Type switch
+        {
+            MediaType.Photo or MediaType.Stick or MediaType.Voice => null,
+            MediaType.Video or MediaType.Anime or MediaType.Round => VideoFileName,
+            MediaType.Audio                                       => AudioFileName,
+            _ => $"piece_fap_bot-{Desert.GetSand()}{result.Extension}",
+        };
 
         DeleteAny_MessageToEdit();
         SendFile(result, Type, name);

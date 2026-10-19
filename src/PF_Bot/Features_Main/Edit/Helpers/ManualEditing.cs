@@ -22,18 +22,22 @@ public static class ManualEditing
     }
 
     public static bool OptionsMentionsPrivateFile(string options) =>
-        options.Contains(File_Config,    StringComparison.OrdinalIgnoreCase)
+        options.Contains("..",           StringComparison.OrdinalIgnoreCase) // а я выпускал?
+     || options.Contains(File_Config,    StringComparison.OrdinalIgnoreCase)
      || options.Contains(File_Cookies,   StringComparison.OrdinalIgnoreCase)
      || options.Contains(Dir_Log + "/",  StringComparison.OrdinalIgnoreCase)
      || options.Contains(Dir_Log + "\\", StringComparison.OrdinalIgnoreCase)
      || options.Contains(Dir_DB  + "/",  StringComparison.OrdinalIgnoreCase)
-     || options.Contains(Dir_DB  + "\\", StringComparison.OrdinalIgnoreCase);
+     || options.Contains(Dir_DB  + "\\", StringComparison.OrdinalIgnoreCase)
+     || _rgx_winroot.IsMatch(options) // handle with permissions on linux
+    ;
 
     //
 
     private static readonly Regex
-        _rgx_args  = new(@"\{(\d+)(?:,-?\d+)?(?::[^}]+)?\}", RegexOptions.Compiled),
-        _rgx_alias = new(@"\$?([^\s!""',;=\]]+)!",           RegexOptions.Compiled); // change with _r_invalid
+        _rgx_winroot = new(@"[a-zA-Z]:[\\\/]",                 RegexOptions.Compiled),
+        _rgx_args    = new(@"\{(\d+)(?:,-?\d+)?(?::[^}]+)?\}", RegexOptions.Compiled),
+        _rgx_alias   = new(@"\$?([^\s!""',;=\]]+)!",           RegexOptions.Compiled); // change with _r_invalid
 
     public static bool ApplyAliases
         (this CommandContext context, ref string options, FilePath directory)

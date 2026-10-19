@@ -27,6 +27,7 @@ namespace PF_Bot.Core;
         History.Plank/
             2024-08-21 a.7819159.json    [list] <-- /planks info
 
+        bot.db
         chats.json
         GIFs.txt
         sounds.txt
@@ -99,6 +100,7 @@ public static class Paths
         Dir_History = Dir_DB.Combine("History"),
         Dir_Board   = Dir_DB.Combine("History.Board"),
         Dir_Plank   = Dir_DB.Combine("History.Plank"),
+        File_DB     = Dir_DB.Combine("bot.db"),
         File_Chats  = Dir_DB.Combine("chats.json"),
         File_GIFs   = Dir_DB.Combine("GIFs.txt"),
         File_Sounds = Dir_DB.Combine("sounds.txt"),

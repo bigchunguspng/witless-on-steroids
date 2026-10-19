@@ -52,7 +52,7 @@ public partial class Bot
     {
         WTelegram.Helpers.Log = (_, _) => { };
 
-        var db_con  = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=bot.db");
+        var db_con  = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={File_DB}");
         var options = new WTelegramBotClientOptions
             (Config.TelegramToken, Config.TelegramApiId, Config.TelegramApiHash, db_con)
         {

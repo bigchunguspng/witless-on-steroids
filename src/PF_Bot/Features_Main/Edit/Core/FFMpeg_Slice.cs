@@ -137,6 +137,8 @@ public partial class FFMpeg_Effects
         var seconds = duration.TotalSeconds;
         var minutes = seconds / 60;
 
+        var min_trim_length = soundOnly ? 0 : 1 / probe.GetVideoStream().AvgFramerate;
+
         var timecodes = new List<TrimCode>();
         var head = -seconds / 2;
         while (head < seconds) // PICK A TIMECODE
@@ -161,6 +163,7 @@ public partial class FFMpeg_Effects
             length *= piece_len_mul;
 
             if (soundOnly && minutes < 3) length *= RandomDouble(1.5, 3);
+            if (soundOnly.Janai()) length = Math.Max(length, min_trim_length);
 
             var a = Math.Clamp(head + step, 0, seconds);
             var b = Math.Min(a + length, seconds);

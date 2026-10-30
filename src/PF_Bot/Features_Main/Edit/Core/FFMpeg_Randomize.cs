@@ -23,7 +23,7 @@ public partial class FFMpeg_Effects
     {
         var soundOnly = SoundOnly();
         var timecodes = GetTrimCodes(piece_len_mul, break_len_mul, soundOnly, selection, 200, options.Ordered.IsOff());
-        var fragments = GenerateSchematic(timecodes, options, soundOnly);
+        var fragments = GenerateSchematic(timecodes, options, soundOnly, selection);
 
         // todo random-specific slicing code
         // repeats - not equal in length, may be offset
@@ -52,12 +52,16 @@ public partial class FFMpeg_Effects
     // PHASE I
 
     private List<Fragment> GenerateSchematic
-        (List<TrimCode> timecodes, RandomizeOptions options, bool soundOnly)
+        (List<TrimCode> timecodes, RandomizeOptions options, bool soundOnly, TimeSelection selection)
     {
         var fragments = new List<Fragment>(timecodes.Count);
 
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
+
+        var duration = selection.GetDuration(probe);
+        var seconds = duration.TotalSeconds;
+        var min_trim_length = soundOnly ? 0 : 1 / probe.GetVideoStream().AvgFramerate;
 
         // MAP + REPEATS
         var adjust_timecodes = IsOneIn(2);
@@ -76,6 +80,18 @@ public partial class FFMpeg_Effects
                     var length = timecode.Length;
                     var start  = timecode.Start + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
                     var end    = timecode.End   + (adjust_timecodes ? RandomDouble(-0.25 * length, 0.25 * length) : 0);
+                    if (adjust_timecodes)
+                    {
+                        if (start < 0) start = 0;
+                        if (end > seconds) end = seconds;
+                        if (end - start < min_trim_length)
+                        {
+                            if (start + min_trim_length < seconds)
+                                end = start + min_trim_length;
+                            else
+                                start = end - min_trim_length;
+                        }
+                    }
                     fragments.Add(new Fragment(new TrimCode(start, end)));
                 }
             }

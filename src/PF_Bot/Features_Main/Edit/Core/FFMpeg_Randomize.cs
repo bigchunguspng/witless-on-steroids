@@ -149,6 +149,7 @@ public partial class FFMpeg_Effects
         var video = probe.HasVideo && soundOnly.Janai();
         var audio = probe.HasAudio;
         var singleInput = ShouldBeSingleInput(count);
+        var weird_SAR = video && probe.GetVideoStream().SAR != "1:1";
 
         // FRAG FX
         var fx = false;
@@ -157,10 +158,10 @@ public partial class FFMpeg_Effects
         {
             var frag = fragments[i];
 
-            var vfx = video && (singleInput || frag.UseOriginalVideo.Janai());
+            var vfx = video && (singleInput || frag.UseOriginalVideo.Janai() || weird_SAR);
             var afx = audio && (singleInput || frag.UseOriginalAudio.Janai());
 
-            if (vfx) AddVideoFilters(frag, i, singleInput);
+            if (vfx) AddVideoFilters(frag, i, singleInput, weird_SAR);
             if (afx) AddAudioFilters(frag, i, singleInput);
 
             fx |= afx || vfx;
@@ -174,7 +175,7 @@ public partial class FFMpeg_Effects
             var frag = fragments[i];
 
             if (video)
-                _ = singleInput.Janai() && frag.UseOriginalVideo
+                _ = singleInput.Janai() && frag.UseOriginalVideo && weird_SAR.Janai()
                     ? _args.FilterAppend($"[{i}:v]")
                     : _args.FilterAppend($"[v{i}]");
             if (audio)
@@ -186,7 +187,7 @@ public partial class FFMpeg_Effects
         _args.FilterAppend($"concat=n={count}:v={(video ? 1 : 0)}:a={(audio ? 1 : 0)}");
     }
 
-    private void AddVideoFilters(Fragment frag, int i, bool singleInput)
+    private void AddVideoFilters(Fragment frag, int i, bool singleInput, bool weird_SAR)
     {
         _args.Filter($"[{(singleInput ? 0 : i)}:v]");
 
@@ -282,10 +283,11 @@ public partial class FFMpeg_Effects
                 _args.FilterAppend($":(iw-out_w)*0.5*(1+sin(t*({speed})-{offset}))");
                 _args.FilterAppend($":(ih-out_h)*0.5*(1+sin(t*({speed})+{offset}*2))");
             }
+        }
 
-            var sar = video.SAR?.Contains(':') ?? false ? video.SAR.Replace(':', '/') : "1/1";
-            var dar = video.DAR?.Contains(':') ?? false ? video.DAR.Replace(':', '/') : "1/1";
-            _args.FilterAppend($"setsar=sar={sar},setdar=dar={dar}");
+        if (frag.Crop || weird_SAR)
+        {
+            _args.FilterAppend("setsar=sar=1");
         }
 
         if (frag.Nuke > 0)
